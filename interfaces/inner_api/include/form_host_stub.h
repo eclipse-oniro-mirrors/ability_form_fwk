@@ -42,6 +42,9 @@ public:
     virtual int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
+protected:
+    virtual int32_t CheckPermission();
+
 private:
     /**
      * @brief handle OnAcquired message.

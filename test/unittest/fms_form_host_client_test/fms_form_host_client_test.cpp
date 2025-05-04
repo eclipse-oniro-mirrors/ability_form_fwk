@@ -140,7 +140,7 @@ HWTEST_F(FmsFormHostClientTest, AddFormState_0200, TestSize.Level0)
     EXPECT_EQ(result, true);
     formHostClient->OnAcquireState(FormState::DEFAULT, want);
     FormState state = formStateCallback->GetFormState();
-    EXPECT_EQ(state, FormState::UNKNOWN);
+    EXPECT_EQ(state, FormState::DEFAULT);
     formHostClient->RemoveFormState(want);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest AddFormState_0200 end";
 }
@@ -511,7 +511,7 @@ HWTEST_F(FmsFormHostClientTest, OnAcquired_0200, TestSize.Level0)
     callbackSet.emplace(callback);
     formHostClient->formCallbackMap_.emplace(formId, callbackSet);
 
-    EXPECT_CALL(*callback, ProcessFormUpdate(_)).Times(0);
+    EXPECT_CALL(*callback, ProcessFormUpdate(_)).Times(1);
     FormJsInfo formJsInfo;
     formJsInfo.formId = formId;
     sptr<MockFormToken> token = nullptr;
@@ -536,7 +536,7 @@ HWTEST_F(FmsFormHostClientTest, OnUpdate_0100, TestSize.Level0)
     callbackSet.emplace(callback);
     formHostClient->formCallbackMap_.emplace(formId, callbackSet);
 
-    EXPECT_CALL(*callback, ProcessFormUpdate(_)).Times(0);
+    EXPECT_CALL(*callback, ProcessFormUpdate(_)).Times(1);
     FormJsInfo formJsInfo;
     formJsInfo.formId = formId;
     formHostClient->OnUpdate(formJsInfo);
@@ -560,7 +560,7 @@ HWTEST_F(FmsFormHostClientTest, OnUninstall_0200, TestSize.Level0)
     int64_t formId = 10;
     formHostClient->formCallbackMap_.emplace(formId, callbackSet);
 
-    EXPECT_CALL(*callback, ProcessFormUninstall(_)).Times(0);
+    EXPECT_CALL(*callback, ProcessFormUninstall(_)).Times(1);
     std::vector<int64_t> formIds;
     formIds.emplace_back(-1);
     formIds.emplace_back(100);
@@ -587,7 +587,7 @@ HWTEST_F(FmsFormHostClientTest, OnShareFormResponse_0100, TestSize.Level0)
     auto callback = std::make_shared<ShareFormCallBackMock>();
     formHostClient->shareFormCallbackMap_.emplace(requestCode, callback);
 
-    EXPECT_CALL(*callback, ProcessShareFormResponse(_)).Times(0);
+    EXPECT_CALL(*callback, ProcessShareFormResponse(_)).Times(1);
     int32_t result = 0;
     formHostClient->OnShareFormResponse(2, result);
     formHostClient->OnShareFormResponse(requestCode, result);
@@ -640,7 +640,7 @@ HWTEST_F(FmsFormHostClientTest, OnEnableForm_0300, TestSize.Level0)
     int64_t formId = 10;
     formHostClient->formCallbackMap_.emplace(formId, callbackSet);
 
-    EXPECT_CALL(*callback, ProcessEnableForm(_)).Times(0);
+    EXPECT_CALL(*callback, ProcessEnableForm(_)).Times(1);
     std::vector<int64_t> formIds;
     formIds.emplace_back(-1);
     formIds.emplace_back(formId);

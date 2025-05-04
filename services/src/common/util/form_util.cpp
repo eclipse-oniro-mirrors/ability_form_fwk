@@ -23,6 +23,7 @@
 
 #include "accesstoken_kit.h"
 #include "bundle_constants.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "ipc_skeleton.h"
@@ -1727,5 +1728,16 @@ long long FormUtil::ConvertStringToLongLong(const std::string &strInfo, int radi
 {
     return static_cast<long long>(strtoll(strInfo.c_str(), nullptr, radix));
 }
+
+bool FormUtil::CheckIsFRSCall()
+{
+    std::string callBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Get bundleName failed");
+        return false;
+    }
+    return callBundleName == Constants::FRS_BUNDLE_NAME;
+};
 } // namespace AppExecFwk
 } // namespace OHOS

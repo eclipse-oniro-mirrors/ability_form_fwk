@@ -75,10 +75,6 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         "%{public}s, moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{public}s,", formJsInfo.formId,
         formJsInfo.bundleName.c_str(), formJsInfo.abilityName.c_str(), formJsInfo.formName.c_str(),
         formJsInfo.moduleName.c_str(), formJsInfo.jsFormCodePath.c_str(), formJsInfo.formSrc.c_str());
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     {
         std::lock_guard<std::mutex> lock(formSupplyMutex_);
@@ -125,10 +121,6 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
     const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null IFormSupply");
@@ -186,10 +178,6 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
 int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid)
 {
     HILOG_INFO("formId:%{public}" PRId64 ",compId:%{public}s,uid:%{public}s", formId, compId.c_str(), uid.c_str());
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     sptr<IFormSupply> formSupplyClient = nullptr;
     {
         std::lock_guard<std::mutex> lock(formSupplyMutex_);
@@ -231,10 +219,6 @@ int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compI
 int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
 {
     HILOG_INFO("Form host is died,clean renderRecord");
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end();) {
         auto renderRecord = iter->second;
@@ -255,10 +239,6 @@ int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
 int32_t FormRenderImpl::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("ReloadForm start");
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
         HILOG_ERROR("Get uid failed");
@@ -283,10 +263,6 @@ int32_t FormRenderImpl::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, 
 int32_t FormRenderImpl::OnUnlock()
 {
     HILOG_INFO("OnUnlock start");
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (isVerified_) {
         HILOG_WARN("Has been unlocked in render form, maybe miss or delay unlock event");
@@ -305,10 +281,6 @@ int32_t FormRenderImpl::OnUnlock()
 int32_t FormRenderImpl::SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want)
 {
     HILOG_INFO("formId:%{public}" PRId64 " isVisble: %{public}d", formId, isVisible);
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     if (formId <= 0) {
         HILOG_ERROR("formId is negative");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -430,10 +402,6 @@ void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Co
 void FormRenderImpl::RunCachedConfigurationUpdated()
 {
     HILOG_INFO("RunCachedConfigUpdated");
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return;
-    }
     if (hasCachedConfig_) {
         OnConfigurationUpdatedInner();
     }
@@ -468,10 +436,6 @@ void FormRenderImpl::FormRenderGC(const std::string &uid)
 
 int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
 {
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     if (formId <= 0) {
         HILOG_ERROR("formId is negative");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -523,10 +487,6 @@ int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
 
 int32_t FormRenderImpl::RecoverForm(const FormJsInfo &formJsInfo, const Want &want)
 {
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     auto formId = formJsInfo.formId;
     if (formId <= 0) {
         HILOG_ERROR("formId is negative");
@@ -579,10 +539,6 @@ void FormRenderImpl::ConfirmUnlockState(Want &renderWant)
 int32_t FormRenderImpl::UpdateFormSize(
     const int64_t &formId, float width, float height, float borderWidth, const std::string &uid)
 {
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
@@ -600,6 +556,15 @@ bool FormRenderImpl::CheckIsFoundationCall()
 {
     return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
 };
+
+int32_t FormRenderImpl::CheckPermission()
+{
+    if (!CheckIsFoundationCall()) {
+        HILOG_ERROR("Caller not foundation");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return ERR_OK;
+}
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS

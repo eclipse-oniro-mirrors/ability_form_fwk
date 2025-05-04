@@ -167,10 +167,6 @@ FormMgrService::~FormMgrService()
 
 bool FormMgrService::CheckFMSReady()
 {
-    if (!CheckIsHostCall()) {
-        HILOG_ERROR("Caller not host");
-        return false;
-    }
     if (state_ != ServiceRunningState::STATE_RUNNING) {
         return false;
     }
@@ -190,7 +186,10 @@ bool FormMgrService::CheckFMSReady()
 bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
 {
     HILOG_DEBUG("check %{public}s is system form.", bundleName.c_str());
-
+    if (!FormUtil::CheckIsFRSCall()) {
+        HILOG_ERROR("lxg Caller not frs");
+        return false;
+    }
     std::vector<FormRecord> formRecords;
     FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecords);
     if (formRecords.empty()) {
@@ -2060,11 +2059,6 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
-}
-
-bool FormMgrService::CheckIsHostCall()
-{
-    return CheckIsSystemAppCall() && FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
 }
 
 bool FormMgrService::CheckIsSystemAppCall()
