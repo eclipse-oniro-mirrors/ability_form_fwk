@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { BusinessError } from '@ohos.base';
+import { BusinessError，AsyncCallback } from '@ohos.base';
 
 export namespace formProvider {
 
@@ -22,26 +22,13 @@ export namespace formProvider {
   native function setFormNextRefreshTime_inner(formId: string, minute: number): void;
 
   export function setFormNextRefreshTime(formId: string, minute: number): Promise<BusinessError> {
-    return new Promise<BusinessError>((resolve, reject): void => {
-      taskpool.execute((): void => { return setFormNextRefreshTime_inner(formId, minute); })
-        .then((ret: NullishType): void => {
-          let r = ret as BusinessError;
-          resolve(r);
-        })
-        .catch((ret: NullishType): void => {
-          reject(ret as BusinessError);
-        });
+    return new Promise<void>(() => {
+      setFormNextRefreshTime_inner(formId, minute);
     });
   }
 
   export function setFormNextRefreshTime(formId: string, minute: number,
-    callback: (err: BusinessError) => void): void {
-    taskpool.execute((): void => { return setFormNextRefreshTime_inner(formId, minute); })
-      .then((ret: NullishType): void => {
-        callback(new BusinessError());
-      })
-      .catch((ret: NullishType): void => {
-        callback(ret as BusinessError);
-      });
+    callback: AsyncCallback<void>): void {
+    setFormNextRefreshTime_inner(formId, minute);
   }
 }
