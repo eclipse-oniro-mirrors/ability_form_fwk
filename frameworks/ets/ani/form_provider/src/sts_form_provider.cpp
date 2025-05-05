@@ -89,7 +89,7 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
 {
     HILOG_INFO("Call");
     ani_size strSize;
-    if ( env->String_GetUTF8Size(aniStr, &strSize) != ANI_OK) {
+    if (env->String_GetUTF8Size(aniStr, &strSize) != ANI_OK) {
         HILOG_ERROR("String_GetUTF8Size Failed");
         return "";
     }
@@ -98,7 +98,7 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
     char *utf8Buffer = buffer.data();
 
     ani_size bytesWritten = 0;
-    if ( env->String_GetUTF8(aniStr, utf8Buffer, strSize + 1, &bytesWritten) != ANI_OK ) {
+    if (env->String_GetUTF8(aniStr, utf8Buffer, strSize + 1, &bytesWritten) != ANI_OK) {
         HILOG_ERROR("String_GetUTF8 Failed");
         return "";
     }
