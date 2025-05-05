@@ -57,6 +57,13 @@ public:
     {
         return 0;
     }
+
+protected:
+    int32_t CheckPermission() override
+    {
+        return 0;
+    }
+};
 };
 
 uint32_t GetU32Data(const char* ptr)
