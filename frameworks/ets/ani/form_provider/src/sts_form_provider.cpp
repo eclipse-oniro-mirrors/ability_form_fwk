@@ -84,26 +84,26 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
     return false;
 }
 
-std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string ani_str)
+std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
 {
     HILOG_INFO("Call");
     ani_size strSize;
-    if (ANI_OK != env->String_GetUTF8Size(ani_str, &strSize)) {
+    if (ANI_OK != env->String_GetUTF8Size(aniStr, &strSize)) {
         HILOG_ERROR("String_GetUTF8Size Failed");
         return "";
     }
 
     std::vector<char> buffer(strSize + 1);
-    char *utf8_buffer = buffer.data();
+    char *utf8Buffer = buffer.data();
 
-    ani_size bytes_written = 0;
-    if (ANI_OK != env->String_GetUTF8(ani_str, utf8_buffer, strSize + 1, &bytes_written)) {
+    ani_size bytesWritten = 0;
+    if (ANI_OK != env->String_GetUTF8(aniStr, utf8Buffer, strSize + 1, &bytesWritten)) {
         HILOG_ERROR("String_GetUTF8 Failed");
         return "";
     }
 
-    utf8_buffer[bytes_written] = '\0';
-    std::string content = std::string(utf8_buffer);
+    utf8Buffer[bytesWritten] = '\0';
+    std::string content = std::string(utf8Buffer);
     HILOG_INFO("End");
     return content;
 }
