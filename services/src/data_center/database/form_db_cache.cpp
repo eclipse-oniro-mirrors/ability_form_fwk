@@ -451,9 +451,16 @@ void FormDbCache::DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap)
     HILOG_INFO("call");
     std::vector<int64_t> removeList;
     for (const auto &element : removedFormsMap) {
-        removeList.emplace_back(element.first);
+        FormDBInfo dbInfo;
+        ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(element.first, dbInfo);
+        HILOG_INFO("getDbRet:%{public}d, isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
+        if (getDbRet == ERR_OK && dbInfo.isThemeForm) {
+            removeList.emplace_back(element.first);
+        }
     }
-    ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
+    if (!removeList.empty()) {
+        ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
+    }
 }
 #endif
 
