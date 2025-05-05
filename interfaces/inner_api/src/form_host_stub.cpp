@@ -250,9 +250,5 @@ int32_t FormHostStub::HandleOnErrorForms(MessageParcel &data, MessageParcel &rep
     return ERR_OK;
 }
 
-int32_t FormHostStub::CheckPermission()
-{
-    return ERR_OK;
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS

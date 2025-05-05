@@ -43,7 +43,7 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
 protected:
-    virtual int32_t CheckPermission();
+    virtual int32_t CheckPermission() = 0;
 
 private:
     /**

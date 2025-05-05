@@ -287,10 +287,5 @@ int32_t FormRenderStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel 
     reply.WriteInt32(result);
     return result;
 }
-
-int32_t FormRenderStub::CheckPermission()
-{
-    return ERR_OK;
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS

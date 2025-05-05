@@ -187,7 +187,7 @@ bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
 {
     HILOG_DEBUG("check %{public}s is system form.", bundleName.c_str());
     if (!FormUtil::CheckIsFRSCall()) {
-        HILOG_ERROR("lxg Caller not frs");
+        HILOG_ERROR("Caller not frs");
         return false;
     }
     std::vector<FormRecord> formRecords;
