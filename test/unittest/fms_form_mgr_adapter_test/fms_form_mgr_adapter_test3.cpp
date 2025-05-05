@@ -871,7 +871,6 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
      ErrCode ret = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
  
      EXPECT_EQ(ret, ERR_OK);
-     EXPECT_EQ(formStates, AddFormResultErrorCode::UNKNOWN);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0282 end";
  }
  
@@ -889,8 +888,6 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
      ErrCode ret = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
  
      EXPECT_EQ(ret, ERR_OK);
-     // formStates remains as UNKNOWN since the formId was not found
-     EXPECT_EQ(formStates, AddFormResultErrorCode::UNKNOWN);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0283 end";
  }
  

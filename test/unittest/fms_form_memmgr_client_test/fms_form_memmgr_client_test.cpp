@@ -56,22 +56,7 @@ void FmsFormMemmgrClientTest::TearDown() {}
 HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_001 start";
-
-    void* handle = dlopen("libmemmgrclient.z.so", RTLD_LAZY);
-    if (!handle) {
-        EXPECT_TRUE(false);
-        return;
-    }
-
-    void *setcritical = (dlsym(handle, "set_critical"));
-    if (!setcritical) {
-        GTEST_LOG_(INFO) << "dlsym set_critical failed.";
-        dlclose(handle);
-        EXPECT_TRUE(true);
-        return;
-    }
-
-    EXPECT_TRUE(true);
+    FormMemmgrClient::GetInstance().SetCritical(false);
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_001 end";
 }
 

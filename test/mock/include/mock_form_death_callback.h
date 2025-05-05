@@ -79,6 +79,32 @@ public:
     {
         HILOG_INFO("%{public}s called.", __func__);
     }
+
+    /**
+     * @brief Recycle form.
+     */
+    void ProcessRecycleForm()
+    {
+        HILOG_INFO("%{public}s called.", __func__);
+    }
+
+    /**
+     * @brief Enable form.
+     * @param enable True is enable form, false is disable form.
+     */
+    void ProcessEnableForm(bool enable)
+    {
+        HILOG_INFO("%{public}s called.", __func__);
+    }
+
+    /**
+     * @brief Lock form.
+     * @param enable True is lock form, false is unlock form.
+     */
+    void ProcessLockForm(bool lock)
+    {
+        HILOG_INFO("%{public}s called.", __func__);
+    }
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
