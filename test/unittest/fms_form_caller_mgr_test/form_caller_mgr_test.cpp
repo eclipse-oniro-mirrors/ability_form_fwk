@@ -289,7 +289,7 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0013, TestSize.Level1) {
  * @tc.desc: test GetEventHandler function eventHandler is nullptr
  * @tc.type: FUNC
  */
- HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0015, TestSize.Level1) {
+HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0015, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0015 starts";
     // create eventHandler_
     FormCallerMgr::GetInstance().GetEventHandler();

@@ -157,13 +157,13 @@ HWTEST_F(FmsFormHostRecordTest, OnRemoteDied_001, TestSize.Level0)
  * @tc.desc: test GetBundleMgr function.
  * @tc.type: GetBundleMgr
  */
- HWTEST_F(FmsFormHostRecordTest, FormDbCache_001, TestSize.Level0)
- {
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_001, TestSize.Level0)
+{
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_001 start";
     FormBmsHelper formBmsHelper;
     EXPECT_NE(formBmsHelper.GetBundleMgr(), nullptr);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_001 end";
- }
+}
 
 /**
  * @tc.name: FormDbCache_002
