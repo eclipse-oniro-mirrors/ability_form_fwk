@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <iostream>
 #include <vector>
 #include <cinttypes>
@@ -112,6 +113,10 @@ void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, an
 {
     HILOG_INFO("Call");
 
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_boolean isUndefined;
     env->Reference_IsUndefined(formId, &isUndefined);
     if (isUndefined) {
@@ -126,7 +131,7 @@ void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, an
     }
 
     int64_t formIdNum;
-    if (ConvertStringToInt64(stdFormId, formIdNum) != true) {
+    if (!ConvertStringToInt64(stdFormId, formIdNum)) {
         HILOG_ERROR("ConvertStringToInt64 failed");
         return;
     }
