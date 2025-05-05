@@ -1502,14 +1502,13 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
 
 void FormMgrAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation)
 {
+    bool isFormBundleForbidden =
+        FormBundleForbidMgr::GetInstance().IsBundleForbidden(formConfigInfo.GetProviderBundleName());
+    formConfigInfo.SetEnableForm(!isFormBundleForbidden);
     // form is always visible on the lock screen
     if (formLocation == static_cast<int>(Constants::FormLocation::SCREEN_LOCK)) {
-        formConfigInfo.SetEnableForm(true);
         formConfigInfo.SetLockForm(false);
     } else {
-        bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
-            formConfigInfo.GetProviderBundleName());
-        formConfigInfo.SetEnableForm(!isFormBundleForbidden);
         SetLockFormStateOfFormItemInfo(formInfo, formConfigInfo);
     }
 }
