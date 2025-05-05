@@ -51,7 +51,7 @@ public:
 protected:
     int32_t CheckPermission() override
     {
-        return 0;
+        return ERR_OK;
     }
 };
 

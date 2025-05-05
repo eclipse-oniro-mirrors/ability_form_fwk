@@ -98,7 +98,7 @@ void MockFormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const
 
 int32_t MockFormHostClient::CheckPermission()
 {
-    return 0;
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -1738,6 +1738,6 @@ bool FormUtil::CheckIsFRSCall()
         return false;
     }
     return callBundleName == Constants::FRS_BUNDLE_NAME;
-};
+}
 } // namespace AppExecFwk
 } // namespace OHOS
