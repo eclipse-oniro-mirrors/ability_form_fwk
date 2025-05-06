@@ -39,6 +39,7 @@
 #ifdef THEME_MGR_ENABLE
 #include "theme_manager_client.h"
 #endif
+#include "configuration.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -634,6 +635,12 @@ public:
      */
     ErrCode BatchRefreshForms(const int32_t formRefreshType);
 
+    /**
+     * @brief notify formAbility when system configuration changed.
+     * @param configuration system config
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Configuration &configuration);
 #ifdef RES_SCHEDULE_ENABLE
     /**
      * @brief Set the value which indicate whether Refresh Timer task should be triggered.

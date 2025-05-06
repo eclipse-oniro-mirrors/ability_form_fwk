@@ -4065,6 +4065,33 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
     return ERR_OK;
 }
 
+ErrCode FormMgrAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Configuration &configuration)
+{
+    std::vector<FormRecord> visibleFormRecords;
+    std::vector<FormRecord> invisibleFormRecords;
+    std::set<std::string> notified;
+    FormDataMgr::GetInstance().GetRecordsByFormType(Constants::REFRESH_SYSTEMAPP_FORM,
+        visibleFormRecords, invisibleFormRecords);
+    HILOG_INFO("getRecords visible size:%{public}zu, invisible size:%{public}zu",
+        visibleFormRecords.size(), invisibleFormRecords.size());
+    Want reqWant;
+    for (auto formRecord : visibleFormRecords) {
+        if (notified.find(formRecord.bundleName + formRecord.abilityName) != notified.end()) {
+            continue;
+        }
+        notified.insert(formRecord.bundleName + formRecord.abilityName);
+        FormProviderMgr::GetInstance().ConnectForConfigUpdate(configuration, formRecord, reqWant);
+    }
+    for (auto formRecord : invisibleFormRecords) {
+        if (notified.find(formRecord.bundleName + formRecord.abilityName) != notified.end()) {
+            continue;
+        }
+        notified.insert(formRecord.bundleName + formRecord.abilityName);
+        FormProviderMgr::GetInstance().ConnectForConfigUpdate(configuration, formRecord, reqWant);
+    }
+    return ERR_OK;
+}
+
 #ifdef RES_SCHEDULE_ENABLE
 void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {

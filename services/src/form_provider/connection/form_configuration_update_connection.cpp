@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "form_provider/connection/form_refresh_connection.h"
+#include "form_provider/connection/form_configuration_update_connection.h"
 
 #include <cinttypes>
 
@@ -26,15 +26,14 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want& want,
-    const std::string &bundleName, const std::string &abilityName, bool isFreeInstall)
-    : want_(want)
+ConfigurationUpdateConnection::ConfigurationUpdateConnection(const int64_t formId, const Want& want,
+    const std::string &bundleName, const std::string &abilityName,
+    AppExecFwk::Configuration configuration): want_(want), configuration_(configuration)
 {
     SetFormId(formId);
-    SetFreeInstall(isFreeInstall);
     SetProviderKey(bundleName, abilityName);
 }
-
+ 
 /**
  * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
  *
@@ -42,7 +41,7 @@ FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want& w
  * @param remoteObject The session proxy of service ability.
  * @param resultCode ERR_OK on success, others on failure.
  */
-void FormRefreshConnection::OnAbilityConnectDone(
+void ConfigurationUpdateConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     HILOG_INFO("call");
@@ -53,25 +52,12 @@ void FormRefreshConnection::OnAbilityConnectDone(
         return;
     }
     onFormAppConnect();
-    sptr<FormRefreshConnection> connection(this);
+    sptr<ConfigurationUpdateConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
 
-    if (want_.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
-        std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);
-        Want msgWant = Want(want_);
-        msgWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-        FormTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, msgWant, remoteObject);
-    } else if (want_.HasParameter(Constants::RECREATE_FORM_KEY)) {
-        Want cloneWant = Want(want_);
-        cloneWant.RemoveParam(Constants::RECREATE_FORM_KEY);
-        cloneWant.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_RECREATE_FORM);
-        cloneWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-        FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), cloneWant, remoteObject);
-    } else {
-        Want want = Want(want_);
-        want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-        FormTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
-    }
+    Want want = Want(want_);
+    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
+    FormTaskMgr::GetInstance().NotifyConfigurationUpdate(configuration_, want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

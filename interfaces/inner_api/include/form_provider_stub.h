@@ -87,6 +87,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int HandleNotifyFormCastTempForm(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle HandleNotifyConfigurationUpdate message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int HandleNotifyConfigurationUpdate(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief handle NotifyFormCastTempForm message.
      * @param data input param.
