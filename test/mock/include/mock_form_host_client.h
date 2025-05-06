@@ -118,6 +118,10 @@ public:
      * @param enable True is enableform, false is disableform.
      */
     void OnEnableForm(const std::vector<int64_t> &formIds, const bool enable) override;
+
+protected:
+    int32_t CheckPermission() override;
+
 private:
     Semaphore sem_;
     DISALLOW_COPY_AND_MOVE(MockFormHostClient);

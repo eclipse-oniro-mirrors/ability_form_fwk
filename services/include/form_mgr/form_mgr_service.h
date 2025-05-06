@@ -784,7 +784,6 @@ private:
     static std::string GetCurrentDateTime();
     void SetNetConnect();
     void SetDisConnectTypeTime();
-    bool CheckIsHostCall();
     bool CheckIsSystemAppCall();
 
 private:

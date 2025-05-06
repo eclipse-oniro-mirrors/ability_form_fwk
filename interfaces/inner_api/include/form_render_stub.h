@@ -42,6 +42,9 @@ public:
     virtual int32_t OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
+protected:
+    virtual int32_t CheckPermission() = 0;
+
 private:
     /**
      * @brief handle render form message.

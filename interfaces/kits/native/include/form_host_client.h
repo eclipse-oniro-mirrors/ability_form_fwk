@@ -212,6 +212,10 @@ public:
      * @param lock True is lockform, false is unlockform.
      */
     void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) override;
+
+protected:
+    int32_t CheckPermission() override;
+
 private:
     bool CheckIsFoundationCall();
 
