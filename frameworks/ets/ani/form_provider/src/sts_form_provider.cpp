@@ -117,7 +117,7 @@ void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, an
         HILOG_ERROR("env is nullptr");
         return;
     }
-    ani_boolean isUndefined;
+    ani_boolean isUndefined = false;
     env->Reference_IsUndefined(formId, &isUndefined);
     if (isUndefined) {
         HILOG_ERROR("formId is undefined");
@@ -189,6 +189,5 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     return ANI_OK;
 }
 }
-
 }  // namespace AbilityRuntime
 }  // namespace OHOS
