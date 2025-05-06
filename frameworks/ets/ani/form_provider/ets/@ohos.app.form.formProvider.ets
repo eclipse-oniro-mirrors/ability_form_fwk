@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { BusinessError，AsyncCallback } from '@ohos.base';
+import { BusinessError, AsyncCallback } from '@ohos.base';
 
 export namespace formProvider {
 
