@@ -31,7 +31,13 @@ using namespace OHOS::AppExecFwk;
 constexpr int ZERO_VALUE = 0;
 constexpr int INT_64_LENGTH = 19;
 constexpr int BASE_NUMBER = 9;
+constexpr int BASE_REQUEST_CODE_NUM = 10;
 constexpr int64_t HEAD_BIT_NUM = 9000000000000000000;
+
+int ConvertStringToInt(const std::string &strInfo)
+{
+    return static_cast<int>(strtoll(strInfo.c_str(), nullptr, BASE_REQUEST_CODE_NUM));
+}
 
 bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
 {
@@ -49,7 +55,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
                 int64Value = std::stoll(strInfo);
                 return true;
             }
-            int maxSubValue = std::stoi(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
+            int maxSubValue = ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
             if (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER) {
                 int64Value = std::stoll(strInfo);
                 return true;
@@ -67,7 +73,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
             return true;
         }
         if (strLength == INT_64_LENGTH + 1) {
-            int minSubValue = std::stoi(strInfo.substr(1, 1));
+            int minSubValue = ConvertStringToInt(strInfo.substr(1, 1));
             if (minSubValue < BASE_NUMBER) {
                 int64Value = std::stoll(strInfo);
                 return true;
