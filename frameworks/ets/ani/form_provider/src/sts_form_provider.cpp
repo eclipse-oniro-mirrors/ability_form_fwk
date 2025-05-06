@@ -110,7 +110,7 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
     }
 
     utf8Buffer[bytesWritten] = '\0';
-    std::string content = std::string(utf8Buffer);
+    std::string content = std::string(utf8Buffer, sizeof(utf8Buffer));
     HILOG_INFO("End");
     return content;
 }
