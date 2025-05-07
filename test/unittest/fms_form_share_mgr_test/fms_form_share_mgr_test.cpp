@@ -114,7 +114,6 @@ public:
     MOCK_METHOD2(OnError, void(int32_t errorCode, const std::string &errorMsg));
     MOCK_METHOD3(OnError, void(int32_t errorCode, const std::string &errorMsg, std::vector<int64_t> &formIds));
     MOCK_METHOD2(OnAcquireDataResponse, void(const AAFwk::WantParams &wantParams, int64_t requestCode));
-    MOCK_METHOD0(CheckPermission, int());
 };
 
 static sptr<BundleMgrService> bundleMgr_ = nullptr;
