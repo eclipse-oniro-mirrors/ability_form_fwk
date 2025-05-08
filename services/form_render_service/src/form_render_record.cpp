@@ -393,6 +393,10 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     HILOG_DEBUG("Updated record");
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     if (renderType == Constants::RENDER_FORM) {
+        // Manager delegate proxy invalid, do not render form
+        if (!CheckManagerDelegateValid(formJsInfo, want)) {
+            return RENDER_FORM_FAILED;
+        }
         renderFormTasksNum++;
     }
     {
