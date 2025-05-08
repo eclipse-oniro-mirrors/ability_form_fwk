@@ -161,11 +161,7 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_001 start";
     FormBmsHelper formBmsHelper;
-    bool formBms = true;
-    if (nullptr != formBmsHelper.GetBundleMgr()) {
-        formBms = false;
-    }
-    EXPECT_EQ(false, formBms);
+    EXPECT_NE(formBmsHelper.GetBundleMgr(), nullptr);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_001 end";
 }
 

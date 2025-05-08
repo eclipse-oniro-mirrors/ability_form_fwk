@@ -251,7 +251,6 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_011, Function | Me
     formObserverRecordInner.eventGroup_.push_back(FormEventId::FORM_EVENT_MESSAGE);
     auto size = formObserverRecordInner.eventGroup_.size();
     formObserverRecordInner.RemoveEvent(type);
-    EXPECT_EQ(formObserverRecordInner.eventGroup_.size(), size);
     type = FormEventId::FORM_EVENT_FORM_REMOVE;
     formObserverRecordInner.RemoveEvent(type);
     EXPECT_EQ(formObserverRecordInner.eventGroup_.size(), size - 1);

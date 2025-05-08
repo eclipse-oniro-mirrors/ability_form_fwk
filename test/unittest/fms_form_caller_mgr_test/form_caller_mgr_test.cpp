@@ -285,22 +285,6 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0013, TestSize.Level1) {
 }
 
 /**
- * @tc.name: FormCallerMgrTest_0014
- * @tc.desc: test GetEventHandler function eventHandler is nullptr
- * @tc.type: FUNC
- */
-HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0014, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormCallerMgrTest_0014 starts";
-    bool result = true;
-    // test GetEventHandler
-    if (FormCallerMgr::GetInstance().GetEventHandler() != nullptr) {
-        result = false;
-    }
-    EXPECT_EQ(false, result);
-    GTEST_LOG_(INFO) << "FormCallerMgrTest_0014 test ends";
-}
-
-/**
  * @tc.name: FormCallerMgrTest_0015
  * @tc.desc: test GetEventHandler function eventHandler is nullptr
  * @tc.type: FUNC
@@ -309,12 +293,7 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0015, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0015 starts";
     // create eventHandler_
     FormCallerMgr::GetInstance().GetEventHandler();
-    // test GetEventHandler
-    bool result = true;
-    if (FormCallerMgr::GetInstance().GetEventHandler() != nullptr) {
-        result = false;
-    }
-    EXPECT_EQ(false, result);
+    EXPECT_NE(FormCallerMgr::GetInstance().GetEventHandler(), nullptr);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0015 test ends";
 }
 

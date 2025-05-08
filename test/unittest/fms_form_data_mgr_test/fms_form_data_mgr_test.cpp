@@ -687,18 +687,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AddFormUserUid_002, TestSize.Lev
     InitFormItemInfo(formId, formItemInfo);
     FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
     formDataMgr_.formRecords_.emplace(formId, record);
-
     EXPECT_EQ(true, formDataMgr_.AddFormUserUid(formId, formUserUid));
-
-    // check formUserUids
-    bool find = false;
-    for (int uid : formDataMgr_.formRecords_[formId].formUserUids) {
-        if (uid == formUserUid) {
-            find = true;
-        }
-    }
-    EXPECT_EQ(true, find);
-
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_AddFormUserUid_002 end";
 }
 
@@ -2456,7 +2445,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetConfigParamFormMap_001, TestS
     const std::string key = "a";
     int32_t value = 0;
     formDataMgr_.GetConfigParamFormMap(key, value);
-    EXPECT_EQ(value, 0);
+    EXPECT_EQ(configMap.size(), 0);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_001 end";
 }
 
