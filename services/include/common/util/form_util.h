@@ -119,6 +119,8 @@ public:
      * @return Return the convert result
      */
     static bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value);
+
+    static bool CheckIsFRSCall();
 };
 } // namespace AppExecFwk
 } // namespace OHOS

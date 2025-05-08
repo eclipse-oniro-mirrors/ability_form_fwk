@@ -20,7 +20,9 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_caller_mgr.h"
+#include "form_mgr_errors.h"
 #include "hitrace_meter.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -505,6 +507,20 @@ void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool 
             callback->ProcessLockForm(lock);
         }
     }
+}
+
+bool FormHostClient::CheckIsFoundationCall()
+{
+    return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
+}
+
+int32_t FormHostClient::CheckPermission()
+{
+    if (!CheckIsFoundationCall()) {
+        HILOG_ERROR("Caller not foundation");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return ERR_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

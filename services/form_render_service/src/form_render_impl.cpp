@@ -554,6 +554,20 @@ int32_t FormRenderImpl::UpdateFormSize(
     HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
     return UPDATE_FORM_SIZE_FAILED;
 }
+
+bool FormRenderImpl::CheckIsFoundationCall()
+{
+    return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
+}
+
+int32_t FormRenderImpl::CheckPermission()
+{
+    if (!CheckIsFoundationCall()) {
+        HILOG_ERROR("Caller not foundation");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return ERR_OK;
+}
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS
