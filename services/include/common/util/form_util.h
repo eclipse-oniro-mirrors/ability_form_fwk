@@ -166,8 +166,6 @@ public:
     static int ConvertStringToInt(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
 
     static long long ConvertStringToLongLong(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
-
-    static bool CheckIsFRSCall();
 };
 } // namespace AppExecFwk
 } // namespace OHOS

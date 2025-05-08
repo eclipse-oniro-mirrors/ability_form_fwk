@@ -47,11 +47,6 @@ int FormHostStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         HILOG_ERROR("localDescribe not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    int32_t result = CheckPermission();
-    if (result != ERR_OK) {
-        HILOG_ERROR("check permission fail");
-        return result;
-    }
 
     switch (code) {
         case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRED):
@@ -249,6 +244,6 @@ int32_t FormHostStub::HandleOnErrorForms(MessageParcel &data, MessageParcel &rep
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }
-
+ 
 }  // namespace AppExecFwk
 }  // namespace OHOS

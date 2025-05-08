@@ -87,10 +87,6 @@ public:
     {
         return ERR_OK;
     };
-    int32_t CheckPermission()
-    {
-        return ERR_OK;
-    };
 };
 
 class MockFormSupplyStub : public FormSupplyStub {

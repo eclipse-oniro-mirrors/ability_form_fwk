@@ -69,12 +69,15 @@ FormRenderImpl::FormRenderImpl()
 
 FormRenderImpl::~FormRenderImpl() = default;
 
-int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want, sptr<IRemoteObject> callerToken)
+int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
+    sptr<IRemoteObject> callerToken)
 {
-    HILOG_INFO("Render form,formId=%{public}" PRId64 ",bundleName=%{public}s,abilityName=%{public}s,formName="
-        "%{public}s, moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{public}s,", formJsInfo.formId,
+    HILOG_INFO("Render form,bundleName=%{public}s,abilityName=%{public}s,formName=%{public}s,"
+        "moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{public}s,formId=%{public}" PRId64,
         formJsInfo.bundleName.c_str(), formJsInfo.abilityName.c_str(), formJsInfo.formName.c_str(),
-        formJsInfo.moduleName.c_str(), formJsInfo.jsFormCodePath.c_str(), formJsInfo.formSrc.c_str());
+        formJsInfo.moduleName.c_str(), formJsInfo.jsFormCodePath.c_str(), formJsInfo.formSrc.c_str(),
+        formJsInfo.formId);
+
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     {
         std::lock_guard<std::mutex> lock(formSupplyMutex_);
@@ -84,7 +87,9 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         }
         formSupplyClient_ = formSupplyClient;
     }
-    HILOG_DEBUG("connectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
+    HILOG_DEBUG("connectId:%{public}d",
+        want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
+
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
         HILOG_ERROR("GetUid failed");
@@ -104,6 +109,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
                 HILOG_ERROR("null record");
                 return RENDER_FORM_FAILED;
             }
+
             record->SetConfiguration(configuration_);
             result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
             if (renderRecordMap_.empty()) {
@@ -550,20 +556,6 @@ int32_t FormRenderImpl::UpdateFormSize(
     }
     HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
     return UPDATE_FORM_SIZE_FAILED;
-}
-
-bool FormRenderImpl::CheckIsFoundationCall()
-{
-    return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
-};
-
-int32_t FormRenderImpl::CheckPermission()
-{
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    return ERR_OK;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

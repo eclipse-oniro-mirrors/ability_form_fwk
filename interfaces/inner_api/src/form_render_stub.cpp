@@ -47,11 +47,6 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         HILOG_ERROR("localDescriptor not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    int32_t result = CheckPermission();
-    if (result != ERR_OK) {
-        HILOG_ERROR("check permission fail");
-        return result;
-    }
 
     switch (code) {
         case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM):
