@@ -99,11 +99,16 @@ public:
 
     int32_t UpdateFormSize(
         const int64_t &formId, float width, float height, float borderWidth, const std::string &uid) override;
+
+protected:
+    int32_t CheckPermission() override;
+
 private:
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);
     void OnConfigurationUpdatedInner();
     void ConfirmUnlockState(Want &renderWant);
+    bool CheckIsFoundationCall();
 
     std::mutex renderRecordMutex_;
     // <uid(userId + bundleName), renderRecord>

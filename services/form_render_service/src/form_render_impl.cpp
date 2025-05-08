@@ -366,12 +366,12 @@ void FormRenderImpl::OnConfigurationUpdatedInner()
 
     configUpdateTime_ = std::chrono::steady_clock::now();
     size_t allFormCount = 0;
-    for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
-        if (iter->second) {
-            iter->second->UpdateConfiguration(configuration_, formSupplyClient);
-            allFormCount += iter->second->FormCount();
+        for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
+            if (iter->second) {
+                iter->second->UpdateConfiguration(configuration_, formSupplyClient);
+                allFormCount += iter->second->FormCount();
+            }
         }
-    }
     HILOG_INFO("OnConfigurationUpdated %{public}zu forms updated.", allFormCount);
     hasCachedConfig_ = false;
     PerformanceEventInfo eventInfo;
@@ -553,6 +553,20 @@ int32_t FormRenderImpl::UpdateFormSize(
     }
     HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
     return UPDATE_FORM_SIZE_FAILED;
+}
+
+bool FormRenderImpl::CheckIsFoundationCall()
+{
+    return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
+};
+
+int32_t FormRenderImpl::CheckPermission()
+{
+    if (!CheckIsFoundationCall()) {
+        HILOG_ERROR("Caller not foundation");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return ERR_OK;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

@@ -47,6 +47,12 @@ public:
     {}
     void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) override
     {}
+
+protected:
+    int32_t CheckPermission() override
+    {
+        return ERR_OK;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)
