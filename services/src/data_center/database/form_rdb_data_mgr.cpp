@@ -640,6 +640,10 @@ bool FormRdbDataMgr::IsFormRdbLoaded()
     if (rdbStore_ != nullptr) {
         return true;
     }
+    std::unique_lock<std::shared_mutex> guard(rdbStoreMutex_);
+    if (rdbStore_ != nullptr) {
+        return true;
+    }
 
     HILOG_WARN("null Rdb, need to reload");
     if (LoadRdbStore() != ERR_OK) {
