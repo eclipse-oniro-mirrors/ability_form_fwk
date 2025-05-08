@@ -1645,7 +1645,7 @@ int32_t FormMgrService::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
     HILOG_DEBUG("call");
     if (!CheckIsSystemAppCall()) {
-        HILOG_ERROR("Caller not host");
+        HILOG_ERROR("Caller not system");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
     return FormMgrAdapter::GetInstance().GetFormsCount(isTempFormFlag, formCount);
@@ -1655,7 +1655,7 @@ int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &form
 {
     HILOG_DEBUG("call");
     if (!CheckIsSystemAppCall()) {
-        HILOG_ERROR("Caller not host");
+        HILOG_ERROR("Caller not system");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
     return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
