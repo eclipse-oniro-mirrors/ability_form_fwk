@@ -558,7 +558,7 @@ int32_t FormRenderImpl::UpdateFormSize(
 bool FormRenderImpl::CheckIsFoundationCall()
 {
     return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
-};
+}
 
 int32_t FormRenderImpl::CheckPermission()
 {

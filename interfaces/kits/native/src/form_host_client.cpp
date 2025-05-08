@@ -512,7 +512,7 @@ void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool 
 bool FormHostClient::CheckIsFoundationCall()
 {
     return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
-};
+}
 
 int32_t FormHostClient::CheckPermission()
 {
