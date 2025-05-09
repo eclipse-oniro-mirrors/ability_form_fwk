@@ -94,6 +94,7 @@ ohos_shared_library("formrender") {
     "ability_runtime:runtime",
     "ability_runtime:service_extension",
     "ace_engine:ace_form_render",
+    "background_task_mgr:bgtaskmgr_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
