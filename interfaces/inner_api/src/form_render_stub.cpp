@@ -99,6 +99,7 @@ int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)
         HILOG_ERROR("error to get remote object");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_RenderForm",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = RenderForm(*formJsInfo, *want, client);
@@ -125,6 +126,7 @@ int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &
         HILOG_ERROR("get remote object failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_StopRenderingForm",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = StopRenderingForm(*formJsInfo, *want, client);
@@ -140,6 +142,7 @@ int FormRenderStub::HandleCleanFormHost(MessageParcel &data, MessageParcel &repl
         HILOG_ERROR("null hostToken");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_CleanFormHost",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = CleanFormHost(hostToken);
@@ -175,6 +178,7 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
         HILOG_ERROR("ReadParcelable<Want> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReloadForm",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     result = ReloadForm(std::move(formJsInfos), *want);
@@ -185,10 +189,7 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
 
 int32_t FormRenderStub::HandleOnUnlock(MessageParcel &data, MessageParcel &reply)
 {
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_OnUnlock",
-        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = OnUnlock();
-    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
