@@ -19,6 +19,13 @@ module_output_path = "form_fwk/form_fwk/form_mgr_proxy"
 ohos_unittest("FmsFormHostProxyTest") {
   module_out_path = module_output_path
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../../../cfi_blocklist.txt"
+  }
+
   sources = [ "${form_fwk_path}/test/mock/src/mock_message_parcel.cpp" ]
 
   sources += [ "fms_form_host_proxy_test.cpp" ]
