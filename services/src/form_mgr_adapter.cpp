@@ -4043,7 +4043,7 @@ ErrCode FormMgrAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Co
     }
     for (auto formRecord : invisibleFormRecords) {
         std::string notifiedKey = formRecord.bundleName + formRecord.abilityName;
-        if (notifiedFormAbility.find(notifiedKey) != notified.end()) {
+        if (notifiedFormAbility.find(notifiedKey) != notifiedFormAbility.end()) {
             continue;
         }
         notifiedFormAbility.insert(notifiedKey);
