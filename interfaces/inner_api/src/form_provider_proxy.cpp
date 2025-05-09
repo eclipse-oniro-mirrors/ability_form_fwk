@@ -296,6 +296,53 @@ int FormProviderProxy::NotifyFormCastTempForm(
 }
 
 /**
+ * @brief Notify provider when system configuration changed.
+ * @param configuration system configuration.
+ * @param want Indicates the structure containing form info.
+ * @param callerToken Caller ability token.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormProviderProxy::NotifyConfigurationUpdate(
+    const AppExecFwk::Configuration& configuration,
+    const Want &want,
+    const sptr<IRemoteObject> &callerToken)
+{
+    int error;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&configuration)) {
+        HILOG_ERROR("write configuration failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_NOTIFY_CONFIGURATION_UPDATE,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    return ERR_OK;
+}
+
+/**
  * @brief Fire message event to form provider.
  * @param formId The Id of the from.
  * @param message Event message.

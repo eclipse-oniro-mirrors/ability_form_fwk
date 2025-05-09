@@ -93,7 +93,18 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int NotifyFormCastTempForm(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken) override;
+        const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Notify provider when the system configuration changed.
+     * @param configuration system configuration.
+     * @param want Indicates the structure containing form info.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
+        const Want &want, const sptr<IRemoteObject> &callerToken) override;
+
     /**
      * @brief Fire message event to form provider.
      * @param formId The Id of the from.
@@ -103,7 +114,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int FireFormEvent(const int64_t formId, const std::string &message, const Want &want,
-    const sptr<IRemoteObject> &callerToken) override;
+        const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Acquire form state to form provider.

@@ -31,6 +31,7 @@
 #include "running_form_info.h"
 #include "form_mgr/form_mgr_service.h"
 #include "want.h"
+#include "configuration.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -112,6 +113,13 @@ public:
      * @return none.
      */
     void PostRefreshTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief notify configuration update to form provider(task).
+     *
+     * @param configuration system configuration.
+     */
+     void PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration);
 
     /**
      * @brief Cast temp form data from form provider(task).
@@ -352,6 +360,15 @@ public:
      * @param want The want of the request.
      */
     void PostDelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want);
+
+    /**
+     * @brief notify forms ability when configuration update.
+     * @param configuration system configuration.
+     * @param want The want of the request.
+     * @param remoteObject Form host proxy object.
+     */
+    void NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
+        const Want &want, const sptr<IRemoteObject> &remoteObject);
 
 private:
     /**

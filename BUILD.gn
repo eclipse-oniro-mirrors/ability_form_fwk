@@ -89,6 +89,7 @@ ohos_shared_library("libfms") {
     "services/src/form_rdb_data_mgr.cpp",
     "services/src/form_record_report.cpp",
     "services/src/form_refresh_connection.cpp",
+    "services/src/form_configuration_update_connection.cpp",
     "services/src/form_refresh_limiter.cpp",
     "services/src/form_render_connection.cpp",
     "services/src/form_render_mgr.cpp",

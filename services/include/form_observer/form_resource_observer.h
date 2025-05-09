@@ -30,7 +30,6 @@ public:
 
     void OnConfigurationUpdated(const AppExecFwk::Configuration& configuration) override;
 private:
-    std::string colorMode_;
     std::string language_;
 };
 } // AppExecFwk

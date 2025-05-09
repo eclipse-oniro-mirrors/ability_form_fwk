@@ -22,6 +22,7 @@
 #include "data_center/form_record/form_record.h"
 #include "form_state_info.h"
 #include "want.h"
+#include "configuration.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -78,6 +79,17 @@ public:
      */
     ErrCode ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want,
         const bool isCountTimerRefresh);
+
+    /**
+     * @brief Connect provider ability for notify config update
+     * @param configuration system config.
+     * @param record Form data.
+     * @param want The want of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ConnectForConfigUpdate(const AppExecFwk::Configuration &configuration,
+        const FormRecord &record, const Want &want);
+
     /**
      * @brief Connect ability manager service for refresh app permission
      *

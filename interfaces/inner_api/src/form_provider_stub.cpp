@@ -67,6 +67,8 @@ int FormProviderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
             return HandleAcquireShareFormData(data, reply);
         case static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FOMR_DATA):
             return HandleAcquireFormData(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_CONFIGURATION_UPDATE):
+            return HandleNotifyConfigurationUpdate(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -236,8 +238,40 @@ int FormProviderStub::HandleNotifyFormCastTempForm(MessageParcel &data, MessageP
     reply.WriteInt32(result);
     return result;
 }
+
 /**
- * @brief handle NotifyFormCastTempForm message.
+ * @brief handle NotifyConfigurationUpdate message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormProviderStub::HandleNotifyConfigurationUpdate(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call.");
+    std::unique_ptr<AppExecFwk::Configuration> configuration(data.ReadParcelable<AppExecFwk::Configuration>());
+    if (!configuration) {
+        HILOG_ERROR("ReadParcelable<Configuration> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    if (client == nullptr) {
+        HILOG_ERROR("get remote object failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = NotifyConfigurationUpdate(*configuration, *want, client);
+    reply.WriteInt32(result);
+    return result;
+}
+
+/**
+ * @brief handle FireFormEvent message.
  * @param data input param.
  * @param reply output param.
  * @return Returns ERR_OK on success, others on failure.
