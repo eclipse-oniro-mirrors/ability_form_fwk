@@ -887,6 +887,26 @@ void FormTaskMgr::InnerPostRenderForm(const FormRecord &formRecord, const Want &
     HILOG_DEBUG("end");
 }
 
+void FormTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
+    const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("get formProviderProxy failed");
+        return;
+    }
+
+    int error = formProviderProxy->NotifyConfigurationUpdate(configuration, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("acquire providerFormInfo failed");
+    }
+}
+
 void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("render form");
@@ -1434,6 +1454,21 @@ void FormTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
     HILOG_DEBUG("end");
 }
 
+void FormTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
+{
+    HILOG_INFO("Call.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return;
+    }
+
+    auto batchConfigurationUpdate = [configuration]() {
+        return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchConfigurationUpdate);
+    HILOG_INFO("end");
+}
+
 void FormTaskMgr::PostEnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
     const sptr<IRemoteObject> &remoteObject)
 {
@@ -1608,7 +1643,5 @@ void FormTaskMgr::PostDelayRefreshForms(const std::vector<FormRecord> updatedFor
     serialQueue_->ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
     HILOG_INFO("end");
 }
-
-
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -28,6 +28,7 @@
 #include "form_provider/connection/form_msg_event_connection.h"
 #include "data_center/form_record/form_record.h"
 #include "form_provider/connection/form_refresh_connection.h"
+#include "form_provider/connection/form_configuration_update_connection.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_report.h"
 #include "data_center/form_record/form_record_report.h"
@@ -251,6 +252,37 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
     if (!addFormFinish) {
         HILOG_ERROR("form is adding form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    return ERR_OK;
+}
+
+/**
+ * @brief Connect provider ability for notify configuration changed.
+ *
+ * @param configuration The form id.
+ * @param record Form data.
+ * @param want The want of the form.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration &configuration,
+    const FormRecord &record, const Want &want)
+{
+    HILOG_INFO("bundleName:%{public}s, abilityName:%{public}s",
+        record.bundleName.c_str(), record.abilityName.c_str());
+    sptr<IAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(record.formId, want,
+        record.bundleName, record.abilityName, configuration);
+    if (abilityConnection == nullptr) {
+        HILOG_ERROR("create FormRefreshConnection failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    Want connectWant;
+    connectWant.SetElementName(record.bundleName, record.abilityName);
+
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, abilityConnection);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbility failed");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
     return ERR_OK;
