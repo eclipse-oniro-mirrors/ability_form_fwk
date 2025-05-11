@@ -16,10 +16,13 @@
 #include "form_render_service_extension.h"
 
 #include "ability_info.h"
+#include "background_task_mgr_helper.h"
 #include "context_impl.h"
+#include "efficiency_resource_info.h"
 #include "fms_log_wrapper.h"
 #include "form_render_impl.h"
 #include "hitrace_meter.h"
+#include "resource_type.h"
 #include "service_extension_context.h"
 
 namespace OHOS {
@@ -49,13 +52,18 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
         OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->SetConfiguration(context->GetConfiguration());
     }
 
-    HILOG_INFO("FormRenderServiceExtension OnStart begin");
+    // Prevents FRS-processe from being frozen (Phone, WGR, PC only)
+    OHOS::BackgroundTaskMgr::EfficiencyResourceInfo resourceInfo(
+        OHOS::BackgroundTaskMgr::ResourceType::Type::CPU, true, 0, "", true);
+    auto ret = OHOS::BackgroundTaskMgr::BackgroundTaskMgrHelper::ApplyEfficiencyResources(resourceInfo);
+    HILOG_INFO("OnStart ApplyEfficiencyResources ret: %{public}d.", ret);
 }
 
 void FormRenderServiceExtension::OnStop()
 {
     ServiceExtension::OnStop();
-    HILOG_INFO("FormRenderServiceExtension OnStop begin");
+    auto ret = OHOS::BackgroundTaskMgr::BackgroundTaskMgrHelper::ResetAllEfficiencyResources();
+    HILOG_INFO("OnStop ResetAllEfficiencyResources ret: %{public}d.", ret);
 }
 
 sptr<IRemoteObject> FormRenderServiceExtension::OnConnect(const AAFwk::Want &want)

@@ -31,6 +31,7 @@
         "deps": {
           "components": [
               "ability_runtime",
+              "background_task_mgr",
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
