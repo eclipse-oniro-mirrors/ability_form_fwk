@@ -416,7 +416,6 @@ HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_001, Function | MediumTest | Le
     MockWriteInterfaceToken(true);
     proxy->OnError(errorCode, errorMsg);
     proxy->OnError(errorCode, errorMsg, formIds);
-    EXPECT_NE(proxy, nullptr);
 }
 
 /*
@@ -437,7 +436,6 @@ HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_002, Function | MediumTest | Le
     proxy->OnRecycleForm(formId);
     MockWriteInterfaceToken(true);
     proxy->OnRecycleForm(formId);
-    EXPECT_NE(proxy, nullptr);
 }
 
 /*
@@ -460,6 +458,5 @@ HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_003, Function | MediumTest | Le
     MockWriteInterfaceToken(true);
     proxy->OnLockForm(formIds, true);
     proxy->OnLockForm(formIds, false);
-    EXPECT_NE(proxy, nullptr);
 }
 }
