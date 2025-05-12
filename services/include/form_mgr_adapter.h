@@ -691,7 +691,7 @@ public:
      * @param isLocked locked or not.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t NotifyFormLocked(const int64_t &formId, bool isLocked);
+    ErrCode NotifyFormLocked(const int64_t &formId, bool isLocked);
 
 private:
     /**
@@ -1262,6 +1262,8 @@ private:
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 
     std::map<int, std::vector<int64_t>> conditionUpdateFormMap;
+
+    bool IsForegroundApp(std::string bundleName);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

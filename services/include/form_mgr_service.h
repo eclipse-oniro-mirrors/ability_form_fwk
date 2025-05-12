@@ -376,7 +376,6 @@ public:
     /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved here.
-    * @param filter Filter that contains attributes that the formInfos have to have.
     * @param formInfos Return the forms' information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */

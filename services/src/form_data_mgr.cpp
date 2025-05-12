@@ -575,9 +575,9 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
-    const int64_t &formId, int32_t userId) const
+    const int64_t formId, int32_t userId) const
 {
-    HILOG_DEBUG("get form record by bundleName & formId");
+    HILOG_DEBUG("get form record by bundleName:%{public}s & formId:%{public}" PRId64, bundleName.c_str(), formId);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
         if (bundleName == itFormRecord->second.bundleName && formId == itFormRecord->second.formId &&
@@ -588,7 +588,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
             return ERR_OK;
         }
     }
-    HILOG_DEBUG("formInfo not find");
+    HILOG_WARN("formInfo not find");
     return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 
@@ -602,7 +602,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
 ErrCode FormDataMgr::GetPublishedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
     int32_t userId) const
 {
-    HILOG_DEBUG("get form record by bundleName");
+    HILOG_DEBUG("get form record by bundleName:%{public}s", bundleName.c_str());
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
         if (bundleName == itFormRecord->second.bundleName &&
@@ -616,10 +616,9 @@ ErrCode FormDataMgr::GetPublishedFormInfos(const std::string &bundleName, std::v
     if (formInfos.size() > 0) {
         HILOG_DEBUG("GetPublishedFormInfos success, size:%{public}zu", formInfos.size());
         return ERR_OK;
-    } else {
-        HILOG_DEBUG("formInfo not find");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
+    HILOG_WARN("formInfo not find");
+    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 
 /**
@@ -1107,6 +1106,56 @@ void FormDataMgr::SetTimerRefresh(const int64_t formId, const bool timerRefresh)
 }
 
 /**
+ * @brief Set isHostRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param hostRefresh true or false.
+ */
+void FormDataMgr::SetHostRefresh(const int64_t formId, const bool hostRefresh)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
+        return;
+    }
+    itFormRecord->second.isHostRefresh = hostRefresh;
+}
+  
+/**
+ * @brief Clear want cache for FormRecord.
+ * @param formId The Id of the form.
+ */
+void FormDataMgr::ClearWantCache(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
+        return;
+    }
+    itFormRecord->second.wantCacheMap.clear();
+}
+ 
+/**
+ * @brief Clear host refresh flag.
+ * @param formId The Id of the form.
+ */
+void FormDataMgr::ClearHostRefreshFlag(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
+        return;
+    }
+    if (itFormRecord->second.isHostRefresh) {
+        HILOG_INFO("clean host refresh flag, form:%{public}" PRId64, formId);
+        itFormRecord->second.isHostRefresh = false;
+        itFormRecord->second.wantCacheMap.clear();
+    }
+}
+
+/**
  * @brief Get updated form.
  * @param record FormRecord.
  * @param targetForms Target forms.
@@ -1559,8 +1608,8 @@ void FormDataMgr::ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemI
             HILOG_ERROR("invalid config");
             continue;
         }
-        int hour = std::stoi(temp[0]);
-        int min = std::stoi(temp[1]);
+        int hour = FormUtil::ConvertStringToInt(temp[0]);
+        int min = FormUtil::ConvertStringToInt(temp[1]);
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
             HILOG_ERROR("invalid time, hour:%{public}d, min:%{public}d", hour, min);
@@ -1598,8 +1647,8 @@ void FormDataMgr::ParseAtTimerConfig(FormRecord &record, const FormItemInfo &inf
     }
     int hour = -1;
     int min = -1;
-    hour = std::stoi(temp[0]);
-    min = std::stoi(temp[1]);
+    hour = FormUtil::ConvertStringToInt(temp[0]);
+    min = FormUtil::ConvertStringToInt(temp[1]);
     if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
         Constants::MAX_MINUTE) {
         HILOG_ERROR("invalid time");
@@ -2391,7 +2440,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
         auto info = formRecords_.find(formId);
-        isFormRecordsEnd = info == formRecords_.end();
+        isFormRecordsEnd = (info == formRecords_.end());
         if (!isFormRecordsEnd) {
             formRecord = info->second;
         }
