@@ -1361,9 +1361,9 @@ int FormMgrAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::strin
     int32_t userId = DEFAULT_USER_ID;
     int32_t instIndex = 0;
     if (size > USER_ID_INDEX) {
-        userId = static_cast<int32_t>(FormUtil::ConvertStringToInt(bundleInfoList[USER_ID_INDEX]));
+        userId = std::stoi(bundleInfoList[USER_ID_INDEX]);
         if (size > INSTANCE_SEQ_INDEX) {
-            instIndex = static_cast<int32_t>(FormUtil::ConvertStringToInt(bundleInfoList[INSTANCE_SEQ_INDEX]));
+            instIndex = std::stoi(bundleInfoList[INSTANCE_SEQ_INDEX]);
         }
     }
     HILOG_INFO("resolve bundleInfo, bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d",
@@ -3758,7 +3758,7 @@ void FormMgrAdapter::UpdateFormCloudUpdateDuration(const std::string &bundleName
         if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
             continue;
         }
-        int val = FormUtil::ConvertStringToInt(searchResult[DATA_FIELD].str());
+        int val = std::stoi(searchResult[DATA_FIELD].str());
         if (val >= Constants::MIN_CONFIG_DURATION && val <= Constants::MAX_CONFIG_DURATION) {
             durationArray.emplace_back(val);
         }
