@@ -45,14 +45,16 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "measure",
     "intl",
     "systemDateTime",
-    "batteryInfo"
+    "batteryInfo",
+    "commonEventManager"
 };
 const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "i18n",
     "font",
     "multimedia.image",
     "deviceInfo",
-    "window"
+    "window",
+    "process"
 };
 const std::vector<std::string> API_ALLOW_LIST = {
     "i18n.System.getSystemLanguage",
@@ -64,6 +66,7 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "i18n.getCalendar"
     "i18n.Calendar.*",
     "i18n.TimeZone.*",
+    "i18n.Unicode.*",
     "font.registerFont",
     "multimedia.image.PixelMapFormat.*",
     "multimedia.image.Size.*",
@@ -97,7 +100,9 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "window.ModalityType.*",
     "window._napiwrapper.*",
     "window.getTopWindow.*",
-    "window.getLastWindow.*"
+    "window.getLastWindow.*",
+    "process.pid",
+    "process.tid"
 };
 } // namespace
 
@@ -154,7 +159,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         }
     }
 
-    // check mnodule and api
+    // check module and api
     if (IsModuelAllowToLoad(moduleName)) {
         HILOG_DEBUG("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
