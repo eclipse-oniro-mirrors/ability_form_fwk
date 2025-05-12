@@ -43,8 +43,9 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
         for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
             auto hapPath = hapModuleInfo.hapPath;
             auto moduleName = hapModuleInfo.moduleName;
-            HILOG_DEBUG("update record %{public}" PRId64 ". packageName is %{public}s, hap path is %{public}s",
-                formRecord.formId, hapModuleInfo.packageName.c_str(), hapPath.c_str());
+            HILOG_INFO("update record %{public}" PRId64 ". packageName is %{public}s, hap path is %{public}s, "
+                "jsFormCodePath:%{public}s", formRecord.formId, hapModuleInfo.packageName.c_str(), hapPath.c_str(),
+                formRecord.jsFormCodePath.c_str());
             if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
                 hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
             }
@@ -93,6 +94,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
 
     BundlePackInfo bundlePackInfo;
     bool hasPackInfo = FormBmsHelper::GetInstance().GetBundlePackInfo(bundleName, userId, bundlePackInfo);
+    HILOG_INFO("bundleName:%{public}s, hasPackInfo:%{public}d", bundleName.c_str(), hasPackInfo);
     BundleInfo bundleInfo;
     if (FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, userId, bundleInfo) != ERR_OK) {
         HILOG_ERROR("get bundleInfo failed");
@@ -101,10 +103,10 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     std::vector<int64_t> removedForms;
     std::vector<FormRecord> updatedForms;
     for (FormRecord& formRecord : formInfos) {
-        HILOG_INFO("bundle update, formName:%{public}s", formRecord.formName.c_str());
         int64_t formId = formRecord.formId;
+        HILOG_INFO("bundle update, formName:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
         if (bundleInfo.versionCode == formRecord.versionCode) {
-            HILOG_INFO("form: %{public}s, versionCode is same. formId:%{public}" PRId64,
+            HILOG_WARN("form: %{public}s, versionCode is same. formId:%{public}" PRId64,
                        formRecord.formName.c_str(), formId);
             continue;
         }
