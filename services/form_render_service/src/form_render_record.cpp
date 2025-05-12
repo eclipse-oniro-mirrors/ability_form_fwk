@@ -48,6 +48,7 @@ constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr size_t THREAD_NAME_LEN = 15;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
+constexpr char FORM_RENDERER_PROCESS_ON_ADD_SURFACE[] = "ohos.extra.param.key.process_on_add_surface";
 
 inline uint64_t GetCurrentTickMillseconds()
 {
@@ -393,6 +394,10 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     HILOG_DEBUG("Updated record");
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     if (renderType == Constants::RENDER_FORM) {
+        // Manager delegate proxy invalid, do not render form
+        if (!CheckManagerDelegateValid(formJsInfo, want)) {
+            return RENDER_FORM_FAILED;
+        }
         renderFormTasksNum++;
     }
     {
@@ -1856,6 +1861,34 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
         auto group = search->second;
         group->UpdateFormSizeOfFormRequests(width, height, borderWidth);
     }
+}
+
+bool FormRenderRecord::CheckManagerDelegateValid(const FormJsInfo &formJsInfo, const Want &want)
+{
+    HILOG_DEBUG("call");
+    if (!want.HasParameter(FORM_RENDERER_PROCESS_ON_ADD_SURFACE)) {
+        HILOG_INFO("not add surface, ingore it");
+        return true;
+    }
+
+    auto context = GetContext(formJsInfo, want);
+    if (context == nullptr) {
+        return true;
+    }
+
+    {
+        std::shared_lock<std::shared_mutex> lock(eventHandlerReset_);
+        if (eventHandleNeedReset) {
+            return true;
+        }
+    }
+    auto key = formJsInfo.formId;
+    auto iter = formRendererGroupMap_.find(key);
+    if (iter == formRendererGroupMap_.end() || iter->second == nullptr) {
+        return true;
+    }
+
+    return iter->second->IsManagerDelegateValid(want);
 }
 } // namespace FormRender
 } // namespace AppExecFwk

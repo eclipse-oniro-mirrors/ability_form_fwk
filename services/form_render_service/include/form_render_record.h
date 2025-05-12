@@ -273,6 +273,8 @@ private:
 
     void MarkRenderFormTaskDone(int32_t renderType);
 
+    bool CheckManagerDelegateValid(const FormJsInfo &formJsInfo, const Want &want);
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 
