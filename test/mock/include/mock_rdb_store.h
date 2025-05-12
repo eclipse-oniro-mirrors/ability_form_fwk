@@ -81,8 +81,8 @@ public:
     MOCK_METHOD3(Sync, int(const SyncOption&, const AbsRdbPredicates&, const AsyncBrief&));
     MOCK_METHOD3(Sync, int(const SyncOption&, const std::vector<std::string>&, const AsyncDetail&));
     MOCK_METHOD3(Sync, int(const SyncOption&, const AbsRdbPredicates&, const AsyncDetail&));
-    MOCK_METHOD2(Subscribe, int(const SubscribeOption&, RdbStoreObserver*));
-    MOCK_METHOD2(UnSubscribe, int(const SubscribeOption&, RdbStoreObserver*));
+    MOCK_METHOD2(Subscribe, int(const SubscribeOption&, std::shared_ptr<RdbStoreObserver>));
+    MOCK_METHOD2(UnSubscribe, int(const SubscribeOption&, std::shared_ptr<RdbStoreObserver>));
     MOCK_METHOD1(RegisterAutoSyncCallback, int(std::shared_ptr<DetailProgressObserver>));
     MOCK_METHOD1(UnregisterAutoSyncCallback, int(std::shared_ptr<DetailProgressObserver>));
     MOCK_METHOD1(Notify, int(const std::string&));
