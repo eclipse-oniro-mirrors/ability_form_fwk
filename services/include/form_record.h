@@ -73,6 +73,7 @@ public:
     bool isDynamic = true;
     bool transparencyEnabled = false;
     bool isTimerRefresh = false;
+    bool isHostRefresh = false;
     bool isDataProxy = false;
     bool isSystemApp = false;
     int32_t uid = 0;
