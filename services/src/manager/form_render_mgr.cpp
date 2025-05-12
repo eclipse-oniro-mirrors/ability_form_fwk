@@ -140,7 +140,7 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
 ErrCode FormRenderMgr::ReloadForm(
     const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId)
 {
-    HILOG_INFO("userId:%{public}d", userId);
+    HILOG_INFO("userId:%{public}d, bundleName:%{public}s", userId, bundleName.c_str());
     std::vector<FormRecord> sandboxRecords;
     std::vector<FormRecord> normalRecords;
     for (const auto &record : formRecords) {
@@ -658,6 +658,7 @@ ErrCode FormRenderMgr::RecoverForms(const std::vector<int64_t> &formIds, const W
     if (sandboxIter != sandboxInners_.end()) {
         return sandboxIter->second->RecoverForms(formIds, wantParams);
     }
+    HILOG_ERROR("recover forms failed, callingUserId:%{public}d", callingUserId);
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }
 

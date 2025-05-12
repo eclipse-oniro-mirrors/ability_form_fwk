@@ -268,8 +268,8 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
 ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
     const FormRecord &record, const Want &want, const bool isCountTimerRefresh)
 {
-    HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s, needFreeInstall:%{public}d",
-        record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall);
+    HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s, needFreeInstall:%{public}d",
+        formId, record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall);
 
     sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want,
         record.bundleName, record.abilityName, record.needFreeInstall);

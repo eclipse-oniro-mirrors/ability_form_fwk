@@ -723,7 +723,7 @@ ErrCode FormRenderMgrInner::RecycleForms(
 
 ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams)
 {
-    HILOG_DEBUG("call");
+    HILOG_INFO("call");
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {

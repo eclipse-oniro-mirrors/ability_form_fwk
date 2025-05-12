@@ -1209,11 +1209,13 @@ void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsI
     for (const auto &form : formJsInfos) {
         auto iter = formRequests_.find(form.formId);
         if (iter == formRequests_.end()) {
+            HILOG_ERROR("%{public}" PRId64 " formRequest is empty", form.formId);
             continue;
         }
 
         for (const auto& formRequest : iter->second) {
             if (!formRequest.second.hasRelease) {
+                HILOG_ERROR("%{public}" PRId64 " hasRelease false", form.formId);
                 continue;
             }
 
