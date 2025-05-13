@@ -19,6 +19,13 @@ module_output_path = "form_fwk/form_fwk/form_mgr_service"
 ohos_unittest("FmsFormHostDelegateStubTest") {
   module_out_path = module_output_path
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../../../cfi_blocklist.txt"
+  }
+
   sources = [ "${form_fwk_path}/test/unittest/fms_form_host_delegate_stub_test/fms_form_host_delegate_stub_test.cpp" ]
 
   include_dirs = [
