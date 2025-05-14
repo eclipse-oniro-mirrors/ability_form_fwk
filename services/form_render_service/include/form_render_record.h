@@ -273,6 +273,8 @@ private:
 
     void MarkRenderFormTaskDone(int32_t renderType);
 
+    bool CheckManagerDelegateValid(const FormJsInfo &formJsInfo, const Want &want);
+
     void SetFormSupplyClient(const sptr<IFormSupply>& formSupplyClient);
 
     sptr<IFormSupply> GetFormSupplyClient();
@@ -305,7 +307,7 @@ private:
     std::shared_ptr<EventHandler> eventHandler_;
     bool eventHandleNeedReset = false;
     std::shared_mutex eventHandlerReset_;
-    std::mutex eventHandlerMutex_;
+    std::recursive_mutex eventHandlerMutex_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;
 
     // <formId, hostRemoteObj>

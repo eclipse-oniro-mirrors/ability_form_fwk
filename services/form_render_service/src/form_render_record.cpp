@@ -1789,7 +1789,7 @@ sptr<IFormSupply> FormRenderRecord::GetFormSupplyClient()
 
 std::shared_ptr<EventHandler> FormRenderRecord::GetEventHandler()
 {
-    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+    std::lock_guard<recursive_mutex> lock(eventHandlerMutex_);
     return eventHandler_;
 }
 
