@@ -1803,6 +1803,7 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
 ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
+    HILOG_INFO("acquire ProviderFormInfo async, formId:%{public}" PRId64, formId);
     std::string providerBundleName = info.GetProviderBundleName();
     if (!info.IsEnableForm()) {
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
@@ -1853,6 +1854,16 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_ERROR("null formAcquireConnection");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
+#ifdef RES_SCHEDULE_ENABLE
+    auto&& connectCallback = [](const std::string &bundleName) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
+    };
+    auto&& disconnectCallback = [](const std::string &bundleName) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
+    };
+    formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
+    formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);
+#endif
     FormRecord record;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
         HILOG_ERROR("not found in formRecord");
@@ -1868,16 +1879,6 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_ERROR("ConnectServiceAbility failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-#ifdef RES_SCHEDULE_ENABLE
-    auto&& connectCallback = [](const std::string &bundleName) {
-        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
-    };
-    auto&& disconnectCallback = [](const std::string &bundleName) {
-        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
-    };
-    formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
-    formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);
-#endif
     return ERR_OK;
 }
 
@@ -2139,6 +2140,10 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
+    if (formRecord.isDataProxy) {
+        HILOG_INFO("data proxy form set next refresh time form:%{public}" PRId64 "", formId);
+    }
+
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
@@ -2336,7 +2341,10 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     }
 
     // Handle by interceptor callback when the system handler is not found.
-    int64_t formId = std::stoll(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY));
+    int64_t formId = 0;
+    if (!FormUtil::ConvertStringToInt64(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY), formId)) {
+        HILOG_ERROR("formId ConvertStringToInt64 failed");
+    }
     if (formPublishInterceptor_ == nullptr) {
         return AcquireAddFormResult(formId);
     }
@@ -2424,27 +2432,12 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
     HILOG_DEBUG("StartAbilityByFms pageRouterServiceCode: %{public}" PRId32, pageRouterServiceCode);
     if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
         HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
-        auto appMgrProxy = GetAppMgr();
-        if (!appMgrProxy) {
-            HILOG_ERROR("Get app mgr failed");
-            return ERR_APPEXECFWK_FORM_NOT_TRUST;
-        }
-
-        std::vector<AppExecFwk::AppStateData> curForegroundApps;
-        IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
-        bool checkFlag = false;
-        for (auto &appData : curForegroundApps) {
-            HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
-            if (appData.bundleName == dstBundleName) {
-                checkFlag = true;
-                HILOG_DEBUG("This application is a foreground program");
-                break;
-            }
-        }
-        if (!checkFlag) {
+        bool isForeground = IsForegroundApp(dstBundleName);
+        if (!isForeground) {
             HILOG_ERROR("This application is not a foreground program");
             return ERR_APPEXECFWK_FORM_NOT_TRUST;
         }
+        HILOG_DEBUG("This application is a foreground program");
     }
 
     std::string dstAbilityName = elementName.GetAbilityName();
@@ -3022,13 +3015,12 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     }
 
     HILOG_INFO("formId:%{public}" PRId64 ", needRefresh:%{public}d, formVisibleType:%{public}d,"
-        "isTimerRefresh:%{public}d, wantCacheMapSize:%{public}d", matchedFormId, formRecord.needRefresh,
-        static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh, (int)formRecord.wantCacheMap.size());
+        "isTimerRefresh:%{public}d, wantCacheMapSize:%{public}d, isHostRefresh:%{public}d", matchedFormId,
+        formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
+        (int)formRecord.wantCacheMap.size(), formRecord.isHostRefresh);
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
-        if (formRecord.wantCacheMap.size() != 0) {
-            FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, formRecord.wantCacheMap[matchedFormId], true);
-        } else if (formRecord.isTimerRefresh) {
+        if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
             FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, userId);
         } else {
             std::string cacheData;
@@ -4167,7 +4159,7 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
 
     ErrCode res = ProtectLockForms(bundleName, userId, lock);
     if (res != ERR_OK) {
-        HILOG_ERROR("ProtectLockForms faild when executing the switchLockForms");
+        HILOG_ERROR("protectLockForms faild when executing the switchLockForms");
         return res;
     }
     return ERR_OK;
@@ -4210,7 +4202,7 @@ ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t 
     return ERR_OK;
 }
 
-int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
+ErrCode FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
 {
     FormRecord formRecord;
     auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
@@ -4330,6 +4322,26 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
         HiSysEventType::BEHAVIOR, eventInfo);
 
     return ERR_OK;
+}
+
+bool FormMgrAdapter::IsForegroundApp(std::string bundleName)
+{
+    bool checkFlag = false;
+    auto appMgrProxy = GetAppMgr();
+    if (!appMgrProxy) {
+        HILOG_ERROR("Get app mgr failed");
+        return false;
+    }
+    std::vector<AppExecFwk::AppStateData> curForegroundApps;
+    IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
+    for (auto &appData : curForegroundApps) {
+        HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
+        if (appData.bundleName == bundleName) {
+            checkFlag = true;
+            break;
+        }
+    }
+    return checkFlag;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

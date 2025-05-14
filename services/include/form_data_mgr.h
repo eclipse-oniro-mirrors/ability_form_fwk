@@ -165,7 +165,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
-        const int64_t &formId, int32_t userId = Constants::INVALID_USER_ID) const;
+        const int64_t formId, int32_t userId = Constants::INVALID_USER_ID) const;
     /**
      * @brief Get published form records.
      * @param bundleName Bundle name.
@@ -177,6 +177,7 @@ public:
         int32_t userId = Constants::INVALID_USER_ID) const;
 
     /**
+     * @brief Get form record.
      * @param conditionType refresh type.
      * @param formInfos The form record list.
      * @return Returns true if this function is successfully called; returns false otherwise.
@@ -319,6 +320,25 @@ public:
      * @param timerRefresh true or false.
      */
     void SetTimerRefresh(const int64_t formId, const bool timerRefresh);
+    
+    /**
+    * @brief Set isHostRefresh for FormRecord.
+    * @param formId The Id of the form.
+    * @param hostRefresh true or false.
+    */
+    void SetHostRefresh(const int64_t formId, const bool hostRefresh);
+ 
+    /**
+    * @brief Clear want cache for FormRecord.
+    * @param formId The Id of the form.
+    */
+    void ClearWantCache(const int64_t formId);
+
+    /**
+    * @brief Clear host refresh flag.
+    * @param formId The Id of the form.
+    */
+    void ClearHostRefreshFlag(const int64_t formId);
 
     /**
      * @brief Get updated form info.
