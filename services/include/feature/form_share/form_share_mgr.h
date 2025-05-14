@@ -151,7 +151,7 @@ private:
 private:
     DECLARE_DELAYED_SINGLETON(FormShareMgr);
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
-    std::shared_ptr<FormDistributedClient> formDmsClient_ = nullptr;
+    std::unique_ptr<FormDistributedClient> formDmsClient_ = nullptr;
     // map for <formShareInfoKey, FormShareInfo>
     std::map<std::string, FormShareInfo> shareInfo_;
     // map for <eventId, formShareInfoKey>

@@ -61,7 +61,7 @@ __attribute__((constructor)) void RegisterServiceExtensionCreator()
 FormRenderImpl::FormRenderImpl()
 {
     const std::string queueName = "FormRenderSerialQueue";
-    serialQueue_ = std::make_shared<FormRenderSerialQueue>(queueName);
+    serialQueue_ = std::make_unique<FormRenderSerialQueue>(queueName);
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
     }

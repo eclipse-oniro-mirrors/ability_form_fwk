@@ -2258,7 +2258,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_227, TestSize.Level0)
     Constants::PublishFormResult result {Constants::PublishFormErrorCode::SUCCESS, ""};
     EXPECT_EQ(formMgrAdapter.SetPublishFormResult(formId, result), ERR_APPEXECFWK_FORM_COMMON_CODE);
 
-    formMgrAdapter.serialQueue_ = std::make_shared<FormSerialQueue>("FormMgrTimerTaskQueueTest");
+    formMgrAdapter.serialQueue_ = std::make_unique<FormSerialQueue>("FormMgrTimerTaskQueueTest");
     EXPECT_EQ(formMgrAdapter.SetPublishFormResult(formId, result), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 
     formMgrAdapter.formIdMap_.insert(std::make_pair(formId, AddFormResultErrorCode::UNKNOWN));

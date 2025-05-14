@@ -93,7 +93,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0246, TestSize.Level0)
     int64_t formId = 1;
     int result = ERR_APPEXECFWK_FORM_COMMON_CODE;
     const std::string queueName = "queue";
-    formMgrAdapter.serialQueue_ = std::make_shared<FormSerialQueue>(queueName.c_str());
+    formMgrAdapter.serialQueue_ = std::make_unique<FormSerialQueue>(queueName.c_str());
     formMgrAdapter.CancelAddFormRequestTimeOutTask(formId, result);
     EXPECT_EQ(formMgrAdapter.formIdMap_.find(formId), formMgrAdapter.formIdMap_.end());
     formMgrAdapter.formIdMap_[formId] = AddFormResultErrorCode::UNKNOWN;

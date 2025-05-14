@@ -479,7 +479,7 @@ void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &re
     formShareInfo.providerShareData = wantParams;
 
     if (formDmsClient_ == nullptr) {
-        formDmsClient_ = std::make_shared<FormDistributedClient>();
+        formDmsClient_ = std::make_unique<FormDistributedClient>();
     }
     int32_t retval = formDmsClient_->ShareForm(remoteDeviceId, formShareInfo);
     if (retval != ERR_OK) {

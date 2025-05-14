@@ -133,7 +133,7 @@ void FmsFormShareMgrTest::TearDownTestCase()
 void FmsFormShareMgrTest::SetUp()
 {
     formyMgrServ_->OnStart();
-    DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_ = std::make_shared<FormDistributedClient>();
+    DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_ = std::make_unique<FormDistributedClient>();
     DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_->SetDmsProxy(dmsSerice->AsObject());
     token_ = new (std::nothrow) MockFormHostClient();
 
