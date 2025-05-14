@@ -635,6 +635,12 @@ public:
 
     /**
     * @brief get temp forms count.
+    * @return Return the temp forms number.
+    */
+    int32_t GetTempFormCount() const;
+
+    /**
+    * @brief get temp forms count.
     * @param formCount Returns the number of the temp form.
     * @return Return the temp forms number.
     */
@@ -902,6 +908,21 @@ public:
      * @param formRecords The list of formRecord.
      */
     void GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords);
+
+    /**
+     * @brief update formRecord recycle status to recycled.
+     * @param formId form id.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateFormRecordRecycleStatusToRecycled(const int64_t formId);
+
+    /**
+     * @brief get formRecord by formId
+     * @param formId form id.
+     * @param formRecord form record.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetFormRecordById(const int64_t formId, FormRecord& formRecord);
 
 private:
     /**

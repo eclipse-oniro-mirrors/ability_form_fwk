@@ -85,7 +85,7 @@ public:
 
     ErrCode RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams);
 
-    ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth);
+	ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth);
 
     void SetUserId(int32_t userId);
 
@@ -112,6 +112,18 @@ private:
     ErrCode GetConnectionAndRenderForm(FormRecord &formRecord, Want &want);
 
     ErrCode GetRenderObject(sptr<IRemoteObject> &renderObj);
+
+    bool GetRenderFormConnectId(const int64_t formId, int32_t& connectId);
+
+    bool GetRenderFormConnection(sptr<FormRenderConnection>& connection, const int64_t formId);
+
+    void GetConnectedForms(const std::vector<int64_t> &formIds, std::vector<int64_t>& connectedForms);
+
+    ErrCode RenderConnectedForm(const FormRecord &formRecord, Want &want, const sptr<FormRenderConnection>& connection);
+
+    ErrCode PostStopRenderingFormTask(const FormRecord &formRecord, Want &want);
+
+    ErrCode CheckRenderConnectionExistById(int64_t formId);
 
 private:
     class RemoteObjHash {

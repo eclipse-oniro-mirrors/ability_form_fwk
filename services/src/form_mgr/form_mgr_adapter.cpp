@@ -386,39 +386,30 @@ void FormMgrAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, const
     std::lock_guard<std::mutex> lock(formResultMutex_);
     auto iter = formIdMap_.find(formId);
     if (iter != formIdMap_.end()) {
-        if (result != ERR_OK) {
-            iter->second = AddFormResultErrorCode::FAILED;
-        } else {
-            iter->second = AddFormResultErrorCode::SUCCESS;
-        }
+        const auto state = (result != ERR_OK ? AddFormResultErrorCode::FAILED : AddFormResultErrorCode::SUCCESS);
+        iter->second = state;
         condition_.notify_all();
     }
 }
 
-ErrCode FormMgrAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates)
+AddFormResultErrorCode FormMgrAdapter::GetFormResultErrCode(const int64_t formId)
 {
     std::lock_guard<std::mutex> lock(formResultMutex_);
-    auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [this, formId, &formStates] (const auto elem) {
-        if (elem.first == formId) {
-            if (elem.second == AddFormResultErrorCode::FAILED) {
-                formIdMap_.erase(formId);
-                return true;
-            } else if (elem.second == AddFormResultErrorCode::TIMEOUT) {
-                formIdMap_.erase(formId);
-                return true;
-            } else if (elem.second == AddFormResultErrorCode::SUCCESS) {
-                formStates = AddFormResultErrorCode::SUCCESS;
-                return false;
-            } else {
-                formStates = AddFormResultErrorCode::UNKNOWN;
-                return false;
-            }
-        }
-        return false;
-    });
-    if (result != formIdMap_.end()) {
+    const auto iter = formIdMap_.find(formId);
+    if (iter != formIdMap_.end()) {
+        return iter->second;
+    }
+    return AddFormResultErrorCode::SUCCESS;
+}
+
+ErrCode FormMgrAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates)
+{
+    const auto state = GetFormResultErrCode(formId);
+    if (state == AddFormResultErrorCode::FAILED || state == AddFormResultErrorCode::TIMEOUT) {
+        RemoveFormIdMapElement(formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    formStates = state;
     return ERR_OK;
 }
 
