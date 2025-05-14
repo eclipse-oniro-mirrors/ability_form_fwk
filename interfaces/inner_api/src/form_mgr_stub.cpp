@@ -296,6 +296,18 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleIsFormExempt(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY):
             return HandleOpenFormEditAbility(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_OVERFLOW_PROXY):
+            return HandleRegisterOverflowProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_OVERFLOW_PROXY):
+            return HandleUnregisterOverflowProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_OVERFLOW):
+            return HandleRequestOverflow(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CHANGE_SCENEANIMATION_STATE_PROXY):
+            return HandleRegisterChangeSceneAnimationStateProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CHANGE_SCENEANIMATION_STATE_PROXY):
+            return HandleUnregisterChangeSceneAnimationStateProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHANGE_SCENE_ANIMATION_STATE):
+            return HandleChangeSceneAnimationState(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1810,6 +1822,83 @@ ErrCode FormMgrStub::HandleOpenFormEditAbility(MessageParcel &data, MessageParce
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+ErrCode FormMgrStub::HandleRegisterOverflowProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Handle save overflow proxy to service");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    bool result = RegisterOverflowProxy(callerToken);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("Write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterOverflowProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    bool result = UnregisterOverflowProxy();
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write proxy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRequestOverflow(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call");
+    int64_t formId = data.ReadInt64();
+    OverflowInfo* overflowInfoPtr = data.ReadParcelable<OverflowInfo>();
+    if (overflowInfoPtr == nullptr) {
+        HILOG_ERROR("Read oveflowInfo failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool isOverflow = data.ReadBool();
+    ErrCode result = RequestOverflow(formId, *overflowInfoPtr, isOverflow);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterChangeSceneAnimationStateProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    bool result = RegisterChangeSceneAnimationStateProxy(callerToken);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterChangeSceneAnimationStateProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    bool result = UnregisterChangeSceneAnimationStateProxy();
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleChangeSceneAnimationState(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call");
+    int64_t formId = data.ReadInt64();
+    int32_t state = data.ReadInt32();
+    ErrCode result = ChangeSceneAnimationState(formId, state);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

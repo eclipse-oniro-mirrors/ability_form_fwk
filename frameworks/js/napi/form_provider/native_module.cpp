@@ -40,6 +40,10 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
     BindNativeFunction(env, exports, "isRequestPublishFormSupported", moduleName,
         JsFormProvider::IsRequestPublishFormSupported);
     BindNativeFunction(env, exports, "openFormEditAbility", moduleName, JsFormProvider::OpenFormEditAbility);
+    BindNativeFunction(env, exports, "requestOverflow", moduleName, JsFormProvider::RequestOverflow);
+    BindNativeFunction(env, exports, "cancelOverflow", moduleName, JsFormProvider::CancelOverflow);
+    BindNativeFunction(env, exports, "activateSceneAnimation", moduleName, JsFormProvider::ActivateSceneAnimation);
+    BindNativeFunction(env, exports, "deactivateSceneAnimation", moduleName, JsFormProvider::DeactivateSceneAnimation);
     return exports;
 }
 

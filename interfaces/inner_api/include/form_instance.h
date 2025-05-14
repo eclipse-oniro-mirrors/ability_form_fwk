@@ -61,6 +61,26 @@ struct FormInstance : public Parcelable {
     bool Marshalling(Parcel &parcel) const override;
     static FormInstance *Unmarshalling(Parcel &parcel);
 };
+
+struct Rect : public Parcelable {
+    int32_t left;
+    int32_t top;
+    int32_t width;
+    int32_t height;
+
+    bool ReadFromParcel(Parcel &parcel);
+    bool Marshalling(Parcel &parcel) const override;
+    static Rect *Unmarshalling(Parcel &parcel);
+};
+
+struct OverflowInfo : public Parcelable {
+    Rect area;
+    int32_t duration = -1;
+
+    bool ReadFromParcel(Parcel &parcel);
+    bool Marshalling(Parcel &parcel) const override;
+    static OverflowInfo *Unmarshalling(Parcel &parcel);
+};
 } // namespace AppExecFwk
 } // namespace OHOS
 #endif // FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H

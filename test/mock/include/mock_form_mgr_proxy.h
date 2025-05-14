@@ -113,6 +113,8 @@ public:
     MOCK_METHOD3(GetFormInstanceById, ErrCode(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance));
     MOCK_METHOD1(IsFormBundleForbidden, bool(const std::string &bundleName));
     MOCK_METHOD2(StopRenderingForm, int32_t(const int64_t formId, const std::string &compId));
+    MOCK_METHOD3(RequestOverflow, ErrCode(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow));
+    MOCK_METHOD2(ChangeSceneAnimationState, ErrCode(const int64_t formId, int32_t state));
 };
 }
 }

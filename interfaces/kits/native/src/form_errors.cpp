@@ -69,6 +69,8 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
     { ERR_APPEXECFWK_FORM_NOT_TRUST,                   ERR_FORM_EXTERNAL_FORM_NOT_TRUST },
     { ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT,           ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT},
     { ERR_APPEXECFWK_FORM_STATUS_TIMIE_OUT,            ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT },
+    { ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED,         ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED },
+    { ERR_APPEXECFWK_SYSTEMCAP_ERROR,                  ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
@@ -94,6 +96,8 @@ const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_FORM_EXTERNAL_FORM_NOT_TRUST,               "Form is not trust." },
     { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT,            "Waiting for the form addition to the desktop timed out." },
     { ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT,        "form status timeout, try reAddForm." },
+    { ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,          "The form can not support this operation, Please check whether "
+        "the configuration information of sceneAnimationParams in your form_config is correct." },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {

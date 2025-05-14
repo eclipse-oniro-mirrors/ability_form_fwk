@@ -2837,4 +2837,133 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0300, Function 
     int32_t result = proxy->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
 }
+
+/*
+ * @tc.name: RequestOverflowTest_0100
+ * @tc.desc: test RequestOverflow function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0100, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, RequestOverflowTest_0100, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    int32_t result = proxy->RequestOverflow(formId, overflowInfo, isOverflow);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+}
+ 
+/*
+ * @tc.name: RequestOverflowTest_0200
+ * @tc.desc: test RequestOverflow function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0200, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, RequestOverflowTest_0200, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke(std::bind(SendRequestReplace, _1, _2, _3, _4,
+        ERR_OK, true)), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    int32_t result = proxy->RequestOverflow(formId, overflowInfo, isOverflow);
+    EXPECT_EQ(ERR_OK, result);
+}
+ 
+/*
+ * @tc.name: RequestOverflowTest_0300
+ * @tc.desc: test RequestOverflow function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0300, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, RequestOverflowTest_0300, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Return(-1)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    int32_t result = proxy->RequestOverflow(formId, overflowInfo, isOverflow);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+}
+ 
+/*
+ * @tc.name: ChangeSceneAnimationStateTest_0100
+ * @tc.desc: test ChangeSceneAnimationState function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0100, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0100, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int64_t formId = 1;
+    int32_t state = 1;
+    int32_t result = proxy->ChangeSceneAnimationState(formId, state);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+}
+ 
+/*
+ * @tc.name: ChangeSceneAnimationStateTest_0200
+ * @tc.desc: test ChangeSceneAnimationState function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0200, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0200, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke(std::bind(SendRequestReplace, _1, _2, _3, _4,
+        ERR_OK, true)), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int64_t formId = 1;
+    int32_t state = 1;
+    int32_t result = proxy->ChangeSceneAnimationState(formId, state);
+    EXPECT_EQ(ERR_OK, result);
+}
+ 
+/*
+ * @tc.name: ChangeSceneAnimationStateTest_0300
+ * @tc.desc: test ChangeSceneAnimationState function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0300, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0300, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Return(-1)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int64_t formId = 1;
+    int32_t state = 1;
+    int32_t result = proxy->ChangeSceneAnimationState(formId, state);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+}
 }

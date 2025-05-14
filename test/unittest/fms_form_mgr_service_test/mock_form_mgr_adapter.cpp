@@ -61,6 +61,8 @@ namespace {
     int g_registerRemoveObserver = OHOS::ERR_OK;
     int g_registerClickEventObserver = OHOS::ERR_OK;
     int g_unregisterClickEventObserver = OHOS::ERR_OK;
+    int g_requestoverflow = OHOS::ERR_OK;
+    int g_changesceneanimationstate = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -383,6 +385,17 @@ ErrCode FormMgrAdapter::UnregisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
     return g_unregisterClickEventObserver;
+}
+
+ErrCode FormMgrAdapter::RequestOverflow(const int64_t formId, const int32_t callingUid,
+    const OverflowInfo &overflowInfo, bool isOverflow)
+{
+    return g_requestoverflow;
+}
+
+ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const int32_t callingUid, int32_t state)
+{
+    return g_changesceneanimationstate;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

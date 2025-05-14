@@ -51,6 +51,10 @@ namespace {
     constexpr int64_t MICROSECONDS = 1000000;
     constexpr int32_t INVALID_FORM_LOCATION = -2;
     constexpr int32_t INVALID_FORM_RESULT_ERRCODE = -2;
+    const std::string FORM_UNINSTALL = "formUninstall";
+    const std::string FORM_OVERFLOW = "formOverflow";
+    const std::string CHANGE_SCENE_ANIMATION_STATE = "changeSceneAnimationState";
+    const std::set<std::string> FORM_LISTENER_TYPE = { FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE };
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -1159,9 +1163,11 @@ private:
         }
 
         std::string type;
-        if (!ConvertFromJsValue(env, argv[PARAM0], type) || type != "formUninstall") {
-            HILOG_ERROR("args[0] not formUninstall");
-            NapiFormUtil::ThrowParamTypeError(env, "type", "formUninstall");
+        if (!ConvertFromJsValue(env, argv[PARAM0], type) ||
+            (type != FORM_UNINSTALL && type != FORM_OVERFLOW && type != CHANGE_SCENE_ANIMATION_STATE)) {
+            HILOG_ERROR("args[0] not register func %{public}s", type.c_str());
+            NapiFormUtil::ThrowParamTypeError(env, "type",
+                "formUninstall or formOverflow or changeSceneAnimationState");
             return CreateJsUndefined(env);
         }
 
@@ -1171,8 +1177,17 @@ private:
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
             return CreateJsUndefined(env);
         }
-        FormHostClient::GetInstance()->RegisterUninstallCallback(FormUninstallCallback);
-        AddFormUninstallCallback(env, argv[PARAM1]);
+        napi_value callback = argv[PARAM1];
+        napi_ref callbackRef;
+        napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+        if (type == FORM_UNINSTALL) {
+            FormHostClient::GetInstance()->RegisterUninstallCallback(FormUninstallCallback);
+            AddFormUninstallCallback(env, argv[PARAM1]);
+        } else if (type == FORM_OVERFLOW) {
+            return OnRegisterOverflowListener(env, callbackRef);
+        } else if (type == CHANGE_SCENE_ANIMATION_STATE) {
+            return OnRegisterChangeSceneAnimationStateListener(env, callbackRef);
+        }
         return CreateJsUndefined(env);
     }
 
@@ -1194,9 +1209,12 @@ private:
 
         // Check the type of the PARAM0 and convert it to string.
         std::string type;
-        if (!ConvertFromJsValue(env, argv[PARAM0], type) || type != "formUninstall") {
-            HILOG_ERROR("args[0] not formUninstall");
-            NapiFormUtil::ThrowParamTypeError(env, "type", "formUninstall");
+        if (!ConvertFromJsValue(env, argv[PARAM0], type) ||
+            (type != FORM_UNINSTALL && type != FORM_OVERFLOW &&  type != CHANGE_SCENE_ANIMATION_STATE)) {
+            HILOG_ERROR("Invalid type provided: %{public}s."
+                "Expected formUninstall or formOverflow or changeSceneAnimationState.", type.c_str());
+            NapiFormUtil::ThrowParamTypeError(env, "type",
+                "formUninstall or formOverflow or changeSceneAnimationState");
             return CreateJsUndefined(env);
         }
         // Check the type of the PARAM1.
@@ -1211,7 +1229,13 @@ private:
             return CreateJsUndefined(env);
         }
 
-        ClearFormUninstallCallback();
+        if (type == FORM_UNINSTALL) {
+            ClearFormUninstallCallback();
+        } else if (type == FORM_OVERFLOW) {
+            return OffRegisterOverflowListener(env);
+        } else if (type == CHANGE_SCENE_ANIMATION_STATE) {
+            return OffRegisterChangeSceneAnimationStateListener(env);
+        }
         return CreateJsUndefined(env);
     }
 
@@ -1871,6 +1895,52 @@ private:
         NapiFormUtil::ThrowByInternalErrorCode(env, ret);
         return CreateJsUndefined(env);
     }
+
+    napi_value OnRegisterOverflowListener(napi_env env, napi_ref callbackRef)
+    {
+        HILOG_INFO("call");
+        bool result = FormMgr::GetInstance().RegisterOverflowProxy(JsFormRouterProxyMgr::GetInstance());
+        if (!result) {
+            return CreateJsValue(env, result);
+        }
+        result = JsFormRouterProxyMgr::GetInstance()->RegisterOverflowListener(env, callbackRef);
+        return CreateJsValue(env, result);
+    }
+    
+    napi_value OffRegisterOverflowListener(napi_env env)
+    {
+        HILOG_INFO("call");
+        bool result = FormMgr::GetInstance().UnregisterOverflowProxy();
+        if (!result) {
+            return CreateJsValue(env, result);
+        }
+        result = JsFormRouterProxyMgr::GetInstance()->UnregisterOverflowListener();
+        return CreateJsValue(env, result);
+    }
+
+    napi_value OnRegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
+    {
+        HILOG_INFO("call");
+        bool result = FormMgr::GetInstance().RegisterChangeSceneAnimationStateProxy(
+            JsFormRouterProxyMgr::GetInstance());
+        if (!result) {
+            return CreateJsValue(env, result);
+        }
+        result = JsFormRouterProxyMgr::GetInstance()->RegisterChangeSceneAnimationStateListener(
+            env, callbackRef);
+        return CreateJsValue(env, result);
+    }
+
+    napi_value OffRegisterChangeSceneAnimationStateListener(napi_env env)
+    {
+        HILOG_INFO("call");
+        bool result = FormMgr::GetInstance().UnregisterChangeSceneAnimationStateProxy();
+        if (!result) {
+            return CreateJsValue(env, result);
+        }
+        result = JsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
+        return CreateJsValue(env, result);
+    }
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -2016,6 +2086,278 @@ void JsFormRouterProxyMgr::RemoveFormRouterProxyCallback(const std::vector<int64
             formRouterProxyCallbackMap_.erase(formId);
         }
     }
+}
+
+bool JsFormRouterProxyMgr::RegisterOverflowListener(napi_env env, napi_ref callbackRef)
+{
+    HILOG_INFO("call");
+
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("Invalid callback reference");
+        return false;
+    }
+
+    if (overflowRegisterCallback_ != nullptr) {
+        napi_delete_reference(env, overflowRegisterCallback_);
+        overflowRegisterCallback_ = nullptr;
+    }
+
+    overflowRegisterCallback_ = callbackRef;
+    overflowEnv_ = env;
+
+    napi_value callback;
+    napi_get_reference_value(env, callbackRef, &callback);
+    napi_valuetype valueType;
+    napi_typeof(env, callback, &valueType);
+    if (valueType != napi_function) {
+        HILOG_ERROR("Callback is not a function");
+        return false;
+    }
+
+    HILOG_INFO("Listener registered successfully");
+    return true;
+}
+
+bool JsFormRouterProxyMgr::UnregisterOverflowListener()
+{
+    HILOG_INFO("call");
+    overflowRegisterCallback_ = nullptr;
+    overflowEnv_ = nullptr;
+    return true;
+}
+
+ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo,
+    bool isOverflow)
+{
+    HILOG_INFO("call");
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(overflowEnv_, &loop);
+    if (loop == nullptr) {
+        HILOG_ERROR("Failed to get loop, formId:%{public}" PRId64 ".", formId);
+        return ERR_GET_INFO_FAILED;
+    }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOG_ERROR("Failed to new uv_work_t, formId:%{public}" PRId64 ".", formId);
+        return ERR_GET_INFO_FAILED;
+    }
+
+    LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
+        .formId = std::to_string(formId),
+        .overflowInfo = overflowInfo,
+        .isOverflow = isOverflow
+    };
+    if (dataParam == nullptr) {
+        HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
+        delete work;
+        return ERR_GET_INFO_FAILED;
+    }
+    work->data = dataParam;
+    uv_queue_work(
+        loop, work, [](uv_work_t *work) {},
+        [](uv_work_t *work, int status) {
+            LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
+            JsFormRouterProxyMgr::GetInstance()->RequestOverflowInner(dataParam);
+            std::unique_lock<std::mutex> lock(dataParam->mutex);
+            dataParam->isReady = true;
+            dataParam->condition.notify_all();
+            delete work;
+        });
+    std::unique_lock<std::mutex> lock(dataParam->mutex);
+    dataParam->condition.wait(lock, [&] { return dataParam->isReady; });
+    bool result = dataParam->result;
+    delete dataParam;
+    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+}
+
+void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataParam)
+{
+    HILOG_INFO("call");
+    napi_value requestObj;
+    napi_create_object(overflowEnv_, &requestObj);
+
+    napi_value formIdValue;
+    napi_create_string_utf8(overflowEnv_, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
+    napi_set_named_property(overflowEnv_, requestObj, "formId", formIdValue);
+    napi_set_named_property(overflowEnv_, requestObj, "isOverflow", CreateJsValue(overflowEnv_, dataParam->isOverflow));
+
+    napi_value overflowInfoValue;
+    CreateFormOverflowInfo(overflowEnv_, dataParam->overflowInfo, &overflowInfoValue);
+    napi_set_named_property(overflowEnv_, requestObj, "overflowInfo", overflowInfoValue);
+
+    napi_value myCallback = nullptr;
+    napi_get_reference_value(overflowEnv_, overflowRegisterCallback_, &myCallback);
+
+    napi_valuetype valueType;
+    napi_typeof(overflowEnv_, myCallback, &valueType);
+
+    if (valueType != napi_function) {
+        dataParam->result = false;
+        return;
+    }
+
+    napi_value args[] = { requestObj };
+    napi_value callResult = nullptr;
+    napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, &callResult);
+    if (status != napi_ok) {
+        dataParam->result = false;
+        return;
+    }
+
+    napi_valuetype returnType;
+    napi_typeof(overflowEnv_, callResult, &returnType);
+
+    bool result = false;
+    if (returnType == napi_undefined) {
+        dataParam->result = false;
+        return;
+    }
+
+    napi_get_value_bool(overflowEnv_, callResult, &result);
+    dataParam->result = result;
+}
+
+void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo,
+    napi_value* result)
+{
+    HILOG_INFO("CreateFormOverflowInfo call");
+    napi_value area = nullptr;
+    napi_create_object(env, &area);
+    napi_set_named_property(env, area, "left", CreateJsValue(env, overflowInfo.area.left));
+    napi_set_named_property(env, area, "top", CreateJsValue(env, overflowInfo.area.top));
+    napi_set_named_property(env, area, "width", CreateJsValue(env, overflowInfo.area.width));
+    napi_set_named_property(env, area, "height", CreateJsValue(env, overflowInfo.area.height));
+
+    napi_value duration = nullptr;
+    napi_create_int32(env, overflowInfo.duration, &duration);
+    napi_create_object(env, result);
+    napi_set_named_property(env, *result, "area", area);
+    napi_set_named_property(env, *result, "duration", duration);
+}
+
+bool JsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
+{
+    HILOG_INFO("call");
+
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("Invalid callback reference");
+        return false;
+    }
+
+    if (changeSceneAnimationStateRigisterCallback_ != nullptr) {
+        napi_delete_reference(env, changeSceneAnimationStateRigisterCallback_);
+        changeSceneAnimationStateRigisterCallback_ = nullptr;
+    }
+
+    changeSceneAnimationStateRigisterCallback_ = callbackRef;
+    changeSceneAnimationStateEnv_ = env;
+
+    napi_value callback;
+    napi_get_reference_value(env, callbackRef, &callback);
+    napi_valuetype valueType;
+    napi_typeof(env, callback, &valueType);
+    if (valueType != napi_function) {
+        HILOG_ERROR("Callback is not a function");
+        return false;
+    }
+
+    HILOG_INFO("Listener registered successfully");
+    return true;
+}
+
+bool JsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
+{
+    HILOG_INFO("call");
+    changeSceneAnimationStateRigisterCallback_ = nullptr;
+    changeSceneAnimationStateEnv_ = nullptr;
+    return true;
+}
+
+ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, int32_t state)
+{
+    HILOG_INFO("call");
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(overflowEnv_, &loop);
+    if (loop == nullptr) {
+        HILOG_ERROR("Failed to get loop, formId:%{public}" PRId64 ".", formId);
+        return ERR_GET_INFO_FAILED;
+    }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOG_ERROR("Failed to new uv_work_t, formId:%{public}" PRId64 ".", formId);
+        return ERR_GET_INFO_FAILED;
+    }
+
+    LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
+        .formId = std::to_string(formId),
+        .state = state
+    };
+    if (dataParam == nullptr) {
+        HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
+        delete work;
+        return ERR_GET_INFO_FAILED;
+    }
+    work->data = dataParam;
+    uv_queue_work(
+        loop, work, [](uv_work_t *work) {},
+        [](uv_work_t *work, int status) {
+            LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
+            JsFormRouterProxyMgr::GetInstance()->ChangeSceneAnimationStateInner(dataParam);
+            std::unique_lock<std::mutex> lock(dataParam->mutex);
+            dataParam->isReady = true;
+            dataParam->condition.notify_all();
+            delete work;
+        });
+    std::unique_lock<std::mutex> lock(dataParam->mutex);
+    dataParam->condition.wait(lock, [&] { return dataParam->isReady; });
+    bool result = dataParam->result;
+
+    delete dataParam;
+    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+}
+
+void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam* dataParam)
+{
+    HILOG_INFO("call");
+    napi_value requestObj;
+    napi_create_object(changeSceneAnimationStateEnv_, &requestObj);
+
+    napi_value formIdValue;
+    napi_create_string_utf8(changeSceneAnimationStateEnv_, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
+    napi_set_named_property(changeSceneAnimationStateEnv_, requestObj, "formId", formIdValue);
+    napi_set_named_property(changeSceneAnimationStateEnv_, requestObj, "state",
+        CreateJsValue(changeSceneAnimationStateEnv_, dataParam->state));
+
+    napi_value myCallback = nullptr;
+    napi_get_reference_value(changeSceneAnimationStateEnv_, changeSceneAnimationStateRigisterCallback_, &myCallback);
+
+    napi_valuetype valueType;
+    napi_typeof(changeSceneAnimationStateEnv_, myCallback, &valueType);
+
+    if (valueType != napi_function) {
+        dataParam->result = false;
+        return;
+    }
+
+    napi_value args[] = { requestObj };
+    napi_value callResult = nullptr;
+    napi_status status = napi_call_function(changeSceneAnimationStateEnv_, nullptr, myCallback, 1, args, &callResult);
+    if (status != napi_ok) {
+        dataParam->result = false;
+        return;
+    }
+
+    napi_valuetype returnType;
+    napi_typeof(changeSceneAnimationStateEnv_, callResult, &returnType);
+
+    if (returnType == napi_undefined) {
+        dataParam->result = false;
+        return;
+    }
+
+    bool result = false;
+    napi_get_value_bool(changeSceneAnimationStateEnv_, callResult, &result);
+    dataParam->result = result;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS
