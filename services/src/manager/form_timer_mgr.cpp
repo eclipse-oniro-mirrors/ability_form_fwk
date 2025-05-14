@@ -1010,7 +1010,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
         return false;
     }
     timerOption->SetWantAgent(wantAgent);
-    
+
     unint64_t updateAtTimerId_ = 0L;
     atTimerWakeUpTime_ = nextTime;
     {
