@@ -1010,7 +1010,8 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
         return false;
     }
     timerOption->SetWantAgent(wantAgent);
-
+    
+    unint64_t updateAtTimerId_ = 0L;
     atTimerWakeUpTime_ = nextTime;
     {
         std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
@@ -1018,9 +1019,10 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
             ClearUpdateAtTimerResource();
         }
         currentUpdateAtWantAgent_ = wantAgent;
+        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        updateAtTimerId = updateAtTimerId_；
     }
     
-    updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
         static_cast<uint64_t>(nextTime));
     if (!bRet) {
