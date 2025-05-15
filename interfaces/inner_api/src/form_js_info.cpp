@@ -36,7 +36,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     jsFormCodePath = Str16ToStr8(parcel.ReadString16());
     MessageParcel* msgParcel = static_cast<MessageParcel*>(&parcel);
     int32_t formDataLength = parcel.ReadInt32();
-    HILOG_INFO("ReadFromParcel data length is %{public}d , formId:%{public}lld", formDataLength, formId);
+    HILOG_INFO("ReadFromParcel data length is %{public}d , formId:%{public}" PRId64, formDataLength, formId);
     if (formDataLength > BIG_DATA) {
         HILOG_INFO("data length > 32k");
         const void *rawData = msgParcel->ReadRawData(formDataLength);
