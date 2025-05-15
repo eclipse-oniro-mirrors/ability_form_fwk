@@ -58,26 +58,22 @@ bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, int64_t form
     if (FormUtil::GetCurrentAccountId() != DEFAULT_USER_ID) {
         return false;
     }
- 
+
     if (formId != 0) {
         bool lockStatus = false;
         FormDataMgr::GetInstance().GetFormLock(formId, lockStatus);
         return lockStatus;
     }
- 
+
     if (bundleName.empty()) {
         HILOG_ERROR("invalid bundleName");
         return false;
     }
- 
-    {
-        std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
-        if (!isInitialized_ && !Init()) {
-            HILOG_ERROR("Form bundle lock mgr not init");
-            return false;
-        }
+
+    if (!IsBundleLockMgrInit()) {
+        return false;
     }
- 
+
     std::shared_lock<std::shared_mutex> lock(bundleLockSetMutex_);
     auto iter = formBundleLockSet_.find(bundleName);
     return iter != formBundleLockSet_.end();
@@ -90,9 +86,7 @@ void FormBundleLockMgr::SetBundleLockStatus(const std::string &bundleName, bool 
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
-    if (!isInitialized_ && !Init()) {
-        HILOG_ERROR("Form bundle lock mgr not init");
+    if (!IsBundleLockMgrInit()) {
         return;
     }
 
@@ -145,5 +139,16 @@ void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bo
         HILOG_ERROR("set bundle protect status failed");
     }
 }
+
+bool FormBundleLockMgr::IsBundleLockMgrInit()
+{
+    std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
+    if (!isInitialized_ && !Init()) {
+        HILOG_ERROR("Form bundle lock mgr not init");
+        return false;
+    }
+    return true;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
