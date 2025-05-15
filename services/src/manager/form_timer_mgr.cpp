@@ -1011,7 +1011,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     }
     timerOption->SetWantAgent(wantAgent);
 
-    unint64_t updateAtTimerId_ = 0L;
+    unint64_t updateAtTimerId = 0L;
     atTimerWakeUpTime_ = nextTime;
     {
         std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
