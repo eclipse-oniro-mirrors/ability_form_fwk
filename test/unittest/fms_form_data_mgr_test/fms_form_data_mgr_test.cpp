@@ -4233,4 +4233,72 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_002, TestSize.L
     EXPECT_EQ(value, true);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_002 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetHostRefresh_001
+ * @tc.name: SetHostRefresh
+ * @tc.desc: Verify that the map can be operated normally.
+ */
+ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetHostRefresh_001, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostRefresh_001 start";
+     int64_t formId = FORM_ID_ONE;
+     formDataMgr_.formRecords_.erase(formId);
+     formDataMgr_.SetHostRefresh(formId, true);
+     EXPECT_EQ(formDataMgr_.formRecords_.find(formId) == formDataMgr_.formRecords_.end(), true);
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostRefresh_001 end";
+ }
+  
+ /**
+  * @tc.number: FmsFormDataMgrTest_SetHostRefresh_002
+  * @tc.name: SetHostRefresh
+  * @tc.desc: Verify that the map can be operated normally.
+  */
+ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetHostRefresh_002, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostRefresh_002 start";
+     FormRecord formRecord;
+     int64_t formId = FORM_ID_ONE;
+     formRecord.formId = formId;
+     formDataMgr_.formRecords_.emplace(formId, formRecord);
+     formDataMgr_.SetHostRefresh(formId, true);
+     auto itFormRecord = formDataMgr_.formRecords_.find(formId);
+     EXPECT_EQ(itFormRecord->second.isHostRefresh, true);
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostRefresh_002 end";
+ }
+  
+ /**
+  * @tc.number: FmsFormDataMgrTest_ClearWantCache_001
+  * @tc.name: ClearWantCache
+  * @tc.desc: Verify that the map can be operated normally.
+  */
+ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearWantCache_001, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_001 start";
+     int64_t formId = FORM_ID_ONE;
+     formDataMgr_.formRecords_.erase(formId);
+     formDataMgr_.ClearWantCache(formId);
+     EXPECT_EQ(formDataMgr_.formRecords_.find(formId) == formDataMgr_.formRecords_.end(), true);
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_001 end";
+ }
+  
+ /**
+  * @tc.number: FmsFormDataMgrTest_ClearWantCache_002
+  * @tc.name: ClearWantCache
+  * @tc.desc: Verify that the map can be operated normally.
+  */
+ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearWantCache_002, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_002 start";
+     Want want;
+     FormRecord formRecord;
+     int64_t formId = FORM_ID_ONE;
+     formRecord.formId = formId;
+     formRecord.wantCacheMap[formId] = want;
+     formDataMgr_.formRecords_.emplace(formId, formRecord);
+     formDataMgr_.ClearWantCache(formId);
+     auto itFormRecord = formDataMgr_.formRecords_.find(formId);
+     EXPECT_EQ(itFormRecord->second.wantCacheMap.size(), 0);
+     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_002 end";
+ }
 }

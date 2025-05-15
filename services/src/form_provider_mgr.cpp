@@ -85,7 +85,6 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     }
     formRecord.isInited = true;
     formRecord.needRefresh = false;
-    formRecord.wantCacheMap.clear();
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
     formRecord.formProviderInfo = formProviderInfo;
@@ -209,8 +208,8 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
         record.needRefresh = true;
         UpdateWant(formId, want, record);
-        FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+        FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
         HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);
         return ERR_OK;
     }
@@ -481,7 +480,6 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
     // formRecord init
     formRecord.isInited = true;
     formRecord.needRefresh = false;
-    formRecord.wantCacheMap.clear();
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
     // update form for host clients
