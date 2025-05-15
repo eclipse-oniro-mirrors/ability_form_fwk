@@ -47,6 +47,20 @@ public:
     void GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos);
 
     /**
+     * @brief Get all form data size from DbCache.
+     * @return Returns form data size.
+     */
+    int32_t GetAllFormInfoSize();
+
+    /**
+     * @brief Get form counts from DbCache by calling user id.
+     * @param currentAccountId current account ID.
+     * @param callingUid calling user ID.
+     * @return Returns form counts.
+     */
+    int GetCallingFormCountsByUid(const int32_t currentAccountId, const int callingUid);
+
+    /**
      * @brief Get all form data in DbCache and DB by bundleName.
      * @param bundleName BundleName.
      * @param userId user ID.

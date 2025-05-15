@@ -495,5 +495,39 @@ ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t form
     return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
 }
 
+/**
+ * @brief Get form counts from DbCache by calling user id.
+ * @param currentAccountId current account ID.
+ * @param callingUid calling user ID.
+ * @return Returns form counts.
+ */
+int FormDbCache::GetCallingFormCountsByUid(const int32_t currentAccountId, const int callingUid)
+{
+    int callingUidFormCounts = 0;
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (const auto& record : formDBInfos_) {
+        if (record.providerUserId != currentAccountId) {
+            continue;
+        }
+        for (const auto &userUid : record.formUserUids) {
+            if (userUid != callingUid) {
+                continue;
+            }
+            callingUidFormCounts++;
+        }
+    }
+    return callingUidFormCounts;
+}
+
+/**
+ * @brief Get all form data size from DbCache.
+ * @return Returns form data size.
+ */
+int32_t FormDbCache::GetAllFormInfoSize()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    return static_cast<int32_t>(formDBInfos_.size());
+}
 } // namespace AppExecFwk
 } // namespace OHOS
