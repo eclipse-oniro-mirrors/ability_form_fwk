@@ -1775,6 +1775,34 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
     }
 }
 
+bool FormRenderRecord::CheckManagerDelegateValid(const FormJsInfo &formJsInfo, const Want &want)
+{
+    HILOG_DEBUG("call");
+    if (!want.HasParameter(FORM_RENDERER_PROCESS_ON_ADD_SURFACE)) {
+        HILOG_INFO("not add surface, ingore it");
+        return true;
+    }
+
+    auto context = GetContext(formJsInfo, want);
+    if (context == nullptr) {
+        return true;
+    }
+
+    {
+        std::shared_lock<std::shared_mutex> lock(eventHandlerReset_);
+        if (eventHandleNeedReset) {
+            return true;
+        }
+    }
+    auto key = formJsInfo.formId;
+    auto iter = formRendererGroupMap_.find(key);
+    if (iter == formRendererGroupMap_.end() || iter->second == nullptr) {
+        return true;
+    }
+
+    return iter->second->IsManagerDelegateValid(want);
+}
+
 void FormRenderRecord::SetFormSupplyClient(const sptr<IFormSupply>& formSupplyClient)
 {
     std::lock_guard<std::mutex> lock(formSupplyMutex_);
