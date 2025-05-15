@@ -2429,7 +2429,6 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
     FormRecord formRecord;
     isFormRecordsEnd = GetFormRecordById(formId, formRecord);
     if (!isFormRecordsEnd) {
-    if (!isFormRecordsEnd) {
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
         if (formHostRecords.empty()) {
