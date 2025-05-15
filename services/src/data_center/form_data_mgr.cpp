@@ -2492,7 +2492,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
     }
     FormRecord formRecord;
     std::vector<FormHostRecord> formHostRecords;
-    bool isFormRecordsEnd = isFormRecordsEnd = GetFormRecordById(formId, formRecord);
+    bool isFormRecordsEnd = GetFormRecordById(formId, formRecord);
     if (!isFormRecordsEnd) {
         GetFormHostRecord(formId, formHostRecords);
     }
