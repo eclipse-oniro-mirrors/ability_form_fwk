@@ -1023,7 +1023,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
         updateAtTimerId = updateAtTimerId_；
     }
     
-    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId,
         static_cast<uint64_t>(nextTime));
     if (!bRet) {
         HILOG_ERROR("init update at timer task error");
