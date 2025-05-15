@@ -2970,29 +2970,6 @@ int32_t FormDataMgr::GetTempFormCount() const
 }
 
 /**
- * @brief update formRecord recycle status to recycled.
- * @param formId form id.
- * @return Returns true on success, false on failure.
- */
-bool FormDataMgr::UpdateFormRecordRecycleStatusToRecycled(const int64_t formId)
-{
-    HILOG_DEBUG("get form record by formId");
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    auto info = formRecords_.find(formId);
-    if (info == formRecords_.end()) {
-        HILOG_WARN("form %{public}" PRId64 " not exist", formId);
-        return false;
-    }
-    if (info->second.recycleStatus != RecycleStatus::RECYCLABLE) {
-        HILOG_WARN("form %{public}" PRId64 " not RECYCLABLE", formId);
-        return false;
-    }
-    info->second.recycleStatus = RecycleStatus::RECYCLED;
-    HILOG_DEBUG("get form record successfully");
-    return true;
-}
-
-/**
  * @brief get formRecord by formId
  * @param formId form id.
  * @param formRecord form record.

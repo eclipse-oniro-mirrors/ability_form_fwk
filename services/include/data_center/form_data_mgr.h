@@ -910,13 +910,6 @@ public:
     void GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords);
 
     /**
-     * @brief update formRecord recycle status to recycled.
-     * @param formId form id.
-     * @return Returns true on success, false on failure.
-     */
-    bool UpdateFormRecordRecycleStatusToRecycled(const int64_t formId);
-
-    /**
      * @brief get formRecord by formId
      * @param formId form id.
      * @param formRecord form record.
