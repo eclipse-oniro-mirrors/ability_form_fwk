@@ -1020,7 +1020,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
         }
         currentUpdateAtWantAgent_ = wantAgent;
         updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
-        updateAtTimerId = updateAtTimerId_；
+        updateAtTimerId = updateAtTimerId_;
     }
     
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId,
