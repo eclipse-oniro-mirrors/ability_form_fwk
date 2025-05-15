@@ -947,10 +947,7 @@ void FormTaskMgr::PostStopRenderingForm(
     auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
-    {
-        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes.erase(formId);
-    }
+    RemoveLastRecoverTimesByFormId(formId);
     FormCommand deleteCommand{
         formId,
         std::make_pair(TaskCommandType::DELETE_FORM, formId),
@@ -995,10 +992,7 @@ void FormTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &compId,
     auto deleterenderForm = [formId, compId, uid, remoteObject]() {
         FormTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
     };
-    {
-        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes.erase(formId);
-    }
+    RemoveLastRecoverTimesByFormId(formId);
     if (!isDynamic) {
         FormCommand deleteCommand{
             formId,
@@ -1260,10 +1254,7 @@ void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Wa
         auto recycleForm = [formId, remoteObjectOfHost, remoteObjectOfRender]() {
             FormTaskMgr::GetInstance().RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
         };
-        {
-            std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-            formLastRecoverTimes.erase(formId);
-        }
+        RemoveLastRecoverTimesByFormId(formId);
         serialQueue_->ScheduleDelayTask(
             std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId), delayTime, recycleForm);
     }
@@ -1325,10 +1316,7 @@ void FormTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, co
     auto recoverForm = [record, want, remoteObject]() {
         FormTaskMgr::GetInstance().RecoverForm(record, want, remoteObject);
     };
-    {
-        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
-    }
+    UpdateFormLastRecoverTimes(formId);
     auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     FormCommand recoverCommand{
         formId,
@@ -1642,6 +1630,18 @@ void FormTaskMgr::PostDelayRefreshForms(const std::vector<FormRecord> updatedFor
     };
     serialQueue_->ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
     HILOG_INFO("end");
+}
+
+void FormTaskMgr::RemoveLastRecoverTimesByFormId(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+    formLastRecoverTimes.erase(formId);
+}
+
+void FormTaskMgr::UpdateFormLastRecoverTimes(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+    formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
 }
 } // namespace AppExecFwk
 } // namespace OHOS

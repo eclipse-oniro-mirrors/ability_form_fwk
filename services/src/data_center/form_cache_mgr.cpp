@@ -386,7 +386,11 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
 {
     NativeRdb::AbsRdbPredicates absRdbPredicates(FORM_CACHE_TABLE);
     absRdbPredicates.EqualTo(FORM_ID, std::to_string(formId));
-    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> absSharedResultSet = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formCacheMutex_);
+        absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
+    }
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("GetDataCacheFromDb failed");
         return false;
@@ -445,6 +449,7 @@ bool FormCacheMgr::SaveDataCacheToDb(int64_t formId, const FormCache &formCache)
 
 bool FormCacheMgr::DeleteDataCacheInDb(int64_t formId)
 {
+    std::lock_guard<std::mutex> lock(formCacheMutex_);
     NativeRdb::AbsRdbPredicates absRdbPredicates(FORM_CACHE_TABLE);
     absRdbPredicates.EqualTo(FORM_ID, std::to_string(formId));
     return FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
@@ -455,7 +460,12 @@ bool FormCacheMgr::GetImgCacheFromDb(
 {
     NativeRdb::AbsRdbPredicates absRdbPredicates(IMG_CACHE_TABLE);
     absRdbPredicates.EqualTo(IMAGE_ID, std::to_string(rowId));
-    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> absSharedResultSet = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(imgCacheMutex_);
+        absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
+    }
+
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("GetImgCacheFromDb failed");
         return false;
@@ -510,7 +520,7 @@ bool FormCacheMgr::DeleteImgCacheInDb(const std::string &rowId)
     if (rowId.empty()) {
         return false;
     }
-
+    std::lock_guard<std::mutex> lock(imgCacheMutex_);
     NativeRdb::AbsRdbPredicates absRdbPredicates(IMG_CACHE_TABLE);
     absRdbPredicates.EqualTo(IMAGE_ID, rowId);
     return FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
