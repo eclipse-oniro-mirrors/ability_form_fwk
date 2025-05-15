@@ -211,6 +211,14 @@ public:
      * @param formId The id of the form.
      * @param formHostObjs The form host remote object.
      */
+
+    /**
+     * @brief update formRecord recycle status to recycled.
+     * @param formId form id.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateFormRecordRecycleStatusToRecycled(const int64_t formId);
+
     void GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const;
     /**
      * @brief Delete form host record.
@@ -1013,13 +1021,6 @@ private:
     template<typename T>
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
-
-    /**
-     * @brief update formRecord recycle status to recycled.
-     * @param formId form id.
-     * @return Returns true on success, false on failure.
-     */
-    bool UpdateFormRecordRecycleStatusToRecycled(const int64_t formId);
 
 private:
     void GetUnusedFormInstancesByFilter(
