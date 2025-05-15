@@ -1014,6 +1014,13 @@ private:
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
 
+    /**
+     * @brief update formRecord recycle status to recycled.
+     * @param formId form id.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateFormRecordRecycleStatusToRecycled(const int64_t formId);
+
 private:
     void GetUnusedFormInstancesByFilter(
         const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances);
