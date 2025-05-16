@@ -249,7 +249,7 @@ private:
 
     void HandleFormRenderGC();
 
-    bool InitCompIds(const int64_t &formId,
+    bool GetAndDeleteRecycledCompIds(const int64_t &formId,
         std::vector<std::string> &orderedCompIds, std::string &currentCompId);
 
     bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,

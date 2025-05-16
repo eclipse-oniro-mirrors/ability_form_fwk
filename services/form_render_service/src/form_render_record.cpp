@@ -1705,7 +1705,7 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
     }
 }
 
-bool FormRenderRecord::InitCompIds(const int64_t &formId,
+bool FormRenderRecord::GetAndDeleteRecycledCompIds(const int64_t &formId,
     std::vector<std::string> &orderedCompIds, std::string &currentCompId)
 {
     std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
@@ -1716,6 +1716,7 @@ bool FormRenderRecord::InitCompIds(const int64_t &formId,
     }
     orderedCompIds = pairIter->second.first;
     currentCompId = pairIter->second.second;
+    recycledFormCompIds_.erase(formId);
     HILOG_INFO("compIds size:%{public}zu,currentCompId:%{public}s,formId:%{public}" PRId64,
         orderedCompIds.size(), currentCompId.c_str(), formId);
     return true;
@@ -1727,7 +1728,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     auto formId = formJsInfo.formId;
     std::vector<std::string> orderedCompIds;
     std::string currentCompId;
-    bool flag = InitCompIds(formId, orderedCompIds, currentCompId);
+    bool flag = GetAndDeleteRecycledCompIds(formId, orderedCompIds, currentCompId);
     if (!flag) {
         HILOG_INFO("init compIds failed,formId:%{public}" PRId64, formId);
         return false;
@@ -1736,16 +1737,6 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex = 0;
     bool currentRequestFound = false;
-    {
-        std::lock_guard<std::mutex> lock(formRequestsMutex_);
-        auto iter = formRequests_.find(formId);
-        if (iter == formRequests_.end()) {
-            HILOG_ERROR("%{public}s doesn't has formRequest", std::to_string(formId).c_str());
-            return false;
-        }
-        recordFormRequests = iter->second;
-    }
-
     UpdateGroupRequestsWhenRecover(formId, formJsInfo, orderedCompIds, currentCompId, statusData, isHandleClickEvent,
         currentRequestIndex, groupRequests, currentRequestFound, recordFormRequests);
 
@@ -1767,12 +1758,17 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
     const bool &isHandleClickEvent, size_t &currentRequestIndex, std::vector<Ace::FormRequest> &groupRequests,
     bool &currentRequestFound, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
 {
+    std::set<std::string> groupCompIds;
     for (auto compId : orderedCompIds) {
         auto recordRequestIter = recordFormRequests.find(compId);
         if (recordRequestIter == recordFormRequests.end()) {
             HILOG_WARN("invalid formRequest,formId:%{public}" PRId64 " compId=%{public}s", formId, compId.c_str());
             continue;
         }
+        if (groupCompIds.find(compId) != groupCompIds.end()) {
+            continue;
+        }
+        groupCompIds.insert(compId);
         auto& recordRequest = recordRequestIter->second;
         Ace::FormRequest groupRequest;
         groupRequest.compId = compId;
