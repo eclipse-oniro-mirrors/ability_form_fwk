@@ -2629,7 +2629,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_139, TestSize.Level1)
 
 /**
  * @tc.name: FormRenderRecordTest_140
- * @tc.desc: Verify InitCompIds
+ * @tc.desc: Verify GetAndDeleteRecycledCompIds
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_140, TestSize.Level1)
@@ -2641,7 +2641,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_140, TestSize.Level1)
     formRenderRecordPtr_->recycledFormCompIds_.clear();
     std::pair<std::vector<std::string>, std::string> pp;
     formRenderRecordPtr_->recycledFormCompIds_.emplace(formId, pp);
-    formRenderRecordPtr_->InitCompIds(formId, orderedCompIds, currentCompId);
+    formRenderRecordPtr_->GetAndDeleteRecycledCompIds(formId, orderedCompIds, currentCompId);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_140 end";
 }
 
