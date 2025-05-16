@@ -1187,7 +1187,7 @@ void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupply
             }
 
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr, formJsInfo = formRequest.second.formJsInfo, &want = formRequest.second.want]() {
+            auto task = [thisWeakPtr, formJsInfo = formRequest.second.formJsInfo, want = formRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
                 if (renderRecord) {
                     renderRecord->HandleUpdateInJsThread(formJsInfo, want);
@@ -1225,7 +1225,7 @@ void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsI
             }
 
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr, form, &want = formRequest.second.want]() {
+            auto task = [thisWeakPtr, form, want = formRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
                 if (renderRecord) {
                     renderRecord->HandleUpdateInJsThread(form, want);
