@@ -86,7 +86,8 @@
                 "//foundation/ability/form_fwk:fmskit_native",
                 "//foundation/ability/form_fwk:fmskit_provider_client",
                 "//foundation/ability/form_fwk:form_napi_packages",
-                "//foundation/ability/form_fwk/frameworks/cj:cj_formBindingData_ffi"
+                "//foundation/ability/form_fwk/frameworks/cj:cj_formBindingData_ffi",
+                "//foundation/ability/form_fwk/frameworks/cj:cj_formProvider_ffi"
               ],
               "service_group": [
                 "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
@@ -147,6 +148,14 @@
                   ]
                 },
                 "name": "//foundation/ability/form_fwk/frameworks/cj:cj_formBindingData_ffi"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/frameworks/cj/form_provider/include",
+                  "header_files": [
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk/frameworks/cj:cj_formProvider_ffi"
               },
               {
                 "header": {
