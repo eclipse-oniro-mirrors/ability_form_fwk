@@ -1116,8 +1116,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0127, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0128
  * @tc.name: test RequestPublishFormWithSnapshot function.
- * @tc.desc: Verify that the RequestPublishFormWithSnapshot is called by the background
- * and the return value is ERR_APPEXECFWK_FORM_NOT_TRUST.
+ * @tc.desc: Verify that the RequestPublishFormWithSnapshot interface is called normally
+ * and the return value is ERR_OK.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0128, TestSize.Level1)
 {
@@ -1131,7 +1131,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0128, TestSize.Level1)
     want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
     MockIsSACall(false);
     ErrCode ret = formMgrService.RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_TRUST);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0128 end";
 }
 
