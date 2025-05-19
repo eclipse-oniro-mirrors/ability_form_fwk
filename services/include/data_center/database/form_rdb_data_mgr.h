@@ -171,8 +171,6 @@ private:
 
     ErrCode LoadRdbStore();
 
-    ErrCode ExecuteRdbSql(const std::string &sql);
-
     std::map<std::string, FormRdbTableConfig> formRdbTableCfgMap_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
     std::shared_mutex rdbStoreMutex_;
