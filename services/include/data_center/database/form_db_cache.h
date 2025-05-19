@@ -58,7 +58,7 @@ public:
      * @param callingUid calling user ID.
      * @return Returns form counts.
      */
-    int GetCallingFormCountsByUid(const int32_t currentAccountId, const int callingUid);
+    int GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid);
 
     /**
      * @brief Get all form data in DbCache and DB by bundleName.

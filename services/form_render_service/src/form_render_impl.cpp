@@ -92,7 +92,9 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     Want formRenderWant(want);
-    return UpdateRenderRecordByUid(uid, formRenderWant, formJsInfo, formSupplyClient);
+    const auto result = UpdateRenderRecordByUid(uid, formRenderWant, formJsInfo, formSupplyClient);
+    formSupplyClient->OnRenderTaskDone(formJsInfo.formId, formRenderWant);
+    return result;
 }
 
 int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
@@ -115,33 +117,21 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
     sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     {
         std::shared_ptr<FormRenderRecord> search = nullptr;
-        const auto result = GetRenderRecordById(search, uid);
-        if (result != ERR_OK || search == nullptr) {
+        GetRenderRecordById(search, uid);
+        if (search == nullptr) {
             HILOG_ERROR("get render record fail");
             return RENDER_FORM_FAILED;
         }
 
         std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
         search->DeleteRenderRecord(formJsInfo.formId, compId, hostToken, isRenderGroupEmpty);
-        {
-            std::lock_guard<std::mutex> lock(renderRecordMutex_);
-            if (search->IsEmpty() && !search->HasRenderFormTask()) {
-                auto iterator = renderRecordMap_.find(uid);
-                if (iterator == renderRecordMap_.end()) {
-                    HILOG_ERROR("fail.");
-                    return RENDER_FORM_FAILED;
-                }
-                renderRecordMap_.erase(iterator);
-                HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
-                if (renderRecordMap_.empty()) {
-                    FormMemmgrClient::GetInstance().SetCritical(false);
-                }
-            }
+        const auto result = DeleteRenderRecordByUid(uid, search);
+        if (result != ERR_OK) {
+            return result;
         }
     }
 
-    HILOG_INFO("connectId:%{public}d",
-        want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
+    HILOG_INFO("connectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
     if (isRenderGroupEmpty) {
         formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
     }
@@ -215,8 +205,8 @@ int32_t FormRenderImpl::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, 
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     std::shared_ptr<FormRenderRecord> search = nullptr;
-    const auto result = GetRenderRecordById(search, uid);
-    if (result != ERR_OK || search == nullptr) {
+    GetRenderRecordById(search, uid);
+    if (search == nullptr) {
         HILOG_ERROR("RenderRecord not find");
         return RELOAD_FORM_FAILED;
     }
@@ -525,20 +515,18 @@ int32_t FormRenderImpl::UpdateRenderRecordByUid(const std::string& uid, Want &fo
         renderRecordMap_.emplace(uid, record);
         FormRenderGCTask(uid);
     }
-    formSupplyClient->OnRenderTaskDone(formJsInfo.formId, formRenderWant);
     return result;
 }
 
-int32_t FormRenderImpl::GetRenderRecordById(std::shared_ptr<FormRenderRecord>& search, const std::string& uid)
+void FormRenderImpl::GetRenderRecordById(std::shared_ptr<FormRenderRecord>& search, const std::string& uid)
 {
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     auto iterator = renderRecordMap_.find(uid);
     if (iterator == renderRecordMap_.end() || !(iterator->second)) {
         HILOG_ERROR("fail");
-        return RENDER_FORM_FAILED;
+        return;
     }
     search = iterator->second;
-    return ERR_OK;
 }
 
 int32_t FormRenderImpl::RecoverFormByUid(const FormJsInfo &formJsInfo, const Want &want, const std::string& uid,
@@ -577,6 +565,28 @@ int32_t FormRenderImpl::RecycleFormByUid(const std::string& uid, std::string& st
     }
     if (statusData.empty()) {
         HILOG_WARN("empty statusData of %{public}s", std::to_string(formId).c_str());
+    }
+    return ERR_OK;
+}
+
+int32_t FormRenderImpl::DeleteRenderRecordByUid(const std::string& uid, const std::shared_ptr<FormRenderRecord>& search)
+{
+    if (!search) {
+        HILOG_ERROR("get render record fail");
+        return RENDER_FORM_FAILED;
+    }
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (search->IsEmpty() && !search->HasRenderFormTask()) {
+        auto iterator = renderRecordMap_.find(uid);
+        if (iterator == renderRecordMap_.end()) {
+            HILOG_ERROR("fail.");
+            return RENDER_FORM_FAILED;
+        }
+        renderRecordMap_.erase(iterator);
+        HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
+        if (renderRecordMap_.empty()) {
+            FormMemmgrClient::GetInstance().SetCritical(false);
+        }
     }
     return ERR_OK;
 }

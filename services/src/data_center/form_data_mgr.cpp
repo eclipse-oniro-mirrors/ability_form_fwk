@@ -381,7 +381,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     }
 
     int32_t currentAccountId = FormUtil::GetCurrentAccountId();
-    int callingUidFormCounts = FormDbCache::GetInstance().GetCallingFormCountsByUid(currentAccountId, callingUid);
+    int callingUidFormCounts = FormDbCache::GetInstance().GetFormCountsByCallingUid(currentAccountId, callingUid);
     if (callingUidFormCounts >= maxRecordPerApp) {
         HILOG_WARN("already use %{public}d forms by userId==currentAccountId", maxRecordPerApp);
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
@@ -2421,14 +2421,14 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
 ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     HILOG_DEBUG("get form instance by formId");
-    bool isFormRecordsEnd = false;
+    bool notFindFormRecord  = false;
     if (formId <= 0) {
         HILOG_ERROR("invalid formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     FormRecord formRecord;
-    isFormRecordsEnd = GetFormRecordById(formId, formRecord);
-    if (!isFormRecordsEnd) {
+    notFindFormRecord  = GetFormRecordById(formId, formRecord);
+    if (!notFindFormRecord ) {
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
         if (formHostRecords.empty()) {
@@ -2977,14 +2977,14 @@ int32_t FormDataMgr::GetTempFormCount() const
  */
 bool FormDataMgr::GetFormRecordById(const int64_t formId, FormRecord& formRecord)
 {
-    bool isFormRecordsEnd = false;
+    bool notFindFormRecord  = false;
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
-    isFormRecordsEnd = info == formRecords_.end();
-    if (!isFormRecordsEnd) {
+    notFindFormRecord  = info == formRecords_.end();
+    if (!notFindFormRecord ) {
         formRecord = info->second;
     }
-    return isFormRecordsEnd;
+    return notFindFormRecord ;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

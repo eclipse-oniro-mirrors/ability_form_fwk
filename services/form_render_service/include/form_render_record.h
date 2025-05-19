@@ -281,7 +281,13 @@ private:
 
     std::shared_ptr<EventHandler> GetEventHandler();
 
-    void AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
+    int32_t AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
+
+    void DeleteHostRemoteObjByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
+
+    void DeleteRecycledFormCompIds(int64_t formId);
+
+    void InsertRecycledFormCompIds(int64_t formId, const std::pair<std::vector<std::string>, std::string>& compIds);
 
     void DeleteHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
 

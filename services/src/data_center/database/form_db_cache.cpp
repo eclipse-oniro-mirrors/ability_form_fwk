@@ -501,7 +501,7 @@ ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t form
  * @param callingUid calling user ID.
  * @return Returns form counts.
  */
-int FormDbCache::GetCallingFormCountsByUid(const int32_t currentAccountId, const int callingUid)
+int FormDbCache::GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid)
 {
     int callingUidFormCounts = 0;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);

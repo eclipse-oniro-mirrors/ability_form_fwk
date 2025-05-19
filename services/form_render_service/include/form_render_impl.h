@@ -111,12 +111,14 @@ private:
     int32_t UpdateRenderRecordByUid(const std::string& uid, Want &formRenderWant, const FormJsInfo &formJsInfo,
                                     const sptr<IFormSupply>& formSupplyClient);
 
-    int32_t GetRenderRecordById(std::shared_ptr<FormRenderRecord>& search, const std::string& uid);
+    void GetRenderRecordById(std::shared_ptr<FormRenderRecord>& search, const std::string& uid);
 
     int32_t RecoverFormByUid(const FormJsInfo &formJsInfo, const Want &want, const std::string& uid,
                              const std::string& statusData);
 
     int32_t RecycleFormByUid(const std::string& uid, std::string& statusData, const int64_t formId);
+
+    int32_t DeleteRenderRecordByUid(const std::string& uid, const std::shared_ptr<FormRenderRecord>& search);
 
 private:
     std::mutex renderRecordMutex_;

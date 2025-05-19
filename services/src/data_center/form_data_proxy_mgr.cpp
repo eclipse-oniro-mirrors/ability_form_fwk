@@ -51,7 +51,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         return ERR_OK;
     }
 
-    UnsubscribeFormDataById(formId, false);
+    UnsubscribeFormDataById(formId);
 
     ApplicationInfo appInfo;
     if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
@@ -74,7 +74,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
 
 ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
-    UnsubscribeFormDataById(formId, true);
+    UnsubscribeFormDataById(formId);
     return ERR_OK;
 }
 
@@ -154,7 +154,7 @@ void FormDataProxyMgr::GetFormSubscribeInfo(
     }
 }
 
-void FormDataProxyMgr::UnsubscribeFormDataById(int64_t formId, const bool needRemove)
+void FormDataProxyMgr::UnsubscribeFormDataById(int64_t formId)
 {
     HILOG_DEBUG("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
@@ -163,9 +163,7 @@ void FormDataProxyMgr::UnsubscribeFormDataById(int64_t formId, const bool needRe
         if (search->second != nullptr) {
             search->second->UnsubscribeFormData();
         }
-        if (needRemove) {
-            formDataProxyRecordMap_.erase(formId);
-        }
+        formDataProxyRecordMap_.erase(formId);
     }
 }
 } // namespace AppExecFwk

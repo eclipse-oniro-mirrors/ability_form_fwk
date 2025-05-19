@@ -414,8 +414,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         HILOG_WARN("null hostRemoteObj");
         return RENDER_FORM_FAILED;
     }
-    AddHostByFormId(formJsInfo.formId, hostRemoteObj);
-    return ERR_OK;
+    return AddHostByFormId(formJsInfo.formId, hostRemoteObj);
 }
 
 void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId,
@@ -443,7 +442,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
     };
 
     if (hostRemoteObj != nullptr) {
-        DeleteHostByFormId((formId), hostRemoteObj);
+        DeleteHostRemoteObjByFormId(formId, hostRemoteObj);
     }
     if (eventHandler == nullptr) {
         return;
@@ -794,11 +793,7 @@ void FormRenderRecord::AddRenderer(const FormJsInfo &formJsInfo, const Want &wan
         HILOG_ERROR("Create formRendererGroup failed");
         return;
     }
-    auto task = [formRendererGroup, want, formJsInfo]() {
-        HILOG_INFO("execute add form task");
-        formRendererGroup->AddForm(want, formJsInfo);
-    };
-    eventHandler_->PostTask(task, "AddRenderer");
+    formRendererGroup->AddForm(want, formJsInfo);
     HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
 }
 
@@ -958,7 +953,7 @@ void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &comp
         }
     }
     if (isRequestEmpty) {
-        DeleteAndUpdateRecycledFormCompIds(formId, {}, false);
+        DeleteRecycledFormCompIds(formId);
     }
     HILOG_INFO("delete request formId:%{public}" PRId64 " compId:%{public}s request empty:%{public}d",
         formId, compId.c_str(), isRequestEmpty);
@@ -1046,7 +1041,8 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
         formRendererGroupMap_.erase(formId);
         isRenderGroupEmpty = formRendererGroupMap_.empty();
     }
-    DeleteAndUpdateRecycledFormCompIds(formId, compIds, true);
+    DeleteRecycledFormCompIds(formId);
+    InsertRecycledFormCompIds(formId, compIds);
     return true;
 }
 
@@ -1283,9 +1279,8 @@ void FormRenderRecord::HandleReleaseAllRendererInJsThread()
         HILOG_INFO("Release renderer which formId:%{public}" PRId64, formId);
         std::pair<std::vector<std::string>, std::string> compIds = iter.second->GetOrderedAndCurrentCompIds();
         iter.second->DeleteForm();
-        {
-            DeleteAndUpdateRecycledFormCompIds(formId, compIds, true);
-        }
+        DeleteRecycledFormCompIds(formId);
+        InsertRecycledFormCompIds(formId, compIds);
     }
     formRendererGroupMap_.clear();
 }
@@ -1827,18 +1822,19 @@ std::shared_ptr<EventHandler> FormRenderRecord::GetEventHandler()
     return eventHandler_;
 }
 
-void FormRenderRecord::AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj)
+int32_t FormRenderRecord::AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj)
 {
     std::lock_guard<std::mutex> lock(hostsMapMutex_);
     auto iter = hostsMapForFormId_.find(formId);
     if (iter == hostsMapForFormId_.end()) {
         hostsMapForFormId_.emplace(formId, IRemoteObjectSet({ hostRemoteObj }));
-        return;
+        return ERR_OK;
     }
     iter->second.emplace(hostRemoteObj);
+    return ERR_OK;
 }
 
-void FormRenderRecord::DeleteHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj)
+void FormRenderRecord::DeleteHostRemoteObjByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj)
 {
     std::lock_guard<std::mutex> lock(hostsMapMutex_);
     auto iter = hostsMapForFormId_.find(formId);
@@ -1889,14 +1885,17 @@ bool FormRenderRecord::GetEventHandlerNeedReset()
     return eventHandleNeedReset;
 }
 
-void FormRenderRecord::DeleteAndUpdateRecycledFormCompIds(int64_t formId,
-    const std::pair<std::vector<std::string>, std::string>& compIds, const bool needUpdate)
+void FormRenderRecord::DeleteRecycledFormCompIds(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
     recycledFormCompIds_.erase(formId);
-    if (needUpdate) {
-        recycledFormCompIds_.emplace(formId, compIds);
-    }
+}
+
+void FormRenderRecord::InsertRecycledFormCompIds(int64_t formId,
+    const std::pair<std::vector<std::string>, std::string>& compIds)
+{
+    std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
+    recycledFormCompIds_.emplace(formId, compIds);
 }
 
 } // namespace FormRender
