@@ -73,7 +73,9 @@ void FormBundleForbidMgr::SetBundleForbiddenStatus(const std::string &bundleName
         return;
     }
 
-    if (!IsBundleForbidMgrInit()) {
+    std::unique_lock<std::shared_mutex> lock(bundleForbiddenSetMutex_);
+    if (!isInitialized_ && !Init()) {
+        HILOG_ERROR("Form bundle forbid mgr not init");
         return;
     }
 

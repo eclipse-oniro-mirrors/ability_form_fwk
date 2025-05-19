@@ -114,14 +114,6 @@ private:
     void SaveEntries(const std::unordered_map<std::string, std::string> &value,
         std::vector<InnerFormInfo> &innerFormInfos);
 
-    ErrCode RemoveFormTableDataByKey(const std::string& key);
-
-    ErrCode InsertFormTableDataByKey(const std::string& key, const std::string &value);
-
-    ErrCode QueryFormTableDataByKey(const std::string& key, std::string &value);
-
-    ErrCode QueryFormTableDataByKey(const std::string& key, std::unordered_map<std::string, std::string> &value);
-
 private:
     mutable std::mutex rdbStorePtrMutex_;
 };

@@ -86,7 +86,9 @@ void FormBundleLockMgr::SetBundleLockStatus(const std::string &bundleName, bool 
         return;
     }
 
-    if (!IsBundleLockMgrInit()) {
+    std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
+    if (!isInitialized_ && !Init()) {
+        HILOG_ERROR("Form bundle lock mgr not init");
         return;
     }
 
