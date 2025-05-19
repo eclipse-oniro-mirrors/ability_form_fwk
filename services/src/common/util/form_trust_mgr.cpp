@@ -44,7 +44,7 @@ FormTrustMgr::~FormTrustMgr()
 
 bool FormTrustMgr::IsTrust(const std::string &bundleName)
 {
-    std::lock_guard<std::mutex> lock(trustListMutex_);
+    std::lock_guard<std::mutex> lock(unTrustListMutex_);
     auto iter = unTrustList_.find(bundleName);
     if (iter == unTrustList_.end()) {
         return true;
@@ -67,7 +67,7 @@ void FormTrustMgr::GetUntrustAppNameList(std::string &result)
 
 void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
 {
-    std::lock_guard<std::mutex> lock(trustListMutex_);
+    std::lock_guard<std::mutex> lock(unTrustListMutex_);
     auto iter = unTrustList_.find(bundleName);
     if (isTrust && iter != unTrustList_.end()) {
         auto ret = FormRdbDataMgr::GetInstance().DeleteData(UNTRUST_LIST, bundleName);

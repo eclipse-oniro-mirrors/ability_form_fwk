@@ -217,7 +217,7 @@ public:
      * @param formId form id.
      * @return Returns true on success, false on failure.
      */
-    bool UpdateFormRecordRecycleStatusToRecycled(const int64_t formId);
+    bool UpdateFormRecordRecycleStatus(const int64_t formId, const RecycleStatus status);
 
     void GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const;
     /**

@@ -2976,11 +2976,11 @@ void FormDataMgr::UpdateFormWant(const int64_t formId, const Want &want, FormRec
 }
 
 /**
- * @brief update formRecord recycle status to recycled.
+ * @brief update formRecord recycle status.
  * @param formId form id.
  * @return Returns true on success, false on failure.
  */
-bool FormDataMgr::UpdateFormRecordRecycleStatusToRecycled(const int64_t formId)
+bool FormDataMgr::UpdateFormRecordRecycleStatus(const int64_t formId, const RecycleStatus status)
 {
     HILOG_DEBUG("get form record by formId");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -2993,7 +2993,7 @@ bool FormDataMgr::UpdateFormRecordRecycleStatusToRecycled(const int64_t formId)
         HILOG_WARN("form %{public}" PRId64 " not RECYCLABLE", formId);
         return false;
     }
-    info->second.recycleStatus = RecycleStatus::RECYCLED;
+    info->second.recycleStatus = status;
     HILOG_DEBUG("get form record successfully");
     return true;
 }

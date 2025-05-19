@@ -75,8 +75,6 @@ private:
     void ResetCacheStateAfterReboot();
 
     mutable std::mutex cacheMutex_;
-    mutable std::mutex formCacheMutex_;
-    mutable std::mutex imgCacheMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

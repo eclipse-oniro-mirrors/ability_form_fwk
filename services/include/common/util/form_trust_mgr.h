@@ -57,7 +57,7 @@ public:
     void GetUntrustAppNameList(std::string &result);
 private:
     std::map<std::string, int32_t> unTrustList_;
-    mutable std::mutex trustListMutex_;
+    mutable std::mutex unTrustListMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

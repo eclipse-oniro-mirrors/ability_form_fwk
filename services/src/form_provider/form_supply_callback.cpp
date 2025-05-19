@@ -360,7 +360,7 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    if (!FormDataMgr::GetInstance().UpdateFormRecordRecycleStatusToRecycled(formId)) {
+    if (!FormDataMgr::GetInstance().UpdateFormRecordRecycleStatus(formId, RecycleStatus::RECYCLED)) {
         HILOG_ERROR("update recycle status data of %{public}" PRId64 " failed", formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
