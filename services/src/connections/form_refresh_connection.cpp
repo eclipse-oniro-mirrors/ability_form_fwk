@@ -70,6 +70,7 @@ void FormRefreshConnection::OnAbilityConnectDone(
         Want want = Want(want_);
         want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
         FormTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
+        FormDataMgr::GetInstance().ClearHostRefreshFlag(GetFormId());
     }
 }
 }  // namespace AppExecFwk
