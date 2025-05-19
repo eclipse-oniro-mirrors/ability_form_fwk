@@ -176,14 +176,14 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_004, TestSize.Lev
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_005, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_REQUEST_OVERFLOW);
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
 }
-
+  
 /**
  * @tc.name: FormHostDelegateStubTest_006
  * @tc.desc: Verify OnRemoteRequest function and memberFunc is nullptr
@@ -192,7 +192,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_005, TestSize.Lev
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_006, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_REQUEST_OVERFLOW)  100;
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW) + 100;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
@@ -211,7 +211,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_006, TestSize.Lev
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_007, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_REQUEST_OVERFLOW);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
@@ -243,7 +243,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_08, TestSize.Leve
     data.WriteInt64(TEST_FORM_ID);
     data.WriteParcelable(&overflowInfo);
     data.WriteBool(isOverflow);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_REQUEST_OVERFLOW);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
@@ -256,7 +256,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_08, TestSize.Leve
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_09, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_CHANGE_SCENE_ANIMATION_STATE);
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_CHANGE_SCENE_ANIMATION_STATE);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
@@ -272,7 +272,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_09, TestSize.Leve
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_010, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_CHANGE_SCENE_ANIMATION_STATE)  100;
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_CHANGE_SCENE_ANIMATION_STATE) + 100;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
@@ -298,7 +298,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_011, TestSize.Lev
     data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
     data.WriteInt64(TEST_FORM_ID);
     data.WriteInt32(state);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_CHANGE_SCENE_ANIMATION_STATE);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_CHANGE_SCENE_ANIMATION_STATE);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
