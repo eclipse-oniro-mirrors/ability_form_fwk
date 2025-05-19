@@ -115,9 +115,8 @@ ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableC
     std::string createTableSql = !formRdbTableConfig.createTableSql.empty() ? formRdbTableConfig.createTableSql
         : "CREATE TABLE IF NOT EXISTS " + formRdbTableConfig.tableName
             + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-    int32_t ret = NativeRdb::E_OK;
-    ret = ExecuteRdbSql(createTableSql);
 
+    int32_t ret = rdbStore_->ExecuteSql(createTableSql);
     if (ret != NativeRdb::E_OK) {
         HILOG_ERROR("Create rdb table failed, ret:%{public}" PRId32 "", ret);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -133,9 +132,7 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int32_t ret = NativeRdb::E_OK;
-    ret = ExecuteRdbSql(sql);
-
+    int32_t ret = rdbStore_->ExecuteSql(sql); 
     if (ret == NativeRdb::E_OK) {
         if (rdbStore_->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore_->Backup("");
@@ -144,7 +141,7 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            ret = ExecuteRdbSql(sql);
+            ret = rdbStore_->ExecuteSql(sql);
         }
     }
 
@@ -716,12 +713,6 @@ ErrCode FormRdbDataMgr::LoadRdbStore()
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
-}
-
-ErrCode FormRdbDataMgr::ExecuteRdbSql(const std::string &sql)
-{
-    std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
-    return rdbStore_->ExecuteSql(sql);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
