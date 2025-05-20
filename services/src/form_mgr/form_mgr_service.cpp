@@ -1848,15 +1848,6 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
-    if (!CheckCallerIsSystemApp()) {
-        want.SetAction(Constants::FORM_PAGE_ACTION);
-        want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-                      Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-        const std::string key = Constants::PARMA_REQUEST_METHOD;
-        const std::string value = Constants::OPEN_FORM_MANAGE_VIEW;
-        want.SetParam(key, value);
-        return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
-    }
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
                                                             formId, {}, false);
 }
