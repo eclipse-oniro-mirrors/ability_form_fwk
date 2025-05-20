@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1011,6 +1011,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     }
     timerOption->SetWantAgent(wantAgent);
 
+    unint64_t updateAtTimerId = 0L;
     atTimerWakeUpTime_ = nextTime;
     {
         std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
@@ -1018,10 +1019,11 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
             ClearUpdateAtTimerResource();
         }
         currentUpdateAtWantAgent_ = wantAgent;
+        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        updateAtTimerId = updateAtTimerId_;
     }
     
-    updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
-    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId,
         static_cast<uint64_t>(nextTime));
     if (!bRet) {
         HILOG_ERROR("init update at timer task error");
