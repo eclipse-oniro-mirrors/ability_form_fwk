@@ -1221,7 +1221,7 @@ private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
     std::map<int64_t, AddFormResultErrorCode> formIdMap_;
-    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
+    std::unique_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::mutex formResultMutex_;
     std::condition_variable condition_;
 #ifdef THEME_MGR_ENABLE

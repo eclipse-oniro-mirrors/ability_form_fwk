@@ -308,7 +308,7 @@ private:
     std::mutex watchDogMutex_;
     bool threadIsAlive_ = true;
     std::atomic_bool hasMonitor_ = false;
-    std::shared_ptr<ThreadState> threadState_;
+    std::unique_ptr<ThreadState> threadState_;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
     std::atomic<int> renderFormTasksNum = 0;

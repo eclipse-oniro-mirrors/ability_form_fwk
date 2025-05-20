@@ -125,7 +125,7 @@ FormRenderRecord::FormRenderRecord(
     : bundleName_(bundleName), uid_(uid), formSupplyClient_(client)
 {
     HILOG_INFO("bundleName is %{public}s,uid is %{public}s", bundleName.c_str(), uid.c_str());
-    threadState_ = std::make_shared<ThreadState>(CHECK_THREAD_TIME);
+    threadState_ = std::make_unique<ThreadState>(CHECK_THREAD_TIME);
     formSupplyClient_ = client;
 }
 

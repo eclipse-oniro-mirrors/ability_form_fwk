@@ -122,7 +122,7 @@ void FormMgrAdapter::Init()
 {
     FormDataMgr::GetInstance().GetConfigParamFormMap(Constants::VISIBLE_NOTIFY_DELAY, visibleNotifyDelay_);
     HILOG_INFO("load visibleNotifyDelayTime:%{public}d", visibleNotifyDelay_);
-    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_ADD_FORM_TIMER_TASK_QUEUE.c_str());
+    serialQueue_ = std::make_unique<FormSerialQueue>(FORM_ADD_FORM_TIMER_TASK_QUEUE.c_str());
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("FormMgrAdapter Init fail, due to create serialQueue_ error");
     }
