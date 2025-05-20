@@ -67,6 +67,14 @@ public:
      * @param isProtect True for protect, false for not protect.
      */
     void SetBundleProtectStatus(const std::string &bundleName, bool isProtect);
+
+private:
+    /**
+     * @brief check whether bundle lock mgr is init.
+     * @return True for inited, false for not init.
+     */
+    bool IsBundleLockMgrInit();
+
 private:
     bool isInitialized_ = false;
     std::set<std::string> formBundleLockSet_;

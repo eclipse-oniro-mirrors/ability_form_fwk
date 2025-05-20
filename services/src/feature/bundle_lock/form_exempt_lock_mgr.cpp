@@ -55,12 +55,9 @@ bool FormExemptLockMgr::Init()
 bool FormExemptLockMgr::IsExemptLock(int64_t formId)
 {
     std::string formId_s = std::to_string(formId);
-    {
-        std::unique_lock<std::shared_mutex> lock(exemptLockSetMutex_);
-        if (!isInitialized_ && !Init()) {
-            HILOG_ERROR("Form exempt lock mgr not init");
-            return false;
-        }
+    if (!IsExemptLockMgrInit()) {
+        HILOG_ERROR("Form exempt lock mgr not init");
+        return false;
     }
 
     std::shared_lock<std::shared_mutex> lock(exemptLockSetMutex_);
@@ -85,6 +82,16 @@ void FormExemptLockMgr::SetExemptLockStatus(int64_t formId, bool isExempt)
         formExemptLockSet_.erase(formId_s);
         FormRdbDataMgr::GetInstance().DeleteData(LOCK_FORM_EXEMPT_TABLE, formId_s);
     }
+}
+
+bool FormExemptLockMgr::IsExemptLockMgrInit()
+{
+    std::unique_lock<std::shared_mutex> lock(exemptLockSetMutex_);
+    if (!isInitialized_ && !Init()) {
+        HILOG_ERROR("Form bundle lock mgr not init");
+        return false;
+    }
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

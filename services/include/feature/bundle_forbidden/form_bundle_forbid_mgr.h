@@ -53,6 +53,14 @@ public:
      * @param isForbidden True fot forbidden, false for not forbidden.
      */
     void SetBundleForbiddenStatus(const std::string &bundleName, bool isForbidden);
+
+private:
+    /**
+     * @brief check whether bundle forbid mgr is init.
+     * @return True for inited, false for not init.
+     */
+    bool IsBundleForbidMgrInit();
+
 private:
     bool isInitialized_ = false;
     std::set<std::string> formBundleForbiddenSet_;
