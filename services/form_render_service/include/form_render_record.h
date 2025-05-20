@@ -275,6 +275,35 @@ private:
 
     bool CheckManagerDelegateValid(const FormJsInfo &formJsInfo, const Want &want);
 
+    void SetFormSupplyClient(const sptr<IFormSupply>& formSupplyClient);
+
+    sptr<IFormSupply> GetFormSupplyClient();
+
+    std::shared_ptr<EventHandler> GetEventHandler();
+
+    int32_t AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
+
+    void DeleteHostRemoteObjByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
+
+    void DeleteRecycledFormCompIds(int64_t formId);
+
+    void InsertRecycledFormCompIds(int64_t formId, const std::pair<std::vector<std::string>, std::string>& compIds);
+
+    void DeleteHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
+
+    void RemoveHostByFormId(int64_t formId);
+
+    bool IsFormContextExist(const FormJsInfo &formJsInfo);
+
+    bool GetFormRequestByFormId(int64_t formId, std::unordered_map<std::string, Ace::FormRequest>& formRequests);
+
+    void SetEventHandlerNeedResetFlag(bool needReset);
+
+    bool GetEventHandlerNeedReset();
+
+    void DeleteAndUpdateRecycledFormCompIds(int64_t formId,
+        const std::pair<std::vector<std::string>, std::string>& compIds, const bool needUpdate);
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 

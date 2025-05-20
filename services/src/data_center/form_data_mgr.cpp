@@ -335,8 +335,7 @@ int FormDataMgr::CheckTempEnoughForm() const
         Constants::MAX_TEMP_FORMS : maxTempSize;
     HILOG_DEBUG("maxTempSize:%{public}d", maxTempSize);
 
-    std::lock_guard<std::mutex> lock(formTempMutex_);
-    if (static_cast<int32_t>(tempForms_.size()) >= maxTempSize) {
+    if (GetTempFormCount() >= maxTempSize) {
         HILOG_WARN("already exist %{public}d temp forms in system", maxTempSize);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
             static_cast<int64_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT));
@@ -344,6 +343,7 @@ int FormDataMgr::CheckTempEnoughForm() const
     }
     return ERR_OK;
 }
+
 /**
  * @brief Check form count is max.
  * @param callingUid The UID of the proxy.
@@ -354,7 +354,6 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
 {
     HILOG_INFO("callingUid:%{public}d, currentUserId:%{public}d", callingUid, currentUserId);
 
-    int callingUidFormCounts = 0;
     int32_t maxFormsSize = Constants::MAX_FORMS;
     GetConfigParamFormMap(Constants::MAX_NORMAL_FORM_SIZE, maxFormsSize);
     maxFormsSize = ((maxFormsSize > Constants::MAX_FORMS) || (maxFormsSize < 0)) ?
@@ -372,11 +371,9 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    std::vector<FormDBInfo> formDbInfos;
-    FormDbCache::GetInstance().GetAllFormInfo(formDbInfos);
-    HILOG_INFO("already use %{public}zu forms by userId", formDbInfos.size());
-    if (static_cast<int32_t>(formDbInfos.size()) >= maxFormsSize) {
+    const auto formDbInfoSize = FormDbCache::GetInstance().GetAllFormInfoSize();
+    HILOG_INFO("already use %{public}d forms by userId", formDbInfoSize);
+    if (formDbInfoSize >= maxFormsSize) {
         HILOG_WARN("exceeds max form number %{public}d", maxFormsSize);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
             static_cast<int64_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT));
@@ -384,24 +381,15 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     }
 
     int32_t currentAccountId = FormUtil::GetCurrentAccountId();
-    for (const auto &record : formDbInfos) {
-        if ((record.providerUserId == currentAccountId)) {
-            HILOG_DEBUG("called by currentActiveUser");
-            for (const auto &userUid : record.formUserUids) {
-                if (userUid != callingUid) {
-                    continue;
-                }
-                if (++callingUidFormCounts >= maxRecordPerApp) {
-                    HILOG_WARN("already use %{public}d forms by userId==currentAccountId", maxRecordPerApp);
-                    return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
-                }
-                break;
-            }
-        }
+    int callingUidFormCounts = FormDbCache::GetInstance().GetFormCountsByCallingUid(currentAccountId, callingUid);
+    if (callingUidFormCounts >= maxRecordPerApp) {
+        HILOG_WARN("already use %{public}d forms by userId==currentAccountId", maxRecordPerApp);
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
     return ERR_OK;
 }
+
 /**
  * @brief Delete temp form.
  * @param formId The Id of the form.
@@ -2433,21 +2421,14 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
 ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     HILOG_DEBUG("get form instance by formId");
-    bool isFormRecordsEnd = false;
-    FormRecord formRecord;
-    {
-        std::lock_guard<std::mutex> lock(formRecordMutex_);
-        if (formId <= 0) {
-            HILOG_ERROR("invalid formId");
-            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-        }
-        auto info = formRecords_.find(formId);
-        isFormRecordsEnd = info == formRecords_.end();
-        if (!isFormRecordsEnd) {
-            formRecord = info->second;
-        }
+    bool notFindFormRecord  = false;
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (!isFormRecordsEnd) {
+    FormRecord formRecord;
+    notFindFormRecord  = GetFormRecordById(formId, formRecord);
+    if (!notFindFormRecord ) {
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
         if (formHostRecords.empty()) {
@@ -2508,17 +2489,9 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         HILOG_ERROR("invalid formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    bool isFormRecordsEnd = false;
     FormRecord formRecord;
     std::vector<FormHostRecord> formHostRecords;
-    {
-        std::lock_guard<std::mutex> lock(formRecordMutex_);
-        auto info = formRecords_.find(formId);
-        isFormRecordsEnd = info == formRecords_.end();
-        if (!isFormRecordsEnd) {
-            formRecord = info->second;
-        }
-    }
+    bool isFormRecordsEnd = GetFormRecordById(formId, formRecord);
     if (!isFormRecordsEnd) {
         GetFormHostRecord(formId, formHostRecords);
     }
@@ -3007,6 +2980,34 @@ void FormDataMgr::GetFormRecordsByUserId(const int32_t userId, std::vector<FormR
         }
     }
     HILOG_INFO("userId:%{public}d, size:%{public}zu", userId, formRecords.size());
+}
+
+/**
+ * @brief get temp forms count.
+ * @return Return the temp forms number.
+ */
+int32_t FormDataMgr::GetTempFormCount() const
+{
+    std::lock_guard<std::mutex> lock(formTempMutex_);
+    return static_cast<int32_t>(tempForms_.size());
+}
+
+/**
+ * @brief get formRecord by formId
+ * @param formId form id.
+ * @param formRecord form record.
+ * @return Returns true on success, false on failure.
+ */
+bool FormDataMgr::GetFormRecordById(const int64_t formId, FormRecord& formRecord)
+{
+    bool notFindFormRecord  = false;
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    notFindFormRecord  = info == formRecords_.end();
+    if (!notFindFormRecord ) {
+        formRecord = info->second;
+    }
+    return notFindFormRecord ;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
