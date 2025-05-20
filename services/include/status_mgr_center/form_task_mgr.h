@@ -629,6 +629,18 @@ private:
 
     void InnerPostRenderForm(const FormRecord &formRecord, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief remove form last revocer time
+     * @param formId The Id of the form.
+     */
+    void RemoveLastRecoverTimesByFormId(const int64_t formId);
+
+    /**
+     * @brief update form last revocer time
+     * @param formId The Id of the form.
+     */
+    void UpdateFormLastRecoverTimes(const int64_t formId);
 private:
     std::mutex formRecoverTimesMutex_;
     std::unordered_map<int64_t, int64_t> formLastRecoverTimes;

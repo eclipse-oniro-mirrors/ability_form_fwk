@@ -360,17 +360,10 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    FormRecord formRecord;
-    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+    if (!FormDataMgr::GetInstance().UpdateFormRecordRecycleStatus(formId, RecycleStatus::RECYCLED)) {
+        HILOG_ERROR("update recycle status data of %{public}" PRId64 " failed", formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    if (formRecord.recycleStatus != RecycleStatus::RECYCLABLE) {
-        HILOG_WARN("form %{public}" PRId64 " not RECYCLABLE", formId);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    formRecord.recycleStatus = RecycleStatus::RECYCLED;
-    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
 
     sptr<IRemoteObject> remoteObjectOfHost = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     if (remoteObjectOfHost == nullptr) {
