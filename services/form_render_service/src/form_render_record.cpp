@@ -879,6 +879,9 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
         if (!compId.empty()) {
             search->second->DeleteForm(compId);
             HILOG_ERROR("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
+            if (search->second->IsFormRequestsEmpty()) {
+                formRendererGroupMap_.erase(formId);
+            }
             return false;
         }
         search->second->DeleteForm();
@@ -1093,7 +1096,7 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
             HILOG_ERROR("null rendererGroup");
             return false;
         }
-        
+
         compIds = search->second->GetOrderedAndCurrentCompIds();
         search->second->DeleteForm();
         formRendererGroupMap_.erase(formId);
@@ -1135,7 +1138,7 @@ void FormRenderRecord::Release()
     }
 
     eventHandler.reset();
-    
+
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.clear();
 }
@@ -1287,7 +1290,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
     if (ReAddIfHapPathChanged(formJsInfos)) {
         return ERR_OK;
     }
-    
+
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto task = [thisWeakPtr, ids = std::forward<decltype(formJsInfos)>(formJsInfos), want]() {
         HILOG_DEBUG("HandleReloadFormRecord begin");
@@ -1733,7 +1736,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         HILOG_INFO("init compIds failed,formId:%{public}" PRId64, formId);
         return false;
     }
-    
+
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex = 0;
     bool currentRequestFound = false;
@@ -1838,7 +1841,7 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
             HILOG_ERROR("empty formRequests");
             return;
         }
-        
+
         HILOG_INFO("formRequests length: %{public}zu formId: %{public}" PRId64 " width: %{public}f height: %{public}f"
             " borderWidth: %{public}f", iter->second.size(), formId, width, height, borderWidth);
         for (auto& formRequestIter : iter->second) {
