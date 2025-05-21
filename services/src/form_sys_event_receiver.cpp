@@ -55,7 +55,7 @@ void FormSysEventReceiver::HandleAbilityUpdate(const AAFwk::Want& want, std::str
     }
 
     auto task = [want, bundleName]() {
-        HILOG_INFO("bundle updated, bundleName:%{public}s", bundleName.c_str());
+        HILOG_WARN("bundle updated, bundleName:%{public}s", bundleName.c_str());
         int userId = want.GetIntParam(KEY_USER_ID, 0);
         FormEventUtil::HandleProviderUpdated(bundleName, userId);
     };
@@ -174,6 +174,7 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
         return;
     }
 
+    HILOG_WARN("userId: %{public}d", userId);
     serialQueue_->ScheduleTask(0, [userId]() {
         std::vector<int64_t> removedFormIds;
         FormDataMgr::GetInstance().DeleteFormsByUserId(userId, removedFormIds);
