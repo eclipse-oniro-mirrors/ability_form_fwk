@@ -94,7 +94,7 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
  */
 bool FormDataMgr::DeleteFormRecord(const int64_t formId)
 {
-    HILOG_INFO("delete");
+    HILOG_INFO("delete record, form:%{public}" PRId64, formId);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto iter = formRecords_.find(formId);
     if (iter == formRecords_.end()) {
@@ -400,7 +400,7 @@ bool FormDataMgr::DeleteTempForm(const int64_t formId)
     std::lock_guard<std::mutex> lock(formTempMutex_);
     auto iter = std::find(tempForms_.begin(), tempForms_.end(), formId);
     if (iter == tempForms_.end()) {
-        HILOG_ERROR("tempForm not exist");
+        HILOG_ERROR("not find tempForm:%{public}" PRId64, formId);
         return false;
     }
     tempForms_.erase(iter);
@@ -718,7 +718,7 @@ void FormDataMgr::GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IR
  */
 bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const int64_t formId)
 {
-    HILOG_INFO("call");
+    HILOG_WARN("form: %{public}" PRId64, formId);
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     std::vector<FormHostRecord>::iterator iter;
     for (iter = clientRecords_.begin(); iter != clientRecords_.end(); ++iter) {
@@ -746,7 +746,7 @@ bool FormDataMgr::RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &cal
     for (iter = clientRecords_.begin(); iter != clientRecords_.end(); ++iter) {
         if (callerToken == iter->GetFormHostClient()) {
             if (iter->IsEmpty()) {
-                HILOG_INFO("clientRecords_ is empty, clean form host");
+                HILOG_WARN("clientRecords_ is empty, clean form host");
                 iter->CleanResource();
                 iter = clientRecords_.erase(iter);
                 FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
@@ -1827,8 +1827,7 @@ ErrCode FormDataMgr::SetRecordVisible(int64_t matchedFormId, bool isVisible)
  */
 void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t> &removedFormIds)
 {
-    HILOG_INFO("delete forms by userId");
-
+    HILOG_WARN("delete forms, userId: %{public}d", userId);
     // handle formRecords_
     std::vector<int64_t> removedTempForms;
     {
