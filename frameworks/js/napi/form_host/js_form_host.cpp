@@ -2173,6 +2173,12 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
 void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataParam)
 {
     HILOG_INFO("call");
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(overflowEnv_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return;
+    }
     napi_value requestObj;
     napi_create_object(overflowEnv_, &requestObj);
 
@@ -2193,6 +2199,7 @@ void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataPara
 
     if (valueType != napi_function) {
         dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
 
@@ -2201,6 +2208,7 @@ void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataPara
     napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, &callResult);
     if (status != napi_ok) {
         dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
 
@@ -2210,17 +2218,25 @@ void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataPara
     bool result = false;
     if (returnType == napi_undefined) {
         dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
 
     napi_get_value_bool(overflowEnv_, callResult, &result);
     dataParam->result = result;
+    napi_close_handle_scope(overflowEnv_, scope);
 }
 
 void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo,
     napi_value* result)
 {
     HILOG_INFO("CreateFormOverflowInfo call");
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return;
+    }
     napi_value area = nullptr;
     napi_create_object(env, &area);
     napi_set_named_property(env, area, "left", CreateJsValue(env, overflowInfo.area.left));
@@ -2233,6 +2249,7 @@ void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::Over
     napi_create_object(env, result);
     napi_set_named_property(env, *result, "area", area);
     napi_set_named_property(env, *result, "duration", duration);
+    napi_close_handle_scope(env, scope);
 }
 
 bool JsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
@@ -2319,6 +2336,12 @@ ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, in
 void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam* dataParam)
 {
     HILOG_INFO("call");
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(changeSceneAnimationStateEnv_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return;
+    }
     napi_value requestObj;
     napi_create_object(changeSceneAnimationStateEnv_, &requestObj);
 
@@ -2336,6 +2359,7 @@ void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam
 
     if (valueType != napi_function) {
         dataParam->result = false;
+        napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
         return;
     }
 
@@ -2344,6 +2368,7 @@ void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam
     napi_status status = napi_call_function(changeSceneAnimationStateEnv_, nullptr, myCallback, 1, args, &callResult);
     if (status != napi_ok) {
         dataParam->result = false;
+        napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
         return;
     }
 
@@ -2352,12 +2377,14 @@ void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam
 
     if (returnType == napi_undefined) {
         dataParam->result = false;
+        napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
         return;
     }
 
     bool result = false;
     napi_get_value_bool(changeSceneAnimationStateEnv_, callResult, &result);
     dataParam->result = result;
+    napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

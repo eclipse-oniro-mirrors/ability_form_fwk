@@ -181,7 +181,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_005, TestSize.Lev
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_EQ(result, ERR_TRANSACTION_FAILED);
 }
   
 /**
@@ -221,7 +221,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_007, TestSize.Lev
     data.WriteBool(isOverflow);
     data.WriteParcelable(&overflowInfo);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(result, ERR_INVALID_DATA);
 }
 
 /**
@@ -261,7 +261,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_09, TestSize.Leve
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_EQ(result, ERR_TRANSACTION_FAILED);
 }
 
 /**
