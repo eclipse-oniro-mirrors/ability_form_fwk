@@ -146,7 +146,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     ret = CheckFormCountLimit(formId, want);
     if (ret != ERR_OK) {
-        HILOG_ERROR("CheckFormCountLimit failed. code: %{public}d", ret);
+        HILOG_ERROR("CheckFormCountLimit failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
         return ret;
     }
     if (formId > 0) {
@@ -569,7 +569,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
 {
 #ifndef WATCH_API_DISABLE
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_WARN("formId:%{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("releaseForm invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -622,7 +622,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
 ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
 #ifndef WATCH_API_DISABLE
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_WARN("formId:%{public}" PRId64, formId);
     if (!FormDataMgr::GetInstance().ExistFormRecord(formId)) {
         HILOG_ERROR("not exist such db or temp form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
@@ -676,11 +676,12 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
 
     ErrCode result = HandleDeleteFormCache(dbRecord, callingUid, formId);
     if (result != ERR_OK) {
+        HILOG_ERROR("handle delete form cache failed, formId:%{public}" PRId64, formId);
         return result;
     }
 
     if (!FormDataMgr::GetInstance().DeleteHostRecord(callerToken, formId)) {
-        HILOG_ERROR("fail remove host record");
+        HILOG_ERROR("fail remove host record, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1547,8 +1548,8 @@ void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemI
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    HILOG_INFO("call");
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
+    HILOG_WARN("call, formId:%{public}" PRId64, formId);
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     record.enableForm = info.IsEnableForm();
@@ -1605,12 +1606,12 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
 ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
     const FormRecord &record, const int64_t formId, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    HILOG_INFO("add exist formRecord, formId:%{public}" PRId64, formId);
+    HILOG_WARN("add exist formRecord, formId:%{public}" PRId64, formId);
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
     bool isCreated = FormDataMgr::GetInstance().AllotFormHostRecord(info, callerToken, formId, callingUid);
     if (!isCreated) {
-        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord");
+        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1636,7 +1637,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
         if (errorCode != ERR_OK) {
-            HILOG_ERROR("AcquireProviderFormInfoAsync failed");
+            HILOG_ERROR("AcquireProviderFormInfoAsync failed, formId:%{public}" PRId64, formId);
             return errorCode;
         }
     }
@@ -1688,7 +1689,7 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     UpdateReUpdateFormMap(newFormId);
-    HILOG_INFO("Add new form bundleName: %{public}s abilityName: %{public}s formId: %{public}" PRId64,
+    HILOG_WARN("Add new form bundleName: %{public}s abilityName: %{public}s formId: %{public}" PRId64,
         formInfo.bundleName.c_str(), formInfo.abilityName.c_str(), newFormId);
     return AddNewFormRecord(info, newFormId, callerToken, wantParams, formInfo);
 }
@@ -1696,13 +1697,13 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
 ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formJsInfo)
 {
-    HILOG_INFO("call formId: %{public}" PRId64, formId);
+    HILOG_WARN("call formId: %{public}" PRId64, formId);
     FormItemInfo newInfo(info);
     newInfo.SetFormId(formId);
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
     if (!FormDataMgr::GetInstance().AllotFormHostRecord(newInfo, callerToken, formId, callingUid)) {
-        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord");
+        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1716,7 +1717,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     // acquire formInfo from provider
     ErrCode errorCode = AcquireProviderFormInfoAsync(formId, newInfo, wantParams);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("AcquireProviderFormInfoAsync failed");
+        HILOG_ERROR("AcquireProviderFormInfoAsync failed, formId:%{public}" PRId64, formId);
         return errorCode;
     }
 
@@ -1727,7 +1728,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     if (!newInfo.IsTemporaryForm()) {
         errorCode = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
         if (errorCode != ERR_OK) {
-            HILOG_ERROR("UpdateDBRecord failed");
+            HILOG_ERROR("UpdateDBRecord failed, formId:%{public}" PRId64, formId);
             return errorCode;
         }
     }
@@ -1746,7 +1747,7 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             formRecord.isEnableUpdate, formRecord.formTempFlag);
         return ERR_OK;
     }
-    HILOG_INFO("start");
+    HILOG_WARN("start, formId:%{public}" PRId64, formRecord.formId);
     if (formRecord.updateDuration > 0 && !formRecord.isDataProxy) {
         if (!FormDataMgr::GetInstance().HasFormCloudUpdateDuration(formRecord.bundleName)) {
             UpdateFormCloudUpdateDuration(formRecord.bundleName);
@@ -1757,6 +1758,7 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         }
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
+        HILOG_WARN("add interval timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::vector<std::vector<int>> updateAtTimes = formRecord.updateAtTimes;
@@ -1768,9 +1770,10 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
     } else if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             formRecord.updateAtHour, formRecord.updateAtMin, formRecord.providerUserId);
+        HILOG_WARN("add updateAt timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_INFO("no need add form timer");
+    HILOG_WARN("no need add form timer, formId:%{public}" PRId64, formRecord.formId);
     return ERR_OK;
 }
 
