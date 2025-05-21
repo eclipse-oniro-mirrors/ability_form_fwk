@@ -64,7 +64,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", formId_);
+        HILOG_ERROR("not exist such form:%{public}" PRId64, formId_);
         return;
     }
 
@@ -78,6 +78,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
     }
 
     // delete form
+    HILOG_WARN("delete form record, form:%{public}" PRId64, formId_);
     if (formRecord.formTempFlag) {
         FormDataMgr::GetInstance().DeleteTempForm(formId_);
     } else {

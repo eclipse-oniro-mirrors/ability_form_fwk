@@ -81,7 +81,7 @@ void FormEventUtil::HandleUpdateFormCloud(const std::string &bundleName)
 
 void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         return;
@@ -124,7 +124,8 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         } else {
             FormDbCache::GetInstance().DeleteFormInfo(formId);
         }
-        HILOG_INFO("form %{public}s deleted", formRecord.formName.c_str());
+        HILOG_WARN(
+            "delete form record, formName:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
         removedForms.emplace_back(formId);
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
         FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
@@ -161,8 +162,7 @@ void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, i
 
 void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const int32_t userId)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d",
-        bundleName.c_str(), userId);
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     // clean removed form in DB
     std::set<int64_t> removedForms;
     std::vector<FormDBInfo> removedDBForm;
@@ -193,7 +193,7 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
 
 void FormEventUtil::HandleBundleDataCleared(const std::string &bundleName, int32_t userId)
 {
-    HILOG_DEBUG("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     // clear dynamic form info
     FormInfoMgr::GetInstance().RemoveAllDynamicFormsInfo(bundleName, userId);
 
