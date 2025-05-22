@@ -71,6 +71,7 @@ ohos_fuzztest("FormProviderTaskMgrFuzzTest") {
     "faultloggerd:libbacktrace_local",
     "faultloggerd:libdfx_dumpcatcher",
     "ffrt:libffrt",
+    "form_fwk:form_manager",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
