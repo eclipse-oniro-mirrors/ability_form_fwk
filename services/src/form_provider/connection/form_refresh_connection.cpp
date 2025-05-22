@@ -22,6 +22,7 @@
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_task_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "want.h"
 
 namespace OHOS {
