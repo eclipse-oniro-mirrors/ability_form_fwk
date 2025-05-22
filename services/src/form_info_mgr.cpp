@@ -871,5 +871,31 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
     }
     return ERR_OK;
 }
+
+ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
+    int32_t providerUserId, bool &appFormVisibleNotify)
+{
+    std::lock_guard<std::mutex> lock(appFormVisibleNotifyMapMutex_);
+    auto iter = appFormVisibleNotifyMap_.find(bundleName);
+    if (iter == appFormVisibleNotifyMap_.end()) {
+        sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+        if (iBundleMgr == nullptr) {
+            HILOG_ERROR("get IBundleMgr failed");
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+        AppExecFwk::ApplicationInfo info;
+        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName,
+            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, providerUserId, info))) {
+            HILOG_ERROR("get ApplicationInfo failed");
+            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        }
+        appFormVisibleNotifyMap_.emplace(bundleName, info.formVisibleNotify);
+        appFormVisibleNotify = info.formVisibleNotify;
+        HILOG_INFO("bundleName=%{public}s, appFormVisibleNotify=%{public}d", bundleName.c_str(), appFormVisibleNotify);
+    } else {
+        appFormVisibleNotify = iter->second;
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

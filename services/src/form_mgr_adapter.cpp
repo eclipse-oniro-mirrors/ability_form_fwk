@@ -948,13 +948,14 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         // Check the value of formVisibleNotify.
         AppExecFwk::ApplicationInfo info;
 
-        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
-            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
-            HILOG_ERROR("get ApplicationInfo failed");
-            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        bool appFormVisibleNotify = false;
+        auto ret = FormInfoMgr::GetInstance().GetAppFormVisibleNotifyByBundleName(
+            formRecord.bundleName, formRecord.providerUserId, appFormVisibleNotify);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("get app formVisibleNotify failed");
+            return ret;
         }
-
-        if (!info.formVisibleNotify) {
+        if (!appFormVisibleNotify) {
             HILOG_DEBUG("the value of formVisibleNotify is false");
             continue;
         }

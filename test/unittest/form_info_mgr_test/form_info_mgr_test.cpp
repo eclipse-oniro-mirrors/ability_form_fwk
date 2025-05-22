@@ -1177,3 +1177,19 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0011, TestSize.Level1)
     EXPECT_EQ(ret, nullptr);
     GTEST_LOG_(INFO) << "FormInfoMgrTest0011 end";
 }
+
+/**
+ * @tc.name: FormInfoMgrTest0012
+ * @tc.number: GetAppFormVisibleNotifyByBundleName
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0012 start";
+    std::string bundleName = "com.form.provider.service";
+    int32_t providerUserId = Constants::DEFAULT_PROVIDER_USER_ID;
+    bool appFormVisibleNotify = false;
+    auto ret = formInfoMgr_.GetAppFormVisibleNotifyByBundleName(bundleName, providerUserId, appFormVisibleNotify);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    EXPECT_EQ(appFormVisibleNotify, false);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0012 end";
+}
