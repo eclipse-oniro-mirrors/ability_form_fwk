@@ -34,22 +34,14 @@ FormFwkResourceObserver::~FormFwkResourceObserver()
 
 void FormFwkResourceObserver::OnConfigurationUpdated(const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("call");
-    bool needUpdateForms = false;
-    std::string colorMode = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
-    if (!colorMode.empty() && colorMode != colorMode_) {
-        HILOG_INFO("colorMode:%{public}s", colorMode.c_str());
-        needUpdateForms = true;
-        colorMode_ = colorMode;
-    }
+    HILOG_INFO("language: %{public}s colorMode: %{public}s",
+        configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE).c_str(),
+        configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE).c_str());
     std::string language = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE);
     if (!language.empty() && language != language_) {
-        HILOG_INFO("language:%{public}s", language.c_str());
-        needUpdateForms = true;
+        HILOG_INFO("language changed %{public}s to %{public}s", language_.c_str(), language.c_str());
         language_ = language;
-    }
-    if (needUpdateForms) {
-        FormObserverTaskMgr::GetInstance().PostBatchRefreshForms(Constants::REFRESH_SYSTEMAPP_FORM);
+        FormTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
     }
     HILOG_INFO("end");
 }
