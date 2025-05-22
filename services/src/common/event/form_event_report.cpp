@@ -14,6 +14,7 @@
  */
 
 #include "common/event/form_event_report.h"
+#include "common/event/form_event_util.h"
 
 #include <map>
 
@@ -54,6 +55,7 @@ constexpr const char *EVENT_KEY_TIMESTAMP = "TIMESTAMP";
 constexpr const char *EVENT_KEY_RENDERING_MODE = "RENDERING_MODE";
 constexpr const char *EVENT_KEY_CONDITION_TYPE = "CONDITION_TYPE";
 constexpr const char *EVENT_KEY_BUNDLE_FORMNAME = "BUNDLE_FORMNAME";
+constexpr const char *FORM_STORAGE_DIR_PATH = "/data/service/el1/public/database/form_storage";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
@@ -351,6 +353,23 @@ void FormEventReport::SendLoadStageFormConfigInfoEvent(const FormEventName &even
             EVENT_KEY_FORM_NAME, eventInfo.formName,
             EVENT_KEY_RENDERING_MODE, static_cast<int32_t>(eventInfo.renderingMode));
     }
+}
+
+void FormEventReport::SendDiskUseEvent()
+{
+    std::vector<std::string> files;
+    std::vector<std::uint64_t> filesSize;
+    FormEventUtil::GetFolderSize(FORM_STORAGE_DIR_PATH, files, filesSize);
+    if (files.empty() || filesSize.empty()) {
+        HILOG_ERROR("files or filesSize is empty, not report disk use info");
+        return;
+    }
+    files.push_back(FORM_STORAGE_DIR_PATH);
+    HiSysEventWrite(HiSysEvent::Domain::FILEMANAGEMENT, "USER_DATA_SIZE",
+        HiSysEvent::EventType::STATISTIC,
+        "COMPONENT_NAME", "form_fwk",
+        "FILE_OR_FOLDER_PATH", files,
+        "FILE_OR_FOLDER_SIZE", filesSize);
 }
 
 std::string FormEventReport::ConvertEventName(const FormEventName &eventName)
