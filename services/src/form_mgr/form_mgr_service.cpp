@@ -753,6 +753,7 @@ void FormMgrService::OnStop()
         handler_.reset();
     }
     FormAmsHelper::GetInstance().UnRegisterConfigurationObserver();
+    ParamCommonEvent::GetInstance().UnSubscriberEvent();
 }
 
 ErrCode FormMgrService::ReadFormConfigXML()
