@@ -115,11 +115,11 @@ private:
 
     bool GetRenderFormConnectId(const int64_t formId, int32_t& connectId);
 
-    bool GetRenderFormConnection(sptr<FormRenderConnection>& connection, const int64_t formId);
+    bool GetRenderFormConnection(sptr<FormRenderConnection> &connection, const int64_t formId);
 
-    void GetConnectedForms(const std::vector<int64_t> &formIds, std::vector<int64_t>& connectedForms);
+    void GetConnectedForms(const std::vector<int64_t> &formIds, std::vector<int64_t> &connectedForms);
 
-    ErrCode RenderConnectedForm(const FormRecord &formRecord, Want &want, const sptr<FormRenderConnection>& connection);
+    ErrCode RenderConnectedForm(const FormRecord &formRecord, Want &want, const sptr<FormRenderConnection> &connection);
 
     ErrCode PostStopRenderingFormTask(const FormRecord &formRecord, Want &want);
 

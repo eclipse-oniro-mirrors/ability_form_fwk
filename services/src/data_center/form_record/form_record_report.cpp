@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "data_center/form_basic_info_mgr.h"
 #include "data_center/form_record/form_record_report.h"
 #include "fms_log_wrapper.h"
 #include "common/event/form_event_report.h"
@@ -37,9 +38,6 @@ void FormRecordReport::SetFormRecordRecordInfo(int64_t formId, const Want &want)
 {
     FormRecordReportInfo info;
     std::lock_guard<std::mutex> guard(formRecordReportMutex_);
-    info.bundleName = want.GetElement().GetBundleName();
-    info.moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
-    info.formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     if (formRecordReportMap_.find(formId) == formRecordReportMap_.end()) {
         formRecordReportMap_[formId] = info;
     }
@@ -98,9 +96,9 @@ void FormRecordReport::HandleFormRefreshCount()
         FormRecordReportInfo record = entry.second;
         NewFormEventInfo eventInfo;
         eventInfo.formId = formId;
-        eventInfo.bundleName = record.bundleName;
-        eventInfo.moduleName = record.moduleName;
-        eventInfo.formName = record.formName;
+        eventInfo.bundleName = FormBasicInfoMgr::GetInstance().GetFormBundleName(formId);
+        eventInfo.moduleName = FormBasicInfoMgr::GetInstance().GetFormModuleName(formId);
+        eventInfo.formName = FormBasicInfoMgr::GetInstance().GetFormName(formId);
         eventInfo.dailyRefreshTimes = record.dailyRefreshTimes;
         eventInfo.invisibleRefreshTimes = record.invisibleRefreshTimes;
         eventInfo.hfRefreshBlockTimes = record.hfRefreshBlockTimes;

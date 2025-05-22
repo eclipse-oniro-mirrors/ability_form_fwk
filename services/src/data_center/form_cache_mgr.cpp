@@ -456,7 +456,6 @@ bool FormCacheMgr::GetImgCacheFromDb(
     NativeRdb::AbsRdbPredicates absRdbPredicates(IMG_CACHE_TABLE);
     absRdbPredicates.EqualTo(IMAGE_ID, std::to_string(rowId));
     auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
-
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("GetImgCacheFromDb failed");
         return false;

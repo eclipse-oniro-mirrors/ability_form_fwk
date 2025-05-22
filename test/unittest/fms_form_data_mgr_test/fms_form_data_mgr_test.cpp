@@ -18,6 +18,7 @@
 #include <string>
 #include <thread>
 
+#include "mock_form_db_cache.h"
 #include "appexecfwk_errors.h"
 #define private public
 #include "data_center/database/form_db_cache.h"
@@ -515,7 +516,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_001, TestSize.Le
     int32_t checkAllDBFormMaxSize = 2;
 
     // set formDbInfos size is over 512
-    MockGetAllFormInfo(checkAllDBFormMaxSize);
+    MockGetAllFormInfoSize(checkAllDBFormMaxSize, callingUid);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, formDataMgr_.CheckEnoughForm(callingUid));
 
@@ -536,7 +537,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Le
     int callingUid = 0;
     int32_t checkAllDBFormPreAPPSize = 1;
 
-    MockGetAllFormInfo(checkAllDBFormPreAPPSize);
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
 
     EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughForm(callingUid));
 
@@ -558,7 +559,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_003, TestSize.Le
     int32_t checkAllDBFormPreAPPSize = 1;
 
     // set formDbInfos size is over 256
-    MockGetAllFormInfo(checkAllDBFormPreAPPSize);
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
 

@@ -172,7 +172,6 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     int64_t rowId = -1;
     ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
-
     if (ret == NativeRdb::E_OK) {
         if (rdbStore_->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore_->Backup("");
@@ -214,7 +213,6 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     int64_t rowId = -1;
     ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
         NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
-
     if (ret == NativeRdb::E_OK) {
         if (rdbStore_->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore_->Backup("");
@@ -554,7 +552,6 @@ bool FormRdbDataMgr::InsertData(
     int32_t ret = NativeRdb::E_OK;
     ret = rdbStore_->InsertWithConflictResolution(
         rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
-
     if (ret == NativeRdb::E_OK) {
         if (rdbStore_->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore_->Backup("");

@@ -727,7 +727,7 @@ ErrCode FormRenderMgrInner::GetRenderObject(sptr<IRemoteObject> &renderObj)
     return ERR_OK;
 }
 
-bool FormRenderMgrInner::GetRenderFormConnectId(const int64_t formId, int32_t& connectId)
+bool FormRenderMgrInner::GetRenderFormConnectId(const int64_t formId, int32_t &connectId)
 {
     std::lock_guard<std::mutex> lock(resourceMutex_);
     auto conIterator = renderFormConnections_.find(formId);
@@ -744,7 +744,7 @@ bool FormRenderMgrInner::GetRenderFormConnectId(const int64_t formId, int32_t& c
     return false;
 }
 
-bool FormRenderMgrInner::GetRenderFormConnection(sptr<FormRenderConnection>& connection, const int64_t formId)
+bool FormRenderMgrInner::GetRenderFormConnection(sptr<FormRenderConnection> &connection, const int64_t formId)
 {
     std::lock_guard<std::mutex> lock(resourceMutex_);
     HILOG_DEBUG("renderFormConnections_ size:%{public}zu", renderFormConnections_.size());
@@ -756,10 +756,10 @@ bool FormRenderMgrInner::GetRenderFormConnection(sptr<FormRenderConnection>& con
     return false;
 }
 
-void FormRenderMgrInner::GetConnectedForms(const std::vector<int64_t> &formIds, std::vector<int64_t>& connectedForms)
+void FormRenderMgrInner::GetConnectedForms(const std::vector<int64_t> &formIds, std::vector<int64_t> &connectedForms)
 {
     std::lock_guard<std::mutex> lock(resourceMutex_);
-    for (const int64_t &formId : formIds) {
+    for (const int64_t formId : formIds) {
         auto conIterator = renderFormConnections_.find(formId);
         if (conIterator != renderFormConnections_.end()) {
             auto connection = conIterator->second;
@@ -775,7 +775,7 @@ void FormRenderMgrInner::GetConnectedForms(const std::vector<int64_t> &formIds, 
 }
 
 ErrCode FormRenderMgrInner::RenderConnectedForm(const FormRecord &formRecord, Want &want,
-                                                const sptr<FormRenderConnection>& connection)
+                                                const sptr<FormRenderConnection> &connection)
 {
     if (connection == nullptr) {
         HILOG_ERROR("null connection");
