@@ -474,15 +474,9 @@ void FormProviderTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configurat
 void FormProviderTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
 {
     HILOG_INFO("Call.");
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
-        return;
-    }
-
     auto batchConfigurationUpdate = [configuration]() {
         return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
     };
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchConfigurationUpdate);
     HILOG_INFO("end");
 }
 } // namespace AppExecFwk
