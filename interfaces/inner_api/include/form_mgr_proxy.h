@@ -679,6 +679,49 @@ public:
      */
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override;
 
+    /**
+     * @brief Register overflow proxy in fms
+     * @param callerToken The form host proxy
+     * @return Return true for form register success
+     */
+    bool RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister overflow proxy in fms
+     * @return Return true if unregister success
+     */
+    bool UnregisterOverflowProxy() override;
+
+    /**
+     * @brief Request overflow with specific range
+     * @param formId The id of the form to request overflow
+     * @param overflowInfo The overflowInfo to explict overflow area and duration
+     * @param isOverflow True for request overflow, false for cancel overflow, default value is true
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow = true) override;
+
+    /**
+     * @brief Register change sceneAnimation state proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns true for change sceneAnimation state proxy register success.
+     */
+    bool RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister change sceneAnimation state proxy in fms.
+     * @return Returns true for change sceneAnimation state proxy unregister success.
+     */
+    bool UnregisterChangeSceneAnimationStateProxy() override;
+
+    /**
+     * @brief Change SceneAnimation State.
+     * @param formId The formId.
+     * @param state 1 for activate SceneAnimation, 2 for deactivate SceneAnimation
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state) override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

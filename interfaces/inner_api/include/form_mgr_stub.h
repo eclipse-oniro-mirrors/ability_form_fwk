@@ -663,6 +663,53 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleOpenFormEditAbility(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle register overflow proxy in fms
+     * @param data Input param
+     * @param reply Output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleRegisterOverflowProxy(MessageParcel &data, MessageParcel &reply);
+    
+    /**
+     * @brief Handle unregister overflow proxy in fms
+     * @param data Input param
+     * @param reply Output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleUnregisterOverflowProxy(MessageParcel &data, MessageParcel &reply);
+    /**
+     * @brief Handle request overflow with specific range
+     * @param data Input param
+     * @param reply Output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleRequestOverflow(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle register change sceneAnimation state proxy in fms.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterChangeSceneAnimationStateProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister change sceneAnimation state proxy in fms.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterChangeSceneAnimationStateProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle change sceneAnimation state.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleChangeSceneAnimationState(MessageParcel &data, MessageParcel &reply);
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

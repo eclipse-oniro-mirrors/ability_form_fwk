@@ -46,6 +46,12 @@ using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::SetArgReferee;
 
+extern void MockCheckInvalidForm(int32_t mockRet);
+extern void MockGetFormRecord(bool mockRet);
+extern void MockGetFormRecordParams(bool mockRet);
+extern void MockGetFormRecordParamsUid(bool mockRet);
+extern void MockSceneAnimationCheck(OHOS::ErrCode mockRet);
+
 namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 class FmsFormMgrAdapterTest3 : public testing::Test {
@@ -979,4 +985,151 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0296, TestSize.Level1)
         formVisibleType, visibleNotifyDelay, callerToken);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0296 end";
 }
+ /**
+  * @tc.name:  FormMgrAdapter_0288
+  * @tc.desc: test RequestOverflow function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0288, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0288 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = -1;
+     int32_t uid = 1;
+     OverflowInfo overflowInfo;
+     bool isOverflow = true;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+         formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0288 end";
+ }
+ 
+ /**
+  * @tc.name:  FormMgrAdapter_0289
+  * @tc.desc: test RequestOverflow function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0289, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0289 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     int32_t uid = 1;
+     OverflowInfo overflowInfo;
+     bool isOverflow = true;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+         formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0289 end";
+ }
+ 
+ /**
+  * @tc.name:  FormMgrAdapter_0290
+  * @tc.desc: test RequestOverflow function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0290, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0290 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     int32_t uid = 1;
+     OverflowInfo overflowInfo;
+     bool isOverflow = true;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+         formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0290 end";
+ }
+ 
+ /**
+  * @tc.name:  FormMgrAdapter_0291
+  * @tc.desc: test RequestOverflow function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0291, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0291 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     int32_t uid = 1;
+     OverflowInfo overflowInfo;
+     bool isOverflow = true;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED,
+         formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0291 end";
+ }
+ 
+ /**
+  * @tc.name:  FormMgrAdapter_0292
+  * @tc.desc: test ChangeSceneAnimationState function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0292, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0292 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = -1;
+     int32_t uid = 1;
+     int32_t state = 1;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+         formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0292 end";
+ }
+ 
+ /**
+  * @tc.name:  FormMgrAdapter_0293
+  * @tc.desc: test ChangeSceneAnimationState function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0293, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0293 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     int32_t uid = 1;
+     int32_t state = 1;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+         formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0293 end";
+ }
+ 
+ /**
+  * @tc.name:  FormMgrAdapter_0294
+  * @tc.desc: test ChangeSceneAnimationState function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0294, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0294 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     int32_t uid = 1;
+     int32_t state = 1;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+         formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0294 end";
+ }
+ 
+ /**
+  * @tc.name:  FormMgrAdapter_0295
+  * @tc.desc: test ChangeSceneAnimationState function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3,  FormMgrAdapter_0295, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0295 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     int32_t uid = 1;
+     int32_t state = 1;
+     MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED,
+         formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+     GTEST_LOG_(INFO) << " FormMgrAdapter_0295 end";
+ }
 }

@@ -704,7 +704,52 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RefreshFormsByScreenOn();
+    
+    /**
+     * @brief Register overflow proxy
+     * @param callerToken The form host proxy
+     * @return Return true for overflow proxy register success, false otherwise
+     */
+    bool RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken);
 
+    /**
+     * @brief Unregister overflow proxy
+     * @return Return true for overflow proxy unregister success, false otherwise
+     */
+    bool UnregisterOverflowProxy();
+    
+    /**
+     * @brief Request overflow with specific range
+     * @param formId The id of the form to request overflow
+     * @param callingUid Provider ability uid.
+     * @param overflowInfo The overflowInfo to explict overflow area and duration
+     * @param isOverflow True for request overflow, false for cancel overflow, default value is true
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RequestOverflow(const int64_t formId, const int32_t callingUid,
+        const OverflowInfo &overflowInfo, bool isOverflow = true);
+
+    /**
+     * @brief Register change sceneAnimation state proxy
+     * @param callerToken The form host proxy.
+     * @return Returns true for change sceneAnimation state proxy register success, false otherwise
+     */
+    bool RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister change sceneAnimation state proxy
+     * @return Return true for change sceneAnimation state proxy unregister success, false otherwise
+     */
+    bool UnregisterChangeSceneAnimationStateProxy();
+    
+    /**
+     * @brief Change SceneAnimation State.
+     * @param formId The formId.
+     * @param callingUid Provider ability uid.
+     * @param state 1 for activate SceneAnimation, 0 for deactivate SceneAnimation
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode ChangeSceneAnimationState(const int64_t formId, const int32_t callingUid, int32_t state);
 private:
     /**
      * @brief Get form configure info.
@@ -1218,6 +1263,14 @@ private:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     };
 
+    /**
+     * @brief Check sceneAnimation request parameter legitimacy.
+     * @param formId The formId.
+     * @param callingUid Provider ability uid.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode SceneAnimationCheck(const int64_t formId, const int32_t callingUid);
+
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
@@ -1291,6 +1344,10 @@ private:
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 
     std::map<int, std::vector<int64_t>> conditionUpdateFormMap;
+
+    sptr<IRemoteObject> overflowCallerToken_;
+
+    sptr<IRemoteObject> sceneanimationCallerToken_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
