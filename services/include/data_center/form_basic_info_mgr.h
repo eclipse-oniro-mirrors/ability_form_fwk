@@ -36,7 +36,7 @@ struct FormBasicInfo {
  * form basic info mananger.
  */
 class FormBasicInfoMgr final : public DelayedRefSingleton<FormBasicInfoMgr> {
-DECLARE_DELAYED_REF_SINGLETON(FormBasicInfoMgr)
+    DECLARE_DELAYED_REF_SINGLETON(FormBasicInfoMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormBasicInfoMgr);
 

@@ -23,6 +23,6 @@
 #include "common/util/form_util.h"
 
 namespace OHOS {
-void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
+    void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
 }
 #endif // OHOS_MOCK_FORM_DB_CACHE_H
