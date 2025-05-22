@@ -26,10 +26,6 @@
  
 namespace OHOS {
 namespace AppExecFwk {
-namespace {
-constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
-constexpr int32_t FORM_BUILD_DELAY_TIME = 2000; // ms
-}
 FormStatusTaskMgr::FormStatusTaskMgr() {}
 
 FormStatusTaskMgr::~FormStatusTaskMgr() {}
