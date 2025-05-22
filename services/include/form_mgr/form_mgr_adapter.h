@@ -30,9 +30,8 @@
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_publish_interceptor_interface.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "form_state_info.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
 #include "want.h"
@@ -1270,6 +1269,21 @@ private:
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 
     void SetVisibleChange(const int64_t formId, const int32_t formVisibleType);
+
+    /**
+    * @brief Post Form visible/invisible notify.
+    * @param formIds  the Ids of forms need to notify.
+    * @param formInstanceMaps formInstances for visibleNotify.
+    * @param eventMaps eventMaps for event notify.
+    * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+    * @param visibleNotifyDelay delay time.
+    * @param callerToken Caller ability token.
+    */
+    void PostVisibleNotify(const std::vector<int64_t> &formIds,
+        std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> &eventMaps,
+        const int32_t formVisibleType, int32_t visibleNotifyDelay,
+        const sptr<IRemoteObject> &callerToken);
 
     sptr<OHOS::AppExecFwk::IAppMgr> GetAppMgr();
 

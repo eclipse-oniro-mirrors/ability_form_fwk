@@ -12,15 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "form_render_task_mgr.h"
+ 
+#include "form_render/form_render_task_mgr.h"
+ 
 #include "form_render_interface.h"
 #include "form_mgr_service_queue.h"
-#include "form_data_mgr.h"
-#include "form_record.h"
 #include "form_js_info.h"
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
+#include "form_render/form_render_queue.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -39,7 +41,7 @@ void FormRenderTaskMgr::PostUpdateFormSize(const int64_t &formId, float width, f
     auto updateFormSize = [formId, width, height, borderWidth, uid, remoteObject]() {
         FormRenderTaskMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, updateFormSize);
+    FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, updateFormSize);
     HILOG_DEBUG("end");
 }
 
@@ -50,7 +52,7 @@ void FormRenderTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
     auto task = [remoteObject]() {
         FormRenderTaskMgr::GetInstance().OnUnlock(remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
     HILOG_DEBUG("end");
 }
 
@@ -61,8 +63,8 @@ void FormRenderTaskMgr::PostSetVisibleChange(int64_t formId, bool isVisible, con
     auto task = [formId, isVisible, remoteObject]() {
         FormRenderTaskMgr::GetInstance().SetVisibleChange(formId, isVisible, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
-    HILOG_INFO("end");
+    FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    HILOG_INFO("start task formId: %{public}" PRId64 " isVisible: %{public}d", formId, isVisible);
 }
 
 void FormRenderTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
@@ -73,7 +75,7 @@ void FormRenderTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecor
     auto reloadForm = [forms = std::forward<decltype(formRecords)>(formRecords), want, remoteObject]() {
         FormRenderTaskMgr::GetInstance().ReloadForm(std::move(forms), want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, reloadForm);
+    FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, reloadForm);
     HILOG_INFO("end");
 }
 
@@ -138,7 +140,7 @@ void FormRenderTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const s
         HILOG_ERROR("fail");
         return;
     }
-    HILOG_INFO("end");
+    HILOG_INFO("formId: %{public}" PRId64 " isVisible change to: %{public}d", formId, isVisible);
 }
 
 void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,

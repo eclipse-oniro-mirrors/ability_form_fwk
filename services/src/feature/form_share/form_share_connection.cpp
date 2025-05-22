@@ -20,7 +20,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "feature/form_share/form_share_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -39,7 +39,7 @@ void FormShareConnection::OnAbilityConnectDone(
     if (resultCode != ERR_OK) {
         HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
             element.GetAbilityName().c_str(), resultCode);
-        FormTaskMgr::GetInstance().PostFormShareSendResponse(formShareRequestCode_,
+        FormShareTaskMgr::GetInstance().PostFormShareSendResponse(formShareRequestCode_,
             ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
         return;
     }
@@ -50,7 +50,7 @@ void FormShareConnection::OnAbilityConnectDone(
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_SHARE_REQUEST_CODE, formShareRequestCode_);
 
-    FormTaskMgr::GetInstance().PostShareAcquireTask(formId_, remoteDeviceId_, want, remoteObject);
+    FormShareTaskMgr::GetInstance().PostShareAcquireTask(formId_, remoteDeviceId_, want, remoteObject);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

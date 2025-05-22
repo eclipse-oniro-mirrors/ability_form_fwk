@@ -20,7 +20,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "common/util/form_util.h"
 #include "want.h"
 
@@ -48,7 +48,7 @@ void FormAcquireDataConnection::OnAbilityConnectDone(const AppExecFwk::ElementNa
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_ACQUIRE_DATA_REQUEST_CODE, formRequestCode_);
-    FormTaskMgr::GetInstance().PostAcquireDataTask(GetFormId(), want, remoteObject);
+    FormProviderTaskMgr::GetInstance().PostAcquireDataTask(GetFormId(), want, remoteObject);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

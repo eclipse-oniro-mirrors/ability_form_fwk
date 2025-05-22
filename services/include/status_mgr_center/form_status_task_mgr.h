@@ -20,6 +20,7 @@
 #include "iremote_object.h"
 #include "form_record.h"
 #include "want.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,7 +46,7 @@ public:
 
     /**
      * @brief Post recover form.
-     * @param formIds The Id of form to be recovered.
+     * @param record The form record.
      * @param want The want of the request.
      * @param remoteObject Form render proxy object.
      */

@@ -13,12 +13,15 @@
  * limitations under the License.
  */
 
-#include "form_host_task_mgr.h"
+#include "form_host/form_host_task_mgr.h"
+
 #include "form_host_interface.h"
 #include "form_mgr_service_queue.h"
 #include "form_mgr_errors.h"
-#include "form_data_mgr.h"
 #include "fms_log_wrapper.h"
+#include "form_host/form_host_queue.h"
+#include "data_center/form_data_mgr.h"
+#include "form_provider/form_supply_callback.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -46,7 +49,7 @@ void FormHostTaskMgr::PostAcquireTaskToHost(const int64_t formId, const FormReco
     auto acquireTaskToHostFunc = [formId, record, remoteObject]() {
         FormHostTaskMgr::GetInstance().AcquireTaskToHost(formId, record, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireTaskToHostFunc);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireTaskToHostFunc);
 }
 
 /**
@@ -65,7 +68,7 @@ void FormHostTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecor
     auto updateTaskToHostFunc = [formId, record, remoteObject]() {
         FormHostTaskMgr::GetInstance().UpdateTaskToHost(formId, record, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, updateTaskToHostFunc);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, updateTaskToHostFunc);
 }
 
 /**
@@ -81,7 +84,7 @@ void FormHostTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formId
     auto uninstallFunc = [formIds, remoteObject]() {
         FormHostTaskMgr::GetInstance().FormUninstall(formIds, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, uninstallFunc);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, uninstallFunc);
 }
 
 /**
@@ -98,7 +101,7 @@ void FormHostTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, co
     auto acquireStateFunc = [state, want, remoteObject]() {
         FormHostTaskMgr::GetInstance().AcquireStateBack(state, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireStateFunc);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireStateFunc);
 }
 
 /**
@@ -115,7 +118,7 @@ void FormHostTaskMgr::PostAcquireDataTaskToHost(const AAFwk::WantParams &wantPar
     auto acquireTaskToHostFunc = [wantParams, requestCode, remoteObject]() {
         FormHostTaskMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireTaskToHostFunc);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireTaskToHostFunc);
 }
 
 /**
@@ -132,7 +135,7 @@ void FormHostTaskMgr::PostEnableFormsTaskToHost(const std::vector<int64_t> &form
     auto enableFormsTaskToHostFunc = [formIds, enable, remoteObject]() {
         FormHostTaskMgr::GetInstance().EnableFormsTaskToHost(formIds, enable, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, enableFormsTaskToHostFunc);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, enableFormsTaskToHostFunc);
 }
 
 /**
@@ -149,7 +152,7 @@ void FormHostTaskMgr::PostLockFormsTaskToHost(const std::vector<int64_t> &formId
     auto lockFormsTaskToHostFunc = [formIds, lock, remoteObject]() {
         FormHostTaskMgr::GetInstance().LockFormsTaskToHost(formIds, lock, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, lockFormsTaskToHostFunc);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, lockFormsTaskToHostFunc);
 }
 
 /**
@@ -163,7 +166,21 @@ void FormHostTaskMgr::PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObj
     auto task = [remoteObject]() {
         FormHostTaskMgr::GetInstance().FrsDiedTaskToHost(remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_FRS_DIED_TASK_DELAY_TIME, task);
+    FormHostQueue::GetInstance().ScheduleTask(FORM_FRS_DIED_TASK_DELAY_TIME, task);
+}
+
+/**
+ * @brief Handle form host died(task).
+ * @param remoteHost Form host proxy object.
+ */
+void FormHostTaskMgr::PostHostDiedTask(const sptr<IRemoteObject> &remoteHost)
+{
+    HILOG_DEBUG("call");
+
+    auto postTaskFunc = [remoteHost]() {
+        FormHostTaskMgr::GetInstance().HostDied(remoteHost);
+    };
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, postTaskFunc);
 }
 
 /**
@@ -187,8 +204,8 @@ void FormHostTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &
 
     FormJsInfo formJsInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formJsInfo);
-    remoteFormHost->OnAcquired(formJsInfo, nullptr);
     HILOG_DEBUG("FormTaskMgr remoteFormHost OnAcquired");
+    remoteFormHost->OnAcquired(formJsInfo, nullptr);
 }
 
 /**
@@ -202,7 +219,7 @@ void FormHostTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &
 void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("start");
+    HILOG_INFO("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -212,6 +229,7 @@ void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &r
 
     FormJsInfo formJsInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formJsInfo);
+    HILOG_DEBUG("FormTaskMgr remoteFormHost OnUpdate");
     remoteFormHost->OnUpdate(formJsInfo);
     HILOG_DEBUG("end");
 }
@@ -224,7 +242,7 @@ void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &r
 void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("start");
+    HILOG_INFO("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -233,7 +251,7 @@ void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
     }
 
     remoteFormHost->OnUninstall(formIds);
-    HILOG_DEBUG("end");
+    HILOG_INFO("end");
 }
 
 /**
@@ -245,7 +263,7 @@ void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
 void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("start");
+    HILOG_INFO("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -254,7 +272,7 @@ void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk:
     }
 
     remoteFormHost->OnAcquireState(state, want);
-    HILOG_DEBUG("end");
+    HILOG_INFO("end");
 }
 
 /**
@@ -266,7 +284,7 @@ void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk:
 void FormHostTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
     int64_t requestCode, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("start");
+    HILOG_INFO("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -275,7 +293,7 @@ void FormHostTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
     }
 
     remoteFormHost->OnAcquireDataResponse(wantParams, requestCode);
-    HILOG_DEBUG("end");
+    HILOG_INFO("end");
 }
 
 void FormHostTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
@@ -296,9 +314,8 @@ void FormHostTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds,
 void FormHostTaskMgr::LockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("start");
+    HILOG_INFO("start");
 
-    HILOG_INFO("LockFormsTaskToHost start");
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
         HILOG_ERROR("get formHostProxy failed");
@@ -311,7 +328,7 @@ void FormHostTaskMgr::LockFormsTaskToHost(const std::vector<int64_t> &formIds, c
 
 void FormHostTaskMgr::FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("start");
+    HILOG_INFO("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -321,6 +338,18 @@ void FormHostTaskMgr::FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
 
     remoteFormHost->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.");
     HILOG_DEBUG("end");
+}
+ 
+void FormHostTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
+{
+    HILOG_INFO("remote client died event");
+
+    if (remoteHost == nullptr) {
+        HILOG_ERROR("remote client died, invalid param");
+        return;
+    }
+    FormDataMgr::GetInstance().HandleHostDied(remoteHost);
+    FormSupplyCallback::GetInstance()->HandleHostDied(remoteHost);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

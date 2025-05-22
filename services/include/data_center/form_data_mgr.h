@@ -1036,6 +1036,14 @@ private:
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
 
+    /**
+     * @brief post delay RecheckWhetherNeedCleanFormHost task.
+     * @param callerUid The calleruid of FormHostRecord of vector<FormHostRecord> clientRecords_.
+     * @param remoteObjectOfHost The client stub of the form host record.
+     */
+    void PostDelayRecheckWhetherNeedCleanFormHostTask(
+        const int callerUid, const sptr<IRemoteObject> &remoteObjectOfHost);
+
 private:
     void GetUnusedFormInstancesByFilter(
         const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances);

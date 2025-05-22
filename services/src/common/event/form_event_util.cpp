@@ -30,7 +30,6 @@
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "form_provider/form_provider_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -81,7 +80,7 @@ void FormEventUtil::HandleUpdateFormCloud(const std::string &bundleName)
 
 void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId)
 {
-    HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         return;
@@ -124,8 +123,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         } else {
             FormDbCache::GetInstance().DeleteFormInfo(formId);
         }
-        HILOG_WARN(
-            "delete form record, formName:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
+        HILOG_INFO("form %{public}s deleted", formRecord.formName.c_str());
         removedForms.emplace_back(formId);
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
         FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
@@ -144,7 +142,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    FormTaskMgr::GetInstance().PostDelayRefreshForms(updatedForms, want);
+    FormProviderMgr::GetInstance().DelayRefreshForms(updatedForms, want);
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
 

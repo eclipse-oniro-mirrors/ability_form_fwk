@@ -21,6 +21,8 @@ ohos_unittest("FmsObserverRecordTest") {
 
   sources = [
     "${form_fwk_path}/services/src/form_observer/form_observer_record.cpp",
+    "${form_fwk_path}/services/src/form_observer/form_observer_task_mgr.cpp",
+    "${form_fwk_path}/services/src/form_mgr/form_mgr_queue.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "fms_observer_record_test.cpp",
   ]

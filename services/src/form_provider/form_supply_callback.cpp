@@ -23,9 +23,9 @@
 #include "data_center/form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "form_render/form_render_mgr.h"
 #include "feature/form_share/form_share_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "common/util/form_util.h"
 #include "hitrace_meter.h"
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"
@@ -296,7 +296,7 @@ void FormSupplyCallback::RemoveConnection(int64_t formId, const sptr<IRemoteObje
             Want want;
             want.SetParam(Constants::FORM_CONNECT_ID, conn.first);
             want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
-            FormTaskMgr::GetInstance().PostDeleteTask(formId, want, conn.second->GetProviderToken());
+            FormProviderTaskMgr::GetInstance().PostDeleteTask(formId, want, conn.second->GetProviderToken());
             HILOG_DEBUG("remove the connection, connect id is %{public}d", conn.first);
         }
     }

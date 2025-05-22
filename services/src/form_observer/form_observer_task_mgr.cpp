@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-#include "form_observer_task_mgr.h"
+#include "form_observer/form_observer_task_mgr.h"
 #include "form_mgr_service_queue.h"
 #include "fms_log_wrapper.h"
 #include "js_form_state_observer_interface.h"
-
+#include "form_mgr/form_mgr_queue.h"
+#include "form_mgr/form_mgr_adapter.h"
+ 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
@@ -41,7 +43,7 @@ void FormObserverTaskMgr::PostAddTaskToHost(const std::string bundleName,
     auto addFunc = [bundleName, remoteObject, runningFormInfo]() {
         FormObserverTaskMgr::GetInstance().FormAdd(bundleName, remoteObject, runningFormInfo);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, addFunc);
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, addFunc);
 }
 
 /**
@@ -58,7 +60,7 @@ void FormObserverTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
     auto removeFunc = [bundleName, remoteObject, runningFormInfo]() {
         FormObserverTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, removeFunc);
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, removeFunc);
 }
 
 /**
@@ -81,9 +83,23 @@ void FormObserverTaskMgr::PostFormClickEventToHost(
         }
         FormObserverTaskMgr::GetInstance().FormClickEvent(bundleName, formEventType, remoteObject, runningFormInfo);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
 }
-
+ 
+/**
+* @brief Post BatchRefresh forms.
+* @param formRefreshType batch refresh forms type.
+*/
+void FormObserverTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
+{
+    HILOG_DEBUG("call");
+ 
+    auto batchRefreshForms = [formRefreshType]() {
+        return FormMgrAdapter::GetInstance().BatchRefreshForms(formRefreshType);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchRefreshForms);
+}
+ 
 void FormObserverTaskMgr::FormAdd(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
     const RunningFormInfo &runningFormInfo)
 {

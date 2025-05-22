@@ -21,7 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -52,7 +52,7 @@ void FormCastTempConnection::OnAbilityConnectDone(
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostCastTempTask(GetFormId(), want, remoteObject);
+    FormProviderTaskMgr::GetInstance().PostCastTempTask(GetFormId(), want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

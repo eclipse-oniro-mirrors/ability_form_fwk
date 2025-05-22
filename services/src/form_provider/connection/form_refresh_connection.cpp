@@ -21,6 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "status_mgr_center/form_task_mgr.h"
 #include "want.h"
 
@@ -60,17 +61,18 @@ void FormRefreshConnection::OnAbilityConnectDone(
         std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);
         Want msgWant = Want(want_);
         msgWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-        FormTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, msgWant, remoteObject);
+        FormProviderTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, msgWant, remoteObject);
     } else if (want_.HasParameter(Constants::RECREATE_FORM_KEY)) {
         Want cloneWant = Want(want_);
         cloneWant.RemoveParam(Constants::RECREATE_FORM_KEY);
         cloneWant.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_RECREATE_FORM);
         cloneWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-        FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), cloneWant, remoteObject);
+        FormProviderTaskMgr::GetInstance().PostAcquireTask(GetFormId(), cloneWant, remoteObject);
     } else {
         Want want = Want(want_);
         want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-        FormTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
+        FormProviderTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
+        FormDataMgr::GetInstance().ClearHostRefreshFlag(GetFormId());
     }
 }
 }  // namespace AppExecFwk

@@ -20,12 +20,13 @@
 #include "form_observer/form_resource_observer.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "form_mgr/form_mgr_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -120,14 +121,10 @@ ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnec
  */
 ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect, int delayTime)
 {
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
-        return ERR_INVALID_OPERATION;
-    }
     auto disConnectAbilityFunc = [connect]() {
         FormAmsHelper::GetInstance().DisconnectAbilityTask(connect);
     };
-    if (!serialQueue_->ScheduleTask(delayTime, disConnectAbilityFunc)) {
+    if (!FormMgrQueue::GetInstance().ScheduleTask(delayTime, disConnectAbilityFunc)) {
         HILOG_ERROR("fail disconnect ability");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }

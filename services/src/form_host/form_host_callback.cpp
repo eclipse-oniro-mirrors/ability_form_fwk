@@ -19,8 +19,8 @@
 
 #include "fms_log_wrapper.h"
 #include "form_host_interface.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "form_render/form_render_mgr.h"
+#include "form_host/form_host_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -34,7 +34,7 @@ void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record
     const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("FormHostCallback OnAcquired, formId:%{public}" PRId64 "", formId);
-    FormTaskMgr::GetInstance().PostAcquireTaskToHost(formId, record, callerToken);
+    FormHostTaskMgr::GetInstance().PostAcquireTaskToHost(formId, record, callerToken);
 }
 
 /**
@@ -59,7 +59,7 @@ void FormHostCallback::OnUpdate(const int64_t formId, const FormRecord &record, 
     }
 
     // post updateTask to host
-    FormTaskMgr::GetInstance().PostUpdateTaskToHost(formId, record, callerToken);
+    FormHostTaskMgr::GetInstance().PostUpdateTaskToHost(formId, record, callerToken);
 }
 
 /**
@@ -80,7 +80,7 @@ void FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IRe
         return;
     }
     // post updateTask to host
-    FormTaskMgr::GetInstance().PostUninstallTaskToHost(formIds, callerToken);
+    FormHostTaskMgr::GetInstance().PostUninstallTaskToHost(formIds, callerToken);
 }
 
 void FormHostCallback::OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode,
@@ -91,7 +91,7 @@ void FormHostCallback::OnAcquireFormData(const AAFwk::WantParams &wantParams, in
         return;
     }
     // post updateTask to host
-    FormTaskMgr::GetInstance().PostAcquireDataTaskToHost(wantParams, requestCode, callerToken);
+    FormHostTaskMgr::GetInstance().PostAcquireDataTaskToHost(wantParams, requestCode, callerToken);
 }
 
 /**
@@ -108,7 +108,7 @@ void FormHostCallback::OnAcquireState(AppExecFwk::FormState state, const AAFwk::
         return;
     }
     // post updateTask to host
-    FormTaskMgr::GetInstance().PostAcquireStateTaskToHost(state, want, callerToken);
+    FormHostTaskMgr::GetInstance().PostAcquireStateTaskToHost(state, want, callerToken);
 }
 
 /**
@@ -146,7 +146,7 @@ void FormHostCallback::OnEnableForms(
         return;
     }
     // post enableFormsTask to host
-    FormTaskMgr::GetInstance().PostEnableFormsTaskToHost(formIds, enable, callerToken);
+    FormHostTaskMgr::GetInstance().PostEnableFormsTaskToHost(formIds, enable, callerToken);
 }
 
 void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
@@ -163,7 +163,7 @@ void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
         return;
     }
     // post enableFormsTask to host
-    FormTaskMgr::GetInstance().PostLockFormsTaskToHost(formIds, lock, callerToken);
+    FormHostTaskMgr::GetInstance().PostLockFormsTaskToHost(formIds, lock, callerToken);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

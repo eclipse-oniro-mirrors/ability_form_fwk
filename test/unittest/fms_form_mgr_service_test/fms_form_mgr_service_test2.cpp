@@ -1356,4 +1356,16 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
     formMgrService.UpdateFormSize(formId, width, height, borderWidth);
     GTEST_LOG_(INFO) << "FormMgrService_0180 end";
 }
+/**
+ * @tc.name: FormMgrService_0181
+ * @tc.desc: Verify PostConnectNetWork
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0181, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0181 start";
+    std::shared_ptr<FormMgrService> formTaskMgr = std::make_shared<FormMgrService>();
+    formTaskMgr->PostConnectNetWork();
+    GTEST_LOG_(INFO) << "FormMgrService_0181 end";
+}
 }

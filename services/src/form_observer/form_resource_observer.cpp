@@ -19,7 +19,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_resource_param.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_observer/form_observer_task_mgr.h"
 #include "configuration.h"
 
 namespace OHOS {
@@ -34,14 +34,22 @@ FormFwkResourceObserver::~FormFwkResourceObserver()
 
 void FormFwkResourceObserver::OnConfigurationUpdated(const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("language: %{public}s colorMode: %{public}s",
-        configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE).c_str(),
-        configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE).c_str());
+    HILOG_INFO("call");
+    bool needUpdateForms = false;
+    std::string colorMode = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    if (!colorMode.empty() && colorMode != colorMode_) {
+        HILOG_INFO("colorMode:%{public}s", colorMode.c_str());
+        needUpdateForms = true;
+        colorMode_ = colorMode;
+    }
     std::string language = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE);
     if (!language.empty() && language != language_) {
-        HILOG_INFO("language changed %{public}s to %{public}s", language_.c_str(), language.c_str());
+        HILOG_INFO("language:%{public}s", language.c_str());
+        needUpdateForms = true;
         language_ = language;
-        FormTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
+    }
+    if (needUpdateForms) {
+        FormObserverTaskMgr::GetInstance().PostBatchRefreshForms(Constants::REFRESH_SYSTEMAPP_FORM);
     }
     HILOG_INFO("end");
 }

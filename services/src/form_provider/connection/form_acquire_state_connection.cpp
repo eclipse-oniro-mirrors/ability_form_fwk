@@ -19,7 +19,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -51,7 +51,7 @@ void FormAcquireStateConnection::OnAbilityConnectDone(
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostAcquireStateTask(want_, provider_, want, remoteObject);
+    FormProviderTaskMgr::GetInstance().PostAcquireStateTask(want_, provider_, want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

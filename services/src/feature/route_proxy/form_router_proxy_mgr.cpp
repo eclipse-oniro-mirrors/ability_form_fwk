@@ -17,8 +17,9 @@
 
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "running_form_info.h"
+#include "form_mgr/form_mgr_queue.h"
+#include "form_host_delegate_proxy.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -99,7 +100,7 @@ void FormRouterProxyMgr::OnFormRouterEvent(int64_t formId, const Want &want)
     if (routerProxy == nullptr) {
         return;
     }
-    FormTaskMgr::GetInstance().PostRouterProxyToHost(formId, routerProxy, want);
+    PostRouterProxyToHost(formId, routerProxy, want);
 }
 
 void FormRouterProxyMgr::CleanResource(const wptr<IRemoteObject> &remote)
@@ -137,5 +138,25 @@ void FormRouterProxyMgr::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteOb
     FormRouterProxyMgr::GetInstance().CleanResource(remote);
 }
 
+void FormRouterProxyMgr::PostRouterProxyToHost(const int64_t formId, const sptr<IRemoteObject> &remoteObject,
+    const Want &want)
+{
+    auto routerProxyFunc = [formId, want, remoteObject]() {
+        if (remoteObject == nullptr) {
+            HILOG_ERROR("Fail,null remoteObject");
+            return;
+        }
+
+        sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(remoteObject);
+        if (remoteFormHostDelegateProxy == nullptr) {
+            HILOG_ERROR("Fail,null remoteFormHostDelegateProxy");
+            return;
+        }
+
+        remoteFormHostDelegateProxy->RouterEvent(formId, want);
+    };
+ 
+    FormMgrQueue::GetInstance().ScheduleTask(0, routerProxyFunc);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -103,7 +103,6 @@ group("unittest") {
     "unittest/fms_form_supply_stub_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_systemload_listener_test:unittest",
-    "unittest/fms_form_task_mgr_test:unittest",
     "unittest/fms_form_timer_mgr_new_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
     "unittest/fms_form_util_permission_verify_test:unittest",
@@ -133,6 +132,16 @@ group("unittest") {
     "unittest/frs_form_render_event_report_test:unittest",
     "unittest/frs_form_render_record_test:unittest",
     "unittest/frs_form_render_serial_queue_test:unittest",
+    "unittest/fms_form_share_task_mgr_test:unittest",
+    "unittest/fms_form_host_task_mgr_test:unittest",
+    "unittest/fms_form_observer_task_mgr_test:unittest",
+    "unittest/fms_form_provider_task_mgr_test:unittest",
+    "unittest/fms_form_render_task_mgr_test:unittest",
+    "unittest/fms_form_status_task_mgr_test:unittest",
+    "unittest/fms_form_mgr_service_queue_test:unittest",
+    "unittest/fms_form_host_queue_test:unittest",
+    "unittest/fms_form_provider_queue_test:unittest",
+    "unittest/fms_form_render_queue_test:unittest"
   ]
 }
 

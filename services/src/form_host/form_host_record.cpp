@@ -16,7 +16,7 @@
 #include "form_host/form_host_record.h"
 
 #include <cinttypes>
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_host/form_host_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -301,7 +301,7 @@ FormHostRecord FormHostRecord::CreateRecord(const FormItemInfo &info,
 void FormHostRecord::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     HILOG_DEBUG("Form remote died");
-    FormTaskMgr::GetInstance().PostHostDiedTask(remote.promote());
+    FormHostTaskMgr::GetInstance().PostHostDiedTask(remote.promote());
 }
 
 /**

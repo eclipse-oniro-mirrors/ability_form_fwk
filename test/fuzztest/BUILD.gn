@@ -74,13 +74,16 @@ group("fuzztest") {
     "formsupplyproxy_fuzzer:fuzztest",
     "formsupplystub_fuzzer:fuzztest",
     "formsyseventreceiver_fuzzer:fuzztest",
-    "formtaskmgr_fuzzer:fuzztest",
     "formtimermgr_fuzzer:fuzztest",
     "formtimermgrannex_fuzzer:fuzztest",
     "formutil_fuzzer:fuzztest",
     "geterrormsg_fuzzer:fuzztest",
     "providerconnectproxy_fuzzer:fuzztest",
     "providerconnectstub_fuzzer:fuzztest",
+    "formhosttaskmgr_fuzzer:fuzztest",
+    "formobservertaskmgr_fuzzer:fuzztest",
+    "formprovidertaskmgr_fuzzer:fuzztest",
+    "formsharetaskmgr_fuzzer:fuzztest",
   ]
 
   if (ability_runtime_graphics) {
