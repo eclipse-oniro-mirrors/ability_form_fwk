@@ -64,6 +64,8 @@
 #include "net_handle.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
+#include "feature/param_update/param_common_event.h"
+#include "feature/param_update/param_manager.h"
 #include "string_wrapper.h"
 #include "int_wrapper.h"
 #include "want_params_wrapper.h"

@@ -59,6 +59,6 @@ private:
     std::map<std::string, HandleEventFunc> handleEventFunc_;
     std::shared_ptr<ParamCommonEventSubscriber> subscriber_ = nullptr;
 };
-} // namespace ParamDemo
+} // namespace AppExecFwk
 } // namespace OHOS
 #endif // OHOS_FORM_FWK_PARAM_COMMON_EVENT_H

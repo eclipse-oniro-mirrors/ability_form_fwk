@@ -80,7 +80,6 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
         EVP_PKEY_free(evpKey);
         return false;
     }
-    // warnning：需要与签名的hash算法一致，当前使用的是 sha256withrsa ，需要选择 EVP_sha256()
     if (EVP_VerifyInit_ex(ctx, EVP_sha256(), NULL) != 1) {
         HILOG_ERROR("EVP_VerifyInit_ex fail");
         EVP_PKEY_free(evpKey);
@@ -107,16 +106,17 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
 
 std::string SignTools::GetfileStream(const std::string &filepath)
 {
+    const std::string fileString;
     std::ifstream file(filepath, std::ios::in | std::ios::binary);
     if (!file) {
         HILOG_ERROR("Failed to open the file!");
-        return NULL;
+        return fileString;
     }
     std::stringstream infile;
     infile << file.rdbuf();
-    const std::string fileString = infile.str();
+    fileString = infile.str();
     if (fileString.empty()) {
-        return NULL;
+        return fileString;
     }
     return fileString;
 }
@@ -155,7 +155,7 @@ int SignTools::ForEachFileSegment(const std::string &fpath, std::function<void(c
     } while (actLen == pageSize);
 
     return ferror(filp.get()) ? errno : 0;
-};
+}
 
 void SignTools::CalcBase64(uint8_t *input, uint32_t inputLen, std::string &encodedStr)
 {

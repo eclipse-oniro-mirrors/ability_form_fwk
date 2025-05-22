@@ -18,7 +18,7 @@
 #include <iostream>
 #include <fstream>
 #include "form_constants.h"
-#include "feature/param_updateparam_reader.h"
+#include "feature/param_update/param_reader.h"
 #include "common/util/string_utils.h"
 #include "data_center/database/form_rdb_data_mgr.h"
 #include "fms_log_wrapper.h"
@@ -37,6 +37,7 @@ ParamManager::ParamManager()
 {
     HILOG_INFO("init");
 }
+
 ParamManager::~ParamManager()
 {
     HILOG_INFO("destory");
@@ -75,17 +76,17 @@ void ParamManager::InitParam()
     if (currentVersionNum < pathVersionNum) {
         ReloadParam(pathVersion, path);
     }
-};
+}
 
 std::string ParamManager::GetParamStr()
 {
     return g_paramStr;
-};
+}
 
 std::string ParamManager::GetParamVersion()
 {
     return g_currentVersion;
-};
+}
 
 void ParamManager::ReloadParam(const std::string &versionStr, const std::string path)
 {
@@ -109,7 +110,7 @@ void ParamManager::ReloadParam(const std::string &versionStr, const std::string 
     g_currentVersion = versionStr;
     SaveVersionStr(g_currentVersion);
     SaveParamStr(g_paramStr);
-};
+}
 
 std::string ParamManager::LoadVersion()
 {

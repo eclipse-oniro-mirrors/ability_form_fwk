@@ -63,12 +63,13 @@ public:
     static inline bool VersionStrToNumber(std::string &versionStr, long long &versionNum)
     {
         std::smatch matchResults;
+        // version format: aa.bb.yy.rrr,example: 10.10.25.100
         std::regex reg(R"(^\d{1,3}(\.\d{1,3}){1,3}$)");
         bool ret = std::regex_match(versionStr, matchResults, reg);
         if (!ret) {
             return false;
         }
-        char dot = '.';
+        const char dot = '.';
         auto tokens = split(versionStr, dot);
         std::string formatVersionStr;
         for (const auto &token : tokens) {

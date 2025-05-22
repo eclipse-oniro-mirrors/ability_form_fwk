@@ -43,7 +43,6 @@ ParamReader::~ParamReader()
     HILOG_INFO("destory");
 }
 
-// 获取路径下版本信息
 std::string ParamReader::GetPathVersion(const std::string &path)
 {
     HILOG_INFO("GetPathVersion:%{public}s", path.c_str());
@@ -62,7 +61,7 @@ std::string ParamReader::GetPathVersion(const std::string &path)
     StringUtils::trim(versionStr);
     file.close();
     return versionStr;
-};
+}
 
 bool ParamReader::VerifyCertSfFile()
 {
@@ -85,9 +84,8 @@ bool ParamReader::VerifyCertSfFile()
         return false;
     }
     return sha256Digest == calSha256Digest;
-};
+}
 
-// 校验下载的参数文件的完整性
 bool ParamReader::VerifyParamFile(const std::string &fileName)
 {
     HILOG_INFO("VerifyParamFile ,fileName:%{public}s", fileName.c_str());
@@ -104,7 +102,7 @@ bool ParamReader::VerifyParamFile(const std::string &fileName)
         return false;
     }
     return sha256Digest == calSha256Digest;
-};
+}
 
 std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
 {
@@ -117,7 +115,7 @@ std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
     }
     file.close();
     return paramInfo;
-};
+}
 
 std::string ParamReader::GetManifestSha256Digest()
 {
@@ -134,7 +132,7 @@ std::string ParamReader::GetManifestSha256Digest()
     sha256Digest = StringUtils::split(line, ':')[1];
     StringUtils::trim(sha256Digest);
     return sha256Digest;
-};
+}
 
 std::string ParamReader::GetSha256Digest(const std::string &fileName)
 {
@@ -142,7 +140,7 @@ std::string ParamReader::GetSha256Digest(const std::string &fileName)
     std::ifstream file(manifestFile);
     std::string sha256Digest;
     if (!file.good()) {
-        HILOG_INFO("manifestFile is not good");
+        HILOG_ERROR("manifestFile is not good");
         return sha256Digest;
     }
     std::string line;
@@ -157,7 +155,7 @@ std::string ParamReader::GetSha256Digest(const std::string &fileName)
     }
     file.close();
     return sha256Digest;
-};
+}
 
 std::string ParamReader::CalcFileSha256Digest(const std::string &fileName)
 {
@@ -170,6 +168,6 @@ std::string ParamReader::CalcFileSha256Digest(const std::string &fileName)
     }
     calSha256Digest = std::get<1>(ret);
     return calSha256Digest;
-};
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

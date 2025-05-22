@@ -31,8 +31,8 @@ class ParamManager final : public DelayedRefSingleton<ParamManager> {
 public:
     DISALLOW_COPY_AND_MOVE(ParamManager);
     void InitParam();
-    std::string GetParamStr();
-    std::string GetParamVersion();
+    const std::string &GetParamStr();
+    const std::string &GetParamVersion();
 
 private:
     void ReloadParam(const std::string &versionStr, const std::string path);

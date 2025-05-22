@@ -35,8 +35,6 @@ private:
     std::string GetManifestSha256Digest();   
     std::string GetSha256Digest(const std::string &fileName);
     std::string CalcFileSha256Digest(const std::string &fileName);
-
-    std::mutex custMethodLock_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

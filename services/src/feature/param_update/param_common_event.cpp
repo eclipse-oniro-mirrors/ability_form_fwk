@@ -81,7 +81,8 @@ void ParamCommonEvent::SubscriberEvent()
         }
     } while (retry);
     HILOG_ERROR("SubscriberEvent failed.");
-};
+}
+
 void ParamCommonEvent::UnSubscriberEvent()
 {
     HILOG_INFO("call");
@@ -92,7 +93,8 @@ void ParamCommonEvent::UnSubscriberEvent()
         subscriber_ = nullptr;
     }
     HILOG_INFO("UnSubscriberEvent end.");
-};
+}
+
 void ParamCommonEvent::OnReceiveEvent(const AAFwk::Want &want)
 {
     std::string action = want.GetAction();
@@ -102,7 +104,7 @@ void ParamCommonEvent::OnReceiveEvent(const AAFwk::Want &want)
         return;
     }
     it->second(want);
-};
+}
 
 
 void ParamCommonEvent::HandleParamUpdate(const AAFwk::Want &want) const
@@ -110,13 +112,13 @@ void ParamCommonEvent::HandleParamUpdate(const AAFwk::Want &want) const
     std::string action = want.GetAction();
     std::string type = want.GetStringParam(EVENT_INFO_TYPE);
     std::string subtype = want.GetStringParam(EVENT_INFO_SUBTYPE);
-    HILOG_INFO("param update event: %{public}s ,%{public}s ,%{public}s ", action.c_str(),
+    HILOG_INFO("param update event: %{public}s, %{public}s, %{public}s", action.c_str(),
         type.c_str(), subtype.c_str());
     if (action != CFG_UPDATED_ACTION || type != PARAM_CONFIG_TYPE) {
         HILOG_WARN("Ignore type: %{public}s", type.c_str());
         return;
     }
     ParamManager::GetInstance().InitParam();
-};
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
