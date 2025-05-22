@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_PROVIDER_TASK_MGR_H
 
 #include <singleton.h>
+#include "configuration.h"
 #include "iremote_object.h"
 #include "want.h"
 
