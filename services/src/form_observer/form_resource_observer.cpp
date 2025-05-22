@@ -14,6 +14,7 @@
  */
 
 #include "form_observer/form_resource_observer.h"
+#include "form_provider/form_provider_task_mgr.h"
 
 #include <thread>
 
@@ -41,7 +42,7 @@ void FormFwkResourceObserver::OnConfigurationUpdated(const AppExecFwk::Configura
     if (!language.empty() && language != language_) {
         HILOG_INFO("language changed %{public}s to %{public}s", language_.c_str(), language.c_str());
         language_ = language;
-        FormTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
+        FormProviderTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
     }
     HILOG_INFO("end");
 }
