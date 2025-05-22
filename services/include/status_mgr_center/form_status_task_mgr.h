@@ -23,11 +23,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-enum class TaskType : int64_t {
-    RECYCLE_FORM, // add form type base 0
-    RENDER_FORM,
-    DELETE_FORM_HOST_RECORD = 10000 // add form_host type base 10000
-};
 using Want = OHOS::AAFwk::Want;
 class FormStatusTaskMgr final : public DelayedRefSingleton<FormStatusTaskMgr> {
     DECLARE_DELAYED_REF_SINGLETON(FormStatusTaskMgr)
