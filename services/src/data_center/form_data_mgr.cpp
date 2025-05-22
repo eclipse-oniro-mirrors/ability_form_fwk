@@ -23,6 +23,7 @@
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
+#include "data_center/form_basic_info_mgr.h"
 #include "data_center/form_data_proxy_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #include "form_mgr_errors.h"
@@ -85,6 +86,10 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
         }
     }
     HILOG_INFO("end formId: %{public}" PRId64, formInfo.GetFormId());
+    FormBasicInfo basic {
+        record.formId, record.abilityName, record.bundleName, record.moduleName, record.formName, record.packageName
+    };
+    FormBasicInfoMgr::GetInstance().AddFormBasicInfo(basic);
     return record;
 }
 /**
@@ -103,8 +108,10 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
     }
     formRecords_.erase(iter);
     FormUtil::DeleteFormId(formId);
+    FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
     return true;
 }
+
 /**
  * @brief Allot form host record by caller token.
  * @param info The form item info.
@@ -837,6 +844,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
             if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
                 FormRecord formRecord = itFormRecord->second;
                 itFormRecord = formRecords_.erase(itFormRecord);
+                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
                 FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
                 FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
             } else {
@@ -1247,6 +1255,7 @@ void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::se
             FormCacheMgr::GetInstance().DeleteData(itFormRecord->first);
             FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
             itFormRecord = formRecords_.erase(itFormRecord);
+            FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(itFormRecord->first);
         } else {
             itFormRecord++;
         }
@@ -1271,6 +1280,7 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
                 removedTempForms.emplace(itFormRecord->second.formId);
                 FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
                 itFormRecord = formRecords_.erase(itFormRecord);
+                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(itFormRecord->first);
             } else {
                 itFormRecord++;
             }
@@ -1840,6 +1850,7 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
                 }
                 removedFormIds.emplace_back(itFormRecord->second.formId);
                 itFormRecord = formRecords_.erase(itFormRecord);
+                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(itFormRecord->second.formId);
             } else {
                 ++itFormRecord;
             }
@@ -2427,7 +2438,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
     }
     FormRecord formRecord;
     notFindFormRecord  = GetFormRecordById(formId, formRecord);
-    if (!notFindFormRecord ) {
+    if (!notFindFormRecord) {
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
         if (formHostRecords.empty()) {
@@ -3003,7 +3014,7 @@ bool FormDataMgr::GetFormRecordById(const int64_t formId, FormRecord& formRecord
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     notFindFormRecord  = info == formRecords_.end();
-    if (!notFindFormRecord ) {
+    if (!notFindFormRecord) {
         formRecord = info->second;
     }
     return notFindFormRecord ;

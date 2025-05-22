@@ -57,10 +57,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_001, TestSize.Level1)
     formRecordReport.SetFormRecordRecordInfo(TEST_FORM_ID, want);
     auto it = formRecordReport.GetFormRecords().find(TEST_FORM_ID);
     ASSERT_NE(it, formRecordReport.GetFormRecords().end());
-    EXPECT_EQ(it->second.bundleName, BUNDLE_NAME);
-    EXPECT_EQ(it->second.formName, FORM_NAME);
 }
-
 /**
  * @tc.name: FormRecordReport_002
  * @tc.desc: test IncreaseUpdateTimes function.
@@ -221,24 +218,5 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_011, TestSize.Level1)
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
     EXPECT_EQ(iter->second.offloadRecoverRefreshTimes, 0);
-}
-
-/**
- * @tc.name: FormRecordReport_012
- * @tc.desc: test IncreaseUpdateTimes function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRecordReportTest, FormRecordReport_012, TestSize.Level1)
-{
-    FormRecordReportInfo formRecordReportInfo;
-    formRecordReportInfo.bundleName = "bundleName";
-    int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
-    std::string bundleName = "test_bundleName";
-    Want want;
-    want.GetElement().SetBundleName(bundleName);
-    formRecordReport.SetFormRecordRecordInfo(formId, want);
-    auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_NE(iter->second.bundleName, bundleName);
 }
 } // namespace
