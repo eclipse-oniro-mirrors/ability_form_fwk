@@ -1,5 +1,3 @@
-code/foundation/ability/form_fwk/test/unittest/fms_form_data_mgr_test/mock_form_db_cache.h
-
 /*
  * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
