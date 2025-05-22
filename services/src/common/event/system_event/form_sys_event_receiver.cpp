@@ -66,25 +66,12 @@ void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 
-void FormSysEventReceiver::HandleScreenUnlocked()
+void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 {
     auto task = []() {
         FormRenderMgr::GetInstance().OnScreenUnlock();
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
-}
-
-void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
-{
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
-    auto task = [userId]() {
-        FormRenderMgr::GetInstance().OnScreenUnlock(userId);
-    };
-    serialQueue_->ScheduleTask(0, task);
 }
 
 void FormSysEventReceiver::HandleUserUnlocked(int32_t userId)
