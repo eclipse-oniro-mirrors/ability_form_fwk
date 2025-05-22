@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
 }
 FormObserverTaskMgr::FormObserverTaskMgr() {}
 
