@@ -452,7 +452,7 @@ void FormProviderTaskMgr::RemoveConnection(int32_t connectId)
     formSupplyCallback->RemoveConnection(connectId);
 }
 
-void FormTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
+void FormProviderTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("call");
@@ -470,6 +470,21 @@ void FormTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configuration& con
         RemoveConnection(connectId);
         HILOG_ERROR("acquire providerFormInfo failed");
     }
+}
+
+void FormProviderTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
+{
+    HILOG_INFO("Call.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return;
+    }
+
+    auto batchConfigurationUpdate = [configuration]() {
+        return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchConfigurationUpdate);
+    HILOG_INFO("end");
 }
 } // namespace AppExecFwk
 } // namespace OHOS
