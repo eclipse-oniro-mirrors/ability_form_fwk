@@ -74,7 +74,7 @@ ohos_unittest("FmsFormHostTaskMgrTest") {
     "ffrt:libffrt",
     "form_fwk:form_manager",
     "googletest:gtest_main",
-    "googletest:gmock_main"
+    "googletest:gmock_main",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
