@@ -444,7 +444,6 @@ void FormDbCache::DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap)
     if (!removeList.empty()) {
         ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
     }
-    ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
 }
 #endif
 
