@@ -26,6 +26,7 @@
  
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
 FormStatusTaskMgr::FormStatusTaskMgr() {}
 
 FormStatusTaskMgr::~FormStatusTaskMgr() {}
