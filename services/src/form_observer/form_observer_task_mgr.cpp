@@ -21,8 +21,6 @@
  
 namespace OHOS {
 namespace AppExecFwk {
-namespace {
-}
 FormObserverTaskMgr::FormObserverTaskMgr() {}
 
 FormObserverTaskMgr::~FormObserverTaskMgr() {}
