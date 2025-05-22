@@ -18,8 +18,6 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
-#include "config_policy_param_upgrade_path.h"
-#include "config_policy_utils.h"
 #include "common/util/string_utils.h"
 #include "cloud_param/sign_tools.h"
 #include "form_constants.h"
@@ -29,12 +27,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    const std::string FORM_MGR_CONFIG_DIR = "etc/FormMgrConfig/";
     const std::string CERT_ENC_FILE = "CERT.ENC";
     const std::string CERT_SF_FILE = "CERT.SF";
     const std::string MANIFEST_MF_FILE = "MANIFEST.MF";
     const std::string FILE_SHA_KEY = "Name: ";
-    const std::string PUBKEY_PATH = "/system/etc/FormMgrConfig/hwkey_param_upgrade_v1.pem";
+    const std::string PUBKEY_PATH = "/system/etc/update/hwkey_param_upgrade_v1.pem";
 }
 
 ParamReader::ParamReader()
@@ -46,30 +43,8 @@ ParamReader::~ParamReader()
     HILOG_INFO("destory");
 }
 
-// 获取高版本配置路径
-std::string ParamReader::GetConfigFilePath()
-{
-    std::lock_guard<std::mutex> lock(custMethodLock_);
-    ::HwCustSetDataSourceType(HW_CUST_TYPE_SYSTEM);
-    std::string cfgDir = FORM_MGR_CONFIG_DIR;
-    ParamVersionFileInfo *paramVersionFileInfo = ::GetDownloadCfgFile(cfgDir.c_str(), cfgDir.c_str());
-    if (paramVersionFileInfo == NULL) {
-        HILOG_INFO("can not found version txt in path :  %{public}s", cfgDir.c_str());
-        return {};
-    }
-    if (!paramVersionFileInfo->found) {
-        HILOG_INFO("can not found version txt in path :  %{public}s", cfgDir.c_str());
-        free(paramVersionFileInfo);
-        return {};
-    }
-    std::string path = std::string(paramVersionFileInfo->path);
-    HILOG_INFO("GetConfigFilePath path:%{public}s", path.c_str());
-    free(paramVersionFileInfo);
-    return path;
-};
-
 // 获取路径下版本信息
-std::string ParamReader::GetPathVersion(std::string path)
+std::string ParamReader::GetPathVersion(const std::string &path)
 {
     HILOG_INFO("GetPathVersion:%{public}s", path.c_str());
     if (path.empty()) {
@@ -91,8 +66,8 @@ std::string ParamReader::GetPathVersion(std::string path)
 
 bool ParamReader::VerifyCertSfFile()
 {
-    std::string certFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + CERT_ENC_FILE;
-    std::string verifyFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
+    std::string certFile = Constants::FORM_MGR_CONFIG_DIR + CERT_ENC_FILE;
+    std::string verifyFile = Constants::FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
     if (!SignTools::VerifyFileSign(PUBKEY_PATH, certFile, verifyFile)) {
         HILOG_ERROR("verify file sign failed");
         return false;
@@ -146,7 +121,7 @@ std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
 
 std::string ParamReader::GetManifestSha256Digest()
 {
-    std::string verifyFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
+    std::string verifyFile = Constants::FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
     std::ifstream file(verifyFile);
     std::string sha256Digest;
     if (!file.good()) {
@@ -163,7 +138,7 @@ std::string ParamReader::GetManifestSha256Digest()
 
 std::string ParamReader::GetSha256Digest(const std::string &fileName)
 {
-    std::string manifestFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + MANIFEST_MF_FILE;
+    std::string manifestFile = Constants::FORM_MGR_CONFIG_DIR + MANIFEST_MF_FILE;
     std::ifstream file(manifestFile);
     std::string sha256Digest;
     if (!file.good()) {
@@ -186,7 +161,7 @@ std::string ParamReader::GetSha256Digest(const std::string &fileName)
 
 std::string ParamReader::CalcFileSha256Digest(const std::string &fileName)
 {
-    std::string filePath = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + fileName;
+    std::string filePath = Constants::FORM_MGR_CONFIG_DIR + fileName;
     std::string calSha256Digest;
     std::tuple<int, std::string> ret = SignTools::CalcFileSha256Digest(filePath);
     if (std::get<0>(ret) != 0) {

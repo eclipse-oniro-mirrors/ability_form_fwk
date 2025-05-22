@@ -214,7 +214,6 @@ ohos_shared_library("libfms") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "config_policy_ext:config_policy_ext_utils",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",

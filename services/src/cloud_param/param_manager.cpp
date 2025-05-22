@@ -26,9 +26,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
+    const std::string PARAM_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
     constexpr const char* FORM_MGR_CONFIG_VERSION = "FormMgrConfig_version";
     constexpr const char* FORM_MGR_CONFIG_DATA = "FormMgrConfig_data";
     const std::string CONFIG_FILE_NAME = "form_mgr_config.json";
+    const std::string PARAM_PRESET_PATH = "/system/etc/FormMgrConfig/";
 }
 
 ParamManager::ParamManager()
@@ -45,12 +47,23 @@ void ParamManager::InitParam()
     HILOG_INFO("call");
     g_paramStr = LoadParamStr();
     g_currentVersion = LoadVersion();
-    std::string path = ParamReader::GetInstance().GetConfigFilePath();
-    std::string pathVersion = ParamReader::GetInstance().GetPathVersion(path);
+    std::string presetVersion = ParamReader::GetInstance().GetPathVersion(PARAM_PRESET_PATH);
+    long long presetVersionNum;
+    if (!StringUtils::VersionStrToNumber(presetVersion, presetVersionNum)) {
+        HILOG_ERROR("path version error:%{public}s", presetVersion.c_str());
+        return;
+    }
+    std::string pathVersion = ParamReader::GetInstance().GetPathVersion(Constants::FORM_MGR_CONFIG_DIR);
     long long pathVersionNum;
     if (!StringUtils::VersionStrToNumber(pathVersion, pathVersionNum)) {
         HILOG_ERROR("path version error:%{public}s", pathVersion.c_str());
         return;
+    }
+    HILOG_INFO("presetVersion: %{public}s  pathVersion:%{public}s", presetVersion.c_str(), pathVersion.c_str());
+    std::string path = Constants::FORM_MGR_CONFIG_DIR;
+    if (presetVersionNum > pathVersionNum) {
+        pathVersionNum = presetVersionNum;
+        path = PARAM_PRESET_PATH;
     }
     std::string currentVersion = g_currentVersion;
     long long currentVersionNum;
@@ -58,7 +71,7 @@ void ParamManager::InitParam()
         HILOG_ERROR("current version error:%{public}s", currentVersion.c_str());
         return;
     }
-    HILOG_INFO("currentVersion: %{public}s  pathVersion :%{public}s", currentVersion.c_str(), pathVersion.c_str());
+    HILOG_INFO("currentVersion: %{public}s", currentVersion.c_str());
     if (currentVersionNum < pathVersionNum) {
         ReloadParam(pathVersion, path);
     }
@@ -77,7 +90,7 @@ std::string ParamManager::GetParamVersion()
 void ParamManager::ReloadParam(const std::string &versionStr, const std::string path)
 {
     HILOG_INFO("reloadParam version:%{public}s,path:%{public}s", versionStr.c_str(), path.c_str());
-    if (path.find(Constants::PARAM_INSTALL_PATH) != std::string::npos) {
+    if (path.find(PARAM_INSTALL_PATH) != std::string::npos) {
         if (!ParamReader::GetInstance().VerifyCertSfFile()) {
             HILOG_ERROR("verify CertSf file error");
             return;

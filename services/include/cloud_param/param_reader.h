@@ -26,8 +26,7 @@ class ParamReader final : public DelayedRefSingleton<ParamReader> {
     DECLARE_DELAYED_REF_SINGLETON(ParamReader)
 public:
     DISALLOW_COPY_AND_MOVE(ParamReader);
-    std::string GetConfigFilePath();
-    std::string GetPathVersion(std::string path);
+    std::string GetPathVersion(const std::string &path);
     bool VerifyCertSfFile();
     bool VerifyParamFile(const std::string &filePathStr);
     std::string GetParamInfoStr(const std::string &filePathStr);

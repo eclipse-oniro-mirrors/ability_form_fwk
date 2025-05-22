@@ -72,7 +72,6 @@
               "dmsfwk",
               "huks",
               "selinux_adapter",
-              "config_policy_ext",
               "openssl"
 
           ],
