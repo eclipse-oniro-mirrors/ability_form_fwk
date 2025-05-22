@@ -80,6 +80,16 @@ public:
         return ERR_OK;
     };
 
+    ErrCode RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow) override
+    {
+        return ERR_OK;
+    }
+        
+    ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 
@@ -154,6 +164,141 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_004, TestSize.Lev
     Want want = {};
     data.WriteParcelable(&want);
     constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_ROUTER_EVENT);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_005
+ * @tc.desc: Verify OnRemoteRequest function and remoteDescriptor is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_005, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_TRANSACTION_FAILED);
+}
+  
+/**
+ * @tc.name: FormHostDelegateStubTest_006
+ * @tc.desc: Verify OnRemoteRequest function and memberFunc is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_006, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW) + 100;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_007
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleRequestOverflow interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ *           3.formId is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_007, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    data.WriteBool(isOverflow);
+    data.WriteParcelable(&overflowInfo);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_INVALID_DATA);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_08
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleRequestOverflow interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_08, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    ASSERT_NE(callback, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    data.WriteInt64(TEST_FORM_ID);
+    data.WriteParcelable(&overflowInfo);
+    data.WriteBool(isOverflow);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_REQUEST_OVERFLOW);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_09
+ * @tc.desc: Verify OnRemoteRequest function and remoteDescriptor is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_09, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_CHANGE_SCENE_ANIMATION_STATE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_TRANSACTION_FAILED);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_010
+ * @tc.desc: Verify OnRemoteRequest function and memberFunc is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_010, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_CHANGE_SCENE_ANIMATION_STATE) + 100;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_011
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleChangeSceneAnimationState interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_011, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    ASSERT_NE(callback, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    int32_t state = 1;
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    data.WriteInt64(TEST_FORM_ID);
+    data.WriteInt32(state);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_CHANGE_SCENE_ANIMATION_STATE);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }

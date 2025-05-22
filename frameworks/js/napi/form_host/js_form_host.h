@@ -23,6 +23,7 @@
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 #include "napi_common_want.h"
+#include "form_instance.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -42,6 +43,26 @@ private:
     napi_env env_;
 };
 
+/* formId：the Id of form.
+ * overflowInfo: overflow information, including overflow area and overflow duration.
+ * isOverflow: whether overflow, true means request overflow, false means cancel overflow.
+ * state：activation state, 1 means activate, 0 means deactivate.
+ * condition：condition variable for thread synchronization
+ * mutex：mutex locks for shared resources.
+ * isReady：used to indicate whether the asynchronous operation is completed or not.
+ * result：the result of the operation.
+ */
+typedef struct LiveFormInterfaceParam {
+    std::string formId;
+    AppExecFwk::OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    int32_t state;
+    std::condition_variable condition;
+    std::mutex mutex;
+    bool isReady = false;
+    bool result = false;
+} LiveFormInterfaceParam;
+
 class JsFormRouterProxyMgr : public AppExecFwk::FormHostDelegateStub {
 public:
     JsFormRouterProxyMgr() = default;
@@ -55,6 +76,14 @@ public:
     void RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds);
 
     ErrCode RouterEvent(const int64_t formId, const OHOS::AAFwk::Want &want);
+    
+    bool RegisterOverflowListener(napi_env env, napi_ref callback);
+
+    bool UnregisterOverflowListener();
+    
+    bool RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callback);
+
+    bool UnregisterChangeSceneAnimationStateListener();
 
 private:
     static std::mutex mutex_;
@@ -64,6 +93,15 @@ private:
     std::map<int64_t, std::shared_ptr<FormRouterProxyCallbackClient>> formRouterProxyCallbackMap_;
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
     DISALLOW_COPY_AND_MOVE(JsFormRouterProxyMgr);
+    napi_ref overflowRegisterCallback_ = nullptr;
+    napi_env overflowEnv_;
+    napi_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
+    napi_env changeSceneAnimationStateEnv_;
+    ErrCode RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow = true);
+    void CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo, napi_value* result);
+    void RequestOverflowInner(LiveFormInterfaceParam* dataParam);
+    ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
+    void ChangeSceneAnimationStateInner(LiveFormInterfaceParam* dataParam);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

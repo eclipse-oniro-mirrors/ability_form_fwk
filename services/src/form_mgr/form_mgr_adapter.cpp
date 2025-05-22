@@ -82,6 +82,7 @@
 #include "common/connection/form_ability_connection_reporter.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
+#include "iform_host_delegate.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -102,6 +103,7 @@ const std::string FORM_CLICK_ROUTER = "router";
 const std::string FORM_CLICK_MESSAGE = "message";
 const std::string FORM_CLICK_CALL = "call";
 const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
+const std::string FORM_SUPPORT_LIVE = "persist.sys.fms.supprot.liveForm";
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 enum class AddFormTaskType : int64_t {
@@ -4380,6 +4382,131 @@ ErrCode FormMgrAdapter::RefreshFormsByScreenOn()
         if (formRecord.isTimerRefresh) {
             FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, currUserId);
         }
+    }
+    return ERR_OK;
+}
+
+bool FormMgrAdapter::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return false;
+    }
+    overflowCallerToken_ = callerToken;
+    return true;
+}
+
+bool FormMgrAdapter::UnregisterOverflowProxy()
+{
+    HILOG_INFO("call");
+    overflowCallerToken_ = nullptr;
+    return true;
+}
+
+ErrCode FormMgrAdapter::RequestOverflow(const int64_t formId, const int32_t callingUid,
+    const OverflowInfo &overflowInfo, bool isOverflow)
+{
+    HILOG_INFO("call");
+    ErrCode checkResult = SceneAnimationCheck(formId, callingUid);
+    if (checkResult != ERR_OK) {
+        return checkResult;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(overflowCallerToken_);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("Failed, remoteFormHostDelegateProxy is nullptr");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    ErrCode result = remoteFormHostDelegateProxy->RequestOverflow(formId, overflowInfo, isOverflow);
+    HILOG_INFO("RequestOverflow result: %{public}d", result);
+    return result;
+}
+
+bool FormMgrAdapter::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return false;
+    }
+    sceneanimationCallerToken_ = callerToken;
+    return true;
+}
+
+bool FormMgrAdapter::UnregisterChangeSceneAnimationStateProxy()
+{
+    HILOG_INFO("call");
+    sceneanimationCallerToken_ = nullptr;
+    return true;
+}
+
+ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const int32_t callingUid, int32_t state)
+{
+    HILOG_INFO("call");
+    ErrCode checkResult = SceneAnimationCheck(formId, callingUid);
+    if (checkResult != ERR_OK) {
+        return checkResult;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(sceneanimationCallerToken_);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    ErrCode result = remoteFormHostDelegateProxy->ChangeSceneAnimationState(formId, state);
+    HILOG_INFO("ChangeSceneAnimationState result: %{public}d", result);
+    return result;
+}
+
+ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t callingUid)
+{
+    HILOG_INFO("call");
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId, formId: %{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    // check whether CCM config is support live form
+    std::string supportLive = OHOS::system::GetParameter(FORM_SUPPORT_LIVE, "false");
+    if (supportLive == "false") {
+        HILOG_ERROR("fms not support live form");
+        return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
+    }
+
+    // find matched formId
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    
+    // check exist and get the formRecord
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    
+    // check bundleName match
+    if (formRecord.uid != callingUid) {
+        HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d", formRecord.uid, callingUid);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    // check whether application is locked
+    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect("", formId);
+    if (isBundleProtect) {
+        HILOG_ERROR("Failed, application is locked");
+        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+    }
+    
+    Want want;
+    want.SetElementName(formRecord.bundleName, formRecord.abilityName);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formRecord.formName);
+    FormInfo formInfo;
+    ErrCode errCode = GetFormInfo(want, formInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Get target form info failed");
+        return errCode;
+    }
+    if (formInfo.sceneAnimationParams.abilityName.empty()) {
+        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
     return ERR_OK;
 }

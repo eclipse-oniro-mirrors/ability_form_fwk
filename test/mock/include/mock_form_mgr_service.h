@@ -125,6 +125,8 @@ public:
     MOCK_METHOD4(UpdateFormSize, ErrCode(const int64_t &formId, float width, float height, float borderWidth));
     MOCK_METHOD2(LockForms, int32_t(const std::vector<FormLockInfo> &formLockInfos, LockChangeType type));
     MOCK_METHOD3(OpenFormEditAbility, ErrCode(const std::string &abilityName, const int64_t &formId, bool isMainPage));
+    MOCK_METHOD3(RequestOverflow, ErrCode(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow));
+    MOCK_METHOD2(ChangeSceneAnimationState, ErrCode(const int64_t formId, int32_t state));
 };
 }
 }

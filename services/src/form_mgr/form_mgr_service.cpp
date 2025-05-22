@@ -37,6 +37,7 @@
 #include "common/event/form_event_report.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr/form_mgr_adapter.h"
+#include "form_instance.h"
 #include "form_mgr_errors.h"
 #include "status_mgr_center/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"
@@ -71,6 +72,7 @@
 #include "mem_mgr_client.h"
 #endif
 #include "common/util/form_report.h"
+#include "iform_host_delegate.h"
 
 #ifdef RES_SCHEDULE_ENABLE
 #include "common/event/system_event/form_systemload_listener.h"
@@ -2030,6 +2032,44 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
+bool FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().RegisterOverflowProxy(callerToken);
+}
+
+bool FormMgrService::UnregisterOverflowProxy()
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().UnregisterOverflowProxy();
+}
+
+ErrCode FormMgrService::RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow)
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapter::GetInstance().RequestOverflow(formId, callingUid, overflowInfo, isOverflow);
+}
+
+bool FormMgrService::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().RegisterChangeSceneAnimationStateProxy(callerToken);
+}
+
+bool FormMgrService::UnregisterChangeSceneAnimationStateProxy()
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().UnregisterChangeSceneAnimationStateProxy();
+}
+
+ErrCode FormMgrService::ChangeSceneAnimationState(const int64_t formId, int32_t state)
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapter::GetInstance().ChangeSceneAnimationState(formId, callingUid, state);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

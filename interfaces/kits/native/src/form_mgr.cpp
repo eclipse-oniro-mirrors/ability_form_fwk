@@ -2013,5 +2013,106 @@ ErrCode FormMgr::OpenFormEditAbility(const std::string &abilityName, const int64
     }
     return resultCode;
 }
+
+bool FormMgr::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("Call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Connect form mgr service failed, errCode %{public}d", errCode);
+        return false;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    return remoteProxy_->RegisterOverflowProxy(callerToken);
+}
+
+bool FormMgr::UnregisterOverflowProxy()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    return remoteProxy_->UnregisterOverflowProxy();
+}
+
+ErrCode FormMgr::RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow)
+{
+    HILOG_INFO("Call");
+    if (formId <= 0) {
+        HILOG_ERROR("RequestOverflow failed, formId is invalid");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    if (isOverflow && overflowInfo.duration <= 0) {
+        HILOG_ERROR("RequestOverflow failed, duration is invalid");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Connect form mgr service failed, errCode %{public}d", errCode);
+        return errCode;
+    }
+
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is invalid");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    ErrCode result = remoteProxy_->RequestOverflow(formId, overflowInfo, isOverflow);
+    HILOG_INFO("RequestOverflow result: %{public}d", result);
+    return result;
+}
+
+bool FormMgr::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    return remoteProxy_->RegisterChangeSceneAnimationStateProxy(callerToken);
+}
+
+bool FormMgr::UnregisterChangeSceneAnimationStateProxy()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    return remoteProxy_->UnregisterChangeSceneAnimationStateProxy();
+}
+
+ErrCode FormMgr::ChangeSceneAnimationState(const int64_t formId, int32_t state)
+{
+    HILOG_INFO("call");
+    if (formId <= 0) {
+        HILOG_ERROR("RequestOverflow failed, formId is invalid");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed, errCode %{public}d", errCode);
+        return errCode;
+    }
+
+    // check remoteProxy_
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    ErrCode result = remoteProxy_->ChangeSceneAnimationState(formId, state);
+    HILOG_INFO("ChangeSceneAnimationState result: %{public}d", result);
+    return result;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

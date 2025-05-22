@@ -71,6 +71,10 @@ public:
     static napi_value GetPublishedFormInfos(napi_env env, napi_callback_info info);
     static napi_value OpenFormManager(napi_env env, napi_callback_info info);
     static napi_value OpenFormEditAbility(napi_env env, napi_callback_info info);
+    static napi_value RequestOverflow(napi_env env, napi_callback_info info);
+    static napi_value CancelOverflow(napi_env env, napi_callback_info info);
+    static napi_value ActivateSceneAnimation(napi_env env, napi_callback_info info);
+    static napi_value DeactivateSceneAnimation(napi_env env, napi_callback_info info);
 private:
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
     napi_value OnGetPublishedFormInfoById(napi_env env, size_t argc, napi_value* argv);
@@ -88,6 +92,13 @@ private:
         size_t &convertArgc, bool &isPromise, AppExecFwk::FormInfoFilter &formInfoFilter);
     napi_value OnUpdateFormParseParam(napi_env env, size_t argc, napi_value* argv, int64_t &formId);
     napi_value OnOpenFormEditAbility(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnRequestOverflow(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnCancelOverflow(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnActivateSceneAnimation(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnDeactivateSceneAnimation(napi_env env, size_t argc, napi_value* argv);
+    static bool ConvertFormOverflowInfo(napi_env env, napi_value argv, AppExecFwk::OverflowInfo* overflowInfo);
+    static bool ConvertOverflowInfoArea(napi_env env, napi_value rangeArea, AppExecFwk::Rect &area);
+    static bool GetAndConvertProperty(napi_env env, napi_value object, const char* propertyName, int32_t& outValue);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

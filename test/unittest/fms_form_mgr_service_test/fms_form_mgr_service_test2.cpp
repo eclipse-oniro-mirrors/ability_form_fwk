@@ -1356,4 +1356,35 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
     formMgrService.UpdateFormSize(formId, width, height, borderWidth);
     GTEST_LOG_(INFO) << "FormMgrService_0180 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0181
+ * @tc.name: test RequestOverflow function.
+ * @tc.desc: Verify that the RequestOverflow interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0181, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0181 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    EXPECT_EQ(formMgrService.RequestOverflow(formId, overflowInfo, isOverflow), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0181 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0182
+ * @tc.name: test ChangeSceneAnimationState function.
+ * @tc.desc: Verify that the ChangeSceneAnimationState interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0182, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0182 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    int32_t state = 1;
+    EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0182 end";
+}
 }
