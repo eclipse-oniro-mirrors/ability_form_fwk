@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "cloud_param/param_manager.h"
+#include "feature/param_update/param_manager.h"
 
 #include <iostream>
 #include <fstream>
 #include "form_constants.h"
-#include "cloud_param/param_reader.h"
+#include "feature/param_updateparam_reader.h"
 #include "common/util/string_utils.h"
 #include "data_center/database/form_rdb_data_mgr.h"
 #include "fms_log_wrapper.h"

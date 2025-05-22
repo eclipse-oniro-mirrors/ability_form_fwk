@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "cloud_param/param_reader.h"
+#include "feature/param_update/param_reader.h"
 
 #include <memory>
 #include <iostream>
 #include <fstream>
 #include "common/util/string_utils.h"
-#include "cloud_param/sign_tools.h"
+#include "feature/param_update/sign_tools.h"
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
 #include "json_serializer.h"

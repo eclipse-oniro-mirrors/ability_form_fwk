@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "cloud_param/param_common_event.h"
+#include "feature/param_update/param_common_event.h"
 
 #include <common_event_data.h>
 #include <common_event_manager.h>
@@ -22,7 +22,7 @@
 #include <memory>
 #include <unistd.h>
 
-#include "cloud_param/param_manager.h"
+#include "feature/param_update/param_manager.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 
