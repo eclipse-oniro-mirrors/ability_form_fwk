@@ -2038,7 +2038,7 @@ void FormMgrService::PostConnectNetWork()
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
     HILOG_DEBUG("end");
-
+}
 bool FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
