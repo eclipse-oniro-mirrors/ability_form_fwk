@@ -18,7 +18,6 @@
 
 #include <singleton.h>
 #include "iremote_object.h"
-#include "form_record.h"
 #include "want.h"
 #include "data_center/form_record/form_record.h"
 
