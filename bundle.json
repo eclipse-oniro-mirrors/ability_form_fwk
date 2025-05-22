@@ -71,7 +71,9 @@
               "device_manager",
               "dmsfwk",
               "huks",
-              "selinux_adapter"
+              "selinux_adapter",
+              "config_policy_ext",
+              "openssl"
 
           ],
           "third_party": [

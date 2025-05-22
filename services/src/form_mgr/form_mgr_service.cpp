@@ -930,6 +930,8 @@ ErrCode FormMgrService::Init()
     FormMgrAdapter::GetInstance().Init();
     FormAmsHelper::GetInstance().RegisterConfigurationObserver();
     SubscribeNetConn();
+    ParamManager::GetInstance().InitParam();
+    ParamCommonEvent::GetInstance().SubscriberEvent();
     return ERR_OK;
 }
 

@@ -1,0 +1,44 @@
+/*
+ * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef OHOS_FORM_FWK_PARAM_READER_H
+#define OHOS_FORM_FWK_PARAM_READER_H
+
+#include <mutex> 
+#include <singleton.h>
+#include <string>
+
+namespace OHOS {
+namespace AppExecFwk {
+class ParamReader final : public DelayedRefSingleton<ParamReader> {
+    DECLARE_DELAYED_REF_SINGLETON(ParamReader)
+public:
+    DISALLOW_COPY_AND_MOVE(ParamReader);
+    std::string GetConfigFilePath();
+    std::string GetPathVersion(std::string path);
+    bool VerifyCertSfFile();
+    bool VerifyParamFile(const std::string &filePathStr);
+    std::string GetParamInfoStr(const std::string &filePathStr);
+
+private:
+    std::string GetManifestSha256Digest();   
+    std::string GetSha256Digest(const std::string &fileName);
+    std::string CalcFileSha256Digest(const std::string &fileName);
+
+    std::mutex custMethodLock_;
+};
+}  // namespace AppExecFwk
+}  // namespace OHOS
+#endif // OHOS_FORM_FWK_PARAM_READER_H

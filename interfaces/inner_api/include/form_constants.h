@@ -363,6 +363,12 @@ namespace Constants {
     constexpr const int32_t FORM_VERSION_CODE = 100001;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
+    
+    const std::string PARAM_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
+
+    const std::string VERSION_FILE_NAME = "version.txt";
+
+    constexpr const char* FMC_DEFAULT_VERSION = "10.10.25.100";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

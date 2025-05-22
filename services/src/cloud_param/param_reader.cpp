@@ -1,0 +1,200 @@
+/*
+ * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "cloud_param/param_reader.h"
+
+#include <memory>
+#include <iostream>
+#include <fstream>
+#include "config_policy_param_upgrade_path.h"
+#include "config_policy_utils.h"
+#include "common/util/string_utils.h"
+#include "cloud_param/sign_tools.h"
+#include "form_constants.h"
+#include "fms_log_wrapper.h"
+#include "json_serializer.h"
+
+namespace OHOS {
+namespace AppExecFwk {
+namespace {
+    const std::string FORM_MGR_CONFIG_DIR = "etc/FormMgrConfig/";
+    const std::string CERT_ENC_FILE = "CERT.ENC";
+    const std::string CERT_SF_FILE = "CERT.SF";
+    const std::string MANIFEST_MF_FILE = "MANIFEST.MF";
+    const std::string FILE_SHA_KEY = "Name: ";
+    const std::string PUBKEY_PATH = "/system/etc/FormMgrConfig/hwkey_param_upgrade_v1.pem";
+}
+
+ParamReader::ParamReader()
+{
+    HILOG_INFO("init");
+}
+ParamReader::~ParamReader()
+{
+    HILOG_INFO("destory");
+}
+
+// 获取高版本配置路径
+std::string ParamReader::GetConfigFilePath()
+{
+    std::lock_guard<std::mutex> lock(custMethodLock_);
+    ::HwCustSetDataSourceType(HW_CUST_TYPE_SYSTEM);
+    std::string cfgDir = FORM_MGR_CONFIG_DIR;
+    ParamVersionFileInfo *paramVersionFileInfo = ::GetDownloadCfgFile(cfgDir.c_str(), cfgDir.c_str());
+    if (paramVersionFileInfo == NULL) {
+        HILOG_INFO("can not found version txt in path :  %{public}s", cfgDir.c_str());
+        return {};
+    }
+    if (!paramVersionFileInfo->found) {
+        HILOG_INFO("can not found version txt in path :  %{public}s", cfgDir.c_str());
+        free(paramVersionFileInfo);
+        return {};
+    }
+    std::string path = std::string(paramVersionFileInfo->path);
+    HILOG_INFO("GetConfigFilePath path:%{public}s", path.c_str());
+    free(paramVersionFileInfo);
+    return path;
+};
+
+// 获取路径下版本信息
+std::string ParamReader::GetPathVersion(std::string path)
+{
+    HILOG_INFO("GetPathVersion:%{public}s", path.c_str());
+    if (path.empty()) {
+        HILOG_ERROR("path is empty, return default version");
+        return Constants::FMC_DEFAULT_VERSION;
+    }
+    std::ifstream file(path + Constants::VERSION_FILE_NAME);
+    if (!file.good()) {
+        HILOG_INFO("VersionFilePath is not good,FilePath:%{public}s", path.c_str());
+        return Constants::FMC_DEFAULT_VERSION;
+    }
+    std::string line;
+    std::getline(file, line);
+    std::string versionStr = StringUtils::split(line, '=')[1];
+    StringUtils::trim(versionStr);
+    file.close();
+    return versionStr;
+};
+
+bool ParamReader::VerifyCertSfFile()
+{
+    std::string certFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + CERT_ENC_FILE;
+    std::string verifyFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
+    if (!SignTools::VerifyFileSign(PUBKEY_PATH, certFile, verifyFile)) {
+        HILOG_ERROR("verify file sign failed");
+        return false;
+    }
+    std::string sha256Digest = GetManifestSha256Digest();
+    HILOG_INFO("sha256Digest:%{public}s", sha256Digest.c_str());
+    if (sha256Digest.empty()) {
+        HILOG_ERROR("sha256Digest is empty");
+        return false;
+    }
+    std::string calSha256Digest = CalcFileSha256Digest(MANIFEST_MF_FILE);
+    HILOG_ERROR("calSha256Digest:%{public}s", calSha256Digest.c_str());
+    if (calSha256Digest.empty()) {
+        HILOG_ERROR("calSha256Digest is empty");
+        return false;
+    }
+    return sha256Digest == calSha256Digest;
+};
+
+// 校验下载的参数文件的完整性
+bool ParamReader::VerifyParamFile(const std::string &fileName)
+{
+    HILOG_INFO("VerifyParamFile ,fileName:%{public}s", fileName.c_str());
+    std::string sha256Digest = GetSha256Digest(fileName);
+    HILOG_INFO("sha256Digest:%{public}s", sha256Digest.c_str());
+    if (sha256Digest.empty()) {
+        HILOG_ERROR("sha256Digest is empty");
+        return false;
+    }
+    std::string calSha256Digest = CalcFileSha256Digest(fileName);
+    HILOG_INFO("calSha256Digest:%{public}s", sha256Digest.c_str());
+    if (calSha256Digest.empty()) {
+        HILOG_ERROR("calSha256Digest is empty");
+        return false;
+    }
+    return sha256Digest == calSha256Digest;
+};
+
+std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
+{
+    std::string paramInfo;
+    std::ifstream file(filePathStr);
+    std::string line;
+    while (std::getline(file, line)) {
+        StringUtils::trim(line);
+        paramInfo += line;
+    }
+    file.close();
+    return paramInfo;
+};
+
+std::string ParamReader::GetManifestSha256Digest()
+{
+    std::string verifyFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
+    std::ifstream file(verifyFile);
+    std::string sha256Digest;
+    if (!file.good()) {
+        HILOG_ERROR("Verify file is not good");
+        return sha256Digest;
+    }
+    std::string line;
+    std::getline(file, line);
+    file.close();
+    sha256Digest = StringUtils::split(line, ':')[1];
+    StringUtils::trim(sha256Digest);
+    return sha256Digest;
+};
+
+std::string ParamReader::GetSha256Digest(const std::string &fileName)
+{
+    std::string manifestFile = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + MANIFEST_MF_FILE;
+    std::ifstream file(manifestFile);
+    std::string sha256Digest;
+    if (!file.good()) {
+        HILOG_INFO("manifestFile is not good");
+        return sha256Digest;
+    }
+    std::string line;
+    while (std::getline(file, line)) {
+        std::string nextline;
+        if (line.find(FILE_SHA_KEY + fileName) != std::string::npos) {
+            std::getline(file, nextline);
+            sha256Digest = StringUtils::split(nextline, ':')[1];
+            StringUtils::trim(sha256Digest);
+            break;
+        }
+    }
+    file.close();
+    return sha256Digest;
+};
+
+std::string ParamReader::CalcFileSha256Digest(const std::string &fileName)
+{
+    std::string filePath = Constants::PARAM_INSTALL_PATH + FORM_MGR_CONFIG_DIR + fileName;
+    std::string calSha256Digest;
+    std::tuple<int, std::string> ret = SignTools::CalcFileSha256Digest(filePath);
+    if (std::get<0>(ret) != 0) {
+        HILOG_ERROR("CalcFileSha256Digest failed,error : %{public}d ", std::get<0>(ret));
+        return calSha256Digest;
+    }
+    calSha256Digest = std::get<1>(ret);
+    return calSha256Digest;
+};
+}  // namespace AppExecFwk
+}  // namespace OHOS
