@@ -66,6 +66,13 @@ void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 
+void FormSysEventReceiver::HandleScreenUnlocked()
+{
+    auto task = []() {
+        FormRenderMgr::GetInstance().OnScreenUnlock();
+    };
+}
+
 void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 {
     auto task = []() {
