@@ -62,7 +62,7 @@ void FormBasicInfoMgrTest::TearDown()
  */
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_001, TestSize.Level1)
 {
-    const auto formSize = formBasicInfoMgr.GetBasinInfoCount();
+    const auto formSize = formBasicInfoMgr.GetBasicInfoCount();
     EXPECT_EQ(formSize, 1);
 }
 
@@ -94,10 +94,10 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_003, TestSize.Level1)
 {
     int64_t formId = 1;
     const auto abilityName = formBasicInfoMgr.GetFormAbilityName(formId);
-    const auto bundleName =  formBasicInfoMgr.GetFormBundleName(formId);
-    const auto moudleName =  formBasicInfoMgr.GetFormModuleName(formId);
-    const auto formName =  formBasicInfoMgr.GetFormName(formId);
-    const auto packageName =  formBasicInfoMgr.GetFormPackageName(formId);
+    const auto bundleName = formBasicInfoMgr.GetFormBundleName(formId);
+    const auto moudleName = formBasicInfoMgr.GetFormModuleName(formId);
+    const auto formName = formBasicInfoMgr.GetFormName(formId);
+    const auto packageName = formBasicInfoMgr.GetFormPackageName(formId);
     EXPECT_EQ(abilityName, INVALID_VALUE);
     EXPECT_EQ(bundleName, INVALID_VALUE);
     EXPECT_EQ(moudleName, INVALID_VALUE);
@@ -112,10 +112,10 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_003, TestSize.Level1)
  */
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_004, TestSize.Level1)
 {
-    const auto formSize = formBasicInfoMgr.GetBasinInfoCount();
+    const auto formSize = formBasicInfoMgr.GetBasicInfoCount();
     EXPECT_EQ(formSize, 1);
     formBasicInfoMgr.DeleteFormBasicInfo(TEST_FORM_ID);
-    const auto formSizeDeleted = formBasicInfoMgr.GetBasinInfoCount();
+    const auto formSizeDeleted = formBasicInfoMgr.GetBasicInfoCount();
     EXPECT_EQ(formSizeDeleted, 0);
 }
 

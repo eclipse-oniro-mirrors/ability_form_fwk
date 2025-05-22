@@ -45,7 +45,7 @@ public:
     void DeleteFormBasicInfo(int64_t formId);
     void ClearFormBasicInfo();
 
-    int GetBasinInfoCount() const;
+    int GetBasicInfoCount() const;
     bool GetBasicInfoByFormId(int64_t formId, FormBasicInfo& basicInfo);
 
     const std::string& GetFormAbilityName(int64_t formId);

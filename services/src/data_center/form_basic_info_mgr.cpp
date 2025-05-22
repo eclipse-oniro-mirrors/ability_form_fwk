@@ -57,7 +57,7 @@ void FormBasicInfoMgr::ClearFormBasicInfo()
     formBasicInfoMap_.clear();
 }
 
-int FormBasicInfoMgr::GetBasinInfoCount() const
+int FormBasicInfoMgr::GetBasicInfoCount() const
 {
     return formBasicInfoMap_.size();
 }
