@@ -4364,6 +4364,8 @@ void FormMgrAdapter::PostVisibleNotify(const std::vector<int64_t> &formIds,
             formInstanceMaps, eventMaps, formVisibleType, callerToken);
     }
     HILOG_DEBUG("end");
+}
+
 bool FormMgrAdapter::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
