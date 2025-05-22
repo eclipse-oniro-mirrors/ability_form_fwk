@@ -119,6 +119,16 @@ public:
     void NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
         const Want &want, const sptr<IRemoteObject> &remoteObject);
 
+    /**
+     * @brief notify configuration update to form provider(task).
+     *
+     * @param formId The Id of the form.
+     * @param want The want of the form.
+     * @param remoteObject Form provider proxy object.
+     * @return none.
+     */
+    void PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration);
+
 private:
     /**
     * @brief Acquire provider formInfo.
