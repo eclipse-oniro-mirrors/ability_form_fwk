@@ -133,6 +133,7 @@ public:
         const NewFormEventInfo &eventInfo);
     static void SendLoadStageFormConfigInfoEvent(const FormEventName &eventName, HiSysEventType type,
         const NewFormEventInfo &eventInfo);
+    static void SendDiskUseEvent();
 private:
     static std::string ConvertEventName(const FormEventName &eventName);
 };

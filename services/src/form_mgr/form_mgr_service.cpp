@@ -739,6 +739,8 @@ void FormMgrService::OnStart()
     onStartEndTime_ = GetCurrentDateTime();
     HILOG_INFO("success,time:%{public}s,onKvDataServiceAddTime:%{public}s",
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+    FormEventReport::SendDiskUseEvent();
+    FormTimerMgr::GetInstance().StartDiskUseInfoReportTimer();
 }
 /**
  * @brief Stop event for the form manager service.

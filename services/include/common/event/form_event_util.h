@@ -58,12 +58,15 @@ public:
         std::map<int64_t, bool> &removedFormsMap);
     static void HandleOnUnlock(int32_t userId);
     static bool HandleAdditionalInfoChanged(const std::string &bundleName);
+    static void GetFolderSize(const std::string &path, std::vector<std::string> &files,
+        std::vector<std::uint64_t> &filesSize);
 
 private:
     static void UpdateMultiUpdateTime(std::string multiScheduledUpdateTime, FormRecord &formRecord);
     static void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
     static void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
     static UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg);
+    static void GetDirFiles(const std::string &path, std::vector<std::string> &files);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
