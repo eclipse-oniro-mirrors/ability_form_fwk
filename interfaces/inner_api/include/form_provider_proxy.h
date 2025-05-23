@@ -155,15 +155,6 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-     virtual int NotifyFormLocationUpdate(const int64_t formId, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override;
-    /**
-     * @brief Notify provider when the form need update.
-     * @param formId The Id of the form.
-     * @param location Indicates the structure containing form location.
-     * @param callerToken Caller ability token.
-     * @return Returns ERR_OK on success, others on failure.
-     */
     virtual int NotifyFormLocationUpdate(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
 private:
