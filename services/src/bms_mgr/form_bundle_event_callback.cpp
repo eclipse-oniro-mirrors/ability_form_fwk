@@ -53,7 +53,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED ||
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
-        HILOG_INFO("bundleName:%{public}s changed", bundleName.c_str());
+        HILOG_WARN("bundleName:%{public}s changed", bundleName.c_str());
         FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId);
         std::function<void()> taskFunc = [bundleName, userId]() {
             FormEventUtil::HandleUpdateFormCloud(bundleName);
@@ -68,7 +68,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
                 appIndex: %{public}d", appIndex);
             return;
         }
-        HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());
+        HILOG_WARN("package removed, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
         FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userId);
         std::function<void()> taskFunc = [bundleName, userId]() {
             FormEventUtil::HandleProviderRemoved(bundleName, userId);
