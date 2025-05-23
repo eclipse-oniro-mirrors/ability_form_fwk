@@ -1769,11 +1769,11 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         HILOG_INFO("updateAtTimes size:%{public}zu", updateAtTimes.size());
         bool ret = FormTimerMgr::GetInstance().AddFormTimerForMultiUpdate(formRecord.formId,
             updateAtTimes, formRecord.providerUserId);
-        HILOG_WARN("add updateAt timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     } else if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             formRecord.updateAtHour, formRecord.updateAtMin, formRecord.providerUserId);
+        HILOG_WARN("add updateAt timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_WARN("no need add form timer, formId:%{public}" PRId64, formRecord.formId);
