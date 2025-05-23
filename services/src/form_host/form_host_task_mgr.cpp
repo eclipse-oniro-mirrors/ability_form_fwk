@@ -236,7 +236,7 @@ void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &r
 void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
