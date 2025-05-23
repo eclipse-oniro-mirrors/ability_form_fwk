@@ -136,7 +136,7 @@ void FormRenderTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const s
         HILOG_ERROR("fail");
         return;
     }
-    HILOG_INFO("formId: %{public}" PRId64 " isVisible change to: %{public}d", formId, isVisible);
+    HILOG_INFO("end");
 }
 
 void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
