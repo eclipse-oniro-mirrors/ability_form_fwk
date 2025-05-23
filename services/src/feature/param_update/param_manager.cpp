@@ -78,12 +78,12 @@ void ParamManager::InitParam()
     }
 }
 
-std::string ParamManager::GetParamStr()
+const std::string &ParamManager::GetParamStr()
 {
     return g_paramStr;
 }
 
-std::string ParamManager::GetParamVersion()
+const std::string &ParamManager::GetParamVersion()
 {
     return g_currentVersion;
 }

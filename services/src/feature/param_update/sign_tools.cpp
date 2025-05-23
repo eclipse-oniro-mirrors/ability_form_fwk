@@ -106,7 +106,7 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
 
 std::string SignTools::GetfileStream(const std::string &filepath)
 {
-    const std::string fileString;
+    std::string fileString;
     std::ifstream file(filepath, std::ios::in | std::ios::binary);
     if (!file) {
         HILOG_ERROR("Failed to open the file!");
