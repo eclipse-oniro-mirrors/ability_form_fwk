@@ -532,7 +532,7 @@ void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hos
         HILOG_WARN("hostUserId is 0, get current active userId ");
         hostUserId = FormUtil::GetCurrentAccountId();
     }
-    HILOG_INFO("hostUserId:%{public}d", hostUserId);
+    HILOG_WARN("hostUserId:%{public}d", hostUserId);
     auto renderIter = renderInners_.find(hostUserId);
     if (renderIter != renderInners_.end()) {
         renderIter->second->CleanFormHost(host);
