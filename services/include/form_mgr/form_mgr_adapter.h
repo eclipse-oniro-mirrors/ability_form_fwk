@@ -313,22 +313,6 @@ public:
     int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
-     * @brief Acquire form data from form provider.
-     * @param formId The Id of the from.
-     * @param want The want of the request.
-     * @param remoteObject Form provider proxy object.
-     */
-    void AcquireProviderFormInfo(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
-    /**
-     * @brief Notify form provider for delete form.
-     * @param formId The Id of the from.
-     * @param want The want of the form.
-     * @param remoteObject Form provider proxy object.
-     * @return none.
-     */
-    void NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.
