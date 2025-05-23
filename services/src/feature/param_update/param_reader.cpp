@@ -78,7 +78,7 @@ bool ParamReader::VerifyCertSfFile()
         return false;
     }
     std::string calSha256Digest = CalcFileSha256Digest(MANIFEST_MF_FILE);
-    HILOG_ERROR("calSha256Digest:%{public}s", calSha256Digest.c_str());
+    HILOG_INFO("calSha256Digest:%{public}s", calSha256Digest.c_str());
     if (calSha256Digest.empty()) {
         HILOG_ERROR("calSha256Digest is empty");
         return false;
