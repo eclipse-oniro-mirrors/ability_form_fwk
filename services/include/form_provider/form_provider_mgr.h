@@ -70,6 +70,13 @@ public:
      */
     ErrCode RefreshForm(const int64_t formId, const Want &want, bool isVisibleToFresh);
     /**
+     * @brief Delay refresh forms task when provider update.
+     * @param updatedForms Need refresh forms.
+     * @param want The want of the request.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    void DelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want);
+    /**
      * @brief Connect ams for refresh form
      * @param formId The form id.
      * @param record Form data.
@@ -161,6 +168,7 @@ private:
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
     void UpdateWant(const int64_t formId, const Want &want, FormRecord &record);
     void DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate);
+    void PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

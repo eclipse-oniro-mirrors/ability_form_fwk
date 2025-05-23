@@ -27,8 +27,9 @@
 #include "common/event/form_event_report.h"
 #include "form_host_interface.h"
 #include "form_mgr_errors.h"
+#include "form_render/form_render_task_mgr.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "status_mgr_center/form_status_task_mgr.h"
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "ipc_skeleton.h"
@@ -36,6 +37,7 @@
 #include "want.h"
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"
 #include "status_mgr_center/form_status_mgr.h"
+#include "form_host/form_host_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -125,7 +127,7 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
     }
     CheckIfFormRecycled(formRecord, want);
     want.SetParam(Constants::FORM_CONNECT_ID, connectId);
-    FormTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
+    FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
     return ERR_OK;
 }
 
@@ -192,7 +194,8 @@ ErrCode FormRenderMgrInner::ReloadForm(
     Want want;
     FillBundleInfo(want, bundleName);
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
-    FormTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords), want, remoteObject);
+    FormRenderTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords),
+        want, remoteObject);
     return ERR_OK;
 }
 
@@ -218,7 +221,7 @@ void FormRenderMgrInner::PostOnUnlockTask()
         HILOG_ERROR("null remoteObjectGotten");
         return;
     }
-    FormTaskMgr::GetInstance().PostOnUnlock(remoteObject);
+    FormRenderTaskMgr::GetInstance().PostOnUnlock(remoteObject);
 }
 
 void FormRenderMgrInner::NotifyScreenOn()
@@ -246,7 +249,7 @@ void FormRenderMgrInner::PostSetVisibleChangeTask(int64_t formId, bool isVisible
         HILOG_ERROR("null remoteObjectGotten");
         return;
     }
-    FormTaskMgr::GetInstance().PostSetVisibleChange(formId, isVisible, remoteObject);
+    FormRenderTaskMgr::GetInstance().PostSetVisibleChange(formId, isVisible, remoteObject);
 }
 
 ErrCode FormRenderMgrInner::StopRenderingForm(int64_t formId, const FormRecord &formRecord,
@@ -335,7 +338,7 @@ ErrCode FormRenderMgrInner::ReleaseRenderer(int64_t formId, const FormRecord &fo
         return ret;
     }
     std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
-    FormTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject, formRecord.isDynamic);
+    FormStatusTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject, formRecord.isDynamic);
     return ERR_OK;
 }
 
@@ -609,7 +612,7 @@ void FormRenderMgrInner::NotifyHostRenderServiceIsDead() const
             HILOG_ERROR("null hostClient");
             continue;
         }
-        FormTaskMgr::GetInstance().PostFrsDiedTaskToHost(hostClient);
+        FormHostTaskMgr::GetInstance().PostFrsDiedTaskToHost(hostClient);
     }
 }
 
@@ -642,7 +645,7 @@ ErrCode FormRenderMgrInner::RecycleForms(
 
     std::vector<int64_t> connectedForms;
     GetConnectedForms(formIds, connectedForms);
-    FormTaskMgr::GetInstance().PostRecycleForms(connectedForms, want, remoteObjectOfHost, remoteObject);
+    FormStatusTaskMgr::GetInstance().PostRecycleForms(connectedForms, want, remoteObjectOfHost, remoteObject);
     return ERR_OK;
 }
 
@@ -684,7 +687,7 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
             }
             want.SetParam(Constants::FORM_STATUS_DATA, statusData);
 
-            FormTaskMgr::GetInstance().PostRecoverForm(formRecord, want, remoteObject);
+            FormStatusTaskMgr::GetInstance().PostRecoverForm(formRecord, want, remoteObject);
         } else {
             HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
         }
@@ -708,7 +711,7 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
-    FormTaskMgr::GetInstance().PostUpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    FormRenderTaskMgr::GetInstance().PostUpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
     return ERR_OK;
 }
 
@@ -800,7 +803,7 @@ ErrCode FormRenderMgrInner::RenderConnectedForm(const FormRecord &formRecord, Wa
     }
     guard.unlock();
     want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-    FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
+    FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
     return ERR_OK;
 }
 
@@ -821,7 +824,7 @@ ErrCode FormRenderMgrInner::PostStopRenderingFormTask(const FormRecord &formReco
             return ret;
         }
         want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-        FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord, std::move(want), remoteObject);
+        FormStatusTaskMgr::GetInstance().PostStopRenderingForm(formRecord, std::move(want), remoteObject);
         return ERR_OK;
     }
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;

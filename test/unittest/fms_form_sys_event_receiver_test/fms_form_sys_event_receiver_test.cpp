@@ -226,7 +226,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_001, TestSize.Level0)
     EventFwk::CommonEventData eventData;
     eventData.SetWant(want);
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
     FormDbCache::GetInstance().GetAllFormInfo(allFormInfo);
     FormDBInfo tempFormDBInfo;
@@ -260,7 +259,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_002, TestSize.Level0)
     CreateFormRecordAndFormInfo(bundle, formId, callingUid);
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     FormRecord tempFormRecord;
@@ -297,7 +295,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_003, TestSize.Level0)
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
@@ -328,7 +325,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_004, TestSize.Level0)
     want.SetBundle(bundle);
     want.SetParam(KEY_UID, callingUid);
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_004 end";
@@ -356,7 +352,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_005, TestSize.Level0)
     CreateEventData(bundle, formId, callingUid, actionType, eventData);
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_005 end";
@@ -405,7 +400,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_006, TestSize.Level0)
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
@@ -441,7 +435,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_007, TestSize.Level0)
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
@@ -493,7 +486,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_008, TestSize.Level0)
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
@@ -529,7 +521,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_009, TestSize.Level0)
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
@@ -566,7 +557,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0010, TestSize.Level0)
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
 
     auto testCase = std::make_shared<FormSysEventReceiver>();
-    testCase->SetSerialQueue(nullptr);
     testCase->OnReceiveEvent(eventData);
 
     ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
@@ -883,7 +873,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleAbilityUpdate_0002, TestSize.Level0)
     std::string bundleName = "testBundleName";
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    receiver->SetSerialQueue(serialQueue);
     receiver->HandleAbilityUpdate(want, bundleName);
     GTEST_LOG_(INFO) << "HandleAbilityUpdate_0002 end";
 }
@@ -914,7 +903,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserUnlocked_0003, TestSize.Level0)
     ASSERT_NE(nullptr, receiver);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    receiver->SetSerialQueue(serialQueue);
     receiver->HandleUserUnlocked(MAIN_USER_ID);
     GTEST_LOG_(INFO) << "HandleUserUnlocked_0003 end";
 }
@@ -939,7 +927,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0017, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0017 end";
 }
@@ -964,7 +951,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0018, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0018 end";
 }
@@ -989,7 +975,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0019, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0019 end";
 }
@@ -1014,7 +999,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0020, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0020 end";
 }
@@ -1039,7 +1023,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0021, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0021 end";
 }
@@ -1064,7 +1047,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0022, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0022 end";
 }
@@ -1089,7 +1071,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0023, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0023 end";
 }
@@ -1114,7 +1095,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0024, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0024 end";
 }
@@ -1139,7 +1119,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0025, TestSize.Level0)
     eventData.SetWant(want);
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0025 end";
 }
@@ -1172,7 +1151,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserIdRemoved_0003, TestSize.Level0)
     const int32_t userId = 0;
     const std::string queueName = "queue";
     std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->HandleUserIdRemoved(userId);
     GTEST_LOG_(INFO) << "HandleUserIdRemoved_0003 end";
 }
@@ -1187,9 +1165,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, InitFormInfosAndRegister_0001, TestSize.Le
     GTEST_LOG_(INFO) << "InitFormInfosAndRegister_0001 start";
     std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
     ASSERT_NE(nullptr, testCase);
-    const std::string queueName = "queue";
-    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    testCase->SetSerialQueue(serialQueue);
     testCase->InitFormInfosAndRegister();
     GTEST_LOG_(INFO) << "InitFormInfosAndRegister_0001 end";
 }
@@ -1211,13 +1186,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0003, TestSize.Level0)
     OHOS::EventFwk::CommonEventData eventData2;
     eventData2.SetCode(300);
     receiver->HandleUserSwitched(eventData);
-    receiver->HandleUserSwitched(eventData);
-    receiver->SetSerialQueue(nullptr);
     receiver->HandleUserSwitched(eventData1);
-    const std::string queueName = "queue";
-    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    receiver->SetSerialQueue(serialQueue);
-    receiver->HandleUserSwitched(eventData2);
     GTEST_LOG_(INFO) << "HandleUserSwitched_0003 end";
 }
 
@@ -1231,9 +1200,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenOn_0002, TestSize.Level0)
     GTEST_LOG_(INFO) << "HandleScreenOn_0002 start";
     std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
     ASSERT_NE(nullptr, receiver);
-    const std::string queueName = "queue";
-    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    receiver->SetSerialQueue(serialQueue);
     receiver->HandleScreenOn();
     GTEST_LOG_(INFO) << "HandleScreenOn_0002 end";
 }

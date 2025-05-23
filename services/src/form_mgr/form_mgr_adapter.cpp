@@ -75,13 +75,14 @@
 #include "os_account_manager.h"
 #include "parameters.h"
 #include "system_ability_definition.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "common/event/form_event_report.h"
 #include "common/util/form_report.h"
 #include "data_center/form_record/form_record_report.h"
 #include "common/connection/form_ability_connection_reporter.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
+#include "form_mgr/form_mgr_queue.h"
+#include "common/util/form_task_common.h"
 #include "iform_host_delegate.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
@@ -963,7 +964,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
     }
-    FormTaskMgr::GetInstance().PostVisibleNotify(
+    PostVisibleNotify(
         (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
         formInstanceMaps, eventMaps, formVisibleType, Constants::DEFAULT_VISIBLE_NOTIFY_DELAY, callerToken);
     return ERR_OK;
@@ -2938,46 +2939,6 @@ bool FormMgrAdapter::IsFormCached(const FormRecord record)
     return true;
 }
 
-void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &remoteObject)
-{
-    HILOG_INFO("call");
-    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
-    if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
-        return;
-    }
-    FormRecord formRecord;
-    FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
-    FormJsInfo formJsInfo;
-    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
-    int error = formProviderProxy->AcquireProviderFormInfo(formJsInfo, want, FormSupplyCallback::GetInstance());
-    if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("fail acquire providerFormInfo");
-    }
-    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
-}
-
-void FormMgrAdapter::NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
-{
-    HILOG_INFO("call");
-    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
-    if (formProviderProxy == nullptr) {
-        HILOG_ERROR("get formProviderProxy failed");
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        return;
-    }
-    int error = formProviderProxy->NotifyFormDelete(formId, want, FormSupplyCallback::GetInstance());
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail NotifyFormDelete");
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-    }
-}
-
 bool FormMgrAdapter::CreateHandleEventMap(const int64_t matchedFormId, const FormRecord &formRecord,
     std::map<std::string, std::vector<int64_t>> &eventMaps)
 {
@@ -3984,7 +3945,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         }
         if (record.recycleStatus == RecycleStatus::RECYCLABLE) {
             HILOG_WARN("form %{public}" PRId64 " is RECYCLABLE, set it to NON_RECYCLABLE", formId);
-            FormTaskMgr::GetInstance().CancelDelayTask(std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId));
+            FormMgrQueue::GetInstance().CancelDelayTask(std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId));
             record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
             FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
             continue;
@@ -4384,6 +4345,27 @@ ErrCode FormMgrAdapter::RefreshFormsByScreenOn()
         }
     }
     return ERR_OK;
+}
+
+void FormMgrAdapter::PostVisibleNotify(const std::vector<int64_t> &formIds,
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> &eventMaps,
+    const int32_t formVisibleType, int32_t visibleNotifyDelay,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+ 
+    auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken]() {
+        FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
+            formInstanceMaps, eventMaps, formVisibleType, callerToken);
+    };
+ 
+    bool ret = FormMgrQueue::GetInstance().ScheduleTask(visibleNotifyDelay, task);
+    if (!ret) {
+        FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
+            formInstanceMaps, eventMaps, formVisibleType, callerToken);
+    }
+    HILOG_DEBUG("end");
 }
 
 bool FormMgrAdapter::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)

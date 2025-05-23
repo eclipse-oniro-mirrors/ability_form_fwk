@@ -39,9 +39,8 @@
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_instance.h"
 #include "form_mgr_errors.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
@@ -81,6 +80,8 @@
 #include "res_sched_client.h"
 #include "res_type.h"
 #endif // RES_SCHEDULE_ENABLE
+#include "form_mgr/form_mgr_queue.h"
+#include "common/util/form_task_common.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -339,9 +340,8 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     FormEventReport::SendSecondFormEvent(FormEventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
-    ret = FormMgrAdapter::GetInstance().ReleaseForm(formId, callerToken, delCache);
-    HILOG_WARN("release form result:%{public}d, formId:%{public}" PRId64, ret, formId);
-    return ret;
+
+    return FormMgrAdapter::GetInstance().ReleaseForm(formId, callerToken, delCache);
 }
 
 /**
@@ -790,7 +790,6 @@ void FormMgrService::SubscribeSysEventReceiver()
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
         formSysEventReceiver_ = std::make_shared<FormSysEventReceiver>(subscribeInfo);
-        formSysEventReceiver_->SetSerialQueue(serialQueue_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
 }
@@ -881,7 +880,7 @@ void FormMgrService::SubscribeNetConn()
             HILOG_ERROR("Register defaultNetworkCallback_ failed 10 time");
             return;
         }
-        FormTaskMgr::GetInstance().PostConnectNetWork();
+        PostConnectNetWork();
     }
 }
 
@@ -902,8 +901,6 @@ ErrCode FormMgrService::Init()
         HILOG_ERROR("init failed.null handler_");
         return ERR_INVALID_OPERATION;
     }
-    FormTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
-    FormAmsHelper::GetInstance().SetSerialQueue(serialQueue_);
     /* Publish service maybe failed, so we need call this function at the last,
      * so it can't affect the TDD test program */
     if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
@@ -2038,7 +2035,16 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
-
+void FormMgrService::PostConnectNetWork()
+{
+    HILOG_DEBUG("start");
+ 
+    auto connectNetWork = []() {
+        DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
+    HILOG_DEBUG("end");
+}
 bool FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");

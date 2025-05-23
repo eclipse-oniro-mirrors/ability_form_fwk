@@ -24,7 +24,7 @@
 #include "form_mgr_errors.h"
 #include "form_provider/form_supply_callback.h"
 #include "form_render/form_render_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "status_mgr_center/form_status_task_mgr.h"
 #include "common/util/form_util.h"
 #include "ipc_skeleton.h"
 #include "want.h"
@@ -71,7 +71,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
-    FormTaskMgr::GetInstance().PostRenderForm(newRecord, std::move(want), remoteObject);
+    FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, std::move(want), remoteObject);
 }
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)

@@ -32,6 +32,7 @@
 #include "ipc_skeleton.h"
 #include "mock_form_host_client.h"
 #include "running_form_info.h"
+#include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -5022,5 +5023,21 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_014, TestSize.Level0)
             [formId2](const FormHostRecord record) { return record.Contains(formId2); }),
         formDataMgr_.clientRecords_.end());
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_Coverage_014 end";
+}
+ 
+/**
+ * @tc.name: FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001
+ * @tc.desc: Verify PostDelayRecheckWhetherNeedCleanFormHostTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001 start";
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    int callerUid = 1;
+    sptr<IRemoteObject> remoteObjectOfHost = new (std::nothrow) MockFormProviderClient();
+    formDataMgr->PostDelayRecheckWhetherNeedCleanFormHostTask(callerUid, remoteObjectOfHost);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001 end";
 }
 }

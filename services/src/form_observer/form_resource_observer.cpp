@@ -14,12 +14,13 @@
  */
 
 #include "form_observer/form_resource_observer.h"
+#include "form_provider/form_provider_task_mgr.h"
 
 #include <thread>
 
 #include "fms_log_wrapper.h"
 #include "form_resource_param.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_observer/form_observer_task_mgr.h"
 #include "configuration.h"
 
 namespace OHOS {
@@ -41,7 +42,7 @@ void FormFwkResourceObserver::OnConfigurationUpdated(const AppExecFwk::Configura
     if (!language.empty() && language != language_) {
         HILOG_INFO("language changed %{public}s to %{public}s", language_.c_str(), language.c_str());
         language_ = language;
-        FormTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
+        FormProviderTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
     }
     HILOG_INFO("end");
 }

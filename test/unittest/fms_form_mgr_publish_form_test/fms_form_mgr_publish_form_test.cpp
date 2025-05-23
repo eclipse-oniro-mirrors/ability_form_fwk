@@ -32,9 +32,6 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_service.h"
-#define private public
-#include "status_mgr_center/form_task_mgr.h"
-#undef private
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"

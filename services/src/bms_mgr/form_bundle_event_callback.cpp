@@ -16,7 +16,7 @@
 #include "bms_mgr/form_bundle_event_callback.h"
 
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_mgr/form_mgr_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -59,7 +59,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
             FormEventUtil::HandleUpdateFormCloud(bundleName);
             FormEventUtil::HandleProviderUpdated(bundleName, userId);
         };
-        FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
+        FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         int appIndex = want.GetIntParam("appIndex", 0);
@@ -76,14 +76,14 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
             // Health contol will set again when reinstall
             FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
         };
-        FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
+        FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {
         // additional info changed
         HILOG_INFO("bundleName:%{public}s additional info changed", bundleName.c_str());
         std::function<void()> taskFunc = [bundleName]() {
             FormEventUtil::HandleAdditionalInfoChanged(bundleName);
         };
-        FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
+        FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     }
 }
 

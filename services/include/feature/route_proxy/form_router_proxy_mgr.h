@@ -73,6 +73,9 @@ private:
     void SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
         const sptr<IRemoteObject::DeathRecipient> &deathRecipient);
 
+    void PostRouterProxyToHost(const int64_t formId, const sptr<IRemoteObject> &remoteObject,
+        const Want &want);
+
     mutable std::mutex formRouterProxyMutex_;
     mutable std::mutex deathRecipientsMutex_;
     std::map<int64_t, sptr<IRemoteObject>> formRouterProxyMap_;

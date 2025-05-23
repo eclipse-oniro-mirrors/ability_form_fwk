@@ -21,7 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -57,7 +57,7 @@ void ConfigurationUpdateConnection::OnAbilityConnectDone(
 
     Want want = Want(want_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormTaskMgr::GetInstance().NotifyConfigurationUpdate(configuration_, want, remoteObject);
+    FormProviderTaskMgr::GetInstance().NotifyConfigurationUpdate(configuration_, want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

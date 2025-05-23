@@ -1387,4 +1387,17 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0182, TestSize.Level1)
     EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0182 end";
 }
+
+/**
+ * @tc.name: FormMgrService_0183
+ * @tc.desc: Verify PostConnectNetWork
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0183, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0183 start";
+    std::shared_ptr<FormMgrService> formTaskMgr = std::make_shared<FormMgrService>();
+    formTaskMgr->PostConnectNetWork();
+    GTEST_LOG_(INFO) << "FormMgrService_0183 end";
+}
 }

@@ -24,7 +24,7 @@
 #include "form_instances_filter.h"
 #include "form_mgr_stub.h"
 #include "form_provider_data.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "common/event/system_event/form_sys_event_receiver.h"
 #include "running_form_info.h"
 #include "iremote_object.h"
@@ -811,6 +811,8 @@ private:
     bool CheckAcrossLocalAccountsPermission() const;
 
     void InitFormShareMgrSerialQueue();
+
+    void PostConnectNetWork();
 
     void Dump(const std::vector<std::u16string> &args, std::string &result);
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);

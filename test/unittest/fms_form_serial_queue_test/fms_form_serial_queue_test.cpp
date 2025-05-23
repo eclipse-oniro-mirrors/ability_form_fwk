@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "fms_log_wrapper.h"
 
 using namespace testing;

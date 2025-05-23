@@ -17,7 +17,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_observer/form_observer_task_mgr.h"
 #include "running_form_info.h"
 
 namespace OHOS {
@@ -93,7 +93,7 @@ void FormObserverRecord::onFormAdd(const std::string bundleName, RunningFormInfo
     auto iter = formAddObservers_.find(bundleName);
     if (iter != formAddObservers_.end()) {
         for (auto callerToken : iter->second) {
-            FormTaskMgr::GetInstance().PostAddTaskToHost(bundleName, callerToken, runningFormInfo);
+            FormObserverTaskMgr::GetInstance().PostAddTaskToHost(bundleName, callerToken, runningFormInfo);
         }
     }
 }
@@ -110,7 +110,7 @@ void FormObserverRecord::onFormRemove(const std::string bundleName, const Runnin
     auto iter = formRemoveObservers_.find(bundleName);
     if (iter != formRemoveObservers_.end()) {
         for (auto callerToken : iter->second) {
-            FormTaskMgr::GetInstance().PostRemoveTaskToHost(bundleName, callerToken, runningFormInfo);
+            FormObserverTaskMgr::GetInstance().PostRemoveTaskToHost(bundleName, callerToken, runningFormInfo);
         }
     }
 }
@@ -221,7 +221,7 @@ void FormObserverRecord::NotifyFormEvent(const FormObserverRecordInner &recordIn
         case FormEventId::FORM_EVENT_CALL :
         case FormEventId::FORM_EVENT_MESSAGE :
         case FormEventId::FORM_EVENT_ROUTER :
-            FormTaskMgr::GetInstance().PostFormClickEventToHost(
+            FormObserverTaskMgr::GetInstance().PostFormClickEventToHost(
                 recordInner.BindHostBundle(), formEventType, recordInner.GetRemote(), runningFormInfo);
             break;
         case FormEventId::FORM_EVENT_FORM_ADD :

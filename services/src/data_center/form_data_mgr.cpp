@@ -31,7 +31,6 @@
 #include "form_provider/form_provider_mgr.h"
 #include "data_center/form_record/form_record.h"
 #include "form_render/form_render_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "form_xml_parser.h"
@@ -40,6 +39,8 @@
 #include "running_form_info.h"
 #include "data_center/form_record/form_record_report.h"
 #include "common/event/form_event_report.h"
+#include "common/util/form_task_common.h"
+#include "form_mgr/form_mgr_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -128,8 +129,8 @@ bool FormDataMgr::AllotFormHostRecord(const FormItemInfo &info, const sptr<IRemo
     for (auto &record : clientRecords_) {
         if (callerToken == record.GetFormHostClient()) {
             if (record.GetFormsCount() == 0) {
-                FormTaskMgr::GetInstance().CancelDelayTask(std::make_pair((int64_t)TaskType::DELETE_FORM_HOST_RECORD,
-                    callingUid));
+                FormMgrQueue::GetInstance().CancelDelayTask(
+                    std::make_pair((int64_t)TaskType::DELETE_FORM_HOST_RECORD, callingUid));
                 HILOG_INFO("cancel delay task of recheck whether need clean form host");
             }
             record.AddForm(formId);
@@ -255,6 +256,9 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.uiSyntax = record.uiSyntax;
     formInfo.isDynamic = record.isDynamic;
     formInfo.transparencyEnabled = record.transparencyEnabled;
+    formInfo.modulePkgNameMap = record.modulePkgNameMap;
+    formInfo.formData = record.formProviderInfo.GetFormDataString();
+    formInfo.formProviderData = record.formProviderInfo.GetFormData();
 }
 
 void FormDataMgr::SetConfigMap(const std::map<std::string, int32_t> &configMap)
@@ -733,8 +737,7 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             iter->DelForm(formId);
             if (iter->IsEmpty()) {
                 HILOG_INFO("post delay recheck whether need clean form host task");
-                FormTaskMgr::GetInstance().PostDelayRecheckWhetherNeedCleanFormHostTask(
-                    iter->GetCallerUid(), callerToken);
+                PostDelayRecheckWhetherNeedCleanFormHostTask(iter->GetCallerUid(), callerToken);
             }
             break;
         }
@@ -3018,6 +3021,21 @@ bool FormDataMgr::GetFormRecordById(const int64_t formId, FormRecord& formRecord
         formRecord = info->second;
     }
     return notFindFormRecord ;
+}
+
+void FormDataMgr::PostDelayRecheckWhetherNeedCleanFormHostTask(
+    const int callerUid, const sptr<IRemoteObject> &remoteObjectOfHost)
+{
+    HILOG_DEBUG("start");
+ 
+    auto recheckWhetherNeedCleanFormHost = [remoteObjectOfHost]() {
+        FormDataMgr::GetInstance().RecheckWhetherNeedCleanFormHost(remoteObjectOfHost);
+    };
+    FormMgrQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair((int64_t)TaskType::DELETE_FORM_HOST_RECORD, static_cast<int64_t>(callerUid)),
+        CLEAN_FORM_HOST_TASK_DELAY_TIME,
+        recheckWhetherNeedCleanFormHost);
+    HILOG_DEBUG("end");
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

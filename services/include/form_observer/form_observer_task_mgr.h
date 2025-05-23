@@ -29,7 +29,7 @@ public:
     /**
     * @brief Post form add event.
     * @param bundleName BundleName of the form host
-    * @param remoteObject thr remote observer.
+    * @param remoteObject the remote observer.
     * @param runningFormInfo Current form data.
     */
     void PostAddTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
@@ -38,7 +38,7 @@ public:
     /**
     * @brief Post form remove event.
     * @param bundleName BundleName of the form host
-    * @param remoteObject thr remote observer.
+    * @param remoteObject the remote observer.
     * @param runningFormInfo Current form data.
     */
     void PostRemoveTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
@@ -48,18 +48,24 @@ public:
     * @brief Post form click event.
     * @param bundleName BundleName of the form host
     * @param formEventType form event type.
-    * @param remoteObject thr remote observer.
+    * @param remoteObject the remote observer.
     * @param runningFormInfo Current form data.
     */
     void PostFormClickEventToHost(
         const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
 
+    /**
+    * @brief Post BatchRefresh forms.
+    * @param formRefreshType batch refresh forms type.
+    */
+    void PostBatchRefreshForms(const int32_t formRefreshType);
+
 private:
     /**
     * @brief Notify remote observer form click event.
     * @param bundleName BundleName of the form host
-    * @param remoteObject thr remote observer.
+    * @param remoteObject the remote observer.
     * @param runningFormInfo Current form data.
     */
     void FormAdd(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
@@ -68,7 +74,7 @@ private:
     /**
     * @brief Notify remote observer form click event.
     * @param bundleName BundleName of the form host
-    * @param remoteObject thr remote observer.
+    * @param remoteObject the remote observer.
     * @param runningFormInfo Current form data.
     */
     void FormRemove(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
@@ -78,7 +84,7 @@ private:
     * @brief Notify remote observer form click event.
     * @param bundleName BundleName of the form host
     * @param formEventType  form event type.
-    * @param remoteObject thr remote observer.
+    * @param remoteObject the remote observer.
     * @param runningFormInfo Current form data.
     */
     void FormClickEvent(const std::string &bundleName, const std::string &formEventType,

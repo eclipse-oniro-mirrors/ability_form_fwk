@@ -487,4 +487,32 @@ HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_006, TestSize.Level1)
     FormProviderMgr::GetInstance().MessageEvent(formId, formRecord, want);
     GTEST_LOG_(INFO) << "FormProviderMgrTest_006 end";
 }
+
+/**
+ * @tc.name: FormProviderMgrTest_007
+ * @tc.desc: Verify FmsFormProviderMgrTest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_007 start";
+    std::vector<FormRecord> updatedForms;
+    Want want;
+    FormProviderMgr::GetInstance().DelayRefreshForms(updatedForms, want);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_007 end";
+}
+ 
+/**
+ * @tc.name: FormProviderMgrTest_008
+ * @tc.desc: Verify FmsFormProviderMgrTest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_008 start";
+    std::vector<FormRecord> updatedForms;
+    Want want;
+    FormProviderMgr::GetInstance().DelayRefreshForms(updatedForms, want);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_008 end";
+}
 }

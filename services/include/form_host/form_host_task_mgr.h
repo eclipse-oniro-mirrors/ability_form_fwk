@@ -19,7 +19,7 @@
 #include <singleton.h>
 #include "iremote_object.h"
 #include "form_state_info.h"
-#include "form_record.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -94,6 +94,12 @@ public:
      */
     void PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
 
+    /**
+     * @brief Handle form host died(task).
+     * @param remoteHost Form host proxy object.
+     */
+    void PostHostDiedTask(const sptr<IRemoteObject> &remoteHost);
+
 private:
     /**
      * @brief Post form data to form host when acquire form..
@@ -160,6 +166,12 @@ private:
      * @param remoteObject Form host proxy object.
      */
     void FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Handle form host died.
+     * @param remoteHost Form host proxy object.
+     */
+    void HostDied(const sptr<IRemoteObject> &remoteHost);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

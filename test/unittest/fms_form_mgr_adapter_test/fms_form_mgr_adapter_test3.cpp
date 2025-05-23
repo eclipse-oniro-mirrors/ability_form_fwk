@@ -966,6 +966,25 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
      GTEST_LOG_(INFO) << "FormMgrAdapter_0287 end";
  }
  
+/**
+ * @tc.name: FormMgrAdapter_0296
+ * @tc.desc: Verify PostVisibleNotify
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0296, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0296 start";
+    std::shared_ptr<FormMgrAdapter> formTaskMgr = std::make_shared<FormMgrAdapter>();
+    std::vector<int64_t> formIds;
+    std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::map<std::string, std::vector<int64_t>> eventMaps;
+    int32_t formVisibleType = 123;
+    int32_t visibleNotifyDelay = 123;
+    sptr<IRemoteObject> callerToken;
+    formTaskMgr->PostVisibleNotify(formIds, formInstanceMaps, eventMaps,
+        formVisibleType, visibleNotifyDelay, callerToken);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0296 end";
+}
  /**
   * @tc.name:  FormMgrAdapter_0288
   * @tc.desc: test RequestOverflow function.
