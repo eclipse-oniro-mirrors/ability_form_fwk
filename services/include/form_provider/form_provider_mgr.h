@@ -147,6 +147,15 @@ public:
      */
     int MessageEvent(const int64_t formId, const FormRecord &record, const Want &want);
     void MergeWant(const Want &newWant, Want &oldWant);
+
+    /**
+     * @brief Connect ams for refresh form
+     * @param formId The form id.
+     * @param record Form data.
+     * @param want The want of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+     ErrCode ConnectAmsChangeLocation(const int64_t formId, const FormRecord &record, const Want &want);
 private:
     bool IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh);
 

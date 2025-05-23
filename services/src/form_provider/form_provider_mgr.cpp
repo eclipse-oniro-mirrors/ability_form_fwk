@@ -28,6 +28,7 @@
 #include "form_provider/connection/form_msg_event_connection.h"
 #include "data_center/form_record/form_record.h"
 #include "form_provider/connection/form_refresh_connection.h"
+#include "form_provider/connection/form_location_connection.h"
 #include "form_provider/connection/form_configuration_update_connection.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_report.h"
@@ -614,6 +615,40 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
+    return ERR_OK;
+}
+
+/**
+ * @brief Connect ams for refresh form
+ *
+ * @param formId The form id.
+ * @param record Form data.
+ * @param want The want of the form.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ ErrCode FormProviderMgr::ConnectAmsChangeLocation(const int64_t formId, const FormRecord &record,
+    const Want &want)
+{
+    HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s", formId,
+        record.bundleName.c_str(), record.abilityName.c_str());
+ 
+    sptr<IAbilityConnection> formLocationConnection = new (std::nothrow) FormLocationConnection(formId, want,
+        record.bundleName, record.abilityName);
+    if (formLocationConnection == nullptr) {
+        HILOG_ERROR("create FormLocationConnection failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    Want connectWant;
+    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connectWant.SetElementName(record.bundleName, record.abilityName);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formLocationConnection);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbility failed");
+        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
+            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
+        }
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
     return ERR_OK;
 }
 

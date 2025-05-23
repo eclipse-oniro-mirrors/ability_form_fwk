@@ -70,6 +70,12 @@ public:
         return 0;
     }
 
+    int NotifyFormLocationUpdate(const int64_t formId, const Want &want,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return 0;
+    }
+
     int AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
         const sptr<IRemoteObject> &callerToken) override
     {

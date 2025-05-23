@@ -69,6 +69,8 @@ int FormProviderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
             return HandleAcquireFormData(data, reply);
         case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_CONFIGURATION_UPDATE):
             return HandleNotifyConfigurationUpdate(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_LOCATION_UPDATE):
+            return HandleNotifyFormLocationUpdate(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -357,6 +359,28 @@ int32_t FormProviderStub::HandleAcquireFormData(MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    return ERR_OK;
+}
+
+int32_t FormProviderStub::HandleNotifyFormLocationUpdate(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto remoteObj = data.ReadRemoteObject();
+    if (remoteObj == nullptr) {
+        HILOG_ERROR("get remoteObject failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = NotifyFormLocationUpdate(formId, *want, remoteObj);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
     return ERR_OK;
 }
 }  // namespace AppExecFwk

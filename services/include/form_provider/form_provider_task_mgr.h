@@ -129,7 +129,16 @@ public:
      * @return none.
      */
     void PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration);
-
+    
+    /**
+    * @brief Refresh form location data from form provider(task).
+    *
+    * @param formId The Id of the form.
+    * @param want The want of the form.
+    * @param remoteObject Form provider proxy object.
+    * @return none.
+    */
+    void PostRefreshLocationTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     /**
     * @brief Acquire provider formInfo.
@@ -212,6 +221,16 @@ private:
         const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void RemoveConnection(int32_t connectId);
+
+    /**
+    * @brief Notify form provider for updating form location.
+    *
+    * @param formId The Id of the from.
+    * @param location The location of the form.
+    * @param remoteObject Form provider proxy object.
+    * @return none.
+    */
+    void NotifyFormLocationUpdate(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
