@@ -230,7 +230,7 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
 void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
