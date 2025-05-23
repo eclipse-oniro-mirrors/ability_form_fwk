@@ -338,7 +338,7 @@ ErrCode FormRenderMgrInner::ReleaseRenderer(int64_t formId, const FormRecord &fo
         return ret;
     }
     std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
-    FormTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject, formRecord.isDynamic);
+    FormStatusTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject, formRecord.isDynamic);
     return ERR_OK;
 }
 
