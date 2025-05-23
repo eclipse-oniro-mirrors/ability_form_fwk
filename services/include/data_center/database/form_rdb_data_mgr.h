@@ -137,8 +137,14 @@ public:
      * @param absRdbPredicates The rdb's predicates to be query.
      * @return Returns query result.
      */
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> QueryData(
-        const NativeRdb::AbsRdbPredicates &absRdbPredicates);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> QueryData(const NativeRdb::AbsRdbPredicates &absRdbPredicates);
+
+    /**
+     * @brief Query data in DB for data over 2M.
+     * @param absRdbPredicates The rdb's predicates to be query.
+     * @return Returns query result.
+     */
+    std::shared_ptr<NativeRdb::ResultSet> QueryDataByStep(const NativeRdb::AbsRdbPredicates &absRdbPredicates);
 
     /**
      * @brief Query data in DB.
