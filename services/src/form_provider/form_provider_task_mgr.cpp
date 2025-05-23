@@ -59,9 +59,9 @@ void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Wa
 {
     HILOG_DEBUG("Call.");
     auto notifyFormLocationUpdateFunc = [formId, want, remoteObject]() {
-        FormTaskMgr::GetInstance().NotifyFormLocationUpdate(formId, want, remoteObject);
+        FormProviderTaskMgr::GetInstance().NotifyFormLocationUpdate(formId, want, remoteObject);
     };
-    FormProviderQueue::GetInstance().ScheduleTas(FORM_TASK_DELAY_TIME, notifyFormLocationUpdateFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormLocationUpdateFunc);
 }
 
 /**
