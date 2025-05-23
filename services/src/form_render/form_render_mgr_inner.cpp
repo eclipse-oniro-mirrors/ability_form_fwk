@@ -74,7 +74,13 @@ ErrCode FormRenderMgrInner::RenderForm(
     FillBundleInfo(want, formRecord.bundleName);
 
     sptr<FormRenderConnection> connection = nullptr;
-    return RenderConnectedForm(formRecord, want, connection);
+    bool connectionExisted = GetRenderFormConnection(connection, formRecord.formId);
+    if (connectionExisted) {
+        if (connection == nullptr) {
+            HILOG_ERROR("null connection");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        return RenderConnectedForm(formRecord, want, connection);
     }
 
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
