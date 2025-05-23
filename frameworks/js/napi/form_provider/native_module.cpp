@@ -44,6 +44,7 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
     BindNativeFunction(env, exports, "cancelOverflow", moduleName, JsFormProvider::CancelOverflow);
     BindNativeFunction(env, exports, "activateSceneAnimation", moduleName, JsFormProvider::ActivateSceneAnimation);
     BindNativeFunction(env, exports, "deactivateSceneAnimation", moduleName, JsFormProvider::DeactivateSceneAnimation);
+    BindNativeFunction(env, exports, "getFormRect", moduleName, JsFormProvider::GetFormRect);
     return exports;
 }
 
