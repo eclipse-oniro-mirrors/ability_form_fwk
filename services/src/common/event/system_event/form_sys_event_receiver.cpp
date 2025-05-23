@@ -51,7 +51,7 @@ FormSysEventReceiver::FormSysEventReceiver(const EventFwk::CommonEventSubscribeI
 void FormSysEventReceiver::HandleAbilityUpdate(const AAFwk::Want& want, std::string &bundleName)
 {
     auto task = [want, bundleName]() {
-        HILOG_INFO("bundle updated, bundleName:%{public}s", bundleName.c_str());
+        HILOG_WARN("bundle updated, bundleName:%{public}s", bundleName.c_str());
         int userId = want.GetIntParam(KEY_USER_ID, 0);
         FormEventUtil::HandleProviderUpdated(bundleName, userId);
     };
@@ -147,7 +147,6 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
         HILOG_ERROR("invalid userId: -1");
         return;
     }
-
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
         std::vector<int64_t> removedFormIds;
         FormDataMgr::GetInstance().DeleteFormsByUserId(userId, removedFormIds);
