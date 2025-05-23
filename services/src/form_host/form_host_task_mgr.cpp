@@ -214,7 +214,7 @@ void FormHostTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &
 void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -224,7 +224,6 @@ void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &r
 
     FormJsInfo formJsInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formJsInfo);
-    HILOG_DEBUG("FormTaskMgr remoteFormHost OnUpdate");
     remoteFormHost->OnUpdate(formJsInfo);
     HILOG_DEBUG("end");
 }
@@ -246,7 +245,7 @@ void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
     }
 
     remoteFormHost->OnUninstall(formIds);
-    HILOG_INFO("end");
+    HILOG_DEBUG("end");
 }
 
 /**
@@ -258,7 +257,7 @@ void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
 void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -267,7 +266,7 @@ void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk:
     }
 
     remoteFormHost->OnAcquireState(state, want);
-    HILOG_INFO("end");
+    HILOG_DEBUG("end");
 }
 
 /**
@@ -279,7 +278,7 @@ void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk:
 void FormHostTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
     int64_t requestCode, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -288,7 +287,7 @@ void FormHostTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
     }
 
     remoteFormHost->OnAcquireDataResponse(wantParams, requestCode);
-    HILOG_INFO("end");
+    HILOG_DEBUG("end");
 }
 
 void FormHostTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
@@ -309,8 +308,9 @@ void FormHostTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds,
 void FormHostTaskMgr::LockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
 
+    HILOG_INFO("LockFormsTaskToHost start");
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
         HILOG_ERROR("get formHostProxy failed");
@@ -323,7 +323,7 @@ void FormHostTaskMgr::LockFormsTaskToHost(const std::vector<int64_t> &formIds, c
 
 void FormHostTaskMgr::FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
