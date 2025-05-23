@@ -144,7 +144,7 @@ void FormBasicInfoMgr::UpdateBundleName(int64_t formId, const std::string& bundl
     }
 }
 
-void FormBasicInfoMgr::UpdateMoudleName(int64_t formId, const std::string& moduleName)
+void FormBasicInfoMgr::UpdateModuleName(int64_t formId, const std::string& moduleName)
 {
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     const auto iter = formBasicInfoMap_.find(formId);

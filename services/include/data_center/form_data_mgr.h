@@ -206,19 +206,20 @@ public:
      * @param formHostRecords The form host records.
      */
     void GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const;
+
+    /**
+     * @brief update formRecord recycle status.
+     * @param formId form id.
+     * @param status form status.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateFormRecordRecycleStatus(const int64_t formId, const RecycleStatus status);
+
     /**
      * @brief Get form host remote object.
      * @param formId The id of the form.
      * @param formHostObjs The form host remote object.
      */
-
-    /**
-     * @brief update formRecord recycle status to recycled.
-     * @param formId form id.
-     * @return Returns true on success, false on failure.
-     */
-    bool UpdateFormRecordRecycleStatus(const int64_t formId, const RecycleStatus status);
-
     void GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const;
     /**
      * @brief Delete form host record.
