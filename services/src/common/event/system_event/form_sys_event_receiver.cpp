@@ -110,7 +110,6 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
             action.c_str(), bundleName.c_str());
         return;
     }
-
     HILOG_INFO("action:%{public}s", action.c_str());
     std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED) {
