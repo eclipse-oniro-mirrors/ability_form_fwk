@@ -151,6 +151,5 @@ bool FormBundleLockMgr::IsBundleLockMgrInit()
     }
     return true;
 }
-
 }  // namespace AppExecFwk
 }  // namespace OHOS

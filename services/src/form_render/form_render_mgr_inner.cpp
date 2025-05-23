@@ -813,6 +813,121 @@ ErrCode FormRenderMgrInner::GetRenderObject(sptr<IRemoteObject> &renderObj)
     return ERR_OK;
 }
 
+bool FormRenderMgrInner::GetRenderFormConnectId(const int64_t formId, int32_t &connectId)
+{
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    auto conIterator = renderFormConnections_.find(formId);
+    if (conIterator != renderFormConnections_.end()) {
+        auto connection = conIterator->second;
+        if (connection == nullptr) {
+            HILOG_ERROR("connection of %{public}" PRId64 " is null.", formId);
+            return false;
+        }
+        connectId = connection->GetConnectId();
+        return true;
+    }
+    HILOG_ERROR("Not find renderFormConnection. formId: %{public}" PRId64, formId);
+    return false;
+}
+
+bool FormRenderMgrInner::GetRenderFormConnection(sptr<FormRenderConnection> &connection, const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    HILOG_DEBUG("renderFormConnections_ size:%{public}zu", renderFormConnections_.size());
+    auto conIterator = renderFormConnections_.find(formId);
+    if (conIterator != renderFormConnections_.end()) {
+        connection = conIterator->second;
+        return true;
+    }
+    return false;
+}
+
+void FormRenderMgrInner::GetConnectedForms(const std::vector<int64_t> &formIds, std::vector<int64_t> &connectedForms)
+{
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    for (const int64_t formId : formIds) {
+        auto conIterator = renderFormConnections_.find(formId);
+        if (conIterator != renderFormConnections_.end()) {
+            auto connection = conIterator->second;
+            if (connection == nullptr) {
+                HILOG_ERROR("connection of %{public}" PRId64 " is null.", formId);
+                continue;
+            }
+            connectedForms.emplace_back(formId);
+        } else {
+            HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
+        }
+    }
+}
+
+ErrCode FormRenderMgrInner::RenderConnectedForm(const FormRecord &formRecord, Want &want,
+                                                const sptr<FormRenderConnection> &connection)
+{
+    if (connection == nullptr) {
+        HILOG_ERROR("null connection");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
+    if (renderRemoteObj_ == nullptr) {
+        connection->UpdateFormRecord(formRecord);
+        connection->UpdateWantParams(want.GetParams());
+        ErrCode ret = ConnectRenderService(connection, formRecord.privacyLevel);
+        HILOG_INFO("ret:%{public}d", ret);
+        if (ret) {
+            FormRenderMgr::GetInstance().HandleConnectFailed(formRecord.formId, ret);
+        }
+        return ret;
+    }
+    auto remoteObject = renderRemoteObj_->AsObject();
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("null remoteObject");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    guard.unlock();
+    want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+    FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
+    return ERR_OK;
+}
+
+ErrCode FormRenderMgrInner::PostStopRenderingFormTask(const FormRecord &formRecord, Want &want)
+{
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    auto conIterator = renderFormConnections_.find(formRecord.formId);
+    if (conIterator != renderFormConnections_.end()) {
+        auto connection = conIterator->second;
+        if (connection == nullptr) {
+            HILOG_ERROR("null connection");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        sptr<IRemoteObject> remoteObject;
+        auto ret = GetRenderObject(remoteObject);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("null remoteObjectGotten");
+            return ret;
+        }
+        want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+        FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord, std::move(want), remoteObject);
+        return ERR_OK;
+    }
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
+ErrCode FormRenderMgrInner::CheckRenderConnectionExistById(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    auto conIterator = renderFormConnections_.find(formId);
+    if (conIterator != renderFormConnections_.end()) {
+        auto connection = conIterator->second;
+        if (connection == nullptr) {
+            HILOG_ERROR("null connection");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        return ERR_OK;
+    }
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     HILOG_INFO("Recv FormRenderService death notice");
