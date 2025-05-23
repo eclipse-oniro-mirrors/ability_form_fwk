@@ -29,6 +29,9 @@ const std::string ABILITY_NAME = "com.huawei.hmos.notepad";
 const std::string MODULE_NAME = "TestModule";
 const std::string PACKAGE_NAME = "TestPackage";
 const std::string INVALID_VALUE = "";
+const FormBasicInfo BASIC_INFO {
+    TEST_FORM_ID, ABILITY_NAME, BUNDLE_NAME, MODULE_NAME, FORM_NAME, PACKAGE_NAME
+};
 
 class FormBasicInfoMgrTest : public testing::Test {
 public:
@@ -39,15 +42,7 @@ public:
 
 void FormBasicInfoMgrTest::SetUp()
 {
-    FormBasicInfo basicInfo {
-        TEST_FORM_ID,
-        ABILITY_NAME,
-        BUNDLE_NAME,
-        MODULE_NAME,
-        FORM_NAME,
-        PACKAGE_NAME
-    };
-    formBasicInfoMgr.AddFormBasicInfo(basicInfo);
+    formBasicInfoMgr.AddFormBasicInfo(BASIC_INFO);
 }
 
 void FormBasicInfoMgrTest::TearDown()
@@ -75,12 +70,12 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_002, TestSize.Level1)
 {
     const auto abilityName = formBasicInfoMgr.GetFormAbilityName(TEST_FORM_ID);
     const auto bundleName =  formBasicInfoMgr.GetFormBundleName(TEST_FORM_ID);
-    const auto moudleName =  formBasicInfoMgr.GetFormModuleName(TEST_FORM_ID);
+    const auto moduleName =  formBasicInfoMgr.GetFormModuleName(TEST_FORM_ID);
     const auto formName =  formBasicInfoMgr.GetFormName(TEST_FORM_ID);
     const auto packageName =  formBasicInfoMgr.GetFormPackageName(TEST_FORM_ID);
     EXPECT_EQ(abilityName, ABILITY_NAME);
     EXPECT_EQ(bundleName, BUNDLE_NAME);
-    EXPECT_EQ(moudleName, MODULE_NAME);
+    EXPECT_EQ(moduleName, MODULE_NAME);
     EXPECT_EQ(formName, FORM_NAME);
     EXPECT_EQ(packageName, PACKAGE_NAME);
 }
@@ -126,6 +121,7 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_004, TestSize.Level1)
  */
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_005, TestSize.Level1)
 {
+    formBasicInfoMgr.AddFormBasicInfo(BASIC_INFO);
     const auto abilityName = formBasicInfoMgr.GetFormAbilityName(TEST_FORM_ID);
     EXPECT_EQ(abilityName, ABILITY_NAME);
     const std::string newAbilityName = "newAbilityName";
@@ -141,10 +137,11 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_005, TestSize.Level1)
  */
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_006, TestSize.Level1)
 {
+    formBasicInfoMgr.AddFormBasicInfo(BASIC_INFO);
     const auto moduleName = formBasicInfoMgr.GetFormModuleName(TEST_FORM_ID);
-    EXPECT_EQ(moduleName, ABILITY_NAME);
+    EXPECT_EQ(moduleName, MODULE_NAME);
     const std::string newModuleName = "newModuleName";
-    formBasicInfoMgr.UpdateMoudleName(TEST_FORM_ID, newModuleName);
+    formBasicInfoMgr.UpdateModuleName(TEST_FORM_ID, newModuleName);
     const auto updatedName = formBasicInfoMgr.GetFormModuleName(TEST_FORM_ID);
     EXPECT_NE(updatedName, moduleName);
 }
@@ -156,6 +153,7 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_006, TestSize.Level1)
  */
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_007, TestSize.Level1)
 {
+    formBasicInfoMgr.AddFormBasicInfo(BASIC_INFO);
     const auto bundleName = formBasicInfoMgr.GetFormBundleName(TEST_FORM_ID);
     EXPECT_EQ(bundleName, BUNDLE_NAME);
     const std::string newBundleName = "newBundleName";
@@ -171,8 +169,9 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_007, TestSize.Level1)
  */
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_008, TestSize.Level1)
 {
+    formBasicInfoMgr.AddFormBasicInfo(BASIC_INFO);
     const auto formName = formBasicInfoMgr.GetFormName(TEST_FORM_ID);
-    EXPECT_EQ(formName, BUNDLE_NAME);
+    EXPECT_EQ(formName, FORM_NAME);
     const std::string newFormName = "newFormName";
     formBasicInfoMgr.UpdateFormName(TEST_FORM_ID, newFormName);
     const auto updatedName = formBasicInfoMgr.GetFormName(TEST_FORM_ID);
@@ -186,8 +185,9 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_008, TestSize.Level1)
  */
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_009, TestSize.Level1)
 {
+    formBasicInfoMgr.AddFormBasicInfo(BASIC_INFO);
     const auto packageName = formBasicInfoMgr.GetFormPackageName(TEST_FORM_ID);
-    EXPECT_EQ(packageName, BUNDLE_NAME);
+    EXPECT_EQ(packageName, PACKAGE_NAME);
     const std::string newPackageName = "newPackageName";
     formBasicInfoMgr.UpdatePackageName(TEST_FORM_ID, newPackageName);
     const auto updatedName = formBasicInfoMgr.GetFormPackageName(TEST_FORM_ID);

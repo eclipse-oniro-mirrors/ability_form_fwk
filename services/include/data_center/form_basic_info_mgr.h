@@ -56,7 +56,7 @@ public:
 
     void UpdateAbilityName(int64_t formId, const std::string& abilityName);
     void UpdateBundleName(int64_t formId, const std::string& bundleName);
-    void UpdateMoudleName(int64_t formId, const std::string& moduleName);
+    void UpdateModuleName(int64_t formId, const std::string& moduleName);
     void UpdateFormName(int64_t formId, const std::string& formName);
     void UpdatePackageName(int64_t formId, const std::string& packageName);
 
