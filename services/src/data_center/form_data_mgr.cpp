@@ -756,7 +756,7 @@ bool FormDataMgr::RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &cal
     for (iter = clientRecords_.begin(); iter != clientRecords_.end(); ++iter) {
         if (callerToken == iter->GetFormHostClient()) {
             if (iter->IsEmpty()) {
-                HILOG_INFO("clientRecords_ is empty, clean form host");
+                HILOG_WARN("clientRecords_ is empty, clean form host");
                 iter->CleanResource();
                 iter = clientRecords_.erase(iter);
                 FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
@@ -1840,8 +1840,7 @@ ErrCode FormDataMgr::SetRecordVisible(int64_t matchedFormId, bool isVisible)
  */
 void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t> &removedFormIds)
 {
-    HILOG_INFO("delete forms, userId: %{public}d", userId);
-
+    HILOG_WARN("delete forms, userId: %{public}d", userId);
     // handle formRecords_
     std::vector<int64_t> removedTempForms;
     {
