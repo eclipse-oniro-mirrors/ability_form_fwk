@@ -886,7 +886,7 @@ ErrCode FormRenderMgrInner::RenderConnectedForm(const FormRecord &formRecord, Wa
     }
     guard.unlock();
     want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-    FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
+    FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
     return ERR_OK;
 }
 
@@ -907,7 +907,7 @@ ErrCode FormRenderMgrInner::PostStopRenderingFormTask(const FormRecord &formReco
             return ret;
         }
         want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-        FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord, std::move(want), remoteObject);
+        FormStatusTaskMgr::GetInstance().PostStopRenderingForm(formRecord, std::move(want), remoteObject);
         return ERR_OK;
     }
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
