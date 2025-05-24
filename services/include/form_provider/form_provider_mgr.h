@@ -149,7 +149,7 @@ public:
     void MergeWant(const Want &newWant, Want &oldWant);
 
     /**
-     * @brief Connect ams for refresh form
+     * @brief Connect ams for refresh form location
      * @param formId The form id.
      * @param record Form data.
      * @param want The want of the form.
