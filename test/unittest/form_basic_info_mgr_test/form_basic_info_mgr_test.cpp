@@ -29,15 +29,13 @@ const std::string ABILITY_NAME = "com.huawei.hmos.notepad";
 const std::string MODULE_NAME = "TestModule";
 const std::string PACKAGE_NAME = "TestPackage";
 const std::string INVALID_VALUE = "";
-const FormBasicInfo BASIC_INFO {
-    TEST_FORM_ID, ABILITY_NAME, BUNDLE_NAME, MODULE_NAME, FORM_NAME, PACKAGE_NAME
-};
+const FormBasicInfo BASIC_INFO{TEST_FORM_ID, ABILITY_NAME, BUNDLE_NAME, MODULE_NAME, FORM_NAME, PACKAGE_NAME};
 
 class FormBasicInfoMgrTest : public testing::Test {
 public:
     void SetUp() override;
     void TearDown() override;
-    FormBasicInfoMgr& formBasicInfoMgr = FormBasicInfoMgr::GetInstance();
+    FormBasicInfoMgr &formBasicInfoMgr = FormBasicInfoMgr::GetInstance();
 };
 
 void FormBasicInfoMgrTest::SetUp()
@@ -69,10 +67,10 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_001, TestSize.Level1)
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_002, TestSize.Level1)
 {
     const auto abilityName = formBasicInfoMgr.GetFormAbilityName(TEST_FORM_ID);
-    const auto bundleName =  formBasicInfoMgr.GetFormBundleName(TEST_FORM_ID);
-    const auto moduleName =  formBasicInfoMgr.GetFormModuleName(TEST_FORM_ID);
-    const auto formName =  formBasicInfoMgr.GetFormName(TEST_FORM_ID);
-    const auto packageName =  formBasicInfoMgr.GetFormPackageName(TEST_FORM_ID);
+    const auto bundleName = formBasicInfoMgr.GetFormBundleName(TEST_FORM_ID);
+    const auto moduleName = formBasicInfoMgr.GetFormModuleName(TEST_FORM_ID);
+    const auto formName = formBasicInfoMgr.GetFormName(TEST_FORM_ID);
+    const auto packageName = formBasicInfoMgr.GetFormPackageName(TEST_FORM_ID);
     EXPECT_EQ(abilityName, ABILITY_NAME);
     EXPECT_EQ(bundleName, BUNDLE_NAME);
     EXPECT_EQ(moduleName, MODULE_NAME);
@@ -193,4 +191,4 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_009, TestSize.Level1)
     const auto updatedName = formBasicInfoMgr.GetFormPackageName(TEST_FORM_ID);
     EXPECT_NE(updatedName, packageName);
 }
-} // namespace
+}  // namespace

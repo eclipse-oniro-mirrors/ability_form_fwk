@@ -506,7 +506,7 @@ int FormDbCache::GetFormCountsByCallingUid(const int32_t currentAccountId, const
 {
     int callingUidFormCounts = 0;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    for (const auto& record : formDBInfos_) {
+    for (const auto &record : formDBInfos_) {
         if (record.providerUserId != currentAccountId) {
             continue;
         }

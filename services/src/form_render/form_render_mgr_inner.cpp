@@ -762,7 +762,7 @@ bool FormRenderMgrInner::GetRenderFormConnection(sptr<FormRenderConnection> &con
 void FormRenderMgrInner::GetConnectedForms(const std::vector<int64_t> &formIds, std::vector<int64_t> &connectedForms)
 {
     std::lock_guard<std::mutex> lock(resourceMutex_);
-    for (const int64_t formId : formIds) {
+    for (const int64_t &formId : formIds) {
         auto conIterator = renderFormConnections_.find(formId);
         if (conIterator != renderFormConnections_.end()) {
             auto connection = conIterator->second;
@@ -777,8 +777,8 @@ void FormRenderMgrInner::GetConnectedForms(const std::vector<int64_t> &formIds, 
     }
 }
 
-ErrCode FormRenderMgrInner::RenderConnectedForm(const FormRecord &formRecord, Want &want,
-                                                const sptr<FormRenderConnection> &connection)
+ErrCode FormRenderMgrInner::RenderConnectedForm(
+    const FormRecord &formRecord, Want &want, const sptr<FormRenderConnection> &connection)
 {
     if (connection == nullptr) {
         HILOG_ERROR("null connection");

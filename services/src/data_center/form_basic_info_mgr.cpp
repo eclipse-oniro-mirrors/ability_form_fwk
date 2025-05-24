@@ -31,7 +31,7 @@ FormBasicInfoMgr::~FormBasicInfoMgr()
     HILOG_INFO("Destroy");
 }
 
-void FormBasicInfoMgr::AddFormBasicInfo(const FormBasicInfo& baseInfo)
+void FormBasicInfoMgr::AddFormBasicInfo(const FormBasicInfo &baseInfo)
 {
     HILOG_INFO("FormBasicInfoMgr::AddFormBasicInfo");
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
@@ -62,7 +62,7 @@ int FormBasicInfoMgr::GetBasicInfoCount() const
     return formBasicInfoMap_.size();
 }
 
-bool FormBasicInfoMgr::GetBasicInfoByFormId(int64_t formId, FormBasicInfo& basicInfo)
+bool FormBasicInfoMgr::GetBasicInfoByFormId(int64_t formId, FormBasicInfo &basicInfo)
 {
     HILOG_DEBUG("get form basic info by formId");
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
@@ -126,7 +126,7 @@ const std::string& FormBasicInfoMgr::GetFormPackageName(int64_t formId)
     return INVALID_VALUE;
 }
 
-void FormBasicInfoMgr::UpdateAbilityName(int64_t formId, const std::string& abilityName)
+void FormBasicInfoMgr::UpdateAbilityName(int64_t formId, const std::string &abilityName)
 {
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     const auto iter = formBasicInfoMap_.find(formId);
@@ -135,7 +135,7 @@ void FormBasicInfoMgr::UpdateAbilityName(int64_t formId, const std::string& abil
     }
 }
 
-void FormBasicInfoMgr::UpdateBundleName(int64_t formId, const std::string& bundleName)
+void FormBasicInfoMgr::UpdateBundleName(int64_t formId, const std::string &bundleName)
 {
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     const auto iter = formBasicInfoMap_.find(formId);
@@ -144,7 +144,7 @@ void FormBasicInfoMgr::UpdateBundleName(int64_t formId, const std::string& bundl
     }
 }
 
-void FormBasicInfoMgr::UpdateModuleName(int64_t formId, const std::string& moduleName)
+void FormBasicInfoMgr::UpdateModuleName(int64_t formId, const std::string &moduleName)
 {
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     const auto iter = formBasicInfoMap_.find(formId);
@@ -153,7 +153,7 @@ void FormBasicInfoMgr::UpdateModuleName(int64_t formId, const std::string& modul
     }
 }
 
-void FormBasicInfoMgr::UpdateFormName(int64_t formId, const std::string& formName)
+void FormBasicInfoMgr::UpdateFormName(int64_t formId, const std::string &formName)
 {
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     const auto iter = formBasicInfoMap_.find(formId);
@@ -162,7 +162,7 @@ void FormBasicInfoMgr::UpdateFormName(int64_t formId, const std::string& formNam
     }
 }
 
-void FormBasicInfoMgr::UpdatePackageName(int64_t formId, const std::string& packageName)
+void FormBasicInfoMgr::UpdatePackageName(int64_t formId, const std::string &packageName)
 {
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     const auto iter = formBasicInfoMap_.find(formId);
