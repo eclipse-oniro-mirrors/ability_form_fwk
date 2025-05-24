@@ -887,9 +887,8 @@ napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* 
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
-    napi_value result = nullptr;
     HILOG_INFO("call end");
-    return result;
+    return CreateJsNull(env);
 }
 
 bool JsFormProvider::ConvertFormOverflowInfo(napi_env env, napi_value argv, AppExecFwk::OverflowInfo* overflowInfo)
