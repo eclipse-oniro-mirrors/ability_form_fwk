@@ -560,7 +560,7 @@ int32_t FormRenderImpl::RecycleFormByUid(const std::string &uid, std::string &st
     auto search = renderRecordMap_.find(uid);
     if (search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
-            HILOG_ERROR("null renderRecord of %{public}" PRId64, formJsInfo.formId);
+            HILOG_ERROR("null renderRecord of %{public}" PRId64, formId);
             return RECYCLE_FORM_FAILED;
         }
         auto ret = search->second->RecycleForm(formId, statusData);
@@ -568,11 +568,11 @@ int32_t FormRenderImpl::RecycleFormByUid(const std::string &uid, std::string &st
             return ret;
         }
     } else {
-        HILOG_ERROR("can't find render record of %{public}" PRId64, formJsInfo.formId);
+        HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
         return RECYCLE_FORM_FAILED;
     }
     if (statusData.empty()) {
-        HILOG_WARN("empty statusData of %{public}s" PRId64, formJsInfo.formId);
+        HILOG_WARN("empty statusData of %{public}s" PRId64, formId);
     }
     return ERR_OK;
 }
