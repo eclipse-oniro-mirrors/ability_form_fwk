@@ -3011,7 +3011,7 @@ int32_t FormDataMgr::GetTempFormCount() const
  * @param formRecord form record.
  * @return Returns true on success, false on failure.
  */
-bool FormDataMgr::GetFormRecordById(const int64_t formId, FormRecord& formRecord)
+bool FormDataMgr::GetFormRecordById(const int64_t formId, FormRecord &formRecord)
 {
     bool notFindFormRecord  = false;
     std::lock_guard<std::mutex> lock(formRecordMutex_);

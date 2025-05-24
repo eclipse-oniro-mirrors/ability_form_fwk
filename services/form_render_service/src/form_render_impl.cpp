@@ -97,8 +97,8 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
     return result;
 }
 
-int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
-    const sptr<IRemoteObject> &callerToken)
+int32_t FormRenderImpl::StopRenderingForm(
+    const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
@@ -204,12 +204,12 @@ int32_t FormRenderImpl::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, 
         HILOG_ERROR("Get uid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    std::shared_ptr<FormRenderRecord> search = nullptr;
-    GetRenderRecordById(search, uid);
-    if (search == nullptr) {
+    if (!IsRenderRecordExist(uid)) {
         HILOG_ERROR("RenderRecord not find");
         return RELOAD_FORM_FAILED;
     }
+    std::shared_ptr<FormRenderRecord> search = nullptr;
+    GetRenderRecordById(search, uid);
     if (search != nullptr) {
         search->ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
     }
@@ -226,7 +226,7 @@ int32_t FormRenderImpl::OnUnlock()
     }
 
     isVerified_ = true;
-    for (const auto& iter : renderRecordMap_) {
+    for (const auto &iter : renderRecordMap_) {
         if (iter.second) {
             iter.second->OnUnlock();
         }
@@ -331,11 +331,12 @@ void FormRenderImpl::OnConfigurationUpdatedInner()
     FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
 }
 
-void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
+void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config)
 {
     if (config != nullptr && configuration_ != nullptr) {
-        auto checkConfigItem = { SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE };
-        for (const auto& item: checkConfigItem) {
+        const auto checkConfigItem = {
+            SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE};
+        for (const auto &item : checkConfigItem) {
             std::string newValue = config->GetItem(item);
             std::string oldValue = configuration_->GetItem(item);
             if (newValue.empty() && !oldValue.empty()) {
@@ -474,7 +475,7 @@ int32_t FormRenderImpl::UpdateFormSize(
     return UPDATE_FORM_SIZE_FAILED;
 }
 
-void FormRenderImpl::SetFormSupplyClient(const sptr<IFormSupply>& formSupplyClient)
+void FormRenderImpl::SetFormSupplyClient(const sptr<IFormSupply> &formSupplyClient)
 {
     std::lock_guard<std::mutex> lock(formSupplyMutex_);
     formSupplyClient_ = formSupplyClient;
@@ -486,8 +487,15 @@ sptr<IFormSupply> FormRenderImpl::GetFormSupplyClient()
     return formSupplyClient_;
 }
 
-int32_t FormRenderImpl::UpdateRenderRecordByUid(const std::string& uid, Want &formRenderWant,
-                                                const FormJsInfo &formJsInfo, const sptr<IFormSupply>& formSupplyClient)
+bool FormRenderImpl::IsRenderRecordExist(const std::string &uid)
+{
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    auto iterator = renderRecordMap_.find(uid);
+    return iterator != renderRecordMap_.end();
+}
+
+int32_t FormRenderImpl::UpdateRenderRecordByUid(const std::string &uid, Want &formRenderWant,
+    const FormJsInfo &formJsInfo, const sptr<IFormSupply> &formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null IFormSupply");
@@ -518,7 +526,7 @@ int32_t FormRenderImpl::UpdateRenderRecordByUid(const std::string& uid, Want &fo
     return result;
 }
 
-void FormRenderImpl::GetRenderRecordById(std::shared_ptr<FormRenderRecord>& search, const std::string& uid)
+void FormRenderImpl::GetRenderRecordById(std::shared_ptr<FormRenderRecord> &search, const std::string &uid)
 {
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     auto iterator = renderRecordMap_.find(uid);
@@ -529,30 +537,30 @@ void FormRenderImpl::GetRenderRecordById(std::shared_ptr<FormRenderRecord>& sear
     search = iterator->second;
 }
 
-int32_t FormRenderImpl::RecoverFormByUid(const FormJsInfo &formJsInfo, const Want &want, const std::string& uid,
-                                         const std::string& statusData)
+int32_t FormRenderImpl::RecoverFormByUid(
+    const FormJsInfo &formJsInfo, const Want &want, const std::string &uid, const std::string &statusData)
 {
-    bool isRecoverFormToHandleClickEvent = want.GetBoolParam(
-        Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
+    bool isRecoverFormToHandleClickEvent =
+        want.GetBoolParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
-            HILOG_ERROR("null renderRecord of %{public}s", std::to_string(formJsInfo.formId).c_str());
+            HILOG_ERROR("null renderRecord of %{public}" PRId64, formJsInfo.formId);
             return RECYCLE_FORM_FAILED;
         }
         return search->second->RecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
     }
-    HILOG_ERROR("can't find render record of %{public}s", std::to_string(formJsInfo.formId).c_str());
+    HILOG_ERROR("can't find render record of %{public}" PRId64, formJsInfo.formId);
     return RENDER_FORM_FAILED;
 }
 
-int32_t FormRenderImpl::RecycleFormByUid(const std::string& uid, std::string& statusData, const int64_t formId)
+int32_t FormRenderImpl::RecycleFormByUid(const std::string &uid, std::string &statusData, const int64_t formId)
 {
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     auto search = renderRecordMap_.find(uid);
     if (search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
-            HILOG_ERROR("null renderRecord of %{public}s", std::to_string(formId).c_str());
+            HILOG_ERROR("null renderRecord of %{public}" PRId64, formJsInfo.formId);
             return RECYCLE_FORM_FAILED;
         }
         auto ret = search->second->RecycleForm(formId, statusData);
@@ -560,16 +568,16 @@ int32_t FormRenderImpl::RecycleFormByUid(const std::string& uid, std::string& st
             return ret;
         }
     } else {
-        HILOG_ERROR("can't find render record of %{public}s", std::to_string(formId).c_str());
+        HILOG_ERROR("can't find render record of %{public}" PRId64, formJsInfo.formId);
         return RECYCLE_FORM_FAILED;
     }
     if (statusData.empty()) {
-        HILOG_WARN("empty statusData of %{public}s", std::to_string(formId).c_str());
+        HILOG_WARN("empty statusData of %{public}s" PRId64, formJsInfo.formId);
     }
     return ERR_OK;
 }
 
-int32_t FormRenderImpl::DeleteRenderRecordByUid(const std::string& uid, const std::shared_ptr<FormRenderRecord>& search)
+int32_t FormRenderImpl::DeleteRenderRecordByUid(const std::string &uid, const std::shared_ptr<FormRenderRecord> &search)
 {
     if (!search) {
         HILOG_ERROR("get render record fail");
