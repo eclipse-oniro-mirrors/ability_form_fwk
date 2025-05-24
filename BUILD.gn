@@ -167,11 +167,11 @@ ohos_shared_library("libfms") {
     "services/src/form_provider/connection/form_background_connection.cpp",
     "services/src/form_provider/connection/form_batch_delete_connection.cpp",
     "services/src/form_provider/connection/form_cast_temp_connection.cpp",
+    "services/src/form_provider/connection/form_configuration_update_connection.cpp",
     "services/src/form_provider/connection/form_delete_connection.cpp",
     "services/src/form_provider/connection/form_location_connection.cpp",
     "services/src/form_provider/connection/form_msg_event_connection.cpp",
     "services/src/form_provider/connection/form_refresh_connection.cpp",
-    "services/src/form_provider/connection/form_configuration_update_connection.cpp",
     "services/src/form_provider/form_provider_mgr.cpp",
     "services/src/form_provider/form_supply_callback.cpp",
     "services/src/form_provider/form_provider_task_mgr.cpp",
@@ -505,6 +505,10 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formprovider",
       "${form_fwk_napi_path}:formprovider_napi",
       "${form_fwk_napi_path}:formutil_napi",
+      "${form_fwk_napi_path}:live_form_extension",
+      "${form_fwk_napi_path}:live_form_extension_module",
+      "${form_fwk_napi_path}:liveformextensionability_napi",
+      "${form_fwk_napi_path}:liveformextensioncontext_napi",
     ]
   }
 }
