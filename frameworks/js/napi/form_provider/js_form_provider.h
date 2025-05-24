@@ -75,6 +75,7 @@ public:
     static napi_value CancelOverflow(napi_env env, napi_callback_info info);
     static napi_value ActivateSceneAnimation(napi_env env, napi_callback_info info);
     static napi_value DeactivateSceneAnimation(napi_env env, napi_callback_info info);
+    static napi_value GetFormRect(napi_env env, napi_callback_info info);
 private:
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
     napi_value OnGetPublishedFormInfoById(napi_env env, size_t argc, napi_value* argv);
@@ -84,6 +85,7 @@ private:
     napi_value OnUpdateForm(napi_env env, size_t argc, napi_value* argv);
     napi_value OnIsRequestPublishFormSupported(napi_env env, size_t argc, napi_value* argv);
     napi_value OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnGetFormRect(napi_env env, size_t argc, napi_value* argv);
     bool ConvertFromDataProxies(napi_env env, napi_value jsValue,
         std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
     bool ConvertFormDataProxy(napi_env env, napi_value jsValue, AppExecFwk::FormDataProxy &formDataProxy);
