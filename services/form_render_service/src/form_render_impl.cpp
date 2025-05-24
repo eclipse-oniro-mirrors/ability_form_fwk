@@ -572,7 +572,7 @@ int32_t FormRenderImpl::RecycleFormByUid(const std::string &uid, std::string &st
         return RECYCLE_FORM_FAILED;
     }
     if (statusData.empty()) {
-        HILOG_WARN("empty statusData of %{public}s" PRId64, formId);
+        HILOG_WARN("empty statusData of %{public}" PRId64, formId);
     }
     return ERR_OK;
 }
