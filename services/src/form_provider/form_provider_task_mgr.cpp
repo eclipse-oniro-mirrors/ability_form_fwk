@@ -47,6 +47,24 @@ void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want
 }
 
 /**
+ * @brief Refresh form location data from form provider(task).
+ *
+ * @param formId The Id of the form.
+ * @param want The want of the form.
+ * @param remoteObject Form provider proxy object.
+ * @return none.
+ */
+void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("Call.");
+    auto notifyFormLocationUpdateFunc = [formId, want, remoteObject]() {
+        FormProviderTaskMgr::GetInstance().NotifyFormLocationUpdate(formId, want, remoteObject);
+    };
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormLocationUpdateFunc);
+}
+
+/**
  * @brief Refresh form data from form provider(task).
  *
  * @param formId The Id of the form.
@@ -478,6 +496,24 @@ void FormProviderTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Co
         return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
     };
     HILOG_INFO("end");
+}
+
+void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("get formProviderProxy failed");
+        return;
+    }
+    int error = formProviderProxy->NotifyFormLocationUpdate(formId, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("fail notify form update");
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS
