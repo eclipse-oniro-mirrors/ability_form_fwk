@@ -1546,7 +1546,10 @@ void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemI
         needUpdate = true;
     }
     if (record.formLocation != info.GetFormLocation()) {
+        HILOG_INFO("formLocation change oldLocation: %{public}d, newLocation: %{public}d, formId: %{public}" PRId64,
+            (int)record.formLocation, (int)info.GetFormLocation(), formId);
         record.formLocation = info.GetFormLocation();
+        record.isLocationChange = true;
         needUpdate = true;
     }
     if (needUpdate) {
@@ -1649,6 +1652,10 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
             HILOG_ERROR("AcquireProviderFormInfoAsync failed, formId:%{public}" PRId64, formId);
             return errorCode;
         }
+    } else if (newRecord.isLocationChange) {
+        Want locationWant;
+        locationWant.SetParams(wantParams);
+        FormProviderMgr::GetInstance().ConnectAmsChangeLocation(formId, newRecord, locationWant);
     }
 
     // Add new form user uid.

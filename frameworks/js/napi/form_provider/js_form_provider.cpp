@@ -866,6 +866,31 @@ napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc,
     return result;
 }
 
+napi_value JsFormProvider::GetFormRect(napi_env env, napi_callback_info info)
+{
+    HILOG_INFO("call");
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetFormRect);
+}
+
+napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_INFO("call");
+    if (argc != ARGS_SIZE_ONE) {
+        HILOG_ERROR("OnGetFormRect wrong number of arguments.");
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+        return CreateJsUndefined(env);
+    }
+
+    int64_t formId;
+    if (!ConvertFormId(env, argv[PARAM0], formId)) {
+        HILOG_ERROR("Convert formId failed, formId:%{public}" PRId64 ".", formId);
+        NapiFormUtil::ThrowParamError(env, "The formId is invalid");
+        return CreateJsUndefined(env);
+    }
+    HILOG_INFO("call end");
+    return CreateJsNull(env);
+}
+
 bool JsFormProvider::ConvertFormOverflowInfo(napi_env env, napi_value argv, AppExecFwk::OverflowInfo* overflowInfo)
 {
     HILOG_INFO("call");

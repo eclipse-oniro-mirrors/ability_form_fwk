@@ -1558,11 +1558,11 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
 {
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId:%{public}s", std::to_string(formId).c_str());
-    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (!CheckEventHandler(true, true)) {
         HILOG_ERROR("null eventHandler_");
         return RENDER_FORM_FAILED;
     }
+    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
 
     sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
     if (formSupplyClient == nullptr) {
