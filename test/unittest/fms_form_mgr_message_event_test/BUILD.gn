@@ -28,12 +28,6 @@ ohos_unittest("FmsFormMgrMessageEventTest") {
   sources += [ "fms_form_mgr_message_event_test.cpp" ]
 
   include_dirs = [
-    "//third_party/zlib/contrib/minizip",
-    "//third_party/zlib",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
-    "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
@@ -52,7 +46,6 @@ ohos_unittest("FmsFormMgrMessageEventTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -79,6 +72,7 @@ ohos_unittest("FmsFormMgrMessageEventTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "selinux_adapter:librestorecon",
+    "googletest:gmock_main",
   ]
 
   if (form_runtime_power) {

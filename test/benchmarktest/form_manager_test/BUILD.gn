@@ -20,9 +20,7 @@ ohos_benchmarktest("BenchmarkTestForFormManager") {
   module_out_path = module_output_path
   sources = [ "form_manager_test.cpp" ]
   include_dirs = [
-    "${access_token_path}/interfaces/innerkits/token_setproc/include",
-    "${access_token_path}/interfaces/innerkits/nativetoken/include",
-    "${access_token_path}/interfaces/innerkits/accesstoken/include",
+
   ]
 
   cflags = []
@@ -35,8 +33,6 @@ ohos_benchmarktest("BenchmarkTestForFormManager") {
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}/test/resource/benchmark/form_test_bundle:formTestWidget1",
     "${form_fwk_path}/test/resource/benchmark/ohos_test:copy_ohos_test",
-    "//third_party/benchmark:benchmark",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -50,6 +46,8 @@ ohos_benchmarktest("BenchmarkTestForFormManager") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "selinux_adapter:librestorecon",
+    "benchmark:benchmark",
+    "googletest:gtest_main",
   ]
 }
 

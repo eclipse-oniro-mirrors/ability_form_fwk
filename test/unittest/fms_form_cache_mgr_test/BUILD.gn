@@ -22,11 +22,6 @@ ohos_unittest("FmsFormCacheMgrTest") {
   sources = [ "${form_fwk_path}/test/unittest/fms_form_cache_mgr_test/fms_form_cache_mgr_test.cpp" ]
 
   include_dirs = [
-    "//third_party/zlib/contrib/minizip",
-    "//third_party/zlib",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
-    "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 

@@ -17,8 +17,8 @@
 #include "hilog_tag_wrapper.h"
 #include "hitrace_meter.h"
 #include "js_ui_extension_base.h"
-#include "../form_edit_extension_context/js_form_edit_extension_context.h"
-#include "../form_edit_extension_context/js_form_edit_extension_impl.h"
+#include "js_form_edit_extension_context.h"
+#include "js_form_edit_extension_impl.h"
 
 namespace OHOS {
 namespace AbilityRuntime {

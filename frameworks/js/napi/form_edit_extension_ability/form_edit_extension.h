@@ -17,7 +17,7 @@
 #define OHOS_ABILITY_RUNTIME_FORM_EDIT_EXTENSION_H
 
 #include "ui_extension_base.h"
-#include "../form_edit_extension_context/form_edit_extension_context.h"
+#include "form_edit_extension_context.h"
 namespace OHOS {
 namespace AbilityRuntime {
 class FormEditExtensionContext;

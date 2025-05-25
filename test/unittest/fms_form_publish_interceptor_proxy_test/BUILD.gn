@@ -29,7 +29,6 @@ ohos_unittest("FmsFormPublishInterceptorProxyTest") {
 
   deps = [
     "${form_fwk_path}:form_manager",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -47,6 +46,7 @@ ohos_unittest("FmsFormPublishInterceptorProxyTest") {
     "kv_store:distributeddata_inner",
     "relational_store:native_appdatafwk",
     "relational_store:native_rdb",
+    "googletest:gmock_main",
   ]
 
   if (device_usage_statistics) {

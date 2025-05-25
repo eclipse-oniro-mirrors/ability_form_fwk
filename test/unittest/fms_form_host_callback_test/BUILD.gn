@@ -27,12 +27,6 @@ ohos_unittest("FmsFormHostCallbackTest") {
   sources += [ "fms_form_host_callback_test.cpp" ]
 
   include_dirs = [
-    "//third_party/zlib/contrib/minizip",
-    "//third_party/zlib",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
-    "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
@@ -42,13 +36,8 @@ ohos_unittest("FmsFormHostCallbackTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata:distributeddata_inner",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -69,6 +58,7 @@ ohos_unittest("FmsFormHostCallbackTest") {
     "kv_store:distributeddata_inner",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 
   if (form_runtime_power) {

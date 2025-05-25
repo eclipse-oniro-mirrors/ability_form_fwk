@@ -647,7 +647,7 @@ ohos_shared_library("formeditextensioncontext_napi") {
 
 ################################### gen_form_edit_extension_ability ########################################
 ohos_shared_library("form_edit_extension") {
-  include_dirs = []
+  include_dirs = ["form_edit_extension_context/"]
 
   sources = [
     "form_edit_extension_ability/form_edit_extension.cpp",
@@ -687,7 +687,7 @@ ohos_shared_library("form_edit_extension") {
 }
 
 ohos_shared_library("form_edit_extension_module") {
-  include_dirs = []
+  include_dirs = ["form_edit_extension_context/"]
 
   sources =
       [ "form_edit_extension_ability/form_edit_extension_module_loader.cpp" ]

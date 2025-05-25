@@ -28,9 +28,6 @@ ohos_unittest("FrsFormRenderMgrInnerTest") {
   ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
   ]
@@ -43,7 +40,6 @@ ohos_unittest("FrsFormRenderMgrInnerTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -61,6 +57,7 @@ ohos_unittest("FrsFormRenderMgrInnerTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "libxml2:libxml2",
+    "googletest:gmock_main",
   ]
 
   if (device_usage_statistics) {

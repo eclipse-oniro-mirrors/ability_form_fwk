@@ -17,7 +17,7 @@
 #include "hilog_tag_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "../form_edit_extension_context/js_form_edit_extension_context.h"
+#include "js_form_edit_extension_context.h"
 #include "js_ui_extension_content_session.h"
 #include "napi_common_want.h"
 

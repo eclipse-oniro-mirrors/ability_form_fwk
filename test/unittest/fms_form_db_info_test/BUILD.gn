@@ -35,7 +35,6 @@ ohos_unittest("FmsFormDbInfoTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -51,6 +50,7 @@ ohos_unittest("FmsFormDbInfoTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",
+    "googletest:gmock_main",
   ]
 
   if (device_usage_statistics) {

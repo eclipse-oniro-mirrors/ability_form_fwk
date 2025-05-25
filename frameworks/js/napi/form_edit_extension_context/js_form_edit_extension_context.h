@@ -16,7 +16,7 @@
 #ifndef OHOS_ABILITY_RUNTIME_JS_FORM_EDIT_EXTENSION_CONTEXT_H
 #define OHOS_ABILITY_RUNTIME_JS_FORM_EDIT_EXTENSION_CONTEXT_H
 
-#include "../form_edit_extension_context/form_edit_extension_context.h"
+#include "form_edit_extension_context.h"
 #include "native_engine/native_engine.h"
 
 namespace OHOS {
