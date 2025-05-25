@@ -28,7 +28,6 @@ ohos_unittest("FmsObserverRecordTest") {
   ]
 
   include_dirs = [
-    "${ability_runtime_path}/services/formmgr/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
   ]
@@ -39,7 +38,6 @@ ohos_unittest("FmsObserverRecordTest") {
   }
   deps = [
     "${form_fwk_path}:fms_target",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -86,6 +84,7 @@ ohos_unittest("FmsObserverRecordTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "googletest:gmock_main",
   ]
 }
 

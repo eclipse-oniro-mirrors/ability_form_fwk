@@ -25,10 +25,12 @@ ohos_unittest("FmsFormSystemloadListenerTest") {
 
   deps = [
     "${form_fwk_path}:fms_target",
-    "//third_party/googletest:gmock_main",
   ]
 
-  external_deps = [ "c_utils:utilsbase" ]
+  external_deps = [ 
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+  ]
 
   defines = []
 

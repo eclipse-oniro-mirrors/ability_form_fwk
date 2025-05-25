@@ -36,9 +36,6 @@ ohos_unittest("FmsFormMgrAdapterTest") {
   ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
   ]
@@ -52,7 +49,6 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -78,6 +74,7 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 
   defines = []
@@ -120,9 +117,6 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
   ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
   ]
@@ -136,7 +130,6 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -162,6 +155,7 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 
   defines = []

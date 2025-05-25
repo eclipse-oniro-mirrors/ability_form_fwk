@@ -36,7 +36,6 @@ ohos_unittest("FormReportTest") {
 
   deps = [
     "${form_fwk_path}:fmskit_native",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -49,6 +48,7 @@ ohos_unittest("FormReportTest") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "googletest:gmock_main",
   ]
 }
 

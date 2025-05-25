@@ -21,12 +21,10 @@ config("formmgr_test_config") {
 
 public_configs = [ ":formmgr_test_config" ]
 
-external_deps = [ "c_utils:utils" ]
-
-public_deps = [
-  "${c_utils_base_path}:utils",
-  "//third_party/googletest:gmock_main",
-  "//third_party/googletest:gtest_main",
+external_deps = [
+  "c_utils:utils",
+  "googletest:gmock_main",
+  "googletest:gtest_main",
 ]
 
 group("unittest") {

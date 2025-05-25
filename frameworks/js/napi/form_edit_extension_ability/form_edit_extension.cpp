@@ -17,7 +17,7 @@
 #include "hilog_tag_wrapper.h"
 #include "js_form_edit_extension.h"
 #include "runtime.h"
-#include "../form_edit_extension_context/form_edit_extension_context.h"
+#include "form_edit_extension_context.h"
 namespace OHOS {
 namespace AbilityRuntime {
 FormEditExtension::FormEditExtension()

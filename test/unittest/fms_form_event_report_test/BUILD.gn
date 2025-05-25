@@ -21,7 +21,7 @@ ohos_unittest("FmsFormEventReportTest") {
 
   sources = [ "${form_fwk_path}/test/unittest/fms_form_event_report_test/fms_form_event_report_test.cpp" ]
 
-  include_dirs = [ "${ability_runtime_services_path}/common/include" ]
+  include_dirs = []
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
 
@@ -33,7 +33,6 @@ ohos_unittest("FmsFormEventReportTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:form_manager",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -42,6 +41,7 @@ ohos_unittest("FmsFormEventReportTest") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "googletest:gmock_main",
   ]
 }
 

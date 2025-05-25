@@ -32,12 +32,12 @@ ohos_unittest("FrsFormRenderSerialTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "googletest:gmock_main",
   ]
 
   if (device_usage_statistics) {

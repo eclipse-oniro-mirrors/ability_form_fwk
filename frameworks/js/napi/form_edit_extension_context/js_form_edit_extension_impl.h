@@ -17,7 +17,7 @@
 #define OHOS_ABILITY_RUNTIME_JS_FORM_EDIT_EXTENSION_IMPL_H
 
 #include "js_ui_extension_base.h"
-#include "../form_edit_extension_context/form_edit_extension_context.h"
+#include "form_edit_extension_context.h"
 #include <set>
 
 namespace OHOS {

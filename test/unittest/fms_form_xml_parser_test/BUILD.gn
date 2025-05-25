@@ -38,12 +38,12 @@ ohos_unittest("FmsFormXmlParserTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_config",
     "${form_fwk_path}:form_manager",
-    "//third_party/libxml2:libxml2",
   ]
 
   external_deps = [
     "form_fwk:form_manager",
     "hilog:libhilog",
+    "libxml2:libxml2",
   ]
 }
 

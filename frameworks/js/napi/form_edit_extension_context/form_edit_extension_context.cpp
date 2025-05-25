@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "../form_edit_extension_context/form_edit_extension_context.h"
+#include "form_edit_extension_context.h"
 #include "hilog_tag_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr.h"

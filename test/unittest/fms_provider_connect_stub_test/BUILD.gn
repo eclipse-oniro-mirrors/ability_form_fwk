@@ -22,9 +22,6 @@ ohos_unittest("FmsProviderConnectStubTest") {
   sources = [ "${form_fwk_path}/test/unittest/fms_provider_connect_stub_test/fms_provider_connect_stub_test.cpp" ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 

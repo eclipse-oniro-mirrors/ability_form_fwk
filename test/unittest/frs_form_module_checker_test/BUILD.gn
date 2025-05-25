@@ -22,7 +22,6 @@ ohos_unittest("FmsFormModuleCheckerTest") {
   sources = [ "form_module_checker_test.cpp" ]
 
   include_dirs = [
-    "//third_party/json/include",
     "${form_fwk_path}/services/form_render_service/include",
     "${form_fwk_path}/services//include",
     "${form_fwk_path}/test/mock/include",
@@ -30,12 +29,12 @@ ohos_unittest("FmsFormModuleCheckerTest") {
   deps = [
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
     "hilog:libhilog",
     "napi:ace_napi",
+    "googletest:gmock_main",
   ]
 }
 

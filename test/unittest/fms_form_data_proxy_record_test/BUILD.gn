@@ -30,14 +30,9 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
   ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/test/mock/include",
-    "${ability_runtime_path}/services/common/include",
-    "${ability_runtime_native_path}/appkit/ability_runtime",
   ]
 
   configs = []

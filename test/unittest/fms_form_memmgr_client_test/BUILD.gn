@@ -21,7 +21,6 @@ ohos_unittest("FmsFormMemmgrClientTest") {
   sources = [ "${form_fwk_path}/test/unittest/fms_form_memmgr_client_test/fms_form_memmgr_client_test.cpp" ]
 
   include_dirs = [
-    "//third_party/json/include",
     "${form_fwk_path}/services/form_render_service/include",
     "${form_fwk_path}/services//include",
     "${form_fwk_path}/test/mock/include",
@@ -30,7 +29,6 @@ ohos_unittest("FmsFormMemmgrClientTest") {
   deps = [
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -45,6 +43,7 @@ ohos_unittest("FmsFormMemmgrClientTest") {
     "ipc:ipc_core",
     "napi:ace_napi",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 }
 
