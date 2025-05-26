@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import Want from './@ohos.app.ability.Want';
+import Want from '@ohos.app.ability.Want';
 declare namespace FormInfo {
   interface FormInfo {
     bundleName: string;
