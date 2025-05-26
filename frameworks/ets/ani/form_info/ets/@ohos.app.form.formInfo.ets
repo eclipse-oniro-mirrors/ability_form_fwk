@@ -14,6 +14,7 @@
  */
 
 import Want from '@ohos.app.ability.Want';
+
 declare namespace FormInfo {
   interface FormInfo {
     bundleName: string;
@@ -43,29 +44,35 @@ declare namespace FormInfo {
     readonly enableBlurBackground?: boolean;
     readonly renderingMode?: RenderingMode;
   }
+
   enum RenderingMode {
     AUTO_COLOR = 0,
     FULL_COLOR = 1,
     SINGLE_COLOR = 2
   }
+
   enum FormType {
     JS = 1,
     eTS = 2
   }
+
   enum ColorMode {
     MODE_AUTO = -1,
     MODE_DARK = 0,
     MODE_LIGHT = 1
   }
+
   interface FormStateInfo {
     formState: FormState;
     want: Want;
   }
+
   enum FormState {
     UNKNOWN = -1,
     DEFAULT = 0,
     READY = 1
   }
+
   enum FormParam {
     IDENTITY_KEY = 'ohos.extra.param.key.form_identity',
     DIMENSION_KEY = 'ohos.extra.param.key.form_dimension',
@@ -86,12 +93,14 @@ declare namespace FormInfo {
     FORM_PERMISSION_NAME_KEY = 'ohos.extra.param.key.permission_name',
     FORM_PERMISSION_GRANTED_KEY = 'ohos.extra.param.key.permission_granted',
   }
+
   interface FormInfoFilter {
     bundleName?: string;
     moduleName?: string;
     supportedDimensions?: Array<number>;
     supportedShapes?: Array<number>;
   }
+
   enum FormDimension {
     Dimension_1_2 = 1,
     Dimension_2_2,
@@ -104,36 +113,43 @@ declare namespace FormInfo {
     DIMENSION_3_3 = 9,
     DIMENSION_3_4 = 10
   }
+
   enum FormShape {
     RECT = 1,
     CIRCLE = 2
   }
+
   enum VisibilityType {
     UNKNOWN = 0,
     FORM_VISIBLE = 1,
     FORM_INVISIBLE = 2
   }
+
   enum LaunchReason {
     FORM_DEFAULT = 1,
     FORM_SHARE = 2
   }
+
   interface PublishFormResult {
     code: PublishFormErrorCode;
     message: string;
   }
+
   enum PublishFormErrorCode {
     SUCCESS = 0,
     NO_SPACE = 1,
     PARAM_ERROR = 2,
     INTERNAL_ERROR = 3
   }
+
   interface FormProviderFilter {
     bundleName: string;
-    formName ?: string;
-    moduleName ?: string;
-    abilityName ?: string;
+    formName?: string;
+    moduleName?: string;
+    abilityName?: string;
     isUnusedIncluded?: boolean;
   }
+
   interface RunningFormInfo {
     readonly formId: string;
     readonly bundleName: string;
@@ -148,10 +164,12 @@ declare namespace FormInfo {
     readonly formDescription: string;
     readonly extraData?: Record<string, Object>;
   }
+
   enum FormUsageState {
     USED = 0,
     UNUSED = 1
   }
+
   enum FormLocation {
     OTHER = -1,
     DESKTOP = 0,
@@ -164,4 +182,5 @@ declare namespace FormInfo {
     AI_SUGGESTION = 7,
   }
 }
+
 export default FormInfo;

@@ -40,4 +40,5 @@ declare namespace FormError {
     ERR_DISTRIBUTED_SCHEDULE_FAILED = 37
   }
 }
+
 export default FormError;
