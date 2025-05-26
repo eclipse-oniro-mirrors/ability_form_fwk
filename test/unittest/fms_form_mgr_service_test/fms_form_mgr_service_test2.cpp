@@ -1172,19 +1172,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0130, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0131
- * @tc.name: test OnStart function.
- * @tc.desc: Verify that the OnStart
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0131, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0131 start";
-    FormMgrService formMgrService;
-    formMgrService.OnStart();
-    GTEST_LOG_(INFO) << "FormMgrService_0131 end";
-}
-
-/**
  * @tc.number: FormMgrService_0132
  * @tc.name: test SubscribeSysEventReceiver function.
  * @tc.desc: Verify that the SubscribeSysEventReceiver
@@ -1206,7 +1193,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0133, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0133 start";
     FormMgrService* service = new FormMgrService();
-    service->Init();
     service->SubscribeSysEventReceiver();
     delete service;
     GTEST_LOG_(INFO) << "FormMgrService_0133 end";
@@ -1284,7 +1270,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0138, TestSize.Level1)
     std::string abilityName = "abilityName";
     int64_t formId = 1;
     formMgrService.SubscribeSysEventReceiver();
-    formMgrService.OnStart();
     formMgrService.OnStop();
     formMgrService.SubscribeSysEventReceiver();
     RunningFormInfo formInfo;
