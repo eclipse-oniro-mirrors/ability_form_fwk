@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-declare namespace formError {
+declare namespace FormError {
   enum FormError {
     ERR_COMMON = 1,
     ERR_PERMISSION_DENY = 2,
@@ -40,4 +40,4 @@ declare namespace formError {
     ERR_DISTRIBUTED_SCHEDULE_FAILED = 37
   }
 }
-export default formError;
+export default FormError;

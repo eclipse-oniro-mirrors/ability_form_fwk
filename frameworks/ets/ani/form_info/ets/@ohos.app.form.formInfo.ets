@@ -14,7 +14,7 @@
  */
 
 import Want from './@ohos.app.ability.Want';
-declare namespace formInfo {
+declare namespace FormInfo {
   interface FormInfo {
     bundleName: string;
     moduleName: string;
@@ -67,19 +67,19 @@ declare namespace formInfo {
     READY = 1
   }
   enum FormParam {
-    IDENTITY_KEY = "ohos.extra.param.key.form_identity",
-    DIMENSION_KEY = "ohos.extra.param.key.form_dimension",
-    NAME_KEY = "ohos.extra.param.key.form_name",
-    MODULE_NAME_KEY = "ohos.extra.param.key.module_name",
-    WIDTH_KEY = "ohos.extra.param.key.form_width",
-    HEIGHT_KEY = "ohos.extra.param.key.form_height",
-    TEMPORARY_KEY = "ohos.extra.param.key.form_temporary",
-    BUNDLE_NAME_KEY = "ohos.extra.param.key.bundle_name",
-    ABILITY_NAME_KEY = "ohos.extra.param.key.ability_name",
+    IDENTITY_KEY = 'ohos.extra.param.key.form_identity',
+    DIMENSION_KEY = 'ohos.extra.param.key.form_dimension',
+    NAME_KEY = 'ohos.extra.param.key.form_name',
+    MODULE_NAME_KEY = 'ohos.extra.param.key.module_name',
+    WIDTH_KEY = 'ohos.extra.param.key.form_width',
+    HEIGHT_KEY = 'ohos.extra.param.key.form_height',
+    TEMPORARY_KEY = 'ohos.extra.param.key.form_temporary',
+    BUNDLE_NAME_KEY = 'ohos.extra.param.key.bundle_name',
+    ABILITY_NAME_KEY = 'ohos.extra.param.key.ability_name',
     THEME_KEY = 'ohos.extra.param.key.form_is_theme',
-    DEVICE_ID_KEY = "ohos.extra.param.key.device_id",
-    LAUNCH_REASON_KEY = "ohos.extra.param.key.form_launch_reason",
-    PARAM_FORM_CUSTOMIZE_KEY = "ohos.extra.param.key.form_customize",
+    DEVICE_ID_KEY = 'ohos.extra.param.key.device_id',
+    LAUNCH_REASON_KEY = 'ohos.extra.param.key.form_launch_reason',
+    PARAM_FORM_CUSTOMIZE_KEY = 'ohos.extra.param.key.form_customize',
     FORM_LOCATION_KEY = 'ohos.extra.param.key.form_location',
     FORM_RENDERING_MODE_KEY = 'ohos.extra.param.key.form_rendering_mode',
     HOST_BG_INVERSE_COLOR_KEY = 'ohos.extra.param.key.host_bg_inverse_color',
@@ -164,4 +164,4 @@ declare namespace formInfo {
     AI_SUGGESTION = 7,
   }
 }
-export default formInfo;
+export default FormInfo;
