@@ -524,6 +524,19 @@ std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QueryData(
     return rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
 }
 
+std::shared_ptr<NativeRdb::ResultSet> FormRdbDataMgr::QueryDataByStep(
+    const NativeRdb::AbsRdbPredicates &absRdbPredicates)
+{
+    HILOG_DEBUG("QueryDataByStep start");
+    if (!IsFormRdbLoaded()) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return nullptr;
+    }
+
+    std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+    return rdbStore_->QueryByStep(absRdbPredicates, std::vector<std::string>());
+}
+
 std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QuerySql(const std::string &sql)
 {
     HILOG_DEBUG("QuerySql start");

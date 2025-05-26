@@ -455,7 +455,7 @@ bool FormCacheMgr::GetImgCacheFromDb(
 {
     NativeRdb::AbsRdbPredicates absRdbPredicates(IMG_CACHE_TABLE);
     absRdbPredicates.EqualTo(IMAGE_ID, std::to_string(rowId));
-    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryDataByStep(absRdbPredicates);
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("GetImgCacheFromDb failed");
         return false;
@@ -466,11 +466,6 @@ bool FormCacheMgr::GetImgCacheFromDb(
             absSharedResultSet->Close();
         }
     });
-    if (!absSharedResultSet->HasBlock()) {
-        HILOG_ERROR("absSharedResultSet has no block");
-        return false;
-    }
-
     int ret = absSharedResultSet->GoToFirstRow();
     if (ret != NativeRdb::E_OK) {
         HILOG_ERROR("GoToFirstRow failed,ret:%{public}d", ret);

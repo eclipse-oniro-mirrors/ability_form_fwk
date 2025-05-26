@@ -693,5 +693,36 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_026, Function | SmallTest 
     FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_026 end";
 }
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_027
+ * @tc.desc: Test QueryDataByStep
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_027, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_027 start";
+
+    FormRdbTableConfig formRdbTableConfig;
+    formRdbTableConfig.tableName = FORM_CACHE_TABLE;
+    auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
+    EXPECT_EQ(result, ERR_OK);
+    
+    int64_t formId = 1;
+    NativeRdb::ValuesBucket valuesBucket;
+    valuesBucket.PutString(FORM_ID, std::to_string(formId));
+    valuesBucket.PutString(DATA_CACHE, "dataCache");
+    valuesBucket.PutString(FORM_IMAGES, "imgCache");
+    valuesBucket.PutInt(CACHE_STATE, 0);
+    int64_t rowId;
+    bool ret = FormRdbDataMgr::GetInstance().InsertData(FORM_CACHE_TABLE, valuesBucket, rowId);
+    EXPECT_EQ(ret, true);
+
+    NativeRdb::AbsRdbPredicates absRdbPredicates(FORM_CACHE_TABLE);
+    absRdbPredicates.EqualTo(FORM_ID, std::to_string(formId));
+    auto resultSet = FormRdbDataMgr::GetInstance().QueryDataByStep(absRdbPredicates);
+    EXPECT_NE(resultSet, nullptr);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_027 end";
+}
 }
 }
