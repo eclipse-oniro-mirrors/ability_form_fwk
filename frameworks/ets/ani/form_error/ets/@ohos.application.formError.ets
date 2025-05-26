@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-declare namespace FormError {
+declare namespace formError {
   enum FormError {
     ERR_COMMON = 1,
     ERR_PERMISSION_DENY = 2,
@@ -41,4 +41,4 @@ declare namespace FormError {
   }
 }
 
-export default FormError;
+export default formError;

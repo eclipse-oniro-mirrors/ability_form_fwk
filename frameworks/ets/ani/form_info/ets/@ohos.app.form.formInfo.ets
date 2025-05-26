@@ -15,7 +15,7 @@
 
 import Want from '@ohos.app.ability.Want';
 
-declare namespace FormInfo {
+declare namespace formInfo {
   interface FormInfo {
     bundleName: string;
     moduleName: string;
@@ -183,4 +183,4 @@ declare namespace FormInfo {
   }
 }
 
-export default FormInfo;
+export default formInfo;
