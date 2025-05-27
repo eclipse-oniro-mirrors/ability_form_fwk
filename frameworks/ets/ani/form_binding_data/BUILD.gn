@@ -37,6 +37,7 @@ ohos_shared_library("formBindingData_ani") {
     "hilog:libhilog",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
+    "runtime_core:ani_helpers",
   ]
 
   subsystem_name = "ability"
