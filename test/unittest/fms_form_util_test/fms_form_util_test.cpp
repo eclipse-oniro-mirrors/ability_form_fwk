@@ -243,6 +243,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
         EXPECT_EQ(FormUtil::TestFormId28(i), i);
         EXPECT_EQ(FormUtil::TestFormId29(i), i);
         EXPECT_EQ(FormUtil::TestFormId30(i), i);
+        EXPECT_EQ(FormUtil::TestFormId31(i), i);
+        EXPECT_EQ(FormUtil::TestFormId32(i), i);
+        EXPECT_EQ(FormUtil::TestFormId33(i), i);
+        EXPECT_EQ(FormUtil::TestFormId34(i), i);
+        EXPECT_EQ(FormUtil::TestFormId35(i), i);
     }
 }
 
