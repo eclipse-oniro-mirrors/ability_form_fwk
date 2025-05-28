@@ -173,6 +173,23 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 }
 
 /**
+ * @brief Get all form data in DbCache and DB by bundleName.
+ * @param bundleName BundleName.
+ * @param userId user ID.
+ * @param formDBInfos all db form infos
+ */
+void FormDbCache::GetAllFormDBInfoByBundleName(const std::string &bundleName, const int32_t userId,
+    std::vector<FormDBInfo> &formDBInfos)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (auto dbInfo : formDBInfos_) {
+        if (bundleName == dbInfo.bundleName && dbInfo.userId == userId) {
+            formDBInfos.push_back(dbInfo);
+        }
+    }
+}
+
+/**
  * @brief Get record from DB cache with formId
  * @param formId Form data Id
  * @param record Form data
