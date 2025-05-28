@@ -21,11 +21,11 @@
 #include "cj_form_util.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_mgr_errors.h"
 #include "form_mgr.h"
+#include "form_mgr_errors.h"
+#include "ipc_skeleton.h"
 #include "napi_form_util.h"
 #include "running_form_info.h"
-#include "ipc_skeleton.h"
 #include "runtime.h"
 #include "tokenid_kit.h"
 
@@ -37,7 +37,7 @@ using namespace OHOS::AppExecFwk;
 
 const size_t MAX_SIZE = 1024;
 
-int32_t OnGetFormsInfo(CFormFilter cfilter, CArrCFormInfo* cArrformInfo)
+int32_t OnGetFormsInfo(const CFormFilter& cfilter, CArrCFormInfo* cArrformInfo)
 {
     FormInfoFilter formInfoFilter;
     formInfoFilter.moduleName = std::string(cfilter.moduleName);
@@ -46,7 +46,7 @@ int32_t OnGetFormsInfo(CFormFilter cfilter, CArrCFormInfo* cArrformInfo)
     if (ret != ERR_OK) {
         return CreateErrorByInternalErrorCode(ret);
     }
-    if (formInfos.size() < 0 || formInfos.size() > MAX_SIZE) {
+    if (formInfos.size() > MAX_SIZE) {
         return ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND;
     }
     CFormInfo* head = static_cast<CFormInfo*>(malloc(sizeof(CFormInfo) * formInfos.size()));
@@ -54,7 +54,7 @@ int32_t OnGetFormsInfo(CFormFilter cfilter, CArrCFormInfo* cArrformInfo)
         return ERR_FORM_EXTERNAL_KERNEL_MALLOC_ERROR;
     }
     uint32_t index = 0;
-    for (const auto &formInfo : formInfos) {
+    for (const auto& formInfo : formInfos) {
         head[index] = ConvertFormInfo2CFormInfo(formInfo);
         index++;
     }
@@ -66,6 +66,10 @@ int32_t OnGetFormsInfo(CFormFilter cfilter, CArrCFormInfo* cArrformInfo)
 int32_t OnSetFormNextRefreshTime(char* cFormId, int32_t time)
 {
     HILOG_DEBUG("call");
+    if (cFormId == nullptr) {
+        HILOG_ERROR("input param is nullptr");
+        return ERR_FORM_EXTERNAL_PARAM_INVALID;
+    }
     int64_t formId = 0;
     std::string strFormId = std::string(cFormId);
     if (!ConvertStringToInt64(strFormId, formId)) {
@@ -74,14 +78,19 @@ int32_t OnSetFormNextRefreshTime(char* cFormId, int32_t time)
     }
     int32_t ret = FormMgr::GetInstance().SetNextRefreshTime(formId, time);
     if (ret != ERR_OK) {
+        HILOG_ERROR("SetNextRefreshTime failed");
         return CreateErrorByInternalErrorCode(ret);
     }
     return ret;
 }
 
-int32_t OnUpdateForm(char* cFormId, CFormBindingData cFormBindingData)
+int32_t OnUpdateForm(char* cFormId, const CFormBindingData& cFormBindingData)
 {
     HILOG_DEBUG("call");
+    if (cFormId == nullptr) {
+        HILOG_ERROR("input param is nullptr");
+        return ERR_FORM_EXTERNAL_PARAM_INVALID;
+    }
     int64_t formId = 0;
     std::string strFormId = std::string(cFormId);
     if (!ConvertStringToInt64(strFormId, formId)) {
@@ -112,6 +121,7 @@ void FreeCArrCFormInfo(CArrCFormInfo* cArrformInfo)
         FreeCFormInfo((cArrformInfo->head)[i]);
     }
     free(cArrformInfo->head);
+    cArrformInfo->head = nullptr;
 }
 
 extern "C" {
@@ -153,5 +163,5 @@ CJ_EXPORT int32_t FFIFormProviderUpdateForm(char* cFormId, CFormBindingData cFor
 
 } // extern "C"
 
-}
-}
+} // namespace AbilityRuntime
+} // namespace OHOS

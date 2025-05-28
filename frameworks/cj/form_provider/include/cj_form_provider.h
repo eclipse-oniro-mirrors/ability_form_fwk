@@ -17,11 +17,12 @@
 #define CJ_FORM_PROVIDER_FFI_H
 
 #include <stdint.h>
+#include <vector>
+
 #include "ability.h"
 #include "form_info_filter.h"
 #include "form_provider_info.h"
 #include "want.h"
-#include <vector>
 
 #ifdef WINDOWS_PLATFORM
 #define CJ_EXPORT __declspec(dllexport)

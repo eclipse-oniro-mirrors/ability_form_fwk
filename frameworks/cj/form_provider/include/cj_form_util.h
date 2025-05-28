@@ -17,6 +17,8 @@
 #define CJ_FORM_UTIL_FFI_H
 
 #include <stdint.h>
+#include <vector>
+
 #include "ability.h"
 #include "form_binding_data_defination.h"
 #include "form_info.h"
@@ -24,7 +26,6 @@
 #include "form_provider_info.h"
 #include "running_form_info.h"
 #include "want.h"
-#include <vector>
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -92,13 +93,12 @@ struct CArrCFormInfo {
 
 int32_t CreateErrorByInternalErrorCode(int32_t internalErrorCode);
 char* CreateCStringFromString(const std::string& source);
-CFormInfo ConvertFormInfo2CFormInfo(FormInfo formInfo);
-void FreeCFormInfo(CFormInfo formInfo);
-bool ConvertFromDataProxies(CArrProxyData cArrProxyData, std::vector<FormDataProxy> &formDataProxies);
-bool ConvertFormDataProxy(CProxyData cProxyData, FormDataProxy &formDataProxy);
+CFormInfo ConvertFormInfo2CFormInfo(const FormInfo& formInfo);
+void FreeCFormInfo(CFormInfo& formInfo);
+bool ConvertFromDataProxies(const CArrProxyData& cArrProxyData, std::vector<FormDataProxy>& formDataProxies);
+bool ConvertFormDataProxy(const CProxyData& cProxyData, FormDataProxy& formDataProxy);
 
-}
-}
+} // namespace AbilityRuntime
+} // namespace OHOS
 
 #endif // CJ_FORM_UTIL_FFI_H
-

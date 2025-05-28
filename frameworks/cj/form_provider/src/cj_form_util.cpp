@@ -20,10 +20,10 @@
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_mgr_errors.h"
 #include "form_mgr.h"
-#include "running_form_info.h"
+#include "form_mgr_errors.h"
 #include "ipc_skeleton.h"
+#include "running_form_info.h"
 #include "runtime.h"
 #include "tokenid_kit.h"
 
@@ -60,7 +60,7 @@ char* CreateCStringFromString(const std::string& source)
     return res;
 }
 
-int32_t GetFormType(const FormInfo &formInfo)
+int32_t GetFormType(const FormInfo& formInfo)
 {
     if (formInfo.uiSyntax == FormType::ETS) {
         return static_cast<int32_t>(FormType::ETS);
@@ -68,7 +68,7 @@ int32_t GetFormType(const FormInfo &formInfo)
     return static_cast<int32_t>(formInfo.type);
 }
 
-CArrI32 ConvertArrI32(std::vector<int32_t> infos)
+CArrI32 ConvertArrI32(const std::vector<int32_t>& infos)
 {
     CArrI32 ret = { .head = nullptr, .size = 0 };
     int32_t* head = static_cast<int32_t*>(malloc(sizeof(int32_t) * infos.size()));
@@ -76,7 +76,7 @@ CArrI32 ConvertArrI32(std::vector<int32_t> infos)
         return ret;
     }
     uint32_t index = 0;
-    for (const auto &info : infos) {
+    for (const auto& info : infos) {
         head[index] = info;
         index++;
     }
@@ -85,7 +85,7 @@ CArrI32 ConvertArrI32(std::vector<int32_t> infos)
     return ret;
 }
 
-CArrUI32 ConvertArrUI32(std::vector<uint32_t> infos)
+CArrUI32 ConvertArrUI32(const std::vector<uint32_t>& infos)
 {
     CArrUI32 ret = { .head = nullptr, .size = 0 };
     uint32_t* head = static_cast<uint32_t*>(malloc(sizeof(uint32_t) * infos.size()));
@@ -93,7 +93,7 @@ CArrUI32 ConvertArrUI32(std::vector<uint32_t> infos)
         return ret;
     }
     uint32_t index = 0;
-    for (const auto &info : infos) {
+    for (const auto& info : infos) {
         head[index] = info;
         index++;
     }
@@ -102,7 +102,7 @@ CArrUI32 ConvertArrUI32(std::vector<uint32_t> infos)
     return ret;
 }
 
-CArrCFormCustomizeData ConvertArrFormCustomizeData(std::vector<FormCustomizeData> infos)
+CArrCFormCustomizeData ConvertArrFormCustomizeData(const std::vector<FormCustomizeData>& infos)
 {
     CArrCFormCustomizeData ret = { .head = nullptr, .size = 0 };
     CFormCustomizeData* head = static_cast<CFormCustomizeData*>(malloc(sizeof(CFormCustomizeData) * infos.size()));
@@ -110,7 +110,7 @@ CArrCFormCustomizeData ConvertArrFormCustomizeData(std::vector<FormCustomizeData
         return ret;
     }
     uint32_t index = 0;
-    for (const auto &info : infos) {
+    for (const auto& info : infos) {
         head[index].name = CreateCStringFromString(info.name);
         head[index].value = CreateCStringFromString(info.value);
         index++;
@@ -120,36 +120,51 @@ CArrCFormCustomizeData ConvertArrFormCustomizeData(std::vector<FormCustomizeData
     return ret;
 }
 
-void FreeCArrFormCustomizeData(CArrCFormCustomizeData infos)
+void FreeCArrFormCustomizeData(CArrCFormCustomizeData& infos)
 {
     if (infos.head == nullptr) {
         return;
     }
     for (int64_t i = 0; i < infos.size; i++) {
         free(infos.head[i].name);
+        infos.head[i].name = nullptr;
         free(infos.head[i].value);
+        infos.head[i].value = nullptr;
     }
     free(infos.head);
+    infos.head = nullptr;
 }
 
-void FreeCFormInfo(CFormInfo formInfo)
+void FreeCFormInfo(CFormInfo& formInfo)
 {
     free(formInfo.bundleName);
+    formInfo.bundleName = nullptr;
     free(formInfo.moduleName);
+    formInfo.moduleName = nullptr;
     free(formInfo.abilityName);
+    formInfo.abilityName = nullptr;
     free(formInfo.name);
+    formInfo.name = nullptr;
     free(formInfo.displayName);
+    formInfo.displayName = nullptr;
     free(formInfo.description);
+    formInfo.description = nullptr;
     free(formInfo.jsComponentName);
+    formInfo.jsComponentName = nullptr;
     free(formInfo.scheduledUpdateTime);
+    formInfo.scheduledUpdateTime = nullptr;
     free(formInfo.formConfigAbility);
+    formInfo.formConfigAbility = nullptr;
     free(formInfo.supportDimensions.head);
+    formInfo.supportDimensions.head = nullptr;
     FreeCArrFormCustomizeData(formInfo.customizeData);
     free(formInfo.supportedShapes.head);
+    formInfo.supportedShapes.head = nullptr;
     free(formInfo.previewImages.head);
+    formInfo.previewImages.head = nullptr;
 }
 
-CFormInfo ConvertFormInfo2CFormInfo(FormInfo formInfo)
+CFormInfo ConvertFormInfo2CFormInfo(const FormInfo& formInfo)
 {
     CFormInfo ret = {};
     ret.bundleName = CreateCStringFromString(formInfo.bundleName);
@@ -181,14 +196,13 @@ CFormInfo ConvertFormInfo2CFormInfo(FormInfo formInfo)
     return ret;
 }
 
-bool ConvertFromDataProxies(CArrProxyData cArrProxyData,
-    std::vector<FormDataProxy> &formDataProxies)
+bool ConvertFromDataProxies(const CArrProxyData& cArrProxyData, std::vector<FormDataProxy>& formDataProxies)
 {
-    uint32_t len = cArrProxyData.size;
     if (cArrProxyData.head == nullptr) {
         HILOG_ERROR("null head");
         return false;
     }
+    int32_t len = cArrProxyData.size;
     for (uint32_t i = 0; i < len; i++) {
         FormDataProxy formDataProxy("", "");
         CProxyData element = cArrProxyData.head[i];
@@ -201,7 +215,7 @@ bool ConvertFromDataProxies(CArrProxyData cArrProxyData,
     return true;
 }
 
-bool ConvertFormDataProxy(CProxyData cProxyData, FormDataProxy &formDataProxy)
+bool ConvertFormDataProxy(const CProxyData& cProxyData, FormDataProxy& formDataProxy)
 {
     if (cProxyData.key == nullptr || cProxyData.subscribeId == nullptr) {
         return false;
@@ -211,5 +225,5 @@ bool ConvertFormDataProxy(CProxyData cProxyData, FormDataProxy &formDataProxy)
     return true;
 }
 
-}
-}
+} // namespace AbilityRuntime
+} // namespace OHOS
