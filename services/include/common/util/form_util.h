@@ -133,6 +133,11 @@ public:
     static int TestFormId28(int &formId);
     static int TestFormId29(int &formId);
     static int TestFormId30(int &formId);
+    static int TestFormId31(int &formId);
+    static int TestFormId32(int &formId);
+    static int TestFormId33(int &formId);
+    static int TestFormId34(int &formId);
+    static int TestFormId35(int &formId);
 
     /**
      * @brief get current active account id.
