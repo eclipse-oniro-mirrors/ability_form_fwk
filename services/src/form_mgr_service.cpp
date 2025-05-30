@@ -335,9 +335,11 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     FormEventReport::SendSecondFormEvent(FormEventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+
     ret = FormMgrAdapter::GetInstance().ReleaseForm(formId, callerToken, delCache);
     HILOG_WARN("release form result:%{public}d, formId:%{public}" PRId64, ret, formId);
     return ret;
+}
 
 /**
  * @brief Update form with formId, send formId to form manager service.
