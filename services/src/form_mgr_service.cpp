@@ -288,6 +288,7 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ret = FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    HILOG_WARN("delete form result:%{public}d, formId:%{public}" PRId64, ret, formId);
     return ret;
 }
 
