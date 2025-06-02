@@ -220,7 +220,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
         API_TIME_OUT_30S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ret = FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    HILOG_WARN("no need add form timer, formId:%{public}" PRId64, formRecord.formId);
+    HILOG_WARN("no need add form timer, formId:%{public}" PRId64, formId);
     return ret;
 }
 
