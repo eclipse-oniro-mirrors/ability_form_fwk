@@ -1749,7 +1749,7 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             formRecord.isEnableUpdate, formRecord.formTempFlag);
         return ERR_OK;
     }
-    HILOG_ERROR("UpdateDBRecord failed, formId:%{public}" PRId64, formId);
+    HILOG_WARN("start, formId:%{public}" PRId64, formRecord.formId);
     if (formRecord.updateDuration > 0 && !formRecord.isDataProxy) {
         if (!FormDataMgr::GetInstance().HasFormCloudUpdateDuration(formRecord.bundleName)) {
             UpdateFormCloudUpdateDuration(formRecord.bundleName);
