@@ -256,11 +256,12 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
         std::lock_guard<std::mutex> lock(updateAtMutex_);
         std::list<UpdateAtItem>::iterator itItem;
 
-        for (itItem = updateAtTimerTasks_.begin(); itItem != updateAtTimerTasks_.end(); itItem++) {
+        for (itItem = updateAtTimerTasks_.begin(); itItem != updateAtTimerTasks_.end();) {
             if (itItem->refreshTask.formId == formId) {
                 changedItem = *itItem;
-                updateAtTimerTasks_.erase(itItem);
-                continue;
+                itItem = updateAtTimerTasks_.erase(itItem);
+            } else {
+                itItem++;
             }
         }
 
@@ -364,10 +365,12 @@ bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &ti
     {
         std::lock_guard<std::mutex> lock(updateAtMutex_);
         std::list<UpdateAtItem>::iterator itItem;
-        for (itItem = updateAtTimerTasks_.begin(); itItem != updateAtTimerTasks_.end(); itItem++) {
+        for (itItem = updateAtTimerTasks_.begin(); itItem != updateAtTimerTasks_.end();) {
             if (itItem->refreshTask.formId == formId) {
                 targetItem = *itItem;
-                updateAtTimerTasks_.erase(itItem);
+                itItem = updateAtTimerTasks_.erase(itItem);
+            } else {
+                itItem++;
             }
         }
     }
