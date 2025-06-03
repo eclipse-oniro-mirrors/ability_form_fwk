@@ -495,7 +495,7 @@ ErrCode FormMgrAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFo
 int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_WARN("formId:%{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("deleteForm invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -549,7 +549,7 @@ int FormMgrAdapter::DeleteCommonForm(const int64_t formId, const sptr<IRemoteObj
     FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
     auto ret = HandleDeleteForm(matchedFormId, callerToken);
     if (ret != ERR_OK) {
-        HILOG_ERROR("delete form failed");
+        HILOG_ERROR("delete failed, form:%{public}" PRId64, formId);
         return ret;
     }
     HILOG_DEBUG("Checks if there is a listener listening for release form");
@@ -3099,7 +3099,6 @@ int32_t FormMgrAdapter::GetCurrentUserId(const int callingUid)
 int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, int32_t &numFormsDeleted)
 {
-    HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("null callerToken");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -3114,7 +3113,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     std::map<int64_t, bool> removedFormsMap {};
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCurrentAccountId();
-
+    HILOG_WARN("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
     // delete invalid DB form record
     FormDbCache::GetInstance().DeleteInvalidDBForms(userId, callingUid, matchedFormIds, removedFormsMap);
     // delete invalid temp form record

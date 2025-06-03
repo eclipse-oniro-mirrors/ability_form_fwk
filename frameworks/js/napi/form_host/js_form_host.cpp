@@ -584,7 +584,7 @@ private:
         decltype(argc) convertArgc = 0;
         int64_t formId = 0;
         if (!ConvertFromId(env, argv[PARAM0], formId)) {
-            HILOG_ERROR("invalid formId");
+            HILOG_ERROR("OnDeleteForm invalid formId");
             NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
             return CreateJsUndefined(env);
         }
@@ -597,7 +597,7 @@ private:
 
         NapiAsyncTask::CompleteCallback complete = [formId, ret = apiResult](napi_env env,
             NapiAsyncTask &task, int32_t status) {
-            HILOG_INFO("deleteForm ret:%{public}d,formId:%{public}" PRId64, *ret, formId);
+            HILOG_WARN("deleteForm ret:%{public}d,formId:%{public}" PRId64, *ret, formId);
             if (*ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
