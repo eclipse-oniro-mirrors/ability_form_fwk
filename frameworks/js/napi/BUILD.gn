@@ -22,6 +22,11 @@ config("fmskit_config") {
 
 ################################### formbindingdata_napi ########################################
 ohos_shared_library("formbindingdata_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = []
 
   sources = [
@@ -48,6 +53,11 @@ ohos_shared_library("formbindingdata_napi") {
 }
 
 ohos_shared_library("formbindingdata") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = []
 
   sources = [
@@ -101,6 +111,11 @@ gen_js_obj("form_extension_abc") {
 }
 
 ohos_shared_library("formextension_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [ "form_extension/form_extension_module.cpp" ]
 
   configs = [ ":fmskit_config" ]
@@ -139,6 +154,11 @@ gen_js_obj("form_extension_ability_abc") {
 }
 
 ohos_shared_library("formextensionability") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [ "form_extension_ability/form_extension_ability_module.cpp" ]
 
   configs = [ ":fmskit_config" ]
@@ -177,6 +197,11 @@ gen_js_obj("form_extension_context_abc") {
 }
 
 ohos_shared_library("formextensioncontext_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [ "form_extension_context/form_extension_context_module.cpp" ]
 
   configs = [ ":fmskit_config" ]
@@ -195,6 +220,11 @@ ohos_shared_library("formextensioncontext_napi") {
 
 ################################### forminfo_napi ########################################
 ohos_shared_library("forminfo_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [ "${form_fwk_path}/interfaces/inner_api/include" ]
 
   sources = [
@@ -233,6 +263,11 @@ ohos_shared_library("forminfo_napi") {
 }
 
 ohos_shared_library("forminfo") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [ "${form_fwk_path}/interfaces/inner_api/include" ]
 
   sources = [
@@ -273,6 +308,11 @@ ohos_shared_library("forminfo") {
 
 ################################### formhost_napi ########################################
 ohos_shared_library("formhost_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = []
 
   sources = [
@@ -309,6 +349,11 @@ ohos_shared_library("formhost_napi") {
 
 ################################### formhost ########################################
 ohos_shared_library("formhost") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [ "${form_fwk_path}/interfaces/inner_api/include" ]
 
   sources = [
@@ -355,6 +400,11 @@ ohos_shared_library("formhost") {
 
 ################################### formobserver ########################################
 ohos_shared_library("formobserver") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/frameworks/js/napi/form_host",
@@ -401,6 +451,11 @@ ohos_shared_library("formobserver") {
 
 ################################### formprovider_napi ########################################
 ohos_shared_library("formprovider_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = []
 
   sources = [
@@ -436,6 +491,11 @@ ohos_shared_library("formprovider_napi") {
 }
 
 ohos_shared_library("formprovider") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = []
 
   sources = [
@@ -474,6 +534,11 @@ ohos_shared_library("formprovider") {
 
 ################################### formagent_napi ########################################
 ohos_shared_library("formagent") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = []
 
   sources = [
@@ -515,6 +580,11 @@ config("formutil_napi_public_config") {
 }
 
 ohos_shared_library("formutil_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = []
 
   public_configs = [ ":formutil_napi_public_config" ]
@@ -541,6 +611,11 @@ ohos_shared_library("formutil_napi") {
 
 ################################### formerror_napi ########################################
 ohos_shared_library("formerror_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [ "${form_fwk_napi_path}/formUtil" ]
 
   sources = [
@@ -588,6 +663,11 @@ gen_js_obj("form_edit_extension_ability_abc") {
 }
 
 ohos_shared_library("formeditextensionability_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources =
       [ "form_edit_extension_ability/form_edit_extension_ability_module.cpp" ]
 
@@ -628,6 +708,11 @@ gen_js_obj("form_edit_extension_context_abc") {
 }
 
 ohos_shared_library("formeditextensioncontext_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources =
       [ "form_edit_extension_context/form_edit_extension_context_module.cpp" ]
 
@@ -647,6 +732,11 @@ ohos_shared_library("formeditextensioncontext_napi") {
 
 ################################### gen_form_edit_extension_ability ########################################
 ohos_shared_library("form_edit_extension") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = ["form_edit_extension_context/"]
 
   sources = [
@@ -687,6 +777,11 @@ ohos_shared_library("form_edit_extension") {
 }
 
 ohos_shared_library("form_edit_extension_module") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = ["form_edit_extension_context/"]
 
   sources =
@@ -742,6 +837,11 @@ gen_js_obj("live_form_extension_ability_abc") {
 }
 
 ohos_shared_library("liveformextensionability_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources =
       [ "live_form_extension_ability/live_form_extension_ability_module.cpp" ]
 
@@ -782,6 +882,11 @@ gen_js_obj("live_form_extension_context_abc") {
 }
 
 ohos_shared_library("liveformextensioncontext_napi") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources =
       [ "live_form_extension_context/live_form_extension_context_module.cpp" ]
 
@@ -801,6 +906,11 @@ ohos_shared_library("liveformextensioncontext_napi") {
 
 ################################### gen_live_form_extension_ability ########################################
 ohos_shared_library("live_form_extension") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [ "live_form_extension_context" ]
 
   sources = [
@@ -841,6 +951,11 @@ ohos_shared_library("live_form_extension") {
 }
 
 ohos_shared_library("live_form_extension_module") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [ "live_form_extension_context" ]
 
   sources =

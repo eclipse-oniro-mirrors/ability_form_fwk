@@ -300,6 +300,11 @@ config("fmskit_public_config") {
 }
 
 ohos_shared_library("fmskit_native") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [
     ":fmskit_config",
     ":fms_idl_config",
@@ -360,6 +365,11 @@ config("fmskit_provider_public_config") {
 }
 
 ohos_shared_library("fmskit_provider_client") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":fmskit_provider_config" ]
   public_configs = [ ":fmskit_provider_public_config" ]
   sources = [ "interfaces/kits/native/src/form_provider_client.cpp" ]
