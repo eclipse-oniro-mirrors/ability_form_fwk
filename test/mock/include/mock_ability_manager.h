@@ -91,7 +91,7 @@ public:
     {
         return nullptr;
     }
-    int SendWantSender(sptr<AAFwk::IWantSender> target, const AAFwk::SenderInfo &senderInfo) override
+    int SendWantSender(sptr<AAFwk::IWantSender> target, AAFwk::SenderInfo &senderInfo) override
     {
         return 0;
     }
@@ -484,7 +484,7 @@ public:
     {
         return nullptr;
     }
-    int SendWantSender(sptr<AAFwk::IWantSender> target, const AAFwk::SenderInfo &senderInfo) override
+    int SendWantSender(sptr<AAFwk::IWantSender> target, AAFwk::SenderInfo &senderInfo) override
     {
         return 0;
     }
