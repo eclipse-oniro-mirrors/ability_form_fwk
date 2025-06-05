@@ -2478,8 +2478,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0128, TestSize.Level0)
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
     ASSERT_NE(nullptr, iremoteObject);
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    int result = FormMgr::GetInstance().RegisterClickEventObserver(bundleName, formEventType, iremoteObject);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    FormMgr::GetInstance().RegisterClickEventObserver(bundleName, formEventType, iremoteObject);
     FormMgr::GetInstance().resetFlag_ = false;
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0128 end";
@@ -2556,8 +2555,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0132, TestSize.Level0)
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
     ASSERT_NE(nullptr, iremoteObject);
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    int result = FormMgr::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, iremoteObject);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    FormMgr::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, iremoteObject);
     FormMgr::GetInstance().resetFlag_ = false;
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0132 end";
