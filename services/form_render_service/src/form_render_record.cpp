@@ -379,11 +379,11 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     }
     {
         // Some resources need to be initialized in a JS thread
-        std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
         if (!CheckEventHandler(true, formJsInfo.isDynamic)) {
             HILOG_ERROR("null eventHandler_ ");
             return RENDER_FORM_FAILED;
         }
+        std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
 
         sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
         if (formSupplyClient == nullptr) {
