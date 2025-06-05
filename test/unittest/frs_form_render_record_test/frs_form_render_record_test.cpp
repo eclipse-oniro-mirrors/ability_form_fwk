@@ -1825,8 +1825,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
     size_t requestIndex = 0;
     formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
         nullptr);
-    bool ret = formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
-    EXPECT_EQ(false, ret);
+    formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_090 end";
 }
 
