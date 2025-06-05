@@ -1404,24 +1404,28 @@ void FormTimerMgr::StartDiskUseInfoReportTimer()
         return;
     }
     auto timerOption = std::make_shared<FormTimerOption>();
-    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME)) |
+    unsigned int flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME)) |
         ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
-    timerOption->SetType(flag);
+    timerOption->SetType((int)flag);
     timerOption->SetRepeat(true);
     int64_t interval = Constants::MS_PER_DAY;
     timerOption->SetInterval(interval);
     auto timeCallback = []() { FormEventReport::SendDiskUseEvent(); };
     timerOption->SetCallbackInfo(timeCallback);
     reportDiskUseTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+    if (reportDiskUseTimerId_ <= 0) {
+        HILOG_ERROR("invalid reportDiskUseTimerId_:%{public}" PRId64 ".", reportDiskUseTimerId_);
+        return;
+    }
     int64_t timeInSec = GetBootTimeMs();
     HILOG_INFO("TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64 ".",
-        limiterTimerReportId_, timeInSec, interval);
+        reportDiskUseTimerId_, timeInSec, interval);
     int64_t startTime = timeInSec + interval;
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(reportDiskUseTimerId_,
         static_cast<uint64_t>(startTime));
     if (!bRet) {
         HILOG_ERROR("start disk use report Timer error");
-        InnerClearDiskInfoReportTimer();
+        ClearDiskInfoReportTimer();
     }
     HILOG_INFO("report disk use info  end");
 }
@@ -1459,7 +1463,7 @@ void FormTimerMgr::InnerClearIntervalReportTimer()
     HILOG_INFO("end");
 }
 
-void FormTimerMgr::InnerClearDiskInfoReportTimer()
+void FormTimerMgr::ClearDiskInfoReportTimer()
 {
     HILOG_INFO("start");
     if (reportDiskUseTimerId_ != 0L) {
