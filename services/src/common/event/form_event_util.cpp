@@ -738,7 +738,7 @@ void FormEventUtil::GetFilesSize(std::vector<std::string> &files, std::vector<st
 {
     struct stat statbuf = {0};
     uint64_t totalSize = 0;
-    for (auto& file : files) {
+    for (auto &file : files) {
         if (stat(file.c_str(), &statbuf) == 0) {
             filesSize.emplace_back(statbuf.st_size);
             totalSize += statbuf.st_size;
