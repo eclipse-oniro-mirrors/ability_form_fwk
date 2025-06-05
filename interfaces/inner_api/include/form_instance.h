@@ -63,10 +63,10 @@ struct FormInstance : public Parcelable {
 };
 
 struct Rect : public Parcelable {
-    int32_t left;
-    int32_t top;
-    int32_t width;
-    int32_t height;
+    double left;
+    double top;
+    double width;
+    double height;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

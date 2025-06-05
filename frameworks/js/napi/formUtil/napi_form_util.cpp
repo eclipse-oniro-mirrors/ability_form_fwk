@@ -611,6 +611,8 @@ napi_value CreateFunInteractionParamsDatas(napi_env env, const FormFunInteractio
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, funInteractionParamsDatas.abilityName));
     napi_set_named_property(env, objContext, "targetBundleName",
         CreateJsValue(env, funInteractionParamsDatas.targetBundleName));
+    napi_set_named_property(env, objContext, "subBundleName",
+        CreateJsValue(env, funInteractionParamsDatas.subBundleName));
     napi_set_named_property(env, objContext, "keepStateDuration",
         CreateJsValue(env, funInteractionParamsDatas.keepStateDuration));
     return objContext;
