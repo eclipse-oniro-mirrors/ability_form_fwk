@@ -2440,36 +2440,20 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
     int32_t userId = GetCurrentUserId(callingUid);
     wantToHost.SetParam(Constants::PARAM_FORM_USER_ID, userId);
 
-    ElementName elementName = want.GetElement();
-    std::string dstBundleName = elementName.GetBundleName();
-
     int32_t pageRouterServiceCode = want.GetIntParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, -1);
     HILOG_DEBUG("StartAbilityByFms pageRouterServiceCode: %{public}" PRId32, pageRouterServiceCode);
     if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
         HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
-        auto appMgrProxy = GetAppMgr();
-        if (!appMgrProxy) {
-            HILOG_ERROR("Get app mgr failed");
-            return ERR_APPEXECFWK_FORM_NOT_TRUST;
-        }
-
-        std::vector<AppExecFwk::AppStateData> curForegroundApps;
-        IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
-        bool checkFlag = false;
-        for (auto &appData : curForegroundApps) {
-            HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
-            if (appData.bundleName == dstBundleName) {
-                checkFlag = true;
-                HILOG_DEBUG("This application is a foreground program");
-                break;
-            }
-        }
-        if (!checkFlag) {
+        bool isForeground = IsForegroundApp();
+        if (!isForeground) {
             HILOG_ERROR("This application is not a foreground program");
             return ERR_APPEXECFWK_FORM_NOT_TRUST;
         }
+        HILOG_DEBUG("This application is a foreground program");
     }
 
+    ElementName elementName = want.GetElement();
+    std::string dstBundleName = elementName.GetBundleName();
     std::string dstAbilityName = elementName.GetAbilityName();
     wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
     wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);
@@ -4504,6 +4488,32 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
     return ERR_OK;
+}
+
+bool FormMgrAdapter::IsForegroundApp()
+{
+    bool checkFlag = false;
+    std::string bundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get BundleName failed");
+        return false;
+    }
+    auto appMgrProxy = GetAppMgr();
+    if (!appMgrProxy) {
+        HILOG_ERROR("Get app mgr failed");
+        return false;
+    }
+    std::vector<AppExecFwk::AppStateData> curForegroundApps;
+    IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
+    for (auto &appData : curForegroundApps) {
+        HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
+        if (appData.bundleName == bundleName) {
+            checkFlag = true;
+            break;
+        }
+    }
+    return checkFlag;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

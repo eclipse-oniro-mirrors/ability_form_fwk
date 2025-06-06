@@ -82,6 +82,7 @@
 #endif // RES_SCHEDULE_ENABLE
 #include "form_mgr/form_mgr_queue.h"
 #include "common/util/form_task_common.h"
+#include "scene_board_judgement.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1297,6 +1298,25 @@ int32_t FormMgrService::StartAbilityByFms(const Want &want)
         HILOG_ERROR("dstBundleName not self");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
+    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
+int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+ 
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+ 
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        HILOG_ERROR("capability not support");
+        return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
+    }
+    
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 

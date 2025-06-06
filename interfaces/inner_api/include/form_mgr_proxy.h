@@ -346,6 +346,13 @@ public:
     int32_t StartAbilityByFms(const Want &want) override;
 
     /**
+     * @brief Start an ability by cross bundle.
+     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+     int32_t StartAbilityByCrossBundle(const Want &want) override;
+
+    /**
      * @brief Share form by formID and deviceID.
      * @param formId Indicates the unique id of form.
      * @param deviceId Indicates the remote device ID.

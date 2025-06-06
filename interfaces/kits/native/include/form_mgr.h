@@ -470,6 +470,13 @@ public:
     int32_t StartAbilityByFms(const Want &want);
 
     /**
+     * @brief Start an ability by cross bundle.
+     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+     int32_t StartAbilityByCrossBundle(const Want &want);
+
+    /**
      * @brief Share form with formId and remote device id.
      * @param formId The Id of the forms to share.
      * @param remoteDeviceId The Id of the remote revice to share.
