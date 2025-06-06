@@ -361,7 +361,7 @@ void FormEventReport::SendDiskUseEvent()
     std::vector<std::uint64_t> filesSize;
     FormEventUtil::GetDirFiles(FORM_STORAGE_DIR_PATH, files);
     if (files.empty()) {
-        HILOG_ERROR("files or filesSize is empty, not report disk use info");
+        HILOG_ERROR("files is empty, not report disk use info");
         return;
     }    
     FormEventUtil::GetFilesSize(files, filesSize);
