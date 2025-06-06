@@ -113,26 +113,26 @@ FormInstance* FormInstance::Unmarshalling(Parcel &parcel)
 
 bool Rect::ReadFromParcel(Parcel &parcel)
 {
-    left = parcel.ReadInt32();
-    top = parcel.ReadInt32();
-    width = parcel.ReadInt32();
-    height = parcel.ReadInt32();
-    HILOG_INFO("call rect: %{public}d, %{public}d, %{public}d, %{public}d", left, top, width, height);
+    left = parcel.ReadDouble();
+    top = parcel.ReadDouble();
+    width = parcel.ReadDouble();
+    height = parcel.ReadDouble();
+    HILOG_INFO("call rect: %{public}f, %{public}f, %{public}f, %{public}f", left, top, width, height);
     return true;
 }
 
 bool Rect::Marshalling(Parcel &parcel) const
 {
-    if (!parcel.WriteInt32(left)) {
+    if (!parcel.WriteDouble(left)) {
         return false;
     }
-    if (!parcel.WriteInt32(top)) {
+    if (!parcel.WriteDouble(top)) {
         return false;
     }
-    if (!parcel.WriteInt32(width)) {
+    if (!parcel.WriteDouble(width)) {
         return false;
     }
-    if (!parcel.WriteInt32(height)) {
+    if (!parcel.WriteDouble(height)) {
         return false;
     }
     return true;
@@ -154,7 +154,7 @@ bool OverflowInfo::ReadFromParcel(Parcel &parcel)
         return false;
     }
     duration = parcel.ReadInt32();
-    HILOG_INFO("OverflowInfo, rect: %{public}d, %{public}d, %{public}d, %{public}d, duration: %{public}d",
+    HILOG_INFO("OverflowInfo, rect: %{public}f, %{public}f, %{public}f, %{public}f, duration: %{public}d",
         area.left, area.top, area.width, area.height, duration);
     return true;
 }

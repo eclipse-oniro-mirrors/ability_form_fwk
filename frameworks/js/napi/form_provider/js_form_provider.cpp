@@ -926,12 +926,12 @@ bool JsFormProvider::ConvertFormOverflowInfo(napi_env env, napi_value argv, AppE
         return false;
     }
     overflowInfo->area = area;
-    HILOG_INFO("ConvertFormOverflowInfo rect: %{public}d, %{public}d, %{public}d, %{public}d",
+    HILOG_INFO("ConvertFormOverflowInfo rect: %{public}f, %{public}f, %{public}f, %{public}f",
         area.left, area.top, area.width, area.height);
     return true;
 }
 
-bool JsFormProvider::GetAndConvertProperty(napi_env env, napi_value object, const char* propertyName, int32_t& outValue)
+bool JsFormProvider::GetAndConvertProperty(napi_env env, napi_value object, const char* propertyName, double& outValue)
 {
     napi_value propertyValue;
     napi_status status = napi_get_named_property(env, object, propertyName, &propertyValue);
