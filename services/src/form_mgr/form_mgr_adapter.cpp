@@ -1665,14 +1665,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         newRecord.formUserUids.emplace_back(callingUid);
     }
 
-    if (hasCacheData) {
-        HILOG_INFO("use cache data, formId:%{public}" PRId64 "", formId);
-        formInfo.formData = cacheData;
-        formInfo.formProviderData.SetDataString(cacheData);
-        formInfo.formProviderData.SetImageDataMap(imageDataMap);
-    }
-
-    FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formInfo);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, newRecord, formInfo);
 
     return UpdateTimer(formId, newRecord);
 }
