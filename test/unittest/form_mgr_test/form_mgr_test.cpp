@@ -4896,13 +4896,13 @@ HWTEST_F(FormMgrTest, FormMgrTest_0262, TestSize.Level1)
  * @tc.desc: Verify StartAbilityByCrossBundle
  * @tc.type: FUNC
  */
- HWTEST_F(FormMgrTest, FormMgrTest_0271, TestSize.Level1)
- {
-     GTEST_LOG_(INFO) << "FormMgrTest_0263 begin";
-     Want want;
-     ErrCode result = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
-     HILOG_INFO("FormMgrTest_0263,result: %{public}d", result);
-     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-     GTEST_LOG_(INFO) << "FormMgrTest_0263 end";
- }
+HWTEST_F(FormMgrTest, FormMgrTest_0263, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0263 begin";
+    Want want;
+    ErrCode result = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
+    HILOG_INFO("FormMgrTest_0263,result: %{public}d", result);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrTest_0263 end";
+}
 } // namespace

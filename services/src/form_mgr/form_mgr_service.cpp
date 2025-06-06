@@ -2043,9 +2043,9 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
         formInfoParam.SetParam("cardId", String::Box(std::to_string(formId)));
         formInfoParam.SetParam("formConfigAbility", String::Box(abilityName));
         wantarams.SetParam("formInfo", WantParamWrapper::Box(formInfoParam));
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_VIEW));
+        wantarams.SetParam(Constants::PARAM_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_VIEW));
     } else {
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
+        wantarams.SetParam(Constants::PARAM_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
         wantarams.SetParam(Constants::PARAM_SEC_PAGE_ABILITY_NAME, String::Box(abilityName));
     }
     wantarams.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,

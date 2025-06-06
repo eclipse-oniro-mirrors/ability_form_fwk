@@ -376,7 +376,7 @@ public:
 
     /**
      * @brief Start an ability. This function can only be called by a form extension of a system app.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @param callerToken token of the ability that initially calls this function.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -384,7 +384,7 @@ public:
 
     /**
      * @brief Start an ability by form manager service.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int32_t StartAbilityByFms(const Want &want)
@@ -394,7 +394,7 @@ public:
 
     /**
      * @brief Start an ability by cross bundle.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
      virtual int32_t StartAbilityByCrossBundle(const Want &want)

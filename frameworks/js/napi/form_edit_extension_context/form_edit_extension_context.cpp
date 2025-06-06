@@ -34,7 +34,7 @@ ErrCode FormEditExtensionContext::StartAbilityByFms(const AAFwk::Want &want)
     Want wantToHost(want);
     std::string requestMethod = "openFormEditSecPageView";
     wantToHost.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT);
-    wantToHost.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
+    wantToHost.SetParam(Constants::PARAM_REQUEST_METHOD, requestMethod);
     wantToHost.SetAction(Constants::FORM_PAGE_ACTION);
 
     TAG_LOGI(AAFwkTag::UI_EXT, "StartAbilityByFms wantToHost: %{public}s", wantToHost.ToString().c_str());
