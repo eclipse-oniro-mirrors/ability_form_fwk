@@ -348,7 +348,7 @@ private:
      * @param reply output param.
      * @return Returns ERR_OK on success, others on failure.
      */
-     int32_t HandleStartAbilityByCrossBundle(MessageParcel &data, MessageParcel &reply);
+    int32_t HandleStartAbilityByCrossBundle(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Check form manager service ready
