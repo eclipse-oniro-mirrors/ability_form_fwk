@@ -1203,12 +1203,12 @@ int32_t FormMgrStub::HandleStartAbilityByCrossBundle(MessageParcel &data, Messag
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
         HILOG_ERROR("get want failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     int32_t result = StartAbilityByCrossBundle(*want);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     return result;
 }
