@@ -474,7 +474,7 @@ public:
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
-     int32_t StartAbilityByCrossBundle(const Want &want);
+    int32_t StartAbilityByCrossBundle(const Want &want);
 
     /**
      * @brief Share form with formId and remote device id.
