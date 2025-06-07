@@ -403,9 +403,9 @@ private:
     bool IsNeedUpdate();
 
     void FormRefreshCountReport();
+    void ClearDiskInfoReportTimer();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
-    void InnerClearDiskInfoReportTimer();
     void BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want);
 
     mutable std::mutex intervalMutex_;

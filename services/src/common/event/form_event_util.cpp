@@ -707,13 +707,13 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
 
 void FormEventUtil::GetDirFiles(const std::string &path, std::vector<std::string> &files)
 {
-    std::string pathStringWithDelimiter;
     DIR *dir = opendir(path.c_str());
     if (dir == nullptr) {
         HILOG_ERROR("failed to open file: %{public}s, error: %{public}d", path.c_str(), errno);
         return;
     }
  
+    std::string pathStringWithDelimiter;
     while (true) {
         struct dirent *ptr = readdir(dir);
         if (ptr == nullptr) {
@@ -734,13 +734,11 @@ void FormEventUtil::GetDirFiles(const std::string &path, std::vector<std::string
     closedir(dir);
 }
  
-void FormEventUtil::GetFolderSize(const std::string &path, std::vector<std::string> &files,
-    std::vector<std::uint64_t> &filesSize)
+void FormEventUtil::GetFilesSize(std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize)
 {
     struct stat statbuf = {0};
-    GetDirFiles(path, files);
     uint64_t totalSize = 0;
-    for (auto& file : files) {
+    for (auto &file : files) {
         if (stat(file.c_str(), &statbuf) == 0) {
             filesSize.emplace_back(statbuf.st_size);
             totalSize += statbuf.st_size;
