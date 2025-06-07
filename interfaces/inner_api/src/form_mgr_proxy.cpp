@@ -1543,12 +1543,12 @@ int32_t FormMgrProxy::StartAbilityByCrossBundle(const Want &want)
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     // write in want
     if (!data.WriteParcelable(&want)) {
         HILOG_ERROR("write want failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     // send request.
     MessageParcel reply;
@@ -1560,7 +1560,7 @@ int32_t FormMgrProxy::StartAbilityByCrossBundle(const Want &want)
         option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return error;
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     // retrieve and return result.
     return reply.ReadInt32();
