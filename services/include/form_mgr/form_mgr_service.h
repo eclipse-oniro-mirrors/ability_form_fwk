@@ -419,7 +419,7 @@ public:
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
-     int32_t StartAbilityByCrossBundle(const Want &want) override;
+    int32_t StartAbilityByCrossBundle(const Want &want) override;
 
     /**
      * @brief Share form by formID and deviceID.
