@@ -391,7 +391,7 @@ napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t arg
     want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
     want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
                   AppExecFwk::Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-    const std::string key = AppExecFwk::Constants::PARAM_REQUEST_METHOD;
+    const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
     const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
     want.SetParam(key, value);
     HILOG_DEBUG("JsFormProvider OnOpenFormManagerCrossBundle want:%{public}s", want.ToString().c_str());
