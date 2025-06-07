@@ -112,6 +112,12 @@ namespace Constants {
     constexpr const char* RECYCLE_FORMS_USER_ID = "ohos.extra.param.key.recycle_forms_user_id";
     constexpr const char* PARAM_APP_CLONE_INDEX_KEY = "ohos.extra.param.key.appCloneIndex";
 
+    // live form support type
+    constexpr const char* LIVE_FORM_NONE = "0";
+    constexpr const char* FUN_INTERACTION = "1";
+    constexpr const char* SCENE_ANIMATION = "2";
+    constexpr const char* LIVE_FORM_BOTH = "3";
+
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
     constexpr int32_t FORM_VISIBLE = 1;
