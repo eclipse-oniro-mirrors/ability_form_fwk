@@ -82,6 +82,7 @@
 #endif // RES_SCHEDULE_ENABLE
 #include "form_mgr/form_mgr_queue.h"
 #include "common/util/form_task_common.h"
+#include "scene_board_judgement.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1300,6 +1301,25 @@ int32_t FormMgrService::StartAbilityByFms(const Want &want)
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 
+int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+ 
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+ 
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        HILOG_ERROR("capability not support");
+        return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
+    }
+    
+    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
 void FormMgrService::InitFormShareMgrSerialQueue()
 {
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(serialQueue_);
@@ -2023,9 +2043,9 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
         formInfoParam.SetParam("cardId", String::Box(std::to_string(formId)));
         formInfoParam.SetParam("formConfigAbility", String::Box(abilityName));
         wantarams.SetParam("formInfo", WantParamWrapper::Box(formInfoParam));
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_VIEW));
+        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_VIEW));
     } else {
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
+        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
         wantarams.SetParam(Constants::PARAM_SEC_PAGE_ABILITY_NAME, String::Box(abilityName));
     }
     wantarams.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,

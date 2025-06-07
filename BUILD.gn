@@ -247,6 +247,7 @@ ohos_shared_library("libfms") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libwsutils",
   ]
 
   if (cite_memmgr) {

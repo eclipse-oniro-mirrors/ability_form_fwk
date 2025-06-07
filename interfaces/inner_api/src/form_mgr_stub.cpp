@@ -308,6 +308,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleUnregisterChangeSceneAnimationStateProxy(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHANGE_SCENE_ANIMATION_STATE):
             return HandleChangeSceneAnimationState(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY_BY_CROSS_BUNDLE):
+            return HandleStartAbilityByCrossBundle(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1190,6 +1192,23 @@ int32_t FormMgrStub::HandleStartAbilityByFms(MessageParcel &data, MessageParcel 
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleStartAbilityByCrossBundle(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    // retrieve want
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+    }
+    int32_t result = StartAbilityByCrossBundle(*want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     return result;
 }

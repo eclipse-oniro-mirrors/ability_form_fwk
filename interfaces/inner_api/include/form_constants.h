@@ -29,6 +29,7 @@ namespace Constants {
     constexpr const char* PERMISSION_OBSERVE_FORM_RUNNING = "ohos.permission.OBSERVE_FORM_RUNNING";
     constexpr const char* PERMISSION_START_ABILITIES_FROM_BACKGROUND =
         "ohos.permission.START_ABILITIES_FROM_BACKGROUND";
+    constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE = "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
     constexpr const char* PARAM_MODULE_NAME_KEY = "ohos.extra.param.key.module_name";
@@ -73,8 +74,8 @@ namespace Constants {
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_CONTROL_CENTER = 2;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;
     constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
-    constexpr const char* PARMA_OPEN_FORM_EDIT_VIEW = "openFormEditView";
-    constexpr const char* PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
+    constexpr const char* PARAM_OPEN_FORM_EDIT_VIEW = "openFormEditView";
+    constexpr const char* PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
     constexpr const char* PARAM_PAGE_ROUTER_SERVICE_CODE = "pageRouterServiceCode";
     constexpr const char* PARAM_SEC_PAGE_ABILITY_NAME = "secPageAbilityName";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";

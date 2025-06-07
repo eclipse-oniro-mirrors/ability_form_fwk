@@ -376,7 +376,7 @@ public:
 
     /**
      * @brief Start an ability. This function can only be called by a form extension of a system app.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @param callerToken token of the ability that initially calls this function.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -384,13 +384,23 @@ public:
 
     /**
      * @brief Start an ability by form manager service.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int32_t StartAbilityByFms(const Want &want)
     {
         return 0;
     }
+
+    /**
+     * @brief Start an ability by cross bundle.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+     virtual int32_t StartAbilityByCrossBundle(const Want &want)
+     {
+         return 0;
+     }
 
     /**
      * @brief Share form by formID and deviceID.
@@ -913,6 +923,7 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_EXEMPT,
         FORM_MGR_NOTIFY_FORM_LOCKED,
         FORM_MGR_START_ABILITY_BY_FMS,
+        FORM_MGR_START_ABILITY_BY_CROSS_BUNDLE,
         FORM_MGR_GET_PUBLISHED_FORM_INFOS,
         FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
         FORM_MGR_OPEN_FORM_EDIT_ABILITY,

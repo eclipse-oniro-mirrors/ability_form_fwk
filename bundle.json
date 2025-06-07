@@ -72,7 +72,8 @@
               "dmsfwk",
               "huks",
               "selinux_adapter",
-              "openssl"
+              "openssl",
+              "window_manager"
 
           ],
           "third_party": [

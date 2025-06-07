@@ -1329,6 +1329,8 @@ private:
 
     std::map<int, std::vector<int64_t>> conditionUpdateFormMap;
 
+    bool IsForegroundApp();
+
     sptr<IRemoteObject> overflowCallerToken_;
 
     sptr<IRemoteObject> sceneanimationCallerToken_;

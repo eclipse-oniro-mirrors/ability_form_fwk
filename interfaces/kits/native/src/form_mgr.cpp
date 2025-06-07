@@ -1294,6 +1294,27 @@ int32_t FormMgr::StartAbilityByFms(const Want &want)
     return remoteProxy_->StartAbilityByFms(want);
 }
 
+int32_t FormMgr::StartAbilityByCrossBundle(const Want &want)
+{
+    HILOG_DEBUG("call");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+    }
+    auto ret = remoteProxy_->StartAbilityByCrossBundle(want);
+    if (ret == ERR_APPEXECFWK_FORM_NOT_TRUST) {
+        return ERR_FORM_EXTERNAL_PERMISSION_DENIED;
+    } else if (ret == ERR_APPEXECFWK_FORM_GET_HOST_FAILED || ret == ERR_APPEXECFWK_FORM_COMMON_CODE) {
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+    }
+    return ret;
+}
+
 int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId,
     const sptr<IRemoteObject> &callerToken, int64_t requestCode)
 {
