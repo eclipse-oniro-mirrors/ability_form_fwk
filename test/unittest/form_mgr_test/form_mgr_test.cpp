@@ -4902,7 +4902,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0263, TestSize.Level1)
     Want want;
     ErrCode result = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
     HILOG_INFO("FormMgrTest_0263,result: %{public}d", result);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED);
     GTEST_LOG_(INFO) << "FormMgrTest_0263 end";
 }
 } // namespace
