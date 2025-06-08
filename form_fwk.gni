@@ -17,6 +17,7 @@ ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 ability_runtime_native_path = "${ability_runtime_path}/frameworks/native"
 ability_runtime_services_path = "${ability_runtime_path}/services"
 ability_runtime_napi_path = "${ability_runtime_path}/frameworks/js/napi"
+form_fwk_ani_path = "//foundation/ability/form_fwk/frameworks/ets/ani"
 ability_dmsfwk_path = "//foundation/ability/dmsfwk"
 
 access_token_path = "//base/security/access_token"
