@@ -104,7 +104,7 @@ const std::string FORM_CLICK_ROUTER = "router";
 const std::string FORM_CLICK_MESSAGE = "message";
 const std::string FORM_CLICK_CALL = "call";
 const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
-const std::string FORM_SUPPORT_LIVE = "persist.sys.fms.supprot.liveForm";
+const std::string FORM_SUPPORT_LIVE = "persist.sys.fms.support.liveForm";
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 enum class AddFormTaskType : int64_t {
@@ -4437,10 +4437,9 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    // check whether CCM config is support live form
-    std::string supportLive = OHOS::system::GetParameter(FORM_SUPPORT_LIVE, "false");
-    if (supportLive == "false") {
-        HILOG_ERROR("fms not support live form");
+    std::string supportLiveForm = OHOS::system::GetParameter(FORM_SUPPORT_LIVE, Constants::LIVE_FORM_NONE);
+    if (supportLiveForm != Constants::SCENE_ANIMATION && supportLiveForm != Constants::LIVE_FORM_BOTH) {
+        HILOG_ERROR("fms not support sceneAnimation of live form, support %{public}s", supportLiveForm.c_str());
         return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
     }
 
