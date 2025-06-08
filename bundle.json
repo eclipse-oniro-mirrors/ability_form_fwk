@@ -68,6 +68,7 @@
               "jsoncpp",
               "libxml2",
               "config_policy",
+	      "runtime_core",
               "device_manager",
               "dmsfwk",
               "huks",
