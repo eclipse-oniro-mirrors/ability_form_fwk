@@ -524,6 +524,16 @@ group("form_napi_packages") {
   }
 }
 
+group("form_ani_packages") {                                                                                                                                                              
+  deps = []
+  if (ability_runtime_graphics) {
+    deps += [
+      "${form_fwk_ani_path}/form_binding_data:formBindingData_ani",
+      "${form_fwk_ani_path}/form_binding_data:form_binding_data_etc",
+    ]
+  }
+}
+
 group("fms_innerkits_target") {
   if (ability_runtime_graphics) {
     deps = [ ":form_manager" ]
