@@ -425,7 +425,7 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos)
 {
-    HILOG_INFO("formInfo num: %{public}u,formDBInfo num: %{public}u", inFormInfos.size(), formDBInfos.size());
+    HILOG_INFO("formInfo num: %{public}zu,formDBInfo num: %{public}zu", inFormInfos.size(), formDBInfos.size());
     std::set<std::string> formDBNames;
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
     if (formDBNames.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
@@ -475,7 +475,7 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
             }
         }
     }
-    HILOG_INFO("used form num: %{public}u", formDBNames.size());
+    HILOG_INFO("used form num: %{public}zu", formDBNames.size());
 }
 
 FormInfoMgr::FormInfoMgr()
