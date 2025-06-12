@@ -761,7 +761,6 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
         bool isHandleClickEvent = false;
         HandleRecoverForm(formJsInfo, statusData, isHandleClickEvent);
-        UpdateRenderer(formJsInfo);
     }
 }
 
@@ -1692,6 +1691,8 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
         groupRequest.want = recordRequest.want;
         groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
         MergeMap(groupRequest.formJsInfo.imageDataMap, formJsInfo.imageDataMap);
+        // merge the latest provider data when recover form
+        MergeFormData(groupRequest, formJsInfo);
         if (compId == currentCompId) {
             groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
@@ -1740,7 +1741,8 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
         HILOG_INFO("execute recover form task");
         formRendererGroup->RecoverRenderer(groupRequests, currentRequestIndex);
     };
-    eventHandler_->PostTask(task, "RecoverRenderer");
+    // the formrenderer_ must be initialized using a sync task
+    eventHandler_->PostSyncTask(task, "RecoverRenderer");
     HILOG_INFO("recover renderer, formId:%{public}" PRId64, currentRequest.formJsInfo.formId);
     return true;
 }
