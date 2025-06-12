@@ -882,6 +882,13 @@ public:
      */
     bool GetFormCanUpdate(int64_t formId);
 
+    /**
+     * @brief Get all formRecord by userId.
+     * @param userId User ID.
+     * @param formRecords The list of formRecord.
+     */
+    void GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords);
+
 private:
     /**
      * @brief Create form record.

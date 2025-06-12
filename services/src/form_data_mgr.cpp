@@ -2950,5 +2950,16 @@ bool FormDataMgr::GetFormCanUpdate(int64_t formId)
     }
     return search->second;
 }
+
+void FormDataMgr::GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto formRecord : formRecords_) {
+        if (formRecord.second.userId == userId) {
+            formRecords.emplace_back(formRecord.second);
+        }
+    }
+    HILOG_INFO("userId:%{public}d, size:%{public}zu", userId, formRecords.size());
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
