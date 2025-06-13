@@ -53,11 +53,12 @@ std::string ParamReader::GetPathVersion(const std::string &path)
         HILOG_ERROR("path is empty, return default version");
         return Constants::FMC_DEFAULT_VERSION;
     }
-    char canonicalPath[PATH_MAX + 1] = { '\0' };
+    char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath((path + Constants::VERSION_FILE_NAME).c_str(), canonicalPath) == nullptr) {
         HILOG_ERROR("canonicalPath is null, return default version");
         return Constants::FMC_DEFAULT_VERSION;
     }
+    canonicalPath[PATH_MAX - 1] = '\0';
     std::ifstream file(canonicalPath);
     if (!file.good()) {
         HILOG_ERROR("VersionFilePath is not good");
@@ -115,11 +116,12 @@ bool ParamReader::VerifyParamFile(const std::string &fileName)
 std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
 {
     std::string paramInfo;
-    char canonicalPath[PATH_MAX + 1] = { '\0' };
+    char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath(filePathStr.c_str(), canonicalPath) == nullptr) {
         HILOG_ERROR("canonicalPath is null");
         return paramInfo;
     }
+    canonicalPath[PATH_MAX - 1] = '\0';
     std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
     if (!file.good()) {
         HILOG_ERROR("Failed to open the file!");

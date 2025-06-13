@@ -149,11 +149,12 @@ std::tuple<int, std::string> SignTools::CalcFileSha256Digest(const std::string &
 
 int SignTools::ForEachFileSegment(const std::string &fpath, std::function<void(char *, size_t)> executor)
 {
-    char canonicalPath[PATH_MAX + 1] = { '\0' };
+    char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath(fpath.c_str(), canonicalPath) == nullptr) {
         HILOG_ERROR("canonicalPath is null");
         return errno;
     }
+    canonicalPath[PATH_MAX - 1] = '\0';
     std::unique_ptr<FILE, decltype(&fclose)> filp = { fopen(canonicalPath, "r"), fclose };
     if (!filp) {
         return errno;
