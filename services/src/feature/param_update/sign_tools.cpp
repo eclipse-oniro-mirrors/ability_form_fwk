@@ -23,6 +23,7 @@
 #include <openssl/rsa.h> // rsa
 #include <sstream>       // stringstream
 #include <cstdlib>
+#include <climits>
 
 #include "common/util/file_utils.h"
 #include "fms_log_wrapper.h"
@@ -111,13 +112,12 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
 std::string SignTools::GetfileStream(const std::string &filepath)
 {
     std::string fileString;
-    char *canonicalPath = realpath(filepath.c_str(), nullptr);
-    if (canonicalPath == nullptr) {
+    char canonicalPath[PATH_MAX + 1] = { '\0' };
+    if (realpath(filepath.c_str(), canonicalPath) == nullptr) {
         HILOG_ERROR("canonicalPath is null");
         return fileString;
     }
     std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
-    free(canonicalPath);
     if (!file.good()) {
         HILOG_ERROR("Failed to open the file!");
         return fileString;
@@ -148,13 +148,12 @@ std::tuple<int, std::string> SignTools::CalcFileSha256Digest(const std::string &
 
 int SignTools::ForEachFileSegment(const std::string &fpath, std::function<void(char *, size_t)> executor)
 {
-    char *canonicalPath = realpath(fpath.c_str(), nullptr);
-    if (canonicalPath == nullptr) {
+    char canonicalPath[PATH_MAX + 1] = { '\0' };
+    if (realpath(fpath.c_str(), canonicalPath) == nullptr) {
         HILOG_ERROR("canonicalPath is null");
         return errno;
     }
     std::unique_ptr<FILE, decltype(&fclose)> filp = { fopen(canonicalPath, "r"), fclose };
-    free(canonicalPath);
     if (!filp) {
         return errno;
     }
