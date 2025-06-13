@@ -189,6 +189,10 @@ public:
      * @return Returns true on success, false on failure.
      */
     bool UpdateDynamicAlarm();
+    /**
+     * @brief per 24h report disk use info.
+     */
+    void StartDiskUseInfoReportTimer();
 
 #ifdef RES_SCHEDULE_ENABLE
     /**
@@ -399,6 +403,7 @@ private:
     bool IsNeedUpdate();
 
     void FormRefreshCountReport();
+    void ClearDiskInfoReportTimer();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
     void BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want);
@@ -419,6 +424,7 @@ private:
     uint64_t dynamicAlarmTimerId_ = 0L;
     uint64_t limiterTimerId_ = 0L;
     uint64_t limiterTimerReportId_ = 0L;
+    uint64_t reportDiskUseTimerId_ = 0L;
 
     mutable std::mutex currentLimiterWantAgentMutex_;
     mutable std::mutex currentUpdateWantAgentMutex_;

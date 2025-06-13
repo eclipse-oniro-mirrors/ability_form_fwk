@@ -21,7 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -59,7 +59,7 @@ void FormMsgEventConnection::OnAbilityConnectDone(
     std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);
     Want eventWant = Want(want_);
     eventWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, eventWant, remoteObject);
+    FormProviderTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, eventWant, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

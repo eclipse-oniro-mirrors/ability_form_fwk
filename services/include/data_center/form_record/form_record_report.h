@@ -37,9 +37,6 @@ enum HiSysEventPointType {
 };
 
 struct FormRecordReportInfo {
-    std::string bundleName;
-    std::string moduleName;
-    std::string formName;
     int32_t dailyRefreshTimes;
     int32_t invisibleRefreshTimes;
     int32_t hfRefreshBlockTimes;

@@ -17,7 +17,7 @@
 #define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_FREE_INSTALL_OPERATOR_H
 
 #include "common/event/form_event_handler.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "feature/free_install/free_install_status_callback_stub.h"
 
 namespace OHOS {

@@ -16,6 +16,8 @@
 #include "common/event/form_event_util.h"
 
 #include <regex>
+#include <dirent.h>
+#include "directory_ex.h"
 
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
@@ -30,7 +32,6 @@
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "form_provider/form_provider_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -81,7 +82,7 @@ void FormEventUtil::HandleUpdateFormCloud(const std::string &bundleName)
 
 void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         return;
@@ -124,7 +125,8 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         } else {
             FormDbCache::GetInstance().DeleteFormInfo(formId);
         }
-        HILOG_INFO("form %{public}s deleted", formRecord.formName.c_str());
+        HILOG_WARN(
+            "delete form record, formName:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
         removedForms.emplace_back(formId);
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
         FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
@@ -143,7 +145,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    FormTaskMgr::GetInstance().PostDelayRefreshForms(updatedForms, want);
+    FormProviderMgr::GetInstance().DelayRefreshForms(updatedForms, want);
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
 
@@ -161,8 +163,7 @@ void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, i
 
 void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const int32_t userId)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d",
-        bundleName.c_str(), userId);
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     // clean removed form in DB
     std::set<int64_t> removedForms;
     std::vector<FormDBInfo> removedDBForm;
@@ -193,7 +194,7 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
 
 void FormEventUtil::HandleBundleDataCleared(const std::string &bundleName, int32_t userId)
 {
-    HILOG_DEBUG("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     // clear dynamic form info
     FormInfoMgr::GetInstance().RemoveAllDynamicFormsInfo(bundleName, userId);
 
@@ -702,6 +703,48 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
+}
+
+void FormEventUtil::GetDirFiles(const std::string &path, std::vector<std::string> &files)
+{
+    DIR *dir = opendir(path.c_str());
+    if (dir == nullptr) {
+        HILOG_ERROR("failed to open file: %{public}s, error: %{public}d", path.c_str(), errno);
+        return;
+    }
+ 
+    std::string pathStringWithDelimiter;
+    while (true) {
+        struct dirent *ptr = readdir(dir);
+        if (ptr == nullptr) {
+            HILOG_INFO("The file has been traversed");
+            break;
+        }
+ 
+        // current dir OR parent dir
+        if ((strcmp(ptr->d_name, ".") == 0) || (strcmp(ptr->d_name, "..") == 0)) {
+            continue;
+        } else if (ptr->d_type == DT_DIR) {
+            pathStringWithDelimiter = IncludeTrailingPathDelimiter(path) + std::string(ptr->d_name);
+            GetDirFiles(pathStringWithDelimiter, files);
+        } else {
+            files.push_back(IncludeTrailingPathDelimiter(path) + std::string(ptr->d_name));
+        }
+    }
+    closedir(dir);
+}
+ 
+void FormEventUtil::GetFilesSize(std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize)
+{
+    struct stat statbuf = {0};
+    uint64_t totalSize = 0;
+    for (auto &file : files) {
+        if (stat(file.c_str(), &statbuf) == 0) {
+            filesSize.emplace_back(statbuf.st_size);
+            totalSize += statbuf.st_size;
+        }
+    }
+    filesSize.emplace_back(totalSize);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

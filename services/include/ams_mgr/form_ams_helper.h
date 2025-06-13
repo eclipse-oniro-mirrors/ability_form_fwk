@@ -21,7 +21,7 @@
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
 #include "common/event/form_event_handler.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "iconfiguration_observer.h"
 #include "uri.h"
 
@@ -38,14 +38,6 @@ class FormAmsHelper final : public DelayedRefSingleton<FormAmsHelper> {
     DECLARE_DELAYED_REF_SINGLETON(FormAmsHelper)
 public:
     DISALLOW_COPY_AND_MOVE(FormAmsHelper);
-    /**
-     * @brief SetEventHandler.
-     * @param handler event handler
-     */
-    inline void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
-    {
-        serialQueue_ = serialQueue;
-    }
     /**
      * @brief acquire a form ability manager if it not existed,
      * @return returns the ability manager ipc object or nullptr for failed.
@@ -117,7 +109,6 @@ private:
     void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
-    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     sptr<IConfigurationObserver> configurationObserver = nullptr;
 };
 }  // namespace AppExecFwk

@@ -33,7 +33,7 @@
 #include "form_info.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"
 #include "running_form_info.h"
 #undef private
@@ -133,7 +133,7 @@ void FmsFormShareMgrTest::TearDownTestCase()
 void FmsFormShareMgrTest::SetUp()
 {
     formyMgrServ_->OnStart();
-    DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_ = std::make_shared<FormDistributedClient>();
+    DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_ = std::make_unique<FormDistributedClient>();
     DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_->SetDmsProxy(dmsSerice->AsObject());
     token_ = new (std::nothrow) MockFormHostClient();
 
@@ -1974,7 +1974,6 @@ HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormAmsHelper_0003 start";
     FormAmsHelper formAmsHelper;
-    formAmsHelper.SetSerialQueue(nullptr);
     sptr<AAFwk::IAbilityConnection> connect = nullptr;
     formAmsHelper.DisconnectServiceAbilityDelay(connect);
     GTEST_LOG_(INFO) << "FormAmsHelper_0003 end";

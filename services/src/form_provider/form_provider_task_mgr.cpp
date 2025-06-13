@@ -13,11 +13,14 @@
  * limitations under the License.
  */
 
-#include "form_provider_task_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "form_provider_interface.h"
-#include "form_mgr_service_queue.h"
-#include "form_mgr_adapter.h"
-#include "form_supply_callback.h"
+#include "form_mgr/form_mgr_adapter.h"
+#include "form_provider/form_supply_callback.h"
+#include "form_provider/form_provider_queue.h"
+#include "data_center/form_data_mgr.h"
+#include "common/util/form_report.h"
+#include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -38,9 +41,27 @@ void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want
     HILOG_DEBUG("call");
 
     auto acquireProviderFormInfoFunc = [formId, want, remoteObject]() {
-        FormMgrAdapter::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
+        FormProviderTaskMgr::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireProviderFormInfoFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireProviderFormInfoFunc);
+}
+
+/**
+ * @brief Refresh form location data from form provider(task).
+ *
+ * @param formId The Id of the form.
+ * @param want The want of the form.
+ * @param remoteObject Form provider proxy object.
+ * @return none.
+ */
+void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("Call.");
+    auto notifyFormLocationUpdateFunc = [formId, want, remoteObject]() {
+        FormProviderTaskMgr::GetInstance().NotifyFormLocationUpdate(formId, want, remoteObject);
+    };
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormLocationUpdateFunc);
 }
 
 /**
@@ -59,7 +80,7 @@ void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want
     auto notifyFormUpdateFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyFormUpdate(formId, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormUpdateFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormUpdateFunc);
 }
 
 /**
@@ -74,9 +95,9 @@ void FormProviderTaskMgr::PostDeleteTask(const int64_t formId, const Want &want,
     HILOG_DEBUG("call");
 
     auto notifyFormDeleteFunc = [formId, want, remoteObject]() {
-        FormMgrAdapter::GetInstance().NotifyFormDelete(formId, want, remoteObject);
+        FormProviderTaskMgr::GetInstance().NotifyFormDelete(formId, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormDeleteFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormDeleteFunc);
 }
 
 /**
@@ -93,7 +114,7 @@ void FormProviderTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds
     auto batchDeleteFunc = [&formIds, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().ProviderBatchDelete(formIds, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchDeleteFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchDeleteFunc);
 }
 
 /**
@@ -112,7 +133,7 @@ void FormProviderTaskMgr::PostCastTempTask(const int64_t formId, const Want &wan
     auto notifyCastTempFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyCastTemp(formId, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyCastTempFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, notifyCastTempFunc);
 }
 
 /**
@@ -130,7 +151,7 @@ void FormProviderTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::s
     auto acquireStateFunc = [wantArg, provider, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().AcquireState(wantArg, provider, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireStateFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireStateFunc);
 }
 
 /**
@@ -147,7 +168,7 @@ void FormProviderTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &
     auto acquireDataFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().AcquireFormData(formId, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireDataFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, acquireDataFunc);
 }
 
 /**
@@ -165,7 +186,55 @@ void FormProviderTaskMgr::PostFormEventTask(const int64_t formId, const std::str
     auto formEventFunc = [formId, message, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().FireFormEvent(formId, message, want, remoteObject);
     };
-    FormMgrServiceQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, formEventFunc);
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, formEventFunc);
+}
+
+/**
+ * @brief Post event notify to form provider.
+ * @param formEvent The vector of form ids.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param want The want of the form.
+ * @param remoteObject The form provider proxy object.
+ */
+void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEvent, const int32_t formVisibleType,
+    const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("call");
+
+    auto eventNotifyFunc = [formEvent, formVisibleType, want, remoteObject]() {
+        FormProviderTaskMgr::GetInstance().EventNotify(formEvent, formVisibleType, want, remoteObject);
+    };
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, eventNotifyFunc);
+}
+
+/**
+ * @brief Acquire provider formInfo.
+ * @param formId The Id of the from.
+ * @param want The want of the form.
+ * @param remoteObject Form provider proxy object.
+ * @return none.
+ */
+void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("get formProviderProxy failed");
+        return;
+    }
+    FormRecord formRecord;
+    FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    FormJsInfo formJsInfo;
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
+    int error = formProviderProxy->AcquireProviderFormInfo(formJsInfo, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("fail acquire providerFormInfo");
+    }
+    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
 }
 
 /**
@@ -192,6 +261,31 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail notify form update");
+    }
+}
+
+/**
+ * @brief Post provider delete.
+ * @param formIds The Id list.
+ * @param want The want of the request.
+ * @param remoteObject Form provider proxy object.
+ */
+void FormProviderTaskMgr::NotifyFormDelete(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        HILOG_ERROR("get formProviderProxy failed");
+        RemoveConnection(connectId);
+        return;
+    }
+    int error = formProviderProxy->NotifyFormDelete(formId, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail NotifyFormDelete");
+        RemoveConnection(connectId);
     }
 }
 
@@ -338,6 +432,33 @@ void FormProviderTaskMgr::FireFormEvent(const int64_t formId, const std::string 
     }
 }
 
+/**
+ * @brief Event notify to form provider.
+ * @param formEvents The vector of form ids.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param want The want of the form.
+ * @param remoteObject The form provider proxy object.
+ */
+void FormProviderTaskMgr::EventNotify(const std::vector<int64_t> &formEvents, const int32_t formVisibleType,
+    const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("get formProviderProxy failed");
+        return;
+    }
+
+    int error = formProviderProxy->EventNotify(formEvents, formVisibleType, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("fail send event notify");
+    }
+}
+
 void FormProviderTaskMgr::RemoveConnection(int32_t connectId)
 {
     auto formSupplyCallback = FormSupplyCallback::GetInstance();
@@ -346,6 +467,53 @@ void FormProviderTaskMgr::RemoveConnection(int32_t connectId)
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
+}
+
+void FormProviderTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
+    const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("get formProviderProxy failed");
+        return;
+    }
+
+    int error = formProviderProxy->NotifyConfigurationUpdate(configuration, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("acquire providerFormInfo failed");
+    }
+}
+
+void FormProviderTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
+{
+    HILOG_INFO("Call.");
+    auto batchConfigurationUpdate = [configuration]() {
+        return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
+    };
+    HILOG_INFO("end");
+}
+
+void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("get formProviderProxy failed");
+        return;
+    }
+    int error = formProviderProxy->NotifyFormLocationUpdate(formId, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("fail notify form update");
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

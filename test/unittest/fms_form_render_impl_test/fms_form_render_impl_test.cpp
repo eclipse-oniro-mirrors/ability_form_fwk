@@ -553,7 +553,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_022, TestSize.Level0)
     int64_t formId{ -1 };
     std::string compId{ "1" };
     std::string uid{ "202410101010" };
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderImplTest_022 end";
 }
 
@@ -570,7 +570,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_023, TestSize.Level0)
     int64_t formId{ 15 };
     std::string compId{ "" };
     std::string uid{ "202410101010" };
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderImplTest_023 end";
 }
 
@@ -587,7 +587,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_024, TestSize.Level0)
     int64_t formId{ 15 };
     std::string compId{ "15" };
     std::string uid{ "" };
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderImplTest_024 end";
 }
 

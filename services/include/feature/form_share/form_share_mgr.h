@@ -25,7 +25,7 @@
 #include "common/event/form_event_handler.h"
 #include "feature/form_share/form_free_install_operator.h"
 #include "data_center/form_info/form_item_info.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "form_share_info.h"
 
 namespace OHOS {
@@ -151,7 +151,7 @@ private:
 private:
     DECLARE_DELAYED_SINGLETON(FormShareMgr);
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
-    std::shared_ptr<FormDistributedClient> formDmsClient_ = nullptr;
+    std::unique_ptr<FormDistributedClient> formDmsClient_ = nullptr;
     // map for <formShareInfoKey, FormShareInfo>
     std::map<std::string, FormShareInfo> shareInfo_;
     // map for <eventId, formShareInfoKey>

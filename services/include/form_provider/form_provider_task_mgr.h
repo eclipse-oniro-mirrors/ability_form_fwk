@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_PROVIDER_TASK_MGR_H
 
 #include <singleton.h>
+#include "configuration.h"
 #include "iremote_object.h"
 #include "want.h"
 
@@ -86,7 +87,7 @@ public:
 
     /**
     * @brief Post acquire data to form provider.
-    * @param formId The Id of the from.
+    * @param formId The Id of the form.
     * @param want The want of the request.
     * @param remoteObject Form provider proxy object.
     */
@@ -94,7 +95,7 @@ public:
 
     /**
      * @brief Post message event to form provider.
-     * @param formId The Id of the from.
+     * @param formId The Id of the form.
      * @param message Event message.
      * @param want The want of the request.
      * @param remoteObject Form provider proxy object.
@@ -102,14 +103,66 @@ public:
     void PostFormEventTask(const int64_t formId, const std::string &message, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
 
+    /**
+     * @brief Post event notify to form provider.
+     * @param formEvent The vector of form ids.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     * @param want The want of the form.
+     * @param remoteObject The form provider proxy object.
+     */
+    void PostEventNotifyTask(const std::vector<int64_t> &formEvent, const int32_t formVisibleType, const Want &want,
+        const sptr<IRemoteObject> &remoteObject);
+    /**
+     * @brief notify forms ability when configuration update.
+     * @param configuration system configuration.
+     * @param want The want of the request.
+     */
+    void NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
+        const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief notify configuration update to form provider(task).
+     *
+     * @param formId The Id of the form.
+     * @param want The want of the form.
+     * @param remoteObject Form provider proxy object.
+     * @return none.
+     */
+    void PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration);
+    
+    /**
+    * @brief Refresh form location data from form provider(task).
+    *
+    * @param formId The Id of the form.
+    * @param want The want of the form.
+    * @param remoteObject Form provider proxy object.
+    * @return none.
+    */
+    void PostRefreshLocationTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     /**
+    * @brief Acquire provider formInfo.
+    * @param formId The Id of the form.
+    * @param want The want of the form.
+    * @param remoteObject Form provider proxy object.
+    */
+    void AcquireProviderFormInfo(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
      * @brief Notify form provider for updating form.
-     * @param formId The Id of the from.
+     * @param formId The Id of the form.
      * @param want The want of the form.
      * @param remoteObject Form provider proxy object.
      */
     void NotifyFormUpdate(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Post provider delete.
+     * @param formIds The Id list.
+     * @param want The want of the request.
+     * @param remoteObject Form provider proxy object.
+     */
+    void NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief Post provider batch delete.
@@ -122,7 +175,7 @@ private:
     /**
      * @brief Notify form provider for cast temp form.
      *
-     * @param formId The Id of the from.
+     * @param formId The Id of the form.
      * @param want The want of the form.
      * @param remoteObject Form provider proxy object.
      * @return none.
@@ -149,7 +202,7 @@ private:
 
     /**
      * @brief Fire message event to form provider.
-     * @param formId The Id of the from.
+     * @param formId The Id of the form.
      * @param message Event message.
      * @param want The want of the request.
      * @param remoteObject Form provider proxy object.
@@ -157,7 +210,27 @@ private:
     void FireFormEvent(const int64_t formId, const std::string &message, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
 
+    /**
+    * @brief Event notify to form provider.
+    * @param formEvents The vector of form ids.
+    * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+    * @param want The want of the form.
+    * @param remoteObject The form provider proxy object.
+    */
+    void EventNotify(const std::vector<int64_t> &formEvents, const int32_t formVisibleType,
+        const Want &want, const sptr<IRemoteObject> &remoteObject);
+
     void RemoveConnection(int32_t connectId);
+
+    /**
+    * @brief Notify form provider for updating form location.
+    *
+    * @param formId The Id of the from.
+    * @param location The location of the form.
+    * @param remoteObject Form provider proxy object.
+    * @return none.
+    */
+    void NotifyFormLocationUpdate(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

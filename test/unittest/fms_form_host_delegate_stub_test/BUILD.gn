@@ -29,9 +29,6 @@ ohos_unittest("FmsFormHostDelegateStubTest") {
   sources = [ "${form_fwk_path}/test/unittest/fms_form_host_delegate_stub_test/fms_form_host_delegate_stub_test.cpp" ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/test/mock/include",

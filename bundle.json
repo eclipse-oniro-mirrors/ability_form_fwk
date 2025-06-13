@@ -68,10 +68,13 @@
               "jsoncpp",
               "libxml2",
               "config_policy",
+              "runtime_core",
               "device_manager",
               "dmsfwk",
               "huks",
-              "selinux_adapter"
+              "selinux_adapter",
+              "openssl",
+              "window_manager"
 
           ],
           "third_party": [
@@ -86,6 +89,7 @@
                 "//foundation/ability/form_fwk:fmskit_native",
                 "//foundation/ability/form_fwk:fmskit_provider_client",
                 "//foundation/ability/form_fwk:form_napi_packages",
+                "//foundation/ability/form_fwk:form_ani_packages",
                 "//foundation/ability/form_fwk/frameworks/cj:cj_formBindingData_ffi",
                 "//foundation/ability/form_fwk/frameworks/cj:cj_formProvider_ffi"
               ],

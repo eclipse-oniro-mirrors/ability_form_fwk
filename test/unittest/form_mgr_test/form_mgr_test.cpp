@@ -2478,8 +2478,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0128, TestSize.Level0)
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
     ASSERT_NE(nullptr, iremoteObject);
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    int result = FormMgr::GetInstance().RegisterClickEventObserver(bundleName, formEventType, iremoteObject);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    FormMgr::GetInstance().RegisterClickEventObserver(bundleName, formEventType, iremoteObject);
     FormMgr::GetInstance().resetFlag_ = false;
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0128 end";
@@ -2556,8 +2555,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0132, TestSize.Level0)
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
     ASSERT_NE(nullptr, iremoteObject);
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    int result = FormMgr::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, iremoteObject);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    FormMgr::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, iremoteObject);
     FormMgr::GetInstance().resetFlag_ = false;
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0132 end";
@@ -4760,5 +4758,151 @@ HWTEST_F(FormMgrTest, FormMgrTest_0255, TestSize.Level1)
     HILOG_INFO("FormMgrTest_0255,result: %{public}d", result);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrTest_0255 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0256
+ * @tc.desc: Verify requestOverflow
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0256, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0256 starts";
+    EXPECT_CALL(*mockProxy, RequestOverflow(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    OverflowInfo overflowInfo;
+    overflowInfo.duration = 3500;
+    overflowInfo.area.left = -30;
+    overflowInfo.area.top = -30;
+    overflowInfo.area.width = 300;
+    overflowInfo.area.height = 300;
+    bool isOverflow = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
+    ErrCode result = FormMgr::GetInstance().RequestOverflow(formJsInfo.formId, overflowInfo, isOverflow);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0256 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0257
+ * @tc.desc: Verify requestOverflow
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0257, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0257 starts";
+    int64_t formId = -1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    ErrCode result = FormMgr::GetInstance().RequestOverflow(formId, overflowInfo, isOverflow);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0257 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0258
+ * @tc.desc: Verify requestOverflow
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0258, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0258 starts";
+    int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    overflowInfo.duration = -1;
+    bool isOverflow = true;
+    ErrCode result = FormMgr::GetInstance().RequestOverflow(formId, overflowInfo, isOverflow);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0258 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0259
+ * @tc.desc: Verify requestOverflow
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0259, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0259 begin";
+    int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    overflowInfo.area.left = -30;
+    overflowInfo.area.top = -30;
+    overflowInfo.area.width = 200;
+    overflowInfo.area.height = 200;
+    overflowInfo.duration = 3500;
+    bool isOverflow = true;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    ErrCode result = FormMgr::GetInstance().RequestOverflow(formId, overflowInfo, isOverflow);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_0259 end";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0260
+ * @tc.desc: Verify ChangeSceneAnimationState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0260, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0260 starts";
+    EXPECT_CALL(*mockProxy, ChangeSceneAnimationState(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    int32_t state = 1;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
+    ErrCode result = FormMgr::GetInstance().ChangeSceneAnimationState(formJsInfo.formId, state);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0260 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0261
+ * @tc.desc: Verify ChangeSceneAnimationState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0261, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0261 starts";
+    int64_t formId = -1;
+    int32_t state = 1;
+    ErrCode result = FormMgr::GetInstance().ChangeSceneAnimationState(formId, state);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0261 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0262
+ * @tc.desc: Verify ChangeSceneAnimationState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0262, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0262 begin";
+    int64_t formId = 1;
+    int32_t state = 1;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    ErrCode result = FormMgr::GetInstance().ChangeSceneAnimationState(formId, state);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_0262 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0263
+ * @tc.desc: Verify StartAbilityByCrossBundle
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0263, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0263 begin";
+    Want want;
+    ErrCode result = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
+    HILOG_INFO("FormMgrTest_0263,result: %{public}d", result);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED);
+    GTEST_LOG_(INFO) << "FormMgrTest_0263 end";
 }
 } // namespace

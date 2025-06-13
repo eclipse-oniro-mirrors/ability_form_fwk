@@ -51,16 +51,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         return ERR_OK;
     }
 
-    {
-        std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
-        auto search = formDataProxyRecordMap_.find(formId);
-        if (search != formDataProxyRecordMap_.end()) {
-            if (search->second != nullptr) {
-                HILOG_INFO("the form has already subscribed, formId:%{public}" PRId64, formId);
-                search->second->UnsubscribeFormData();
-            }
-        }
-    }
+    UnsubscribeFormDataById(formId);
 
     ApplicationInfo appInfo;
     if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
@@ -83,20 +74,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
 
 ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
-    HILOG_INFO("unsubscribe form data. formId:%{public}" PRId64, formId);
-    std::shared_ptr<FormDataProxyRecord> record = nullptr;
-    {
-        std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
-        auto search = formDataProxyRecordMap_.find(formId);
-        if (search != formDataProxyRecordMap_.end()) {
-            record = search->second;
-            formDataProxyRecordMap_.erase(formId);
-        }
-    }
-    if (record != nullptr) {
-        record->UnsubscribeFormData();
-    }
-
+    UnsubscribeFormDataById(formId);
     return ERR_OK;
 }
 
@@ -173,6 +151,19 @@ void FormDataProxyMgr::GetFormSubscribeInfo(
         if (search->second != nullptr) {
             search->second->GetFormSubscribeInfo(subscribedKeys, count);
         }
+    }
+}
+
+void FormDataProxyMgr::UnsubscribeFormDataById(int64_t formId)
+{
+    HILOG_DEBUG("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
+    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+    auto search = formDataProxyRecordMap_.find(formId);
+    if (search != formDataProxyRecordMap_.end()) {
+        if (search->second != nullptr) {
+            search->second->UnsubscribeFormData();
+        }
+        formDataProxyRecordMap_.erase(formId);
     }
 }
 } // namespace AppExecFwk

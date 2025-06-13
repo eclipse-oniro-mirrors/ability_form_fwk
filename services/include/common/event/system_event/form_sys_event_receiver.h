@@ -20,7 +20,7 @@
 #include "common_event_subscribe_info.h"
 #include "common/event/form_event_handler.h"
 #include "common/event/form_event_util.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -41,15 +41,6 @@ public:
     virtual void OnReceiveEvent(const EventFwk::CommonEventData &eventData) override;
 
     /**
-     * @brief SetSerialQueue.
-     * @param serialQueue serial queue
-     */
-    inline void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
-    {
-        serialQueue_ = serialQueue;
-    }
-
-    /**
      * @brief Init form infos and register form bundle event callback.
      */
     void InitFormInfosAndRegister();
@@ -66,7 +57,6 @@ private:
     void HandleScreenOn();
     void RecycleForms(int32_t userId);
 private:
-    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     int32_t lastUserId_ = 0;
 };
 }  // namespace AppExecFwk

@@ -53,6 +53,14 @@ public:
      * @param isExempt True for exempt, false for not exempt.
      */
     void SetExemptLockStatus(int64_t formId, bool isExempt);
+
+private:
+    /**
+     * @brief check whether exempt lock mgr is init.
+     * @return True for inited, false for not init.
+     */
+    bool IsExemptLockMgrInit();
+
 private:
     bool isInitialized_ = false;
     std::set<std::string> formExemptLockSet_;

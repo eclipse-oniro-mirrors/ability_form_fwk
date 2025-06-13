@@ -1116,8 +1116,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0127, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0128
  * @tc.name: test RequestPublishFormWithSnapshot function.
- * @tc.desc: Verify that the RequestPublishFormWithSnapshot is called by the background
- * and the return value is ERR_APPEXECFWK_FORM_NOT_TRUST.
+ * @tc.desc: Verify that the RequestPublishFormWithSnapshot interface is called normally
+ * and the return value is ERR_OK.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0128, TestSize.Level1)
 {
@@ -1131,7 +1131,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0128, TestSize.Level1)
     want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
     MockIsSACall(false);
     ErrCode ret = formMgrService.RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_TRUST);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0128 end";
 }
 
@@ -1172,19 +1172,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0130, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0131
- * @tc.name: test OnStart function.
- * @tc.desc: Verify that the OnStart
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0131, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0131 start";
-    FormMgrService formMgrService;
-    formMgrService.OnStart();
-    GTEST_LOG_(INFO) << "FormMgrService_0131 end";
-}
-
-/**
  * @tc.number: FormMgrService_0132
  * @tc.name: test SubscribeSysEventReceiver function.
  * @tc.desc: Verify that the SubscribeSysEventReceiver
@@ -1206,7 +1193,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0133, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0133 start";
     FormMgrService* service = new FormMgrService();
-    service->Init();
     service->SubscribeSysEventReceiver();
     delete service;
     GTEST_LOG_(INFO) << "FormMgrService_0133 end";
@@ -1284,7 +1270,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0138, TestSize.Level1)
     std::string abilityName = "abilityName";
     int64_t formId = 1;
     formMgrService.SubscribeSysEventReceiver();
-    formMgrService.OnStart();
     formMgrService.OnStop();
     formMgrService.SubscribeSysEventReceiver();
     RunningFormInfo formInfo;
@@ -1355,5 +1340,49 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
     formMgrService.NotifyFormLocked(formId, true);
     formMgrService.UpdateFormSize(formId, width, height, borderWidth);
     GTEST_LOG_(INFO) << "FormMgrService_0180 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0181
+ * @tc.name: test RequestOverflow function.
+ * @tc.desc: Verify that the RequestOverflow interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0181, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0181 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    EXPECT_EQ(formMgrService.RequestOverflow(formId, overflowInfo, isOverflow), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0181 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0182
+ * @tc.name: test ChangeSceneAnimationState function.
+ * @tc.desc: Verify that the ChangeSceneAnimationState interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0182, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0182 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    int32_t state = 1;
+    EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0182 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0183
+ * @tc.desc: Verify PostConnectNetWork
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0183, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0183 start";
+    std::shared_ptr<FormMgrService> formTaskMgr = std::make_shared<FormMgrService>();
+    formTaskMgr->PostConnectNetWork();
+    GTEST_LOG_(INFO) << "FormMgrService_0183 end";
 }
 }

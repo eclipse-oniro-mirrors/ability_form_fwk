@@ -121,9 +121,11 @@ ohos_shared_library("libfms") {
     "services/src/common/util/form_trust_mgr.cpp",
     "services/src/common/util/form_util.cpp",
     "services/src/common/util/mem_status_listener.cpp",
+    "services/src/common/util/form_serial_queue.cpp",
     "services/src/data_center/database/form_db_cache.cpp",
     "services/src/data_center/database/form_db_info.cpp",
     "services/src/data_center/database/form_rdb_data_mgr.cpp",
+    "services/src/data_center/form_basic_info_mgr.cpp",
     "services/src/data_center/form_cache_mgr.cpp",
     "services/src/data_center/form_data_mgr.cpp",
     "services/src/data_center/form_data_proxy_mgr.cpp",
@@ -141,37 +143,50 @@ ohos_shared_library("libfms") {
     "services/src/feature/form_share/form_free_install_operator.cpp",
     "services/src/feature/form_share/form_share_connection.cpp",
     "services/src/feature/form_share/form_share_mgr.cpp",
+    "services/src/feature/form_share/form_share_task_mgr.cpp",
     "services/src/feature/free_install/free_install_status_callback_proxy.cpp",
     "services/src/feature/free_install/free_install_status_callback_stub.cpp",
+    "services/src/feature/param_update/param_common_event.cpp",
+    "services/src/feature/param_update/param_manager.cpp",
+    "services/src/feature/param_update/param_reader.cpp",
+    "services/src/feature/param_update/sign_tools.cpp",
     "services/src/feature/route_proxy/form_router_proxy_mgr.cpp",
     "services/src/form_host/form_host_callback.cpp",
     "services/src/form_host/form_host_record.cpp",
+    "services/src/form_host/form_host_task_mgr.cpp",
+    "services/src/form_host/form_host_queue.cpp",
     "services/src/form_mgr/form_mgr_adapter.cpp",
     "services/src/form_mgr/form_mgr_service.cpp",
+    "services/src/form_mgr/form_mgr_queue.cpp",
     "services/src/form_observer/form_observer_record.cpp",
     "services/src/form_observer/form_resource_observer.cpp",
+    "services/src/form_observer/form_observer_task_mgr.cpp",
     "services/src/form_provider/connection/form_acquire_connection.cpp",
     "services/src/form_provider/connection/form_acquire_data_connection.cpp",
     "services/src/form_provider/connection/form_acquire_state_connection.cpp",
     "services/src/form_provider/connection/form_background_connection.cpp",
     "services/src/form_provider/connection/form_batch_delete_connection.cpp",
     "services/src/form_provider/connection/form_cast_temp_connection.cpp",
+    "services/src/form_provider/connection/form_configuration_update_connection.cpp",
     "services/src/form_provider/connection/form_delete_connection.cpp",
+    "services/src/form_provider/connection/form_location_connection.cpp",
     "services/src/form_provider/connection/form_msg_event_connection.cpp",
     "services/src/form_provider/connection/form_refresh_connection.cpp",
-    "services/src/form_provider/connection/form_configuration_update_connection.cpp",
     "services/src/form_provider/form_provider_mgr.cpp",
     "services/src/form_provider/form_supply_callback.cpp",
+    "services/src/form_provider/form_provider_task_mgr.cpp",
+    "services/src/form_provider/form_provider_queue.cpp",
     "services/src/form_render/form_render_connection.cpp",
     "services/src/form_render/form_render_mgr.cpp",
     "services/src/form_render/form_render_mgr_inner.cpp",
     "services/src/form_render/form_sandbox_render_mgr_inner.cpp",
+    "services/src/form_render/form_render_task_mgr.cpp",
+    "services/src/form_render/form_render_queue.cpp",
     "services/src/status_mgr_center/form_command_process_strategy.cpp",
     "services/src/status_mgr_center/form_command_queue.cpp",
-    "services/src/status_mgr_center/form_serial_queue.cpp",
     "services/src/status_mgr_center/form_status_mgr.cpp",
     "services/src/status_mgr_center/form_status_queue.cpp",
-    "services/src/status_mgr_center/form_task_mgr.cpp",
+    "services/src/status_mgr_center/form_status_task_mgr.cpp"
   ]
 
   configs = [
@@ -225,12 +240,14 @@ ohos_shared_library("libfms") {
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
+    "openssl:libcrypto_shared",
     "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "resource_management:global_resmgr",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libwsutils",
   ]
 
   if (cite_memmgr) {
@@ -284,6 +301,11 @@ config("fmskit_public_config") {
 }
 
 ohos_shared_library("fmskit_native") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [
     ":fmskit_config",
     ":fms_idl_config",
@@ -344,6 +366,11 @@ config("fmskit_provider_public_config") {
 }
 
 ohos_shared_library("fmskit_provider_client") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":fmskit_provider_config" ]
   public_configs = [ ":fmskit_provider_public_config" ]
   sources = [ "interfaces/kits/native/src/form_provider_client.cpp" ]
@@ -489,6 +516,20 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formprovider",
       "${form_fwk_napi_path}:formprovider_napi",
       "${form_fwk_napi_path}:formutil_napi",
+      "${form_fwk_napi_path}:live_form_extension",
+      "${form_fwk_napi_path}:live_form_extension_module",
+      "${form_fwk_napi_path}:liveformextensionability_napi",
+      "${form_fwk_napi_path}:liveformextensioncontext_napi",
+    ]
+  }
+}
+
+group("form_ani_packages") {                                                                                                                                                              
+  deps = []
+  if (ability_runtime_graphics) {
+    deps += [
+      "${form_fwk_ani_path}/form_binding_data:formBindingData_ani",
+      "${form_fwk_ani_path}/form_binding_data:form_binding_data_etc",
     ]
   }
 }

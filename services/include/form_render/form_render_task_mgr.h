@@ -18,8 +18,8 @@
 
 #include <singleton.h>
 #include "iremote_object.h"
-#include "form_record.h"
 #include "want.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -39,9 +39,6 @@ public:
         const sptr<IRemoteObject> &remoteObject);
 
 private:
-    void RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
-        const sptr<IRemoteObject> &remoteObjectOfRender);
-
     void UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth, const std::string &uid,
         const sptr<IRemoteObject> &remoteObject);
 

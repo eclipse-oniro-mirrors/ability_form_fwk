@@ -28,21 +28,8 @@ ohos_unittest("FmsFormShareMgrTest") {
   sources += [ "${form_fwk_path}/test/unittest/fms_form_share_mgr_test/fms_form_share_mgr_test.cpp" ]
 
   include_dirs = [
-    "//third_party/zlib/contrib/minizip",
-    "//third_party/zlib",
-    "${bundlefwk_path}/common/log/include/",
-    "${bundlefwk_path}/services/bundlemgr/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include/",
-    "${dtbschedmgr_path}/include/",
-    "${samgr_proxy_path}/include",
-    "${samgr_proxy_path}/include/",
-    "${adapter_innerkits_path}/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
-    "${device_manager_path}/common/include",
-    "${device_manager_path}/interfaces/inner_kits/native_cpp/include/",
-    "${ability_dmsfwk_path}/services/dtbschedmgr/include/",
   ]
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
@@ -55,7 +42,6 @@ ohos_unittest("FmsFormShareMgrTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:libfms",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -81,6 +67,7 @@ ohos_unittest("FmsFormShareMgrTest") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 }
 

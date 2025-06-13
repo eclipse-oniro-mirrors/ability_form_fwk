@@ -142,6 +142,20 @@ private:
      */
     virtual int32_t AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
         int64_t requestCode) override;
+    
+    /**
+     * @brief Notify provider when the form need update.
+     *
+     * @param formId The Id of the form.
+     * @param want Indicates the structure containing form info.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int NotifyFormLocationUpdate(const int64_t formId, const Want &want,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
 private:
     DISALLOW_COPY_AND_MOVE(MockFormProviderClient);
 };

@@ -22,7 +22,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "common/util/form_util.h"
 #include "want.h"
 
@@ -73,7 +73,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     HILOG_DEBUG("deviceId:%{public}s, bundleName:%{public}s, abilityName:%{public}s",
         info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
 
-    FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
+    FormProviderTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
     FormReport::GetInstance().SetStartGetTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
     if (GetHostToken() != nullptr) {
         SetProviderToken(remoteObject);

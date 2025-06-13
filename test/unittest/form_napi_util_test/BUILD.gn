@@ -28,7 +28,6 @@ ohos_unittest("FmsFormNapiUtilTest") {
   deps = [
     "${form_fwk_napi_path}:formutil_napi",
     "${form_fwk_path}:fmskit_native",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -43,6 +42,7 @@ ohos_unittest("FmsFormNapiUtilTest") {
     "ipc:ipc_core",
     "napi:ace_napi",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 }
 

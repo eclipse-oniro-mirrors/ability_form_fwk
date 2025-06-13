@@ -37,10 +37,10 @@
 #include "common/event/form_event_report.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr/form_mgr_adapter.h"
+#include "form_instance.h"
 #include "form_mgr_errors.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
@@ -64,6 +64,8 @@
 #include "net_handle.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
+#include "feature/param_update/param_common_event.h"
+#include "feature/param_update/param_manager.h"
 #include "string_wrapper.h"
 #include "int_wrapper.h"
 #include "want_params_wrapper.h"
@@ -71,12 +73,16 @@
 #include "mem_mgr_client.h"
 #endif
 #include "common/util/form_report.h"
+#include "iform_host_delegate.h"
 
 #ifdef RES_SCHEDULE_ENABLE
 #include "common/event/system_event/form_systemload_listener.h"
 #include "res_sched_client.h"
 #include "res_type.h"
 #endif // RES_SCHEDULE_ENABLE
+#include "form_mgr/form_mgr_queue.h"
+#include "common/util/form_task_common.h"
+#include "scene_board_judgement.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -220,6 +226,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
         API_TIME_OUT_30S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ret = FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    HILOG_WARN("add form result:%{public}d, formId:%{public}" PRId64, ret, formId);
     return ret;
 }
 
@@ -287,6 +294,7 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ret = FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    HILOG_WARN("delete form result:%{public}d, formId:%{public}" PRId64, ret, formId);
     return ret;
 }
 
@@ -732,6 +740,8 @@ void FormMgrService::OnStart()
     onStartEndTime_ = GetCurrentDateTime();
     HILOG_INFO("success,time:%{public}s,onKvDataServiceAddTime:%{public}s",
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+    FormEventReport::SendDiskUseEvent();
+    FormTimerMgr::GetInstance().StartDiskUseInfoReportTimer();
 }
 /**
  * @brief Stop event for the form manager service.
@@ -750,6 +760,7 @@ void FormMgrService::OnStop()
         handler_.reset();
     }
     FormAmsHelper::GetInstance().UnRegisterConfigurationObserver();
+    ParamCommonEvent::GetInstance().UnSubscriberEvent();
 }
 
 ErrCode FormMgrService::ReadFormConfigXML()
@@ -782,7 +793,6 @@ void FormMgrService::SubscribeSysEventReceiver()
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
         formSysEventReceiver_ = std::make_shared<FormSysEventReceiver>(subscribeInfo);
-        formSysEventReceiver_->SetSerialQueue(serialQueue_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
 }
@@ -873,7 +883,7 @@ void FormMgrService::SubscribeNetConn()
             HILOG_ERROR("Register defaultNetworkCallback_ failed 10 time");
             return;
         }
-        FormTaskMgr::GetInstance().PostConnectNetWork();
+        PostConnectNetWork();
     }
 }
 
@@ -894,8 +904,6 @@ ErrCode FormMgrService::Init()
         HILOG_ERROR("init failed.null handler_");
         return ERR_INVALID_OPERATION;
     }
-    FormTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
-    FormAmsHelper::GetInstance().SetSerialQueue(serialQueue_);
     /* Publish service maybe failed, so we need call this function at the last,
      * so it can't affect the TDD test program */
     if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
@@ -927,6 +935,8 @@ ErrCode FormMgrService::Init()
     FormMgrAdapter::GetInstance().Init();
     FormAmsHelper::GetInstance().RegisterConfigurationObserver();
     SubscribeNetConn();
+    ParamManager::GetInstance().InitParam();
+    ParamCommonEvent::GetInstance().SubscriberEvent();
     return ERR_OK;
 }
 
@@ -1288,6 +1298,25 @@ int32_t FormMgrService::StartAbilityByFms(const Want &want)
         HILOG_ERROR("dstBundleName not self");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
+    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
+int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+ 
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+ 
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        HILOG_ERROR("capability not support");
+        return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
+    }
+    
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 
@@ -1848,15 +1877,6 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
-    if (!CheckCallerIsSystemApp()) {
-        want.SetAction(Constants::FORM_PAGE_ACTION);
-        want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-                      Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-        const std::string key = Constants::PARMA_REQUEST_METHOD;
-        const std::string value = Constants::OPEN_FORM_MANAGE_VIEW;
-        want.SetParam(key, value);
-        return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
-    }
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
                                                             formId, {}, false);
 }
@@ -2023,9 +2043,9 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
         formInfoParam.SetParam("cardId", String::Box(std::to_string(formId)));
         formInfoParam.SetParam("formConfigAbility", String::Box(abilityName));
         wantarams.SetParam("formInfo", WantParamWrapper::Box(formInfoParam));
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_VIEW));
+        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_VIEW));
     } else {
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
+        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
         wantarams.SetParam(Constants::PARAM_SEC_PAGE_ABILITY_NAME, String::Box(abilityName));
     }
     wantarams.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
@@ -2036,6 +2056,53 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+void FormMgrService::PostConnectNetWork()
+{
+    HILOG_DEBUG("start");
+ 
+    auto connectNetWork = []() {
+        DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
+    HILOG_DEBUG("end");
+}
+bool FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().RegisterOverflowProxy(callerToken);
+}
+
+bool FormMgrService::UnregisterOverflowProxy()
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().UnregisterOverflowProxy();
+}
+
+ErrCode FormMgrService::RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow)
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapter::GetInstance().RequestOverflow(formId, callingUid, overflowInfo, isOverflow);
+}
+
+bool FormMgrService::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().RegisterChangeSceneAnimationStateProxy(callerToken);
+}
+
+bool FormMgrService::UnregisterChangeSceneAnimationStateProxy()
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().UnregisterChangeSceneAnimationStateProxy();
+}
+
+ErrCode FormMgrService::ChangeSceneAnimationState(const int64_t formId, int32_t state)
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapter::GetInstance().ChangeSceneAnimationState(formId, callingUid, state);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

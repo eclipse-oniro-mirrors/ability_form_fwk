@@ -21,12 +21,10 @@ config("formmgr_test_config") {
 
 public_configs = [ ":formmgr_test_config" ]
 
-external_deps = [ "c_utils:utils" ]
-
-public_deps = [
-  "${c_utils_base_path}:utils",
-  "//third_party/googletest:gmock_main",
-  "//third_party/googletest:gtest_main",
+external_deps = [
+  "c_utils:utils",
+  "googletest:gmock_main",
+  "googletest:gtest_main",
 ]
 
 group("unittest") {
@@ -103,7 +101,6 @@ group("unittest") {
     "unittest/fms_form_supply_stub_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_systemload_listener_test:unittest",
-    "unittest/fms_form_task_mgr_test:unittest",
     "unittest/fms_form_timer_mgr_new_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
     "unittest/fms_form_util_permission_verify_test:unittest",
@@ -116,6 +113,7 @@ group("unittest") {
     "unittest/fms_provider_connect_proxy_test:unittest",
     "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/fms_running_form_info_test:unittest",
+    "unittest/form_basic_info_mgr_test:unittest",
     "unittest/form_bundle_forbid_mgr_test:unittest",
     "unittest/form_bundle_lock_mgr_test:unittest",
     "unittest/form_errors_test:unittest",
@@ -133,6 +131,16 @@ group("unittest") {
     "unittest/frs_form_render_event_report_test:unittest",
     "unittest/frs_form_render_record_test:unittest",
     "unittest/frs_form_render_serial_queue_test:unittest",
+    "unittest/fms_form_share_task_mgr_test:unittest",
+    "unittest/fms_form_host_task_mgr_test:unittest",
+    "unittest/fms_form_observer_task_mgr_test:unittest",
+    "unittest/fms_form_provider_task_mgr_test:unittest",
+    "unittest/fms_form_render_task_mgr_test:unittest",
+    "unittest/fms_form_status_task_mgr_test:unittest",
+    "unittest/fms_form_mgr_service_queue_test:unittest",
+    "unittest/fms_form_host_queue_test:unittest",
+    "unittest/fms_form_provider_queue_test:unittest",
+    "unittest/fms_form_render_queue_test:unittest"
   ]
 }
 

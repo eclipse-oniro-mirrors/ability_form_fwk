@@ -206,6 +206,15 @@ public:
      * @param formHostRecords The form host records.
      */
     void GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const;
+
+    /**
+     * @brief update formRecord recycle status.
+     * @param formId form id.
+     * @param status form status.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateFormRecordRecycleStatus(const int64_t formId, const RecycleStatus status);
+
     /**
      * @brief Get form host remote object.
      * @param formId The id of the form.
@@ -635,6 +644,12 @@ public:
 
     /**
     * @brief get temp forms count.
+    * @return Return the temp forms number.
+    */
+    int32_t GetTempFormCount() const;
+
+    /**
+    * @brief get temp forms count.
     * @param formCount Returns the number of the temp form.
     * @return Return the temp forms number.
     */
@@ -903,6 +918,14 @@ public:
      */
     void GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords);
 
+    /**
+     * @brief get formRecord by formId
+     * @param formId form id.
+     * @param formRecord form record.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetFormRecordById(const int64_t formId, FormRecord& formRecord);
+
 private:
     /**
      * @brief Create form record.
@@ -1013,6 +1036,14 @@ private:
     template<typename T>
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
+
+    /**
+     * @brief post delay RecheckWhetherNeedCleanFormHost task.
+     * @param callerUid The calleruid of FormHostRecord of vector<FormHostRecord> clientRecords_.
+     * @param remoteObjectOfHost The client stub of the form host record.
+     */
+    void PostDelayRecheckWhetherNeedCleanFormHostTask(
+        const int callerUid, const sptr<IRemoteObject> &remoteObjectOfHost);
 
 private:
     void GetUnusedFormInstancesByFilter(

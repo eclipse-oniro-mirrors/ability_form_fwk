@@ -3231,4 +3231,58 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleIsSystemAppForm_001, TestSize.Le
     EXPECT_EQ(mockFormMgrService->HandleIsSystemAppForm(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsSystemAppForm_001 ends";
 }
+
+
+/**
+ * @tc.number: FormMgrStubTest_0133
+ * @tc.name: Verify OnRemoteRequest and HandleRequestOverflow
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_OVERFLOW, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0133, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0133 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1;
+    OverflowInfo overflowInfo;
+    overflowInfo.area.left = -30;
+    overflowInfo.area.top = -30;
+    overflowInfo.area.width = 200;
+    overflowInfo.area.height = 200;
+    overflowInfo.duration = 3500;
+    bool isOverflow = true;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_OVERFLOW);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64(formId);
+    data.WriteBool(isOverflow);
+    data.WriteParcelable(&overflowInfo);
+    EXPECT_CALL(*mockFormMgrService, RequestOverflow(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0133 ends";
+}
+ 
+/**
+ * @tc.number: FormMgrStubTest_0133
+ * @tc.name: Verify OnRemoteRequest and HandleChangeSceneAnimationState
+ * @tc.desc: When the parameter code is FORM_MGR_CHANGE_SCENE_ANIMATION_STATE, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0134, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0134 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1;
+    int32_t state = 1;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHANGE_SCENE_ANIMATION_STATE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64(formId);
+    data.WriteInt32(state);
+    EXPECT_CALL(*mockFormMgrService, ChangeSceneAnimationState(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0134 ends";
+}
 }

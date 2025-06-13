@@ -580,5 +580,50 @@ int FormProviderProxy::SendTransactCmd(IFormProvider::Message code, MessageParce
     return ERR_OK;
 }
 
+/**
+ * @brief Notify provider when the form need update.
+ * @param formId The Id of the form.
+ * @param want Indicates the structure containing form info.
+ * @param callerToken Caller ability token.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormProviderProxy::NotifyFormLocationUpdate(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &callerToken)
+{
+    int error;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+ 
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_LOCATION_UPDATE,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

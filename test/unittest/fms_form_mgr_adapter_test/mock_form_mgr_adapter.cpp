@@ -17,11 +17,17 @@
 #include "data_center/form_info/form_info_mgr.h"
 namespace {
     bool g_mockRequestPublishFormToHost = true;
+    OHOS::ErrCode g_mockSceneAnimationCheckResult = OHOS::ERR_OK;
 }
 
 void MockRequestPublishFormToHost(bool mockRet)
 {
     g_mockRequestPublishFormToHost = mockRet;
+}
+
+void MockSceneAnimationCheck(OHOS::ErrCode mockRet)
+{
+    g_mockSceneAnimationCheckResult = mockRet;
 }
 
 namespace OHOS {
@@ -45,6 +51,11 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
         return ERR_OK;
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t callingUi)
+{
+    return g_mockSceneAnimationCheckResult;
 }
 }
 }

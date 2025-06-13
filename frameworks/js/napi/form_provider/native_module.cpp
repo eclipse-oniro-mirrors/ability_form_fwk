@@ -34,12 +34,19 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
     BindNativeFunction(env, exports, "getPublishedFormInfos", moduleName, JsFormProvider::GetPublishedFormInfos);
     BindNativeFunction(env, exports, "getPublishedFormInfoById", moduleName, JsFormProvider::GetPublishedFormInfoById);
     BindNativeFunction(env, exports, "openFormManager", moduleName, JsFormProvider::OpenFormManager);
+    BindNativeFunction(env, exports, "openFormManagerCrossBundle", moduleName,
+        JsFormProvider::OpenFormManagerCrossBundle);
     BindNativeFunction(env, exports, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
     BindNativeFunction(env, exports, "updateForm", moduleName, JsFormProvider::UpdateForm);
     BindNativeFunction(env, exports, "requestPublishForm", moduleName, JsFormProvider::RequestPublishForm);
     BindNativeFunction(env, exports, "isRequestPublishFormSupported", moduleName,
         JsFormProvider::IsRequestPublishFormSupported);
     BindNativeFunction(env, exports, "openFormEditAbility", moduleName, JsFormProvider::OpenFormEditAbility);
+    BindNativeFunction(env, exports, "requestOverflow", moduleName, JsFormProvider::RequestOverflow);
+    BindNativeFunction(env, exports, "cancelOverflow", moduleName, JsFormProvider::CancelOverflow);
+    BindNativeFunction(env, exports, "activateSceneAnimation", moduleName, JsFormProvider::ActivateSceneAnimation);
+    BindNativeFunction(env, exports, "deactivateSceneAnimation", moduleName, JsFormProvider::DeactivateSceneAnimation);
+    BindNativeFunction(env, exports, "getFormRect", moduleName, JsFormProvider::GetFormRect);
     return exports;
 }
 

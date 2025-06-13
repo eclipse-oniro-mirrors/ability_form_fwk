@@ -20,7 +20,7 @@
 #include <set>
 #include "event_handler.h"
 #include "event_runner.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {

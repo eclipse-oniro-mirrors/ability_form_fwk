@@ -110,5 +110,76 @@ FormInstance* FormInstance::Unmarshalling(Parcel &parcel)
     }
     return object.release();
 }
+
+bool Rect::ReadFromParcel(Parcel &parcel)
+{
+    left = parcel.ReadDouble();
+    top = parcel.ReadDouble();
+    width = parcel.ReadDouble();
+    height = parcel.ReadDouble();
+    HILOG_INFO("call rect: %{public}f, %{public}f, %{public}f, %{public}f", left, top, width, height);
+    return true;
+}
+
+bool Rect::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteDouble(left)) {
+        return false;
+    }
+    if (!parcel.WriteDouble(top)) {
+        return false;
+    }
+    if (!parcel.WriteDouble(width)) {
+        return false;
+    }
+    if (!parcel.WriteDouble(height)) {
+        return false;
+    }
+    return true;
+}
+
+Rect* Rect::Unmarshalling(Parcel &parcel)
+{
+    std::unique_ptr<Rect> object = std::make_unique<Rect>();
+    if (object && !object->ReadFromParcel(parcel)) {
+        object = nullptr;
+        return nullptr;
+    }
+    return object.release();
+}
+
+bool OverflowInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!area.ReadFromParcel(parcel)) {
+        return false;
+    }
+    duration = parcel.ReadInt32();
+    HILOG_INFO("OverflowInfo, rect: %{public}f, %{public}f, %{public}f, %{public}f, duration: %{public}d",
+        area.left, area.top, area.width, area.height, duration);
+    return true;
+}
+
+bool OverflowInfo::Marshalling(Parcel &parcel) const
+{
+    if (!area.Marshalling(parcel)) {
+        HILOG_ERROR("Write area failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(duration)) {
+        HILOG_ERROR("Write duraion failed");
+        return false;
+    }
+    return true;
+}
+
+OverflowInfo* OverflowInfo::Unmarshalling(Parcel &parcel)
+{
+    std::unique_ptr<OverflowInfo> object = std::make_unique<OverflowInfo>();
+    if (object && !object->ReadFromParcel(parcel)) {
+        object = nullptr;
+        return nullptr;
+    }
+    return object.release();
+}
 } // namespace AppExecFwk
 } // namespace OHOS

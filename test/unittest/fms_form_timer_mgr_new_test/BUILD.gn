@@ -25,8 +25,6 @@ ohos_unittest("FmsFormTimerMgrNewTest") {
   ]
 
   include_dirs = [
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
@@ -45,7 +43,6 @@ ohos_unittest("FmsFormTimerMgrNewTest") {
 
   deps = [
     "${form_fwk_path}:fms_target",
-    "//third_party/googletest:gmock_main",
   ]
 
   defines = []
@@ -75,6 +72,7 @@ ohos_unittest("FmsFormTimerMgrNewTest") {
     "ipc:ipc_core",
     "selinux_adapter:librestorecon",
     "time_service:time_client",
+    "googletest:gmock_main",
   ]
 }
 

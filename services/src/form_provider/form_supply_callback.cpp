@@ -23,9 +23,9 @@
 #include "data_center/form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
+#include "form_provider/form_provider_task_mgr.h"
 #include "form_render/form_render_mgr.h"
 #include "feature/form_share/form_share_mgr.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "common/util/form_util.h"
 #include "hitrace_meter.h"
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"
@@ -296,7 +296,7 @@ void FormSupplyCallback::RemoveConnection(int64_t formId, const sptr<IRemoteObje
             Want want;
             want.SetParam(Constants::FORM_CONNECT_ID, conn.first);
             want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
-            FormTaskMgr::GetInstance().PostDeleteTask(formId, want, conn.second->GetProviderToken());
+            FormProviderTaskMgr::GetInstance().PostDeleteTask(formId, want, conn.second->GetProviderToken());
             HILOG_DEBUG("remove the connection, connect id is %{public}d", conn.first);
         }
     }
@@ -360,17 +360,10 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    FormRecord formRecord;
-    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+    if (!FormDataMgr::GetInstance().UpdateFormRecordRecycleStatus(formId, RecycleStatus::RECYCLED)) {
+        HILOG_ERROR("update recycle status data of %{public}" PRId64 " failed", formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    if (formRecord.recycleStatus != RecycleStatus::RECYCLABLE) {
-        HILOG_WARN("form %{public}" PRId64 " not RECYCLABLE", formId);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    formRecord.recycleStatus = RecycleStatus::RECYCLED;
-    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
 
     sptr<IRemoteObject> remoteObjectOfHost = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     if (remoteObjectOfHost == nullptr) {

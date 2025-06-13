@@ -53,8 +53,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
 {
     HILOG_DEBUG("FormInfoAllRdbStorageMgr load all form infos");
     std::unordered_map<std::string, std::string> value;
-    ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME,
-        FORM_INFO_PREFIX, value);
+    ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_INFO_PREFIX, value);
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -79,12 +78,7 @@ ErrCode FormInfoRdbStorageMgr::RemoveBundleFormInfos(const std::string &bundleNa
     HILOG_DEBUG("FormInfoRdbStorageMgr remove form info, bundleName=%{public}s", bundleName.c_str());
 
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
-    ErrCode result;
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
-    }
-
+    ErrCode result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     if (result != ERR_OK) {
         HILOG_ERROR("remove formInfoStorages from rdbStore error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -101,7 +95,6 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
 
     HILOG_DEBUG("FormInfoRdbStorageMgr update form info, bundleName=%{public}s", bundleName.c_str());
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
-    std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
     std::string value = formInfoStorages;
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
     if (result != ERR_OK) {
@@ -135,10 +128,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
     HILOG_DEBUG("call");
     ErrCode result;
     std::unordered_map<std::string, std::string> value;
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_ID_PREFIX, value);
-    }
+    result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_ID_PREFIX, value);
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -157,11 +147,7 @@ ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFor
     std::string formId = std::to_string(innerFormInfo.GetFormId());
     std::string key = std::string().append(FORM_ID_PREFIX).append(formId);
     std::string value = innerFormInfo.ToString();
-    ErrCode result;
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
-    }
+    ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
     if (result != ERR_OK) {
         HILOG_ERROR("put innerFormInfo to RdbStore error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -187,12 +173,7 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
 {
     HILOG_DEBUG("formId[%{public}s]", formId.c_str());
     std::string key = std::string().append(FORM_ID_PREFIX).append(formId);
-    ErrCode result;
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
-    }
-
+    ErrCode result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     if (result != ERR_OK) {
         HILOG_ERROR("delete key error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -201,10 +182,7 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     }
 
     key = std::string().append(STATUS_DATA_PREFIX).append(formId);
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
-    }
+    result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     if (result != ERR_OK) {
         HILOG_ERROR("delete status data of %{public}s failed", formId.c_str());
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -270,7 +248,7 @@ ErrCode FormInfoRdbStorageMgr::GetFormVersionCode(std::string &versionCode)
     HILOG_INFO("get form version code success. versionCode:%{public}s", versionCode.c_str());
     return ERR_OK;
 }
-
+ 
 ErrCode FormInfoRdbStorageMgr::UpdateFormVersionCode()
 {
     HILOG_INFO("call. versioncode:%{public}d", Constants::FORM_VERSION_CODE);

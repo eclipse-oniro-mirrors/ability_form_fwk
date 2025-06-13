@@ -23,9 +23,6 @@ ohos_unittest("FmsFormInstanceTest") {
 
   include_dirs = [
     "${form_fwk_path}/test/mock/include",
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
@@ -36,7 +33,6 @@ ohos_unittest("FmsFormInstanceTest") {
   }
   deps = [
     "${form_fwk_path}:fms_target",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -48,6 +44,7 @@ ohos_unittest("FmsFormInstanceTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "googletest:gmock_main",
   ]
 }
 

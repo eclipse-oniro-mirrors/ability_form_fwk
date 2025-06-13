@@ -376,7 +376,7 @@ public:
 
     /**
      * @brief Start an ability. This function can only be called by a form extension of a system app.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @param callerToken token of the ability that initially calls this function.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -384,13 +384,23 @@ public:
 
     /**
      * @brief Start an ability by form manager service.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int32_t StartAbilityByFms(const Want &want)
     {
         return 0;
     }
+
+    /**
+     * @brief Start an ability by cross bundle.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+     virtual int32_t StartAbilityByCrossBundle(const Want &want)
+     {
+         return 0;
+     }
 
     /**
      * @brief Share form by formID and deviceID.
@@ -764,6 +774,67 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Register overflow proxy in fms
+     * @param callerToken The form host proxy
+     * @return Return true for form register success
+     */
+    virtual bool RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Unregister overflow proxy in fms
+     * @return Return true for form unregister success
+     */
+    virtual bool UnregisterOverflowProxy()
+    {
+        return false;
+    }
+
+    /**
+     * @brief Request overflow with specific range
+     * @param formId The id of the form to request overflow
+     * @param overflowInfo The overflowInfo to explict overflow area and duration
+     * @param isOverflow True for request overflow, false for cancel overflow, default value is true
+     * @return Return ERR_OK on success, others on failure
+     */
+    virtual ErrCode RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow = true)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Register change sceneAnimation state proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns true for change SceneAnimation state proxy register success.
+     */
+    virtual bool RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Unregister change sceneAnimation state proxy in fms.
+     * @return Returns true for change SceneAnimation state proxy unregister success.
+     */
+    virtual bool UnregisterChangeSceneAnimationStateProxy()
+    {
+        return false;
+    }
+
+    /**
+     * @brief Change SceneAnimation State.
+     * @param formId The formId.
+     * @param state 1 for activate SceneAnimation, 0 for deactivate SceneAnimation
+     * @return Return ERR_OK on success, others on failure
+     */
+    virtual ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -852,9 +923,16 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_EXEMPT,
         FORM_MGR_NOTIFY_FORM_LOCKED,
         FORM_MGR_START_ABILITY_BY_FMS,
+        FORM_MGR_START_ABILITY_BY_CROSS_BUNDLE,
         FORM_MGR_GET_PUBLISHED_FORM_INFOS,
         FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
-        FORM_MGR_OPEN_FORM_EDIT_ABILITY
+        FORM_MGR_OPEN_FORM_EDIT_ABILITY,
+        FORM_MGR_REGISTER_OVERFLOW_PROXY,
+        FORM_MGR_UNREGISTER_OVERFLOW_PROXY,
+        FORM_MGR_REQUEST_OVERFLOW,
+        FORM_MGR_REGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
+        FORM_MGR_UNREGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
+        FORM_MGR_CHANGE_SCENE_ANIMATION_STATE,
     };
 };
 }  // namespace AppExecFwk

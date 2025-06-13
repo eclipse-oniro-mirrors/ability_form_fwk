@@ -140,6 +140,10 @@ std::string GetStringFromNapi(napi_env env, napi_value value);
 napi_value CreateFormInstances(napi_env env, const std::vector<AppExecFwk::FormInstance> &formInstances);
 napi_value CreateFormInstance(napi_env env, const AppExecFwk::FormInstance &formInstance);
 bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoFilter &formInfoFilter);
+napi_value CreateFunInteractionParamsDatas(napi_env env,
+    const OHOS::AppExecFwk::FormFunInteractionParams &funInteractionParamsDatas);
+napi_value CreateSceneAnimationParamsDatas(napi_env env,
+    const OHOS::AppExecFwk::FormSceneAnimationParams &sceneAnimationParamsDatas);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */

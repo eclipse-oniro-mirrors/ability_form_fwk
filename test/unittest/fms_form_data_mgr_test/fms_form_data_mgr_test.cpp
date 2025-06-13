@@ -18,6 +18,7 @@
 #include <string>
 #include <thread>
 
+#include "mock_form_db_cache.h"
 #include "appexecfwk_errors.h"
 #define private public
 #include "data_center/database/form_db_cache.h"
@@ -31,6 +32,7 @@
 #include "ipc_skeleton.h"
 #include "mock_form_host_client.h"
 #include "running_form_info.h"
+#include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -515,7 +517,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_001, TestSize.Le
     int32_t checkAllDBFormMaxSize = 2;
 
     // set formDbInfos size is over 512
-    MockGetAllFormInfo(checkAllDBFormMaxSize);
+    MockGetAllFormInfoSize(checkAllDBFormMaxSize, callingUid);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, formDataMgr_.CheckEnoughForm(callingUid));
 
@@ -536,7 +538,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Le
     int callingUid = 0;
     int32_t checkAllDBFormPreAPPSize = 1;
 
-    MockGetAllFormInfo(checkAllDBFormPreAPPSize);
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
 
     EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughForm(callingUid));
 
@@ -558,7 +560,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_003, TestSize.Le
     int32_t checkAllDBFormPreAPPSize = 1;
 
     // set formDbInfos size is over 256
-    MockGetAllFormInfo(checkAllDBFormPreAPPSize);
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
 
@@ -5021,5 +5023,21 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_014, TestSize.Level0)
             [formId2](const FormHostRecord record) { return record.Contains(formId2); }),
         formDataMgr_.clientRecords_.end());
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_Coverage_014 end";
+}
+ 
+/**
+ * @tc.name: FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001
+ * @tc.desc: Verify PostDelayRecheckWhetherNeedCleanFormHostTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001 start";
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    int callerUid = 1;
+    sptr<IRemoteObject> remoteObjectOfHost = new (std::nothrow) MockFormProviderClient();
+    formDataMgr->PostDelayRecheckWhetherNeedCleanFormHostTask(callerUid, remoteObjectOfHost);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001 end";
 }
 }

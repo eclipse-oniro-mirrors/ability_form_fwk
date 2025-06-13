@@ -25,7 +25,16 @@ namespace {
     int32_t g_mockAllDBFormMaxSize = 2;
     int32_t g_mockCheckAllDbFormPreAppSize = 1;
     int32_t g_mockCheckType = g_mockAllDBFormMaxSize;
+    int g_callingUid = 0;
 }
+
+namespace OHOS {
+void MockGetAllFormInfoSize(int32_t mockRet, int callingUid)
+{
+    g_mockCheckType = mockRet;
+    g_callingUid = callingUid;
+}
+} // namespace OHOS
 
 void MockGetAllFormInfo(int32_t mockRet)
 {
@@ -57,6 +66,25 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
     } else {
         formDBInfos = formDBInfos_;
     }
+}
+
+/**
+ * @brief Get all form data size.
+ * @return int32_t.
+ */
+int32_t FormDbCache::GetAllFormInfoSize()
+{
+    if (g_mockCheckType == g_mockAllDBFormMaxSize) {
+        return Constants::MAX_FORMS;
+    } else if (g_mockCheckType == g_mockCheckAllDbFormPreAppSize && g_callingUid == -1) {
+        return Constants::MAX_RECORD_PER_APP;
+    }
+    return 0;
+}
+
+int FormDbCache::GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid)
+{
+    return (g_callingUid == -1) ? Constants::MAX_RECORD_PER_APP : 0;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

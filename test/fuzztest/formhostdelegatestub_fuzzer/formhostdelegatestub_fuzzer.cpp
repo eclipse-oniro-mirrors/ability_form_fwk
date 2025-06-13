@@ -34,6 +34,14 @@ public:
     {
         return 0;
     }
+    ErrCode RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow) override
+    {
+        return ERR_OK;
+    }
+    ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state) override
+    {
+        return ERR_OK;
+    }
 };
 uint32_t GetU32Data(const char* ptr)
 {

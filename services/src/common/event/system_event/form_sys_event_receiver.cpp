@@ -27,11 +27,12 @@
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_render/form_render_mgr.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_util.h"
 #include "in_process_call_wrapper.h"
 #include "want.h"
+#include "form_mgr/form_mgr_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -49,43 +50,28 @@ FormSysEventReceiver::FormSysEventReceiver(const EventFwk::CommonEventSubscribeI
 
 void FormSysEventReceiver::HandleAbilityUpdate(const AAFwk::Want& want, std::string &bundleName)
 {
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
     auto task = [want, bundleName]() {
-        HILOG_INFO("bundle updated, bundleName:%{public}s", bundleName.c_str());
+        HILOG_WARN("bundle updated, bundleName:%{public}s", bundleName.c_str());
         int userId = want.GetIntParam(KEY_USER_ID, 0);
         FormEventUtil::HandleProviderUpdated(bundleName, userId);
     };
-    serialQueue_->ScheduleTask(0, task);
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 
 void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int32_t userId)
 {
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
     auto task = [bundleName, userId]() {
         FormEventUtil::HandleBundleDataCleared(bundleName, userId);
     };
-    serialQueue_->ScheduleTask(0, task);
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 
 void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 {
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
     auto task = [userId]() {
         FormRenderMgr::GetInstance().OnScreenUnlock(userId);
     };
-    serialQueue_->ScheduleTask(0, task);
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 
 void FormSysEventReceiver::HandleUserUnlocked(int32_t userId)
@@ -95,15 +81,10 @@ void FormSysEventReceiver::HandleUserUnlocked(int32_t userId)
         return;
     }
 
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
     auto task = [userId]() {
         FormEventUtil::HandleOnUnlock(userId);
     };
-    serialQueue_->ScheduleTask(0, task);
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 
 /**
@@ -127,10 +108,6 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         HILOG_ERROR("invalid param, action:%{public}s, bundleName:%{public}s",
             action.c_str(), bundleName.c_str());
-        return;
-    }
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
         return;
     }
     HILOG_INFO("action:%{public}s", action.c_str());
@@ -169,13 +146,7 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
         HILOG_ERROR("invalid userId: -1");
         return;
     }
-
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
-    serialQueue_->ScheduleTask(0, [userId]() {
+    FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
         std::vector<int64_t> removedFormIds;
         FormDataMgr::GetInstance().DeleteFormsByUserId(userId, removedFormIds);
         FormDbCache::GetInstance().DeleteDBFormsByUserId(userId);
@@ -195,12 +166,7 @@ void FormSysEventReceiver::HandleBundleScanFinished()
 
 void FormSysEventReceiver::InitFormInfosAndRegister()
 {
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
-    serialQueue_->ScheduleTask(TASK_DELAY_TIME, []() {
+    FormMgrQueue::GetInstance().ScheduleTask(TASK_DELAY_TIME, []() {
         int32_t currUserId = FormUtil::GetCurrentAccountId();
         if (currUserId == Constants::ANY_USERID) {
             HILOG_INFO("use MAIN_USER_ID(%{public}d) instead of current userId: ANY_USERID(%{public}d)",
@@ -233,16 +199,11 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         return;
     }
 
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
     int32_t lastUserId = lastUserId_;
     lastUserId_ = userId;
     HILOG_INFO("switch to userId: (%{public}d)", userId);
 
-    serialQueue_->ScheduleTask(0, [userId, lastUserId, this]() {
+    FormMgrQueue::GetInstance().ScheduleTask(0, [userId, lastUserId, this]() {
         if (userId != MAIN_USER_ID) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         }
@@ -255,12 +216,7 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
 
 void FormSysEventReceiver::HandleScreenOn()
 {
-    if (!serialQueue_) {
-        HILOG_ERROR("null serialQueue");
-        return;
-    }
-
-    serialQueue_->ScheduleTask(0, []() {
+    FormMgrQueue::GetInstance().ScheduleTask(0, []() {
         FormRenderMgr::GetInstance().NotifyScreenOn();
         FormMgrAdapter::GetInstance().RefreshFormsByScreenOn();
     });

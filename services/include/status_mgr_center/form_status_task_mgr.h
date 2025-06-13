@@ -18,16 +18,11 @@
 
 #include <singleton.h>
 #include "iremote_object.h"
-#include "form_record.h"
 #include "want.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-enum class TaskType : int64_t {
-    RECYCLE_FORM, // add form type base 0
-    RENDER_FORM,
-    DELETE_FORM_HOST_RECORD = 10000 // add form_host type base 10000
-};
 using Want = OHOS::AAFwk::Want;
 class FormStatusTaskMgr final : public DelayedRefSingleton<FormStatusTaskMgr> {
     DECLARE_DELAYED_REF_SINGLETON(FormStatusTaskMgr)
@@ -45,7 +40,7 @@ public:
 
     /**
      * @brief Post recover form.
-     * @param formIds The Id of form to be recovered.
+     * @param record The form record.
      * @param want The want of the request.
      * @param remoteObject Form render proxy object.
      */

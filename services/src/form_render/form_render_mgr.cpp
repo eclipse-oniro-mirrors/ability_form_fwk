@@ -28,7 +28,6 @@
 #include "form_mgr_errors.h"
 #include "form_render/form_sandbox_render_mgr_inner.h"
 #include "form_provider/form_supply_callback.h"
-#include "status_mgr_center/form_task_mgr.h"
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "ipc_skeleton.h"
@@ -533,7 +532,7 @@ void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hos
         HILOG_WARN("hostUserId is 0, get current active userId ");
         hostUserId = FormUtil::GetCurrentAccountId();
     }
-    HILOG_INFO("hostUserId:%{public}d", hostUserId);
+    HILOG_WARN("hostUserId:%{public}d", hostUserId);
     auto renderIter = renderInners_.find(hostUserId);
     if (renderIter != renderInners_.end()) {
         renderIter->second->CleanFormHost(host);

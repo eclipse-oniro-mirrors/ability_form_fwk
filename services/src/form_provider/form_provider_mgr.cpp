@@ -28,6 +28,7 @@
 #include "form_provider/connection/form_msg_event_connection.h"
 #include "data_center/form_record/form_record.h"
 #include "form_provider/connection/form_refresh_connection.h"
+#include "form_provider/connection/form_location_connection.h"
 #include "form_provider/connection/form_configuration_update_connection.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_report.h"
@@ -36,6 +37,10 @@
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
+#include "form_mgr/form_mgr_queue.h"
+#include "form_mgr/form_mgr_queue.h"
+#include "common/util/form_task_common.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
@@ -132,7 +137,7 @@ void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &re
             formProviderData.SetImageDataMap(imageDataMap);
             FormMgrAdapter::GetInstance().UpdateForm(formId, record.uid, formProviderData);
         }
-        HILOG_INFO("Upgrade APP data agent card update, cacheData: %{public}d, formId:%{public}" PRId64,
+        HILOG_INFO("Upgrade APP data agent card update, cacheData: %{public}zu, formId:%{public}" PRId64,
             cacheData.size(), formId);
     }
 }
@@ -228,6 +233,36 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     refreshRecord.isTimerRefresh = isTimerRefresh;
     refreshRecord.isHostRefresh = record.isHostRefresh;
     return ConnectAmsForRefresh(formId, refreshRecord, newWant, isCountTimerRefresh);
+}
+
+void FormProviderMgr::DelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want)
+{
+    HILOG_INFO("start");
+ 
+    auto delayRefreshForms = [updatedForms, want]() {
+        for (const auto &updatedForm : updatedForms) {
+            ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
+            if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
+                HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
+                    updatedForm.formId);
+                FormProviderMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
+            }
+        }
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
+    HILOG_INFO("end");
+}
+
+void FormProviderMgr::PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want,
+    bool isVisibleToFresh)
+{
+    HILOG_DEBUG("start");
+ 
+    auto refreshForm = [formId, want, isVisibleToFresh]() {
+        FormProviderMgr::GetInstance().RefreshForm(formId, want, isVisibleToFresh);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME, refreshForm);
+    HILOG_DEBUG("end");
 }
 
 ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, const Want &want)
@@ -580,6 +615,40 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
+    return ERR_OK;
+}
+
+/**
+ * @brief Connect ams for refresh form
+ *
+ * @param formId The form id.
+ * @param record Form data.
+ * @param want The want of the form.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ ErrCode FormProviderMgr::ConnectAmsChangeLocation(const int64_t formId, const FormRecord &record,
+    const Want &want)
+{
+    HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s", formId,
+        record.bundleName.c_str(), record.abilityName.c_str());
+ 
+    sptr<IAbilityConnection> formLocationConnection = new (std::nothrow) FormLocationConnection(formId, want,
+        record.bundleName, record.abilityName);
+    if (formLocationConnection == nullptr) {
+        HILOG_ERROR("create FormLocationConnection failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    Want connectWant;
+    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connectWant.SetElementName(record.bundleName, record.abilityName);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formLocationConnection);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbility failed");
+        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
+            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
+        }
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
     return ERR_OK;
 }
 

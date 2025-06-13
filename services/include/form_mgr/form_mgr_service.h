@@ -24,7 +24,7 @@
 #include "form_instances_filter.h"
 #include "form_mgr_stub.h"
 #include "form_provider_data.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "common/event/system_event/form_sys_event_receiver.h"
 #include "running_form_info.h"
 #include "iremote_object.h"
@@ -401,7 +401,7 @@ public:
 
     /**
      * @brief Start an ability. This function can only be called by a form extension of a system app.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @param callerToken token of the ability that initially calls this function.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -409,10 +409,17 @@ public:
 
     /**
      * @brief Start an ability by form manager service.
-     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t StartAbilityByFms(const Want &want) override;
+
+    /**
+     * @brief Start an ability by cross bundle.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t StartAbilityByCrossBundle(const Want &want) override;
 
     /**
      * @brief Share form by formID and deviceID.
@@ -736,6 +743,49 @@ public:
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override;
 
     friend class NetConnCallbackObserver;
+
+    /**
+     * @brief Register overflow proxy
+     * @param callerToken The form host proxy
+     * @return Return true for overflow proxy register success, false otherwise
+     */
+    bool RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister overflow proxy
+     * @return Return true for form unregister success, false otherwise
+     */
+    bool UnregisterOverflowProxy() override;
+
+    /**
+     * @brief Request overflow with specific range
+     * @param formId The id of the form to request overflow
+     * @param overflowInfo The overflowInfo to explict overflow area and duration
+     * @param isOverflow True for request overflow, false for cancel overflow, default value is true
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow = true) override;
+
+    /**
+     * @brief Register change sceneAnimation state proxy.
+     * @param callerToken The form host proxy.
+     * @return Returns true for change sceneAnimation state proxy register success, false otherwise
+     */
+    bool RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister change sceneAnimation state proxy.
+     * @return Returns true for change sceneAnimation state proxy unregister success, false otherwise
+     */
+    bool UnregisterChangeSceneAnimationStateProxy() override;
+
+    /**
+     * @brief Change SceneAnimation State.
+     * @param formId The formId.
+     * @param state 1 for activate SceneAnimation, 0 for deactivate SceneAnimation
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state) override;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
@@ -768,6 +818,8 @@ private:
     bool CheckAcrossLocalAccountsPermission() const;
 
     void InitFormShareMgrSerialQueue();
+
+    void PostConnectNetWork();
 
     void Dump(const std::vector<std::u16string> &args, std::string &result);
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
@@ -812,6 +864,10 @@ private:
      * @param want The want of form.
      */
     void ReportAddFormEvent(const int64_t formId, const Want &want);
+
+    sptr<IRemoteObject> overflowCallerToken_;
+
+    sptr<IRemoteObject> sceneanimationCallerToken_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

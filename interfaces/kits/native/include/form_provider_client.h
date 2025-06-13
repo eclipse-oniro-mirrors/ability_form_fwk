@@ -172,6 +172,20 @@ public:
      */
     void ClearOwner(const std::shared_ptr<Ability> ability);
 
+    /**
+     * @brief Notify provider when the form need update.
+     *
+     * @param formId The Id of the form.
+     * @param want Indicates the structure containing form info.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+     virtual int NotifyFormLocationUpdate(const int64_t formId, const Want &want,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+
 protected:
     bool CheckIsSystemApp() const;
     int HandleDisconnect(const Want &want, const sptr<IRemoteObject> &callerToken);

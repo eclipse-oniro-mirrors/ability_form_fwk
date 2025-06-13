@@ -27,12 +27,7 @@ ohos_unittest("FmsFormInfoStorageTest") {
   sources += [ "fms_form_info_storage_test.cpp" ]
 
   include_dirs = [
-    "${ability_runtime_path}/services/formmgr/include",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
-    "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
-    "${bundlefwk_path}/interfaces/inner_api/appexecfwk_base/include",
   ]
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
@@ -43,7 +38,6 @@ ohos_unittest("FmsFormInfoStorageTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -59,6 +53,7 @@ ohos_unittest("FmsFormInfoStorageTest") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 }
 

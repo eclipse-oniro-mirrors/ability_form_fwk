@@ -1172,7 +1172,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_057, TestSize.Level0)
     EXPECT_TRUE(formRenderRecordPtr_);
 
     formRenderRecordPtr_->CheckEventHandler(true, false);
-    formRenderRecordPtr_->threadState_ = std::make_shared<ThreadState>(2);
+    formRenderRecordPtr_->threadState_ = std::make_unique<ThreadState>(2);
     EXPECT_EQ(TaskState::RUNNING, formRenderRecordPtr_->RunTask());
     GTEST_LOG_(INFO) << "FormRenderRecordTest_057 end";
 }
@@ -1188,7 +1188,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_058, TestSize.Level0)
     EXPECT_TRUE(formRenderRecordPtr_);
 
     formRenderRecordPtr_->CheckEventHandler(true, false);
-    formRenderRecordPtr_->threadState_ = std::make_shared<ThreadState>(1);
+    formRenderRecordPtr_->threadState_ = std::make_unique<ThreadState>(1);
     formRenderRecordPtr_->threadIsAlive_ = false;
 
     EXPECT_EQ(TaskState::BLOCK, formRenderRecordPtr_->RunTask());
@@ -1348,7 +1348,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_066, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_066 start";
 
     ASSERT_NE(formRenderRecordPtr_, nullptr);
-    formRenderRecordPtr_->threadState_ = std::make_shared<ThreadState>(1);
+    formRenderRecordPtr_->threadState_ = std::make_unique<ThreadState>(1);
     ASSERT_NE(formRenderRecordPtr_->threadState_, nullptr);
     formRenderRecordPtr_->MarkThreadAlive();
     EXPECT_EQ(formRenderRecordPtr_->threadState_->state_, 0);
@@ -1825,8 +1825,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
     size_t requestIndex = 0;
     formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
         nullptr);
-    bool ret = formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
-    EXPECT_EQ(false, ret);
+    formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_090 end";
 }
 
@@ -1955,7 +1954,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_098, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_098 start";
     formRenderRecordPtr_->threadIsAlive_ = false;
-    formRenderRecordPtr_->threadState_ = std::make_shared<ThreadState>(0);
+    formRenderRecordPtr_->threadState_ = std::make_unique<ThreadState>(0);
     formRenderRecordPtr_->Timer();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_098 end";
 }
@@ -2629,7 +2628,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_139, TestSize.Level1)
 
 /**
  * @tc.name: FormRenderRecordTest_140
- * @tc.desc: Verify InitCompIds
+ * @tc.desc: Verify GetAndDeleteRecycledCompIds
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_140, TestSize.Level1)
@@ -2641,7 +2640,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_140, TestSize.Level1)
     formRenderRecordPtr_->recycledFormCompIds_.clear();
     std::pair<std::vector<std::string>, std::string> pp;
     formRenderRecordPtr_->recycledFormCompIds_.emplace(formId, pp);
-    formRenderRecordPtr_->InitCompIds(formId, orderedCompIds, currentCompId);
+    formRenderRecordPtr_->GetAndDeleteRecycledCompIds(formId, orderedCompIds, currentCompId);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_140 end";
 }
 

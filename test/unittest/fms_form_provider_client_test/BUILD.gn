@@ -26,8 +26,6 @@ ohos_unittest("FmsFormProviderClientTest") {
     "form_provider_client_test.cpp",
   ]
 
-  deps = [ "//third_party/googletest:gtest_main" ]
-
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
@@ -45,6 +43,7 @@ ohos_unittest("FmsFormProviderClientTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "googletest:gtest_main",
   ]
 }
 

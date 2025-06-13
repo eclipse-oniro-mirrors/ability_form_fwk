@@ -27,17 +27,9 @@ ohos_unittest("FmsFormMgrNotifyVisibleFormsTest") {
   ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/interfaces/kits/native/ability/native",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/app",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
-    "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/test/mock/include",
-    "${global_path}/resource_management/interfaces/inner_api/include",
   ]
 
   configs = []
@@ -55,7 +47,6 @@ ohos_unittest("FmsFormMgrNotifyVisibleFormsTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -80,6 +71,7 @@ ohos_unittest("FmsFormMgrNotifyVisibleFormsTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "selinux_adapter:librestorecon",
+    "googletest:gmock_main",
   ]
 }
 

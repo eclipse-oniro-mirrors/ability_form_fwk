@@ -550,6 +550,10 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "previewImages", CreateNativeArray(env, formInfo.formPreviewImages));
     napi_set_named_property(env, objContext, "renderingMode", CreateJsValue(env, formInfo.renderingMode));
     napi_set_named_property(env, objContext, "enableBlurBackground", CreateJsValue(env, formInfo.enableBlurBackground));
+    napi_set_named_property(env, objContext, "funInteractionParams",
+        CreateFunInteractionParamsDatas(env, formInfo.funInteractionParams));
+    napi_set_named_property(env, objContext, "sceneAnimationParams",
+        CreateSceneAnimationParamsDatas(env, formInfo.sceneAnimationParams));
 
     return objContext;
 }
@@ -597,6 +601,32 @@ napi_value CreateFormCustomizeDatas(napi_env env, const std::vector<FormCustomiz
         napi_set_named_property(env, objContext, data.name.c_str(), CreateJsValue(env, data.value));
     }
 
+    return objContext;
+}
+
+napi_value CreateFunInteractionParamsDatas(napi_env env, const FormFunInteractionParams &funInteractionParamsDatas)
+{
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
+    napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, funInteractionParamsDatas.abilityName));
+    napi_set_named_property(env, objContext, "targetBundleName",
+        CreateJsValue(env, funInteractionParamsDatas.targetBundleName));
+    napi_set_named_property(env, objContext, "subBundleName",
+        CreateJsValue(env, funInteractionParamsDatas.subBundleName));
+    napi_set_named_property(env, objContext, "keepStateDuration",
+        CreateJsValue(env, funInteractionParamsDatas.keepStateDuration));
+    return objContext;
+}
+
+napi_value CreateSceneAnimationParamsDatas(napi_env env, const FormSceneAnimationParams &sceneAnimationParamsDatas)
+{
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
+    napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, sceneAnimationParamsDatas.abilityName));
+    napi_set_named_property(env, objContext, "isAlwaysActive",
+        CreateJsValue(env, sceneAnimationParamsDatas.isAlwaysActive));
+    napi_set_named_property(env, objContext, "disabledDesktopBehaviors",
+        CreateJsValue(env, sceneAnimationParamsDatas.disabledDesktopBehaviors));
     return objContext;
 }
 

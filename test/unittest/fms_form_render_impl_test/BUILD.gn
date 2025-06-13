@@ -25,9 +25,6 @@ ohos_unittest("FrsFormRenderImplTest") {
   ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/form_render_service/include",
     "${form_fwk_path}/test/mock/include",
@@ -43,7 +40,6 @@ ohos_unittest("FrsFormRenderImplTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -67,6 +63,7 @@ ohos_unittest("FrsFormRenderImplTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "googletest:gmock_main",
   ]
 
   defines = []

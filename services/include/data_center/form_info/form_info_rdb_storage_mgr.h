@@ -104,7 +104,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormVersionCode(std::string &versionCode);
-
+ 
     /**
      * @brief Save or update the version code of form in DB.
      * @return Returns ERR_OK on success, others on failure.
@@ -114,6 +114,7 @@ private:
     void SaveEntries(const std::unordered_map<std::string, std::string> &value,
         std::vector<InnerFormInfo> &innerFormInfos);
 
+private:
     mutable std::mutex rdbStorePtrMutex_;
 };
 }  // namespace AppExecFwk

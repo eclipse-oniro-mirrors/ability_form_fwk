@@ -18,7 +18,7 @@
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "form_mgr_errors.h"
-#include "status_mgr_center/form_serial_queue.h"
+#include "common/util/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"
 #include "common/util/form_util.h"
 

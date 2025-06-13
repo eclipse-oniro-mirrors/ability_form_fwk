@@ -1,0 +1,102 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("FormProviderTaskMgrFuzzTest") {
+  module_out_path = form_fuzz_test_path
+
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formprovidertaskmgr_fuzzer"
+
+  include_dirs = [
+    "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/services/include",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [
+    "formprovidertaskmgr_fuzzer.cpp",
+    "${form_fwk_path}/services/src/form_provider/form_provider_queue.cpp",
+    "${form_fwk_path}/services/src/form_provider/form_provider_task_mgr.cpp",
+    "${form_fwk_path}/services/src/common/util/form_report.cpp"
+  ]
+
+  deps = [
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+  ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:configuration",
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:ability_deps_wrapper",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
+    "ability_runtime:appkit_native",
+    "ability_runtime:mission_info",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "common_event_service:cesfwk_core",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
+    "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
+    "ffrt:libffrt",
+    "form_fwk:form_manager",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "libxml2:libxml2",
+    "netmanager_base:net_conn_manager_if",
+    "os_account:os_account_innerkits",
+    "relational_store:native_rdb",
+    "resource_management:global_resmgr",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "time_service:time_client",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":FormProviderTaskMgrFuzzTest",
+  ]
+}
+###############################################################################

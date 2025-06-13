@@ -25,14 +25,8 @@ ohos_unittest("FmsFormDistributedClientTest") {
   ]
 
   include_dirs = [
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include/",
-    "${dtbschedmgr_path}/include/",
-    "${samgr_proxy_path}/include",
-    "${adapter_innerkits_path}/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
-    "${ability_dmsfwk_path}/services/dtbschedmgr/include/",
   ]
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
@@ -44,7 +38,6 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -63,6 +56,7 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "googletest:gmock_main",
   ]
 }
 

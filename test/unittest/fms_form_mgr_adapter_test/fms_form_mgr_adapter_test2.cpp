@@ -978,38 +978,6 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0159, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_0160
- * @tc.desc: test AcquireProviderFormInfo function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0160, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0160 start";
-    FormMgrAdapter formMgrAdapter;
-    const sptr<IRemoteObject> &callerToken = nullptr;
-    const Want want = {};
-    constexpr int64_t formId = 0;
-    formMgrAdapter.AcquireProviderFormInfo(formId, want, callerToken);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0160 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_0161
- * @tc.desc: test NotifyFormDelete function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0161, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0161 start";
-    FormMgrAdapter formMgrAdapter;
-    const sptr<IRemoteObject> &callerToken = nullptr;
-    const Want want = {};
-    constexpr int64_t formId = 0;
-    formMgrAdapter.NotifyFormDelete(formId, want, callerToken);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0161 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_0162
  * @tc.desc: test NotifyFormsVisible function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
  * @tc.type: FUNC
@@ -1515,23 +1483,6 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0188, TestSize.Level0)
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsHelperBackup;
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0188 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_0189
- * @tc.desc: test NotifyFormDelete function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0189, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0189 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    Want want;
-    want.SetBundle("bundle");
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    formMgrAdapter.NotifyFormDelete(formId, want, callerToken);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0189 end";
 }
 
 /**
@@ -2258,7 +2209,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_227, TestSize.Level0)
     Constants::PublishFormResult result {Constants::PublishFormErrorCode::SUCCESS, ""};
     EXPECT_EQ(formMgrAdapter.SetPublishFormResult(formId, result), ERR_APPEXECFWK_FORM_COMMON_CODE);
 
-    formMgrAdapter.serialQueue_ = std::make_shared<FormSerialQueue>("FormMgrTimerTaskQueueTest");
+    formMgrAdapter.serialQueue_ = std::make_unique<FormSerialQueue>("FormMgrTimerTaskQueueTest");
     EXPECT_EQ(formMgrAdapter.SetPublishFormResult(formId, result), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 
     formMgrAdapter.formIdMap_.insert(std::make_pair(formId, AddFormResultErrorCode::UNKNOWN));

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "../form_edit_extension_context/js_form_edit_extension_context.h"
+#include "js_form_edit_extension_context.h"
 #include "hilog_tag_wrapper.h"
 #include "js_ui_extension_context.h"
 #include "js_runtime.h"
