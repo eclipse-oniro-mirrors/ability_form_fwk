@@ -29,12 +29,13 @@ class FileUtils {
 public:
     static bool IsFileExists(const std::string &fileName)
     {
-        char canonicalPath[PATH_MAX + 1] = { '\0' };
+        char* canonicalPath = new char[PATH_MAX];
         if (realpath(fileName.c_str(), canonicalPath) == nullptr) {
             HILOG_ERROR("canonicalPath is null");
             return false;
         }
         std::ifstream file(canonicalPath);
+        free(canonicalPath);
         if (!file.good()) {
             HILOG_WARN("file not exists: %{public}s", fileName.c_str());
             return false;
