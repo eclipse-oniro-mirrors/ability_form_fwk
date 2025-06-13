@@ -18,6 +18,8 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <cstdlib>
 #include "common/util/string_utils.h"
 #include "feature/param_update/sign_tools.h"
 #include "form_constants.h"
@@ -40,7 +42,7 @@ ParamReader::ParamReader()
 }
 ParamReader::~ParamReader()
 {
-    HILOG_INFO("destory");
+    HILOG_INFO("destroy");
 }
 
 std::string ParamReader::GetPathVersion(const std::string &path)
@@ -50,9 +52,15 @@ std::string ParamReader::GetPathVersion(const std::string &path)
         HILOG_ERROR("path is empty, return default version");
         return Constants::FMC_DEFAULT_VERSION;
     }
-    std::ifstream file(path + Constants::VERSION_FILE_NAME);
+    char *canonicalPath = realpath((path + Constants::VERSION_FILE_NAME).c_str(), nullptr);
+    if (canonicalPath == nullptr) {
+        HILOG_ERROR("canonicalPath is null, return default version");
+        return Constants::FMC_DEFAULT_VERSION;
+    }
+    std::ifstream file(canonicalPath);
+    free(canonicalPath);
     if (!file.good()) {
-        HILOG_INFO("VersionFilePath is not good,FilePath:%{public}s", path.c_str());
+        HILOG_ERROR("VersionFilePath is not good");
         return Constants::FMC_DEFAULT_VERSION;
     }
     std::string line;
@@ -96,7 +104,7 @@ bool ParamReader::VerifyParamFile(const std::string &fileName)
         return false;
     }
     std::string calSha256Digest = CalcFileSha256Digest(fileName);
-    HILOG_INFO("calSha256Digest:%{public}s", sha256Digest.c_str());
+    HILOG_INFO("calSha256Digest:%{public}s", calSha256Digest.c_str());
     if (calSha256Digest.empty()) {
         HILOG_ERROR("calSha256Digest is empty");
         return false;
@@ -107,12 +115,20 @@ bool ParamReader::VerifyParamFile(const std::string &fileName)
 std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
 {
     std::string paramInfo;
-    std::ifstream file(filePathStr);
-    std::string line;
-    while (std::getline(file, line)) {
-        StringUtils::trim(line);
-        paramInfo += line;
+    char *canonicalPath = realpath(filePathStr.c_str(), nullptr);
+    if (canonicalPath == nullptr) {
+        HILOG_ERROR("canonicalPath is null");
+        return paramInfo;
     }
+    std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
+    free(canonicalPath);
+    if (!file.good()) {
+        HILOG_ERROR("Failed to open the file!");
+        return paramInfo;
+    }
+    std::stringstream infile;
+    infile << file.rdbuf();
+    paramInfo = infile.str();
     file.close();
     return paramInfo;
 }

@@ -22,6 +22,7 @@
 #include <openssl/pem.h> // PEM_read_bio_RSA_PUBKEY
 #include <openssl/rsa.h> // rsa
 #include <sstream>       // stringstream
+#include <cstdlib>
 
 #include "common/util/file_utils.h"
 #include "fms_log_wrapper.h"
@@ -46,6 +47,8 @@ bool SignTools::VerifyFileSign(const std::string &pubKeyPath, const std::string 
 
     if (PEM_read_bio_RSA_PUBKEY(bio, &pubKey, NULL, NULL) == NULL) {
         HILOG_ERROR("get pubKey is failed");
+        BIO_free(bio);
+        RSA_free(pubKey);
         return false;
     }
 
@@ -71,6 +74,7 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
     }
     if (EVP_PKEY_set1_RSA(evpKey, pubKey) != 1) {
         HILOG_ERROR("EVP_PKEY_set1_RSA fail");
+        EVP_PKEY_free(evpKey);
         return false;
     }
     ctx = EVP_MD_CTX_new();
@@ -107,17 +111,21 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
 std::string SignTools::GetfileStream(const std::string &filepath)
 {
     std::string fileString;
-    std::ifstream file(filepath, std::ios::in | std::ios::binary);
-    if (!file) {
+    char *canonicalPath = realpath(filepath.c_str(), nullptr);
+    if (canonicalPath == nullptr) {
+        HILOG_ERROR("canonicalPath is null");
+        return fileString;
+    }
+    std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
+    free(canonicalPath);
+    if (!file.good()) {
         HILOG_ERROR("Failed to open the file!");
         return fileString;
     }
     std::stringstream infile;
     infile << file.rdbuf();
     fileString = infile.str();
-    if (fileString.empty()) {
-        return fileString;
-    }
+    file.close();
     return fileString;
 }
 
@@ -140,7 +148,13 @@ std::tuple<int, std::string> SignTools::CalcFileSha256Digest(const std::string &
 
 int SignTools::ForEachFileSegment(const std::string &fpath, std::function<void(char *, size_t)> executor)
 {
-    std::unique_ptr<FILE, decltype(&fclose)> filp = { fopen(fpath.c_str(), "r"), fclose };
+    char *canonicalPath = realpath(fpath.c_str(), nullptr);
+    if (canonicalPath == nullptr) {
+        HILOG_ERROR("canonicalPath is null");
+        return errno;
+    }
+    std::unique_ptr<FILE, decltype(&fclose)> filp = { fopen(canonicalPath, "r"), fclose };
+    free(canonicalPath);
     if (!filp) {
         return errno;
     }

@@ -19,6 +19,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -27,7 +28,13 @@ class FileUtils {
 public:
     static bool IsFileExists(const std::string &fileName)
     {
-        std::ifstream file(fileName);
+        char *canonicalPath = realpath(fileName.c_str(), nullptr);
+        if (canonicalPath == nullptr) {
+            HILOG_ERROR("canonicalPath is null");
+            return false;
+        }
+        std::ifstream file(canonicalPath);
+        free(canonicalPath);
         if (!file.good()) {
             HILOG_WARN("file not exists: %{public}s", fileName.c_str());
             return false;
