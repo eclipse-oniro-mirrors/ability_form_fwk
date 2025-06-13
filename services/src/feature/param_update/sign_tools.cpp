@@ -22,6 +22,8 @@
 #include <openssl/pem.h> // PEM_read_bio_RSA_PUBKEY
 #include <openssl/rsa.h> // rsa
 #include <sstream>       // stringstream
+#include <cstdlib>
+#include <climits>
 
 #include "common/util/file_utils.h"
 #include "fms_log_wrapper.h"
@@ -46,6 +48,8 @@ bool SignTools::VerifyFileSign(const std::string &pubKeyPath, const std::string 
 
     if (PEM_read_bio_RSA_PUBKEY(bio, &pubKey, NULL, NULL) == NULL) {
         HILOG_ERROR("get pubKey is failed");
+        BIO_free(bio);
+        RSA_free(pubKey);
         return false;
     }
 
@@ -71,6 +75,7 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
     }
     if (EVP_PKEY_set1_RSA(evpKey, pubKey) != 1) {
         HILOG_ERROR("EVP_PKEY_set1_RSA fail");
+        EVP_PKEY_free(evpKey);
         return false;
     }
     ctx = EVP_MD_CTX_new();
@@ -107,17 +112,21 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
 std::string SignTools::GetfileStream(const std::string &filepath)
 {
     std::string fileString;
-    std::ifstream file(filepath, std::ios::in | std::ios::binary);
-    if (!file) {
+    char canonicalPath[PATH_MAX] = { '\0' };
+    if (realpath(filepath.c_str(), canonicalPath) == nullptr) {
+        HILOG_ERROR("canonicalPath is null");
+        return fileString;
+    }
+    canonicalPath[PATH_MAX - 1] = '\0';
+    std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
+    if (!file.good()) {
         HILOG_ERROR("Failed to open the file!");
         return fileString;
     }
     std::stringstream infile;
     infile << file.rdbuf();
     fileString = infile.str();
-    if (fileString.empty()) {
-        return fileString;
-    }
+    file.close();
     return fileString;
 }
 
@@ -140,7 +149,13 @@ std::tuple<int, std::string> SignTools::CalcFileSha256Digest(const std::string &
 
 int SignTools::ForEachFileSegment(const std::string &fpath, std::function<void(char *, size_t)> executor)
 {
-    std::unique_ptr<FILE, decltype(&fclose)> filp = { fopen(fpath.c_str(), "r"), fclose };
+    char canonicalPath[PATH_MAX] = { '\0' };
+    if (realpath(fpath.c_str(), canonicalPath) == nullptr) {
+        HILOG_ERROR("canonicalPath is null");
+        return errno;
+    }
+    canonicalPath[PATH_MAX - 1] = '\0';
+    std::unique_ptr<FILE, decltype(&fclose)> filp = { fopen(canonicalPath, "r"), fclose };
     if (!filp) {
         return errno;
     }
@@ -161,9 +176,9 @@ void SignTools::CalcBase64(uint8_t *input, uint32_t inputLen, std::string &encod
 {
     size_t expectedLength = 4 * ((inputLen + 2) / 3);
     encodedStr.resize(expectedLength);
-    size_t actualLength = EVP_EncodeBlock(reinterpret_cast<uint8_t *>(&encodedStr[0]), input, inputLen);
+    int actualLength = EVP_EncodeBlock(reinterpret_cast<uint8_t *>(&encodedStr[0]), input, inputLen);
     encodedStr.resize(actualLength);
-    HILOG_INFO("expectedLength = %{public}zu, actualLength = %{public}zu", expectedLength, actualLength);
+    HILOG_INFO("expectedLength = %{public}zu, actualLength = %{public}d", expectedLength, actualLength);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
