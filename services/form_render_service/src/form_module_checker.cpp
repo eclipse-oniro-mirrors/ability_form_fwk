@@ -82,6 +82,7 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "multimedia.image.PixelMap.*",
     "multimedia.image.ImageSource.*",
     "deviceInfo.deviceType",
+    "deviceInfo.productModel",
     "window.WindowType.*",
     "window.AvoidAreaType.*",
     "window.WindowMode.*",
