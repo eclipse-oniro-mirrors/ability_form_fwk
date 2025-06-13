@@ -175,9 +175,9 @@ void SignTools::CalcBase64(uint8_t *input, uint32_t inputLen, std::string &encod
 {
     size_t expectedLength = 4 * ((inputLen + 2) / 3);
     encodedStr.resize(expectedLength);
-    size_t actualLength = EVP_EncodeBlock(reinterpret_cast<uint8_t *>(&encodedStr[0]), input, inputLen);
+    int actualLength = EVP_EncodeBlock(reinterpret_cast<uint8_t *>(&encodedStr[0]), input, inputLen);
     encodedStr.resize(actualLength);
-    HILOG_INFO("expectedLength = %{public}zu, actualLength = %{public}zu", expectedLength, actualLength);
+    HILOG_INFO("expectedLength = %{public}zu, actualLength = %{public}d", expectedLength, actualLength);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
