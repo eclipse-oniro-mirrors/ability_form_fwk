@@ -743,13 +743,12 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         MergeFormData(formRequest, formJsInfo);
         if (!formRequest.hasRelease) {
             UpdateRenderer(formJsInfo);
-            // recover form by updating task, need update provider data to formRequests_
             AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
         if (formJsInfo.isDynamic) {
             isDynamicFormNeedRecover = true;
-
+            // recover form by updating task, need update provider data to formRequests_
             AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
