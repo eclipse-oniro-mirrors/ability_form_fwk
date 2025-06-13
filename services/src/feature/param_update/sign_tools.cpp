@@ -112,11 +112,12 @@ bool SignTools::VerifyRsa(RSA *pubKey, const std::string &digest, const std::str
 std::string SignTools::GetfileStream(const std::string &filepath)
 {
     std::string fileString;
-    char canonicalPath[PATH_MAX + 1] = { '\0' };
+    char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath(filepath.c_str(), canonicalPath) == nullptr) {
         HILOG_ERROR("canonicalPath is null");
         return fileString;
     }
+    canonicalPath[PATH_MAX - 1] = '\0';
     std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
     if (!file.good()) {
         HILOG_ERROR("Failed to open the file!");
