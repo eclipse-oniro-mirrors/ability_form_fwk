@@ -743,11 +743,14 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         MergeFormData(formRequest, formJsInfo);
         if (!formRequest.hasRelease) {
             UpdateRenderer(formJsInfo);
+            // recover form by updating task, need update provider data to formRequests_
             AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
         if (formJsInfo.isDynamic) {
             isDynamicFormNeedRecover = true;
+
+            AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
         if (compMaxId == formRequest.compId) {
@@ -1691,8 +1694,6 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
         groupRequest.want = recordRequest.want;
         groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
         MergeMap(groupRequest.formJsInfo.imageDataMap, formJsInfo.imageDataMap);
-        // merge the latest provider data when recover form
-        MergeFormData(groupRequest, formJsInfo);
         if (compId == currentCompId) {
             groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
