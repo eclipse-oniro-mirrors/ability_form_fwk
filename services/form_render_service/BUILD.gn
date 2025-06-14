@@ -168,6 +168,7 @@ ohos_shared_library("formrender_service") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
+    "ipc:ipc_napi",
     "napi:ace_napi",
   ]
 

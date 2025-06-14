@@ -802,6 +802,7 @@ ohos_shared_library("form_edit_extension_module") {
     "ability_runtime:ui_extension",
     "bundle_framework:appexecfwk_core",
     "hilog:libhilog",
+    "ipc:ipc_napi",
     "napi:ace_napi",
   ]
 
@@ -976,6 +977,7 @@ ohos_shared_library("live_form_extension_module") {
     "ability_runtime:ui_extension",
     "bundle_framework:appexecfwk_core",
     "hilog:libhilog",
+    "ipc:ipc_napi",
     "napi:ace_napi",
   ]
 
