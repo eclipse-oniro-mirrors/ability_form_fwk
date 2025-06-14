@@ -72,6 +72,9 @@ ohos_unittest("FmsFormCheckMgrTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",
+    "libxml2:libxml2",
+    "hisysevent:libhisysevent",
+    "jsoncpp:jsoncpp",
   ]
 }
 

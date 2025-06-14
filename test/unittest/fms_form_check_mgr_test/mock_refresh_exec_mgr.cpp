@@ -23,6 +23,7 @@ namespace {
     OHOS::ErrCode g_mockUpdateData = OHOS::ERR_OK;
 }
 
+namespace OHOS {
 void MockAskForProviderData(OHOS::ErrCode mockRet)
 {
     g_mockAskData = mockRet;
@@ -31,6 +32,7 @@ void MockAskForProviderData(OHOS::ErrCode mockRet)
 void MockUpdateByProviderData(OHOS::ErrCode mockRet)
 {
     g_mockUpdateData = mockRet;
+}
 }
 
 namespace OHOS {

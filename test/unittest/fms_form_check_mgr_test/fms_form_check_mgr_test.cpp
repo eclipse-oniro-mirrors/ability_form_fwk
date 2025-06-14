@@ -14,7 +14,7 @@
  */
 #include <chrono>
 #include <gtest/gtest.h>
-#define private public
+#include "mock_refresh_mgr.h"
 #include "form_refresh/check_mgr/system_app_checker.h"
 #include "form_refresh/check_mgr/self_form_checker.h"
 #include "form_refresh/check_mgr/calling_user_checker.h"
@@ -28,7 +28,6 @@
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
 #include "form_refresh/refresh_impl/form_timer_refresh_impl.h"
-#undef private
 #include "data_center/form_record/form_record.h"
 #include "form_mgr_errors.h"
 
@@ -40,14 +39,6 @@ const std::string FORM_BUNDLE_NAME = "formBundleName";
 const int64_t FORM_ID_ONE = 1;
 const int64_t FORM_ID_ZERO = 0;
 const int64_t FORM_USER_UIDS_ZERO = 0;
-
-extern void MockIsBaseValidPass(ErrCode mockRet);
-extern void MockAskForProviderData(ErrCode mockRet);
-extern void MockUpdateByProviderData(ErrCode mockRet);
-extern void MockIsSystemOverload(bool mockBool);
-extern void MockIsFormInvisible(bool mockBool);
-extern void MockIsScreenOff(bool mockBool);
-extern void MockIsHealthyControl(bool mockBool);
 
 namespace {
 class FmsFormCheckMgrTest : public testing::Test {

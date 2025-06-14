@@ -13,33 +13,21 @@
  * limitations under the License.
  */
 
-#include "form_refresh/strategy/refresh_check_mgr.h"
+#ifndef OHOS_MOCK_REFRESH_MGR_H
+#define OHOS_MOCK_REFRESH_MGR_H
 
-#include "form_mgr_errors.h"
+#include <gtest/gtest.h>
+
 #include "fms_log_wrapper.h"
-
-namespace {
-    OHOS::ErrCode g_mockCheckValid = OHOS::ERR_OK;
-}
+#include "form_mgr_errors.h"
 
 namespace OHOS {
-void MockIsBaseValidPass(OHOS::ErrCode mockRet)
-{
-    g_mockCheckValid = mockRet;
+void MockIsBaseValidPass(OHOS::ErrCode mockRet);
+void MockAskForProviderData(ErrCode mockRet);
+void MockUpdateByProviderData(ErrCode mockRet);
+void MockIsSystemOverload(bool mockBool);
+void MockIsFormInvisible(bool mockBool);
+void MockIsScreenOff(bool mockBool);
+void MockIsHealthyControl(bool mockBool);
 }
-}
-
-namespace OHOS {
-namespace AppExecFwk {
-RefreshCheckMgr::RefreshCheckMgr()
-{}
-
-RefreshCheckMgr::~RefreshCheckMgr()
-{}
-
-ErrCode RefreshCheckMgr::IsBaseValidPass(const std::vector<int32_t> &types, const CheckValidFactor &factor)
-{
-    return g_mockCheckValid;
-}
-} // namespace AppExecFwk
-} // namespace OHOS
+#endif

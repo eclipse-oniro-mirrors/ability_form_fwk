@@ -25,6 +25,7 @@ namespace {
     bool g_mockIsHealthyControl = false;
 }
 
+namespace OHOS {
 void MockIsSystemOverload(bool mockBool)
 {
     g_mockIsSystemOverload = mockBool;
@@ -43,6 +44,7 @@ void MockIsScreenOff(bool mockBool)
 void MockIsHealthyControl(bool mockBool)
 {
     g_mockIsHealthyControl = mockBool;
+}
 }
 
 namespace OHOS {
