@@ -121,7 +121,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0121, TestSize.Level0)
     MockGetMatchedHostClient(true);
     MockGetMatchedHostClientParams(true);
     MockGetMatchedHostClientParamsMatchedId(formId);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.RequestForm(formId, callerToken, want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.RequestForm(formId, callerToken, want));
     MockGetMatchedHostClientParamsMatchedId(0);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0121 end";
 }

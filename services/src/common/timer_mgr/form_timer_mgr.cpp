@@ -34,6 +34,7 @@
 #include "common/event/form_event_report.h"
 #include "data_center/form_record/form_record_report.h"
 #include "data_center/form_data_mgr.h"
+#include "form_refresh/form_refresh_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1205,7 +1206,7 @@ bool FormTimerMgr::UpdateDynamicAlarm()
     }
 
     if (!IsNeedUpdate()) {
-        HILOG_ERROR("no need to  UpdateDynamicAlarm");
+        HILOG_ERROR("no need to UpdateDynamicAlarm");
         return true;
     }
 
@@ -1475,49 +1476,12 @@ void FormTimerMgr::ClearDiskInfoReportTimer()
 }
 
 #ifdef RES_SCHEDULE_ENABLE
-void FormTimerMgr::SetTimerTaskNeeded(bool isTimerTaskNeeded)
-{
-    HILOG_INFO("isTimerTaskNeeded_:%{public}s", isTimerTaskNeeded ? "true" : "false");
-    if (!isTimerTaskNeeded_ && isTimerTaskNeeded) {
-        TriggerAndClearNotExecTaskVec();
-    }
-    isTimerTaskNeeded_ = isTimerTaskNeeded;
-}
-
-void FormTimerMgr::AddToNotExecTaskVec(const FormTimer &task)
-{
-    for (auto &item : notExecTaskVec_) {
-        if (item.formId == task.formId && item.userId == task.userId) {
-            item = task;
-            return;
-        }
-    }
-    notExecTaskVec_.emplace_back(task);
-    HILOG_INFO("the task(formId:%{public}" PRId64 ", userId:%{public}d) is added to notExecTaskVec",
-        task.formId, task.userId);
-}
-
-void FormTimerMgr::TriggerAndClearNotExecTaskVec()
-{
-    for (auto &item : notExecTaskVec_) {
-        ExecTimerTaskCore(item);
-        HILOG_INFO("the task(formId:%{public}" PRId64 ", userId:%{public}d) is triggered when level is down",
-            item.formId, item.userId);
-    }
-    notExecTaskVec_.clear();
-}
-
 /**
  * @brief Execute Form timer task.
  * @param timerTask Form timer task.
  */
 void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 {
-    if (!isTimerTaskNeeded_) {
-        AddToNotExecTaskVec(timerTask);
-        return;
-    }
-
     ExecTimerTaskCore(timerTask);
 }
 
@@ -1534,7 +1498,15 @@ void FormTimerMgr::ExecTimerTaskCore(const FormTimer &timerTask)
 void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 #endif // RES_SCHEDULE_ENABLE
 {
-    AAFwk::Want want;
+    HILOG_BRIEF("userId:%{public}d", timerTask.userId);
+    RefreshData data;
+    data.formId = timerTask.formId;
+    data.formTimer = timerTask;
+    FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_TIMER);
+}
+
+void FormTimerMgr::BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want)
+{
     if (timerTask.isCountTimer) {
         want.SetParam(Constants::KEY_IS_TIMER, true);
     }
@@ -1555,11 +1527,6 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
     } else if (timerTask.refreshType == RefreshType::TYPE_VISIABLE) {
         want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
     }
-    HILOG_BRIEF("userId:%{public}d", timerTask.userId);
-    auto task = [id = timerTask.formId, want]() {
-        FormProviderMgr::GetInstance().RefreshForm(id, want, false);
-    };
-    ffrt::submit(task);
 }
 
 void FormTimerMgr::RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId)

@@ -46,7 +46,7 @@ FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want& w
 void FormRefreshConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("call, formId:%{public}" PRId64, GetFormId());
     FormAbilityConnection::OnAbilityConnectDone(element, remoteObject, resultCode);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",

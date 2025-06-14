@@ -23,6 +23,7 @@
 #include "form_provider/form_supply_callback.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_cache_mgr.h"
+#include "form_refresh/strategy/refresh_cache_mgr.h"
  
 namespace OHOS {
 namespace AppExecFwk {
@@ -151,7 +152,7 @@ void FormStatusTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want 
         }
         FormStatusTaskMgr::GetInstance().InnerPostRenderForm(newRecord, want, remoteObject);
     };
-    FormRenderMgr::GetInstance().AddPostRenderFormTask(formRecord.formId, task);
+    RefreshCacheMgr::GetInstance().AddRenderTask(formRecord.formId, task);
 }
 
 /**

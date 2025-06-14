@@ -953,8 +953,6 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
  {
      GTEST_LOG_(INFO) << "FormMgrAdapter_0287 start";
      FormMgrAdapter formMgrAdapter;
-     auto ret = formMgrAdapter.RefreshFormsByScreenOn();
-     EXPECT_EQ(ret, ERR_OK);
      Want want;
      FormItemInfo formItemInfo;
      formMgrAdapter.GetFormConfigInfo(want, formItemInfo);

@@ -590,7 +590,7 @@ int FormMgr::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemot
  */
 int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("call, nextTime:%{public}" PRId64 ", formId:%{public}" PRId64, nextTime, formId);
 
     if (GetInstance().GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("formManager is in recovering");

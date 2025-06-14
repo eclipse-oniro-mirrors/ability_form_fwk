@@ -1,0 +1,203 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "form_refresh/strategy/refresh_cache_mgr.h"
+
+#include "form_refresh/strategy/refresh_exec_mgr.h"
+#include "common/util/form_util.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/form_record/form_record_report.h"
+#include "fms_log_wrapper.h"
+#include "form_refresh/form_refresh_mgr.h"
+
+namespace OHOS {
+namespace AppExecFwk {
+
+RefreshCacheMgr::RefreshCacheMgr() {}
+RefreshCacheMgr::~RefreshCacheMgr() {}
+
+void RefreshCacheMgr::AddToOverloadTaskQueue(const FormTimer &task)
+{
+    HILOG_WARN("add overload formId:%{public} " PRId64 ", userId:%{public}d", task.formId, task.userId);
+    for (auto &item : overloadTask_) {
+        if (item.formId == task.formId && item.userId == task.userId) {
+            item = task;
+            HILOG_INFO("already exists, update task");
+            return;
+        }
+    }
+    overloadTask_.emplace_back(task);
+    return;
+}
+
+void RefreshCacheMgr::ConsumeOverloadTaskQueue()
+{
+    for (auto &item : overloadTask_) {
+        HILOG_INFO("cosume overload task(formId:%{public}" PRId64 ", userId:%{public}d)", item.formId, item.userId);
+        RefreshData data;
+        data.formId = item.formId;
+        data.formTimer = item;
+        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_TIMER);
+    }
+    overloadTask_.clear();
+}
+
+void RefreshCacheMgr::AddFlagByHealthyControl(const int64_t formId, bool isAskForProviderData)
+{
+    HILOG_WARN("healthy control formId:%{public}" PRId64", ask for data:%{public}d", formId, isAskForProviderData);
+    if (isAskForProviderData) {
+        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
+    } else {
+        FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formId, true);
+    }
+}
+
+void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterator &record, const int32_t userId)
+{
+    if (record->isRefreshDuringDisableForm) {
+        HILOG_INFO("ask for data, formId:%{public}" PRId64, record->formId);
+        record->isRefreshDuringDisableForm = false;
+        Want want;
+        want.SetElementName(record->bundleName, record->abilityName);
+        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+        want.SetParam(Constants::RECREATE_FORM_KEY, true);
+        want.SetParam(Constants::PARAM_MODULE_NAME_KEY, record->moduleName);
+        want.SetParam(Constants::PARAM_FORM_NAME_KEY, record->formName);
+        want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, record->specification);
+        want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(record->renderingMode));
+        want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, record->isDynamic);
+        want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, record->formTempFlag);
+        RefreshData data;
+        data.formId = record->formId;
+        data.record = *record;
+        data.want = want;
+        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
+    } else if (record->isUpdateDuringDisableForm) {
+        HILOG_INFO("update provider data, formId:%{public}" PRId64, record->formId);
+        record->isUpdateDuringDisableForm = false;
+        FormProviderData data = record->formProviderInfo.GetFormData();
+        RefreshExecMgr::UpdateByProviderData(record->formId, data, true);
+    }
+}
+
+void RefreshCacheMgr::AddFlagByInvisible(const int64_t formId, int refreshType)
+{
+    HILOG_WARN("add invisible form:%{public}" PRId64", refreshType:%{public}d", formId, refreshType);
+    FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+    FormDataMgr::GetInstance().SetRefreshType(formId, refreshType);
+    FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
+}
+
+void RefreshCacheMgr::ConsumeInvisibleFlag(const int64_t formId, const int32_t userId)
+{
+    FormRecord record;
+    bool flag = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!flag) {
+        HILOG_ERROR("not exist such, formId:%{public}" PRId64 ", visible refresh", formId);
+        return;
+    }
+
+    HILOG_INFO("formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d, isHostRefresh:%{public}d",
+        formId, userId, record.isTimerRefresh, record.isHostRefresh);
+    Want want;
+    if (record.isTimerRefresh) {
+        want.SetParam(Constants::KEY_IS_TIMER, true);
+        want.SetParam(Constants::KEY_TIMER_REFRESH, true);
+        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
+    }
+    // multi user
+    if (FormUtil::IsActiveUser(userId)) {
+        HILOG_INFO("userId is current user, formId:%{public}" PRId64, formId);
+        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    }
+    if (record.isHostRefresh && record.wantCacheMap.find(formId) != record.wantCacheMap.end()) {
+        FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], want);
+    }
+    RefreshData data;
+    data.formId = formId;
+    data.record = record;
+    data.want = want;
+    FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
+}
+
+void RefreshCacheMgr::AddFlagByScreenOff(const int64_t formId, const Want &want, FormRecord &record)
+{
+    HILOG_WARN("add screen off formId:%{public}" PRId64, formId);
+    FormDataMgr::GetInstance().UpdateFormWant(formId, want, record);
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+    FormDataMgr::GetInstance().SetHostRefresh(formId, true);
+    FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+}
+
+void RefreshCacheMgr::ConsumeScreenOffFlag()
+{
+    const int32_t currUserId = FormUtil::GetCurrentAccountId();
+    HILOG_INFO("screen on and refresh forms, currUserId:%{public}d", currUserId);
+    std::vector<FormRecord> formRecords;
+    FormDataMgr::GetInstance().GetFormRecordsByUserId(currUserId, formRecords);
+    for (const FormRecord& formRecord : formRecords) {
+        if (!formRecord.needRefresh) {
+            continue;
+        }
+        if (formRecord.formVisibleNotifyState == Constants::FORM_INVISIBLE) {
+            continue;
+        }
+        ConsumeInvisibleFlag(formRecord.formId, currUserId);
+    }
+}
+
+void RefreshCacheMgr::AddRenderTask(int64_t formId, std::function<void()> task)
+{
+    std::lock_guard<std::mutex> lock(renderTaskMapMutex_);
+    auto search = renderTaskMap_.find(formId);
+    if (search == renderTaskMap_.end()) {
+        renderTaskMap_.emplace(formId, task);
+    } else {
+        search->second = task;
+    }
+    HILOG_WARN("add render task, formId:%{public}" PRId64, formId);
+}
+
+void RefreshCacheMgr::ConsumeRenderTask(int64_t formId)
+{
+    std::function<void()> task;
+    bool findTask = false;
+    {
+        std::lock_guard<std::mutex> lock(renderTaskMapMutex_);
+        auto search = renderTaskMap_.find(formId);
+        if (search != renderTaskMap_.end()) {
+            task = search->second;
+            findTask = true;
+            renderTaskMap_.erase(search);
+        }
+    }
+    if (findTask) {
+        HILOG_INFO("cosume render task, formId:%{public}" PRId64, formId);
+        task();
+    }
+}
+
+void RefreshCacheMgr::DelRenderTask(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(renderTaskMapMutex_);
+    auto search = renderTaskMap_.find(formId);
+    if (search != renderTaskMap_.end()) {
+        renderTaskMap_.erase(search);
+        HILOG_INFO("delete render task, formId:%{public}" PRId64, formId);
+    }
+}
+
+} // namespace AppExecFwk
+} // namespace OHOS

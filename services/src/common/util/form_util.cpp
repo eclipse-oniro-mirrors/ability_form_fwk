@@ -1962,5 +1962,16 @@ long long FormUtil::ConvertStringToLongLong(const std::string &strInfo, int radi
 {
     return static_cast<long long>(strtoll(strInfo.c_str(), nullptr, radix));
 }
+
+bool FormUtil::IsActiveUser(const int32_t userId)
+{
+    std::vector<int32_t> activeList;
+    auto errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+    auto iter = std::find(activeList.begin(), activeList.end(), userId);
+    if (iter != activeList.end() && errCode == ERR_OK) {
+        return true;
+    }
+    return false;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

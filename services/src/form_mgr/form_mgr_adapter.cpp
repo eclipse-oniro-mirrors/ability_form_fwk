@@ -84,6 +84,9 @@
 #include "form_mgr/form_mgr_queue.h"
 #include "common/util/form_task_common.h"
 #include "iform_host_delegate.h"
+#include "form_refresh/form_refresh_mgr.h"
+#include "form_refresh/strategy/refresh_cache_mgr.h"
+#include "form_refresh/strategy/refresh_control_mgr.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -505,7 +508,7 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     }
 
     FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(formId);
-    FormRenderMgr::GetInstance().DeletePostRenderFormTask(formId);
+    RefreshCacheMgr::GetInstance().DelRenderTask(formId);
     FormDataMgr::GetInstance().DeleteFormVisible(formId);
 #ifdef THEME_MGR_ENABLE
     FormDBInfo dbInfo;
@@ -819,16 +822,14 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    // check bundleName match
-    if (formRecord.uid != callingUid) {
-        HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d", formRecord.uid, callingUid);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
     int32_t ret = ERR_OK;
     if (formRecord.uiSyntax == FormType::ETS) {
-        WantParams wantParams;
-        ret = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, false);
+        RefreshData data;
+        data.formId = matchedFormId;
+        data.record = formRecord;
+        data.callingUid = callingUid;
+        data.providerData = formProviderData;
+        ret = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
     } else {
         // update Form
         ret = FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
@@ -857,26 +858,12 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    FormHostRecord formHostRecord;
-    bool isHostExist = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
-    if (!isHostExist) {
-        HILOG_ERROR("can't find target client");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    if (!formHostRecord.Contains(matchedFormId)) {
-        HILOG_ERROR("form not self-owned");
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-
-    HILOG_INFO("find target client");
-    Want reqWant(want);
-    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
-    reqWant.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_HOST);
-    FormDataMgr::GetInstance().UpdateFormWant(matchedFormId, want, record);
-    FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
-    return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
+    RefreshData data;
+    data.formId = matchedFormId;
+    data.record = record;
+    data.callerToken = callerToken;
+    data.want = want;
+    return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
 
 void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)
@@ -892,7 +879,7 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
  
     FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
-        FormRenderMgr::GetInstance().ExecPostRenderFormTask(formId);
+        RefreshCacheMgr::GetInstance().ConsumeRenderTask(formId);
     }
 }
 
@@ -2122,16 +2109,6 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    std::string bundleName;
-    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("get BundleName failed");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    HILOG_INFO("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
-
     FormRecord formRecord;
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
@@ -2139,18 +2116,11 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    if (userId != formRecord.providerUserId) {
-        HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-
-    // check bundleName
-    if (bundleName != formRecord.bundleName) {
-        HILOG_ERROR("not match bundleName:%{public}s", bundleName.c_str());
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-
-    return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
+    RefreshData data;
+    data.formId = matchedFormId;
+    data.record = formRecord;
+    data.nextTime = nextTime;
+    return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_NEXT_TIME);
 }
 
 int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
@@ -2658,25 +2628,6 @@ bool FormMgrAdapter::GetBundleName(std::string &bundleName, bool needCheckFormPe
     return true;
 }
 
-int FormMgrAdapter::SetNextRefreshTimeLocked(const int64_t formId, const int64_t nextTime, const int32_t userId)
-{
-    HILOG_ERROR("SetNextRefreshTimeLocked");
-    int32_t timerRefreshedCount = FormTimerMgr::GetInstance().GetRefreshCount(formId);
-    if (timerRefreshedCount >= Constants::LIMIT_COUNT) {
-        HILOG_ERROR("already refresh times:%{public}d", timerRefreshedCount);
-        FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_HIGH_FREQUENCY);
-        FormTimerMgr::GetInstance().MarkRemind(formId);
-        return ERR_APPEXECFWK_FORM_MAX_REFRESH;
-    }
-
-    if (!FormTimerMgr::GetInstance().SetNextRefreshTime(formId, nextTime * Constants::SEC_PER_MIN, userId)) {
-        HILOG_ERROR("fail");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    return ERR_OK;
-}
-
 bool FormMgrAdapter::IsUpdateValid(const int64_t formId, const std::string &bundleName)
 {
     if (formId <= 0 || bundleName.empty()) {
@@ -2988,7 +2939,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
         if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
-            FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, userId);
+            RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formRecord.formId, userId);
         } else {
             std::string cacheData;
             std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
@@ -3089,7 +3040,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
             if (removedForm.second) {
                 FormTimerMgr::GetInstance().RemoveFormTimer(removedForm.first);
                 FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(removedForm.first);
-                FormRenderMgr::GetInstance().DeletePostRenderFormTask(removedForm.first);
+                RefreshCacheMgr::GetInstance().DelRenderTask(removedForm.first);
                 FormDataMgr::GetInstance().DeleteFormVisible(removedForm.first);
             }
         }
@@ -3997,16 +3948,21 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
     FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, invisibleFormRecords);
     HILOG_INFO("getRecords visible size:%{public}zu, invisible size:%{public}zu",
         visibleFormRecords.size(), invisibleFormRecords.size());
-    Want reqWant;
-    for (auto formRecord : visibleFormRecords) {
+    std::vector<FormRecord> forceRefreshForms;
+    for (auto &formRecord : visibleFormRecords) {
         formRecord.isCountTimerRefresh = false;
         formRecord.isTimerRefresh = false;
-        FormProviderMgr::GetInstance().ConnectAmsForRefresh(formRecord.formId, formRecord, reqWant, false);
+        forceRefreshForms.emplace_back(formRecord);
     }
-    for (auto formRecord : invisibleFormRecords) {
+    for (auto &formRecord : invisibleFormRecords) {
         formRecord.isCountTimerRefresh = false;
         formRecord.isTimerRefresh = false;
-        FormProviderMgr::GetInstance().ConnectAmsForRefresh(formRecord.formId, formRecord, reqWant, false);
+        forceRefreshForms.emplace_back(formRecord);
+    }
+    for (auto &formRecord : forceRefreshForms) {
+        RefreshData data;
+        data.record = formRecord;
+        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_FORCE);
     }
     return ERR_OK;
 }
@@ -4041,32 +3997,9 @@ ErrCode FormMgrAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Co
 #ifdef RES_SCHEDULE_ENABLE
 void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {
-    FormTimerMgr::GetInstance().SetTimerTaskNeeded(isTimerTaskNeeded);
+    RefreshControlMgr::GetInstance().SetSystemOverloadFlag(!isTimerTaskNeeded);
 }
 #endif // RES_SCHEDULE_ENABLE
-
-static void RefreshOrUpdateDuringDisableForm(std::vector<FormRecord>::iterator &iter, int32_t userId)
-{
-    if (iter->isRefreshDuringDisableForm) {
-        iter->isRefreshDuringDisableForm = false;
-        Want want;
-        want.SetElementName(iter->bundleName, iter->abilityName);
-        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-        want.SetParam(Constants::RECREATE_FORM_KEY, true);
-        want.SetParam(Constants::PARAM_MODULE_NAME_KEY, iter->moduleName);
-        want.SetParam(Constants::PARAM_FORM_NAME_KEY, iter->formName);
-        want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, iter->specification);
-        want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(iter->renderingMode));
-        want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, iter->isDynamic);
-        want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, iter->formTempFlag);
-        FormProviderMgr::GetInstance().RefreshForm(iter->formId, want, true);
-    } else if (iter->isUpdateDuringDisableForm) {
-        iter->isUpdateDuringDisableForm = false;
-        FormProviderData data = iter->formProviderInfo.GetFormData();
-        WantParams wantParams;
-        FormRenderMgr::GetInstance().UpdateRenderingForm(iter->formId, data, wantParams, true);
-    }
-}
 
 int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool enable)
 {
@@ -4092,7 +4025,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         FormDataMgr::GetInstance().SetFormEnable(iter->formId, enable);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
         if (enable) {
-            RefreshOrUpdateDuringDisableForm(iter, userId);
+            RefreshCacheMgr::GetInstance().ConsumeHealthyControlFlag(iter, userId);
         }
         ++iter;
     }
@@ -4288,17 +4221,10 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
     std::set<std::string> reportList;
  
     for (FormRecord& formRecord : formInfos) {
-        if (!formRecord.isSystemApp) {
-            continue;
-        }
-        std::string str = formRecord.bundleName + "-" + formRecord.formName;
-        reportList.insert(str);
-        int32_t userId = FormUtil::GetCurrentAccountId();
-        Want want;
-        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_NETWORKCHANGED);
-        want.SetParam(Constants::KEY_CONNECT_REFRESH, true);
-        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, true);
+        RefreshData data;
+        data.formId = formRecord.formId;
+        data.record = formRecord;
+        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_NETWORK);
     }
 
     if (reportList.size() > 0) {
@@ -4314,26 +4240,6 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
     FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
         HiSysEventType::BEHAVIOR, eventInfo);
 
-    return ERR_OK;
-}
-
-ErrCode FormMgrAdapter::RefreshFormsByScreenOn()
-{
-    const int32_t currUserId = FormUtil::GetCurrentAccountId();
-    HILOG_INFO("screen on and refresh forms, currUserId:%{public}d", currUserId);
-    std::vector<FormRecord> formRecords;
-    FormDataMgr::GetInstance().GetFormRecordsByUserId(currUserId, formRecords);
-    for (FormRecord& formRecord : formRecords) {
-        if (!formRecord.needRefresh) {
-            continue;
-        }
-        if (formRecord.formVisibleNotifyState == Constants::FORM_INVISIBLE) {
-            continue;
-        }
-        if (formRecord.isTimerRefresh) {
-            FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, currUserId);
-        }
-    }
     return ERR_OK;
 }
 

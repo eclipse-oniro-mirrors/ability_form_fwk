@@ -81,18 +81,15 @@ public:
      * @param formId The form id.
      * @param record Form data.
      * @param want The want of the form.
-     * @param isCountTimerRefresh The flag of timer refresh.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want,
-        const bool isCountTimerRefresh);
+    ErrCode ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want);
 
     /**
      * @brief Connect provider ability for notify config update
      * @param configuration system config.
      * @param record Form data.
      * @param want The want of the form.
-     * @param isCountTimerRefresh The flag of timer refresh.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ConnectForConfigUpdate(const AppExecFwk::Configuration &configuration,
@@ -159,7 +156,6 @@ public:
 private:
     bool IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh);
 
-    FormRecord GetFormAbilityInfo(const FormRecord &record) const;
     /**
      * @brief Increase the timer refresh count.
      * @param formId The form id.

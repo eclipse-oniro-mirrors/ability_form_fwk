@@ -191,7 +191,7 @@ HWTEST_F(FmsFormSetNextRefreshTest, FmsFormSetNextRefreshTest_SetNextRefreshTime
     FormTimerMgr::GetInstance().dynamicRefreshTasks_.clear();
     FormTimerMgr::GetInstance().dynamicRefreshTasks_.emplace_back(theItem);
     // check dynamicRefreshTasks_
-    EXPECT_EQ(1, FormTimerMgr::GetInstance().dynamicRefreshTasks_.at(0).settedTime);
+    EXPECT_EQ(1, FormTimerMgr::GetInstance().dynamicRefreshTasks_.begin()->settedTime);
 
     // Create IntervalTimerTasks_
     FormTimer task(formId, 3 * Constants::MIN_PERIOD, userId);
@@ -201,7 +201,7 @@ HWTEST_F(FmsFormSetNextRefreshTest, FmsFormSetNextRefreshTest_SetNextRefreshTime
 
     EXPECT_EQ(ERR_OK, formSetNextRefresh_->SetNextRefreshTime(formId, nextTime));
     // check dynamicRefreshTasks_
-    EXPECT_EQ(true, FormTimerMgr::GetInstance().dynamicRefreshTasks_.at(0).settedTime != 1);
+    EXPECT_EQ(true, FormTimerMgr::GetInstance().dynamicRefreshTasks_.begin()->settedTime != 1);
 
     GTEST_LOG_(INFO) << "FmsFormSetNextRefreshTest_SetNextRefreshTime_005 end";
 }

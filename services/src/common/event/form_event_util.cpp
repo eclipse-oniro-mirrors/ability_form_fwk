@@ -550,6 +550,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     reCreateRecord.formTempFlag = record.formTempFlag;
     reCreateRecord.isInited = record.isInited;
     reCreateRecord.versionUpgrade = record.versionUpgrade;
+    reCreateRecord.isCountTimerRefresh = false;
 
     Want want;
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, reCreateRecord.formName);
@@ -558,7 +559,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     want.SetParam(Constants::RECREATE_FORM_KEY, true);
     want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, (int)record.renderingMode);
 
-    FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want, false);
+    FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want);
 }
 
 void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,

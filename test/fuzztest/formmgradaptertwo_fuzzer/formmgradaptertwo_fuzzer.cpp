@@ -50,9 +50,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     sptr<IRemoteObject> callerToken = nullptr;
     FormJsInfo formJsInfo;
     formMgrAdapter.AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo);
-    int64_t nextTime = static_cast<int64_t>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formMgrAdapter.SetNextRefreshTimeLocked(formId, nextTime, userId);
     std::string bundleName(data, size);
     formMgrAdapter.IsUpdateValid(formId, bundleName);
     std::vector<int64_t> formIDs;
