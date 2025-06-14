@@ -32,8 +32,6 @@ public:
     DISALLOW_COPY_AND_MOVE(ActiveUserChecker);
 
     int CheckValid(const CheckValidFactor &factor) override;
-
-private:
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -169,12 +169,6 @@ public:
      */
     void SetTimeSpeed(int32_t timeSpeed);
     /**
-     * @brief refresh form when form visible.
-     * @param formId The Id of the form.
-     * @param userId User ID.
-     */
-    void RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId);
-    /**
      * @brief Update at timer task alarm.
      * @return Returns true on success, false on failure.
      */
@@ -388,7 +382,6 @@ private:
     void ClearDiskInfoReportTimer();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
-    void BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want);
 
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;

@@ -1505,37 +1505,6 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
     FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_TIMER);
 }
 
-void FormTimerMgr::BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want)
-{
-    if (timerTask.isCountTimer) {
-        want.SetParam(Constants::KEY_IS_TIMER, true);
-    }
-    if (timerTask.isCountTimer || timerTask.isUpdateAt) {
-        want.SetParam(Constants::KEY_TIMER_REFRESH, true);
-    }
-    // multi user
-    if (IsActiveUser(timerTask.userId)) {
-        HILOG_BRIEF("timerTask.userId is current user");
-        want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
-    }
-    if (timerTask.refreshType == RefreshType::TYPE_INTERVAL) {
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_INTERVAL);
-    } else if (timerTask.refreshType == RefreshType::TYPE_UPDATETIMES) {
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_UPDATETIMES);
-    } else if (timerTask.refreshType == RefreshType::TYPE_UPDATENEXTTIME) {
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_UPDATENEXTTIME);
-    } else if (timerTask.refreshType == RefreshType::TYPE_VISIABLE) {
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
-    }
-}
-
-void FormTimerMgr::RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId)
-{
-    FormTimer timerTask(formId, true, userId);
-    timerTask.refreshType = RefreshType::TYPE_VISIABLE;
-    ExecTimerTask(timerTask);
-}
-
 /**
  * @brief Init.
  */
