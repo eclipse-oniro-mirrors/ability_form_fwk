@@ -64,7 +64,8 @@ protected:
 
 void FmsFormCheckMgrTest::SetUpTestCase() {}
 void FmsFormCheckMgrTest::TearDownTestCase() {}
-void FmsFormCheckMgrTest::SetUp() {
+void FmsFormCheckMgrTest::SetUp()
+{
     // token
     token_ = new (std::nothrow) OHOS::AppExecFwk::MockFormHostClient();
 }
