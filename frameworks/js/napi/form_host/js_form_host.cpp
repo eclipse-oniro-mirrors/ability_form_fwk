@@ -2621,13 +2621,21 @@ napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_inf
  
     size_t argc = 1;
     napi_value argv[1] = {nullptr};
-    void *data;
+    void *data = nullptr;
  
     napi_get_cb_info(env, info, &argc, &argv[PARAM0], nullptr, &data);
     std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
     bool ret = ConvertFunctionResult(env, argv[PARAM0], *item);
+    if (data == nullptr) {
+        HILOG_ERROR("PromiseCallback, invalid data");
+        return nullptr;
+    }
  
     auto *callbackInfo = static_cast<PromiseCallbackInfo *>(data);
+    if (callbackInfo == nullptr) {
+        HILOG_ERROR("PromiseCallback, invalid callbackInfo");
+        return nullptr;
+    }
     CallBackReturn(*item, callbackInfo->GetJsCallBackParam(), ret);
  
     PromiseCallbackInfo::Destroy(callbackInfo);

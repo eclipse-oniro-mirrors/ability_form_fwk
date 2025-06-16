@@ -977,7 +977,7 @@ napi_value JsFormProvider::GetFormRect(napi_env env, napi_callback_info info)
     GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetFormRect);
 }
  
-napi_value CreateFromRect(napi_env env, const AppExecFwk::Rect &rect)
+napi_value CreateFormRect(napi_env env, const AppExecFwk::Rect &rect)
 {
     HILOG_DEBUG("call");
  
@@ -1017,12 +1017,11 @@ napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* 
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }
-            task.ResolveWithNoError(env, CreateFromRect(env, item));
+            task.ResolveWithNoError(env, CreateFormRect(env, item));
         };
-    napi_value lastParam = (argc == ARGS_SIZE_ONE) ? argv[PARAM2] : nullptr;
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetFormRect",
-        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
 }  // namespace AbilityRuntime

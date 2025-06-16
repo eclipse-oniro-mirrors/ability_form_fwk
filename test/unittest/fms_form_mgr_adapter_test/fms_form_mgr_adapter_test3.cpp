@@ -51,6 +51,7 @@ extern void MockGetFormRecord(bool mockRet);
 extern void MockGetFormRecordParams(bool mockRet);
 extern void MockGetFormRecordParamsUid(bool mockRet);
 extern void MockSceneAnimationCheck(OHOS::ErrCode mockRet);
+extern void MockCallerCheck(OHOS::ErrCode mockRet);
 
 namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
@@ -1145,7 +1146,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0297, TestSize.Level0)
     int64_t formId = -1;
     int32_t uid = 1;
     Rect rect;
-    MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    MockCallerCheck(ERR_APPEXECFWK_FORM_INVALID_PARAM);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
         formMgrAdapter.GetFormRect(formId, uid, rect));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0297 end";
@@ -1163,7 +1164,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0298, TestSize.Level0)
     int64_t formId = 1;
     int32_t uid = 1;
     Rect rect;
-    MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    MockCallerCheck(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
         formMgrAdapter.GetFormRect(formId, uid, rect));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0298 end";
@@ -1181,7 +1182,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0299, TestSize.Level0)
     int64_t formId = 1;
     int32_t uid = 1;
     Rect rect;
-    MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    MockCallerCheck(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
         formMgrAdapter.GetFormRect(formId, uid, rect));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0299 end";

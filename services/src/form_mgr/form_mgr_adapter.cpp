@@ -4494,6 +4494,7 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
         return errCode;
     }
     if (formInfo.sceneAnimationParams.abilityName.empty()) {
+        HILOG_ERROR("SceneAnimationParams abilityName is empty");
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
     return ERR_OK;

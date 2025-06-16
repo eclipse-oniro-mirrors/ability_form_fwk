@@ -129,7 +129,7 @@ private:
  
     ~PromiseCallbackInfo();
  
-    LiveFormInterfaceParam* liveFormInterfaceParam_;
+    LiveFormInterfaceParam* liveFormInterfaceParam_ = nullptr;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

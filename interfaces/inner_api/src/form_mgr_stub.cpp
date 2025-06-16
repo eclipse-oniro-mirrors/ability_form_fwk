@@ -1957,7 +1957,7 @@ ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply
 
     Rect item;
     ErrCode result = GetFormRect(formId, item);
-    if (!reply.WriteBool(result)) {
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write get form result result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

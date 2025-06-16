@@ -2044,6 +2044,10 @@ bool FormMgr::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
         return false;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     return remoteProxy_->RegisterOverflowProxy(callerToken);
 }
 
@@ -2056,6 +2060,10 @@ bool FormMgr::UnregisterOverflowProxy()
         return false;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     return remoteProxy_->UnregisterOverflowProxy();
 }
 
@@ -2096,6 +2104,10 @@ bool FormMgr::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &
         return false;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     return remoteProxy_->RegisterChangeSceneAnimationStateProxy(callerToken);
 }
 
@@ -2108,6 +2120,10 @@ bool FormMgr::UnregisterChangeSceneAnimationStateProxy()
         return false;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     return remoteProxy_->UnregisterChangeSceneAnimationStateProxy();
 }
 
@@ -2144,6 +2160,10 @@ bool FormMgr::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
         return false;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     return remoteProxy_->RegisterGetFormRectProxy(callerToken);
 }
 
@@ -2156,6 +2176,10 @@ bool FormMgr::UnregisterGetFormRectProxy()
         return false;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     return remoteProxy_->UnregisterGetFormRectProxy();
 }
  

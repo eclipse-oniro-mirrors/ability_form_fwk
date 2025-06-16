@@ -18,6 +18,7 @@
 namespace {
     bool g_mockRequestPublishFormToHost = true;
     OHOS::ErrCode g_mockSceneAnimationCheckResult = OHOS::ERR_OK;
+    OHOS::ErrCode g_mockCallerCheckResult = OHOS::ERR_OK;
 }
 
 void MockRequestPublishFormToHost(bool mockRet)
@@ -28,6 +29,11 @@ void MockRequestPublishFormToHost(bool mockRet)
 void MockSceneAnimationCheck(OHOS::ErrCode mockRet)
 {
     g_mockSceneAnimationCheckResult = mockRet;
+}
+
+void MockCallerCheck(OHOS::ErrCode mockRet)
+{
+    g_mockCallerCheckResult = mockRet;
 }
 
 namespace OHOS {
@@ -56,6 +62,11 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
 ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t callingUi)
 {
     return g_mockSceneAnimationCheckResult;
+}
+
+ErrCode FormMgrAdapter::CallerCheck(const int64_t formId, const int32_t callingUi)
+{
+    return g_mockCallerCheckResult;
 }
 }
 }
