@@ -42,6 +42,10 @@ public:
     {
         return ERR_OK;
     }
+    ErrCode GetFormRect(const int64_t formId, Rect &rect) override
+    {
+        return ERR_OK;
+    }
 };
 uint32_t GetU32Data(const char* ptr)
 {

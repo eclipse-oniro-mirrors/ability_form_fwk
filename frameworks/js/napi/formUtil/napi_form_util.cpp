@@ -753,5 +753,46 @@ long long NapiFormUtil::ConvertStringToLongLong(const std::string &strInfo, int 
 {
     return static_cast<long long>(strtoll(strInfo.c_str(), nullptr, radix));
 }
+
+bool GetPropertyValueByPropertyName(napi_env env, napi_value value, const char *propertyName, double &result) {
+    napi_value propertyValue;
+    napi_status status = napi_get_named_property(env, value, propertyName, &propertyValue);
+    if (status != napi_ok) {
+        HILOG_ERROR("GetPropertyValueByPropertyName, get property value fail, propertyName:%{public}s", 
+            propertyName);
+        return false;
+    }
+    if (!ConvertFromJsValue(env, propertyValue, result)) {
+        HILOG_ERROR("GetPropertyValueByPropertyName, convertFromJsValue property fail, propertyName:%{public}s", 
+            propertyName);
+        return false;
+    }
+    return true;
+}
+ 
+bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect) {
+    double rectLeft;
+    if (!GetPropertyValueByPropertyName(env, value, "left", rectLeft)) {
+        return false;
+    }
+    double rectTop;
+    if (!GetPropertyValueByPropertyName(env, value, "top", rectTop)) {
+        return false;
+    }
+    double rectWidth;
+    if (!GetPropertyValueByPropertyName(env, value, "width", rectWidth)) {
+        return false;
+    }
+    double rectHeight;
+    if (!GetPropertyValueByPropertyName(env, value, "height", rectHeight)) {
+        return false;
+    }
+    rect.left = rectLeft;
+    rect.top = rectTop;
+    rect.width = rectWidth;
+    rect.height = rectHeight;
+ 
+    return true;
+} 
 }  // namespace AbilityRuntime
 }  // namespace OHOS

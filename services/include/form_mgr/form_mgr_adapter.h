@@ -734,6 +734,28 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode ChangeSceneAnimationState(const int64_t formId, const int32_t callingUid, int32_t state);
+
+    /**
+     * @brief Set get form rect proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK for setting success.
+     */
+    bool RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister get form rect proxy in fms
+     * @return Return true if unregister success
+     */
+    bool UnregisterGetFormRectProxy();
+ 
+    /**
+     * @brief Get the form rect.
+     * @param formId The formId.
+     * @param callingUid Provider ability uid.
+     * @param rect The desktop's rect related to the specified formId.
+     * @return Returns error code of method execute, which ERR_OK represents success.
+     */
+    ErrCode GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect);
 private:
     /**
      * @brief Get form configure info.
@@ -1255,6 +1277,13 @@ private:
      */
     ErrCode SceneAnimationCheck(const int64_t formId, const int32_t callingUid);
 
+    /**
+     * @brief Check caller parameter legitimacy.
+     * @param formId The formId.
+     * @param callingUid Provider ability uid.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode CallerCheck(const int64_t formId, const int32_t callingUid);
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
@@ -1334,6 +1363,8 @@ private:
     sptr<IRemoteObject> overflowCallerToken_;
 
     sptr<IRemoteObject> sceneanimationCallerToken_;
+
+    sptr<IRemoteObject> getFormRectCallerToken_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

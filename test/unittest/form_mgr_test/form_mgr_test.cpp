@@ -4905,4 +4905,123 @@ HWTEST_F(FormMgrTest, FormMgrTest_0263, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED);
     GTEST_LOG_(INFO) << "FormMgrTest_0263 end";
 }
+
+/**
+ * @tc.name: FormMgrTest_0272
+ * @tc.desc: Verify getFormRect
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0272, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0272 starts";
+    EXPECT_CALL(*mockProxy, GetFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    Rect rect;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
+    ErrCode result = FormMgr::GetInstance().GetFormRect(formJsInfo.formId, rect);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0272 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0273
+ * @tc.desc: Verify getFormRect
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0273, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0273 starts";
+    int64_t formId = -1;
+    Rect rect;
+    ErrCode result = FormMgr::GetInstance().GetFormRect(formId, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0273 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0274
+ * @tc.desc: Verify getFormRect
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0274, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0274 begin";
+    int64_t formId = 1;
+    Rect rect;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    ErrCode result = FormMgr::GetInstance().GetFormRect(formId, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_0274 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0275
+ * @tc.desc: Verify RegisterGetFormRectProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0275, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0275 starts";
+    EXPECT_CALL(*mockProxy, RegisterGetFormRectProxy(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    bool result = FormMgr::GetInstance().RegisterGetFormRectProxy(callerToken);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_0275 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0276
+ * @tc.desc: Verify RegisterGetFormRectProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0276, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0276 starts";
+    EXPECT_CALL(*mockProxy, RegisterGetFormRectProxy(_))
+        .Times(1)
+        .WillOnce(Return(false));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    bool result = FormMgr::GetInstance().RegisterGetFormRectProxy(callerToken);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0276 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0277
+ * @tc.desc: Verify UnregisterGetFormRectProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0277, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0277 starts";
+    EXPECT_CALL(*mockProxy, UnregisterGetFormRectProxy())
+        .Times(1)
+        .WillOnce(Return(true));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    bool result = FormMgr::GetInstance().UnregisterGetFormRectProxy();
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_0277 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0278
+ * @tc.desc: Verify UnregisterGetFormRectProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0278, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0278 starts";
+    EXPECT_CALL(*mockProxy, UnregisterGetFormRectProxy())
+        .Times(1)
+        .WillOnce(Return(false));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    bool result = FormMgr::GetInstance().UnregisterGetFormRectProxy();
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0278 test ends";
+}
 } // namespace

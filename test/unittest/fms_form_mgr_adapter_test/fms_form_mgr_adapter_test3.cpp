@@ -1132,4 +1132,58 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0296, TestSize.Level1)
          formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
      GTEST_LOG_(INFO) << " FormMgrAdapter_0295 end";
  }
+
+/**
+ * @tc.name: FormMgrAdapter_0297
+ * @tc.desc: test GetFormRect function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0297, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0297 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = -1;
+    int32_t uid = 1;
+    Rect rect;
+    MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrAdapter.GetFormRect(formId, uid, rect));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0297 end";
+}
+ 
+/**
+ * @tc.name: FormMgrAdapter_0298
+ * @tc.desc: test GetFormRect function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0298, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0298 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    Rect rect;
+    MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+        formMgrAdapter.GetFormRect(formId, uid, rect));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0298 end";
+}
+ 
+/**
+ * @tc.name: FormMgrAdapter_0299
+ * @tc.desc: test GetFormRect function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0299, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0299 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    Rect rect;
+    MockSceneAnimationCheck(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+        formMgrAdapter.GetFormRect(formId, uid, rect));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0299 end";
+}
 }

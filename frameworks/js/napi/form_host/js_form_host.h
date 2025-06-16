@@ -61,6 +61,7 @@ typedef struct LiveFormInterfaceParam {
     std::mutex mutex;
     bool isReady = false;
     bool result = false;
+    AppExecFwk::Rect formRect;
 } LiveFormInterfaceParam;
 
 class JsFormRouterProxyMgr : public AppExecFwk::FormHostDelegateStub {
@@ -85,6 +86,10 @@ public:
 
     bool UnregisterChangeSceneAnimationStateListener();
 
+    bool RegisterGetFormRectListener(napi_env env, napi_ref callback);
+
+    bool UnregisterGetFormRectListener();
+
 private:
     static std::mutex mutex_;
     static sptr<JsFormRouterProxyMgr> instance_;
@@ -102,6 +107,29 @@ private:
     void RequestOverflowInner(LiveFormInterfaceParam* dataParam);
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
     void ChangeSceneAnimationStateInner(LiveFormInterfaceParam* dataParam);
+    napi_ref getFormRectCallbackRef_ = nullptr;
+    napi_env getFormRectEnv_;
+    ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect);
+    void GetFormRectInner(LiveFormInterfaceParam* dataParam);
+    void CallPromise(napi_value funcResult, LiveFormInterfaceParam *liveFormInterfaceParam);
+    static napi_value PromiseCallback(napi_env env, napi_callback_info info);
+    static bool ConvertFunctionResult(napi_env env, napi_value funcResult, AppExecFwk::Rect &rect);
+};
+
+class PromiseCallbackInfo {
+public:
+    static PromiseCallbackInfo* Create(LiveFormInterfaceParam* liveFormInterfaceParam);
+ 
+    static void Destroy(PromiseCallbackInfo* callbackInfo);
+ 
+    LiveFormInterfaceParam* GetJsCallBackParam();
+ 
+private:
+    explicit PromiseCallbackInfo(LiveFormInterfaceParam* liveFormInterfaceParam);
+ 
+    ~PromiseCallbackInfo();
+ 
+    LiveFormInterfaceParam* liveFormInterfaceParam_;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

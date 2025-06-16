@@ -2836,5 +2836,85 @@ ErrCode FormMgrProxy::ChangeSceneAnimationState(const int64_t formId, int32_t st
     }
     return reply.ReadInt32();
 }
+
+bool FormMgrProxy::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token");
+        return false;
+    }
+ 
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("Failed to write callerToken");
+        return false;
+    }
+ 
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_GET_FORM_RECT,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool FormMgrProxy::UnregisterGetFormRectProxy()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_FORM_RECT, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+ 
+ErrCode FormMgrProxy::GetFormRect(const int64_t formId, Rect &rect)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("Failed to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_GET_FORM_RECT, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("Read reply result fail: %{public}d", error);
+        return error;
+    }
+    std::unique_ptr<Rect> result(reply.ReadParcelable<Rect>());
+    if (!result) {
+        HILOG_ERROR("Failed to get parcelable info");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    rect = *result;
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

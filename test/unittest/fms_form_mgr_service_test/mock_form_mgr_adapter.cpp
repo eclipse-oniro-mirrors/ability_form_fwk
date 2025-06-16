@@ -63,6 +63,7 @@ namespace {
     int g_unregisterClickEventObserver = OHOS::ERR_OK;
     int g_requestoverflow = OHOS::ERR_OK;
     int g_changesceneanimationstate = OHOS::ERR_OK;
+    int g_getformrect = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -396,6 +397,11 @@ ErrCode FormMgrAdapter::RequestOverflow(const int64_t formId, const int32_t call
 ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const int32_t callingUid, int32_t state)
 {
     return g_changesceneanimationstate;
+}
+
+ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)
+{
+    return g_getformrect;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

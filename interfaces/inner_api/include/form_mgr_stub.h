@@ -718,6 +718,30 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleChangeSceneAnimationState(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle register getFromRect proxy in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterGetFormRectProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister getFromRect proxy in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterGetFormRectProxy(MessageParcel &data, MessageParcel &reply);
+ 
+    /**
+     * @brief Handle get form rect.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleGetFormRect(MessageParcel &data, MessageParcel &reply);
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 
