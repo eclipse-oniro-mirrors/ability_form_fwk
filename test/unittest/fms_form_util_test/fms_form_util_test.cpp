@@ -802,5 +802,17 @@ HWTEST_F(FormUtilTest, FormUtilTest_029, TestSize.Level1)
     strInfo = "-9134567890123456789";
     FormUtil::ConvertStringToInt64(strInfo, int64Value);
 }
+
+HWTEST_F(FormUtilTest, FormUtilTest_030, TestSize.Level1)
+{
+    constexpr size_t accountId = 99;
+    MockQueryActiveOsAccountIdsRetVal(true);
+    MockQueryActiveOsAccountIdsParams(true);
+    EXPECT_EQ(true, FormUtil::IsActiveUser(accountId));
+ 
+    MockQueryActiveOsAccountIdsRetVal(false);
+    MockQueryActiveOsAccountIdsParams(false);
+    EXPECT_EQ(false, FormUtil::IsActiveUser(accountId));
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

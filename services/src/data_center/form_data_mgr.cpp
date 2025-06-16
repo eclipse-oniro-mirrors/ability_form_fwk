@@ -3037,5 +3037,17 @@ void FormDataMgr::PostDelayRecheckWhetherNeedCleanFormHostTask(
         recheckWhetherNeedCleanFormHost);
     HILOG_DEBUG("end");
 }
+
+FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
+{
+    FormRecord newRecord;
+    newRecord.bundleName = record.bundleName;
+    newRecord.moduleName = record.moduleName;
+    newRecord.abilityName = record.abilityName;
+    newRecord.isInited = record.isInited;
+    newRecord.versionUpgrade = record.versionUpgrade;
+    newRecord.needFreeInstall = record.needFreeInstall;
+    return newRecord;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

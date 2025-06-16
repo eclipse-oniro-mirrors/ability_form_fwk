@@ -396,7 +396,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_017, TestSize.Level0)
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockCheckInvalidForm(ERR_OK);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_017 end";
 }
 
@@ -937,7 +937,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_048, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
     int64_t nextTime = 1;
-    MockGetCallerBundleName(true);
+    MockGetFormRecord(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
     GTEST_LOG_(INFO) << "FormMgrAdapter_048 end";
 }
@@ -1142,59 +1142,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_061, TestSize.Level0)
     FormStateInfo stateInfo;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.AcquireFormState(want, callerToken, stateInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_061 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_062
- * @tc.desc: test SetNextRefreshTimeLocked function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_062, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_062 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    int64_t nextTime = 1;
-    int32_t userId = 2;
-    MockGetRefreshCount(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_REFRESH, formMgrAdapter.SetNextRefreshTimeLocked(formId, nextTime, userId));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_062 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_063
- * @tc.desc: test SetNextRefreshTimeLocked function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_063, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_063 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    int64_t nextTime = 1;
-    int32_t userId = 2;
-    MockGetRefreshCount(false);
-    MockSetNextRefreshTime(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.SetNextRefreshTimeLocked(formId, nextTime, userId));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_063 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_064
- * @tc.desc: test SetNextRefreshTimeLocked function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_064, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_064 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    int64_t nextTime = 1;
-    int32_t userId = 2;
-    MockGetRefreshCount(false);
-    MockSetNextRefreshTime(true);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.SetNextRefreshTimeLocked(formId, nextTime, userId));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_064 end";
 }
 
 /**
@@ -2273,7 +2220,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0118, TestSize.Level0)
     int64_t formId = 1;
     int32_t uid = 1;
     FormProviderData formProviderData;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0118 end";
 }
 

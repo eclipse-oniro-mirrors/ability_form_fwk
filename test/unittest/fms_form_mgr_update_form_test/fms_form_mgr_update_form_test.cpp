@@ -185,8 +185,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
 
     // test exec
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
+    EXPECT_EQ(ERR_OK, FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_003 end";
 }
@@ -229,7 +228,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_004, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_004 end";
 }
@@ -272,7 +271,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_005, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_005 end";
 }
@@ -315,7 +314,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_006, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_006 end";
 }

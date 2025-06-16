@@ -684,12 +684,6 @@ public:
     int32_t NotifyFormLocked(const int64_t &formId, bool isLocked);
 
     /**
-     * @brief Refresh the form when screen on.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode RefreshFormsByScreenOn();
-    
-    /**
      * @brief Register overflow proxy
      * @param callerToken The form host proxy
      * @return Return true for overflow proxy register success, false otherwise
@@ -934,15 +928,6 @@ private:
      * @return Returns true on cached, false on not.
      */
     bool IsFormCached(const FormRecord record);
-
-    /**
-     * @brief set next refresh time locked.
-     * @param formId The form's id.
-     * @param nextTime next refresh time.
-     * @param userId User ID.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int SetNextRefreshTimeLocked(const int64_t formId, const int64_t nextTime, const int32_t userId = 0);
 
     /**
      * @brief check if update is valid.

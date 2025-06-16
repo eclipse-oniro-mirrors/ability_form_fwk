@@ -926,6 +926,13 @@ public:
      */
     bool GetFormRecordById(const int64_t formId, FormRecord& formRecord);
 
+    /**
+     * @brief make new formRecord by source record
+     * @param formRecord form record.
+     * @return Returns new formRecord.
+     */
+    FormRecord GetFormAbilityInfo(const FormRecord &record) const;
+
 private:
     /**
      * @brief Create form record.

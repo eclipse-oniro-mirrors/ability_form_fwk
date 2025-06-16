@@ -169,12 +169,6 @@ public:
      */
     void SetTimeSpeed(int32_t timeSpeed);
     /**
-     * @brief refresh form when form visible.
-     * @param formId The Id of the form.
-     * @param userId User ID.
-     */
-    void RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId);
-    /**
      * @brief Update at timer task alarm.
      * @return Returns true on success, false on failure.
      */
@@ -194,13 +188,6 @@ public:
      */
     void StartDiskUseInfoReportTimer();
 
-#ifdef RES_SCHEDULE_ENABLE
-    /**
-     * @brief Set the value which indicate whether Refresh Timer task should be triggered.
-     * @param isTimerTaskNeeded The value of whether Refresh Timer task should be triggered.
-     */
-    void SetTimerTaskNeeded(bool isTimerTaskNeeded);
-#endif // RES_SCHEDULE_ENABLE
 private:
     /**
      * @brief Add update at timer.
@@ -319,17 +306,6 @@ private:
      * @param task Form timer task core.
      */
     void ExecTimerTaskCore(const FormTimer &task);
-
-    /**
-     * @brief Add to the task vector triggered on systemloadlevel down.
-     * @param task Form timer task.
-     */
-    void AddToNotExecTaskVec(const FormTimer &task);
-
-    /**
-     * @brief tiggered and clear the task vector triggered on systemloadlevel down.
-     */
-    void TriggerAndClearNotExecTaskVec();
 #endif // RES_SCHEDULE_ENABLE
 
     /**
@@ -406,7 +382,6 @@ private:
     void ClearDiskInfoReportTimer();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
-    void BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want);
 
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
@@ -434,11 +409,6 @@ private:
 
     int64_t dynamicWakeUpTime_ = INT64_MAX;
     long atTimerWakeUpTime_ = LONG_MAX;
-
-#ifdef RES_SCHEDULE_ENABLE
-    bool isTimerTaskNeeded_ = true;
-    std::vector<FormTimer> notExecTaskVec_;
-#endif // RES_SCHEDULE_ENABLE
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

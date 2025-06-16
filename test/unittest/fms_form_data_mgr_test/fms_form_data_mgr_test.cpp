@@ -5040,4 +5040,16 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_PostDelayRecheckWhetherNeedClean
     formDataMgr->PostDelayRecheckWhetherNeedCleanFormHostTask(callerUid, remoteObjectOfHost);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001 end";
 }
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormAbilityInfo_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 start";
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    FormRecord formRecord;
+    formRecord.bundleName = "testBundle";
+    FormRecord newRecord = formDataMgr->GetFormAbilityInfo(formRecord);
+    EXPECT_EQ(formRecord.bundleName, newRecord.bundleName);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 end";
+}
 }

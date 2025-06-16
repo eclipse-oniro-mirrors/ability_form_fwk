@@ -228,11 +228,11 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         return ERR_OK;
     }
 
-    FormRecord refreshRecord = GetFormAbilityInfo(record);
+    FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(record);
     refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
     refreshRecord.isTimerRefresh = isTimerRefresh;
     refreshRecord.isHostRefresh = record.isHostRefresh;
-    return ConnectAmsForRefresh(formId, refreshRecord, newWant, isCountTimerRefresh);
+    return ConnectAmsForRefresh(formId, refreshRecord, newWant);
 }
 
 void FormProviderMgr::DelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want)
@@ -298,7 +298,6 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
  * @param configuration The form id.
  * @param record Form data.
  * @param want The want of the form.
- * @param isTimerRefresh The flag of timer refresh.
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration &configuration,
@@ -333,14 +332,13 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
  * @param formId The form id.
  * @param record Form data.
  * @param want The want of the form.
- * @param isTimerRefresh The flag of timer refresh.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
-    const FormRecord &record, const Want &want, const bool isCountTimerRefresh)
+ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want)
 {
-    HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s, needFreeInstall:%{public}d",
-        record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall);
+    HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s, "
+        "needFreeInstall:%{public}d, isCountTimerRefresh:%{public}d", formId, record.bundleName.c_str(),
+        record.abilityName.c_str(), record.needFreeInstall, record.isCountTimerRefresh);
 
     sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want,
         record.bundleName, record.abilityName, record.needFreeInstall);
@@ -356,7 +354,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
         return RebindByFreeInstall(record, connectWant, formRefreshConnection);
     }
 
-    if (isCountTimerRefresh) {
+    if (record.isCountTimerRefresh) {
         if (!FormTimerMgr::GetInstance().IsLimiterEnableRefresh(formId)) {
             HILOG_ERROR("timer refresh,already limit");
             return ERR_APPEXECFWK_FORM_PROVIDER_DEL_FAIL;
@@ -712,18 +710,6 @@ bool FormProviderMgr::IsNeedToFresh(FormRecord &record, int64_t formId, bool isV
     bool isEnableUpdate = FormDataMgr::GetInstance().IsEnableUpdate(formId);
     HILOG_DEBUG("isEnableUpdate is %{public}d", isEnableUpdate);
     return isEnableUpdate;
-}
-
-FormRecord FormProviderMgr::GetFormAbilityInfo(const FormRecord &record) const
-{
-    FormRecord newRecord;
-    newRecord.bundleName = record.bundleName;
-    newRecord.moduleName = record.moduleName;
-    newRecord.abilityName = record.abilityName;
-    newRecord.isInited = record.isInited;
-    newRecord.versionUpgrade = record.versionUpgrade;
-    newRecord.needFreeInstall = record.needFreeInstall;
-    return newRecord;
 }
 
 bool FormProviderMgr::IsFormCached(const FormRecord &record)

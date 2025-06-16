@@ -171,6 +171,8 @@ public:
     static int ConvertStringToInt(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
 
     static long long ConvertStringToLongLong(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
+
+    static bool IsActiveUser(const int32_t userId);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

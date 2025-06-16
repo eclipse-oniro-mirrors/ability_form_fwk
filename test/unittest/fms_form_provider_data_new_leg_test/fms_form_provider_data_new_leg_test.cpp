@@ -550,8 +550,8 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_001, TestSize.Level0)
     FormRecord record;
     record.needFreeInstall = true;
     Want want;
-    bool isTimerRefresh = true;
-    formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
+    record.isCountTimerRefresh = true;
+    formProviderMgr.ConnectAmsForRefresh(formId, record, want);
     GTEST_LOG_(INFO) << "FormProviderMgr_001 end";
 }
 
@@ -568,10 +568,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_002, TestSize.Level0)
     FormRecord record;
     record.needFreeInstall = false;
     Want want;
-    bool isTimerRefresh = true;
     MockIsLimiterEnableRefresh(false);
+    record.isCountTimerRefresh = true;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PROVIDER_DEL_FAIL,
-        formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh));
+        formProviderMgr.ConnectAmsForRefresh(formId, record, want));
     GTEST_LOG_(INFO) << "FormProviderMgr_002 end";
 }
 
@@ -588,11 +588,11 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_003, TestSize.Level0)
     FormRecord record;
     record.needFreeInstall = false;
     Want want;
-    bool isTimerRefresh = true;
     MockIsLimiterEnableRefresh(true);
     MockConnectServiceAbility(false);
+    record.isCountTimerRefresh = true;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
-        formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh));
+        formProviderMgr.ConnectAmsForRefresh(formId, record, want));
     GTEST_LOG_(INFO) << "FormProviderMgr_003 end";
 }
 
@@ -610,10 +610,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_004, TestSize.Level0)
     record.needFreeInstall = false;
     record.isCountTimerRefresh = true;
     Want want;
-    bool isTimerRefresh = true;
     MockIsLimiterEnableRefresh(true);
     MockConnectServiceAbility(true);
-    formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
+    record.isCountTimerRefresh = true;
+    formProviderMgr.ConnectAmsForRefresh(formId, record, want);
     GTEST_LOG_(INFO) << "FormProviderMgr_004 end";
 }
 
@@ -867,10 +867,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_019, TestSize.Level1)
     record.needFreeInstall = false;
     record.isCountTimerRefresh = false;
     Want want;
-    bool isTimerRefresh = false;
     MockIsLimiterEnableRefresh(true);
     MockConnectServiceAbility(true);
-    formProviderMgr->ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
+    record.isCountTimerRefresh = false;
+    formProviderMgr->ConnectAmsForRefresh(formId, record, want);
     GTEST_LOG_(INFO) << "FormProviderMgr_019 end";
 }
 

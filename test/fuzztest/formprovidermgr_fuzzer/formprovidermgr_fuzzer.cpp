@@ -71,8 +71,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     bool isVisibleToFresh = *data % ENABLE;
     formProviderMgr.RefreshForm(formId, want, isVisibleToFresh);
     FormRecord record;
-    bool isTimerRefresh = *data % ENABLE;
-    formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
+    record.isCountTimerRefresh = *data % ENABLE;
+    formProviderMgr.ConnectAmsForRefresh(formId, record, want);
     formProviderMgr.NotifyProviderFormDelete(formId, record);
     std::string bundleName(data, size);
     std::string abilityName(data, size);
@@ -89,7 +89,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     Want wantArg;
     formProviderMgr.AcquireFormStateBack(state, provider, wantArg);
     formProviderMgr.IsNeedToFresh(record, formId, isVisibleToFresh);
-    formProviderMgr.GetFormAbilityInfo(record);
     formProviderMgr.IsFormCached(record);
     sptr<AAFwk::IAbilityConnection> formRefreshConnection = nullptr;
     return formProviderMgr.RebindByFreeInstall(record, want, formRefreshConnection);

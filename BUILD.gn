@@ -186,7 +186,25 @@ ohos_shared_library("libfms") {
     "services/src/status_mgr_center/form_command_queue.cpp",
     "services/src/status_mgr_center/form_status_mgr.cpp",
     "services/src/status_mgr_center/form_status_queue.cpp",
-    "services/src/status_mgr_center/form_status_task_mgr.cpp"
+    "services/src/status_mgr_center/form_status_task_mgr.cpp",
+    "services/src/form_refresh/check_mgr/system_app_checker.cpp",
+    "services/src/form_refresh/check_mgr/self_form_checker.cpp",
+    "services/src/form_refresh/check_mgr/calling_user_checker.cpp",
+    "services/src/form_refresh/check_mgr/calling_bundle_checker.cpp",
+    "services/src/form_refresh/check_mgr/active_user_checker.cpp",
+    "services/src/form_refresh/check_mgr/add_finish_checker.cpp",
+    "services/src/form_refresh/strategy/refresh_check_mgr.cpp",
+    "services/src/form_refresh/strategy/refresh_control_mgr.cpp",
+    "services/src/form_refresh/strategy/refresh_exec_mgr.cpp",
+    "services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
+    "services/src/form_refresh/refresh_impl/form_host_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_net_conn_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_next_time_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_timer_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_data_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_force_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.cpp",
+    "services/src/form_refresh/form_refresh_mgr.cpp",
   ]
 
   configs = [

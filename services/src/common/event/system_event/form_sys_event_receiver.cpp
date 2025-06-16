@@ -33,6 +33,7 @@
 #include "in_process_call_wrapper.h"
 #include "want.h"
 #include "form_mgr/form_mgr_queue.h"
+#include "form_refresh/strategy/refresh_cache_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -218,7 +219,7 @@ void FormSysEventReceiver::HandleScreenOn()
 {
     FormMgrQueue::GetInstance().ScheduleTask(0, []() {
         FormRenderMgr::GetInstance().NotifyScreenOn();
-        FormMgrAdapter::GetInstance().RefreshFormsByScreenOn();
+        RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
     });
 }
 
