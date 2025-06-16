@@ -49,4 +49,4 @@ private:
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif
+#endif // OHOS_FORM_FWK_REFRESH_CHECK_MGR_H

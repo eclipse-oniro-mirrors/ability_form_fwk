@@ -43,4 +43,4 @@ public:
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif
+#endif // OHOS_FORM_FWK_BASE_CHECKER_INTERFACE_H

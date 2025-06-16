@@ -1968,10 +1968,7 @@ bool FormUtil::IsActiveUser(const int32_t userId)
     std::vector<int32_t> activeList;
     auto errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     auto iter = std::find(activeList.begin(), activeList.end(), userId);
-    if (iter != activeList.end() && errCode == ERR_OK) {
-        return true;
-    }
-    return false;
+    return iter != activeList.end() && errCode == ERR_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

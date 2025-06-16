@@ -36,11 +36,11 @@ public:
 private:
     int DealRefresh(const RefreshData &data);
 
-    bool DetectControlPoint(RefreshData &newData, bool isCountTimerRefresh, bool isTimerRefresh);
+    bool DetectControlPoint(RefreshData &newData, const bool isCountTimerRefresh, const bool isTimerRefresh);
 
     void BuildTimerWant(const FormTimer &timerTask, Want &want);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif
+#endif // OHOS_FORM_FWK_FORM_TIMER_REFRESH_IMPL_H

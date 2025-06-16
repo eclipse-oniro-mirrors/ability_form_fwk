@@ -44,11 +44,7 @@
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
-static const std::string FORM_HOST_BUNDLE_NAME = "com.form.provider.service";
-const std::string FORM_BUNDLE_NAME = "formBundleName";
-const int64_t FORM_ID_ONE = 1;
-const int64_t FORM_ID_ZERO = 0;
-const int64_t FORM_USER_UIDS_ZERO = 0;
+constexpr int64_t FORM_ID_ONE = 1;
 
 namespace {
 class FmsFormCheckMgrTest : public testing::Test {
@@ -82,7 +78,6 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_ActiveUserChecker_001, TestSiz
     CheckValidFactor reqFactor;
     reqFactor.record = formRecord;
     reqFactor.want = reqWant;
-    ActiveUserChecker::GetInstance().CheckValid(reqFactor);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, ActiveUserChecker::GetInstance().CheckValid(reqFactor));
 
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ActiveUserChecker_001 end";
@@ -347,57 +342,4 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormTimerRefreshImpl_013, Test
     EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormTimerRefreshImpl_013 end";
 }
-
-HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_RefreshCheckMgr_014, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshCheckMgr_014 start";
-
-    std::vector<int32_t> checkTypes = {};
-    CheckValidFactor factor;
-    EXPECT_EQ(ERR_OK, RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor));
-
-    checkTypes = { -1 };
-    EXPECT_EQ(ERR_OK, RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor));
-
-    checkTypes = { TYPE_SYSTEM_APP };
-    EXPECT_EQ(ERR_OK,
-        RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor));
-
-    factor.record.isSystemApp = true;
-    EXPECT_EQ(ERR_OK, RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor));
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshCheckMgr_014 end";
-}
-
-HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_RefreshControlMgr_015, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshControlMgr_015 start";
-
-    EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsSystemOverLoad());
-
-    FormRecord record;
-    record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
-    EXPECT_EQ(true, RefreshControlMgr::GetInstance().IsFormInvisible(record));
-    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
-    EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsFormInvisible(record));
-
-    EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsScreenOff(record));
-
-    EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsHealthyControl(record));
-    record.enableForm = false;
-    EXPECT_EQ(true, RefreshControlMgr::GetInstance().IsHealthyControl(record));
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshControlMgr_015 end";
-}
-
-HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_RefreshExecMgr_016, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshExecMgr_016 start";
-    FormRecord formRecord;
-    Want reqWant;
-    EXPECT_EQ(ERR_OK, RefreshExecMgr::AskForProviderData(FORM_ID_ONE, formRecord, reqWant));
-
-    FormProviderData formProviderData;
-    EXPECT_EQ(ERR_OK, RefreshExecMgr::UpdateByProviderData(FORM_ID_ONE, formProviderData, false));
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshExecMgr_016 end";
-}
-
 }

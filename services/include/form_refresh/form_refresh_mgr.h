@@ -47,4 +47,4 @@ public:
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif
+#endif // OHOS_FORM_FWK_FORM_REFRESH_MGR_H

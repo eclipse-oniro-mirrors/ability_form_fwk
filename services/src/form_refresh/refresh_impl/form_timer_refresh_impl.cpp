@@ -28,6 +28,12 @@ namespace AppExecFwk {
 FormTimerRefreshImpl::FormTimerRefreshImpl() {}
 FormTimerRefreshImpl::~FormTimerRefreshImpl() {}
 
+const static std::map<int32_t, int32_t> refreshTypeMap = {
+    { RefreshType::TYPE_INTERVAL, Constants::REFRESHTYPE_INTERVAL },
+    { RefreshType::TYPE_UPDATETIMES, Constants::REFRESHTYPE_UPDATETIMES },
+    { RefreshType::TYPE_UPDATENEXTTIME, Constants::REFRESHTYPE_UPDATENEXTTIME },
+};
+
 int FormTimerRefreshImpl::RefreshFormInput(RefreshData &data)
 {
     FormRecord record;
@@ -92,7 +98,8 @@ int FormTimerRefreshImpl::DealRefresh(const RefreshData &data)
     return ERR_OK;
 }
 
-bool FormTimerRefreshImpl::DetectControlPoint(RefreshData &newData, bool isCountTimerRefresh, bool isTimerRefresh)
+bool FormTimerRefreshImpl::DetectControlPoint(
+    RefreshData &newData, const bool isCountTimerRefresh, const bool isTimerRefresh)
 {
     int refreshType = newData.want.GetIntParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_DEFAULT);
     if (isTimerRefresh) {
@@ -132,12 +139,9 @@ void FormTimerRefreshImpl::BuildTimerWant(const FormTimer &timerTask, Want &want
     if (FormUtil::IsActiveUser(timerTask.userId)) {
         want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
     }
-    if (timerTask.refreshType == RefreshType::TYPE_INTERVAL) {
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_INTERVAL);
-    } else if (timerTask.refreshType == RefreshType::TYPE_UPDATETIMES) {
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_UPDATETIMES);
-    } else if (timerTask.refreshType == RefreshType::TYPE_UPDATENEXTTIME) {
-        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_UPDATENEXTTIME);
+    auto it = refreshTypeMap.find(timerTask.refreshType);
+    if (it != refreshTypeMap.end()) {
+        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, it->second);
     }
 }
 

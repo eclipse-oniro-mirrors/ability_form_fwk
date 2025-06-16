@@ -34,9 +34,9 @@ public:
     int RefreshFormInput(RefreshData &data) override;
 
 private:
-    bool DetectControlPoint(RefreshData &data, bool isCountTimerRefresh, bool isTimerRefresh);
+    bool DetectControlPoint(RefreshData &data, bool &isCountTimerRefresh, const bool isTimerRefresh);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif
+#endif // OHOS_FORM_FWK_FORM_REFRESH_AFTER_UNCONTROL_IMPL_H

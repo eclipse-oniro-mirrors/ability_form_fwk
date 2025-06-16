@@ -66,7 +66,8 @@ int FormRefreshAfterUncontrolImpl::RefreshFormInput(RefreshData &data)
     return ERR_OK;
 }
 
-bool FormRefreshAfterUncontrolImpl::DetectControlPoint(RefreshData &data, bool isCountTimerRefresh, bool isTimerRefresh)
+bool FormRefreshAfterUncontrolImpl::DetectControlPoint(
+    RefreshData &data, bool &isCountTimerRefresh, const bool isTimerRefresh)
 {
     int refreshType = data.want.GetIntParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_DEFAULT);
     if (isTimerRefresh) {

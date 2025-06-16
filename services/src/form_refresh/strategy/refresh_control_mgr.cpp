@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string HICAR_FORM = "phone_hicar";
+constexpr char HICAR_FORM [] = "phone_hicar";
 }
 
 RefreshControlMgr::RefreshControlMgr() {}

@@ -29,7 +29,7 @@ namespace AppExecFwk {
 RefreshCheckMgr::RefreshCheckMgr() {}
 RefreshCheckMgr::~RefreshCheckMgr() {}
 
-static std::map<int32_t, IBaseChecker *> checkerMap = {
+const static std::map<int32_t, IBaseChecker *> checkerMap = {
     { TYPE_SYSTEM_APP, &SystemAppChecker::GetInstance() },
     { TYPE_SELF_FORM, &SelfFormChecker::GetInstance() },
     { TYPE_CALLING_USER, &CallingUserChecker::GetInstance() },

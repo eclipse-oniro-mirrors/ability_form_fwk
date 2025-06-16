@@ -30,4 +30,4 @@ void MockIsFormInvisible(bool mockBool);
 void MockIsScreenOff(bool mockBool);
 void MockIsHealthyControl(bool mockBool);
 }
-#endif
+#endif // OHOS_MOCK_REFRESH_MGR_H

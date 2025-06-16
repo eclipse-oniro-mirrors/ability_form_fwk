@@ -3959,7 +3959,7 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
         formRecord.isTimerRefresh = false;
         forceRefreshForms.emplace_back(formRecord);
     }
-    for (auto &formRecord : forceRefreshForms) {
+    for (const auto &formRecord : forceRefreshForms) {
         RefreshData data;
         data.record = formRecord;
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_FORCE);

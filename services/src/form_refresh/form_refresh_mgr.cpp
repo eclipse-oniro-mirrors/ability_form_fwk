@@ -31,7 +31,7 @@ namespace AppExecFwk {
 FormRefreshMgr::FormRefreshMgr() {}
 FormRefreshMgr::~FormRefreshMgr() {}
 
-static std::map<int32_t, IFormRefresh *> refreshMap = {
+const static std::map<int32_t, IFormRefresh *> refreshMap = {
     { TYPE_HOST, &FormHostRefreshImpl::GetInstance() },
     { TYPE_NETWORK, &FormNetConnRefreshImpl::GetInstance() },
     { TYPE_NEXT_TIME, &FormNextTimeRefreshImpl::GetInstance() },
@@ -47,10 +47,10 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
     auto it = refreshMap.find(refreshType);
     if (it != refreshMap.end()) {
         return it->second->RefreshFormInput(data);
-    } else {
-        HILOG_ERROR("invalid refreshType");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+
+    HILOG_ERROR("invalid refreshType");
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
 } // namespace AppExecFwk

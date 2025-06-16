@@ -44,7 +44,7 @@ void RefreshCacheMgr::AddToOverloadTaskQueue(const FormTimer &task)
 
 void RefreshCacheMgr::ConsumeOverloadTaskQueue()
 {
-    for (auto &item : overloadTask_) {
+    for (const auto &item : overloadTask_) {
         HILOG_INFO("cosume overload task(formId:%{public}" PRId64 ", userId:%{public}d)", item.formId, item.userId);
         RefreshData data;
         data.formId = item.formId;
