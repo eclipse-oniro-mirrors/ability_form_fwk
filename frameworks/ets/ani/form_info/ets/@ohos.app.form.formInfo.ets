@@ -15,7 +15,7 @@
 
 import Want from '@ohos.app.ability.Want';
 
-declare namespace formInfo {
+export namespace formInfo {
   interface FormInfo {
     bundleName: string;
     moduleName: string;
@@ -182,5 +182,3 @@ declare namespace formInfo {
     AI_SUGGESTION = 7,
   }
 }
-
-export default formInfo;
