@@ -2482,7 +2482,9 @@ ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect
         loop, work, [](uv_work_t *work) {},
         [](uv_work_t *work, int status) {
             LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
-            JsFormRouterProxyMgr::GetInstance()->GetFormRectInner(dataParam);
+            if (dataParam != nullptr) {
+                JsFormRouterProxyMgr::GetInstance()->GetFormRectInner(dataParam);
+            }
             HILOG_INFO("getFormRect start notify.");
             std::unique_lock<std::mutex> lock(dataParam->mutex);
             dataParam->isReady = true;
@@ -2511,10 +2513,6 @@ void CallBackReturn(const Rect &item, LiveFormInterfaceParam* liveFormInterfaceP
 void JsFormRouterProxyMgr::GetFormRectInner(LiveFormInterfaceParam *dataParam)
 {
     HILOG_INFO("call");
-    if (dataParam == nullptr) {
-        HILOG_ERROR("dataParam is null.");
-        return;
-    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(getFormRectEnv_, &scope);
     if (scope == nullptr) {
