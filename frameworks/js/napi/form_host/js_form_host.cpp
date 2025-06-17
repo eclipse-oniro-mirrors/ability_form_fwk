@@ -57,7 +57,7 @@ namespace {
     const std::string GET_FORM_RECT = "getFormRect";
     const std::set<std::string> FORM_LISTENER_TYPE =
     {
-        FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT 
+        FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT
     };
 }
 
