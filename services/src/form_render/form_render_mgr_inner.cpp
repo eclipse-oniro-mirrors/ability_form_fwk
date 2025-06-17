@@ -397,7 +397,7 @@ ErrCode FormRenderMgrInner::checkConnectionsFormIds(std::vector<int64_t> formIds
 
 void FormRenderMgrInner::RerenderAllForms()
 {
-    HILOG_INFO("FRS is died,notify host");
+    HILOG_WARN("FRS is died,notify host");
     std::unique_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
     renderRemoteObj_ = nullptr;
     guard.unlock();

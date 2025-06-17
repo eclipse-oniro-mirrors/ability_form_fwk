@@ -165,6 +165,21 @@ void FormHostTaskMgr::PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObj
 }
 
 /**
+ * @brief Post re-add form task to form host when FormRenderService is died.
+ * @param formId The Id of the form.
+ * @param errorCode Indicates error-code of the form.
+ */
+void FormHostTaskMgr::PostConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode)
+{
+    auto task = [formId, errorCode]() {
+        FormHostTaskMgr::GetInstance().ConnectFRSFailedTaskToHost(formId, errorCode);
+    };
+    const std::pair<int64_t, int64_t> eventMsg = std::make_pair((int64_t)TaskType::RENDER_FORM, formId);
+    FormHostQueue::GetInstance().CancelDelayTask(eventMsg);
+    FormHostQueue::GetInstance().ScheduleDelayTask(eventMsg, FORM_FRS_DIED_TASK_DELAY_TIME, task);
+}
+
+/**
  * @brief Handle form host died(task).
  * @param remoteHost Form host proxy object.
  */
@@ -334,7 +349,24 @@ void FormHostTaskMgr::FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
     remoteFormHost->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.");
     HILOG_DEBUG("end");
 }
- 
+
+void FormHostTaskMgr::ConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode)
+{
+    HILOG_WARN("formId:%{public}" PRId64 ", errorCode:%{public}d", formId, errorCode);
+    std::vector<int64_t> formIds{formId};
+
+    std::vector<sptr<IRemoteObject>> formHostObjs;
+    FormDataMgr::GetInstance().GetFormHostRemoteObj(formId, formHostObjs);
+    for (const auto &host : formHostObjs) {
+        auto hostClient = iface_cast<IFormHost>(host);
+        if (hostClient == nullptr) {
+            HILOG_ERROR("null hostClient");
+            continue;
+        }
+        hostClient->OnError(errorCode, "remoteObject is dead", formIds);
+    }
+}
+
 void FormHostTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
 {
     HILOG_INFO("remote client died event");
