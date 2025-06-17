@@ -77,6 +77,8 @@ int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return HandleOnRecoverFormDone(data, reply);
         case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM_DONE):
             return HandleOnRecycleFormDone(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_DELETE_FORM_DONE):
+            return HandleOnDeleteFormDone(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -331,7 +333,14 @@ int32_t FormSupplyStub::HandleOnRenderFormDone(MessageParcel &data, MessageParce
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t result = OnRenderFormDone(formId);
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRenderFormDone(formId, *want);
     reply.WriteInt32(result);
     return result;
 }
@@ -344,7 +353,14 @@ int32_t FormSupplyStub::HandleOnRecoverFormDone(MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t result = OnRecoverFormDone(formId);
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRecoverFormDone(formId, *want);
     reply.WriteInt32(result);
     return result;
 }
@@ -357,7 +373,34 @@ int32_t FormSupplyStub::HandleOnRecycleFormDone(MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t result = OnRecycleFormDone(formId);
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRecycleFormDone(formId, *want);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormSupplyStub::HandleOnDeleteFormDone(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("ReadInt64<formId> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnDeleteFormDone(formId, *want);
     reply.WriteInt32(result);
     return result;
 }

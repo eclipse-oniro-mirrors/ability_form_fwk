@@ -38,6 +38,7 @@
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "form_host/form_host_task_mgr.h"
+#include "status_mgr_center/form_status.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -99,8 +100,7 @@ ErrCode FormRenderMgrInner::RenderForm(
 
 void FormRenderMgrInner::CheckIfFormRecycled(FormRecord &formRecord, Want& want) const
 {
-    if (formRecord.recycleStatus == RecycleStatus::RECYCLED) {
-        formRecord.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+    if (FormStatus::GetInstance().GetFormStatus(formRecord.formId) == FormFsmStatus::RECYCLED) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         std::string statusData;
         if (FormInfoRdbStorageMgr::GetInstance().LoadStatusData(
@@ -127,7 +127,26 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
     }
     CheckIfFormRecycled(formRecord, want);
     want.SetParam(Constants::FORM_CONNECT_ID, connectId);
-    FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
+
+    auto renderType = want.GetIntParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADD_FORM_UPDATE_FORM);
+    if (renderType != Constants::ADAPTER_UPDATE_FORM ||
+        FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId)) {
+        FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
+        return ERR_OK;
+    }
+
+    auto task = [formRecord, want, remoteObject]() {
+        FormRecord newRecord(formRecord);
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        bool hasCacheData = FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap);
+        if (hasCacheData) {
+            newRecord.formProviderInfo.SetFormDataString(cacheData);
+            newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+        }
+        FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, want, remoteObject);
+    };
+    FormRenderMgr::GetInstance().AddPostRenderFormTask(formRecord.formId, task);
     return ERR_OK;
 }
 
@@ -147,7 +166,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
 
     if (formRecord.formProviderInfo.NeedCache()) {
         FormCacheMgr::GetInstance().AddData(formRecord.formId, formRecord.formProviderInfo.GetFormData());
-        if (formRecord.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
+        if (FormStatus::GetInstance().GetFormStatus(formRecord.formId) == FormFsmStatus::RECYCLED) {
             std::string cacheData;
             std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
             if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
@@ -415,7 +434,6 @@ void FormRenderMgrInner::RerenderAllForms()
                 continue;
             }
             item.second->SetStateDisconnected();
-            FormStatusMgr::GetInstance().ResetFormStatus(item.first);
         }
     }
 

@@ -4321,7 +4321,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_001, TestSize.Level0)
 
     // init record
     FormRecord record1 = formDataMgr_.CreateFormRecord(formItemInfo1, callingUid1, formId1);
-    record1.recycleStatus = RecycleStatus::RECYCLABLE;
     FormRecord record2 = formDataMgr_.CreateFormRecord(formItemInfo2, callingUid2, formId2);
     formDataMgr_.formRecords_.emplace(formId1, record1);
     formDataMgr_.formRecords_.emplace(formId2, record2);

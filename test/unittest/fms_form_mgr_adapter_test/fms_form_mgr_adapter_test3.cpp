@@ -251,24 +251,6 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0251, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_0252
- * @tc.desc: test CheckUpdateFormRecord function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0252, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0252 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    FormItemInfo info;
-    FormRecord record;
-    record.recycleStatus = RecycleStatus::RECYCLED;
-    formMgrAdapter.CheckUpdateFormRecord(formId, info, record);
-    EXPECT_EQ(record.recycleStatus, RecycleStatus::NON_RECYCLABLE);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0252 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_0253
  * @tc.desc: test AllotFormBySpecificId function.
  * @tc.type: FUNC

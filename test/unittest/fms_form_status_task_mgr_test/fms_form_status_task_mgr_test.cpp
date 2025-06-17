@@ -157,6 +157,10 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0006, TestSize.Level0)
     sptr<IRemoteObject> remoteObjectOfRender = nullptr;
     formTaskMgr->RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
     EXPECT_EQ(iface_cast<IFormRender>(remoteObjectOfRender), nullptr);
+
+    remoteObjectOfRender = new (std::nothrow) MockFormProviderClient();
+    formTaskMgr->RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
+
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0006 end";
 }
 
@@ -171,7 +175,9 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0007, TestSize.Level1)
     std::shared_ptr<FormStatusTaskMgr> formTaskMgr = std::make_shared<FormStatusTaskMgr>();
     FormRecord record;
     Want want;
-    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr->RecoverForm(record, want, remoteObject);
+    remoteObject = new (std::nothrow) MockFormProviderClient();
     formTaskMgr->RecoverForm(record, want, remoteObject);
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0007 end";
 }
@@ -191,46 +197,13 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0008, TestSize.Level0)
     std::string uid = "uid";
     sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr->ReleaseRenderer(formId, compId, uid, remoteObject);
+    remoteObject = new (std::nothrow) MockFormProviderClient();
+    formTaskMgr->ReleaseRenderer(formId, compId, uid, remoteObject);
     FormRecord record;
     Want want;
     formTaskMgr->RenderForm(record, want, remoteObject);
     EXPECT_EQ(iface_cast<IFormRender>(remoteObject), nullptr);
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0008 end";
-}
-
-/**
- * @tc.name: FormStatusTaskMgr_0009
- * @tc.desc: Verify InnerPostRenderForm
- * @tc.type: FUNC
- */
-HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0009, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormStatusTaskMgr_0009 start";
-    std::shared_ptr<FormStatusTaskMgr> formTaskMgr = std::make_shared<FormStatusTaskMgr>();
-    FormRecord formRecord;
-    Want want;
-    sptr<IRemoteObject> remoteObject;
-    formTaskMgr->InnerPostRenderForm(formRecord, want, remoteObject);
-    GTEST_LOG_(INFO) << "FormStatusTaskMgr_0009 end";
-}
-
-/**
- * @tc.name: FormStatusTaskMgr_0010
- * @tc.desc: Verify InnerPostRenderForm
- * @tc.type: FUNC
- */
-HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0010, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormStatusTaskMgr_0010 start";
-    std::shared_ptr<FormStatusTaskMgr> formTaskMgr = std::make_shared<FormStatusTaskMgr>();
-    formTaskMgr->formLastRecoverTimes.clear();
-    formTaskMgr->formLastRecoverTimes.insert({123, 123});
-    FormRecord formRecord;
-    formRecord.formId = 123;
-    Want want;
-    sptr<IRemoteObject> remoteObject;
-    formTaskMgr->InnerPostRenderForm(formRecord, want, remoteObject);
-    GTEST_LOG_(INFO) << "FormStatusTaskMgr_0010 end";
 }
 
 /**
@@ -244,7 +217,9 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0011, TestSize.Level1)
     std::shared_ptr<FormStatusTaskMgr> formTaskMgr = std::make_shared<FormStatusTaskMgr>();
     FormRecord formRecords;
     Want want;
-    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr->StopRenderingForm(formRecords, want, remoteObject);
+    remoteObject = new (std::nothrow) MockFormProviderClient();
     formTaskMgr->StopRenderingForm(formRecords, want, remoteObject);
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0011 end";
 }
@@ -259,9 +234,15 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0012, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0012 start";
     std::shared_ptr<FormStatusTaskMgr> formTaskMgr = std::make_shared<FormStatusTaskMgr>();
     FormRecord record;
+    record.isVisible = false;
     Want want;
-    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr->RenderForm(record, want, remoteObject);
+    remoteObject = new (std::nothrow) MockFormProviderClient();
+    formTaskMgr->RenderForm(record, want, remoteObject);
+    record.isVisible = true;
+    formTaskMgr->RenderForm(record, want, remoteObject);
+
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0012 end";
 }
 

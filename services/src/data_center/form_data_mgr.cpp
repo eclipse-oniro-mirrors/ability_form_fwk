@@ -41,6 +41,7 @@
 #include "common/event/form_event_report.h"
 #include "common/util/form_task_common.h"
 #include "form_mgr/form_mgr_queue.h"
+#include "status_mgr_center/form_status.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -290,7 +291,7 @@ void FormDataMgr::RecycleAllRecyclableForms() const
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-            if (itFormRecord->second.recycleStatus ==  RecycleStatus::RECYCLABLE) {
+            if (FormStatus::GetInstance().GetFormStatus(itFormRecord->second.formId) != FormFsmStatus::RECYCLED) {
                 formIds.emplace_back(itFormRecord->first);
             }
         }
@@ -2963,29 +2964,6 @@ void FormDataMgr::UpdateFormWant(const int64_t formId, const Want &want, FormRec
         return;
     }
     record.wantCacheMap[formId] = want;
-}
-
-/**
- * @brief update formRecord recycle status.
- * @param formId form id.
- * @return Returns true on success, false on failure.
- */
-bool FormDataMgr::UpdateFormRecordRecycleStatus(const int64_t formId, const RecycleStatus status)
-{
-    HILOG_DEBUG("get form record by formId");
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    auto info = formRecords_.find(formId);
-    if (info == formRecords_.end()) {
-        HILOG_WARN("form %{public}" PRId64 " not exist", formId);
-        return false;
-    }
-    if (info->second.recycleStatus != RecycleStatus::RECYCLABLE) {
-        HILOG_WARN("form %{public}" PRId64 " not RECYCLABLE", formId);
-        return false;
-    }
-    info->second.recycleStatus = status;
-    HILOG_DEBUG("get form record successfully");
-    return true;
 }
 
 void FormDataMgr::GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords)

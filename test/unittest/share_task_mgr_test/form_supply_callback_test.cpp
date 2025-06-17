@@ -484,7 +484,6 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0023, TestSize.Lev
     FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
     EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
 
-    retFormRec.recycleStatus = RecycleStatus::RECYCLABLE;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
     EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
 

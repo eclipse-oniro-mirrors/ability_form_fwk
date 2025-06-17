@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,10 @@
 
 #include "status_mgr_center/form_status_mgr.h"
 #include "status_mgr_center/form_status_queue.h"
+#include "status_mgr_center/form_status.h"
+#include "status_mgr_center/form_event_timeout_queue.h"
+#include "status_mgr_center/form_event_retry_mgr.h"
+#include "common/timer_mgr/form_timer_mgr.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -29,91 +33,286 @@ FormStatusMgr::~FormStatusMgr()
     HILOG_DEBUG("destroy FormStatusMgr");
 }
 
-void FormStatusMgr::AddFormStatus(const int64_t formId, FormStatus formStatus)
+void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
-    std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
-    formStatusMap_[formId] = formStatus;
-    HILOG_INFO("AddFormStatus formId:%{public}" PRId64 ", formStatus is %{public}d.", formId, (int)formStatus);
-}
-
-void FormStatusMgr::DeleteFormStatus(const int64_t formId)
-{
-    std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
-    formStatusMap_.erase(formId);
-    HILOG_INFO("formStatusMap_ erase, formId:%{public}" PRId64 ". ", formId);
-}
-
-bool FormStatusMgr::GetFormStatus(const int64_t formId, FormStatus &formStatus)
-{
-    FormStatus currentFormStatus;
-    {
-        std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
-        auto iter = formStatusMap_.find(formId);
-        if (iter == formStatusMap_.end()) {
-            HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64 ". ", formId);
-            return false;
+    auto task = [formId, event, func]() {
+        // get status machine info
+        if (!FormStatus::GetInstance().HasFormStatus(formId)) {
+            HILOG_INFO("create new status.");
+            FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::INIT);
         }
-        currentFormStatus = iter->second;
-    }
-    formStatus = currentFormStatus;
-    HILOG_INFO("GetFormStatus formId:%{public}" PRId64 ", formStatus is %{public}d.", formId, (int)formStatus);
-    return true;
+        FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
+
+        FormStatusMachineInfo info;
+        if (!FormStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
+            return;
+        }
+
+        HILOG_INFO("state transition, formId:%{public}" PRId64
+                   ", status is %{public}d, event is %{public}d, nextStatus is %{public}d.",
+            formId,
+            static_cast<int32_t>(status),
+            static_cast<int32_t>(event),
+            static_cast<int32_t>(info.nextStatus));
+
+        // state machine switches to the next state.
+        FormStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
+
+        // state machine timeout process
+        FormStatusMgr::GetInstance().FormTaskTimeoutExec(formId, info.timeoutMs, event, status);
+
+        // state machine excute
+        FormStatusMgr::GetInstance().FormTaskExec(info.processType, formId, event, func);
+    };
+
+    FormStatusQueue::GetInstance().ScheduleTask(0, task);
 }
 
-bool FormStatusMgr::SetFormStatus(const int64_t formId, FormStatus formStatus)
+void FormStatusMgr::CancelFormEventTimeout(const int64_t formId, std::string eventId)
 {
-    std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
-    auto iter = formStatusMap_.find(formId);
-    if (iter == formStatusMap_.end()) {
-        HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64 ". ", formId);
-        return false;
-    }
-    iter->second = formStatus;
-    HILOG_INFO("SetFormStatus formId:%{public}" PRId64 ", formStatus is %{public}d.", formId, (int)formStatus);
-    return true;
+    FormEventTimeoutQueue::GetInstance().CancelDelayTask(std::make_pair(formId, eventId));
 }
 
-bool FormStatusMgr::isProcessableFormStatus(const int64_t formId)
+void FormStatusMgr::FormTaskTimeoutExec(
+    const int64_t formId, FormEventTimeout timeoutMs, FormFsmEvent event, FormFsmStatus status)
 {
-    std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
-    if (formStatusMap_.find(formId) == formStatusMap_.end()) {
-        HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64 ". ", formId);
-        return false;
-    }
-    if (formStatusMap_[formId] == FormStatus::RECOVERED) {
-        return true;
-    } else if (formStatusMap_[formId] == FormStatus::RECYCLED) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void FormStatusMgr::ResetFormStatus(const int64_t &formId)
-{
-    if (isProcessableFormStatus(formId)) {
+    if (timeoutMs == FormEventTimeout::TIMEOUT_NO_NEED) {
+        HILOG_DEBUG("no need exec timeout task.");
         return;
     }
-    HILOG_INFO("Reset formId:%{public}" PRId64 " status.", formId);
-    SetFormStatus(formId, FormStatus::RECOVERED);
+
+    SetFormEventId(formId);
+    std::string eventId = GetFormEventId(formId);
+    if (eventId.empty()) {
+        HILOG_ERROR("get eventId failed.");
+        return;
+    }
+
+    auto timeoutTask = [formId, event, status]() {
+        HILOG_ERROR("excute timeout, event:%{public}d, status:%{public}d, formId:%{public}" PRId64,
+            static_cast<int32_t>(event),
+            static_cast<int32_t>(status),
+            formId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::EXECUTION_TIMEOUT);
+    };
+    FormEventTimeoutQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair(formId, eventId), static_cast<uint32_t>(timeoutMs), timeoutTask);
 }
 
-void FormStatusMgr::OnRenderFormDone(const int64_t &formId)
+void FormStatusMgr::FormTaskExec(
+    FormFsmProcessType processType, const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
-    SetFormStatus(formId, FormStatus::RECOVERED);
-    FormStatusQueue::GetInstance().PostFormCommandTaskByFormId(formId);
+    HILOG_INFO("processType is %{public}d.", static_cast<int32_t>(processType));
+    switch (processType) {
+        case FormFsmProcessType::PROCESS_TASK_DIRECT:
+            ProcessTaskDirect(formId, event, func);
+            break;
+        case FormFsmProcessType::ADD_TASK_TO_QUEUE_UNIQUE:
+            AddTaskToQueueUnique(formId, event, func);
+            break;
+        case FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH:
+            AddTaskToQueuePush(formId, event, func);
+            break;
+        case FormFsmProcessType::ADD_TASK_TO_QUEUE_DELETE:
+            AddTaskToQueueDelete(formId, event, func);
+            break;
+        case FormFsmProcessType::PROCESS_TASK_FROM_QUEUE:
+            ProcessTaskFromQueue(formId);
+            break;
+        case FormFsmProcessType::PROCESS_TASK_DELETE:
+            ProcessTaskDelete(formId);
+            break;
+        case FormFsmProcessType::PROCESS_TASK_RETRY:
+            ProcessTaskFromRetry(formId);
+            break;
+        default:
+            break;
+    }
 }
 
-void FormStatusMgr::OnRecoverFormDone(const int64_t &formId)
+void FormStatusMgr::ProcessTaskDirect(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
-    SetFormStatus(formId, FormStatus::RECOVERED);
-    FormStatusQueue::GetInstance().PostFormCommandTaskByFormId(formId);
+    if (func == nullptr) {
+        HILOG_ERROR("func is nullptr");
+        return;
+    }
+
+    FormEventTaskInfo taskInfo{formId, event, func};
+    FormEventRetryMgr::GetInstance().SetLastFormEvent(formId, taskInfo);
+
+    func();
 }
 
-void FormStatusMgr::OnRecycleFormDone(const int64_t &formId)
+void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
-    SetFormStatus(formId, FormStatus::RECYCLED);
-    FormStatusQueue::GetInstance().PostFormCommandTaskByFormId(formId);
+    std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
+
+    FormEventTaskInfo taskInfo{formId, event, func};
+    formEventQueue->PushFormEvent(taskInfo);
+
+    std::queue<FormEventTaskInfo> temptaskInfoQueue;
+    while (!formEventQueue->IsEventQueueEmpty()) {
+        FormEventTaskInfo eventTaskInfo{};
+        if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
+            HILOG_INFO("formEventQueue is empty.");
+            break;
+        }
+        if (eventTaskInfo.getFormEvent() == FormFsmEvent::RENDER_FORM) {
+            temptaskInfoQueue.push(eventTaskInfo);
+        }
+    }
+
+    while (!temptaskInfoQueue.empty()) {
+        FormEventTaskInfo eventTaskInfo = temptaskInfoQueue.front();
+        temptaskInfoQueue.pop();
+        formEventQueue->PushFormEvent(eventTaskInfo);
+    }
+
+    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueue().size()));
 }
-} // namespace AppExecFwk
-} // namespace OHOS
+
+void FormStatusMgr::AddTaskToQueuePush(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
+{
+    std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
+    FormEventTaskInfo taskInfo{formId, event, func};
+    formEventQueue->PushFormEvent(taskInfo);
+}
+
+void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
+{
+    std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
+
+    FormEventTaskInfo taskInfo{formId, event, func};
+    if (formEventQueue->IsEventQueueEmpty()) {
+        formEventQueue->PushFormEvent(taskInfo);
+        return;
+    }
+
+    while (!formEventQueue->IsEventQueueEmpty()) {
+        FormEventTaskInfo eventTaskInfo{};
+        if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
+            HILOG_INFO("formEventQueue is empty.");
+            break;
+        }
+    }
+    formEventQueue->PushFormEvent(taskInfo);
+    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueue().size()));
+}
+
+void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
+{
+    if (!HasFormEventQueue(formId)) {
+        HILOG_INFO("formEventQueue is empty, not process.");
+        return;
+    }
+    std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
+
+    FormEventTaskInfo eventTaskInfo{};
+    if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
+        HILOG_INFO("formEventQueue is empty, not process.");
+        return;
+    }
+
+    auto func = eventTaskInfo.getFunc();
+    auto event = eventTaskInfo.getFormEvent();
+    FormStatusMgr::GetInstance().PostFormEvent(formId, event, func);
+}
+
+void FormStatusMgr::ProcessTaskDelete(const int64_t formId)
+{
+    DeleteFormEventQueue(formId);
+    DeleteFormEventId(formId);
+    FormStatus::GetInstance().DeleteFormStatus(formId);
+    FormEventRetryMgr::GetInstance().DeleteLastFormEvent(formId);
+    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+}
+
+void FormStatusMgr::ProcessTaskFromRetry(const int64_t formId)
+{
+    int32_t retryCount = FORM_EVENT_RETRY_MAX;
+    bool ret = FormEventRetryMgr::GetInstance().GetRetryCount(formId, retryCount);
+    if (ret && retryCount == FORM_EVENT_RETRY_MAX) {
+        HILOG_INFO("retry reached count.");
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+        ProcessTaskFromQueue(formId);
+        return;
+    }
+    HILOG_INFO("set retry count 1.");
+    FormEventRetryMgr::GetInstance().SetRetryCount(formId, 1);
+
+    FormEventTaskInfo formEventInfo;
+    ret = FormEventRetryMgr::GetInstance().GetLastFormEvent(formId, formEventInfo);
+    if (!ret) {
+        HILOG_ERROR("GetLastFormEvent failed.");
+        return;
+    }
+
+    auto func = formEventInfo.getFunc();
+    auto event = formEventInfo.getFormEvent();
+    FormStatusMgr::GetInstance().PostFormEvent(formId, event, func);
+}
+
+bool FormStatusMgr::HasFormEventQueue(const int64_t formId)
+{
+    std::shared_lock<std::shared_mutex> lock(formEventQueueMutex_);
+    return !(formEventQueueMap_.find(formId) == formEventQueueMap_.end());
+}
+
+const std::shared_ptr<FormEventQueue> FormStatusMgr::GetFormEventQueue(const int64_t formId)
+{
+    std::unique_lock<std::shared_mutex> lock(formEventQueueMutex_);
+    if (formEventQueueMap_.find(formId) == formEventQueueMap_.end()) {
+        std::shared_ptr<FormEventQueue> formEventQueue = std::make_shared<FormEventQueue>(formId);
+        formEventQueueMap_.emplace(formId, formEventQueue);
+        HILOG_INFO("formEventQueueMap_ insert, formId:%{public}" PRId64 ". ", formId);
+    }
+
+    return formEventQueueMap_[formId];
+}
+
+void FormStatusMgr::DeleteFormEventQueue(const int64_t formId)
+{
+    std::unique_lock<std::shared_mutex> lock(formEventQueueMutex_);
+    auto iter = formEventQueueMap_.find(formId);
+    if (iter != formEventQueueMap_.end()) {
+        HILOG_INFO("formId:%{public}" PRId64 ". ", formId);
+        formEventQueueMap_.erase(iter);
+    }
+}
+
+std::string FormStatusMgr::GetFormEventId(const int64_t formId)
+{
+    std::shared_lock<std::shared_mutex> lock(formEventIdMapMutex_);
+    if (formEventIdMap_.find(formId) == formEventIdMap_.end()) {
+        HILOG_ERROR("eventId is not existed, formId:%{public}" PRId64 ".", formId);
+        return "";
+    }
+
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s.", formId, (formEventIdMap_[formId]).c_str());
+    return formEventIdMap_[formId];
+}
+
+void FormStatusMgr::SetFormEventId(const int64_t formId)
+{
+    int64_t eventId = FormUtil::GetCurrentNanosecond();
+    std::string tidString = std::to_string(eventId);
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s.", formId, tidString.c_str());
+    std::unique_lock<std::shared_mutex> lock(formEventIdMapMutex_);
+    if (formEventIdMap_.find(formId) == formEventIdMap_.end()) {
+        formEventIdMap_.emplace(formId, std::to_string(eventId));
+        return;
+    }
+    formEventIdMap_[formId] = tidString;
+}
+
+void FormStatusMgr::DeleteFormEventId(const int64_t formId)
+{
+    std::unique_lock<std::shared_mutex> lock(formEventIdMapMutex_);
+    auto iter = formEventIdMap_.find(formId);
+    if (iter != formEventIdMap_.end()) {
+        HILOG_INFO("formId:%{public}" PRId64 ". ", formId);
+        formEventIdMap_.erase(iter);
+    }
+}
+}  // namespace AppExecFwk
+}  // namespace OHOS

@@ -26,6 +26,7 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "${form_fwk_path}/test/mock/src/remote_native_token.cpp",
     "${form_fwk_path}/test/unittest/fms_form_supply_callback_test/mock_ability_connection.cpp",
     "${form_fwk_path}/test/unittest/fms_form_supply_callback_test/mock_event_handler.cpp",
+    "${form_fwk_path}/services/src/status_mgr_center/form_status_mgr.cpp",
   ]
   sources += [ "form_supply_callback_test.cpp" ]
 

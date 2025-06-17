@@ -47,6 +47,11 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         HILOG_ERROR("localDescriptor not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    int32_t result = CheckPermission();
+    if (result != ERR_OK) {
+        HILOG_ERROR("check permission fail");
+        return result;
+    }
 
     switch (code) {
         case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM):
@@ -155,7 +160,12 @@ int32_t FormRenderStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel
     std::string uid = data.ReadString();
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReleaseRenderer",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    int32_t result = ReleaseRenderer(formId, compId, uid);
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = ReleaseRenderer(formId, compId, uid, *want);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;

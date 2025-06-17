@@ -18,6 +18,7 @@
 #include "fms_log_wrapper.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_mgr/form_mgr_adapter.h"
+#include "status_mgr_center/form_status.h"
 #include <utility>
 #include <map>
 
@@ -191,7 +192,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     }
 
     AppendBundleFormInfo(formRecordInfo, formInfo);
-    AppendRecycleStatus(formRecordInfo.recycleStatus, formInfo);
+    AppendRecycleStatus(formRecordInfo.formId, formInfo);
 }
 
 /**
@@ -257,7 +258,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             }
 
             AppendFormLocation(info.formLocation, infosResult);
-            AppendRecycleStatus(info.recycleStatus, infosResult);
+            AppendRecycleStatus(info.formId, infosResult);
             AppendBundleType(info.formBundleType, infosResult);
             infosResult += " \n";
         }
@@ -343,15 +344,28 @@ void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::st
     }
 }
 
-void FormDumpMgr::AppendRecycleStatus(const RecycleStatus recycleStatus, std::string &formInfo) const
+void FormDumpMgr::AppendRecycleStatus(const int64_t formId, std::string &formInfo) const
 {
     formInfo += "    recycleStatus ";
-    if (recycleStatus == RecycleStatus::RECYCLABLE) {
-        formInfo += "[ RECYCLABLE ]\n";
-    } else if (recycleStatus == RecycleStatus::RECYCLED) {
+    FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
+    if (status == FormFsmStatus::INIT) {
+        formInfo += "[ INIT ]\n";
+    } else if (status == FormFsmStatus::RENDERED) {
+        formInfo += "[ RENDERED ]\n";
+    } else if (status == FormFsmStatus::RECYCLED) {
         formInfo += "[ RECYCLED ]\n";
+    } else if (status == FormFsmStatus::RENDERING) {
+        formInfo += "[ RENDERING ]\n";
+    } else if (status == FormFsmStatus::RECYCLING_DATA) {
+        formInfo += "[ RECYCLING_DATA ]\n";
+    } else if (status == FormFsmStatus::RECYCLING) {
+        formInfo += "[ RECYCLING ]\n";
+    } else if (status == FormFsmStatus::RECOVERING) {
+        formInfo += "[ RECOVERING ]\n";
+    } else if (status == FormFsmStatus::DELETING) {
+        formInfo += "[ DELETING ]\n";
     } else {
-        formInfo += "[ NON_RECYCLABLE ]\n";
+        formInfo += "[ UNPROCESSABLE ]\n";
     }
 }
 

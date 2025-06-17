@@ -21,6 +21,7 @@
 #include "form_provider/form_supply_callback.h"
 #include "feature/form_share/form_share_mgr.h"
 #undef private
+#include "status_mgr_center/form_status_mgr.h"
 #include "appexecfwk_errors.h"
 #include "common/connection/form_ability_connection.h"
 #include "form_provider/connection/form_acquire_connection.h"
@@ -463,17 +464,20 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0022, TestSize.Lev
 }
 
 /**
- * @tc.name: FormAcquireConnectionTest_0023
+ * @tc.name: FormOnRecycleFormTest_0001
  * @tc.desc: Test function OnRecycleForm runs normally and will not throw any exceptions.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0023, TestSize.Level0)
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0001, TestSize.Level0)
 {
-    HILOG_INFO("FormAcquireConnectionTest_0023 start");
+    HILOG_INFO("FormOnRecycleFormTest_0001 start");
     int64_t formId = 102;
     Want want;
     FormSupplyCallback formSupplyCallback;
-    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_DATA, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
 
     FormItemInfo record;
     int callingUid = 0;
@@ -482,12 +486,222 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0023, TestSize.Lev
     record.SetAbilityName(FORM_ABILITY_NAME);
     record.SetTemporaryFlag(false);
     FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
-    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
 
-    retFormRec.recycleStatus = RecycleStatus::RECYCLABLE;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
-    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
 
-    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0023 end";
+    GTEST_LOG_(INFO) << "FormOnRecycleFormTest_0001 end";
+}
+
+/**
+ * @tc.name: FormOnRecycleFormTest_0002
+ * @tc.desc: Test function OnRecycleForm runs normally and will not throw any exceptions.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0002, TestSize.Level0)
+{
+    HILOG_INFO("FormOnRecycleFormTest_0002 start");
+    int64_t formId = 102;
+    Want want;
+    FormSupplyCallback formSupplyCallback;
+    want.SetParam(Constants::FORM_STATUS_DATA, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    std::string nullEventId = "";
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, nullEventId);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    std::string curEventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, curEventId);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_DONE));
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormOnRecycleFormTest_0002 end";
+}
+
+/**
+ * @tc.name: FormOnRenderFormDoneTest_0001
+ * @tc.desc: Verify OnRenderFormDone
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnRenderFormDoneTest_0001, TestSize.Level0)
+{
+    HILOG_INFO("FormOnRenderFormDoneTest_0001 start");
+    int64_t formId = 102;
+    Want want{};
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    std::string nullEventId = "";
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, nullEventId);
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    std::string curEventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, curEventId);
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_DONE));
+    EXPECT_EQ(formSupplyCallback.OnRenderFormDone(formId, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormOnRenderFormDoneTest_0001 end";
+}
+
+/**
+ * @tc.name: FormOnRecoverFormDoneTest_0001
+ * @tc.desc: Verify OnRecoverFormDone
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecoverFormDoneTest_0001, TestSize.Level0)
+{
+    HILOG_INFO("FormOnRecoverFormDoneTest_0001 start");
+    int64_t formId = 102;
+    Want want{};
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    std::string nullEventId = "";
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, nullEventId);
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    std::string curEventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, curEventId);
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_DONE));
+    EXPECT_EQ(formSupplyCallback.OnRecoverFormDone(formId, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormOnRecoverFormDoneTest_0001 end";
+}
+
+/**
+ * @tc.name: FormOnRecycleFormDoneTest_0001
+ * @tc.desc: Verify OnRecycleFormDone
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormDoneTest_0001, TestSize.Level0)
+{
+    HILOG_INFO("FormOnRecycleFormDoneTest_0001 start");
+    int64_t formId = 102;
+    Want want{};
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    std::string nullEventId = "";
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, nullEventId);
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    std::string curEventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, curEventId);
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_DONE));
+    EXPECT_EQ(formSupplyCallback.OnRecycleFormDone(formId, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormOnRecycleFormDoneTest_0001 end";
+}
+
+/**
+ * @tc.name: FormOnDeleteFormDoneTest_0001
+ * @tc.desc: Verify OnDeleteFormDone
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnDeleteFormDoneTest_0001, TestSize.Level0)
+{
+    HILOG_INFO("FormOnDeleteFormDoneTest_0001 start");
+    int64_t formId = 102;
+    Want want{};
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    std::string nullEventId = "";
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, nullEventId);
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    std::string curEventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, curEventId);
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, std::to_string(formId));
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::DELETE_FORM_DONE));
+    EXPECT_EQ(formSupplyCallback.OnDeleteFormDone(formId, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormOnDeleteFormDoneTest_0001 end";
+}
+
+/**
+ * @tc.name: FormOnNotifyRefreshFormTest_0001
+ * @tc.desc: Verify OnNotifyRefreshForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnNotifyRefreshFormTest_0001, TestSize.Level0)
+{
+    HILOG_INFO("FormOnNotifyRefreshFormTest_0001 start");
+    
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnNotifyRefreshForm(123), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormOnNotifyRefreshFormTest_0001 end";
 }
 }

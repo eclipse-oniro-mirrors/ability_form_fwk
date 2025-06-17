@@ -19,6 +19,7 @@
 #include "context_impl.h"
 #include "fms_log_wrapper.h"
 #include "form_render_impl.h"
+#include "form_render_service_mgr.h"
 #include "hitrace_meter.h"
 #include "service_extension_context.h"
 
@@ -46,7 +47,7 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
     Extension::OnStart(want);
     auto context = GetContext();
     if (context) {
-        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->SetConfiguration(context->GetConfiguration());
+        FormRenderServiceMgr::GetInstance().SetConfiguration(context->GetConfiguration());
     }
 
     HILOG_INFO("FormRenderServiceExtension OnStart begin");
@@ -103,7 +104,7 @@ void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Config
         return;
     }
     HILOG_INFO("configuration detail: %{public}s", config->GetName().c_str());
-    OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnConfigurationUpdated(config);
+    FormRenderServiceMgr::GetInstance().OnConfigurationUpdated(config);
 }
 }
 }
