@@ -794,6 +794,6 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
     rect.width = rectWidth;
     rect.height = rectHeight;
     return true;
-} 
+}
 }  // namespace AbilityRuntime
 }  // namespace OHOS
