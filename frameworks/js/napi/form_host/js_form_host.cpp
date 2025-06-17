@@ -1193,7 +1193,7 @@ private:
             return OnRegisterChangeSceneAnimationStateListener(env, callbackRef);
         } else if (type == GET_FORM_RECT) {
             return OnRegisterGetFormRectListener(env, callbackRef);
-         }
+        }
         return CreateJsUndefined(env);
     }
 
