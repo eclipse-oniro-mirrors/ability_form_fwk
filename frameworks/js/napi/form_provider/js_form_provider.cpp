@@ -1009,11 +1009,12 @@ napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* 
     }
  
     NapiAsyncTask::CompleteCallback complete =
-        [formId = formId](napi_env env, NapiAsyncTask &task, int32_t status) {
+        [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
             HILOG_INFO("OnGetFormRect start");
             AppExecFwk::Rect item;
             ErrCode ret = FormMgr::GetInstance().GetFormRect(formId, item);
             if (ret != ERR_OK) {
+                HILOG_INFO("OnGetFormRect failed, code:%{public}d", ret);
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }

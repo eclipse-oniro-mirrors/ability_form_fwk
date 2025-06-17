@@ -2199,8 +2199,7 @@ ErrCode FormMgr::GetFormRect(const int64_t formId, Rect &rect)
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    ErrCode result = remoteProxy_->GetFormRect(formId, rect);
-    return result;
+    return remoteProxy_->GetFormRect(formId, rect);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

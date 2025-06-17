@@ -2588,7 +2588,7 @@ void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, LiveFormInterfaceP
         return;
     }
  
-    napi_value promiseCallback;
+    napi_value promiseCallback = nullptr;
     auto *callbackInfo = PromiseCallbackInfo::Create(params);
     napi_create_function(getFormRectEnv_, "promiseCallback", strlen("promiseCallback"), PromiseCallback,
         callbackInfo, &promiseCallback);
@@ -2601,7 +2601,8 @@ void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, LiveFormInterfaceP
         HILOG_ERROR("Invoke pushCheck promise then error.");
         PromiseCallbackInfo::Destroy(callbackInfo);
         Rect info;
-        return CallBackReturn(info, params, false);
+        CallBackReturn(info, params, false);
+        return;
     }
  
     status = napi_call_function(getFormRectEnv_, funcResult, promiseCatch, ARGS_ONE, argvPromise, nullptr);
@@ -2609,10 +2610,9 @@ void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, LiveFormInterfaceP
         HILOG_ERROR("Invoke pushCheck promise catch error.");
         PromiseCallbackInfo::Destroy(callbackInfo);
         Rect info;
-        return CallBackReturn(info, params, false);
+        CallBackReturn(info, params, false);
+        return;
     }
- 
-    return;
 }
  
 napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_info info)
