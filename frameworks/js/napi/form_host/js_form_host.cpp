@@ -55,8 +55,10 @@ namespace {
     const std::string FORM_OVERFLOW = "formOverflow";
     const std::string CHANGE_SCENE_ANIMATION_STATE = "changeSceneAnimationState";
     const std::string GET_FORM_RECT = "getFormRect";
-    const std::set<std::string> FORM_LISTENER_TYPE = 
-        { FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT };
+    const std::set<std::string> FORM_LISTENER_TYPE =
+    {
+        FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT 
+    };
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -1241,7 +1243,7 @@ private:
             return OffRegisterChangeSceneAnimationStateListener(env);
         } else if (type == GET_FORM_RECT) {
             return OffRegisterGetFormRectListener(env);
-         }
+        }
         return CreateJsUndefined(env);
     }
 
@@ -2536,7 +2538,6 @@ void JsFormRouterProxyMgr::GetFormRectInner(LiveFormInterfaceParam *dataParam)
     napi_value callResult = nullptr;
     napi_status status =
         napi_call_function(getFormRectEnv_, nullptr, myCallback, ARGS_ONE, &callbackValue, &callResult);
-
     if (status != napi_ok) {
         dataParam->result = false;
         napi_close_handle_scope(getFormRectEnv_, scope);
