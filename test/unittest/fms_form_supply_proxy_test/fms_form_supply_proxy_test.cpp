@@ -433,7 +433,8 @@ HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_020, TestSize.Level1)
     std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
     ASSERT_NE(proxy, nullptr);
     int64_t formId = 1;
-    EXPECT_EQ(proxy->OnRenderFormDone(formId), ERR_OK);
+    Want want;
+    EXPECT_EQ(proxy->OnRenderFormDone(formId, want), ERR_OK);
     GTEST_LOG_(INFO)<< "FormSupplyProxyTest, FormSupplyProxyTest_020, TestSize.Level1";
 }
 
@@ -451,7 +452,8 @@ HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_021, TestSize.Level1)
     std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
     ASSERT_NE(proxy, nullptr);
     int64_t formId = 1;
-    EXPECT_EQ(proxy->OnRecoverFormDone(formId), ERR_OK);
+    Want want;
+    EXPECT_EQ(proxy->OnRecoverFormDone(formId, want), ERR_OK);
     GTEST_LOG_(INFO)<< "FormSupplyProxyTest, FormSupplyProxyTest_021, TestSize.Level1";
 }
 
@@ -469,8 +471,28 @@ HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_022, TestSize.Level1)
     std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
     ASSERT_NE(proxy, nullptr);
     int64_t formId = 1;
-    EXPECT_EQ(proxy->OnRecycleFormDone(formId), ERR_OK);
+    Want want;
+    EXPECT_EQ(proxy->OnRecycleFormDone(formId, want), ERR_OK);
     GTEST_LOG_(INFO)<< "FormSupplyProxyTest, FormSupplyProxyTest_022, TestSize.Level1";
+}
+
+/*
+* @tc.name: FormSupplyProxyTest_023
+* @tc.name: OnDeleteFormDone
+* @tc.desc: Verify function OnDeleteFormDone return value is ERR_OK
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_023, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FormSupplyProxyTest, FormSupplyProxyTest_023, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(iremoteObject, nullptr);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(proxy, nullptr);
+    int64_t formId = 1;
+    Want want;
+    EXPECT_EQ(proxy->OnDeleteFormDone(formId, want), ERR_OK);
+    GTEST_LOG_(INFO)<< "FormSupplyProxyTest, FormSupplyProxyTest_023, TestSize.Level1";
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
