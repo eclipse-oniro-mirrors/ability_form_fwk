@@ -2497,7 +2497,7 @@ ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
 
-void CallBackReturn(Rect &item, LiveFormInterfaceParam* liveFormInterfaceParam, bool ret)
+void CallBackReturn(const Rect &item, LiveFormInterfaceParam* liveFormInterfaceParam, bool ret)
 {
     if (liveFormInterfaceParam == nullptr) {
         HILOG_INFO("getFormRect callback param has been released");
@@ -2511,6 +2511,10 @@ void CallBackReturn(Rect &item, LiveFormInterfaceParam* liveFormInterfaceParam, 
 void JsFormRouterProxyMgr::GetFormRectInner(LiveFormInterfaceParam *dataParam)
 {
     HILOG_INFO("call");
+    if (dataParam == nullptr) {
+        HILOG_ERROR("dataParam is null.");
+        return;
+    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(getFormRectEnv_, &scope);
     if (scope == nullptr) {
