@@ -30,6 +30,8 @@
 #include "ipc_skeleton.h"
 #include "want.h"
 
+const int32_t MAX_FAILED_TIMES = 5;
+
 namespace OHOS {
 namespace AppExecFwk {
 FormRenderConnection::FormRenderConnection(
@@ -49,13 +51,18 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
     if (remoteObject->IsObjectDead()) {
-        HILOG_WARN("remoteObject is dead, formId:%{public}" PRId64, GetFormId());
-        FormHostTaskMgr::GetInstance().PostConnectFRSFailedTaskToHost(
-            GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED);
+        failedTimes++;
+        HILOG_WARN(
+            "remoteObject is dead, formId:%{public}" PRId64 ", failedTimes:%{public}d", GetFormId(), failedTimes);
+        if (failedTimes <= MAX_FAILED_TIMES) {
+            FormHostTaskMgr::GetInstance().PostConnectFRSFailedTaskToHost(
+                GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED);
+        }
         return;
     }
 
     connectState_ = ConnectState::CONNECTED;
+    failedTimes = 0;
     int32_t compileMode = 0;
     if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
         formRecord_.providerUserId, compileMode)) {
@@ -83,13 +90,14 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_INFO("element:%{public}s, resultCode:%{public}d, connectState:%{public}d",
-        element.GetURI().c_str(), resultCode, connectState_);
+    HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+        GetFormId(), resultCode, connectState_);
     // If connectState_ is CONNECTING, it means connect failed and host will try again, don't need to notify host
     if (resultCode && connectState_ == ConnectState::CONNECTING) {
         FormRenderMgr::GetInstance().RemoveConnection(GetFormId(), formRecord_);
     }
     connectState_ = ConnectState::DISCONNECTED;
+    failedTimes = 0;
 }
 
 void FormRenderConnection::SetStateConnecting()
