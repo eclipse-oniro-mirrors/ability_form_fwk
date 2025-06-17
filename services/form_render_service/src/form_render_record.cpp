@@ -793,6 +793,8 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         }
         if (formJsInfo.isDynamic) {
             isDynamicFormNeedRecover = true;
+            // recover form by updating task, need update provider data to formRequests_
+            AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
         if (compMaxId == formRequest.compId) {
@@ -806,7 +808,6 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
         bool isHandleClickEvent = false;
         HandleRecoverForm(formJsInfo, statusData, isHandleClickEvent);
-        UpdateRenderer(formJsInfo);
     }
 }
 
