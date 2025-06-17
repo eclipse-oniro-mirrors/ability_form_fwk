@@ -29,6 +29,7 @@
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
+#include "status_mgr_center/form_render_status_task_mgr.h"
 #include "status_mgr_center/form_render_status_mgr.h"
 
 namespace OHOS {
@@ -137,9 +138,11 @@ int32_t FormRenderServiceMgr::StopRenderingForm(
     HILOG_INFO("connectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
     if (isRenderGroupEmpty) {
         formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
-        OnDeleteFormDone(formJsInfo.formId, FormFsmEvent::DELETE_FORM_FINISH, formSupplyClient);
+        FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
+            formJsInfo.formId, FormFsmEvent::DELETE_FORM_FINISH, formSupplyClient);
     } else {
-        OnDeleteFormDone(formJsInfo.formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
+        FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
+            formJsInfo.formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
     }
 
     return ERR_OK;
@@ -177,7 +180,7 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
 
     search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
     HILOG_INFO("end,isRenderGroupEmpty:%{public}d", isRenderGroupEmpty);
-    OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
     if (isRenderGroupEmpty) {
         search->second->Release();
     }
@@ -243,7 +246,7 @@ int32_t FormRenderServiceMgr::OnUnlock()
     return ERR_OK;
 }
 
-int32_t FormRenderServiceMgr::SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want)
+int32_t FormRenderServiceMgr::SetVisibleChange(const int64_t formId, bool isVisible, const Want &want)
 {
     HILOG_INFO("formId:%{public}" PRId64 " isVisble: %{public}d", formId, isVisible);
     if (formId <= 0) {
@@ -389,7 +392,7 @@ void FormRenderServiceMgr::FormRenderGC(const std::string &uid)
     }
 }
 
-int32_t FormRenderServiceMgr::RecycleForm(const int64_t &formId, const Want &want)
+int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want)
 {
     if (formId <= 0) {
         HILOG_ERROR("formId is negative");
@@ -417,7 +420,8 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t &formId, const Want &wan
         HILOG_ERROR("null formSupplyClient, formId:%{public}" PRId64, formId);
         return RECYCLE_FORM_FAILED;
     }
-    OnRecycleForm(formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
+        formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
 
     return ERR_OK;
 }
@@ -466,7 +470,7 @@ void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
 }
 
 int32_t FormRenderServiceMgr::UpdateFormSize(
-    const int64_t &formId, float width, float height, float borderWidth, const std::string &uid)
+    const int64_t formId, float width, float height, float borderWidth, const std::string &uid)
 {
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
@@ -604,74 +608,6 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
         }
     }
     return ERR_OK;
-}
-
-void FormRenderServiceMgr::OnRecycleForm(const int64_t formId, const FormFsmEvent event, const std::string statusData,
-    const Want &want, const sptr<IFormSupply> formSupplyClient)
-{
-    if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
-        return;
-    }
-
-    auto recycleTask = [formId, event, statusData, want, formSupplyClient] {
-        Want newWant = want;
-        newWant.SetParam(Constants::FORM_STATUS_DATA, statusData);
-        std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-        if (eventId.empty()) {
-            newWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_DATA_FAIL));
-        } else {
-            newWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(event));
-            newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-        }
-        return formSupplyClient->OnRecycleForm(formId, newWant);
-    };
-
-    FormRenderStatusMgr::GetInstance().PostFormEvent(formId, event, recycleTask);
-}
-
-void FormRenderServiceMgr::OnDeleteFormDone(
-    const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient)
-{
-    if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
-        return;
-    }
-
-    auto replyTask = [formId, event, formSupplyClient] {
-        Want replyWant;
-        std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-        if (eventId.empty()) {
-            replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL));
-        } else {
-            replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(event));
-            replyWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-        }
-        return formSupplyClient->OnDeleteFormDone(formId, replyWant);
-    };
-    FormRenderStatusMgr::GetInstance().PostFormEvent(formId, event, replyTask);
-}
-
-void FormRenderServiceMgr::OnRecycleFormDone(
-    const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient)
-{
-    if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
-        return;
-    }
-
-    auto replyTask = [formId, event, formSupplyClient] {
-        Want replyWant;
-        std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-        if (eventId.empty()) {
-            replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL));
-        } else {
-            replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(event));
-            replyWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-        }
-        return formSupplyClient->OnRecycleFormDone(formId, replyWant);
-    };
-    FormRenderStatusMgr::GetInstance().PostFormEvent(formId, event, replyTask);
 }
 }  // namespace FormRender
 }  // namespace AppExecFwk

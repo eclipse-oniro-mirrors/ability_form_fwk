@@ -94,13 +94,13 @@ public:
 
     int32_t OnUnlock();
 
-    int32_t SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want);
+    int32_t SetVisibleChange(const int64_t formId, bool isVisible, const Want &want);
 
-    int32_t RecycleForm(const int64_t &formId, const Want &want);
+    int32_t RecycleForm(const int64_t formId, const Want &want);
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want);
 
-    int32_t UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth, const std::string &uid);
+    int32_t UpdateFormSize(const int64_t formId, float width, float height, float borderWidth, const std::string &uid);
 
     void SetFormSupplyClient(const sptr<IFormSupply> &formSupplyClient);
 
@@ -111,10 +111,6 @@ private:
     void FormRenderGC(const std::string &uid);
     void OnConfigurationUpdatedInner();
     void ConfirmUnlockState(Want &renderWant);
-    void OnRecycleFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
-    void OnDeleteFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
-    void OnRecycleForm(const int64_t formId, const FormFsmEvent event, const std::string statusData, const Want &want,
-        const sptr<IFormSupply> formSupplyClient);
     int32_t UpdateRenderRecordByUid(const std::string &uid, Want &formRenderWant, const FormJsInfo &formJsInfo,
         const sptr<IFormSupply> &formSupplyClient);
     bool IsRenderRecordExist(const std::string &uid);

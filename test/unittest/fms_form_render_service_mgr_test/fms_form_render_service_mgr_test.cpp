@@ -42,7 +42,7 @@ constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t ERR_FAILED = -1;
-} // namespace
+}  // namespace
 
 class FormRenderServiceMgrTest : public testing::Test {
 public:
@@ -68,10 +68,9 @@ void FormRenderServiceMgrTest::TearDown()
 
 class MockFormSupplyStub : public FormSupplyStub {
 public:
-    MockFormSupplyStub() {};
-    virtual ~MockFormSupplyStub() {};
-    int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override
+    MockFormSupplyStub(){};
+    virtual ~MockFormSupplyStub(){};
+    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override
     {
         return number_;
     };
@@ -99,8 +98,7 @@ public:
     {
         return number_;
     };
-    int OnAcquireStateResult(FormState state, const std::string &pro, const Want &wantArg,
-        const Want &want) override
+    int OnAcquireStateResult(FormState state, const std::string &pro, const Want &wantArg, const Want &want) override
     {
         return number_;
     };
@@ -108,8 +106,8 @@ public:
     {
         return ERR_OK;
     };
-    void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
-        const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override {};
+    void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId, const AAFwk::WantParams &wantParams,
+        int64_t requestCode, const bool &result) override{};
     sptr<IRemoteObject> AsObject() override
     {
         return nullptr;
@@ -472,8 +470,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_018, TestSize.Level0
     FormRenderServiceMgr formRenderServiceMgr;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
 
-    formRenderServiceMgr.configUpdateTime_ =
-        std::chrono::steady_clock::now() - std::chrono::milliseconds(3000);
+    formRenderServiceMgr.configUpdateTime_ = std::chrono::steady_clock::now() - std::chrono::milliseconds(3000);
     formRenderServiceMgr.OnConfigurationUpdated(configuration);
     EXPECT_EQ(0, formRenderServiceMgr.serialQueue_->taskMap_.size());
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_018 end";
@@ -548,13 +545,14 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_022, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_022 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ -1 };
-    std::string compId{ "1" };
-    std::string uid{ "202410101010" };
+    int64_t formId{-1};
+    std::string compId{"1"};
+    std::string uid{"202410101010"};
     std::string eventId = "123";
     Want want;
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-    EXPECT_EQ(formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(
+        formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_022 end";
 }
 
@@ -568,13 +566,14 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_023, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_023 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 15 };
-    std::string compId{ "" };
-    std::string uid{ "202410101010" };
+    int64_t formId{15};
+    std::string compId{""};
+    std::string uid{"202410101010"};
     std::string eventId = "123";
     Want want;
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-    EXPECT_EQ(formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(
+        formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_023 end";
 }
 
@@ -588,13 +587,14 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_024, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_024 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 15 };
-    std::string compId{ "15" };
-    std::string uid{ "" };
+    int64_t formId{15};
+    std::string compId{"15"};
+    std::string uid{""};
     std::string eventId = "123";
     Want want;
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-    EXPECT_EQ(formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(
+        formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_024 end";
 }
 
@@ -608,9 +608,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_025, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_025 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 15 };
-    std::string compId{ "15" };
-    std::string uid{ "202410101010" };
+    int64_t formId{15};
+    std::string compId{"15"};
+    std::string uid{"202410101010"};
     std::string eventId = "123";
     Want want;
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
@@ -628,9 +628,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_026, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_026 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 15 };
-    std::string compId{ "15" };
-    std::string uid{ "202410101010" };
+    int64_t formId{15};
+    std::string compId{"15"};
+    std::string uid{"202410101010"};
     formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
     std::string eventId = "123";
     Want want;
@@ -649,9 +649,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_027, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_027 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 15 };
-    std::string compId{ "15" };
-    std::string uid{ "202410101010" };
+    int64_t formId{15};
+    std::string compId{"15"};
+    std::string uid{"202410101010"};
 
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
@@ -706,7 +706,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_030, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_030 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 0 };
+    int64_t formId{0};
     Want want;
 
     EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
@@ -723,7 +723,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_031, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_031 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
 
     EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
@@ -740,8 +740,8 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_032, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_032 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
-    std::string uid{ "202410101010" };
+    int64_t formId{3};
+    std::string uid{"202410101010"};
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
@@ -759,9 +759,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_033, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_033 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     formRenderServiceMgr.renderRecordMap_.emplace("2024101010", nullptr);
@@ -779,9 +779,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_034, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_034 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
@@ -800,9 +800,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_035, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_035 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
@@ -831,7 +831,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_036, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_036 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 0 };
+    int64_t formId{0};
     Want want;
     FormJsInfo info;
     info.formId = formId;
@@ -849,7 +849,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_037, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_037 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
     FormJsInfo info;
     info.formId = formId;
@@ -867,9 +867,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_038, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_038 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     FormJsInfo info;
@@ -888,13 +888,13 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_039, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_039 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
     FormJsInfo info;
     info.formId = formId;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
-    std::string val{ "non" };
+    std::string val{"non"};
     want.SetParam(Constants::FORM_STATUS_DATA, val);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     formRenderServiceMgr.renderRecordMap_.emplace("2024101010", nullptr);
@@ -912,13 +912,13 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_040, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_040 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
     FormJsInfo info;
     info.formId = formId;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
-    std::string val{ "non" };
+    std::string val{"non"};
     want.SetParam(Constants::FORM_STATUS_DATA, val);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
@@ -972,16 +972,16 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_042, TestSize.Level0
 }
 
 /**
-* @tc.name: FormRenderServiceMgrTest_043
-* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
-* 2.call SetVisibleChange
-* @tc.type: FUNC
-*/
+ * @tc.name: FormRenderServiceMgrTest_043
+ * @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+ * 2.call SetVisibleChange
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_043, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_043 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 0 };
+    int64_t formId{0};
     Want want;
 
     EXPECT_EQ(formRenderServiceMgr.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
@@ -989,33 +989,33 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_043, TestSize.Level0
 }
 
 /**
-* @tc.name: FormRenderServiceMgrTest_044
-* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
-* 2.call SetVisibleChange
-* @tc.type: FUNC
-*/
+ * @tc.name: FormRenderServiceMgrTest_044
+ * @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+ * 2.call SetVisibleChange
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_044, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_044 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
     EXPECT_EQ(formRenderServiceMgr.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_044 end";
 }
 
 /**
-* @tc.name: FormRenderServiceMgrTest_045
-* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
-* 2.call SetVisibleChange
-* @tc.type: FUNC
-*/
+ * @tc.name: FormRenderServiceMgrTest_045
+ * @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+ * 2.call SetVisibleChange
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_045, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_045 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
-    std::string uid{ "202410101010" };
+    int64_t formId{3};
+    std::string uid{"202410101010"};
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     EXPECT_EQ(formRenderServiceMgr.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
@@ -1023,18 +1023,18 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_045, TestSize.Level0
 }
 
 /**
-* @tc.name: FormRenderServiceMgrTest_046
-* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
-* 2.call SetVisibleChange
-* @tc.type: FUNC
-*/
+ * @tc.name: FormRenderServiceMgrTest_046
+ * @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+ * 2.call SetVisibleChange
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_046, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_046 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     formRenderServiceMgr.renderRecordMap_.emplace("2024101010", nullptr);
     EXPECT_EQ(formRenderServiceMgr.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
@@ -1042,18 +1042,18 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_046, TestSize.Level0
 }
 
 /**
-* @tc.name: FormRenderServiceMgrTest_047
-* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
-* 2.call SetVisibleChange
-* @tc.type: FUNC
-*/
+ * @tc.name: FormRenderServiceMgrTest_047
+ * @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+ * 2.call SetVisibleChange
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_047, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_047 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
     formRenderServiceMgr.renderRecordMap_.emplace("2024101010", formRenderRecord);
@@ -1062,18 +1062,18 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_047, TestSize.Level0
 }
 
 /**
-* @tc.name: FormRenderServiceMgrTest_048
-* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
-* 2.call SetVisibleChange
-* @tc.type: FUNC
-*/
+ * @tc.name: FormRenderServiceMgrTest_048
+ * @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+ * 2.call SetVisibleChange
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_048, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_048 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{ 3 };
+    int64_t formId{3};
     Want want;
-    std::string uid{ "202410101010" };
+    std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
     EXPECT_TRUE(formRenderRecord);

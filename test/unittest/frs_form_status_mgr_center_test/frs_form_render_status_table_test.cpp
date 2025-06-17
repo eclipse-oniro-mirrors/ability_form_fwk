@@ -15,10 +15,8 @@
 
 #include <gtest/gtest.h>
 #include <memory>
-#define private public
 #include "status_mgr_center/form_render_status_table.h"
 #include "status_mgr_center/form_status_common.h"
-#undef private
 #include "fms_log_wrapper.h"
 #include "gmock/gmock.h"
 

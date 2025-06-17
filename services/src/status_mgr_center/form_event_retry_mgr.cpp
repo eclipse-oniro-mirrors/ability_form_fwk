@@ -37,7 +37,6 @@ bool FormEventRetryMgr::GetLastFormEvent(const int64_t formId, FormEventTaskInfo
         return false;
     }
     formEventInfo = iter->second; 
-
     return true;
 }
 
@@ -74,7 +73,6 @@ bool FormEventRetryMgr::GetRetryCount(const int64_t formId, int32_t &retryCount)
         return false;
     }
     retryCount = iter->second;
-
     return true;
 }
 

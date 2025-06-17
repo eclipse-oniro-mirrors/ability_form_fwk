@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <utility>
 
-#include "status_mgr_center/form_render_status_mgr.h"
+#include "status_mgr_center/form_render_status_task_mgr.h"
 #include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "fms_log_wrapper.h"
@@ -402,22 +402,8 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
             renderRecord->MarkRenderFormTaskDone(renderType);
-
-            auto replyTask = [formJsInfo, formSupplyClient] {
-                Want replyWant;
-                std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formJsInfo.formId);
-                if (eventId.empty()) {
-                    replyWant.SetParam(
-                        Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL));
-                } else {
-                    replyWant.SetParam(
-                        Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_DONE));
-                    replyWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-                }
-                return formSupplyClient->OnRenderFormDone(formJsInfo.formId, replyWant);
-            };
-            FormRenderStatusMgr::GetInstance().PostFormEvent(
-                formJsInfo.formId, FormFsmEvent::RENDER_FORM_DONE, replyTask);
+            FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
+                FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
         };
         if (eventHandler == nullptr) {
             HILOG_ERROR("null eventHandler_ ");
@@ -1595,20 +1581,8 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
             return;
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
-
-        std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formJsInfo.formId);
-        auto replyTask = [formJsInfo, formSupplyClient, eventId] {
-            Want replyWant;
-            if (eventId.empty()) {
-                replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL));
-            } else {
-                replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_DONE));
-                replyWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-            }
-            return formSupplyClient->OnRecoverFormDone(formJsInfo.formId, replyWant);
-        };
-        FormFsmEvent event = eventId.empty() ? FormFsmEvent::RECOVER_FORM_FAIL : FormFsmEvent::RECOVER_FORM_DONE;
-        FormRenderStatusMgr::GetInstance().PostFormEvent(formJsInfo.formId, event, replyTask);
+        FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formJsInfo.formId,
+            FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient);
     };
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler_ ");

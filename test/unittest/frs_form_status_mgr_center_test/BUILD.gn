@@ -23,9 +23,11 @@ ohos_unittest("FrsFormStatusMgrCenterTest") {
     "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_table_test.cpp",
     "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_mgr_test.cpp",
     "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_test.cpp",
+    "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_task_mgr_test.cpp",
     "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_table.cpp",
     "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_mgr.cpp",
     "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status.cpp",
+    "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_task_mgr.cpp",
   ]
 
   include_dirs = [
