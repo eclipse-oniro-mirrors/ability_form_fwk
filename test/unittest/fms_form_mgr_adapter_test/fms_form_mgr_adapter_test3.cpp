@@ -36,7 +36,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
 #include "mock_form_provider_client.h"
-#include "mock_form_mgr_adapter.h"
+#include "mock_form_mgr_adapter_test.h"
 
 using namespace testing::ext;
 using namespace OHOS;

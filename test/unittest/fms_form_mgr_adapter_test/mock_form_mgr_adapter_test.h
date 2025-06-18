@@ -19,7 +19,6 @@
 #include <gtest/gtest.h>
 #include "form_mgr_errors.h"
 
-namespace OHOS {
 void MockCallerCheck(OHOS::ErrCode mockRet);
-}
+
 #endif // OHOS_MOCK_FORM_MGR_ADAPTER_TEST_H
