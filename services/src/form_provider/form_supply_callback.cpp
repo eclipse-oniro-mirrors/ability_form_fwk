@@ -240,7 +240,7 @@ bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
             HILOG_INFO("key:%{public}s", conn.second->GetProviderKey().c_str());
             count++;
             if (count >= 1) {
-                HILOG_INFO("true");
+                HILOG_INFO("true count:%{public}d", count);
                 return true;
             }
         }

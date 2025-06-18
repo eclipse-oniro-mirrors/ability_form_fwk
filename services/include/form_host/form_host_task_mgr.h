@@ -95,6 +95,13 @@ public:
     void PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
 
     /**
+     * @brief Post connect FRS failed task to form host when FormRenderService is died.
+     * @param formId The Id of the form.
+     * @param errorCode Indicates error-code of the form.
+     */
+    void PostConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode);
+
+    /**
      * @brief Handle form host died(task).
      * @param remoteHost Form host proxy object.
      */
@@ -166,6 +173,13 @@ private:
      * @param remoteObject Form host proxy object.
      */
     void FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Post connect FRS failed task to form host when FormRenderService is died.
+     * @param formId The Id of the form.
+     * @param errorCode Indicates error-code of the form.
+     */
+    void ConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode);
 
     /**
      * @brief Handle form host died.

@@ -719,6 +719,10 @@ void FormDataMgr::GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IR
             formHostObjs.emplace_back(record.GetFormHostClient());
         }
     }
+    if (formHostObjs.empty()) {
+        HILOG_WARN("empty formHostObjs");
+        return;
+    }
     HILOG_DEBUG("Get form host remote object by formId, size is %{public}zu", formHostObjs.size());
 }
 /**
