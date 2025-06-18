@@ -95,7 +95,7 @@ public:
     void PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
 
     /**
-     * @brief Post re-add form task to form host when FormRenderService is died.
+     * @brief Post connect FRS failed task to form host when FormRenderService is died.
      * @param formId The Id of the form.
      * @param errorCode Indicates error-code of the form.
      */
