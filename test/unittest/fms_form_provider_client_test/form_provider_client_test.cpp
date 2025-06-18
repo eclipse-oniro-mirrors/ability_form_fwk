@@ -1004,5 +1004,32 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_IsCallBySelfBundle_010
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_IsCallBySelfBundle_0100 end";
 }
+
+/**
+ * @tc.number: AaFwk_FormProviderClient_NotifyConfigurationUpdate_0100
+ * @tc.name: NotifyConfigurationUpdate
+ * @tc.desc: notify provider configuration update.
+ */
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyConfigurationUpdate_0100, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyConfigurationUpdate_0100 start";
+
+    const std::shared_ptr<Ability> ability = std::make_shared<Ability>();
+    ASSERT_NE(ability, nullptr);
+    instance_->SetOwner(ability);
+
+    const sptr<IRemoteObject> callerToken = MockFormSupplyCallback::GetInstance();
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_MANAGER_SERVICE_BUNDLENAME_KEY, FORM_MANAGER_SERVICE_BUNDLE_NAME)
+        .SetParam(Constants::ACQUIRE_TYPE, 100)
+        .SetParam(Constants::FORM_CONNECT_ID, 100L)
+        .SetParam(Constants::PARAM_FORM_IDENTITY_KEY, 100L)
+        .SetParam(Constants::FORM_SUPPLY_INFO, FORM_SUPPLY_INFO);
+    AppExecFwk::Configuration config;
+    auto result = instance_->NotifyConfigurationUpdate(config, want, callerToken);
+    EXPECT_EQ(ERR_OK, result);
+
+    GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyConfigurationUpdate_0100 end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS
