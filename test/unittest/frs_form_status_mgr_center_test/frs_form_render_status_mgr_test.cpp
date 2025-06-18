@@ -139,8 +139,10 @@ HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0004, TestSize.Level0)
     std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     EXPECT_EQ(eventId, "");
 
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, "eventId");
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, "eventIdNew");
+    eventId = "eventId";
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
+    eventId = "eventIdNew";
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     EXPECT_EQ(eventId, "eventIdNew");
 

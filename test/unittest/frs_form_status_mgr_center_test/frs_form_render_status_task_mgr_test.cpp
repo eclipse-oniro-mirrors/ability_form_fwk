@@ -123,8 +123,9 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRenderFormDo
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
 
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, std::to_string(formId));
-    std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
+    std::string eventId = std::to_string(formId);
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
+    eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRenderFormDone end";
@@ -147,8 +148,9 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecoverFormD
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient);
 
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, std::to_string(formId));
-    std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
+    std::string eventId = std::to_string(formId);
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
+    eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRecoverFormDone end";
@@ -171,8 +173,9 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnDeleteFormDo
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
 
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, std::to_string(formId));
-    std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
+    std::string eventId = std::to_string(formId);
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
+    eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnDeleteFormDone end";
@@ -195,8 +198,9 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecycleFormD
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
 
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, std::to_string(formId));
-    std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
+    std::string eventId = std::to_string(formId);
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
+    eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRecycleFormDone end";
@@ -223,8 +227,9 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecycleForm,
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
 
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, std::to_string(formId));
-    std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
+    std::string eventId = std::to_string(formId);
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
+    eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
 
