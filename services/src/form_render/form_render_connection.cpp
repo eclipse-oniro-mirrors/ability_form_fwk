@@ -50,10 +50,10 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
             element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
-    if (remoteObject->IsObjectDead()) {
+    if (remoteObject == nullptr || remoteObject->IsObjectDead()) {
         failedTimes++;
-        HILOG_WARN(
-            "remoteObject is dead, formId:%{public}" PRId64 ", failedTimes:%{public}d", GetFormId(), failedTimes);
+        HILOG_WARN("remoteObject is null or dead, formId:%{public}" PRId64 ", failedTimes:%{public}d",
+            GetFormId(), failedTimes);
         if (failedTimes <= MAX_FAILED_TIMES) {
             FormHostTaskMgr::GetInstance().PostConnectFRSFailedTaskToHost(
                 GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED);
