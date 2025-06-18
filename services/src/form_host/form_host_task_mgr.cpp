@@ -367,7 +367,7 @@ void FormHostTaskMgr::ConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCo
             HILOG_ERROR("null hostClient");
             continue;
         }
-        hostClient->OnError(errorCode, "remoteObject is dead", formIds);
+        hostClient->OnError(errorCode, "Connect FormRenderService failed", formIds);
     }
 }
 
