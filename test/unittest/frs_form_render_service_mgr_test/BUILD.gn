@@ -22,7 +22,6 @@ ohos_unittest("FrsFormRenderServiceMgrTest") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/unittest/frs_form_render_service_mgr_test/frs_form_render_service_mgr_test.cpp",
-    "${form_fwk_path}/services/form_render_service/src/form_render_service_mgr.cpp",
   ]
 
   include_dirs = [
