@@ -172,7 +172,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
         bool isFormVisible = record.formVisibleNotifyState == Constants::FORM_VISIBLE;
         if (!isFormVisible) {
-            HILOG_DEBUG("form is invisible");
+            HILOG_INFO("form is invisible, formId:%{public}" PRId64, formId);
             FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
             FormDataMgr::GetInstance().SetRefreshType(formId, refreshType);
             FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);

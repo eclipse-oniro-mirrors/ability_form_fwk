@@ -262,6 +262,7 @@ void FormSysEventReceiver::HandleScreenOn()
 
     serialQueue_->ScheduleTask(0, []() {
         FormRenderMgr::GetInstance().NotifyScreenOn();
+        FormMgrAdapter::GetInstance().RefreshFormsByScreenOn();
     });
 }
 
