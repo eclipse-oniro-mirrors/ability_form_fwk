@@ -112,7 +112,7 @@ public:
      * @param want Input data.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t OnRecycleForm(const int64_t &formId, const Want &want) { return ERR_OK; }
+    virtual int32_t OnRecycleForm(const int64_t formId, const Want &want) { return ERR_OK; }
 
     /**
      * @brief Trigger card recover when configuration changes occur.
@@ -121,28 +121,39 @@ public:
      */
     virtual int32_t OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds) { return ERR_OK; }
 
-    virtual int32_t OnNotifyRefreshForm(const int64_t &formId) { return ERR_OK; }
+    virtual int32_t OnNotifyRefreshForm(const int64_t formId) { return ERR_OK; }
 
     /**
      * @brief Accept form render done from form render service.
      * @param formId The Id of the form.
+     * @param want Input data.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t OnRenderFormDone(const int64_t &formId) { return ERR_OK; }
+    virtual int32_t OnRenderFormDone(const int64_t formId, const Want &want) { return ERR_OK; }
 
     /**
      * @brief Accept form recover done from form render service.
      * @param formId The Id of the form.
+     * @param want Input data.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t OnRecoverFormDone(const int64_t &formId) { return ERR_OK; }
+    virtual int32_t OnRecoverFormDone(const int64_t formId, const Want &want) { return ERR_OK; }
 
     /**
      * @brief Accept form recycle done from form render service.
      * @param formId The Id of the form.
+     * @param want Input data.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t OnRecycleFormDone(const int64_t &formId) { return ERR_OK; }
+    virtual int32_t OnRecycleFormDone(const int64_t formId, const Want &want) { return ERR_OK; }
+
+    /**
+     * @brief Accept form delete done from form render service.
+     * @param formId The Id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnDeleteFormDone(const int64_t formId, const Want &want) { return ERR_OK; }
 
     enum class Message {
         // ipc id 1-1000 for kit
@@ -163,6 +174,7 @@ public:
         TRANSACTION_FORM_RENDER_FORM_DONE,
         TRANSACTION_FORM_RECOVER_FORM_DONE,
         TRANSACTION_FORM_RECYCLE_FORM_DONE,
+        TRANSACTION_FORM_DELETE_FORM_DONE,
     };
 };
 }  // namespace AppExecFwk

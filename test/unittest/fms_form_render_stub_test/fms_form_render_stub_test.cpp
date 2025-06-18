@@ -87,6 +87,10 @@ public:
     {
         return ERR_OK;
     };
+    int32_t CheckPermission() override
+    {
+        return ERR_OK;
+    }
 };
 
 class MockFormSupplyStub : public FormSupplyStub {
@@ -804,6 +808,7 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_017, TestSize.Level0)
 {
     sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
     uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER);
+    Want want = {};
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
@@ -811,6 +816,7 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_017, TestSize.Level0)
     data.WriteInt64(1);
     data.WriteString("<compId>");
     data.WriteString("<uid>");
+    data.WriteParcelable(&want);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
@@ -1022,6 +1028,28 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_027, TestSize.Level0)
     data.WriteString("<uid>");
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_028
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleReleaseRenderer interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_028, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER);
+    Want want = {};
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt64(1);
+    data.WriteString("<compId>");
+    data.WriteString("<uid>");
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
 }
 
 /**

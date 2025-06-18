@@ -21,6 +21,7 @@
 #include "common/util/form_dump_mgr.h"
 #include "form_mgr/form_mgr_service.h"
 #undef private
+#include "status_mgr_center/form_status.h"
 #include "if_system_ability_manager.h"
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
@@ -30,6 +31,7 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 namespace {
+const int64_t FORM_ID_ONE = 1;
 class FmsFormMgrDumpTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -260,7 +262,6 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_009, TestSize.Level0)
     GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_009 end";
 }
 
-
 /**
  * @tc.name: Dump_010
  * @tc.desc: Verify formDumpMgr
@@ -336,11 +337,13 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_013, TestSize.Level1)
 HWTEST_F(FmsFormMgrDumpTest, Dump_014, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Dump_014 start";
+    std::string formInfo = "123";
     FormRecord formRecordInfo;
     formRecordInfo.formId = 123;
+    FormDumpMgr::GetInstance().DumpFormInfo(formRecordInfo, formInfo);
     formRecordInfo.hapSourceDirs = {"1", "2"};
+    FormDumpMgr::GetInstance().DumpFormInfo(formRecordInfo, formInfo);
     formRecordInfo.formUserUids = {1, 2};
-    std::string formInfo = "123";
     FormDumpMgr::GetInstance().DumpFormInfo(formRecordInfo, formInfo);
     GTEST_LOG_(INFO) << "Dump_014 end";
 }
@@ -437,9 +440,23 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Dump_019 start";
     std::string formInfo = "formInfo";
-    FormDumpMgr::GetInstance().AppendRecycleStatus(RecycleStatus::RECYCLABLE, formInfo);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(RecycleStatus::RECYCLED, formInfo);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(RecycleStatus::NON_RECYCLABLE, formInfo);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::INIT);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RENDERED);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECYCLED);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RENDERING);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECYCLING_DATA);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECYCLING);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECOVERING);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::DELETING);
+    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
     GTEST_LOG_(INFO) << "Dump_019 end";
 }
 
@@ -623,21 +640,6 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_029, TestSize.Level1)
     std::string infosResult = "infosResult";
     FormDumpMgr::GetInstance().DumpRunningFormInfos(runningFormInfos, infosResult);
     GTEST_LOG_(INFO) << "Dump_029 end";
-}
-
-/**
- * @tc.name: Dump_030
- * @tc.desc: Verify AppendRecycleStatus
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrDumpTest, Dump_030, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "Dump_030 start";
-    std::string formInfo = "formInfo";
-    FormDumpMgr::GetInstance().AppendRecycleStatus(RecycleStatus::RECYCLABLE, formInfo);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(RecycleStatus::RECYCLED, formInfo);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(RecycleStatus::NON_RECYCLABLE, formInfo);
-    GTEST_LOG_(INFO) << "Dump_030 end";
 }
 
 /**

@@ -134,7 +134,7 @@ bool FormRenderProxy::WriteInterfaceToken(MessageParcel &data)
 }
 
 int32_t FormRenderProxy::ReleaseRenderer(
-    int64_t formId, const std::string &compId, const std::string &uid)
+    int64_t formId, const std::string &compId, const std::string &uid, const Want &want)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -154,6 +154,10 @@ int32_t FormRenderProxy::ReleaseRenderer(
     }
     if (!data.WriteString(uid)) {
         HILOG_ERROR("fail write uid");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int error = SendTransactCmd(

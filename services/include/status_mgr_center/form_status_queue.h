@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,59 +16,42 @@
 #ifndef OHOS_FORM_FWK_FORM_STATUS_QUEUE_H
 #define OHOS_FORM_FWK_FORM_STATUS_QUEUE_H
 
-#include <map>
-#include <unordered_map>
-#include <shared_mutex>
-#include <string>
-
 #include <singleton.h>
-#include "ffrt.h"
-#include "iremote_object.h"
-#include "status_mgr_center/form_command_queue.h"
-#include "status_mgr_center/form_status_mgr.h"
+#include "common/util/form_serial_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-namespace {
-constexpr int32_t FORM_MAX_TIME_OUT = 5000; // ms
-}
-
 class FormStatusQueue final : public DelayedRefSingleton<FormStatusQueue> {
     DECLARE_DELAYED_REF_SINGLETON(FormStatusQueue)
 
 public:
     DISALLOW_COPY_AND_MOVE(FormStatusQueue);
+
+    /**
+     * @brief Schedule a task
+     * @param ms Delay time
+     * @param func Function to execute
+     * @return True if the task is scheduled successfully, false otherwise
+     */
     bool ScheduleTask(uint64_t ms, std::function<void()> func);
-    void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
+
+    /**
+     * @brief Schedule a delayed task
+     * @param eventMsg Event message containing form ID and event ID
+     * @param ms Delay time
+     * @param func Function to execute
+     */
+    void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint64_t ms, std::function<void()> func);
+
+    /**
+     * @brief Cancel a delayed task
+     * @param eventMsg Event message containing form ID and event ID
+     */
     void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
-    
-    void PostFormStatusTask(FormCommand formCommand, sptr<IRemoteObject> remoteObjectOfHost = nullptr);
-    void PostFormDeleteTask(FormCommand formCommand, const std::string compId);
-
-    void PostFormCommandTask(std::shared_ptr<FormCommandQueue> formCommandQueue, const int64_t formId);
-    void PostFormCommandTaskByFormId(const int64_t formId);
-    void ProcessTask(FormCommand &formCommand);
-
-    void PostTimeOutReAddForm(const int64_t formId);
-    void CancelTimeOutReAddForm(const int64_t &formId);
 
 private:
-    std::shared_ptr<FormCommandQueue> GetOrCreateFormStatusQueue(
-        const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus);
-    void DeleteFormStatusQueueIfNecessary(const int64_t formId, const std::string compId);
-
-    void TimeOutReAddForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost);
-
-    //<formid, CommandQueue>
-    std::shared_mutex formCommandQueueMapMutex_;
-    std::unordered_map<int64_t, std::shared_ptr<FormCommandQueue>> formCommandQueueMap_;
-    // <formId, hostToken>
-    std::unordered_map<int64_t, sptr<IRemoteObject>> formHostTokenMap_;
-
-    std::shared_mutex mutex_;
-    std::map<std::pair<int64_t, int64_t>, ffrt::task_handle> taskMap_;
-    ffrt::queue queue_;
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
-}
-}
-#endif // OHOS_FORM_FWK_FORM_STATUS_QUEUE_H
+}  // namespace AppExecFwk
+}  // namespace OHOS
+#endif  // OHOS_FORM_FWK_FORM_STATUS_QUEUE_H

@@ -19,8 +19,11 @@ module_output_path = "form_fwk/form_fwk/form_mgr_service"
 ohos_unittest("FmsFormMgrDumpTest") {
   module_out_path = module_output_path
 
-  sources = [ "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp" ]
-  sources += [ "fms_form_mgr_dump_test.cpp" ]
+  sources = [
+    "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
+    "${form_fwk_path}/services/src/status_mgr_center/form_status.cpp",
+    "fms_form_mgr_dump_test.cpp",
+  ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
@@ -34,6 +37,7 @@ ohos_unittest("FmsFormMgrDumpTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [

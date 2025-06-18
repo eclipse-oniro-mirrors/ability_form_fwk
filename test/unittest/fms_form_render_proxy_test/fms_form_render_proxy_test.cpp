@@ -161,9 +161,10 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0007, TestSize.Level1) {
  */
 HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0008, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0008 starts";
+    Want want;
     EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
         .WillOnce(Return(ERR_OK));
-    int result = formRenderProxy_->ReleaseRenderer(TEST_FORM_ID, "compId", "uid");
+    int result = formRenderProxy_->ReleaseRenderer(TEST_FORM_ID, "compId", "uid", want);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0008 test ends";
 }

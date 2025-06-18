@@ -233,8 +233,6 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_006, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderImplTest_006 start";
     FormRenderImpl formRenderImpl;
     sptr<IRemoteObject> hostToken = nullptr;
-    std::string supplyUid = "UID";
-    formRenderImpl.renderRecordMap_.emplace(supplyUid, nullptr);
     EXPECT_EQ(ERR_OK, formRenderImpl.CleanFormHost(hostToken));
     GTEST_LOG_(INFO) << "FormRenderImplTest_006 end";
 }
@@ -250,9 +248,6 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_007, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderImplTest_007 start";
     FormRenderImpl formRenderImpl;
     sptr<IRemoteObject> hostToken = nullptr;
-    std::string supplyUid = "UID";
-    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
-    formRenderImpl.renderRecordMap_.emplace(supplyUid, formRenderRecord);
     EXPECT_EQ(ERR_OK, formRenderImpl.CleanFormHost(hostToken));
     GTEST_LOG_(INFO) << "FormRenderImplTest_007 end";
 }

@@ -64,7 +64,7 @@ public:
     virtual int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) { return ERR_OK; }
 
     virtual int32_t ReleaseRenderer(
-        int64_t formId, const std::string &compId, const std::string &uid) { return ERR_OK; }
+        int64_t formId, const std::string &compId, const std::string &uid, const Want &want) { return ERR_OK; }
 
     virtual int32_t OnUnlock() { return ERR_OK; }
 

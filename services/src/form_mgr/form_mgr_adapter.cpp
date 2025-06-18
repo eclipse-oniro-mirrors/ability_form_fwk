@@ -1528,10 +1528,6 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
 void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record)
 {
     bool needUpdate = false;
-    if (record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
-        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
-        needUpdate = true;
-    }
     if (record.formLocation != info.GetFormLocation()) {
         HILOG_INFO("formLocation change oldLocation: %{public}d, newLocation: %{public}d, formId: %{public}" PRId64,
             (int)record.formLocation, (int)info.GetFormLocation(), formId);
@@ -3837,10 +3833,6 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " not ETS form", formId);
             continue;
         }
-        if (record.recycleStatus == RecycleStatus::RECYCLED) {
-            HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
-            continue;
-        }
         if (isCheckCallingUid && std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end()) {
             HILOG_WARN("form %{public}" PRId64 " not owned by %{public}d", formId, callingUid);
@@ -3849,8 +3841,6 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
         if (!isCheckCallingUid && callingUid < Constants::CALLING_UID_TRANSFORM_DIVISOR) {
             callingUid = *(record.formUserUids.begin());
         }
-        record.recycleStatus = RecycleStatus::RECYCLABLE;
-        FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
         HILOG_INFO("formId:%{public}" PRId64 " recyclable", formId);
     }
@@ -3884,24 +3874,12 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " not exist", formId);
             continue;
         }
-        if (record.recycleStatus == RecycleStatus::RECYCLABLE) {
-            HILOG_WARN("form %{public}" PRId64 " is RECYCLABLE, set it to NON_RECYCLABLE", formId);
-            FormMgrQueue::GetInstance().CancelDelayTask(std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId));
-            record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
-            FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
-            continue;
-        }
-        if (record.recycleStatus != RecycleStatus::RECYCLED && !needHandleCachedClick) {
-            HILOG_WARN("form %{public}" PRId64 " not RECYCLED", formId);
-            continue;
-        }
         if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end() && !IsFormRenderServiceCall(callingUid)) {
             HILOG_WARN("form %{public}" PRId64 " not owned by %{public}d", formId, callingUid);
             continue;
         }
 
-        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
         HILOG_INFO("formId:%{public}" PRId64 " non-recyclable", formId);

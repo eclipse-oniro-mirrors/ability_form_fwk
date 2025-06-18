@@ -84,5 +84,38 @@ void FormSerialQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMs
     taskMap_.erase(eventMsg);
     HILOG_DEBUG("CancelDelayTask success");
 }
+
+void FormSerialQueue::ScheduleDelayTask(
+    const std::pair<int64_t, std::string> &eventMsg, uint32_t ms, std::function<void()> func)
+{
+    HILOG_DEBUG("begin to ScheduleDelayTask");
+    std::unique_lock<std::shared_mutex> lock(stringTaskMutex_);
+    task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
+    if (task_handle == nullptr) {
+        HILOG_ERROR("null task_handle");
+        return;
+    }
+    stringTaskMap_[eventMsg] = std::move(task_handle);
+    HILOG_DEBUG("ScheduleDelayTask success");
+}
+
+void FormSerialQueue::CancelDelayTask(const std::pair<int64_t, std::string> &eventMsg)
+{
+    HILOG_DEBUG("begin to CancelDelayTask");
+    std::unique_lock<std::shared_mutex> lock(stringTaskMutex_);
+    auto item = stringTaskMap_.find(eventMsg);
+    if (item == stringTaskMap_.end()) {
+        HILOG_ERROR("invalid task");
+        return;
+    }
+    if (item->second != nullptr) {
+        int32_t ret = queue_.cancel(item->second);
+        if (ret != 0) {
+            HILOG_ERROR("CancelDelayTask failed,errCode :%{public}d", ret);
+        }
+    }
+    stringTaskMap_.erase(eventMsg);
+    HILOG_DEBUG("CancelDelayTask success");
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

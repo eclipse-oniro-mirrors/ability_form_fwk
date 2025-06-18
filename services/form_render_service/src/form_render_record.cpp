@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <utility>
 
+#include "status_mgr_center/form_render_status_task_mgr.h"
 #include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "fms_log_wrapper.h"
@@ -400,8 +401,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
                 return;
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
-            formSupplyClient->OnRenderFormDone(formJsInfo.formId);
             renderRecord->MarkRenderFormTaskDone(renderType);
+            FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
+                FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
         };
         if (eventHandler == nullptr) {
             HILOG_ERROR("null eventHandler_ ");
@@ -1579,7 +1581,8 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
             return;
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
-        formSupplyClient->OnRecoverFormDone(formJsInfo.formId);
+        FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formJsInfo.formId,
+            FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient);
     };
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler_ ");

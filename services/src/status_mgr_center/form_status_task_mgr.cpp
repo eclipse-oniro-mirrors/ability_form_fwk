@@ -18,18 +18,20 @@
 #include "fms_log_wrapper.h"
 #include "common/util/form_util.h"
 #include "status_mgr_center/form_status_queue.h"
+#include "status_mgr_center/form_status_mgr.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "data_center/form_record/form_record_report.h"
 #include "form_provider/form_supply_callback.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_cache_mgr.h"
-#include "form_refresh/strategy/refresh_cache_mgr.h"
- 
+
 namespace OHOS {
 namespace AppExecFwk {
-FormStatusTaskMgr::FormStatusTaskMgr() {}
+FormStatusTaskMgr::FormStatusTaskMgr()
+{}
 
-FormStatusTaskMgr::~FormStatusTaskMgr() {}
+FormStatusTaskMgr::~FormStatusTaskMgr()
+{}
 
 /**
  * @brief Post recycle forms.
@@ -43,17 +45,11 @@ void FormStatusTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, co
 {
     HILOG_DEBUG("start");
 
-    auto delayTime = want.GetIntParam(Constants::FORM_DELAY_TIME_OF_RECYCLE, FORM_TASK_DELAY_TIME);
     for (const int64_t formId : formIds) {
         auto recycleForm = [formId, remoteObjectOfHost, remoteObjectOfRender]() {
             FormStatusTaskMgr::GetInstance().RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
         };
-        {
-            std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-            formLastRecoverTimes.erase(formId);
-        }
-        FormMgrQueue::GetInstance().ScheduleDelayTask(
-            std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId), delayTime, recycleForm);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_DATA, recycleForm);
     }
     HILOG_DEBUG("end");
 }
@@ -64,8 +60,8 @@ void FormStatusTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, co
  * @param want The want of the request.
  * @param remoteObject Form render proxy object.
  */
-void FormStatusTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want,
-    const sptr<IRemoteObject> &remoteObject)
+void FormStatusTaskMgr::PostRecoverForm(
+    const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("start");
 
@@ -73,17 +69,7 @@ void FormStatusTaskMgr::PostRecoverForm(const FormRecord &record, const Want &wa
     auto recoverForm = [record, want, remoteObject]() {
         FormStatusTaskMgr::GetInstance().RecoverForm(record, want, remoteObject);
     };
-    {
-        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
-    }
-    auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    FormCommand recoverCommand{
-        formId,
-        std::make_pair(TaskCommandType::RECOVER_FORM, formId),
-        FORM_TASK_DELAY_TIME,
-        recoverForm};
-    FormStatusQueue::GetInstance().PostFormStatusTask(recoverCommand, hostToken);
+    FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECOVER_FORM, recoverForm);
     HILOG_DEBUG("end");
 }
 
@@ -98,31 +84,13 @@ void FormStatusTaskMgr::PostRecoverForm(const FormRecord &record, const Want &wa
 void FormStatusTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid,
     const sptr<IRemoteObject> &remoteObject, bool isDynamic)
 {
-    HILOG_INFO("begin formId: %{public}" PRId64, formId);
- 
+    HILOG_DEBUG("start");
+
     auto deleterenderForm = [formId, compId, uid, remoteObject]() {
         FormStatusTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
     };
-    {
-        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes.erase(formId);
-    }
-    if (!isDynamic) {
-        FormCommand deleteCommand{
-            formId,
-            std::make_pair(TaskCommandType::DELETE_FORM, formId),
-            FORM_TASK_DELAY_TIME,
-            deleterenderForm};
-        FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand, compId);
-    } else {
-        FormCommand releaseRenderCommand{
-            formId,
-            std::make_pair(TaskCommandType::RECYCLE_FORM, formId),
-            FORM_TASK_DELAY_TIME,
-            deleterenderForm};
-        FormStatusQueue::GetInstance().PostFormStatusTask(releaseRenderCommand);
-    }
-    HILOG_INFO("end formId: %{public}" PRId64, formId);
+    FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM, deleterenderForm);
+    HILOG_DEBUG("end");
 }
 
 /**
@@ -131,28 +99,17 @@ void FormStatusTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &c
  * @param want The want of the request.
  * @param remoteObject Form render proxy object.
  */
-void FormStatusTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
-    const sptr<IRemoteObject> &remoteObject)
+void FormStatusTaskMgr::PostRenderForm(
+    const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    auto renderType = want.GetIntParam(Constants::FORM_UPDATE_TYPE_KEY,
-        Constants::ADD_FORM_UPDATE_FORM);
-    if (renderType != Constants::ADAPTER_UPDATE_FORM
-        || FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId)) {
-        FormStatusTaskMgr::GetInstance().InnerPostRenderForm(formRecord, want, remoteObject);
-        return;
-    }
-    auto task = [formRecord, want, remoteObject]() {
-        FormRecord newRecord(formRecord);
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        bool hasCacheData = FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap);
-        if (hasCacheData) {
-            newRecord.formProviderInfo.SetFormDataString(cacheData);
-            newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-        }
-        FormStatusTaskMgr::GetInstance().InnerPostRenderForm(newRecord, want, remoteObject);
+    HILOG_DEBUG("start");
+
+    auto renderForm = [formRecord, want, remoteObject]() {
+        FormStatusTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
-    RefreshCacheMgr::GetInstance().AddRenderTask(formRecord.formId, task);
+
+    FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RENDER_FORM, renderForm);
+    HILOG_DEBUG("end");
 }
 
 /**
@@ -164,23 +121,15 @@ void FormStatusTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want 
 void FormStatusTaskMgr::PostStopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("start");
 
     auto formId = formRecord.formId;
     auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormStatusTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
-    {
-        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes.erase(formId);
-    }
-    FormCommand deleteCommand{
-        formId,
-        std::make_pair(TaskCommandType::DELETE_FORM, formId),
-        FORM_TASK_DELAY_TIME,
-        deleterenderForm};
-    std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
-    FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand, compId);
+
+    FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::DELETE_FORM, deleterenderForm);
+    HILOG_DEBUG("end");
 }
 
 void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
@@ -199,24 +148,22 @@ void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObj
         HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
         return;
     }
-    if (formRecord.recycleStatus != RecycleStatus::RECYCLABLE) {
-        HILOG_ERROR("form %{public}" PRId64 " not RECYCLABLE", formId);
-        return;
-    }
 
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
     want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, remoteObjectOfHost);
+    std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     int32_t error = remoteFormRender->RecycleForm(formId, want);
     if (error != ERR_OK) {
         HILOG_ERROR("RecycleForm fail formId: %{public}" PRId64 " error: %{public}d", formId, error);
-        return;
     }
 }
 
 void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("start formId: %{public}" PRId64, record.formId);
+
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
@@ -227,15 +174,15 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
 
     FormJsInfo formJsInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formJsInfo);
+    Want newWant(want);
+    std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(record.formId);
+    newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
 
-    int32_t error = remoteFormRender->RecoverForm(formJsInfo, want);
+    int32_t error = remoteFormRender->RecoverForm(formJsInfo, newWant);
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail recover form");
-        FormStatusMgr::GetInstance().ResetFormStatus(record.formId);
-        return;
     }
-
     HILOG_DEBUG("end");
 }
 
@@ -243,67 +190,29 @@ void FormStatusTaskMgr::ReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("begin formId: %{public}" PRId64, formId);
- 
+
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
         HILOG_ERROR("get formRenderProxy failed");
         return;
     }
 
-    int32_t error = remoteFormDeleteRender->ReleaseRenderer(formId, compId, uid);
+    Want newWant;
+    std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
+
+    int32_t error = remoteFormDeleteRender->ReleaseRenderer(formId, compId, uid, newWant);
     if (error != ERR_OK) {
         HILOG_ERROR("fail release form renderer");
-        return;
     }
     HILOG_INFO("end formId: %{public}" PRId64, formId);
-}
-
-void FormStatusTaskMgr::InnerPostRenderForm(const FormRecord &formRecord, const Want &want,
-    const sptr<IRemoteObject> &remoteObject)
-{
-    HILOG_DEBUG("PostRenderForm");
-
-    auto renderForm = [formRecord, want, remoteObject]() {
-        FormStatusTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
-    };
-    
-    int64_t formId = formRecord.formId;
-    int64_t lastRecoverTime = 0;
-    {
-        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        if (formLastRecoverTimes.find(formId) != formLastRecoverTimes.end()) {
-            lastRecoverTime = formLastRecoverTimes[formId];
-            formLastRecoverTimes.erase(formId);
-        }
-    }
-    auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    int32_t recoverInterval = (int32_t) (FormUtil::GetCurrentMillisecond() - lastRecoverTime);
-    if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
-        FormCommand renderCommand{
-            formId,
-            std::make_pair(TaskCommandType::RENDER_FORM, formId),
-            FORM_TASK_DELAY_TIME,
-            renderForm};
-        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand, hostToken);
-    } else {
-        HILOG_INFO("delay render task: %{public}" PRId32 " ms, formId is %{public}" PRId64, recoverInterval, formId);
-        int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
-        delayTime = std::min(delayTime, FORM_BUILD_DELAY_TIME);
-        delayTime = std::max(delayTime, FORM_TASK_DELAY_TIME);
-        FormCommand renderCommand{
-            formId,
-            std::make_pair(TaskCommandType::RENDER_FORM, formId),
-            delayTime,
-            renderForm};
-        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand, hostToken);
-    }
-    HILOG_DEBUG("end");
 }
 
 void FormStatusTaskMgr::StopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin");
+    HILOG_INFO("begin formId: %{public}" PRId64, formRecord.formId);
+
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
@@ -314,20 +223,23 @@ void FormStatusTaskMgr::StopRenderingForm(
 
     FormJsInfo formInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formInfo);
-    int32_t error = remoteFormDeleteRender->StopRenderingForm(formInfo, want, FormSupplyCallback::GetInstance());
+    Want newWant(want);
+    std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formRecord.formId);
+    newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
+
+    int32_t error = remoteFormDeleteRender->StopRenderingForm(formInfo, newWant, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail add form renderer");
-        return;
     }
-
     HILOG_INFO("end");
 }
 
-void FormStatusTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want,
-    const sptr<IRemoteObject> &remoteObject)
+void FormStatusTaskMgr::RenderForm(
+    const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("form: %{public}" PRId64, formRecord.formId);
+    HILOG_INFO("render form formId: %{public}" PRId64, formRecord.formId);
+
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
@@ -338,17 +250,19 @@ void FormStatusTaskMgr::RenderForm(const FormRecord &formRecord, const Want &wan
 
     FormJsInfo formInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formInfo);
-    int32_t error = remoteFormRender->RenderForm(formInfo, want, FormSupplyCallback::GetInstance());
+    Want newWant(want);
+    std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formRecord.formId);
+    newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
+
+    int32_t error = remoteFormRender->RenderForm(formInfo, newWant, FormSupplyCallback::GetInstance());
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId, HiSysEventPointType::TYPE_DAILY_REFRESH);
     if (!formRecord.isVisible) {
-        FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId,
-            HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
+        FormRecordReport::GetInstance().IncreaseUpdateTimes(
+            formRecord.formId, HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
     }
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail add form renderer");
-        FormStatusMgr::GetInstance().ResetFormStatus(formRecord.formId);
-        return;
     }
 
     HILOG_DEBUG("end");
@@ -363,5 +277,5 @@ void FormStatusTaskMgr::RemoveConnection(int32_t connectId)
     }
     formSupplyCallback->RemoveConnection(connectId);
 }
-} // namespace AppExecFwk
-} // namespace OHOS
+}  // namespace AppExecFwk
+}  // namespace OHOS

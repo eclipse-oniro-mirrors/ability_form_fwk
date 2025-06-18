@@ -79,20 +79,15 @@ private:
 
     void RecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
-    void ReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid,
-        const sptr<IRemoteObject> &remoteObject);
-
-    void InnerPostRenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void ReleaseRenderer(
+        int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
 
     void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void RemoveConnection(int32_t connectId);
-
-    std::mutex formRecoverTimesMutex_;
-    std::unordered_map<int64_t, int64_t> formLastRecoverTimes;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif // OHOS_FORM_FWK_FORM_STATUS_TASK_MGR_H
+#endif  // OHOS_FORM_FWK_FORM_STATUS_TASK_MGR_H

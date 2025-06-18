@@ -35,6 +35,8 @@
 #include "data_center/form_record/form_record_report.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "status_mgr_center/form_status_mgr.h"
+#include "status_mgr_center/form_event_retry_mgr.h"
+#include "common/util/form_task_common.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -347,9 +349,8 @@ int32_t FormSupplyCallback::OnRenderingBlock(const std::string &bundleName)
     return ERR_OK;
 }
 
-int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &want)
+int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
     std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
     if (statusData.empty()) {
         HILOG_WARN("status data of %{public}" PRId64 " is empty", formId);
@@ -360,22 +361,34 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    if (!FormDataMgr::GetInstance().UpdateFormRecordRecycleStatus(formId, RecycleStatus::RECYCLED)) {
-        HILOG_ERROR("update recycle status data of %{public}" PRId64 " failed", formId);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_DATA_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
 
-    sptr<IRemoteObject> remoteObjectOfHost = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    if (remoteObjectOfHost == nullptr) {
-        HILOG_ERROR("null remoteObjectOfHost");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        auto reCycleForm = [formId, want]() {
+            sptr<IRemoteObject> remoteObjectOfHost = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+            if (remoteObjectOfHost == nullptr) {
+                HILOG_ERROR("null remoteObjectOfHost");
+                return;
+            }
+            sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObjectOfHost);
+            if (remoteFormHost == nullptr) {
+                HILOG_ERROR("null remoteFormHost");
+                return;
+            }
+            remoteFormHost->OnRecycleForm(formId);
+        };
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event, reCycleForm);
     }
-    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObjectOfHost);
-    if (remoteFormHost == nullptr) {
-        HILOG_ERROR("null remoteFormHost");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    remoteFormHost->OnRecycleForm(formId);
+    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 
@@ -386,30 +399,88 @@ int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &f
     return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
 }
 
-int32_t FormSupplyCallback::OnNotifyRefreshForm(const int64_t &formId)
+int32_t FormSupplyCallback::OnNotifyRefreshForm(const int64_t formId)
 {
     FormMgrAdapter::GetInstance().OnNotifyRefreshForm(formId);
     return ERR_OK;
 }
 
-int32_t FormSupplyCallback::OnRenderFormDone(const int64_t &formId)
+int32_t FormSupplyCallback::OnRenderFormDone(const int64_t formId, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
-    FormStatusMgr::GetInstance().OnRenderFormDone(formId);
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 
-int32_t FormSupplyCallback::OnRecoverFormDone(const int64_t &formId)
+int32_t FormSupplyCallback::OnRecoverFormDone(const int64_t formId, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
-    FormStatusMgr::GetInstance().OnRecoverFormDone(formId);
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+
+    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 
-int32_t FormSupplyCallback::OnRecycleFormDone(const int64_t &formId)
+int32_t FormSupplyCallback::OnRecycleFormDone(const int64_t formId, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
-    FormStatusMgr::GetInstance().OnRecycleFormDone(formId);
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+
+    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnDeleteFormDone(const int64_t formId, const Want &want)
+{
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+
+    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 } // namespace AppExecFwk

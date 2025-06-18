@@ -143,6 +143,14 @@ private:
      */
     int32_t HandleOnRecycleFormDone(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief handle OnDeleteForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnDeleteFormDone(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormSupplyStub);
 };

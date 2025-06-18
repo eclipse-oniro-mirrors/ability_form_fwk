@@ -182,8 +182,6 @@ ohos_shared_library("libfms") {
     "services/src/form_render/form_sandbox_render_mgr_inner.cpp",
     "services/src/form_render/form_render_task_mgr.cpp",
     "services/src/form_render/form_render_queue.cpp",
-    "services/src/status_mgr_center/form_command_process_strategy.cpp",
-    "services/src/status_mgr_center/form_command_queue.cpp",
     "services/src/status_mgr_center/form_status_mgr.cpp",
     "services/src/status_mgr_center/form_status_queue.cpp",
     "services/src/status_mgr_center/form_status_task_mgr.cpp",
@@ -205,6 +203,11 @@ ohos_shared_library("libfms") {
     "services/src/form_refresh/refresh_impl/form_force_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.cpp",
     "services/src/form_refresh/form_refresh_mgr.cpp",
+    "services/src/status_mgr_center/form_status_table.cpp",
+    "services/src/status_mgr_center/form_status.cpp",
+    "services/src/status_mgr_center/form_event_queue.cpp",
+    "services/src/status_mgr_center/form_event_timeout_queue.cpp",
+    "services/src/status_mgr_center/form_event_retry_mgr.cpp",
   ]
 
   configs = [

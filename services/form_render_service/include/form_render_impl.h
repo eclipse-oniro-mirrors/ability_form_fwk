@@ -37,8 +37,7 @@ namespace FormRender {
 using OHOS::AAFwk::Want;
 using namespace AbilityRuntime;
 
-class FormRenderImpl : public FormRenderStub,
-                       public std::enable_shared_from_this<FormRenderImpl> {
+class FormRenderImpl : public FormRenderStub, public std::enable_shared_from_this<FormRenderImpl> {
     DECLARE_DELAYED_SINGLETON(FormRenderImpl)
 public:
     /**
@@ -48,8 +47,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        sptr<IRemoteObject> callerToken) override;
+    int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want, sptr<IRemoteObject> callerToken) override;
 
     /**
      * @brief Stop rendering form. This is sync API.
@@ -76,18 +74,10 @@ public:
      */
     int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) override;
 
-    /**
-     * @brief Called when the system configuration is updated.
-     * @param configuration Indicates the updated configuration information.
-     */
-    void OnConfigurationUpdated(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& configuration);
-
-    void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
-
     void RunCachedConfigurationUpdated() override;
 
     int32_t ReleaseRenderer(
-        int64_t formId, const std::string &compId, const std::string &uid) override;
+        int64_t formId, const std::string &compId, const std::string &uid, const Want &want) override;
 
     int32_t OnUnlock() override;
 
@@ -99,43 +89,14 @@ public:
 
     int32_t UpdateFormSize(
         const int64_t &formId, float width, float height, float borderWidth, const std::string &uid) override;
-private:
-    void FormRenderGCTask(const std::string &uid);
-    void FormRenderGC(const std::string &uid);
-    void OnConfigurationUpdatedInner();
-    void ConfirmUnlockState(Want &renderWant);
 
-    void SetFormSupplyClient(const sptr<IFormSupply> &formSupplyClient);
-
-    sptr<IFormSupply> GetFormSupplyClient();
-
-    int32_t UpdateRenderRecordByUid(const std::string &uid, Want &formRenderWant, const FormJsInfo &formJsInfo,
-        const sptr<IFormSupply> &formSupplyClient);
-
-    bool IsRenderRecordExist(const std::string &uid);
-
-    void GetRenderRecordById(std::shared_ptr<FormRenderRecord> &search, const std::string &uid);
-
-    int32_t RecoverFormByUid(
-        const FormJsInfo &formJsInfo, const Want &want, const std::string &uid, const std::string &statusData);
-
-    int32_t RecycleFormByUid(const std::string &uid, std::string &statusData, const int64_t formId);
-
-    int32_t DeleteRenderRecordByUid(const std::string &uid, const std::shared_ptr<FormRenderRecord> &search);
+protected:
+    int32_t CheckPermission() override;
 
 private:
-    std::mutex renderRecordMutex_;
-    // <uid(userId + bundleName), renderRecord>
-    std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_;
-    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
-    std::chrono::steady_clock::time_point configUpdateTime_ = std::chrono::steady_clock::now();
-    std::unique_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
-    std::mutex formSupplyMutex_;
-    sptr<IFormSupply> formSupplyClient_;
-    bool isVerified_ = false;
-    bool hasCachedConfig_ = false;
+    bool CheckIsFoundationCall();
 };
-} // namespace FormRender
-} // namespace AppExecFwk
-} // namespace OHOS
-#endif // OHOS_FORM_FWK_FORM_RENDER_IMPL_H
+}  // namespace FormRender
+}  // namespace AppExecFwk
+}  // namespace OHOS
+#endif  // OHOS_FORM_FWK_FORM_RENDER_IMPL_H

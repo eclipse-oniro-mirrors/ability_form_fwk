@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace FormConstants {
+    constexpr int32_t FOUNDATION_UID = 5523;
+}
 namespace Constants {
     constexpr const char* PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS = "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS";
     constexpr const char* PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
@@ -198,6 +201,8 @@ namespace Constants {
     constexpr const char* FORM_IS_DYNAMIC = "form_is_dynamic";
     constexpr const char* FORM_IS_RECOVER_FORM = "form_is_recover_form";
     constexpr const char* FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT = "form_is_recover_form_to_handle_click_event";
+    constexpr const char* FORM_STATUS_EVENT = "form_status_event";
+    constexpr const char* FORM_STATUS_EVENT_ID = "form_status_event_id";
 
     const size_t MAX_LAYOUT = 8;
     constexpr int32_t MAX_FORMS = 512;
