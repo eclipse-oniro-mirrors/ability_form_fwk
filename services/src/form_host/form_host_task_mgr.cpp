@@ -357,10 +357,6 @@ void FormHostTaskMgr::ConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCo
 
     std::vector<sptr<IRemoteObject>> formHostObjs;
     FormDataMgr::GetInstance().GetFormHostRemoteObj(formId, formHostObjs);
-    if (formHostObjs.empty()) {
-        HILOG_WARN("empty formHostObjs");
-        return;
-    }
     for (const auto &host : formHostObjs) {
         auto hostClient = iface_cast<IFormHost>(host);
         if (hostClient == nullptr) {
