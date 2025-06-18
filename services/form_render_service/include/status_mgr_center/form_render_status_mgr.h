@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,7 @@ public:
      * @param formId The ID of the form
      * @param eventId The ID of the event
      */
-    void SetFormEventId(const int64_t formId, std::string eventId);
+    void SetFormEventId(const int64_t formId, std::string &eventId);
 
     /**
      * @brief Delete <formId, eventId> pair form map
@@ -72,7 +72,7 @@ private:
      * @param func Process function
      * @return Returns the execution result, success returns 0, failure returns -1
      */
-    int32_t FormTaskExec(FormFsmProcessType processType, const int64_t formId, const FormFsmEvent event,
+    int32_t ExecFormTask(FormFsmProcessType processType, const int64_t formId, const FormFsmEvent event,
         const FormFsmStatus status, std::function<int32_t()> func);
 
     /**

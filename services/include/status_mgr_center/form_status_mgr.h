@@ -77,7 +77,7 @@ private:
      * @param event Form FSM event
      * @param status Form FSM status
      */
-    void FormTaskTimeoutExec(
+    void ExecFormTaskTimeout(
         const int64_t formId, FormEventTimeout timeoutMs, FormFsmEvent event, FormFsmStatus status);
 
     /**
@@ -87,7 +87,7 @@ private:
      * @param event Triggering form event
      * @param func Process function
      */
-    void FormTaskExec(
+    void ExecFormTask(
         FormFsmProcessType processType, const int64_t formId, const FormFsmEvent event, std::function<void()> func);
 
     /**

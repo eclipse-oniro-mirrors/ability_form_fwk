@@ -49,7 +49,7 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     }
     int32_t result = CheckPermission();
     if (result != ERR_OK) {
-        HILOG_ERROR("check permission fail");
+        HILOG_ERROR("check permission failed");
         return result;
     }
 

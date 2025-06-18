@@ -59,10 +59,10 @@ void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event
         FormStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
 
         // state machine timeout process
-        FormStatusMgr::GetInstance().FormTaskTimeoutExec(formId, info.timeoutMs, event, status);
+        FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, info.timeoutMs, event, status);
 
         // state machine excute
-        FormStatusMgr::GetInstance().FormTaskExec(info.processType, formId, event, func);
+        FormStatusMgr::GetInstance().ExecFormTask(info.processType, formId, event, func);
     };
 
     FormStatusQueue::GetInstance().ScheduleTask(0, task);
@@ -73,18 +73,18 @@ void FormStatusMgr::CancelFormEventTimeout(const int64_t formId, std::string eve
     FormEventTimeoutQueue::GetInstance().CancelDelayTask(std::make_pair(formId, eventId));
 }
 
-void FormStatusMgr::FormTaskTimeoutExec(
+void FormStatusMgr::ExecFormTaskTimeout(
     const int64_t formId, FormEventTimeout timeoutMs, FormFsmEvent event, FormFsmStatus status)
 {
     if (timeoutMs == FormEventTimeout::TIMEOUT_NO_NEED) {
-        HILOG_DEBUG("no need exec timeout task.");
+        HILOG_DEBUG("no need exec timeout task, formId:%{public}" PRId64, formId);
         return;
     }
 
     SetFormEventId(formId);
     std::string eventId = GetFormEventId(formId);
     if (eventId.empty()) {
-        HILOG_ERROR("get eventId failed.");
+        HILOG_ERROR("get eventId failed, formId:%{public}" PRId64, formId);
         return;
     }
 
@@ -99,7 +99,7 @@ void FormStatusMgr::FormTaskTimeoutExec(
         std::make_pair(formId, eventId), static_cast<uint32_t>(timeoutMs), timeoutTask);
 }
 
-void FormStatusMgr::FormTaskExec(
+void FormStatusMgr::ExecFormTask(
     FormFsmProcessType processType, const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
     HILOG_INFO("processType is %{public}d.", static_cast<int32_t>(processType));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "status_mgr_center/form_render_status_table.h"
-#include <map>
+#include <unordered_map>
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -47,6 +47,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_INIT = {
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RENDERING = {
     // RENDERING
     {
@@ -62,6 +63,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RENDERING = {
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RENDERED = {
     // RENDERED
     {
@@ -89,6 +91,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RENDERED = {
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
     // RECYCLED
     {
@@ -110,6 +113,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA = {
     // RECYCLING_DATA
     {
@@ -131,6 +135,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA 
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING = {
     // RECYCLING
     {
@@ -146,6 +151,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING = {
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECOVERING = {
     // RECOVERING
     {
@@ -161,6 +167,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECOVERING = {
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_DELETING = {
     // DELETING
     {
@@ -182,6 +189,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_DELETING = {
         FormFsmProcessType::PROCESS_TASK_DIRECT,
     },
 };
+
 const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_UNPROCESSABLE = {
     // UNPROCESSABLE
     {
@@ -216,7 +224,7 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_UNPROCESSABLE =
     },
 };
 
-const std::map<FormFsmStatus, std::vector<FormRenderStatusMachineInfo>> FORM_STATUS_TABLE = {
+const std::unordered_map<FormFsmStatus, std::vector<FormRenderStatusMachineInfo>> FORM_STATUS_TABLE = {
     {FormFsmStatus::INIT, FORM_STATUS_TABLE_INIT},
     {FormFsmStatus::RENDERING, FORM_STATUS_TABLE_RENDERING},
     {FormFsmStatus::RENDERED, FORM_STATUS_TABLE_RENDERED},

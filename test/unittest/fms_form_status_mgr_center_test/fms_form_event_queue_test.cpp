@@ -67,6 +67,9 @@ HWTEST_F(FormEventQueueTest, FormEventQueueTest_0001, TestSize.Level0)
     EXPECT_EQ(formEventQueue->IsEventQueueEmpty(), false);
     EXPECT_EQ(formEventQueue->PopFormEvent(eventTaskInfo), true);
 
+    formId = 321;
+    FormEventTaskInfo eTaskInfo{formId, FormFsmEvent::RENDER_FORM, task};
+    formEventQueue->PushFormEvent(eTaskInfo);
     int32_t size = (formEventQueue->GetEventQueue()).size();
     EXPECT_EQ(size, 0);
     GTEST_LOG_(INFO) << "FormEventQueueTest_0001 end";

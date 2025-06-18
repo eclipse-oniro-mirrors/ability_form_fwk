@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,10 +56,10 @@ int32_t FormRenderStatusMgr::PostFormEvent(
     FormRenderStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
 
     // state machine excute
-    return FormTaskExec(info.processType, formId, event, status, func);
+    return ExecFormTask(info.processType, formId, event, status, func);
 }
 
-int32_t FormRenderStatusMgr::FormTaskExec(FormFsmProcessType processType, const int64_t formId,
+int32_t FormRenderStatusMgr::ExecFormTask(FormFsmProcessType processType, const int64_t formId,
     const FormFsmEvent event, const FormFsmStatus status, std::function<int32_t()> func)
 {
     HILOG_INFO("processType is %{public}d.", static_cast<int32_t>(processType));
@@ -83,7 +83,7 @@ std::string FormRenderStatusMgr::GetFormEventId(const int64_t formId)
     return formEventIdMap_[formId];
 }
 
-void FormRenderStatusMgr::SetFormEventId(const int64_t formId, std::string eventId)
+void FormRenderStatusMgr::SetFormEventId(const int64_t formId, std::string &eventId)
 {
     std::unique_lock<std::shared_mutex> lock(formEventIdMapMutex_);
     if (formEventIdMap_.find(formId) == formEventIdMap_.end()) {
@@ -112,7 +112,6 @@ int32_t FormRenderStatusMgr::ProcessTaskDelete(const int64_t formId)
 {
     DeleteFormEventId(formId);
     FormRenderStatus::GetInstance().DeleteFormStatus(formId);
-
     return ERR_OK;
 }
 
@@ -122,7 +121,6 @@ int32_t FormRenderStatusMgr::PrintTaskInfo(const int64_t formId, const FormFsmEv
         formId,
         static_cast<int32_t>(status),
         static_cast<int32_t>(event));
-
     return ERR_OK;
 }
 }  // namespace AppExecFwk

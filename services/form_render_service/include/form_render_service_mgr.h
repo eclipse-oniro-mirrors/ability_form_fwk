@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,7 +70,7 @@ public:
 
     /**
      * @brief Reload form When app updated. This is sync API.
-     * @param formIds the form id need to update.
+     * @param formJsInfo The form js info.
      * @param want Indicates the {@link Want} structure containing form info.
      * @return int32_t Returns ERR_OK on success, others on failure.
      */

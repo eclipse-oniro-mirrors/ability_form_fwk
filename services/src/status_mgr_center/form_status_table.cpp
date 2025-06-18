@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "status_mgr_center/form_status_table.h"
-#include <map>
+#include <unordered_map>
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -51,6 +51,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_INIT = {
         FormEventTimeout::TIMEOUT_3_S,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RENDERING = {
     // RENDERING
     {
@@ -110,6 +111,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RENDERING = {
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RENDERED = {
     {
         FormFsmStatus::RENDERED,
@@ -140,6 +142,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RENDERED = {
         FormEventTimeout::TIMEOUT_3_S,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
     {
         FormFsmStatus::RECYCLED,
@@ -163,6 +166,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
         FormEventTimeout::TIMEOUT_3_S,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA = {
     {
         FormFsmStatus::RECYCLING_DATA,
@@ -214,6 +218,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA = {
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING = {
     {
         FormFsmStatus::RECYCLING,
@@ -258,6 +263,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING = {
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECOVERING = {
     {
         FormFsmStatus::RECOVERING,
@@ -309,6 +315,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECOVERING = {
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_DELETING = {
     {
         FormFsmStatus::DELETING,
@@ -353,6 +360,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_DELETING = {
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
 };
+
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_UNPROCESSABLE = {
     {
         FormFsmStatus::UNPROCESSABLE,
@@ -391,7 +399,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_UNPROCESSABLE = {
     },
 };
 
-const std::map<FormFsmStatus, std::vector<FormStatusMachineInfo>> FORM_STATUS_TABLE = {
+const std::unordered_map<FormFsmStatus, std::vector<FormStatusMachineInfo>> FORM_STATUS_TABLE = {
     {FormFsmStatus::INIT, FORM_STATUS_TABLE_INIT},
     {FormFsmStatus::RENDERING, FORM_STATUS_TABLE_RENDERING},
     {FormFsmStatus::RENDERED, FORM_STATUS_TABLE_RENDERED},

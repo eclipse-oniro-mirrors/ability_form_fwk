@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,13 +82,14 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0002, TestSize.Level0)
     FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RENDER_FORM, task);
     FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::RENDERED);
     FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RENDER_FORM, task);
+    FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RENDER_FORM_DONE, task);
 
     GTEST_LOG_(INFO) << "FormStatusMgrTest_0002 end";
 }
 
 /**
  * @tc.name: FormStatusMgrTest_0003
- * @tc.desc: Verify FormTaskTimeoutExec
+ * @tc.desc: Verify ExecFormTaskTimeout
  * @tc.type: FUNC
  */
 HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0003, TestSize.Level0)
@@ -99,17 +100,24 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0003, TestSize.Level0)
     FormEventTimeout timeoutMs = FormEventTimeout::TIMEOUT_NO_NEED;
     FormFsmEvent event = FormFsmEvent::RENDER_FORM;
     FormFsmStatus status = FormFsmStatus::RENDERED;
-    FormStatusMgr::GetInstance().FormTaskTimeoutExec(formId, timeoutMs, event, status);
+    FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, timeoutMs, event, status);
+
+    FormStatusMgr::GetInstance().DeleteFormEventId(formId);
+    std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    EXPECT_EQ(eventId, "");
 
     timeoutMs = FormEventTimeout::TIMEOUT_3_S;
-    FormStatusMgr::GetInstance().FormTaskTimeoutExec(formId, timeoutMs, event, status);
+    FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, timeoutMs, event, status);
+
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, timeoutMs, event, status);
 
     GTEST_LOG_(INFO) << "FormStatusMgrTest_0003 end";
 }
 
 /**
  * @tc.name: FormStatusMgrTest_0004
- * @tc.desc: Verify FormTaskExec
+ * @tc.desc: Verify ExecFormTask
  * @tc.type: FUNC
  */
 HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0004, TestSize.Level0)
@@ -120,19 +128,20 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0004, TestSize.Level0)
     int64_t formId = FORM_ID;
     FormFsmEvent event = FormFsmEvent::RENDER_FORM;
     auto task = []() { GTEST_LOG_(INFO) << "FormStatusMgrTest_0004 Task called"; };
-    FormStatusMgr::GetInstance().FormTaskExec(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(processType, formId, event, task);
     processType = FormFsmProcessType::ADD_TASK_TO_QUEUE_UNIQUE;
-    FormStatusMgr::GetInstance().FormTaskExec(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(processType, formId, event, task);
     processType = FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH;
-    FormStatusMgr::GetInstance().FormTaskExec(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(processType, formId, event, task);
     processType = FormFsmProcessType::ADD_TASK_TO_QUEUE_DELETE;
-    FormStatusMgr::GetInstance().FormTaskExec(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(processType, formId, event, task);
     processType = FormFsmProcessType::PROCESS_TASK_FROM_QUEUE;
-    FormStatusMgr::GetInstance().FormTaskExec(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(processType, formId, event, task);
     processType = FormFsmProcessType::PROCESS_TASK_DELETE;
-    FormStatusMgr::GetInstance().FormTaskExec(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(processType, formId, event, task);
     processType = FormFsmProcessType::PROCESS_TASK_RETRY;
-    FormStatusMgr::GetInstance().FormTaskExec(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(processType, formId, event, task);
+    FormStatusMgr::GetInstance().ExecFormTask(static_cast<FormFsmProcessType>(100), formId, event, task);
 
     GTEST_LOG_(INFO) << "FormStatusMgrTest_0004 end";
 }
@@ -173,17 +182,22 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0006, TestSize.Level0)
     FormEventTaskInfo taskInfo{formId, event, task};
     formEventQueue->PushFormEvent(taskInfo);
     FormStatusMgr::GetInstance().AddTaskToQueueUnique(formId, event, task);
-
     FormStatusMgr::GetInstance().AddTaskToQueuePush(formId, event, task);
 
-    FormEventTaskInfo eventTaskInfo{};
-    formEventQueue->PopFormEvent(eventTaskInfo);
+    formEventQueue = FormStatusMgr::GetInstance().GetFormEventQueue(formId);
+    while (!formEventQueue->IsEventQueueEmpty()) {
+        FormEventTaskInfo eventTaskInfo{};
+        if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
+            break;
+        }
+    }
     FormStatusMgr::GetInstance().AddTaskToQueueDelete(formId, event, task);
     formEventQueue->PushFormEvent(taskInfo);
     FormStatusMgr::GetInstance().AddTaskToQueueDelete(formId, event, task);
 
     FormStatusMgr::GetInstance().ProcessTaskFromQueue(456);
     FormStatusMgr::GetInstance().ProcessTaskFromQueue(formId);
+    FormEventTaskInfo eventTaskInfo{};
     formEventQueue->PopFormEvent(eventTaskInfo);
     FormStatusMgr::GetInstance().ProcessTaskFromQueue(formId);
 

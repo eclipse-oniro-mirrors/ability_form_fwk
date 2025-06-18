@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,8 @@ bool FormEventRetryMgr::GetLastFormEvent(const int64_t formId, FormEventTaskInfo
         HILOG_ERROR("lastFormEvent not exist, formId:%{public}" PRId64 ". ", formId);
         return false;
     }
-    formEventInfo = iter->second; 
+
+    formEventInfo = iter->second;
     return true;
 }
 
@@ -72,6 +73,7 @@ bool FormEventRetryMgr::GetRetryCount(const int64_t formId, int32_t &retryCount)
         HILOG_ERROR("retryCount not exist, formId:%{public}" PRId64 ". ", formId);
         return false;
     }
+
     retryCount = iter->second;
     return true;
 }

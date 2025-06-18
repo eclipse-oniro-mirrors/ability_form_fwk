@@ -262,7 +262,6 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_009, TestSize.Level0)
     GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_009 end";
 }
 
-
 /**
  * @tc.name: Dump_010
  * @tc.desc: Verify formDumpMgr
@@ -338,11 +337,13 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_013, TestSize.Level1)
 HWTEST_F(FmsFormMgrDumpTest, Dump_014, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Dump_014 start";
+    std::string formInfo = "123";
     FormRecord formRecordInfo;
     formRecordInfo.formId = 123;
+    FormDumpMgr::GetInstance().DumpFormInfo(formRecordInfo, formInfo);
     formRecordInfo.hapSourceDirs = {"1", "2"};
+    FormDumpMgr::GetInstance().DumpFormInfo(formRecordInfo, formInfo);
     formRecordInfo.formUserUids = {1, 2};
-    std::string formInfo = "123";
     FormDumpMgr::GetInstance().DumpFormInfo(formRecordInfo, formInfo);
     GTEST_LOG_(INFO) << "Dump_014 end";
 }

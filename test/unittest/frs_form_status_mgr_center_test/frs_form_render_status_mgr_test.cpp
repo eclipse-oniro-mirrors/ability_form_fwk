@@ -72,7 +72,7 @@ HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0001, TestSize.Level0)
 
 /**
  * @tc.name: FormRenderStatusMgrTest_0002
- * @tc.desc: Verify FormTaskExec
+ * @tc.desc: Verify ExecFormTask
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0002, TestSize.Level0)
@@ -87,16 +87,21 @@ HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0002, TestSize.Level0)
         GTEST_LOG_(INFO) << "FormRenderStatusMgrTest_0002 Task called";
         return 0;
     };
-    FormRenderStatusMgr::GetInstance().FormTaskExec(processType, formId, event, status, task);
+    int32_t ret = FormRenderStatusMgr::GetInstance().ExecFormTask(processType, formId, event, status, task);
+    EXPECT_EQ(ret, 0);
     processType = FormFsmProcessType::PROCESS_TASK_DELETE;
-    FormRenderStatusMgr::GetInstance().FormTaskExec(processType, formId, event, status, task);
+    ret = FormRenderStatusMgr::GetInstance().ExecFormTask(processType, formId, event, status, task);
+    EXPECT_EQ(ret, 0);
+    ret = FormRenderStatusMgr::GetInstance().ExecFormTask(
+        static_cast<FormFsmProcessType>(100), formId, event, status, task);
+    EXPECT_EQ(ret, 0);
 
     GTEST_LOG_(INFO) << "FormRenderStatusMgrTest_0002 end";
 }
 
 /**
  * @tc.name: FormRenderStatusMgrTest_0003
- * @tc.desc: Verify ProcessTaskDirect and ProcessTaskDelete
+ * @tc.desc: Verify ProcessTaskDirect ProcessTaskDelete and PrintTaskInfo
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0003, TestSize.Level0)
@@ -105,12 +110,17 @@ HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0003, TestSize.Level0)
 
     int64_t formId = 123;
     FormFsmEvent event = FormFsmEvent::RENDER_FORM;
+    FormFsmStatus status = FormFsmStatus::RENDERED;
     auto task = []() {
         GTEST_LOG_(INFO) << "FormRenderStatusMgrTest_0001 Task called";
         return 0;
     };
-    FormRenderStatusMgr::GetInstance().ProcessTaskDirect(task);
-    FormRenderStatusMgr::GetInstance().ProcessTaskDelete(formId);
+    int32_t ret = FormRenderStatusMgr::GetInstance().ProcessTaskDirect(task);
+    EXPECT_EQ(ret, 0);
+    ret = FormRenderStatusMgr::GetInstance().ProcessTaskDelete(formId);
+    EXPECT_EQ(ret, 0);
+    ret = FormRenderStatusMgr::GetInstance().PrintTaskInfo(formId, event, status);
+    EXPECT_EQ(ret, 0);
 
     GTEST_LOG_(INFO) << "FormRenderStatusMgrTest_0003 end";
 }
@@ -130,10 +140,12 @@ HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0004, TestSize.Level0)
     EXPECT_EQ(eventId, "");
 
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, "eventId");
+    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, "eventIdNew");
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
+    EXPECT_EQ(eventId, "eventIdNew");
 
+    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
+    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     EXPECT_EQ(eventId, "");
 

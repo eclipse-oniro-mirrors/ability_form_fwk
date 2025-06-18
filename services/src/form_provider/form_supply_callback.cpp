@@ -370,10 +370,10 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
         eventId.c_str(),
         curTid.c_str(),
         event);
-    if (!eventId.empty() && !curTid.empty() && eventId == curTid) {
+    if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
 
-        auto reCycleForm = [formId, want = want]() {
+        auto reCycleForm = [formId, want]() {
             sptr<IRemoteObject> remoteObjectOfHost = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
             if (remoteObjectOfHost == nullptr) {
                 HILOG_ERROR("null remoteObjectOfHost");
@@ -416,7 +416,7 @@ int32_t FormSupplyCallback::OnRenderFormDone(const int64_t formId, const Want &w
         eventId.c_str(),
         curTid.c_str(),
         event);
-    if (!eventId.empty() && !curTid.empty() && eventId == curTid) {
+    if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
@@ -435,7 +435,7 @@ int32_t FormSupplyCallback::OnRecoverFormDone(const int64_t formId, const Want &
         eventId.c_str(),
         curTid.c_str(),
         event);
-    if (!eventId.empty() && !curTid.empty() && eventId == curTid) {
+    if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
@@ -455,7 +455,7 @@ int32_t FormSupplyCallback::OnRecycleFormDone(const int64_t formId, const Want &
         eventId.c_str(),
         curTid.c_str(),
         event);
-    if (!eventId.empty() && !curTid.empty() && eventId == curTid) {
+    if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
@@ -475,7 +475,7 @@ int32_t FormSupplyCallback::OnDeleteFormDone(const int64_t formId, const Want &w
         eventId.c_str(),
         curTid.c_str(),
         event);
-    if (!eventId.empty() && !curTid.empty() && eventId == curTid) {
+    if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
