@@ -55,8 +55,7 @@ namespace {
     const std::string FORM_OVERFLOW = "formOverflow";
     const std::string CHANGE_SCENE_ANIMATION_STATE = "changeSceneAnimationState";
     const std::string GET_FORM_RECT = "getFormRect";
-    const std::set<std::string> FORM_LISTENER_TYPE =
-    {
+    const std::set<std::string> FORM_LISTENER_TYPE = {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT
     };
 }

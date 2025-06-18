@@ -36,6 +36,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
 #include "mock_form_provider_client.h"
+#include "mock_form_mgr_adapter.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -51,7 +52,6 @@ extern void MockGetFormRecord(bool mockRet);
 extern void MockGetFormRecordParams(bool mockRet);
 extern void MockGetFormRecordParamsUid(bool mockRet);
 extern void MockSceneAnimationCheck(OHOS::ErrCode mockRet);
-extern void MockCallerCheck(OHOS::ErrCode mockRet);
 
 namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
