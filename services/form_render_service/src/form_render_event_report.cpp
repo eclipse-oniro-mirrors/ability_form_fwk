@@ -18,19 +18,30 @@
 #include <chrono>
 #include <map>
 #include "backtrace_local.h"
-#include "dfx_dump_catcher.h"
 #include "fms_log_wrapper.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
     static constexpr char DOMAIN_PERFORMANCE[] = "PERFORMANCE";
-    constexpr const char *EVENT_KEY_FORM_BLOCK_CALLSTACK = "EVENT_KEY_FORM_BLOCK_CALLSTACK";
-    constexpr const char *EVENT_KEY_FORM_BLOCK_APPNAME = "EVENT_KEY_FORM_BLOCK_APPNAME";
+    constexpr const char *EVENT_KEY_FORM_ID = "FORM_ID";
+    constexpr const char *EVENT_KEY_FORM_NAME = "FORM_NAME";
+    constexpr const char *EVENT_KEY_BUNDLE_NAME = "BUNDLE_NAME";
+    constexpr const char *EVENT_KEY_ERROR_NAME = "ERROR_NAME";
+    constexpr const char *EVENT_KEY_ERROR_MSG = "ERROR_MSG";
+    constexpr const char *EVENT_KEY_ERROR_TYPE = "ERROR_TYPE";
+    constexpr const char *EVENT_KEY_ERROR_CODE = "ERROR_CODE";
+    constexpr int64_t RECYCLE_FORM_FAILED = 1;
+    constexpr int64_t WAIT_RELEASE_RENDERER_ERROR_CODE = 400;
+    constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 2000;
 }
 
 using namespace std;
 using namespace std::chrono;
+
+std::unordered_map<int64_t, int32_t> FormRenderEventReport::waitReleaseTimerMap_ = {};
 
 int64_t FormRenderEventReport::GetNowMillisecond()
 {
@@ -56,21 +67,51 @@ void FormRenderEventReport::SendPerformanceEvent(SceneType sceneType, Performanc
     }
 }
 
-void FormRenderEventReport::SendBlockFaultEvent(pid_t processId, pid_t jsThreadId, std::string bundleName)
+void FormRenderEventReport::SendBlockFaultEvent(const std::string &bundleName, const std::string &errorName,
+    const std::string &errorMsg)
 {
-    OHOS::HiviewDFX::DfxDumpCatcher dumplog;
-    std::string traceStr;
-    bool ret = dumplog.DumpCatch(processId, jsThreadId, traceStr);
-    if (ret) {
-        HILOG_INFO("Print block form's process id %{public}d and thread %{public}d call stack %{public}s",
-            processId, jsThreadId, traceStr.c_str());
-    }
     HiSysEventWrite(
         HiSysEvent::Domain::FORM_MANAGER,
         "FORM_BLOCK_CALLSTACK",
         HiSysEvent::EventType::FAULT,
-        EVENT_KEY_FORM_BLOCK_CALLSTACK, traceStr,
-        EVENT_KEY_FORM_BLOCK_APPNAME, bundleName);
+        EVENT_KEY_BUNDLE_NAME, bundleName,
+        EVENT_KEY_ERROR_NAME, errorName,
+        EVENT_KEY_ERROR_MSG, errorMsg);
+}
+
+	// After RecycleForm is executed, it will proceed to ReleaseRenderer.
+// If ReleaseRenderer is not called within the timeout period, a card recycling failure will be reported.
+void FormRenderEventReport::StartReleaseTimeoutReportTimer(int64_t formId, const std::string &uid)
+{
+    FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
+    auto timeoutCallback = [formId, uid](void *) {
+        HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
+        HiSysEventWrite(
+            HiSysEvent::Domain::FORM_MANAGER, "FORM_ERROR",
+            HiSysEvent::EventType::FAULT,
+            EVENT_KEY_FORM_ID, formId,
+            EVENT_KEY_BUNDLE_NAME, uid,
+            EVENT_KEY_FORM_NAME, "",
+            EVENT_KEY_ERROR_NAME, "RECYCLE_RECOVER_FORM_FAILED",
+            EVENT_KEY_ERROR_TYPE, RECYCLE_FORM_FAILED,
+            EVENT_KEY_ERROR_CODE, WAIT_RELEASE_RENDERER_ERROR_CODE);
+    };
+    const std::string taskName = "FRS_WaitReleaseRenderer_" + std::to_string(formId);
+    int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer(taskName, WAIT_RELEASE_RENDERER_TIMEOUT,
+        timeoutCallback, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
+    HILOG_INFO("waiting form release, formId: %{public}" PRId64 "timerId: %{public}d", formId, timerId);
+    FormRenderEventReport::waitReleaseTimerMap_.emplace(formId, timerId);
+}
+
+void FormRenderEventReport::StopReleaseTimeoutReportTimer(int64_t formId)
+{
+    auto iter = FormRenderEventReport::waitReleaseTimerMap_.find(formId);
+    if (iter != FormRenderEventReport::waitReleaseTimerMap_.end()) {
+        int32_t timerId = iter->second;
+        HILOG_INFO("form release completed, formId: %{public}" PRId64 "timerId: %{public}d", formId, timerId);
+        HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+        FormRenderEventReport::waitReleaseTimerMap_.erase(iter);
+    }
 }
 
 } // namespace AppExecFwk

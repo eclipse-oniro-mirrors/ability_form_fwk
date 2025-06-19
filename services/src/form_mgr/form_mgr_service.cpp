@@ -56,6 +56,7 @@
 #include "system_ability_definition.h"
 #include "tokenid_kit.h"
 #include "hisysevent.h"
+#include "hitrace_meter.h"
 #include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
@@ -280,6 +281,14 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("delete form permission denied");
+        FormRecord record;
+        FormDataMgr::GetInstance().GetFormRecord(formId, record);
+        FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED,
+            formId,
+            record.bundleName,
+            record.formName,
+            static_cast<int32_t>(DeleteFormErrorType::DELETE_NORMAL_FORM_FAILED),
+            ret);
         return ret;
     }
     FormEventInfo eventInfo;
@@ -437,6 +446,10 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
             return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
         }
     }
+    std::string bundleName;
+    FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+    std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
+    FormEventReport::SendRequestPublicFormEvent(bundleName, formName);
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
 
@@ -1287,6 +1300,7 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
 int32_t FormMgrService::StartAbilityByFms(const Want &want)
 {
     HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::string dstBundleName = want.GetElement().GetBundleName();
     std::string bundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
@@ -1307,16 +1321,16 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
- 
+
     if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE)) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
- 
+
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         HILOG_ERROR("capability not support");
         return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
     }
-    
+
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 
@@ -1877,6 +1891,10 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+    std::string bundleName;
+    FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+    std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
+    FormEventReport::SendRequestPublicFormEvent(bundleName, formName, true);
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
                                                             formId, {}, false);
 }
@@ -2007,6 +2025,7 @@ void FormMgrService::SetDisConnectTypeTime()
 
 ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     int uid = IPCSkeleton::GetCallingUid();
     std::string callerName;
     ErrCode ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, callerName);
@@ -2060,7 +2079,7 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
 void FormMgrService::PostConnectNetWork()
 {
     HILOG_DEBUG("start");
- 
+
     auto connectNetWork = []() {
         DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
     };

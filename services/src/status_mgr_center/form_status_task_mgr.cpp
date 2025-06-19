@@ -17,6 +17,7 @@
 #include "form_render_interface.h"
 #include "fms_log_wrapper.h"
 #include "common/util/form_util.h"
+#include "common/event/form_event_report.h"
 #include "status_mgr_center/form_status_queue.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "form_mgr/form_mgr_queue.h"
@@ -157,6 +158,12 @@ void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObj
     int32_t error = remoteFormRender->RecycleForm(formId, want);
     if (error != ERR_OK) {
         HILOG_ERROR("RecycleForm fail formId: %{public}" PRId64 " error: %{public}d", formId, error);
+        FormEventReport::SendFormFailedEvent(FormEventName::RECYCLE_RECOVER_FORM_FAILED,
+            formId,
+            formRecord.bundleName,
+            formRecord.formName,
+            static_cast<int32_t>(RecycleRecoverFormErrorType::RECYCLE_FORM_FAILED),
+            error);
     }
 }
 
@@ -182,6 +189,12 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail recover form");
+        FormEventReport::SendFormFailedEvent(FormEventName::RECYCLE_RECOVER_FORM_FAILED,
+            record.formId,
+            record.bundleName,
+            record.formName,
+            static_cast<int64_t>(RecycleRecoverFormErrorType::RECOVER_FORM_FAILED),
+            error);
     }
     HILOG_DEBUG("end");
 }

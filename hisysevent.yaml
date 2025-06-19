@@ -129,6 +129,7 @@ UPDATE_FORM_REFRESH_TIMES:
   PASSIVE_RECOVER_REFRESH_TIMES: {type: INT32, desc: passive recover refresh times}
   HF_RECOVER_REFRESH_TIMES: {type: INT32, desc: hf recover refresh times}
   OFFLOAD_RECOVER_REFRESH_TIMES: {type: INT32, desc: offload recover refresh times}
+  DISABLE_REFRESH_TIMES: {type: INT32, desc: disable refresh times}
 
 PROXY_UPDATE_FORM:
   __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
@@ -152,3 +153,20 @@ INVALID_PUBLISH_FORM_TO_HOST:
 FORM_BLOCK_CALLSTACK:
   __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form manager}
   BUNDLE_NAME: {type: STRING, desc: bundle name}
+  ERROR_NAME: {type: STRING, desc: error name}
+  ERROR_MSG: {type: STRING, desc: error msg}
+
+FORM_ERROR:
+  __BASE: {type: FAULT, level: MINOR, tag: ability, desc: Form general error event}
+  FORM_ID: {type: INT64, desc: formId}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}
+  FORM_NAME: {type: STRING, desc: form name}
+  ERROR_NAME: {type: STRING, desc: error name}
+  ERROR_TYPE: {type: INT32, desc: error type}
+  ERROR_CODE: {type: INT32, desc: error code}
+
+REQUEST_PUBLIC_FORM:
+  __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: Publish form within the app}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}
+  FORM_NAME: {type: STRING, desc: form name}
+  WITH_SNAPSHOT: {type: BOOL, desc: with snapshot}

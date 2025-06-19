@@ -40,10 +40,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormRenderEventReport::GetNowMillisecond();
     PerformanceEventInfo eventInfo;
     FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
-    pid_t processId = static_cast<pid_t>(GetU32Data(data));
-    pid_t jsThreadId = static_cast<pid_t>(GetU32Data(data));
     std::string bundleName(data, size);
-    FormRenderEventReport::SendBlockFaultEvent(processId, jsThreadId, bundleName);
+    std::string errorName(data, size);
+    std::string errorMsg(data, size);
+    FormRenderEventReport::SendBlockFaultEvent(bundleName, errorName, errorMsg);
     return true;
 }
 }

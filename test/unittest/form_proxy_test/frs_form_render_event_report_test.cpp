@@ -72,10 +72,10 @@ HWTEST_F(FormRenderEventReportTest, SendPerformanceEvent_001, TestSize.Level0)
 HWTEST_F(FormRenderEventReportTest, SendBlockFaultEvent_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "SendBlockFaultEvent_001 begin";
-    pid_t processId = 1;
-    pid_t jsThreadId = 1;
     std::string bundleName = "com.ohos.test.example";
-    FormRenderEventReport::SendBlockFaultEvent(processId, jsThreadId, bundleName);
+    std::string errorName = "test error type";
+    std::string errorMsg = "test error msg";
+    FormRenderEventReport::SendBlockFaultEvent(bundleName, errorName, errorMsg);
     GTEST_LOG_(INFO) << "SendBlockFaultEvent_001 test ends";
 }
 

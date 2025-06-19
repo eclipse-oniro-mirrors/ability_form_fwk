@@ -34,6 +34,7 @@
 #include "form_render_event_report.h"
 #include "nlohmann/json.hpp"
 #include "xcollie/watchdog.h"
+#include "dfx_dump_catcher.h"
 
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
 
@@ -291,7 +292,15 @@ void FormRenderRecord::Timer()
     if (taskState == TaskState::BLOCK) {
         HILOG_ERROR("FRS block happened when bundleName is %{public}s, uid is %{public}s",
             bundleName_.c_str(), uid_.c_str());
-        FormRenderEventReport::SendBlockFaultEvent(processId_, jsThreadId_, bundleName_);
+        OHOS::HiviewDFX::DfxDumpCatcher dumplog;
+        std::string traceStr;
+        bool ret = dumplog.DumpCatch(processId_, jsThreadId_, traceStr);
+        if (ret) {
+            HILOG_INFO("Print block form's process id %{public}d and thread %{public}d call stack %{public}s",
+                processId_, jsThreadId_, traceStr.c_str());
+        }
+        FormRenderEventReport::SendBlockFaultEvent(bundleName_, "THREAD_BLOCK_" + std::to_string(TIMEOUT) + "ms",
+            traceStr);
         OnRenderingBlock(bundleName_);
     }
 }
@@ -504,6 +513,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         return false;
     }
     hapPath_ = formJsInfo.jsFormCodePath;
+    RegisterNapiUncaughtExceptionHandler();
     return true;
 }
 
@@ -1905,6 +1915,67 @@ void FormRenderRecord::InsertRecycledFormCompIds(
     std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
     recycledFormCompIds_.emplace(formId, compIds);
 }
+
+void FormRenderRecord::SetJsErrorCallback(JsErrorCallback callback)
+{
+    jsErrorCallback_ = callback;
+}
+
+void FormRenderRecord::RegisterNapiUncaughtExceptionHandler()
+{
+    auto &nativeEngine = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNativeEngine();
+    auto uncaughtTask = [weak = weak_from_this()](napi_value value) {
+        auto renderRecord = weak.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("null renderRecord");
+            return;
+        }
+        renderRecord->OnJsError(value);
+    };
+    nativeEngine.RegisterNapiUncaughtExceptionHandler(uncaughtTask);
+}
+
+void FormRenderRecord::OnJsError(napi_value value)
+{
+    std::string errorName = GetNativeStrFromJsTaggedObj(value, "name");
+    std::string errorMsg = GetNativeStrFromJsTaggedObj(value, "message");
+    std::string topStack = GetNativeStrFromJsTaggedObj(value, "topstack");
+    std::string stack = GetNativeStrFromJsTaggedObj(value, "stack");
+    HILOG_ERROR("errorMsg: %{public}s", errorMsg.c_str());
+    HILOG_ERROR("errorName: %{public}s", errorName.c_str());
+    HILOG_ERROR("topStack: %{public}s", topStack.c_str());
+    HILOG_ERROR("stack: %{public}s", stack.c_str());
+    if (jsErrorCallback_) {
+        jsErrorCallback_(bundleName_ + errorName, errorMsg + stack);
+    }
+}
+
+std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const char* key)
+{
+    if (obj == nullptr) {
+        HILOG_ERROR("get value failed");
+        return "";
+    }
+
+    napi_value valueStr = nullptr;
+    napi_env env = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNapiEnv();
+    napi_get_named_property(env, obj, key, &valueStr);
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, valueStr, &valueType);
+    if (valueType != napi_string) {
+        HILOG_ERROR("convert value failed");
+        return "";
+    }
+
+    size_t valueStrBufLength = 0;
+    napi_get_value_string_utf8(env, valueStr, nullptr, 0, &valueStrBufLength);
+    auto valueCStr = std::make_unique<char[]>(valueStrBufLength + 1);
+    size_t valueStrLength = 0;
+    napi_get_value_string_utf8(env, valueStr, valueCStr.get(), valueStrBufLength + 1, &valueStrLength);
+    std::string ret(valueCStr.get(), valueStrLength);
+    return ret;
+}
+
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS

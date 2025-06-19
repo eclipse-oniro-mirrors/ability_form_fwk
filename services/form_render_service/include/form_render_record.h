@@ -64,6 +64,7 @@ private:
 
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
+    using JsErrorCallback = std::function<void(const std::string &, const std::string &)>;
     /**
      * @brief Create a FormRenderRecord.
      * @param bundleName The bundleName of form bundle.
@@ -145,6 +146,7 @@ public:
     size_t FormCount();
 
     void UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth);
+    void SetJsErrorCallback(JsErrorCallback callback = nullptr);
 private:
     class RemoteObjHash {
     public:
@@ -237,7 +239,7 @@ private:
         int64_t formId, const std::string &compId, bool hasRelease);
 
     void RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds, const sptr<IFormSupply> &formSupplyClient);
-    
+
     void ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient);
 
     void ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos);
@@ -304,6 +306,10 @@ private:
     void DeleteAndUpdateRecycledFormCompIds(int64_t formId,
         const std::pair<std::vector<std::string>, std::string>& compIds, const bool needUpdate);
 
+    void RegisterNapiUncaughtExceptionHandler();
+    void OnJsError(napi_value value);
+    std::string GetNativeStrFromJsTaggedObj(napi_value obj, const char* key);
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 
@@ -341,6 +347,7 @@ private:
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
     std::atomic<int> renderFormTasksNum = 0;
+    JsErrorCallback jsErrorCallback_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

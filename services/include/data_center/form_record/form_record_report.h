@@ -33,7 +33,8 @@ enum HiSysEventPointType {
     TYPE_ACTIVE_RECVOER_UPDATE,
     TYPE_PASSIVE_RECOVER_UPDATE,
     TYPE_HF_RECOVER_UPDATE,
-    TYPE_OFFLOAD_RECOVER_UPDATE
+    TYPE_OFFLOAD_RECOVER_UPDATE,
+    TYPE_DISABLE_FORM_INTERCEPT,
 };
 
 struct FormRecordReportInfo {
@@ -46,6 +47,7 @@ struct FormRecordReportInfo {
     int32_t passiveRecoverRefreshTimes;
     int32_t hfRecoverRefreshTimes;
     int32_t offloadRecoverRefreshTimes;
+    int32_t disableFormRefreshTimes;
 };
 
 class FormRecordReport final : public DelayedRefSingleton<FormRecordReport> {
@@ -55,12 +57,13 @@ public:
 public:
     void ClearReportInfo();
     void IncreaseUpdateTimes(int64_t formId, HiSysEventPointType type);
-    std::map<int64_t, FormRecordReportInfo> &GetFormRecords();
+    std::map<int64_t, std::queue<FormRecordReportInfo>> &GetFormRecords();
     void SetFormRecordRecordInfo(int64_t formId, const Want &want);
     void HandleFormRefreshCount();
+    void AddNewDayReportInfo();
 private:
     mutable std::mutex formRecordReportMutex_;
-    std::map<int64_t, FormRecordReportInfo> formRecordReportMap_;
+    std::map<int64_t, std::queue<FormRecordReportInfo>> formRecordReportMap_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

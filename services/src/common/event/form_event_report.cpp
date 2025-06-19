@@ -31,6 +31,7 @@ constexpr const char *EVENT_KEY_MODULE_NAME = "MODULE_NAME";
 constexpr const char *EVENT_KEY_ABILITY_NAME = "ABILITY_NAME";
 constexpr const char *EVENT_KEY_HOST_BUNDLE_NAME = "HOST_BUNDLE_NAME";
 constexpr const char *EVENT_KEY_ERROR_TYPE = "ERROR_TYPE";
+constexpr const char *EVENT_KEY_ERROR_CODE = "ERROR_CODE";
 constexpr const char *EVENT_KEY_SESSION_ID = "SESSION_ID";
 constexpr const char *EVENT_KEY_BIND_DURATION = "BIND_DURATION";
 constexpr const char *EVENT_KEY_GET_DURATION = "GET_DURATION";
@@ -48,6 +49,7 @@ constexpr const char *EVENT_KEY_ACTIVE_RECOVER_REFRESH_TIMES = "ACTIVE_RECOVER_R
 constexpr const char *EVENT_KEY_PASSIVER_RECOVER_REFRESH_TIMES = "PASSIVER_RECOVER_REFRESH_TIMES";
 constexpr const char *EVENT_KEY_HF_RECOVER_REFRESH_TIMES = "HF_RECOVER_REFRESH_TIMES";
 constexpr const char *EVENT_KEY_OFFLOAD_RECOVER_REFRESH_TIMES = "OFFLOAD_RECOVER_REFRESH_TIMER";
+constexpr const char *EVENT_KEY_DISABLE_FORM_REFRESH_TIMES = "DISABLE_REFRESH_TIMES";
 constexpr const char *EVENT_KEY_CLIENT_BUNDLE_NAME = "CLIENT_BUNDLE_NAME";
 constexpr const char *EVENT_KEY_FORM_BUNDLE_NAME = "FORM_BUNDLE_NAME";
 constexpr const char *EVENT_KEY_FORM_APP_PID = "FORM_APP_PID";
@@ -55,6 +57,8 @@ constexpr const char *EVENT_KEY_TIMESTAMP = "TIMESTAMP";
 constexpr const char *EVENT_KEY_RENDERING_MODE = "RENDERING_MODE";
 constexpr const char *EVENT_KEY_CONDITION_TYPE = "CONDITION_TYPE";
 constexpr const char *EVENT_KEY_BUNDLE_FORMNAME = "BUNDLE_FORMNAME";
+constexpr const char *EVENT_KEY_WITH_SNAPSHOT = "WITH_SNAPSHOT";
+constexpr const char *INVALIDEVENTNAME = "INVALIDEVENTNAME";
 constexpr const char *FORM_STORAGE_DIR_PATH = "/data/service/el1/public/database/form_storage";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
@@ -88,6 +92,11 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
         FormEventName::CONDITION_UPDATE_FORM, "CONDITION_UPDATE_FORM"),
     std::map<FormEventName, std::string>::value_type(
         FormEventName::LOAD_STAGE_FORM_CONFIG_INFO, "LOAD_STAGE_FORM_CONFIG_INFO"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::DELETE_FORM_FAILED, "DELETE_FORM_FAILED"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::UPDATE_FORM_FAILED, "UPDATE_FORM_FAILED"),
+    std::map<FormEventName, std::string>::value_type(
+        FormEventName::RECYCLE_RECOVER_FORM_FAILED, "RECYCLE_RECOVER_FORM_FAILED"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_PUBLIC_FORM, "REQUEST_PUBLIC_FORM"),
 };
 }
 
@@ -95,7 +104,7 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
     const FormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -142,7 +151,7 @@ void FormEventReport::SendSecondFormEvent(const FormEventName &eventName, HiSysE
     const FormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -185,7 +194,7 @@ void FormEventReport::SendThirdFormEvent(const FormEventName &eventName, HiSysEv
     const FormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -209,14 +218,13 @@ void FormEventReport::SendThirdFormEvent(const FormEventName &eventName, HiSysEv
 void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, HiSysEventType type, int64_t errorType)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
     switch (eventName) {
         case FormEventName::INIT_FMS_FAILED:
         case FormEventName::CALLEN_DB_FAILED:
-        case FormEventName::ADD_FORM_FAILED:
             HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_ERROR_TYPE, errorType);
             break;
         default:
@@ -228,7 +236,7 @@ void FormEventReport::SendFormRefreshCountEvent(const FormEventName &eventName, 
     const NewFormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -246,14 +254,15 @@ void FormEventReport::SendFormRefreshCountEvent(const FormEventName &eventName, 
             EVENT_KEY_ACTIVE_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.activeRecoverRefreshTimes),
             EVENT_KEY_PASSIVER_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.passiveRecoverRefreshTimes),
             EVENT_KEY_HF_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.hfRecoverRefreshTimes),
-            EVENT_KEY_OFFLOAD_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.offloadRecoverRefreshTimes));
+            EVENT_KEY_OFFLOAD_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.offloadRecoverRefreshTimes),
+            EVENT_KEY_DISABLE_FORM_REFRESH_TIMES, static_cast<int32_t>(eventInfo.disableFormRefreshTimes));
     }
 }
 void FormEventReport::SendFourthFormEvent(const FormEventName &eventName, HiSysEventType type,
     const NewFormEventInfo &eventInfo, const Want &want)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -288,7 +297,7 @@ void FormEventReport::SendFirstAddFormEvent(const FormEventName &eventName, HiSy
     const NewFormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -311,7 +320,7 @@ void FormEventReport::SendFirstUpdateFormEvent(const FormEventName &eventName, H
     const NewFormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -328,7 +337,7 @@ void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName
     const NewFormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -343,7 +352,7 @@ void FormEventReport::SendLoadStageFormConfigInfoEvent(const FormEventName &even
     const NewFormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
-    if (name == "INVALIDEVENTNAME") {
+    if (name == INVALIDEVENTNAME) {
         HILOG_ERROR("invalid eventName");
         return;
     }
@@ -373,13 +382,52 @@ void FormEventReport::SendDiskUseEvent()
         "FILE_OR_FOLDER_SIZE", filesSize);
 }
 
+void FormEventReport::SendRequestPublicFormEvent(const std::string &callerBundleName, const std::string &formName,
+    bool withSnapshot)
+{
+    HiSysEventWrite(
+        HiSysEvent::Domain::FORM_MANAGER,
+        "REQUEST_PUBLIC_FORM",
+        HiSysEventType::STATISTIC,
+        EVENT_KEY_BUNDLE_NAME, callerBundleName,
+        EVENT_KEY_FORM_NAME, formName,
+        EVENT_KEY_WITH_SNAPSHOT, withSnapshot);
+}
+
+void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_t formId, const std::string &bundleName,
+    const std::string &formName, int32_t errorType, int32_t errorCode)
+{
+    std::string name = ConvertEventName(eventName);
+    if (name == INVALIDEVENTNAME) {
+        HILOG_ERROR("invalid eventName");
+        return;
+    }
+    switch (eventName) {
+        case FormEventName::ADD_FORM_FAILED:
+        case FormEventName::DELETE_FORM_FAILED:
+        case FormEventName::UPDATE_FORM_FAILED:
+        case FormEventName::RECYCLE_RECOVER_FORM_FAILED:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_MANAGER, name,
+                HiSysEventType::FAULT,
+                EVENT_KEY_FORM_ID, formId,
+                EVENT_KEY_BUNDLE_NAME, bundleName,
+                EVENT_KEY_FORM_NAME, formName,
+                EVENT_KEY_ERROR_TYPE, errorType,
+                EVENT_KEY_ERROR_CODE, errorCode);
+            break;
+        default:
+            break;
+    }
+}
+
 std::string FormEventReport::ConvertEventName(const FormEventName &eventName)
 {
     auto it = EVENT_NAME_MAP.find(eventName);
     if (it != EVENT_NAME_MAP.end()) {
         return it->second;
     }
-    return "INVALIDEVENTNAME";
+    return INVALIDEVENTNAME;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
