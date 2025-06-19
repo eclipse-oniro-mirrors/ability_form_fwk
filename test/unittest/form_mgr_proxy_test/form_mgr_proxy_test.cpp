@@ -1650,7 +1650,6 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsSystemAppForm_002, TestSize.Level1
     GTEST_LOG_(INFO) << "FormMgrProxyTest_IsSystemAppForm_002 test ends";
 }
 
-
 /**
  * @tc.name: FormMgrProxyTest_StartAbilityByCrossBundle_001
  * @tc.desc: test StartAbilityByCrossBundle function.
