@@ -64,6 +64,7 @@ void ParamManager::InitParam()
     std::string path = Constants::FORM_MGR_CONFIG_DIR;
     if (presetVersionNum > pathVersionNum) {
         pathVersionNum = presetVersionNum;
+        pathVersion = presetVersion;
         path = PARAM_PRESET_PATH;
     }
     std::string currentVersion = g_currentVersion;
