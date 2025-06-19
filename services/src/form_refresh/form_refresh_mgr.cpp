@@ -17,6 +17,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
+#include "common/event/form_event_report.h"
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
@@ -46,7 +47,15 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
     HILOG_INFO("refreshInputType:%{public}d, formId:%{public}" PRId64, refreshType, data.formId);
     auto it = refreshMap.find(refreshType);
     if (it != refreshMap.end()) {
-        return it->second->RefreshFormInput(data);
+        int ret = it->second->RefreshFormInput(data);
+        if (ret != ERR_OK) {
+            FormEventReport::SendFormFailedEvent(FormEventName::UPDATE_FORM_FAILED,
+                data.formId,
+                data.record.bundleName,
+                data.record.formName,
+                refreshType,
+                ret);
+        }
     }
 
     HILOG_ERROR("invalid refreshType");

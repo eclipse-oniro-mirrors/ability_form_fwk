@@ -515,7 +515,10 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbInfo);
     HILOG_INFO("getDbRet:%{public}d, isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
     if (getDbRet == ERR_OK && dbInfo.isThemeForm) {
-        return DeleteThemeForm(formId);
+        int32_t ret = DeleteThemeForm(formId);
+        FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED, formId, dbInfo.bundleName,
+            dbInfo.formName, static_cast<int32_t>(DeleteFormErrorType::DELETE_THEME_FORM_FAILED), ret);
+        return ret;
     }
 #endif
     return DeleteCommonForm(formId, callerToken);
@@ -547,15 +550,22 @@ int FormMgrAdapter::DeleteCommonForm(const int64_t formId, const sptr<IRemoteObj
     // remove connection for in application form
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     FormDataProxyMgr::GetInstance().UnsubscribeFormData(matchedFormId);
-    if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
-        // delete temp form if receive delete form call
-        return HandleDeleteTempForm(matchedFormId, callerToken);
-    }
     RunningFormInfo runningFormInfo;
     FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
+        // delete temp form if receive delete form call
+        int ret = HandleDeleteTempForm(matchedFormId, callerToken);
+        if (ret != ERR_OK) {
+            FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED, formId, runningFormInfo.bundleName,
+                runningFormInfo.formName, static_cast<int32_t>(DeleteFormErrorType::DELETE_TEMP_FORM_FAILED), ret);
+        }
+        return ret;
+    }
     auto ret = HandleDeleteForm(matchedFormId, callerToken);
     if (ret != ERR_OK) {
         HILOG_ERROR("delete failed, form:%{public}" PRId64, formId);
+        FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED, formId, runningFormInfo.bundleName,
+            runningFormInfo.formName, static_cast<int32_t>(DeleteFormErrorType::DELETE_NORMAL_FORM_FAILED), ret);
         return ret;
     }
     HILOG_DEBUG("Checks if there is a listener listening for release form");
@@ -873,10 +883,10 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
         HILOG_WARN("param is not right");
         return;
     }
- 
+
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
- 
+
     FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
         RefreshCacheMgr::GetInstance().ConsumeRenderTask(formId);
@@ -902,7 +912,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("call");
+    HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("null callerToken");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -939,7 +949,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             (!formRecord.isSystemApp)) {
             continue;
         }
-        
+
         // Check the value of formVisibleNotify.
         bool appFormVisibleNotify = false;
         auto ret = FormInfoMgr::GetInstance().GetAppFormVisibleNotifyByBundleName(
@@ -1049,7 +1059,7 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
     } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
         FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
     }
-    
+
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::vector<int64_t> needConFormIds;
     if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
@@ -1268,6 +1278,11 @@ ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecor
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, castTempConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed");
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
+            formId,
+            record.bundleName,
+            record.formName,
+            static_cast<int32_t>(AddFormFiledErrorType::CONNECT_FORM_PROVIDER_FAILED));
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -1478,7 +1493,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     formConfigInfo.SetFormLocation((Constants::FormLocation)formLocation);
-    
+
     int renderingMode = want.GetParams().GetIntParam(Constants::PARAM_FORM_RENDERINGMODE_KEY,
         static_cast<int>(Constants::RenderingMode::FULL_COLOR));
     formConfigInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
@@ -2318,7 +2333,7 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
         HILOG_ERROR("formId ConvertStringToInt64 failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-        
+
     if (formPublishInterceptor_ == nullptr) {
         return AcquireAddFormResult(formId);
     }
@@ -4086,7 +4101,7 @@ ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t 
     if (!protect && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName)) {
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
- 
+
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, protect:%{public}d", userId, formInfos.size(), protect);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
@@ -4126,7 +4141,7 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
     }
 
     formRecord.protectForm = isLocked;
- 
+
     HILOG_INFO("formId:%{public}" PRId64 ", isLocked:%{public}d", formId, isLocked);
     FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, !isLocked);
     FormDataMgr::GetInstance().SetFormProtect(formId, isLocked);
@@ -4197,7 +4212,7 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
 
     std::string reportStr = "";
     std::set<std::string> reportList;
- 
+
     for (FormRecord& formRecord : formInfos) {
         RefreshData data;
         data.formId = formRecord.formId;
@@ -4228,12 +4243,12 @@ void FormMgrAdapter::PostVisibleNotify(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
- 
+
     auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken]() {
         FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
             formInstanceMaps, eventMaps, formVisibleType, callerToken);
     };
- 
+
     bool ret = FormMgrQueue::GetInstance().ScheduleTask(visibleNotifyDelay, task);
     if (!ret) {
         FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
@@ -4329,14 +4344,14 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
 
     // find matched formId
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    
+
     // check exist and get the formRecord
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    
+
     // check bundleName match
     if (formRecord.uid != callingUid) {
         HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d", formRecord.uid, callingUid);
@@ -4349,7 +4364,7 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
         HILOG_ERROR("Failed, application is locked");
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
-    
+
     Want want;
     want.SetElementName(formRecord.bundleName, formRecord.abilityName);
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);

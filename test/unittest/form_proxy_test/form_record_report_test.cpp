@@ -69,7 +69,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_002, TestSize.Level1)
     formRecordReport.IncreaseUpdateTimes(TEST_FORM_ID, TYPE_DAILY_REFRESH);
     auto it = formRecordReport.GetFormRecords().find(TEST_FORM_ID);
     ASSERT_NE(it, formRecordReport.GetFormRecords().end());
-    EXPECT_EQ(it->second.dailyRefreshTimes, 1);
+    EXPECT_EQ(it->second.back().dailyRefreshTimes, 1);
 }
 
 /**
@@ -94,11 +94,13 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_004, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.invisibleRefreshTimes = 0;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_INVISIBLE_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.invisibleRefreshTimes, 1);
+    EXPECT_EQ(iter->second.back().invisibleRefreshTimes, 1);
 }
 
 /**
@@ -111,11 +113,13 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_005, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.hfRefreshBlockTimes = 0;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_HIGH_FREQUENCY;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.hfRefreshBlockTimes, 1);
+    EXPECT_EQ(iter->second.back().hfRefreshBlockTimes, 1);
 }
 
 /**
@@ -128,11 +132,13 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_006, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.invisibleRefreshBlockTimes = 0;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_INVISIBLE_INTERCEPT;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.invisibleRefreshBlockTimes, 1);
+    EXPECT_EQ(iter->second.back().invisibleRefreshBlockTimes, 1);
 }
 
 /**
@@ -145,11 +151,13 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_007, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.highLoadRefreshBlockTimes = 1;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_HIGH_LOAD;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.highLoadRefreshBlockTimes, 0);
+    EXPECT_EQ(iter->second.back().highLoadRefreshBlockTimes, 0);
 }
 
 /**
@@ -162,11 +170,13 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_008, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.activeRecoverRefreshTimes = 1;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_ACTIVE_RECVOER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.activeRecoverRefreshTimes, 0);
+    EXPECT_EQ(iter->second.back().activeRecoverRefreshTimes, 0);
 }
 
 /**
@@ -179,11 +189,13 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_009, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.passiveRecoverRefreshTimes = 0;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_PASSIVE_RECOVER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.passiveRecoverRefreshTimes, 1);
+    EXPECT_EQ(iter->second.back().passiveRecoverRefreshTimes, 1);
 }
 
 /**
@@ -196,11 +208,13 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_010, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.hfRecoverRefreshTimes = 0;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_HF_RECOVER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.hfRecoverRefreshTimes, 1);
+    EXPECT_EQ(iter->second.back().hfRecoverRefreshTimes, 1);
 }
 
 /**
@@ -213,10 +227,12 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_011, TestSize.Level1)
     FormRecordReportInfo formRecordReportInfo;
     formRecordReportInfo.offloadRecoverRefreshTimes = 1;
     int64_t formId = 1;
-    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
     HiSysEventPointType type = TYPE_OFFLOAD_RECOVER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
-    EXPECT_EQ(iter->second.offloadRecoverRefreshTimes, 0);
+    EXPECT_EQ(iter->second.back().offloadRecoverRefreshTimes, 0);
 }
 } // namespace

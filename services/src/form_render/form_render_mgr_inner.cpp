@@ -36,6 +36,7 @@
 #include "os_account_manager.h"
 #include "want.h"
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"
+#include "data_center/form_record/form_record_report.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "form_host/form_host_task_mgr.h"
 #include "status_mgr_center/form_status.h"
@@ -93,6 +94,11 @@ ErrCode FormRenderMgrInner::RenderForm(
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed");
         FormRenderMgr::GetInstance().HandleConnectFailed(formRecord.formId, errorCode);
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
+            formRecord.formId,
+            formRecord.bundleName,
+            formRecord.formName,
+            static_cast<int32_t>(AddFormFiledErrorType::CONNECT_FORM_RENDER_FAILED));
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -187,6 +193,8 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     if (!formRecord.enableForm) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formRecord.formId, true);
+        FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId,
+            HiSysEventPointType::TYPE_DISABLE_FORM_INTERCEPT);
         return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
     }
     Want want;
@@ -226,7 +234,7 @@ void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleNam
         HILOG_ERROR("get bundle info failed. %{public}s", bundleName.c_str());
         return;
     }
-    
+
     want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, static_cast<int32_t>(bundleInfo.compatibleVersion));
     want.SetParam(Constants::FORM_TARGET_VERSION_KEY, static_cast<int32_t>(bundleInfo.targetVersion));
 }

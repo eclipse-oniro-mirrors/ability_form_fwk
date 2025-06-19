@@ -161,6 +161,8 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         formId, record.enableForm);
     if (!record.enableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
+        FormRecordReport::GetInstance().IncreaseUpdateTimes(formId,
+            HiSysEventPointType::TYPE_DISABLE_FORM_INTERCEPT);
         return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
     }
     bool isCountTimerRefresh = want.GetBoolParam(Constants::KEY_IS_TIMER, false);
@@ -185,7 +187,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
             return ERR_OK;
         }
     }
-    
+
     if (refreshType == Constants::REFRESHTYPE_VISIABLE) {
         FormDataMgr::GetInstance().GetRefreshType(formId, refreshType);
         HILOG_INFO("refreshType:%{public}d", refreshType);
@@ -238,7 +240,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
 void FormProviderMgr::DelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want)
 {
     HILOG_INFO("start");
- 
+
     auto delayRefreshForms = [updatedForms, want]() {
         for (const auto &updatedForm : updatedForms) {
             ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
@@ -257,7 +259,7 @@ void FormProviderMgr::PostEnterpriseAppInstallFailedRetryTask(const int64_t form
     bool isVisibleToFresh)
 {
     HILOG_DEBUG("start");
- 
+
     auto refreshForm = [formId, want, isVisibleToFresh]() {
         FormProviderMgr::GetInstance().RefreshForm(formId, want, isVisibleToFresh);
     };
@@ -629,7 +631,7 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
 {
     HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s", formId,
         record.bundleName.c_str(), record.abilityName.c_str());
- 
+
     sptr<IAbilityConnection> formLocationConnection = new (std::nothrow) FormLocationConnection(formId, want,
         record.bundleName, record.abilityName);
     if (formLocationConnection == nullptr) {

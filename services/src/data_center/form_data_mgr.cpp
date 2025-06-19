@@ -349,8 +349,9 @@ int FormDataMgr::CheckTempEnoughForm() const
 
     if (GetTempFormCount() >= maxTempSize) {
         HILOG_WARN("already exist %{public}d temp forms in system", maxTempSize);
-        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT));
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
+            static_cast<int32_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT),
+            ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
     }
     return ERR_OK;
@@ -387,8 +388,9 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     HILOG_INFO("already use %{public}d forms by userId", formDbInfoSize);
     if (formDbInfoSize >= maxFormsSize) {
         HILOG_WARN("exceeds max form number %{public}d", maxFormsSize);
-        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT));
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
+            static_cast<int32_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT),
+            ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
 
@@ -1126,7 +1128,7 @@ void FormDataMgr::SetHostRefresh(const int64_t formId, const bool hostRefresh)
     }
     itFormRecord->second.isHostRefresh = hostRefresh;
 }
- 
+
 /**
  * @brief Clear want cache for FormRecord.
  * @param formId The Id of the form.
@@ -3009,7 +3011,7 @@ void FormDataMgr::PostDelayRecheckWhetherNeedCleanFormHostTask(
     const int callerUid, const sptr<IRemoteObject> &remoteObjectOfHost)
 {
     HILOG_DEBUG("start");
- 
+
     auto recheckWhetherNeedCleanFormHost = [remoteObjectOfHost]() {
         FormDataMgr::GetInstance().RecheckWhetherNeedCleanFormHost(remoteObjectOfHost);
     };

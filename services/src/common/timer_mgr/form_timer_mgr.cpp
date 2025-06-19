@@ -23,6 +23,7 @@
 #include "ffrt.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
 #include "common/timer_mgr/form_timer_option.h"
 #include "common/util/form_util.h"
@@ -143,7 +144,7 @@ bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::v
             return false;
         }
     }
-    
+
     if (!UpdateLimiterAlarm()) {
         HILOG_ERROR("UpdateLimiterAlarm failed");
         return false;
@@ -429,6 +430,8 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
 
     if (!record.isSystemApp && nextGapTime < Constants::MIN_NEXT_TIME) {
         HILOG_ERROR("invalid nextGapTime:%{public}ld", nextGapTime);
+        FormEventReport::SendFormFailedEvent(FormEventName::UPDATE_FORM_FAILED, formId,
+            record.bundleName, record.formName, TYPE_TIMER, ERR_APPEXECFWK_FORM_INVALID_PARAM);
         return false;
     }
     int64_t timeInSec = GetBootTimeMs();
@@ -620,6 +623,7 @@ bool FormTimerMgr::HandleResetLimiter()
 
     std::vector<FormTimer> remindTasks;
     bool bGetTasks = GetRemindTasks(remindTasks);
+    FormRecordReport::GetInstance().AddNewDayReportInfo();
     if (bGetTasks) {
         HILOG_INFO("failed,remind when reset limiter");
         for (auto &task : remindTasks) {
@@ -1020,7 +1024,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
         }
         currentUpdateAtWantAgent_ = wantAgent;
     }
-    
+
     updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
         static_cast<uint64_t>(nextTime));
@@ -1117,7 +1121,7 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     tmAtTime.tm_hour = Constants::MAX_HOUR;
     tmAtTime.tm_min = Constants::MAX_MINUTE;
     int64_t limiterWakeUpTime = FormUtil::GetMillisecondFromTm(tmAtTime);
-    
+
     if (!CreateLimiterTimer()) {
         return false;
     }

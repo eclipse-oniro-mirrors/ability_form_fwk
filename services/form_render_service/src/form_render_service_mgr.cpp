@@ -185,6 +185,7 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
         search->second->Release();
     }
 
+    FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
     return ERR_OK;
 }
 
@@ -423,6 +424,7 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
 
+    FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
     return ERR_OK;
 }
 
@@ -525,6 +527,10 @@ int32_t FormRenderServiceMgr::UpdateRenderRecordByUid(const std::string &uid, Wa
             return RENDER_FORM_FAILED;
         }
 
+        auto callback = [](const std::string &errorName, const std::string &errorMsg) {
+            FormRenderServiceMgr::GetInstance().OnJsError(errorName, errorMsg);
+        };
+        record->SetJsErrorCallback(callback);
         record->SetConfiguration(configuration_);
         result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
         if (renderRecordMap_.empty()) {
@@ -609,6 +615,21 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
     }
     return ERR_OK;
 }
+
+void FormRenderServiceMgr::OnJsError(const std::string &errorName, const std::string &errorMsg)
+{
+    std::string uidList;
+    {
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        for (const auto &iter : renderRecordMap_) {
+            uidList += iter.first;
+        }
+    }
+    HILOG_ERROR("uidList: %{public}s, errorName: %{public}s, errorMsg: %{public}s", uidList.c_str(), errorName.c_str(),
+        errorMsg.c_str());
+    FormRenderEventReport::SendBlockFaultEvent(uidList, errorName, errorMsg);
+}
+
 }  // namespace FormRender
 }  // namespace AppExecFwk
 }  // namespace OHOS

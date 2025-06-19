@@ -53,6 +53,28 @@ enum class InitFmsFiledErrorType : int64_t {
 
 enum class AddFormFiledErrorType : int64_t {
     NUMBER_EXCEEDING_LIMIT = 1,
+    CONNECT_FORM_RENDER_FAILED,
+    CONNECT_FORM_PROVIDER_FAILED,
+};
+
+enum class UpdateFormErrorType : int64_t {
+    REQUEST_FORM_FAILED = 1,
+    UPDATE_FORM_FAILED,
+    PROXY_UPDATE_FORM_FAILED,
+    TIMER_UPDATE_FORM_FAILED,
+    FORM_VISIBLE_UPDATE_FAILED,
+};
+
+enum class DeleteFormErrorType : int64_t {
+    DELETE_THEME_FORM_FAILED = 1,
+    DELETE_TEMP_FORM_FAILED,
+    DELETE_NORMAL_FORM_FAILED,
+};
+
+enum class RecycleRecoverFormErrorType : int64_t {
+    RECYCLE_FORM_FAILED = 1,
+    RECOVER_FORM_FAILED,
+    CHECK_FORM_STATUS_FAILED
 };
 
 struct NewFormEventInfo {
@@ -78,6 +100,7 @@ struct NewFormEventInfo {
     int32_t passiveRecoverRefreshTimes;
     int32_t hfRecoverRefreshTimes;
     int32_t offloadRecoverRefreshTimes;
+    int32_t disableFormRefreshTimes;
     std::string clientBundleName = "";
     std::string formBundleName = "";
     int32_t conditionType;
@@ -110,7 +133,11 @@ enum class FormEventName {
     LAUNCH_FORM_APP,
     CONDITION_UPDATE_FORM,
     UNBIND_FORM_APP,
-    LOAD_STAGE_FORM_CONFIG_INFO
+    LOAD_STAGE_FORM_CONFIG_INFO,
+    DELETE_FORM_FAILED,
+    UPDATE_FORM_FAILED,
+    RECYCLE_RECOVER_FORM_FAILED,
+    REQUEST_PUBLIC_FORM,
 };
 
 class FormEventReport {
@@ -134,6 +161,10 @@ public:
     static void SendLoadStageFormConfigInfoEvent(const FormEventName &eventName, HiSysEventType type,
         const NewFormEventInfo &eventInfo);
     static void SendDiskUseEvent();
+    static void SendRequestPublicFormEvent(const std::string &callerBundleName, const std::string &formName,
+        bool withSnapshot = false);
+    static void SendFormFailedEvent(const FormEventName &eventName, int64_t formId, const std::string &bundleName,
+        const std::string &formName, int32_t errorType, int32_t errorCode = 0);
 private:
     static std::string ConvertEventName(const FormEventName &eventName);
 };

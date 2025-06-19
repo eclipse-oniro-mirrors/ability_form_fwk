@@ -20,6 +20,11 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr size_t REPORT_INFO_QUEUE_MAX_LEN = 2;
+constexpr size_t REPORT_INFO_QUEUE_MIN_LEN = 1;
+}
+
 FormRecordReport::FormRecordReport()
 {
 }
@@ -29,7 +34,7 @@ FormRecordReport::~FormRecordReport()
     ClearReportInfo();
 }
 
-std::map<int64_t, FormRecordReportInfo>& FormRecordReport::GetFormRecords()
+std::map<int64_t, std::queue<FormRecordReportInfo>>& FormRecordReport::GetFormRecords()
 {
     return formRecordReportMap_;
 }
@@ -39,7 +44,9 @@ void FormRecordReport::SetFormRecordRecordInfo(int64_t formId, const Want &want)
     FormRecordReportInfo info;
     std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     if (formRecordReportMap_.find(formId) == formRecordReportMap_.end()) {
-        formRecordReportMap_[formId] = info;
+        std::queue<FormRecordReportInfo> queue;
+        queue.push(info);
+        formRecordReportMap_[formId] = queue;
     }
 }
 
@@ -49,7 +56,11 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
     FormRecordReportInfo info;
     std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     if (formRecordReportMap_.find(formId) != formRecordReportMap_.end()) {
-        info = formRecordReportMap_[formId];
+        auto &queue = formRecordReportMap_[formId];
+        if (queue.empty()) {
+            queue.push(FormRecordReportInfo());
+        }
+        FormRecordReportInfo &info = formRecordReportMap_[formId].back();
         switch (type) {
             case TYPE_DAILY_REFRESH:
                 info.dailyRefreshTimes++;
@@ -78,6 +89,9 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
             case TYPE_OFFLOAD_RECOVER_UPDATE:
                 info.offloadRecoverRefreshTimes = 0;
                 break;
+            case TYPE_DISABLE_FORM_INTERCEPT:
+                info.disableFormRefreshTimes++;
+                break;
             default:
                 break;
         }
@@ -85,15 +99,18 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
     }
 }
 
+// Reports the form refresh statistics for the previous day.
+// After the report is successfully submitted, the data will be deleted.
 void FormRecordReport::HandleFormRefreshCount()
 {
     std::lock_guard<std::mutex> guard(formRecordReportMutex_);
-    for (const auto& entry : formRecordReportMap_) {
+    for (auto& entry : formRecordReportMap_) {
         int64_t formId = entry.first;
-        if (formId <= 0) {
+        auto &queue = entry.second;
+        if (formId <= 0 || queue.empty()) {
             return;
         }
-        FormRecordReportInfo record = entry.second;
+        FormRecordReportInfo record = queue.front();
         NewFormEventInfo eventInfo;
         eventInfo.formId = formId;
         eventInfo.bundleName = FormBasicInfoMgr::GetInstance().GetFormBundleName(formId);
@@ -108,15 +125,32 @@ void FormRecordReport::HandleFormRefreshCount()
         eventInfo.passiveRecoverRefreshTimes = record.passiveRecoverRefreshTimes;
         eventInfo.hfRecoverRefreshTimes = record.hfRecoverRefreshTimes;
         eventInfo.offloadRecoverRefreshTimes = record.offloadRecoverRefreshTimes;
+        eventInfo.disableFormRefreshTimes = record.disableFormRefreshTimes;
         FormEventReport::SendFormRefreshCountEvent(FormEventName::UPDATE_FORM_REFRESH_TIMES,
             HiSysEventType::STATISTIC, eventInfo);
+        while (queue.size() > REPORT_INFO_QUEUE_MIN_LEN) {
+            queue.pop();
+        }
     }
-    ClearReportInfo();
 }
 
 void FormRecordReport::ClearReportInfo()
 {
+    std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     formRecordReportMap_.clear();
 }
+
+void FormRecordReport::AddNewDayReportInfo()
+{
+    std::lock_guard<std::mutex> guard(formRecordReportMutex_);
+    for (auto &entry : formRecordReportMap_) {
+        auto &queue = entry.second;
+        if (queue.size() < REPORT_INFO_QUEUE_MAX_LEN) {
+            FormRecordReportInfo record;
+            queue.push(record);
+        }
+    }
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -40,7 +40,13 @@ class FormRenderEventReport {
 public:
     static int64_t GetNowMillisecond();
     static void SendPerformanceEvent(SceneType sceneType, PerformanceEventInfo &eventInfo);
-    static void SendBlockFaultEvent(pid_t processId, pid_t jsThreadId, std::string bundleName);
+    static void SendBlockFaultEvent(const std::string &bundleName, const std::string &errorName,
+        const std::string &errorMsg);
+    static void StartReleaseTimeoutReportTimer(int64_t formId, const std::string &uid);
+    static void StopReleaseTimeoutReportTimer(int64_t formId);
+
+private:
+    static std::unordered_map<int64_t, int32_t> waitReleaseTimerMap_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
