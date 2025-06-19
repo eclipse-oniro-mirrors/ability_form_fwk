@@ -782,6 +782,27 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
+   
+   /**
+     * @brief Register getFormRect proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns true for form register success
+     */
+    bool RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister get form rect proxy in fms
+     * @return Return true if unregister success
+     */
+    bool UnregisterGetFormRectProxy();
+ 
+    /**
+     * @brief Get the form rect.
+     * @param formId The formId.
+     * @param rect The desktop's rect related to the specified formId.
+     * @return Returns error code of method execute, which ERR_OK represents success.
+     */
+    ErrCode GetFormRect(const int64_t formId, Rect &rect);
 private:
     /**
      * @brief Connect form manager service.

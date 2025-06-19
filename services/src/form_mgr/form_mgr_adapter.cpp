@@ -4313,18 +4313,83 @@ ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const in
     return result;
 }
 
+bool FormMgrAdapter::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return false;
+    }
+    getFormRectCallerToken_ = callerToken;
+    return true;
+}
+
+bool FormMgrAdapter::UnregisterGetFormRectProxy()
+{
+    HILOG_INFO("call");
+    getFormRectCallerToken_ = nullptr;
+    return true;
+}
+ 
+ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)
+{
+    HILOG_INFO("call");
+    ErrCode checkResult = CallerCheck(formId, callingUid);
+    if (checkResult != ERR_OK) {
+        return checkResult;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(getFormRectCallerToken_);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    ErrCode result = remoteFormHostDelegateProxy->GetFormRect(formId, rect);
+ 
+    HILOG_DEBUG("GetFormRect, result:%{public}d", result);
+    return result;
+}
+
 ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t callingUid)
+{
+    HILOG_INFO("call");
+    ErrCode checkResult = CallerCheck(formId, callingUid);
+    if (checkResult != ERR_OK) {
+        return checkResult;
+    }
+    std::string supportLiveForm = OHOS::system::GetParameter(FORM_SUPPORT_LIVE, Constants::LIVE_FORM_NONE);
+    if (supportLiveForm != Constants::SCENE_ANIMATION && supportLiveForm != Constants::LIVE_FORM_BOTH) {
+        HILOG_ERROR("fms not support sceneAnimation of live form, support %{public}s", supportLiveForm.c_str());
+        return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
+    }
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    Want want;
+    want.SetElementName(formRecord.bundleName, formRecord.abilityName);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formRecord.formName);
+    FormInfo formInfo;
+    ErrCode errCode = GetFormInfo(want, formInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Get target form info failed");
+        return errCode;
+    }
+    if (formInfo.sceneAnimationParams.abilityName.empty()) {
+        HILOG_ERROR("SceneAnimationParams abilityName is empty");
+        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::CallerCheck(const int64_t formId, const int32_t callingUid)
 {
     HILOG_INFO("call");
     if (formId <= 0) {
         HILOG_ERROR("invalid formId, formId: %{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    std::string supportLiveForm = OHOS::system::GetParameter(FORM_SUPPORT_LIVE, Constants::LIVE_FORM_NONE);
-    if (supportLiveForm != Constants::SCENE_ANIMATION && supportLiveForm != Constants::LIVE_FORM_BOTH) {
-        HILOG_ERROR("fms not support sceneAnimation of live form, support %{public}s", supportLiveForm.c_str());
-        return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
     }
 
     // find matched formId
@@ -4347,20 +4412,6 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
     bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect("", formId);
     if (isBundleProtect) {
         HILOG_ERROR("Failed, application is locked");
-        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
-    }
-    
-    Want want;
-    want.SetElementName(formRecord.bundleName, formRecord.abilityName);
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);
-    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formRecord.formName);
-    FormInfo formInfo;
-    ErrCode errCode = GetFormInfo(want, formInfo);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("Get target form info failed");
-        return errCode;
-    }
-    if (formInfo.sceneAnimationParams.abilityName.empty()) {
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
     return ERR_OK;

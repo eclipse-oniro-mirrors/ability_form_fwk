@@ -310,6 +310,12 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleChangeSceneAnimationState(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY_BY_CROSS_BUNDLE):
             return HandleStartAbilityByCrossBundle(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_GET_FORM_RECT):
+            return HandleRegisterGetFormRectProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_GET_FORM_RECT):
+            return HandleUnregisterGetFormRectProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_RECT):
+            return HandleGetFormRect(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1920,6 +1926,48 @@ ErrCode FormMgrStub::HandleChangeSceneAnimationState(MessageParcel &data, Messag
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterGetFormRectProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("handle save query proxy to service");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    bool result = RegisterGetFormRectProxy(callerToken);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write proxy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterGetFormRectProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    bool result = UnregisterGetFormRectProxy();
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+ 
+ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+
+    Rect item;
+    ErrCode result = GetFormRect(formId, item);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write get form result result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result == ERR_OK) {
+        if (!reply.WriteParcelable(&item)) {
+            HILOG_ERROR("write form rect failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

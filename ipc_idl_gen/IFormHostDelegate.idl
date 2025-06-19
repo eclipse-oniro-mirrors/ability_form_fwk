@@ -9,8 +9,10 @@
 
 sequenceable OHOS.AAFwk.Want;
 sequenceable FormInstance..OHOS.AppExecFwk.OverflowInfo;
+sequenceable FormInstance..OHOS.AppExecFwk.Rect;
 interface OHOS.AppExecFwk.IFormHostDelegate {
     [ipccode 4002] void RouterEvent([in] long formId, [in] Want want);
     [ipccode 4003] void RequestOverflow([in] long formId, [in] OverflowInfo overflowInfo, [in] boolean isOverflow);
     [ipccode 4004] void ChangeSceneAnimationState([in] long formId, [in] int state);
+    [ipccode 4005] void GetFormRect([in] long formId, [inout] Rect rect);
 }

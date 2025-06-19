@@ -835,6 +835,36 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Set get form rect proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK for setting success.
+     */
+    virtual bool RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Unregister get form rect proxy in fms.
+     * @return Returns true for get form rect proxy unregister success.
+     */
+    virtual bool UnregisterGetFormRectProxy()
+    {
+        return false;
+    }
+ 
+    /**
+     * @brief Get the form rect.
+     * @param formId The formId.
+     * @param rect The desktop's rect related to the specified formId.
+     * @return Returns error code of method execute, which ERR_OK represents success.
+     */
+    virtual ErrCode GetFormRect(const int64_t formId, Rect &rect)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -933,6 +963,9 @@ public:
         FORM_MGR_REGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
         FORM_MGR_UNREGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
         FORM_MGR_CHANGE_SCENE_ANIMATION_STATE,
+        FORM_MGR_REGISTER_GET_FORM_RECT,
+        FORM_MGR_UNREGISTER_GET_FORM_RECT,
+        FORM_MGR_GET_FORM_RECT,
     };
 };
 }  // namespace AppExecFwk

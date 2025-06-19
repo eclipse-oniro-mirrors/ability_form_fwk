@@ -2104,5 +2104,24 @@ ErrCode FormMgrService::ChangeSceneAnimationState(const int64_t formId, int32_t 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapter::GetInstance().ChangeSceneAnimationState(formId, callingUid, state);
 }
+
+bool FormMgrService::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().RegisterGetFormRectProxy(callerToken);
+}
+
+bool FormMgrService::UnregisterGetFormRectProxy()
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().UnregisterGetFormRectProxy();
+}
+ 
+ErrCode FormMgrService::GetFormRect(const int64_t formId, Rect &rect)
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapter::GetInstance().GetFormRect(formId, callingUid, rect);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

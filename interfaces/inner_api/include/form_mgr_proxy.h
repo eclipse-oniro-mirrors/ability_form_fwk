@@ -729,6 +729,27 @@ public:
      */
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state) override;
 
+    /**
+     * @brief Register get form rect proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return true for register success.
+     */
+    bool RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister get form rect proxy in fms.
+     * @return Return true if unregister success.
+     */
+    bool UnregisterGetFormRectProxy() override;
+ 
+    /**
+     * @brief Get the form rect.
+     * @param formId The formId.
+     * @param rect The desktop's rect related to the specified formId.
+     * @return Returns error code of method execute, which ERR_OK represents success.
+     */
+    ErrCode GetFormRect(const int64_t formId, Rect &rect) override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

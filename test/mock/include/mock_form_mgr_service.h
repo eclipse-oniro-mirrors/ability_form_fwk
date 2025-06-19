@@ -127,6 +127,7 @@ public:
     MOCK_METHOD3(OpenFormEditAbility, ErrCode(const std::string &abilityName, const int64_t &formId, bool isMainPage));
     MOCK_METHOD3(RequestOverflow, ErrCode(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow));
     MOCK_METHOD2(ChangeSceneAnimationState, ErrCode(const int64_t formId, int32_t state));
+    MOCK_METHOD2(GetFormRect, ErrCode(const int64_t formId, Rect &rect));
 };
 }
 }
