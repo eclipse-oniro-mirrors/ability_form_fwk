@@ -1649,4 +1649,18 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsSystemAppForm_002, TestSize.Level1
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_IsSystemAppForm_002 test ends";
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_StartAbilityByCrossBundle_001
+ * @tc.desc: test StartAbilityByCrossBundle function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_StartAbilityByCrossBundle_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_StartAbilityByCrossBundle_001 start";
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    auto result = formMgrProxy->StartAbilityByCrossBundle(want);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_StartAbilityByCrossBundle_001 end";
+}
 }
