@@ -4430,19 +4430,6 @@ ErrCode FormMgrAdapter::CallerCheck(const int64_t formId, const int32_t callingU
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
 
-    Want want;
-    want.SetElementName(formRecord.bundleName, formRecord.abilityName);
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);
-    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formRecord.formName);
-    FormInfo formInfo;
-    ErrCode errCode = GetFormInfo(want, formInfo);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("Get target form info failed");
-        return errCode;
-    }
-    if (formInfo.sceneAnimationParams.abilityName.empty()) {
-        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
-    }
     return ERR_OK;
 }
 
