@@ -1385,4 +1385,19 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0183, TestSize.Level1)
     formTaskMgr->PostConnectNetWork();
     GTEST_LOG_(INFO) << "FormMgrService_0183 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0184
+ * @tc.name: test getFormRect function.
+ * @tc.desc: Verify that the getFormRect interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0184, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0184 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    Rect rect;
+    EXPECT_EQ(formMgrService.GetFormRect(formId, rect), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0184 end";
+}
 }

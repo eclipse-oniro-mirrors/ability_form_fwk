@@ -144,6 +144,7 @@ napi_value CreateFunInteractionParamsDatas(napi_env env,
     const OHOS::AppExecFwk::FormFunInteractionParams &funInteractionParamsDatas);
 napi_value CreateSceneAnimationParamsDatas(napi_env env,
     const OHOS::AppExecFwk::FormSceneAnimationParams &sceneAnimationParamsDatas);
+bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */

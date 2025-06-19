@@ -3285,4 +3285,27 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0134, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0134 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0135
+ * @tc.name: Verify OnRemoteRequest and HandleGetFormRect
+ * @tc.desc: When the parameter code is FORM_MGR_GET_FORM_RECT, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0135, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0135 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1;
+    Rect rect;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_RECT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64(formId);
+    data.WriteParcelable(&rect);
+    EXPECT_CALL(*mockFormMgrService, GetFormRect(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0135 ends";
+}
 }

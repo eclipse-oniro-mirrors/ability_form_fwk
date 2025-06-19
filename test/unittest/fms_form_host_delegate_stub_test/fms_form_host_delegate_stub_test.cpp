@@ -90,6 +90,11 @@ public:
         return ERR_OK;
     }
 
+    ErrCode GetFormRect(const int64_t formId, Rect &rect) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 
@@ -299,6 +304,61 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_011, TestSize.Lev
     data.WriteInt64(TEST_FORM_ID);
     data.WriteInt32(state);
     constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_CHANGE_SCENE_ANIMATION_STATE);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_12
+ * @tc.desc: Verify OnRemoteRequest function and remoteDescriptor is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_12, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_GET_FORM_RECT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_TRANSACTION_FAILED);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_013
+ * @tc.desc: Verify OnRemoteRequest function and memberFunc is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_013, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_GET_FORM_RECT) + 100;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
+}
+
+/**
+ * @tc.name: FormHostDelegateStubTest_014
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleGetFormRect interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_014, TestSize.Level0)
+{
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    ASSERT_NE(callback, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    Rect rect;
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    data.WriteInt64(TEST_FORM_ID);
+    data.WriteParcelable(&rect);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_GET_FORM_RECT);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }

@@ -786,6 +786,27 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state) override;
+
+    /**
+     * @brief Register getFormRect proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns true if register success
+     */
+    bool RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister get form rect proxy in fms
+     * @return Return true if unregister success
+     */
+    bool UnregisterGetFormRectProxy() override;
+ 
+    /**
+     * @brief Get the form rect.
+     * @param formId The formId.
+     * @param rect The desktop's rect related to the specified formId.
+     * @return Returns error code of method execute, which ERR_OK represents success.
+     */
+    ErrCode GetFormRect(const int64_t formId, Rect &rect) override;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
