@@ -77,6 +77,7 @@
 #include "system_ability_definition.h"
 #include "common/event/form_event_report.h"
 #include "common/util/form_report.h"
+#include "data_center/form_cust_config_mgr.h"
 #include "data_center/form_record/form_record_report.h"
 #include "common/connection/form_ability_connection_reporter.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
@@ -107,7 +108,6 @@ const std::string FORM_CLICK_ROUTER = "router";
 const std::string FORM_CLICK_MESSAGE = "message";
 const std::string FORM_CLICK_CALL = "call";
 const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
-const std::string FORM_SUPPORT_LIVE = "persist.sys.fms.support.liveForm";
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 enum class AddFormTaskType : int64_t {
@@ -4356,9 +4356,8 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
     if (checkResult != ERR_OK) {
         return checkResult;
     }
-    std::string supportLiveForm = OHOS::system::GetParameter(FORM_SUPPORT_LIVE, Constants::LIVE_FORM_NONE);
-    if (supportLiveForm != Constants::SCENE_ANIMATION && supportLiveForm != Constants::LIVE_FORM_BOTH) {
-        HILOG_ERROR("fms not support sceneAnimation of live form, support %{public}s", supportLiveForm.c_str());
+    if (!FormCustConfigMgr::GetInstance().IsSupportSceneAnimation()) {
+        HILOG_ERROR("fms not support sceneAnimation of live form");
         return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
     }
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);

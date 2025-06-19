@@ -115,7 +115,10 @@ namespace Constants {
     constexpr const char* PARAM_DYNAMIC_NAME_KEY = "isDynamic";
     constexpr const char* RECYCLE_FORMS_USER_ID = "ohos.extra.param.key.recycle_forms_user_id";
     constexpr const char* PARAM_APP_CLONE_INDEX_KEY = "ohos.extra.param.key.appCloneIndex";
-
+    constexpr const char* PARAM_GAME_CARD_SUPPORT_KEY = "persist.sceneboard.desktop.game_card";
+    constexpr const char* PARAM_LIVE_FORM_SUPPORT_KEY = "persist.sys.fms.support.liveForm";
+    constexpr const char* PARAM_GAME_CARD_KEY = "gameType";
+    constexpr const char* PARAM_GAME_CARD_TYPE = "quick";
     // live form support type
     constexpr const char* LIVE_FORM_NONE = "0";
     constexpr const char* FUN_INTERACTION = "1";

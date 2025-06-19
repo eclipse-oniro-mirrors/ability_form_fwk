@@ -16,7 +16,9 @@
 #include "form_info.h"
 #include "form_info_filter.h"
 #include "data_center/form_info/form_info_storage.h"
+#include "data_center/form_cust_config_mgr.h"
 
+#include "form_constants.h"
 #include "fms_log_wrapper.h"
 #include "json_serializer.h"
 
@@ -42,8 +44,11 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         return;
     }
-    
+
     for (const auto &item : this->formInfos) {
+        if (IsFunInterFormInfoFiltered(item)) {
+            continue;
+        }
         formInfos.push_back(item);
     }
 }
@@ -100,6 +105,9 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
         if (!filter.supportShapes.empty() && !find_match_shapes(filter.supportShapes, item.supportShapes)) {
             continue;
         }
+        if (IsFunInterFormInfoFiltered(item)) {
+            continue;
+        }
         if (filter.supportDimensions.empty()) {
             formInfos.emplace_back(item);
         } else {
@@ -120,10 +128,42 @@ void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &mo
         return;
     }
     for (const auto &item : this->formInfos) {
+        if (IsFunInterFormInfoFiltered(item)) {
+            continue;
+        }
         if (item.moduleName == moduleName) {
             formInfos.push_back(item);
         }
     }
+}
+
+bool FormInfoStorage::IsFunInterFormInfoFiltered(const AppExecFwk::FormInfo &formInfo) const
+{
+    if (formInfo.funInteractionParams.targetBundleName.empty() && !IsGameCard(formInfo)) {
+        return false;
+    }
+
+    if (AppExecFwk::FormCustConfigMgr::GetInstance().IsSupportFunInteraction()) {
+        return false;
+    }
+
+    if (IsGameCard(formInfo) && AppExecFwk::FormCustConfigMgr::GetInstance().IsSupportGameCard()) {
+        return false;
+    }
+
+    HILOG_ERROR("fms not support fun interaction of bundleName: %{public}s", formInfo.bundleName.c_str());
+    return true;
+}
+
+bool FormInfoStorage::IsGameCard(const AppExecFwk::FormInfo &formInfo) const
+{
+    for (auto it = formInfo.customizeDatas.begin(); it != formInfo.customizeDatas.end(); ++it) {
+        if (it->name == AppExecFwk::Constants::PARAM_GAME_CARD_KEY &&
+            it->value == AppExecFwk::Constants::PARAM_GAME_CARD_TYPE) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void to_json(nlohmann::json &jsonObject, const FormInfoStorage &formInfoStorage)
@@ -145,5 +185,5 @@ void from_json(const nlohmann::json &jsonObject, FormInfoStorage &formInfoStorag
         formInfoStorage.formInfos = jsonObject.at(JSON_KEY_FORM_INFO).get<std::vector<AppExecFwk::FormInfo>>();
     }
 }
-} // namespace AppExecFwk
+} // namespace AAFwk
 } // namespace OHOS
