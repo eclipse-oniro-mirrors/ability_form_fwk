@@ -41,6 +41,8 @@ namespace {
 using namespace std;
 using namespace std::chrono;
 
+std::unordered_map<int64_t, int32_t> FormRenderEventReport::waitReleaseTimerMap_ = {};
+
 int64_t FormRenderEventReport::GetNowMillisecond()
 {
     system_clock::time_point pointTime = system_clock::now();
@@ -73,7 +75,6 @@ void FormRenderEventReport::SendBlockFaultEvent(const std::string &bundleName, c
         "FORM_BLOCK_CALLSTACK",
         HiSysEvent::EventType::FAULT,
         EVENT_KEY_BUNDLE_NAME, bundleName,
-        EVENT_KEY_FORM_BLOCK_APPNAME, bundleName);
         EVENT_KEY_ERROR_NAME, errorName,
         EVENT_KEY_ERROR_MSG, errorMsg);
 }
@@ -111,7 +112,6 @@ void FormRenderEventReport::StopReleaseTimeoutReportTimer(int64_t formId)
         HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
         FormRenderEventReport::waitReleaseTimerMap_.erase(iter);
     }
-}
 }
 
 } // namespace AppExecFwk

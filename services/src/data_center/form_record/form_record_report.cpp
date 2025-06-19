@@ -53,7 +53,6 @@ void FormRecordReport::SetFormRecordRecordInfo(int64_t formId, const Want &want)
 void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType type)
 {
     HILOG_DEBUG("formId:%{public}" PRId64, formId);
-    FormRecordReportInfo info;
     std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     if (formRecordReportMap_.find(formId) != formRecordReportMap_.end()) {
         auto &queue = formRecordReportMap_[formId];
@@ -95,7 +94,6 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
             default:
                 break;
         }
-        formRecordReportMap_[formId] = info;
     }
 }
 

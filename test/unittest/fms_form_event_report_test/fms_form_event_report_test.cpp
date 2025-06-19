@@ -309,8 +309,8 @@ HWTEST_F(FormFormEventReportTest, SendFormFailedEvent_0100, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::DELETE_FORM_FAILED;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "DELETE_FORM_FAILED");
-    std::string bundleName = 'testBundleName';
-    std::string formName = 'testFormName';
+    std::string bundleName = "testBundleName";
+    std::string formName = "testFormName";
     FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED, 0, bundleName, formName, 0, 0);
 }
 
@@ -324,8 +324,8 @@ HWTEST_F(FormFormEventReportTest, SendFormFailedEvent_0200, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::UPDATE_FORM_FAILED;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "UPDATE_FORM_FAILED");
-    std::string bundleName = 'testBundleName';
-    std::string formName = 'testFormName';
+    std::string bundleName = "testBundleName";
+    std::string formName = "testFormName";
     FormEventReport::SendFormFailedEvent(FormEventName::UPDATE_FORM_FAILED, 0, bundleName, formName, 0, 0);
 }
 
@@ -339,8 +339,8 @@ HWTEST_F(FormFormEventReportTest, SendFormFailedEvent_0300, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::RECYCLE_RECOVER_FORM_FAILED;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "RECYCLE_RECOVER_FORM_FAILED");
-    std::string bundleName = 'testBundleName';
-    std::string formName = 'testFormName';
+    std::string bundleName = "testBundleName";
+    std::string formName = "testFormName";
     FormEventReport::SendFormFailedEvent(FormEventName::RECYCLE_RECOVER_FORM_FAILED, 0, bundleName, formName, 0, 0);
 }
 
@@ -354,8 +354,8 @@ HWTEST_F(FormFormEventReportTest, SendFormFailedEvent_0400, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::ADD_FORM_FAILED;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "ADD_FORM_FAILED");
-    std::string bundleName = 'testBundleName';
-    std::string formName = 'testFormName';
+    std::string bundleName = "testBundleName";
+    std::string formName = "testFormName";
     FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, bundleName, formName, 0, 0);
 }
 
@@ -369,8 +369,8 @@ HWTEST_F(FormFormEventReportTest, SendRequestPublicFormEvent_0100, TestSize.Leve
 {
     FormEventName eventName = FormEventName::REQUEST_PUBLIC_FORM;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "REQUEST_PUBLIC_FORM");
-    std::string bundleName = 'testBundleName';
-    std::string formName = 'testFormName';
+    std::string bundleName = "testBundleName";
+    std::string formName = "testFormName";
     FormEventReport::SendRequestPublicFormEvent(bundleName, formName, true);
 }
 } // namespace AppExecFwk

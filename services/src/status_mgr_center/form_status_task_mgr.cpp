@@ -189,7 +189,6 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail recover form");
-        FormStatusMgr::GetInstance().ResetFormStatus(record.formId);
         FormEventReport::SendFormFailedEvent(FormEventName::RECYCLE_RECOVER_FORM_FAILED,
             record.formId,
             record.bundleName,
