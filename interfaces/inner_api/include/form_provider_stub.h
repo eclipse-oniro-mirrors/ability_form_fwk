@@ -135,6 +135,14 @@ private:
      */
     int32_t HandleNotifyFormLocationUpdate(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle NotifySizeChanged message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleNotifySizeChanged(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormProviderStub);
 };

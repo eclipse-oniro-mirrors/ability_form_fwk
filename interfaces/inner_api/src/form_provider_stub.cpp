@@ -71,6 +71,8 @@ int FormProviderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
             return HandleNotifyConfigurationUpdate(data, reply);
         case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_LOCATION_UPDATE):
             return HandleNotifyFormLocationUpdate(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_SIZE_CHANGED):
+            return HandleNotifySizeChanged(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -381,6 +383,34 @@ int32_t FormProviderStub::HandleNotifyFormLocationUpdate(MessageParcel &data, Me
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
  
+    return ERR_OK;
+}
+
+int32_t FormProviderStub::HandleNotifySizeChanged(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call.");
+    auto formId = data.ReadInt64();
+    std::string newDimesnion = data.ReadString();
+    std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
+    if (newRect == nullptr) {
+        HILOG_ERROR("Read newRect failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto remoteObj = data.ReadRemoteObject();
+    if (remoteObj == nullptr) {
+        HILOG_ERROR("get remoteObject failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = NotifySizeChanged(formId, newDimesnion, *newRect, *want, remoteObj);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return ERR_OK;
 }
 }  // namespace AppExecFwk

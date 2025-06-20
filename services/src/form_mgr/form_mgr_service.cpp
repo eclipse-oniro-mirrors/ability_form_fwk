@@ -84,6 +84,7 @@
 #include "form_mgr/form_mgr_queue.h"
 #include "common/util/form_task_common.h"
 #include "scene_board_judgement.h"
+#include "form_provider/form_provider_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -2141,6 +2142,17 @@ ErrCode FormMgrService::GetFormRect(const int64_t formId, Rect &rect)
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapter::GetInstance().GetFormRect(formId, callingUid, rect);
+}
+
+ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+{
+    HILOG_INFO("call");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("update formSize permission denied");
+        return ret;
+    }
+    return FormProviderMgr::GetInstance().ConnectAmsUpdateSize(formId, newDimesnion, newRect);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

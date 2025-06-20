@@ -554,6 +554,8 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
         CreateFunInteractionParamsDatas(env, formInfo.funInteractionParams));
     napi_set_named_property(env, objContext, "sceneAnimationParams",
         CreateSceneAnimationParamsDatas(env, formInfo.sceneAnimationParams));
+    napi_set_named_property(env, objContext, "resizable", CreateJsValue(env, formInfo.resizable));
+    napi_set_named_property(env, objContext, "groupId", CreateJsValue(env, formInfo.groupId));
 
     return objContext;
 }

@@ -157,6 +157,19 @@ public:
      */
     virtual int NotifyFormLocationUpdate(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Notify provider when the form size changed.
+     * @param formId The Id of the form to update.
+     * @param newDimesnion The dimesnion value to be updated.
+     * @param newRect The rect value to be updated.
+     * @param want Indicates the structure containing form info.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int NotifySizeChanged(const int64_t formId, const std::string &newDimesnion, const Rect &newRect,
+        const Want &want, const sptr<IRemoteObject> &callerToken) override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

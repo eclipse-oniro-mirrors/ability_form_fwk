@@ -23,6 +23,7 @@
 #include "iremote_broker.h"
 #include "want.h"
 #include "configuration.h"
+#include "form_instance.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -157,6 +158,21 @@ public:
     virtual int NotifyFormLocationUpdate(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken) = 0;
 
+    /**
+     * @brief Notify provider when the form size changed.
+     * @param formId The Id of the form to update.
+     * @param newDimesnion The dimesnion value to be updated.
+     * @param newRect The rect value to be updated.
+     * @param want Indicates the structure containing form info.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int NotifySizeChanged(const int64_t formId, const std::string &newDimesnion, const Rect &newRect,
+        const Want &want, const sptr<IRemoteObject> &callerToken)
+    {
+        return 0;
+    };
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -196,6 +212,9 @@ public:
         
         // ipc id for Acquire provider form data (3062)
         FORM_PROVIDER_NOTIFY_FORM_LOCATION_UPDATE,
+
+        // ipc id for notify provider size changed (3062)
+        FORM_PROVIDER_NOTIFY_SIZE_CHANGED,
     };
 };
 }  // namespace AppExecFwk

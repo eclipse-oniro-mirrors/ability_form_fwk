@@ -173,6 +173,7 @@ ohos_shared_library("libfms") {
     "services/src/form_provider/connection/form_location_connection.cpp",
     "services/src/form_provider/connection/form_msg_event_connection.cpp",
     "services/src/form_provider/connection/form_refresh_connection.cpp",
+    "services/src/form_provider/connection/form_update_size_connection.cpp",
     "services/src/form_provider/form_provider_mgr.cpp",
     "services/src/form_provider/form_supply_callback.cpp",
     "services/src/form_provider/form_provider_task_mgr.cpp",

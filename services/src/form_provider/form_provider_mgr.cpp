@@ -30,6 +30,7 @@
 #include "form_provider/connection/form_refresh_connection.h"
 #include "form_provider/connection/form_location_connection.h"
 #include "form_provider/connection/form_configuration_update_connection.h"
+#include "form_provider/connection/form_update_size_connection.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_report.h"
 #include "data_center/form_record/form_record_report.h"
@@ -731,6 +732,43 @@ ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &wan
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formRefreshConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed, err:%{public}d", errorCode);
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return ERR_OK;
+}
+
+/**
+ * @brief Connect provider for update form size.
+ * @param formId The Id of the form to update.
+ * @param newDimesnion The dimesnion value to be updated.
+ * @param newRect The rect value to be updated.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int64_t formId,
+    const std::string &newDimesnion, const Rect &newRect)
+{
+    HILOG_INFO("formId:%{public} " PRId64, formId);
+    FormRecord record;
+    bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!result) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    sptr<IAbilityConnection> formUpdateSizeConnection = new (std::nothrow) FormUpdateSizeConnection(formId,
+        record.bundleName, record.abilityName, newDimesnion, newRect);
+    if (formUpdateSizeConnection == nullptr) {
+        HILOG_ERROR("create FormUpdateSizeConnection failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    Want connectWant;
+    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connectWant.SetElementName(record.bundleName, record.abilityName);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formUpdateSizeConnection);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbility failed");
+        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
+            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
+        }
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;

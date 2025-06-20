@@ -208,6 +208,25 @@ void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEv
 }
 
 /**
+ * @brief Post size changed to form provider.
+ * @param formId The Id of the form to update.
+ * @param newDimesnion The dimesnion value to be updated.
+ * @param newRect The rect value to be updated.
+ * @param want The want of the form.
+ * @param remoteObject Form provider proxy object.
+ * @return none.
+ */
+void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const std::string &newDimesnion,
+    const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("Call.");
+    auto sizeChangedFunc = [formId, newDimesnion, newRect, want, remoteObject]() {
+        FormProviderTaskMgr::GetInstance().NotifySizeChanged(formId, newDimesnion, newRect, want, remoteObject);
+    };
+    FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, sizeChangedFunc);
+}
+
+/**
  * @brief Acquire provider formInfo.
  * @param formId The Id of the from.
  * @param want The want of the form.
@@ -510,6 +529,25 @@ void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const W
         return;
     }
     int error = formProviderProxy->NotifyFormLocationUpdate(formId, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("fail notify form update");
+    }
+}
+
+void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const std::string &newDimesnion,
+    const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("get formProviderProxy failed");
+        return;
+    }
+    int error = formProviderProxy->NotifySizeChanged(formId, newDimesnion, newRect,
+        want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail notify form update");

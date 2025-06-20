@@ -865,6 +865,18 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Update form size.
+     * @param formId The Id of the form to update.
+     * @param newDimesnion The dimesnion value to be updated.
+     * @param newRect The rect value to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -966,6 +978,7 @@ public:
         FORM_MGR_REGISTER_GET_FORM_RECT,
         FORM_MGR_UNREGISTER_GET_FORM_RECT,
         FORM_MGR_GET_FORM_RECT,
+        FORM_MGR_NOTIFY_UPDATE_FORM_SIZE,
     };
 };
 }  // namespace AppExecFwk

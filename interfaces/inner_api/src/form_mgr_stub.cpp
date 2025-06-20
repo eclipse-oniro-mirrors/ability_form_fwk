@@ -316,6 +316,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleUnregisterGetFormRectProxy(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_RECT):
             return HandleGetFormRect(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE):
+            return HandleNotifyUpdateFormSize(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1968,6 +1970,24 @@ ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply
         }
     }
     return result;
+}
+
+ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call");
+    int64_t formId = data.ReadInt64();
+    std::string newDimesnion = data.ReadString();
+    std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
+    if (newRect == nullptr) {
+        HILOG_ERROR("Read newRect failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = UpdateFormSize(formId, newDimesnion, *newRect);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

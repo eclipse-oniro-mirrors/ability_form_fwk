@@ -803,6 +803,16 @@ public:
      * @return Returns error code of method execute, which ERR_OK represents success.
      */
     ErrCode GetFormRect(const int64_t formId, Rect &rect);
+
+    /**
+     * @brief Update form size.
+     * @param formId The Id of the form to update.
+     * @param newDimesnion The dimesnion value to be updated.
+     * @param newRect The rect value to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect);
+
 private:
     /**
      * @brief Connect form manager service.

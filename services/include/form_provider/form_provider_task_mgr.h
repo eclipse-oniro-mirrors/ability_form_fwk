@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "iremote_object.h"
 #include "want.h"
+#include "form_instance.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -139,6 +140,19 @@ public:
     * @return none.
     */
     void PostRefreshLocationTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Post size changed to form provider.
+     * @param formId The Id of the form to update.
+     * @param newDimesnion The dimesnion value to be updated.
+     * @param newRect The rect value to be updated.
+     * @param want The want of the form.
+     * @param remoteObject Form provider proxy object.
+     * @return none.
+     */
+    void PostSizeChangedTask(const int64_t formId, const std::string &newDimesnion, const Rect &newRect,
+        const Want &want, const sptr<IRemoteObject> &remoteObject);
+
 private:
     /**
     * @brief Acquire provider formInfo.
@@ -231,6 +245,18 @@ private:
     * @return none.
     */
     void NotifyFormLocationUpdate(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Notify form provider for size changed.
+     * @param formId The Id of the form to update.
+     * @param newDimesnion The dimesnion value to be updated.
+     * @param newRect The rect value to be updated.
+     * @param want The want of the form.
+     * @param remoteObject Form provider proxy object.
+     * @return none.
+     */
+    void NotifySizeChanged(const int64_t formId, const std::string &newDimesnion, const Rect &newRect,
+        const Want &want, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
