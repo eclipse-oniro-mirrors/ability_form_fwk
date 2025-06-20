@@ -1977,7 +1977,7 @@ ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParc
     HILOG_INFO("Call");
     int64_t formId = data.ReadInt64();
     std::string newDimesnion = data.ReadString();
-    Rect* newRect = data.ReadParcelable<Rect>();
+    std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
     if (newRect == nullptr) {
         HILOG_ERROR("Read newRect failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1985,10 +1985,8 @@ ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParc
     ErrCode result = UpdateFormSize(formId, newDimesnion, *newRect);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write request result failed");
-        delete newRect;
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    delete newRect;
     return ERR_OK;
 }
 }  // namespace AppExecFwk

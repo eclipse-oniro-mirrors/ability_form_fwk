@@ -1986,13 +1986,13 @@ private:
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "3");
             return CreateJsUndefined(env);
         }
-        decltype(argc) convertArgc = 0;
         int64_t formId;
         if (!ConvertFromId(env, argv[PARAM0], formId)) {
             HILOG_ERROR("Convert formId failed");
             NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
             return CreateJsUndefined(env);
         }
+        decltype(argc) convertArgc = 0;
         convertArgc++;
         std::string newDimesnion("");
         if (!ConvertFromJsValue(env, argv[PARAM1], newDimesnion)) {
@@ -2013,20 +2013,12 @@ private:
             return CreateJsUndefined(env);
         }
         convertArgc++;
-        auto complete = [formId, newDimesnion, newRect](napi_env env, NapiAsyncTask &task, int32_t status) {
-            auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimesnion, *newRect);
-            if (ret == ERR_OK) {
-                task.ResolveWithNoError(env, CreateJsUndefined(env));
-            } else {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
-            }
-            delete newRect;
-        };
-        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
-        napi_value result = nullptr;
-        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnUpdateFormSize",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
-        return result;
+        auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimesnion, *newRect);
+        if (ret == ERR_OK) {
+            return CreateJsUndefined(env);
+        }
+        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+        return CreateJsUndefined(env);
     }
 
     bool ConvertFormRect(napi_env env, napi_value rect, AppExecFwk::Rect* newRect)

@@ -391,7 +391,7 @@ int32_t FormProviderStub::HandleNotifySizeChanged(MessageParcel &data, MessagePa
     HILOG_INFO("Call.");
     auto formId = data.ReadInt64();
     std::string newDimesnion = data.ReadString();
-    Rect* newRect = data.ReadParcelable<Rect>();
+    std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
     if (newRect == nullptr) {
         HILOG_ERROR("Read newRect failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
