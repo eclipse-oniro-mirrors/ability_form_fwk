@@ -2201,5 +2201,31 @@ ErrCode FormMgr::GetFormRect(const int64_t formId, Rect &rect)
     }
     return remoteProxy_->GetFormRect(formId, rect);
 }
+
+ErrCode FormMgr::UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+{
+    HILOG_INFO("UpdateFormSize formid:%{public}ld, newDimesnion:%{public}s, left:%{public}f, top:%{public}f,"
+        "width:%{public}f, height:%{public}f", formId, newDimesnion.c_str(), newRect.left, newRect.top,
+        newRect.width, newRect.height);
+    if (formId <= 0) {
+        HILOG_ERROR("UpdateFormSize failed, formId is invalid");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    ErrCode resultCode = Connect();
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed, errCode %{public}d", resultCode);
+        return resultCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    resultCode = remoteProxy_->UpdateFormSize(formId, newDimesnion, newRect);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail UpdateFormSize,errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

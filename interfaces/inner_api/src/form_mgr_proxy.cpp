@@ -2916,5 +2916,35 @@ ErrCode FormMgrProxy::GetFormRect(const int64_t formId, Rect &rect)
     rect = *result;
     return ERR_OK;
 }
+
+ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+{
+    HILOG_INFO("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("Write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(newDimesnion)) {
+        HILOG_ERROR("Write newDimesnion failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&newRect)) {
+        HILOG_ERROR("Write newRect failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest failed: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

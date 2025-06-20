@@ -424,6 +424,11 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUpdateFormLockedState);
     }
 
+    static napi_value UpdateFormSize(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUpdateFormSize);
+    }
+
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -1971,6 +1976,89 @@ private:
         }
         result = JsFormRouterProxyMgr::GetInstance()->UnregisterGetFormRectListener();
         return CreateJsValue(env, result);
+    }
+
+    napi_value OnUpdateFormSize(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_DEBUG("call");
+        if (argc != ARGS_THREE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "3");
+            return CreateJsUndefined(env);
+        }
+        decltype(argc) convertArgc = 0;
+        int64_t formId;
+        if (!ConvertFromId(env, argv[PARAM0], formId)) {
+            HILOG_ERROR("Convert formId failed");
+            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+        std::string newDimesnion("");
+        if (!ConvertFromJsValue(env, argv[PARAM1], newDimesnion)) {
+            HILOG_ERROR("convert newDimesnion failed");
+            NapiFormUtil::ThrowParamTypeError(env, "newDimesnion", "string");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+        AppExecFwk::Rect* newRect = new (std::nothrow) AppExecFwk::Rect {};
+        if (newRect == nullptr) {
+            HILOG_ERROR("Failed to new newRect");
+            return CreateJsUndefined(env);
+        }
+        if (!ConvertFormRect(env, argv[PARAM2], newRect)) {
+            HILOG_ERROR("convert newRect failed");
+            delete newRect;
+            NapiFormUtil::ThrowParamError(env, "The newRect is invalid");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+        auto complete = [formId, newDimesnion, newRect](napi_env env, NapiAsyncTask &task, int32_t status) {
+            auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimesnion, *newRect);
+            if (ret == ERR_OK) {
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+            }
+            delete newRect;
+        };
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnUpdateFormSize",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
+
+    bool ConvertFormRect(napi_env env, napi_value rect, AppExecFwk::Rect* newRect)
+    {
+        napi_valuetype type = napi_undefined;
+        napi_typeof(env, rect, &type);
+        if (type == napi_undefined || type == napi_null) {
+            HILOG_ERROR("input rect is undefined or null");
+            return false;
+        }
+        if (!GetAndConvertProperty(env, rect, "left", newRect->left) ||
+            !GetAndConvertProperty(env, rect, "top", newRect->top) ||
+            !GetAndConvertProperty(env, rect, "width", newRect->width) ||
+            !GetAndConvertProperty(env, rect, "height", newRect->height)) {
+            return false;
+        }
+        return true;
+    }
+
+    bool GetAndConvertProperty(napi_env env, napi_value object, const char* propertyName, double& outValue)
+    {
+        napi_value propertyValue;
+        napi_status status = napi_get_named_property(env, object, propertyName, &propertyValue);
+        if (status != napi_ok) {
+            HILOG_ERROR("Failed to get property: %{public}s", propertyName);
+            return false;
+        }
+        if (!ConvertFromJsValue(env, propertyValue, outValue)) {
+            HILOG_ERROR("ConvertFromJsValue %{public}s failed", propertyName);
+            return false;
+        }
+        return true;
     }
 };
 
