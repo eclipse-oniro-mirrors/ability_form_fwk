@@ -2204,9 +2204,7 @@ ErrCode FormMgr::GetFormRect(const int64_t formId, Rect &rect)
 
 ErrCode FormMgr::UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
 {
-    HILOG_INFO("UpdateFormSize formid:%{public}ld, newDimesnion:%{public}s, left:%{public}f, top:%{public}f,"
-        "width:%{public}f, height:%{public}f", formId, newDimesnion.c_str(), newRect.left, newRect.top,
-        newRect.width, newRect.height);
+    HILOG_INFO("UpdateFormSize formid:%{public}" PRId64, formId);
     if (formId <= 0) {
         HILOG_ERROR("UpdateFormSize failed, formId is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;

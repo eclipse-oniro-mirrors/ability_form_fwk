@@ -170,7 +170,7 @@ public:
     virtual int NotifySizeChanged(const int64_t formId, const std::string &newDimesnion, const Rect &newRect,
         const Want &want, const sptr<IRemoteObject> &callerToken)
     {
-        return 0; 
+        return 0;
     };
 
     enum class Message {

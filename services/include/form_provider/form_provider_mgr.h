@@ -155,7 +155,7 @@ public:
      ErrCode ConnectAmsChangeLocation(const int64_t formId, const FormRecord &record, const Want &want);
 
     /**
-     * @brief Connect ams for update form size.
+     * @brief Connect provider for update form size.
      * @param formId The Id of the form to update.
      * @param newDimesnion The dimesnion value to be updated.
      * @param newRect The rect value to be updated.

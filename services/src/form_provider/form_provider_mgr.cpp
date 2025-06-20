@@ -738,13 +738,14 @@ ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &wan
 }
 
 /**
- * @brief Connect ams for update form size.
+ * @brief Connect provider for update form size.
  * @param formId The Id of the form to update.
  * @param newDimesnion The dimesnion value to be updated.
  * @param newRect The rect value to be updated.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int64_t formId,
+    const std::string &newDimesnion, const Rect &newRect)
 {
     HILOG_INFO("formId:%{public} " PRId64, formId);
     FormRecord record;
