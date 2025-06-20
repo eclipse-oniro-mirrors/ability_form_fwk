@@ -2014,6 +2014,7 @@ private:
         }
         convertArgc++;
         auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimesnion, *newRect);
+        delete newRect;
         if (ret == ERR_OK) {
             return CreateJsUndefined(env);
         }
@@ -2023,6 +2024,10 @@ private:
 
     bool ConvertFormRect(napi_env env, napi_value rect, AppExecFwk::Rect* newRect)
     {
+        if (newRect == nullptr) {
+            HILOG_ERROR("input newRect is null");
+            return false;
+        }
         napi_valuetype type = napi_undefined;
         napi_typeof(env, rect, &type);
         if (type == napi_undefined || type == napi_null) {
