@@ -2102,6 +2102,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "setPublishFormResult", moduleName, JsFormHost::SetPublishFormResult);
     BindNativeFunction(env, exportObj, "addForm", moduleName, JsFormHost::AddForm);
     BindNativeFunction(env, exportObj, "updateFormLockedState", moduleName, JsFormHost::UpdateFormLockedState);
+    BindNativeFunction(env, exportObj, "updateFormSize", moduleName, JsFormHost::UpdateFormSize);
 
     return CreateJsUndefined(env);
 }
