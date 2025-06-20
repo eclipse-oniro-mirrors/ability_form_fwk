@@ -1663,4 +1663,45 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_StartAbilityByCrossBundle_001, TestS
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_StartAbilityByCrossBundle_001 end";
 }
+
+/*
+ * @tc.number: FormMgrProxyTest_RegisterGetFormRectProxy_001
+ * @tc.name: Verify RegisterGetFormRectProxy
+ * @tc.desc: text RegisterGetFormRectProxy function.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterGetFormRectProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterGetFormRectProxy_001 starts";
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    auto result = formMgrProxy->RegisterGetFormRectProxy(token);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterGetFormRectProxy_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UnregisterGetFormRectProxy_001
+ * @tc.name: Verify UnregisterGetFormRectProxy
+ * @tc.desc: text UnregisterGetFormRectProxy function.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterGetFormRectProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetFormRectProxy_001 starts";
+    auto result = formMgrProxy->UnregisterGetFormRectProxy();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetFormRectProxy_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_GetFormRect_001
+ * @tc.name: Verify GetFormRect
+ * @tc.desc: When the parameter code is FORM_MGR_GET_FORM_RECT, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_GetFormRect_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetFormRect_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    EXPECT_CALL(*mockFormMgrService, GetFormRect(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    constexpr int64_t formId = 1;
+    Rect rect;
+    auto result = formMgrProxy->GetFormRect(formId, rect);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetFormRect_001 ends";
+}
 }

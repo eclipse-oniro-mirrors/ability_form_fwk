@@ -4381,6 +4381,12 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+    // check whether application is locked
+    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, formId);
+    if (isBundleProtect) {
+        HILOG_ERROR("Failed, application is locked");
+        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+    }
     Want want;
     want.SetElementName(formRecord.bundleName, formRecord.abilityName);
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);
@@ -4421,14 +4427,6 @@ ErrCode FormMgrAdapter::CallerCheck(const int64_t formId, const int32_t callingU
         HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d", formRecord.uid, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-
-    // check whether application is locked
-    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect("", formId);
-    if (isBundleProtect) {
-        HILOG_ERROR("Failed, application is locked");
-        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
-    }
-
     return ERR_OK;
 }
 
