@@ -96,6 +96,7 @@ int32_t FormRenderServiceMgr::RenderForm(
     Want formRenderWant(want);
     const auto result = UpdateRenderRecordByUid(uid, formRenderWant, formJsInfo, formSupplyClient);
     if (result != ERR_OK) {
+        HILOG_ERROR("render form failed");
         FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
             formJsInfo.formId, FormFsmEvent::RENDER_FORM_FAIL, formSupplyClient);
     }
