@@ -740,12 +740,12 @@ ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &wan
 /**
  * @brief Connect provider for update form size.
  * @param formId The Id of the form to update.
- * @param newDimesnion The dimesnion value to be updated.
+ * @param newDimension The dimesnion value to be updated.
  * @param newRect The rect value to be updated.
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int64_t formId,
-    const std::string &newDimesnion, const Rect &newRect)
+    const std::string &newDimension, const Rect &newRect)
 {
     HILOG_INFO("formId:%{public} " PRId64, formId);
     FormRecord record;
@@ -755,7 +755,7 @@ ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int64_t formId,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     sptr<IAbilityConnection> formUpdateSizeConnection = new (std::nothrow) FormUpdateSizeConnection(formId,
-        record.bundleName, record.abilityName, newDimesnion, newRect);
+        record.bundleName, record.abilityName, newDimension, newRect);
     if (formUpdateSizeConnection == nullptr) {
         HILOG_ERROR("create FormUpdateSizeConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

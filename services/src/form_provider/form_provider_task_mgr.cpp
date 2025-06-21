@@ -210,18 +210,18 @@ void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEv
 /**
  * @brief Post size changed to form provider.
  * @param formId The Id of the form to update.
- * @param newDimesnion The dimesnion value to be updated.
+ * @param newDimension The dimesnion value to be updated.
  * @param newRect The rect value to be updated.
  * @param want The want of the form.
  * @param remoteObject Form provider proxy object.
  * @return none.
  */
-void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const std::string &newDimesnion,
+void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const std::string &newDimension,
     const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("Call.");
-    auto sizeChangedFunc = [formId, newDimesnion, newRect, want, remoteObject]() {
-        FormProviderTaskMgr::GetInstance().NotifySizeChanged(formId, newDimesnion, newRect, want, remoteObject);
+    auto sizeChangedFunc = [formId, newDimension, newRect, want, remoteObject]() {
+        FormProviderTaskMgr::GetInstance().NotifySizeChanged(formId, newDimension, newRect, want, remoteObject);
     };
     FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, sizeChangedFunc);
 }
@@ -535,7 +535,7 @@ void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const W
     }
 }
 
-void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const std::string &newDimesnion,
+void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const std::string &newDimension,
     const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("call");
@@ -546,7 +546,7 @@ void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const std::str
         HILOG_ERROR("get formProviderProxy failed");
         return;
     }
-    int error = formProviderProxy->NotifySizeChanged(formId, newDimesnion, newRect,
+    int error = formProviderProxy->NotifySizeChanged(formId, newDimension, newRect,
         want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         RemoveConnection(connectId);

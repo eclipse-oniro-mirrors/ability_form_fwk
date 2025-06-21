@@ -868,11 +868,11 @@ public:
     /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
-     * @param newDimesnion The dimesnion value to be updated.
+     * @param newDimension The dimesnion value to be updated.
      * @param newRect The rect value to be updated.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+    virtual ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect)
     {
         return ERR_OK;
     }

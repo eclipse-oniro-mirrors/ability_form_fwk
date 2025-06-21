@@ -390,7 +390,7 @@ int32_t FormProviderStub::HandleNotifySizeChanged(MessageParcel &data, MessagePa
 {
     HILOG_INFO("Call.");
     auto formId = data.ReadInt64();
-    std::string newDimesnion = data.ReadString();
+    std::string newDimension = data.ReadString();
     std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
     if (newRect == nullptr) {
         HILOG_ERROR("Read newRect failed");
@@ -406,7 +406,7 @@ int32_t FormProviderStub::HandleNotifySizeChanged(MessageParcel &data, MessagePa
         HILOG_ERROR("get remoteObject failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    auto result = NotifySizeChanged(formId, newDimesnion, *newRect, *want, remoteObj);
+    auto result = NotifySizeChanged(formId, newDimension, *newRect, *want, remoteObj);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
