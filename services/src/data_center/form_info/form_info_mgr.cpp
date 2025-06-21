@@ -255,7 +255,7 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
 {
     auto hapModuleInfoBegin = bundleInfo.hapModuleInfos.begin();
     auto hapModuleInfoEnd = bundleInfo.hapModuleInfos.end();
-    auto entryIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [] (const auto &hapInfo) {
+    auto entryIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [](const auto &hapInfo) {
         return (hapInfo.moduleType == ModuleType::ENTRY) && (!hapInfo.formWidgetModule.empty());
     });
  
@@ -263,7 +263,7 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
         return false;
     }
  
-    auto sharedIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [entryIt] (const auto &hapInfo) {
+    auto sharedIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [entryIt](const auto &hapInfo) {
         return (hapInfo.moduleType == ModuleType::SHARED) && (!hapInfo.formExtensionModule.empty()) &&
             ((entryIt->name == hapInfo.formExtensionModule) && (entryIt->formWidgetModule == hapInfo.name));
     });
