@@ -44,17 +44,17 @@ constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20;  // ms
 constexpr int32_t ENABLE_FORM_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
 constexpr int32_t FORM_CLIENT_INVALID = -1;
+constexpr int64_t MIN_DURATION_MS = 1500;
+constexpr int64_t TASK_ONCONFIGURATIONUPDATED_DELAY_MS = 1000;
+const std::string TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
+const std::string FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
 }  // namespace
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
 
 FormRenderServiceMgr::FormRenderServiceMgr()
 {
-    const std::string queueName = "FormRenderSerialQueue";
-    serialQueue_ = std::make_unique<FormRenderSerialQueue>(queueName);
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
-    }
+    serialQueue_ = std::make_unique<FormRenderSerialQueue>(FORM_RENDER_SERIAL_QUEUE);
 }
 
 FormRenderServiceMgr::~FormRenderServiceMgr() = default;
@@ -305,18 +305,16 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
     }
 #endif
 
-    constexpr int64_t minDurationMs = 1500;
-    const std::string taskName = "FormRenderServiceMgr::OnConfigurationUpdated";
-    serialQueue_->CancelDelayTask(taskName);
+    serialQueue_->CancelDelayTask(TASK_ONCONFIGURATIONUPDATED);
     auto duration = std::chrono::steady_clock::now() - configUpdateTime_;
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() < minDurationMs) {
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() < MIN_DURATION_MS) {
         HILOG_INFO("OnConfigurationUpdated ignored");
         auto configUpdateFunc = [this]() {
             HILOG_INFO("OnConfigurationUpdated task run");
             this->OnConfigurationUpdatedInner();
         };
-        constexpr int64_t taskDelayMs = 1000;
-        serialQueue_->ScheduleDelayTask(taskName, taskDelayMs, configUpdateFunc);
+        serialQueue_->ScheduleDelayTask(TASK_ONCONFIGURATIONUPDATED,
+            TASK_ONCONFIGURATIONUPDATED_DELAY_MS, configUpdateFunc);
         return;
     }
     OnConfigurationUpdatedInner();
@@ -327,6 +325,7 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
     sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
+        return;
     }
 
     configUpdateTime_ = std::chrono::steady_clock::now();
@@ -408,7 +407,7 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
     if (uid.empty() || eventId.empty()) {
-        HILOG_ERROR("empty uid,formId:%{public}" PRId64, formId);
+        HILOG_ERROR("empty uid or eventId, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
@@ -586,6 +585,7 @@ int32_t FormRenderServiceMgr::RecycleFormByUid(const std::string &uid, std::stri
         }
         auto ret = search->second->RecycleForm(formId, statusData);
         if (ret != ERR_OK) {
+            HILOG_ERROR("recycleForm failed, %{public}" PRId64, formId);
             return ret;
         }
     } else {
