@@ -251,6 +251,29 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
     return UpdateFormInfoStorageLocked();
 }
 
+bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)
+{
+    auto hapModuleInfoBegin = bundleInfo.hapModuleInfos.begin();
+    auto hapModuleInfoEnd = bundleInfo.hapModuleInfos.end();
+    auto entryIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [] (const auto &hapInfo) {
+        return (hapInfo.moduleType == ModuleType::ENTRY) && (!hapInfo.formWidgetModule.empty());
+    });
+ 
+    if (entryIt == hapModuleInfoEnd) {
+        return false;
+    }
+ 
+    auto sharedIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [entryIt] (const auto &hapInfo) {
+        return (hapInfo.moduleType == ModuleType::SHARED) && (!hapInfo.formExtensionModule.empty()) &&
+            ((entryIt->name == hapInfo.formExtensionModule) && (entryIt->formWidgetModule == hapInfo.name));
+    });
+    if (sharedIt == hapModuleInfoEnd) {
+        return false;
+    }
+    shared = *sharedIt;
+    return true;
+}
+
 ErrCode BundleFormInfo::Remove(int32_t userId)
 {
     HILOG_INFO("userId is %{public}d", userId);

@@ -48,6 +48,8 @@ private:
 
     static ErrCode GetFormInfoDisplayName(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager,
         FormInfo &formInfo);
+
+    static bool LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared);
 };
 
 class BundleFormInfo {
