@@ -141,7 +141,7 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
         return ERR_OK;
     }
 
-    auto task = [formRecord, want, remoteObject]() {
+    auto task = [formRecord, newWant = want, remoteObject]() {
         FormRecord newRecord(formRecord);
         std::string cacheData;
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
@@ -150,7 +150,7 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
             newRecord.formProviderInfo.SetFormDataString(cacheData);
             newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
         }
-        FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, want, remoteObject);
+        FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, newWant, remoteObject);
     };
     FormRenderMgr::GetInstance().AddPostRenderFormTask(formRecord.formId, task);
     return ERR_OK;

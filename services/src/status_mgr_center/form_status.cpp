@@ -70,6 +70,8 @@ void FormStatus::DeleteFormStatus(const int64_t formId)
     if (iter != formStatusMap_.end()) {
         HILOG_INFO("delete form status, formId:%{public}" PRId64, formId);
         formStatusMap_.erase(iter);
+    } else {
+        HILOG_INFO("not find formId:%{public}" PRId64, formId);
     }
 }
 }  // namespace AppExecFwk

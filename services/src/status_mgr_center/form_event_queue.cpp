@@ -65,6 +65,7 @@ bool FormEventQueue::IsEventQueueEmpty()
 
 const std::queue<FormEventTaskInfo> &FormEventQueue::GetEventQueue()
 {
+    std::lock_guard<std::mutex> lock(eventQueueMutex_);
     return eventQueue_;
 }
 }  // namespace AppExecFwk

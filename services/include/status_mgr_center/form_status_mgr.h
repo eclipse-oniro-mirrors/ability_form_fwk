@@ -131,7 +131,6 @@ private:
     /**
      * @brief Delete fsm info
      * @param formId Form ID
-     * @return Returns the execution result, success returns 0, failure returns -1
      */
     void ProcessTaskDelete(const int64_t formId);
 
