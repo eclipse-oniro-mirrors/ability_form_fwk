@@ -58,6 +58,7 @@ constexpr const char *EVENT_KEY_RENDERING_MODE = "RENDERING_MODE";
 constexpr const char *EVENT_KEY_CONDITION_TYPE = "CONDITION_TYPE";
 constexpr const char *EVENT_KEY_BUNDLE_FORMNAME = "BUNDLE_FORMNAME";
 constexpr const char *EVENT_KEY_WITH_SNAPSHOT = "WITH_SNAPSHOT";
+constexpr const char *EVENT_KEY_DISTRIBUTED_FORM = "DISTRIBUTED_FORM";
 constexpr const char *INVALIDEVENTNAME = "INVALIDEVENTNAME";
 constexpr const char *FORM_STORAGE_DIR_PATH = "/data/service/el1/public/database/form_storage";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
@@ -133,6 +134,13 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
                 EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName);
             break;
         case FormEventName::ADD_FORM:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_MANAGER,
+                name,
+                type,
+                EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm,
+                EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension));
+            break;
         case FormEventName::ROUTE_EVENT_FORM:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER, name, type,
@@ -171,7 +179,9 @@ void FormEventReport::SendSecondFormEvent(const FormEventName &eventName, HiSysE
         case FormEventName::DELETE_FORM:
             HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
                 EVENT_KEY_FORM_ID, eventInfo.formId,
-                EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName);
+                EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName,
+                EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm,
+                EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension));
             break;
         case FormEventName::CASTTEMP_FORM:
         case FormEventName::RELEASE_FORM:
@@ -275,7 +285,8 @@ void FormEventReport::SendFourthFormEvent(const FormEventName &eventName, HiSysE
                 EVENT_KEY_FORM_NAME, want.GetStringParam(Constants::PARAM_FORM_NAME_KEY),
                 EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(want.
                     GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0)),
-                EVENT_KEY_ABILITY_NAME, want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY));
+                EVENT_KEY_ABILITY_NAME, want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY),
+                EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm);
             break;
         case FormEventName::INVALID_PUBLISH_FORM_TO_HOST:
             HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
@@ -344,7 +355,12 @@ void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName
     if (eventName == FormEventName::CONDITION_UPDATE_FORM) {
         HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
             EVENT_KEY_CONDITION_TYPE, static_cast<int32_t>(eventInfo.conditionType),
-            EVENT_KEY_BUNDLE_FORMNAME, eventInfo.bundleAndFormName);
+            EVENT_KEY_BUNDLE_FORMNAME, eventInfo.bundleAndFormName,
+            EVENT_KEY_FORM_ID, eventInfo.formId,
+            EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm,
+            EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension),
+            EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+            EVENT_KEY_ABILITY_NAME, eventInfo.abilityName);
     }
 }
 
