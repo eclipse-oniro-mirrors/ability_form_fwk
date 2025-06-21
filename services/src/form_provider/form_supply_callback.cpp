@@ -370,6 +370,9 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
         eventId.c_str(),
         curTid.c_str(),
         event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RECYCLE_DATA_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
     if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
 
@@ -388,7 +391,6 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
         };
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event, reCycleForm);
     }
-    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 
@@ -416,11 +418,13 @@ int32_t FormSupplyCallback::OnRenderFormDone(const int64_t formId, const Want &w
         eventId.c_str(),
         curTid.c_str(),
         event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
     if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
-    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 
@@ -435,12 +439,13 @@ int32_t FormSupplyCallback::OnRecoverFormDone(const int64_t formId, const Want &
         eventId.c_str(),
         curTid.c_str(),
         event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
     if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
-
-    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 
@@ -455,12 +460,13 @@ int32_t FormSupplyCallback::OnRecycleFormDone(const int64_t formId, const Want &
         eventId.c_str(),
         curTid.c_str(),
         event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
     if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
-
-    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 
@@ -475,12 +481,13 @@ int32_t FormSupplyCallback::OnDeleteFormDone(const int64_t formId, const Want &w
         eventId.c_str(),
         curTid.c_str(),
         event);
+    if (event != static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
     if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
     }
-
-    FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     return ERR_OK;
 }
 } // namespace AppExecFwk
