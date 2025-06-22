@@ -2064,7 +2064,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetConditionUpdate(formInfo.conditionUpdate);
 
     if (!formInfo.customizeDatas.empty()) {
-        for(const auto &customizeData: formInfo.customizeDatas) {
+        for (const auto &customizeData: formInfo.customizeDatas) {
             if (customizeData.name == FORM_METADATA_VISIBILITY_WORD_NAME) {
                 itemInfo.SetFilterVisibility(customizeData.value == "true");
             }
