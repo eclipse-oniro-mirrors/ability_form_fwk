@@ -1718,6 +1718,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
+    formRecord.isDataProxyIgnoreVisible = info.GetFilterVisibility();
 
     FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams, callerToken);
 
@@ -2061,6 +2062,16 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
     itemInfo.SetFormBundleType(formInfo.bundleType);
     itemInfo.SetConditionUpdate(formInfo.conditionUpdate);
+
+    if(!formInfo.customizeDatas.empty()) {
+        for(const auto &customizeData: formInfo.customizeDatas)
+        {
+            if(customizeData.name == FORM_METADATA_VISIBILITY_WORD_NAME)
+            {
+                itemInfo.SetFilterVisibility(customizeData.value == "true");
+            }
+        }
+    }
 
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
