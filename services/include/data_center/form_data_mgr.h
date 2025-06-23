@@ -925,6 +925,19 @@ public:
      */
     FormRecord GetFormAbilityInfo(const FormRecord &record) const;
 
+    /**
+     * @brief Allot form info by item info.
+     * @param formInfo Form item info.
+     * @param formRecord The form record.
+     */
+    void SetProxyVisibilityNotify(const FormItemInfo &formInfo, FormRecord &record);
+    /**
+     * @brief Delete form js info by form record.
+     * @param formId The Id of the form.
+     * @return Returns true if DataProxy ignore visibility; returns false otherwise.
+     */   
+    bool GetProxyVisibilityNotify(const FormRecord &record); 
+
 private:
     /**
      * @brief Create form record.

@@ -1551,6 +1551,12 @@ void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemI
         record.isLocationChange = true;
         needUpdate = true;
     }
+
+    if (info.GetFilterVisibility()) {
+        needUpdate = true;
+        record.isDataProxyIgnoreVisible = info.GetFilterVisibility();
+    }
+
     if (needUpdate) {
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
     }
@@ -1719,7 +1725,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
-    formRecord.isDataProxyIgnoreVisible = info.GetFilterVisibility();
+    FormDataMgr::GetInstance().SetDataProxyVisibilityNoyify(newInfo, formRecord);
 
     FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams, callerToken);
 
