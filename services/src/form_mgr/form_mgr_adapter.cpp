@@ -110,6 +110,7 @@ const std::string FORM_CLICK_CALL = "call";
 const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
+const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
 };
@@ -2066,7 +2067,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     if(!formInfo.customizeDatas.empty()) {
         for(const auto &customizeData: formInfo.customizeDatas)
         {
-            if(customizeData.name == FORM_METADATA_VISIBILITY_WORD_NAME)
+            if(customizeData.name == FORM_DATA_PROXY_IGNORE_VISIBILITY)
             {
                 itemInfo.SetFilterVisibility(customizeData.value == "true");
             }
