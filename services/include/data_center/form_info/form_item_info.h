@@ -488,12 +488,12 @@ public:
     /**
      * @brief Set value of if ignore visibility flag.
      * @param updateDuration Update duration.
-     */    
+     */
     void SetFilterVisibility(bool visibility);
     /**
      * @brief get value of ignore visibility flag.
      * @param updateDuration Update duration.
-     */ 
+     */
     bool GetFilterVisibility() const;
 
 private:
