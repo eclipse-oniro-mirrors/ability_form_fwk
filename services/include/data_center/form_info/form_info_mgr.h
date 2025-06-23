@@ -131,6 +131,8 @@ public:
 
     ErrCode ReloadFormInfos(int32_t userId);
 
+    bool PublishFmsReadyEvent();
+
     bool HasReloadedFormInfos();
 
     ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,

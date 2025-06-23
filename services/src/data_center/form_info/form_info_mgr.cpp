@@ -894,6 +894,16 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             bundleVersionPair.first.c_str(), bundleVersionPair.second);
     }
     hasReloadedFormInfosState_ = true;
+    bool publishRet = PublishFmsReadyEvent();
+    if (!publishRet) {
+        HILOG_ERROR("failed to publish fmsIsReady event with permission");
+    }
+    HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
+    return ERR_OK;
+}
+
+bool FormInfoMgr::PublishFmsReadyEvent()
+{
     HILOG_INFO("publish fmsIsReady event");
     Want eventWant;
     eventWant.SetAction(FMS_IS_READY_EVENT);
@@ -901,12 +911,8 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     eventData.SetWant(eventWant);
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetSubscriberPermissions({PERMISSION_REQUIRE_FORM});
-    bool publishRet = EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo);
-    if (!publishRet) {
-        HILOG_ERROR("failed to publish fmsIsReady event with permission");
-    }
-    HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
-    return ERR_OK;
+    bool ret = EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo);
+    return ret;
 }
 
 bool FormInfoMgr::HasReloadedFormInfos()
