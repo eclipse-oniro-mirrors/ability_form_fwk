@@ -30,6 +30,7 @@ constexpr const char *EVENT_KEY_BUNDLE_NAME = "BUNDLE_NAME";
 constexpr const char *EVENT_KEY_MODULE_NAME = "MODULE_NAME";
 constexpr const char *EVENT_KEY_ABILITY_NAME = "ABILITY_NAME";
 constexpr const char *EVENT_KEY_HOST_BUNDLE_NAME = "HOST_BUNDLE_NAME";
+constexpr const char *EVENT_KEY_ERROR_NAME = "ERROR_NAME";
 constexpr const char *EVENT_KEY_ERROR_TYPE = "ERROR_TYPE";
 constexpr const char *EVENT_KEY_ERROR_CODE = "ERROR_CODE";
 constexpr const char *EVENT_KEY_SESSION_ID = "SESSION_ID";
@@ -60,6 +61,7 @@ constexpr const char *EVENT_KEY_BUNDLE_FORMNAME = "BUNDLE_FORMNAME";
 constexpr const char *EVENT_KEY_WITH_SNAPSHOT = "WITH_SNAPSHOT";
 constexpr const char *EVENT_KEY_DISTRIBUTED_FORM = "DISTRIBUTED_FORM";
 constexpr const char *INVALIDEVENTNAME = "INVALIDEVENTNAME";
+constexpr const char *FORM_ERROR = "FORM_ERROR";
 constexpr const char *FORM_STORAGE_DIR_PATH = "/data/service/el1/public/database/form_storage";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
@@ -424,11 +426,12 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_
         case FormEventName::UPDATE_FORM_FAILED:
         case FormEventName::RECYCLE_RECOVER_FORM_FAILED:
             HiSysEventWrite(
-                HiSysEvent::Domain::FORM_MANAGER, name,
+                HiSysEvent::Domain::FORM_MANAGER, FORM_ERROR,
                 HiSysEventType::FAULT,
                 EVENT_KEY_FORM_ID, formId,
                 EVENT_KEY_BUNDLE_NAME, bundleName,
                 EVENT_KEY_FORM_NAME, formName,
+                EVENT_KEY_ERROR_NAME, name,
                 EVENT_KEY_ERROR_TYPE, errorType,
                 EVENT_KEY_ERROR_CODE, errorCode);
             break;
