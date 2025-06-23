@@ -30,6 +30,8 @@
 #include "json_serializer.h"
 #include "permission_verification.h"
 #include "common/event/form_event_report.h"
+#include "common_event.h"
+#include "common_event_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
