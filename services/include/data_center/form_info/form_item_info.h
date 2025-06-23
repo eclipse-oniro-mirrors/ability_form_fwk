@@ -489,12 +489,12 @@ public:
      * @brief Set value of if ignore visibility flag.
      * @param updateDuration Update duration.
      */
-    void SetFilterVisibility(bool visibility);
+    void SetIgnoreFormVisibility(bool visibility);
     /**
      * @brief get value of ignore visibility flag.
      * @param updateDuration Update duration.
      */
-    bool GetFilterVisibility() const;
+    bool GetIgnoreFormVisibility() const;
 
 private:
     /**
@@ -549,7 +549,8 @@ private:
     bool lockForm_ = false;
     bool protectForm_ = false;
     std::vector<int32_t> conditionUpdate_;
-    bool isDataProxyIgnoreVisibility_ = false;
+    // Data proxy trans form Visibility
+    bool IgnoreFormVisibility_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

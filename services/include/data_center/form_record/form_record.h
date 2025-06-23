@@ -75,7 +75,7 @@ public:
     bool isTimerRefresh = false;
     bool isHostRefresh = false;
     bool isDataProxy = false;
-    bool isDataProxyIgnoreVisible = false;
+    bool isIgnoreFormVisible = false;
     bool isSystemApp = false;
     int32_t uid = 0;
     std::string description = "";

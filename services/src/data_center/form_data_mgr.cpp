@@ -94,7 +94,6 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
     FormBasicInfoMgr::GetInstance().AddFormBasicInfo(basic);
     return record;
 }
-
 /**
  * @brief Delete form js info by form record.
  * @param formId The Id of the form.
@@ -3035,17 +3034,17 @@ FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
     return newRecord;
 }
 
-void FormDataMgr::SetDataProxyVisibilityNotify(const FormItemInfo &formInfo, FormRecord &record)
+void FormDataMgr::SetFormVisibility(const FormItemInfo &formInfo, FormRecord &record)
 {
     auto info = formRecords_.find(formInfo.GetFormId());
     if (info != formRecords_.end()) {
-        record.isDataProxyIgnoreVisible = formInfo.GetFilterVisibility();
+        record.isIgnoreFormVisible = formInfo.GetFilterVisibility();
     }
 }
 
-bool FormDataMgr::GetProxyVisibilityNotify(const FormRecord &record)
+bool FormDataMgr::GetProxyVisibility(const FormRecord &record)
 {
-    return record.isDataProxyIgnoreVisible;
+    return record.isIgnoreFormVisible;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

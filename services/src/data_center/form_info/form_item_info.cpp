@@ -671,14 +671,14 @@ void FormItemInfo::SetProtectForm(bool protectForm)
     protectForm_ = protectForm;
 }
 
-void FormItemInfo::SetFilterVisibility(bool visibility)
+void FormItemInfo::SetIgnoreFormVisibility(bool visibility)
 {
-    isDataProxyIgnoreVisibility_ = visibility;
+    IgnoreFormVisibility_ = visibility;
 }
 
-bool FormItemInfo::GetFilterVisibility() const
+bool FormItemInfo::GetDataProxyVisibility() const
 {
-    return isDataProxyIgnoreVisibility_;
+    return IgnoreFormVisibility_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
