@@ -56,6 +56,7 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
                 refreshType,
                 ret);
         }
+        return ret;
     }
 
     HILOG_ERROR("invalid refreshType");
