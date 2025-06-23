@@ -154,8 +154,9 @@ bool OverflowInfo::ReadFromParcel(Parcel &parcel)
         return false;
     }
     duration = parcel.ReadInt32();
-    HILOG_INFO("OverflowInfo, rect: %{public}f, %{public}f, %{public}f, %{public}f, duration: %{public}d",
-        area.left, area.top, area.width, area.height, duration);
+    useDefaultAnimate = parcel.ReadBool();
+    HILOG_INFO("OverflowInfo, rect: %{public}f, %{public}f, %{public}f, %{public}f, duration: %{public}d,"
+        " useDefaultAnimate: %{public}d", area.left, area.top, area.width, area.height, duration, useDefaultAnimate);
     return true;
 }
 
@@ -167,6 +168,10 @@ bool OverflowInfo::Marshalling(Parcel &parcel) const
     }
     if (!parcel.WriteInt32(duration)) {
         HILOG_ERROR("Write duraion failed");
+        return false;
+    }
+    if (!parcel.WriteBool(useDefaultAnimate)) {
+        HILOG_ERROR("Write useDefaultAnimate failed");
         return false;
     }
     return true;
