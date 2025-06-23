@@ -4937,7 +4937,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0273, TestSize.Level1) {
     int64_t formId = -1;
     Rect rect;
     ErrCode result = FormMgr::GetInstance().GetFormRect(formId, rect);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrTest_0273 test ends";
 }
  
@@ -4953,7 +4953,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0274, TestSize.Level1)
     Rect rect;
     FormMgr::GetInstance().remoteProxy_ = nullptr;
     ErrCode result = FormMgr::GetInstance().GetFormRect(formId, rect);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(result, ERR_APPEXECFWK_SERVICE_NOT_CONNECTED);
     GTEST_LOG_(INFO) << "FormMgrTest_0274 end";
 }
 
