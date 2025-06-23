@@ -1023,14 +1023,13 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
             ClearUpdateAtTimerResource();
         }
         currentUpdateAtWantAgent_ = wantAgent;
-    }
-
-    updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
-    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
-        static_cast<uint64_t>(nextTime));
-    if (!bRet) {
-        HILOG_ERROR("init update at timer task error");
-        return false;
+        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
+            static_cast<uint64_t>(nextTime));
+        if (!bRet) {
+            HILOG_ERROR("init update at timer task error");
+            return false;
+        }
     }
 
     HILOG_INFO("end");
