@@ -4953,7 +4953,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0274, TestSize.Level1)
     Rect rect;
     FormMgr::GetInstance().remoteProxy_ = nullptr;
     ErrCode result = FormMgr::GetInstance().GetFormRect(formId, rect);
-    EXPECT_EQ(result, ERR_APPEXECFWK_SERVICE_NOT_CONNECTED);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrTest_0274 end";
 }
 
