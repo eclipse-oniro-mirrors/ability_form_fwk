@@ -2064,17 +2064,11 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetFormBundleType(formInfo.bundleType);
     itemInfo.SetConditionUpdate(formInfo.conditionUpdate);
 
-<<<<<<< HEAD
     if(!formInfo.customizeDatas.empty()) {
         for(const auto &customizeData: formInfo.customizeDatas)
         {
             if(customizeData.name == FORM_DATA_PROXY_IGNORE_VISIBILITY)
             {
-=======
-    if (!formInfo.customizeDatas.empty()) {
-        for (const auto &customizeData: formInfo.customizeDatas) {
-            if (customizeData.name == FORM_METADATA_VISIBILITY_WORD_NAME) {
->>>>>>> 2d14b63418d81b973a232987f42563d5f0cf6bff
                 itemInfo.SetFilterVisibility(customizeData.value == "true");
             }
         }
