@@ -3036,10 +3036,7 @@ FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
 
 void FormDataMgr::SetFormVisibility(const FormItemInfo &formInfo, FormRecord &record)
 {
-    auto info = formRecords_.find(formInfo.GetFormId());
-    if (info != formRecords_.end()) {
-        record.isIgnoreFormVisible = formInfo.GetFilterVisibility();
-    }
+    record.isIgnoreFormVisible = formInfo.GetFilterVisibility();
 }
 
 bool FormDataMgr::GetProxyVisibility(const FormRecord &record)

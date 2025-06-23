@@ -676,7 +676,7 @@ void FormItemInfo::SetIgnoreFormVisibility(bool visibility)
     IgnoreFormVisibility_ = visibility;
 }
 
-bool FormItemInfo::GetDataProxyVisibility() const
+bool FormItemInfo::GetIgnoreFormVisibility() const
 {
     return IgnoreFormVisibility_;
 }
