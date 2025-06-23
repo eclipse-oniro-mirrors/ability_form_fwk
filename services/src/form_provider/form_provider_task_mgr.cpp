@@ -210,7 +210,7 @@ void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEv
 /**
  * @brief Post size changed to form provider.
  * @param formId The Id of the form to update.
- * @param newDimension The dimesnion value to be updated.
+ * @param newDimension The dimension value to be updated.
  * @param newRect The rect value to be updated.
  * @param want The want of the form.
  * @param remoteObject Form provider proxy object.

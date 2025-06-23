@@ -157,7 +157,7 @@ public:
     /**
      * @brief Connect provider for update form size.
      * @param formId The Id of the form to update.
-     * @param newDimension The dimesnion value to be updated.
+     * @param newDimension The dimension value to be updated.
      * @param newRect The rect value to be updated.
      * @return Returns ERR_OK on success, others on failure.
      */

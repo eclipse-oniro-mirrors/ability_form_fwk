@@ -629,7 +629,7 @@ int FormProviderProxy::NotifyFormLocationUpdate(const int64_t formId, const Want
 /**
  * @brief Notify provider when the form size changed.
  * @param formId The Id of the form to update.
- * @param newDimension The dimesnion value to be updated.
+ * @param newDimension The dimension value to be updated.
  * @param newRect The rect value to be updated.
  * @param want Indicates the structure containing form info.
  * @param callerToken Caller ability token.

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_FORM_UPDATE_SIEZ_CONNECTION_H
-#define OHOS_FORM_FWK_FORM_UPDATE_SIEZ_CONNECTION_H
+#ifndef OHOS_FORM_FWK_FORM_UPDATE_SIZE_CONNECTION_H
+#define OHOS_FORM_FWK_FORM_UPDATE_SIZE_CONNECTION_H
 
 #include "common/connection/form_ability_connection.h"
 #include "want.h"
@@ -53,4 +53,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // OHOS_FORM_FWK_FORM_UPDATE_SIEZ_CONNECTION_H
+#endif // OHOS_FORM_FWK_FORM_UPDATE_SIZE_CONNECTION_H
