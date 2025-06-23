@@ -936,7 +936,7 @@ bool JsFormProvider::ConvertFormOverflowInfo(napi_env env, napi_value argv, AppE
         HILOG_WARN("get overflowInfo useDefaultAnimate failed");
     } else {
         if (!ConvertFromJsValue(env, useDefaultAnimateNapiValue, useDefaultAnimate)) {
-            HILOG_INFO("ConvertFormOverflowInfo useDefaultAnimate: failed");
+            HILOG_ERROR("ConvertFormOverflowInfo useDefaultAnimate: failed");
         }
     }
     overflowInfo->useDefaultAnimate = useDefaultAnimate;
