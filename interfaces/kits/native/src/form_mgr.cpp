@@ -2202,7 +2202,7 @@ ErrCode FormMgr::GetFormRect(const int64_t formId, Rect &rect)
     return remoteProxy_->GetFormRect(formId, rect);
 }
 
-ErrCode FormMgr::UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+ErrCode FormMgr::UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect)
 {
     HILOG_INFO("UpdateFormSize formid:%{public}" PRId64, formId);
     if (formId <= 0) {
@@ -2219,7 +2219,7 @@ ErrCode FormMgr::UpdateFormSize(const int64_t formId, const std::string &newDime
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    resultCode = remoteProxy_->UpdateFormSize(formId, newDimesnion, newRect);
+    resultCode = remoteProxy_->UpdateFormSize(formId, newDimension, newRect);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail UpdateFormSize,errCode %{public}d", resultCode);
     }

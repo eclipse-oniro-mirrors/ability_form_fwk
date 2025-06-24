@@ -629,13 +629,13 @@ int FormProviderProxy::NotifyFormLocationUpdate(const int64_t formId, const Want
 /**
  * @brief Notify provider when the form size changed.
  * @param formId The Id of the form to update.
- * @param newDimesnion The dimesnion value to be updated.
+ * @param newDimension The dimension value to be updated.
  * @param newRect The rect value to be updated.
  * @param want Indicates the structure containing form info.
  * @param callerToken Caller ability token.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormProviderProxy::NotifySizeChanged(const int64_t formId, const std::string &newDimesnion, const Rect &newRect,
+int FormProviderProxy::NotifySizeChanged(const int64_t formId, const std::string &newDimension, const Rect &newRect,
     const Want &want, const sptr<IRemoteObject> &callerToken)
 {
     int error;
@@ -650,8 +650,8 @@ int FormProviderProxy::NotifySizeChanged(const int64_t formId, const std::string
         HILOG_ERROR("write formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteString(newDimesnion)) {
-        HILOG_ERROR("Write newDimesnion failed");
+    if (!data.WriteString(newDimension)) {
+        HILOG_ERROR("Write newDimension failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&newRect)) {

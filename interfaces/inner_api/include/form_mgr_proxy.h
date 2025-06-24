@@ -753,11 +753,11 @@ public:
     /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
-     * @param newDimesnion The dimesnion value to be updated.
+     * @param newDimension The dimension value to be updated.
      * @param newRect The rect value to be updated.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect) override;
+    ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect) override;
 
 private:
     template<typename T>

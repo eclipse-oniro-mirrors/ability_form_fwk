@@ -2917,7 +2917,7 @@ ErrCode FormMgrProxy::GetFormRect(const int64_t formId, Rect &rect)
     return ERR_OK;
 }
 
-ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const std::string &newDimesnion, const Rect &newRect)
+ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect)
 {
     HILOG_INFO("call");
     MessageParcel data;
@@ -2929,8 +2929,8 @@ ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const std::string &ne
         HILOG_ERROR("Write formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteString(newDimesnion)) {
-        HILOG_ERROR("Write newDimesnion failed");
+    if (!data.WriteString(newDimension)) {
+        HILOG_ERROR("Write newDimension failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&newRect)) {
