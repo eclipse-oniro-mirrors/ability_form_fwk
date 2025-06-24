@@ -403,7 +403,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
 
         std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
         auto task = [thisWeakPtr, formJsInfo, want, formSupplyClient, renderType]() {
-            HILOG_DEBUG("HandleUpdateInJsThread begin");
+            HILOG_INFO("HandleUpdateInJsThread begin");
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
                 HILOG_ERROR("null renderRecord");
@@ -413,6 +413,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             renderRecord->MarkRenderFormTaskDone(renderType);
             FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
                 FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
+            HILOG_INFO("HandleUpdateInJsThread end");
         };
         if (eventHandler == nullptr) {
             HILOG_ERROR("null eventHandler_ ");
@@ -723,7 +724,7 @@ bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
     } else {
         UpdateRuntime(formJsInfo);
     }
-    HILOG_DEBUG("BeforeHandleUpdateForm end");
+    HILOG_INFO("BeforeHandleUpdateForm end");
     return true;
 }
 
