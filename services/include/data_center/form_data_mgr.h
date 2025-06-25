@@ -931,13 +931,6 @@ public:
      * @param formRecord The form record.
      */
     void SetFormVisibility(const FormItemInfo &formInfo, FormRecord &formRecord);
-    /**
-     * @brief Delete form js info by form record.
-     * @param formInfo Form item info.
-     * @param get form record visibility.
-     * @return Returns true if DataProxy ignore visibility; returns false otherwise.
-     */   
-    bool GetFormVisibility(const FormRecord formRecord) const; 
 
 private:
     /**
