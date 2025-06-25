@@ -88,6 +88,7 @@
 #include "form_refresh/form_refresh_mgr.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
+#include "status_mgr_center/form_status.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -2072,7 +2073,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     if (!formInfo.customizeDatas.empty()) {
         for (const auto &customizeData: formInfo.customizeDatas) {
             if (customizeData.name == FORM_DATA_PROXY_IGNORE_VISIBILITY) {
-                itemInfo.SetFilterVisibility(!strcasecmp(customizeData.value.c_str(),"true"));
+                itemInfo.SetFilterVisibility(!strcasecmp(customizeData.value.c_str(), "true"));
                 break;
             }
         }
@@ -3864,6 +3865,10 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " not ETS form", formId);
             continue;
         }
+        if (FormStatus::GetInstance().IsFormProcessRecycle(formId)) {
+            HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
+            continue;
+        }
         if (isCheckCallingUid && std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end()) {
             HILOG_WARN("form %{public}" PRId64 " not owned by %{public}d", formId, callingUid);
@@ -3903,6 +3908,12 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
             HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        // Recovery is performed only when the form has been recycled or is recycling, or when there is a
+        // recycling task in the queue.
+        if (!(FormStatus::GetInstance().IsFormProcessRecycle(formId) || record.isExistRecycleTask)) {
+            HILOG_WARN("form %{public}" PRId64 " not RECYCLED", formId);
             continue;
         }
         if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
@@ -4397,6 +4408,12 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+    // check whether application is locked
+    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, formId);
+    if (isBundleProtect) {
+        HILOG_ERROR("Failed, application is locked");
+        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+    }
     Want want;
     want.SetElementName(formRecord.bundleName, formRecord.abilityName);
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);
@@ -4437,14 +4454,6 @@ ErrCode FormMgrAdapter::CallerCheck(const int64_t formId, const int32_t callingU
         HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d", formRecord.uid, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-
-    // check whether application is locked
-    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect("", formId);
-    if (isBundleProtect) {
-        HILOG_ERROR("Failed, application is locked");
-        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
-    }
-
     return ERR_OK;
 }
 

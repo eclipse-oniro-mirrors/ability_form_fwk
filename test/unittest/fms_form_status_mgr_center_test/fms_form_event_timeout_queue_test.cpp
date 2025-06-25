@@ -21,7 +21,6 @@
 #include "status_mgr_center/form_status_common.h"
 #include "common/util/form_serial_queue.h"
 #include "fms_log_wrapper.h"
-#include "gmock/gmock.h"
 
 using namespace testing::ext;
 using namespace OHOS;

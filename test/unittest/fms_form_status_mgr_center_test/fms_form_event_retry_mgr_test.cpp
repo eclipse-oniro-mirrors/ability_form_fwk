@@ -19,7 +19,6 @@
 #include "status_mgr_center/form_event_queue.h"
 #include "status_mgr_center/form_status_common.h"
 #include "fms_log_wrapper.h"
-#include "gmock/gmock.h"
 
 using namespace testing::ext;
 using namespace OHOS;

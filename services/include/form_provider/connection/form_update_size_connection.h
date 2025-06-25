@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_FORM_UPDATE_SIEZ_CONNECTION_H
-#define OHOS_FORM_FWK_FORM_UPDATE_SIEZ_CONNECTION_H
+#ifndef OHOS_FORM_FWK_FORM_UPDATE_SIZE_CONNECTION_H
+#define OHOS_FORM_FWK_FORM_UPDATE_SIZE_CONNECTION_H
 
 #include "common/connection/form_ability_connection.h"
 #include "want.h"
@@ -32,7 +32,7 @@ class FormUpdateSizeConnection : public FormAbilityConnection {
 public:
     FormUpdateSizeConnection(const int64_t formId,
         const std::string &bundleName, const std::string &abilityName,
-        const std::string &newDimesnion, const Rect &newRect);
+        const std::string &newDimension, const Rect &newRect);
     virtual ~FormUpdateSizeConnection() = default;
 
     /**
@@ -46,11 +46,11 @@ public:
 
 private:
     Want want_;
-    std::string newDimesnion_;
+    std::string newDimension_;
     Rect newRect_;
     DISALLOW_COPY_AND_MOVE(FormUpdateSizeConnection);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // OHOS_FORM_FWK_FORM_UPDATE_SIEZ_CONNECTION_H
+#endif // OHOS_FORM_FWK_FORM_UPDATE_SIZE_CONNECTION_H

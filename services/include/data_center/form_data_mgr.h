@@ -161,7 +161,6 @@ public:
      * @return Returns true if DataProxy Update, others on false.
      */
     bool FormDataMgr IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) const;
-
     /**
      * @brief Set dataProxy update flage default.
      * @param formRecord The form record.
@@ -942,6 +941,12 @@ public:
      * @param formRecord The form record.
      */
     void SetDataProxyFormVisibility(const FormItemInfo &formInfo, FormRecord &formRecord);
+     * @brief Update formRecord isExistRecycleTask.
+     * @param formId The id of the forms.
+     * @param isExistRecycleTask Whether the form exist recycle task.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateFormRecordSetIsExistRecycleTask(const int64_t formId, bool isExistRecycleTask);
 
 private:
     /**

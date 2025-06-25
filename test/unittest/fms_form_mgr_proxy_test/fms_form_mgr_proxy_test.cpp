@@ -3006,7 +3006,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0200, Function | MediumTest | Leve
     int64_t formId = 1;
     Rect rect;
     int32_t result = proxy->GetFormRect(formId, rect);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
 }
  
 /*

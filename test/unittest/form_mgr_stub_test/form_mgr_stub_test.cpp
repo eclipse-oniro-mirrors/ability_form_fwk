@@ -3288,24 +3288,59 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0134, TestSize.Level1) {
 
 /**
  * @tc.number: FormMgrStubTest_0135
- * @tc.name: Verify OnRemoteRequest and HandleGetFormRect
- * @tc.desc: When the parameter code is FORM_MGR_GET_FORM_RECT, the interface return value is ERR_OK.
+ * @tc.name: Verify OnRemoteRequest and HandleRegisterGetFormRectProxy
+ * @tc.desc: test HandleRegisterGetFormRectProxy
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0135, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0135 starts";
     EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr int64_t formId = 1;
-    Rect rect;
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_RECT);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    data.WriteInt64(formId);
-    data.WriteParcelable(&rect);
-    EXPECT_CALL(*mockFormMgrService, GetFormRect(_, _)).Times(1).WillOnce(Return(ERR_OK));
-    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterGetFormRectProxy(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    auto result = mockFormMgrService->HandleRegisterGetFormRectProxy(data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0135 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0136
+ * @tc.name: Verify OnRemoteRequest and HandleUnregisterGetFormRectProxy
+ * @tc.desc: test HandleUnregisterGetFormRectProxy
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0136, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0136 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const std::vector<int64_t> formIds;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, UnregisterGetFormRectProxy())
+        .Times(1)
+        .WillOnce(Return(true));
+    auto result = mockFormMgrService->HandleUnregisterGetFormRectProxy(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0136 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0137
+ * @tc.name: Verify OnRemoteRequest and HandleGetFormRect
+ * @tc.desc: test HandleGetFormRect
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0137, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0137 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1;
+    Rect rect;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt64(formId);
+    EXPECT_CALL(*mockFormMgrService, GetFormRect(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->HandleGetFormRect(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0137 ends";
 }
 }

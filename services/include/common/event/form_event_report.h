@@ -35,8 +35,8 @@ struct FormEventInfo {
     std::string hostBundleName = "";
     int32_t formAppPid = -1;
     int64_t timeStamp = 0;
-    int64_t formDimension;
-    bool distributedForm;
+    int64_t formDimension = 0;
+    bool distributedForm = false;
 };
 
 enum class CallDbFiledErrorType : int64_t {
@@ -108,7 +108,7 @@ struct NewFormEventInfo {
     int32_t conditionType;
     int32_t renderingMode;
     std::string bundleAndFormName;
-    bool distributedForm;
+    bool distributedForm = false;
 };
 
 enum class FormEventName {

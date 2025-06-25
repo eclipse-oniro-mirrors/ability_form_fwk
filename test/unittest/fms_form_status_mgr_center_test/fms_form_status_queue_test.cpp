@@ -21,7 +21,6 @@
 #include "common/util/form_serial_queue.h"
 #undef private
 #include "fms_log_wrapper.h"
-#include "gmock/gmock.h"
 
 using namespace testing::ext;
 using namespace OHOS;

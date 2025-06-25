@@ -1994,10 +1994,10 @@ private:
         }
         decltype(argc) convertArgc = 0;
         convertArgc++;
-        std::string newDimesnion("");
-        if (!ConvertFromJsValue(env, argv[PARAM1], newDimesnion)) {
-            HILOG_ERROR("convert newDimesnion failed");
-            NapiFormUtil::ThrowParamTypeError(env, "newDimesnion", "string");
+        std::string newDimension("");
+        if (!ConvertFromJsValue(env, argv[PARAM1], newDimension)) {
+            HILOG_ERROR("convert newDimension failed");
+            NapiFormUtil::ThrowParamTypeError(env, "newDimension", "string");
             return CreateJsUndefined(env);
         }
         convertArgc++;
@@ -2013,7 +2013,7 @@ private:
             return CreateJsUndefined(env);
         }
         convertArgc++;
-        auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimesnion, *newRect);
+        auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimension, *newRect);
         delete newRect;
         if (ret == ERR_OK) {
             return CreateJsUndefined(env);
@@ -2366,6 +2366,7 @@ void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::Over
     napi_create_object(env, result);
     napi_set_named_property(env, *result, "area", area);
     napi_set_named_property(env, *result, "duration", duration);
+    napi_set_named_property(env, *result, "useDefaultAnimation", CreateJsValue(env, overflowInfo.useDefaultAnimation));
     napi_close_handle_scope(env, scope);
 }
 

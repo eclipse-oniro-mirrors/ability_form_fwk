@@ -5051,4 +5051,25 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormAbilityInfo_001, TestSize
     EXPECT_EQ(formRecord.bundleName, newRecord.bundleName);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 end";
 }
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycleTask_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 start";
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    int64_t formId = 123;
+    bool isExistRecycleTask = true;
+    auto result = formDataMgr->UpdateFormRecordSetIsExistRecycleTask(formId, isExistRecycleTask);
+    EXPECT_FALSE(result);
+
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.isExistRecycleTask = isExistRecycleTask;
+    formDataMgr->formRecords_.clear();
+    formDataMgr->formRecords_.emplace(formId, formRecord);
+    result = formDataMgr->UpdateFormRecordSetIsExistRecycleTask(formId, isExistRecycleTask);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(formDataMgr->formRecords_[formId].isExistRecycleTask, isExistRecycleTask);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 end";
+}
 }

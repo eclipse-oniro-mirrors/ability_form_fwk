@@ -28,8 +28,8 @@ namespace OHOS {
 namespace AppExecFwk {
 FormUpdateSizeConnection::FormUpdateSizeConnection(const int64_t formId,
     const std::string &bundleName, const std::string &abilityName,
-    const std::string &newDimesnion, const Rect &newRect)
-    :newDimesnion_(newDimesnion), newRect_(newRect)
+    const std::string &newDimension, const Rect &newRect)
+    :newDimension_(newDimension), newRect_(newRect)
 {
     SetFormId(formId);
     SetProviderKey(bundleName, abilityName);
@@ -57,7 +57,7 @@ void FormUpdateSizeConnection::OnAbilityConnectDone(
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormProviderTaskMgr::GetInstance().PostSizeChangedTask(GetFormId(), newDimesnion_, newRect_, want, remoteObject);
+    FormProviderTaskMgr::GetInstance().PostSizeChangedTask(GetFormId(), newDimension_, newRect_, want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
