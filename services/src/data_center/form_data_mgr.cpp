@@ -231,7 +231,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     if (formInfo.GetIgnoreFormVisibility()) {
-        FormDataMgr::GetInstance().SetVisibility(formInfo, newRecord);
+        FormDataMgr::GetInstance().SetFormVisibility(formInfo, newRecord);
     }
 
     HILOG_DEBUG("end");
