@@ -549,7 +549,6 @@ private:
     bool lockForm_ = false;
     bool protectForm_ = false;
     std::vector<int32_t> conditionUpdate_;
-    // Data proxy trans form Visibility
     bool isIgnoreFormVisibility_ = false;
 };
 } // namespace AppExecFwk

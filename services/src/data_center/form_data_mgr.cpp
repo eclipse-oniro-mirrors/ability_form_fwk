@@ -3038,14 +3038,14 @@ FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
     return newRecord;
 }
 
-void FormDataMgr::SetFormVisibility(const FormItemInfo &formInfo, FormRecord &record)
-{
-    record.isIgnoreFormVisible = formInfo.GetIgnoreFormVisibility();
-}
+// void FormDataMgr::SetFormVisibility(const FormItemInfo &formInfo, FormRecord &record)
+// {
+//     record.isIgnoreFormVisible = formInfo.GetIgnoreFormVisibility();
+// }
 
-bool FormDataMgr::GetProxyVisibility(const FormRecord &record) const
-{
-    return record.isIgnoreFormVisible;
-}
+// bool FormDataMgr::GetProxyVisibility(const FormRecord &record) const
+// {
+//     return record.isIgnoreFormVisible;
+// }
 }  // namespace AppExecFwk
 }  // namespace OHOS
