@@ -2366,6 +2366,7 @@ void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::Over
     napi_create_object(env, result);
     napi_set_named_property(env, *result, "area", area);
     napi_set_named_property(env, *result, "duration", duration);
+    napi_set_named_property(env, *result, "useDefaultAnimation", CreateJsValue(env, overflowInfo.useDefaultAnimation));
     napi_close_handle_scope(env, scope);
 }
 
