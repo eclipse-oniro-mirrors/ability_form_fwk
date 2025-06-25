@@ -76,7 +76,7 @@ struct Rect : public Parcelable {
 struct OverflowInfo : public Parcelable {
     Rect area;
     int32_t duration = -1;
-    bool useDefaultAnimate = true;
+    bool useDefaultAnimation = true;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

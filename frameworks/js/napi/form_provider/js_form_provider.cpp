@@ -929,18 +929,18 @@ bool JsFormProvider::ConvertFormOverflowInfo(napi_env env, napi_value argv, AppE
     overflowInfo->duration = duration;
     HILOG_INFO("ConvertFormOverflowInfo duration: %{public}d", duration);
 
-    napi_value useDefaultAnimateVal;
-    napi_status useDefaultAnimateRet = napi_get_named_property(env, argv, "useDefaultAnimate", &useDefaultAnimateVal);
-    bool useDefaultAnimate = true;
-    if (useDefaultAnimateRet == napi_ok) {
-        if (!ConvertFromJsValue(env, useDefaultAnimateVal, useDefaultAnimate)) {
-            HILOG_ERROR("ConvertFormOverflowInfo useDefaultAnimate: failed");
+    napi_value defaultAnimateNapiVal;
+    napi_status defaultAnimateRet = napi_get_named_property(env, argv, "useDefaultAnimation", &defaultAnimateNapiVal);
+    bool defaultAnimation = true;
+    if (defaultAnimateRet == napi_ok) {
+        if (!ConvertFromJsValue(env, defaultAnimateNapiVal, defaultAnimation)) {
+            HILOG_ERROR("ConvertFormOverflowInfo defaultAnimation: failed");
         }
     } else {
-        HILOG_WARN("get overflowInfo useDefaultAnimate failed");
+        HILOG_WARN("get overflowInfo defaultAnimation failed");
     }
-    overflowInfo->useDefaultAnimate = useDefaultAnimate;
-    HILOG_INFO("ConvertFormOverflowInfo useDefaultAnimate: %{public}d", useDefaultAnimate);
+    overflowInfo->useDefaultAnimation = defaultAnimation;
+    HILOG_INFO("ConvertFormOverflowInfo defaultAnimation: %{public}d", defaultAnimation);
 
     AppExecFwk::Rect area;
     if (!ConvertOverflowInfoArea(env, rangeArea, area)) {
