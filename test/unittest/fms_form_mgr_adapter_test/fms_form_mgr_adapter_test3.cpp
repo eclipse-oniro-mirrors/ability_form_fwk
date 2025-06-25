@@ -1215,4 +1215,48 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0302, TestSize.Level0)
         formMgrAdapter.GetFormRect(formId, uid, rect));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0302 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0303
+ * @tc.desc: test RegisterGetLiveFormStatusProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0303, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0303 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> observer = nullptr;
+    auto ret = formMgrAdapter.RegisterGetLiveFormStatusProxy(observer);
+    EXPECT_EQ(ret, false);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0303 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0304
+ * @tc.desc: test UnregisterGetLiveFormStatusProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0304, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0304 start";
+    FormMgrAdapter formMgrAdapter;
+    auto ret = formMgrAdapter.UnregisterGetLiveFormStatusProxy();
+    EXPECT_EQ(ret, true);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0304 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0305
+ * @tc.desc: test GetLiveFormStatus function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0305, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0305 start";
+    FormMgrAdapter formMgrAdapter;
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    formMgrAdapter.getLiveFormStatusCallerToken_ = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.GetLiveFormStatus(liveFormStatusMap));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0305 end";
+}
 }

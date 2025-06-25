@@ -55,8 +55,9 @@ namespace {
     const std::string FORM_OVERFLOW = "formOverflow";
     const std::string CHANGE_SCENE_ANIMATION_STATE = "changeSceneAnimationState";
     const std::string GET_FORM_RECT = "getFormRect";
+    const std::string GET_LIVE_FORM_STATUS = "getLiveFormStatus";
     const std::set<std::string> FORM_LISTENER_TYPE = {
-        FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT
+        FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
 }
 
@@ -1175,7 +1176,7 @@ private:
             (FORM_LISTENER_TYPE.find(type) == FORM_LISTENER_TYPE.end())) {
             HILOG_ERROR("args[0] not register func %{public}s", type.c_str());
             NapiFormUtil::ThrowParamTypeError(env, "type",
-                "formUninstall or formOverflow or changeSceneAnimationState or getFormRect");
+                "formUninstall or formOverflow or changeSceneAnimationState or getFormRect or getLiveFormStatus");
             return CreateJsUndefined(env);
         }
 
@@ -1197,6 +1198,8 @@ private:
             return OnRegisterChangeSceneAnimationStateListener(env, callbackRef);
         } else if (type == GET_FORM_RECT) {
             return OnRegisterGetFormRectListener(env, callbackRef);
+        } else if (type == GET_LIVE_FORM_STATUS) {
+            return OnRegisterGetLiveFormStatusListener(env, callbackRef);
         }
         return CreateJsUndefined(env);
     }
@@ -1222,9 +1225,11 @@ private:
         if (!ConvertFromJsValue(env, argv[PARAM0], type) ||
             (FORM_LISTENER_TYPE.find(type) == FORM_LISTENER_TYPE.end())) {
             HILOG_ERROR("Invalid type provided: %{public}s."
-                "Expected formUninstall or formOverflow or changeSceneAnimationState or getFormRect.", type.c_str());
+                        "Expected formUninstall or formOverflow or changeSceneAnimationState or getFormRect or "
+                        "getLiveFormStatus.",
+                type.c_str());
             NapiFormUtil::ThrowParamTypeError(env, "type",
-                "formUninstall or formOverflow or changeSceneAnimationState or getFormRect");
+                "formUninstall or formOverflow or changeSceneAnimationState or getFormRect or getLiveFormStatus");
             return CreateJsUndefined(env);
         }
         // Check the type of the PARAM1.
@@ -1247,6 +1252,8 @@ private:
             return OffRegisterChangeSceneAnimationStateListener(env);
         } else if (type == GET_FORM_RECT) {
             return OffRegisterGetFormRectListener(env);
+        } else if (type == GET_LIVE_FORM_STATUS) {
+            return OffRegisterGetLiveFormStatusListener(env);
         }
         return CreateJsUndefined(env);
     }
@@ -2057,6 +2064,30 @@ private:
         }
         return true;
     }
+
+    napi_value OnRegisterGetLiveFormStatusListener(napi_env env, napi_ref callbackRef)
+    {
+        HILOG_INFO("call");
+        bool result = FormMgr::GetInstance().RegisterGetLiveFormStatusProxy(
+            JsFormRouterProxyMgr::GetInstance());
+        if (!result) {
+            return CreateJsValue(env, result);
+        }
+        result = JsFormRouterProxyMgr::GetInstance()->RegisterGetLiveFormStatusListener(
+            env, callbackRef);
+        return CreateJsValue(env, result);
+    }
+ 
+    napi_value OffRegisterGetLiveFormStatusListener(napi_env env)
+    {
+        HILOG_INFO("call");
+        bool result = FormMgr::GetInstance().UnregisterGetLiveFormStatusProxy();
+        if (!result) {
+            return CreateJsValue(env, result);
+        }
+        result = JsFormRouterProxyMgr::GetInstance()->UnregisterGetLiveFormStatusListener();
+        return CreateJsValue(env, result);
+    }
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -2752,7 +2783,196 @@ bool JsFormRouterProxyMgr::ConvertFunctionResult(napi_env env, napi_value funcRe
  
     return true;
 }
+
+bool JsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(napi_env env, napi_ref callbackRef)
+{
+    HILOG_INFO("call");
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("Invalid callback reference");
+        return false;
+    }
  
+    if (getLiveFormStatusCallbackRef_ != nullptr) {
+        napi_delete_reference(env, getLiveFormStatusCallbackRef_);
+        getLiveFormStatusCallbackRef_ = nullptr;
+    }
+ 
+    getLiveFormStatusCallbackRef_ = callbackRef;
+    getLiveFormStatusEnv_ = env;
+ 
+    napi_value callback;
+    napi_get_reference_value(env, callbackRef, &callback);
+    napi_valuetype valueType;
+    napi_typeof(env, callback, &valueType);
+    if (valueType != napi_function) {
+        HILOG_ERROR("Callback is not a function");
+        return false;
+    }
+ 
+    HILOG_INFO("Listener registered successfully");
+    return true;
+}
+ 
+bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
+{
+    HILOG_INFO("call");
+    getLiveFormStatusCallbackRef_ = nullptr;
+    getLiveFormStatusEnv_ = nullptr;
+    return true;
+}
+
+ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
+{
+    HILOG_INFO("call");
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(getLiveFormStatusEnv_, &loop);
+    if (loop == nullptr) {
+        HILOG_ERROR("Failed to get loop");
+        return ERR_GET_INFO_FAILED;
+    }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOG_ERROR("Failed to new uv_work_t");
+        return ERR_GET_INFO_FAILED;
+    }
+ 
+    LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {};
+    if (dataParam == nullptr) {
+        HILOG_ERROR("Failed to new dataParam");
+        delete work;
+        return ERR_GET_INFO_FAILED;
+    }
+ 
+    work->data = dataParam;
+    uv_queue_work(
+        loop, work, [](uv_work_t *work) {},
+        [](uv_work_t *work, int status) {
+            LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
+            JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam);
+            HILOG_INFO("getLiveFormStatus start notify.");
+            std::unique_lock<std::mutex> lock(dataParam->mutex);
+            dataParam->isReady = true;
+            dataParam->condition.notify_all();
+            delete work;
+        });
+    std::unique_lock<std::mutex> lock(dataParam->mutex);
+    dataParam->condition.wait(lock, [&] { return dataParam->isReady; });
+    bool result = dataParam->result;
+    liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
+    delete dataParam;
+    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+}
+
+void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam)
+{
+    HILOG_INFO("call");
+    if (dataParam == nullptr) {
+        HILOG_ERROR("null dataParam");
+        return;
+    }
+    dataParam->result = false;
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(getLiveFormStatusEnv_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return;
+    }
+ 
+    napi_value myCallback = nullptr;
+    napi_get_reference_value(getLiveFormStatusEnv_, getLiveFormStatusCallbackRef_, &myCallback);
+    
+    napi_valuetype callbackType;
+    napi_typeof(getLiveFormStatusEnv_, myCallback, &callbackType);
+    if (callbackType != napi_function) {
+        HILOG_ERROR("callbackType is not napi_function.");
+        napi_close_handle_scope(getLiveFormStatusEnv_, scope);
+        return;
+    }
+ 
+    napi_value callResult;
+    napi_status status = napi_call_function(getLiveFormStatusEnv_, nullptr, myCallback, 0, nullptr, &callResult);
+    if (status != napi_ok) {
+        HILOG_ERROR("status is not napi_ok.");
+        napi_close_handle_scope(getLiveFormStatusEnv_, scope);
+        return;
+    }
+ 
+    napi_valuetype returnType;
+    napi_typeof(getLiveFormStatusEnv_, callResult, &returnType);
+    if (returnType == napi_undefined) {
+        HILOG_ERROR("returnType is napi_undefined.");
+        napi_close_handle_scope(getLiveFormStatusEnv_, scope);
+        return;
+    }
+ 
+    HILOG_INFO("parse result");
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    bool ret = ConvertNapiValueToMap(getLiveFormStatusEnv_, callResult, liveFormStatusMap);
+    dataParam->result = ret;
+    dataParam->liveFormStatusMap = liveFormStatusMap;
+    napi_close_handle_scope(getFormRectEnv_, scope);
+}
+
+bool JsFormRouterProxyMgr::ConvertNapiValueToMap(
+    napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap)
+{
+    if (value == nullptr) {
+        HILOG_ERROR("The value is error.");
+        return false;
+    }
+ 
+    napi_valuetype valueType;
+    napi_typeof(env, value, &valueType);
+    if (valueType != napi_object) {
+        HILOG_ERROR("return type is not object");
+        return false;
+    }
+ 
+    napi_value propNames;
+    napi_get_property_names(env, value, &propNames);
+ 
+    napi_valuetype propNamesType;
+    napi_typeof(env, propNames, &propNamesType);
+    if (propNamesType != napi_object) {
+        HILOG_ERROR("propNamesType is not napi_object");
+        return false;
+    }
+ 
+    uint32_t length;
+    napi_status status = napi_get_array_length(env, propNames, &length);
+    if (status != napi_ok) {
+        HILOG_ERROR("get array length error");
+        return false;
+    }
+    HILOG_INFO("length: %{public}d", length);
+    for (uint32_t i = 0; i < length; ++i) {
+        napi_value key;
+        napi_get_element(env, propNames, i, &key);
+ 
+        napi_valuetype keyType;
+        napi_typeof(env, key, &keyType);
+        if (keyType != napi_string) {
+            HILOG_ERROR("keyType is not napi_string");
+            continue;
+        }
+ 
+        napi_value valueObj;
+        napi_get_property(env, value, key, &valueObj);
+ 
+        napi_valuetype valType;
+        napi_typeof(env, valueObj, &valType);
+        if (valType != napi_string) {
+            HILOG_ERROR("valType is not napi_string");
+            continue;
+        }
+ 
+        std::string mKey = GetStringFromNapi(env, key);
+        std::string mValue = GetStringFromNapi(env, valueObj);
+        uMap.insert({mKey, mValue});
+    }
+    return true;
+}
+
 PromiseCallbackInfo::PromiseCallbackInfo(LiveFormInterfaceParam* liveFormInterfaceParam)
     : liveFormInterfaceParam_(liveFormInterfaceParam)
 {}

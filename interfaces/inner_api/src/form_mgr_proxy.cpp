@@ -2946,5 +2946,48 @@ ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const std::string &ne
     }
     return reply.ReadInt32();
 }
+
+bool FormMgrProxy::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token");
+        return false;
+    }
+ 
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("Failed to write callerToken");
+        return false;
+    }
+ 
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+ 
+bool FormMgrProxy::UnregisterGetLiveFormStatusProxy()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return false;
+    }
+ 
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

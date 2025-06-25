@@ -759,6 +759,18 @@ public:
      */
     ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect) override;
 
+    /**
+     * @brief Register get live form status proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return true for register success.
+     */
+    bool RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken) override;
+ 
+    /**
+     * @brief Unregister get live form status proxy in fms.
+     * @return Return true for unregister success.
+     */
+    bool UnregisterGetLiveFormStatusProxy() override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

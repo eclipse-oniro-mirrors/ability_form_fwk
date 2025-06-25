@@ -813,6 +813,18 @@ public:
      */
     ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect);
 
+    /**
+     * @brief Register getLiveFormStatus proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns true for form register success
+     */
+    bool RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
+ 
+    /**
+     * @brief Unregister get live form status proxy in fms
+     * @return Return true if unregister success
+     */
+    bool UnregisterGetLiveFormStatusProxy();
 private:
     /**
      * @brief Connect form manager service.

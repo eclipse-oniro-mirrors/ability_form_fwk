@@ -118,6 +118,8 @@ public:
     MOCK_METHOD1(RegisterGetFormRectProxy, bool(const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(UnregisterGetFormRectProxy, bool());
     MOCK_METHOD2(GetFormRect, ErrCode(const int64_t formId, Rect &rect));
+    MOCK_METHOD1(RegisterGetLiveFormStatusProxy, bool(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterGetLiveFormStatusProxy, bool());
 };
 }
 }

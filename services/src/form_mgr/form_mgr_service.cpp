@@ -2154,5 +2154,17 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const std::string &
     }
     return FormProviderMgr::GetInstance().ConnectAmsUpdateSize(formId, newDimension, newRect);
 }
+
+bool FormMgrService::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);
+}
+ 
+bool FormMgrService::UnregisterGetLiveFormStatusProxy()
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().UnregisterGetLiveFormStatusProxy();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

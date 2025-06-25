@@ -751,6 +751,21 @@ private:
      */
     ErrCode HandleNotifyUpdateFormSize(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle register getLiveFromStatus proxy in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply);
+ 
+    /**
+     * @brief Handle unregister getLiveFromStatus proxy in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply);
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 
