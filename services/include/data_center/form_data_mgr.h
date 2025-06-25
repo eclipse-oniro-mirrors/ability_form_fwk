@@ -937,7 +937,7 @@ public:
      * @param get form record visibility.
      * @return Returns true if DataProxy ignore visibility; returns false otherwise.
      */   
-    bool GetFormVisibility(const FormRecord formRecord); 
+    bool GetFormVisibility(const FormRecord formRecord) const; 
 
 private:
     /**

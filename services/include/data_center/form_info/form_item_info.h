@@ -486,7 +486,7 @@ public:
      */
     void SetConditionUpdate(const std::vector<int32_t> &conditionUpdate);
     /**
-     * @brief Set value of if ignore visibility flag.
+     * @brief Set value of ignore visibility flag.
      * @param updateDuration Update duration.
      */
     void SetIgnoreFormVisibility(bool visibility);

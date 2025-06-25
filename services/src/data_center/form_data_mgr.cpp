@@ -3043,7 +3043,7 @@ void FormDataMgr::SetFormVisibility(const FormItemInfo &formInfo, FormRecord &re
     record.isIgnoreFormVisible = formInfo.GetIgnoreFormVisibility();
 }
 
-bool FormDataMgr::GetProxyVisibility(const FormRecord &record)
+bool FormDataMgr::GetProxyVisibility(const FormRecord &record) const
 {
     return record.isIgnoreFormVisible;
 }
