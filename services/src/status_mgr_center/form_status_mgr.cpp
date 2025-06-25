@@ -222,11 +222,9 @@ void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
 
     auto func = eventTaskInfo.getFunc();
     auto event = eventTaskInfo.getFormEvent();
-
     if (event == FormFsmEvent::RECYCLE_FORM) {
         FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
     }
-
     FormStatusMgr::GetInstance().PostFormEvent(formId, event, func);
 }
 

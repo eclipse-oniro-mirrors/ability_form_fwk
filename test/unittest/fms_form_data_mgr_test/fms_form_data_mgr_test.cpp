@@ -5058,7 +5058,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycl
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
     int64_t formId = 123;
-	bool isExistRecycleTask = true;
+    bool isExistRecycleTask = true;
     auto result = formDataMgr->UpdateFormRecordSetIsExistRecycleTask(formId, isExistRecycleTask);
     EXPECT_FALSE(result);
 
