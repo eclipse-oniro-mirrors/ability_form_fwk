@@ -230,6 +230,10 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
+    if (formInfo.GetIgnoreFormVisibility()) {
+        FormDataMgr::GetInstance().SetVisibility(formInfo, newRecord);
+    }
+
     HILOG_DEBUG("end");
     return newRecord;
 }
@@ -3036,7 +3040,7 @@ FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
 
 void FormDataMgr::SetFormVisibility(const FormItemInfo &formInfo, FormRecord &record)
 {
-    record.isIgnoreFormVisible = formInfo.GetFilterVisibility();
+    record.isIgnoreFormVisible = formInfo.GetIgnoreFormVisibility();
 }
 
 bool FormDataMgr::GetProxyVisibility(const FormRecord &record)

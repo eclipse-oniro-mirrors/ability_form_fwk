@@ -1554,7 +1554,7 @@ void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemI
 
     if (info.GetIgnoreFormVisibility()) {
         needUpdate = true;
-        record.isDataProxyIgnoreVisible = info.GetFilterVisibility();
+        record.isDataProxyIgnoreVisible = info.GetIgnoreFormVisibility();
     }
 
     if (needUpdate) {
@@ -1725,7 +1725,6 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
-    FormDataMgr::GetInstance().SetVisibility(newInfo, formRecord);
 
     FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams, callerToken);
 
@@ -2073,7 +2072,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     if (!formInfo.customizeDatas.empty()) {
         for (const auto &customizeData: formInfo.customizeDatas) {
             if (customizeData.name == FORM_DATA_PROXY_IGNORE_VISIBILITY) {
-                itemInfo.SetFilterVisibility(customizeData.value);
+                itemInfo.SetIgnoreFormVisibility(customizeData.value == "true");
             }
         }
     }

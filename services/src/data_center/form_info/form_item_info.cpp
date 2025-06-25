@@ -673,12 +673,12 @@ void FormItemInfo::SetProtectForm(bool protectForm)
 
 void FormItemInfo::SetIgnoreFormVisibility(bool visibility)
 {
-    IgnoreFormVisibility_ = visibility;
+    isIgnoreFormVisibility_ = visibility;
 }
 
 bool FormItemInfo::GetIgnoreFormVisibility() const
 {
-    return IgnoreFormVisibility_;
+    return isIgnoreFormVisibility_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
