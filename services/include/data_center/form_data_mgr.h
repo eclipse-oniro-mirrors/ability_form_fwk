@@ -165,7 +165,7 @@ public:
      * @brief Set dataProxy update flage default.
      * @param formRecord The form record.
      */
-    void ResetDataProxyUpdate (FormRecord &formRecord)
+    void ResetDataProxyUpdate (FormRecord &formRecord);
     /**
      * @brief Get published form record by formId.
      * @param bundleName Bundle name.
