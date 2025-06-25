@@ -88,6 +88,7 @@
 #include "form_refresh/form_refresh_mgr.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
+#include "status_mgr_center/form_status.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -3848,6 +3849,10 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " not ETS form", formId);
             continue;
         }
+        if (FormStatus::GetInstance().IsFormProcessRecycle(formId)) {
+            HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
+            continue;
+        }
         if (isCheckCallingUid && std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end()) {
             HILOG_WARN("form %{public}" PRId64 " not owned by %{public}d", formId, callingUid);
@@ -3887,6 +3892,12 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
             HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        // Recovery is performed only when the form has been recycled or is recycling, or when there is a
+        // recycling task in the queue.
+        if (!(FormStatus::GetInstance().IsFormProcessRecycle(formId) || record.isExistRecycleTask)) {
+            HILOG_WARN("form %{public}" PRId64 " not RECYCLED", formId);
             continue;
         }
         if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
