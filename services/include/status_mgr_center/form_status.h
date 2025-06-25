@@ -58,6 +58,13 @@ public:
      */
     void DeleteFormStatus(const int64_t formId);
 
+    /**
+     * @brief Determines if the form process recycle.
+     * @param formId The ID of the form
+     * @return true if the form process recycle, false otherwise.
+     */
+    bool IsFormProcessRecycle(const int64_t formId);
+
 private:
     // <formId, formStatus>
     std::shared_mutex formStatusMutex_;

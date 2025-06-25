@@ -40,6 +40,7 @@
 #include "status_mgr_center/form_status_mgr.h"
 #include "form_host/form_host_task_mgr.h"
 #include "status_mgr_center/form_status.h"
+#include "form_refresh/strategy/refresh_cache_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -153,7 +154,7 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
         }
         FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, newWant, remoteObject);
     };
-    FormRenderMgr::GetInstance().AddPostRenderFormTask(formRecord.formId, task);
+    RefreshCacheMgr::GetInstance().AddRenderTask(formRecord.formId, task);
     return ERR_OK;
 }
 

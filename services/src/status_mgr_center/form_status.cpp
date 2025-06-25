@@ -74,5 +74,18 @@ void FormStatus::DeleteFormStatus(const int64_t formId)
         HILOG_INFO("not find formId:%{public}" PRId64, formId);
     }
 }
+
+bool FormStatus::IsFormProcessRecycle(const int64_t formId)
+{
+    std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
+    auto iter = formStatusMap_.find(formId);
+    if (iter == formStatusMap_.end()) {
+        HILOG_DEBUG("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
+        return false;
+    }
+
+    return iter->second == FormFsmStatus::RECYCLED || iter->second == FormFsmStatus::RECYCLING_DATA ||
+           iter->second == FormFsmStatus::RECYCLING;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

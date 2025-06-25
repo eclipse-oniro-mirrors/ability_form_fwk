@@ -3074,5 +3074,18 @@ FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
     newRecord.needFreeInstall = record.needFreeInstall;
     return newRecord;
 }
+
+bool FormDataMgr::UpdateFormRecordSetIsExistRecycleTask(const int64_t formId, bool isExistRecycleTask)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+        return false;
+    }
+    info->second.isExistRecycleTask = isExistRecycleTask;
+    HILOG_DEBUG("update form %{public}" PRId64 " isExistRecycleTask:%{public}d", formId, isExistRecycleTask);
+    return true;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

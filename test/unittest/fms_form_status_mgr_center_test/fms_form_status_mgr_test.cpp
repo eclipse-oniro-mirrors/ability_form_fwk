@@ -24,7 +24,6 @@
 #include "status_mgr_center/form_status.h"
 #undef private
 #include "fms_log_wrapper.h"
-#include "gmock/gmock.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -175,7 +174,7 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0006, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormStatusMgrTest_0006 start";
 
     int64_t formId = FORM_ID;
-    FormFsmEvent event = FormFsmEvent::RENDER_FORM;
+    FormFsmEvent event = FormFsmEvent::RECYCLE_FORM;
     auto task = []() { GTEST_LOG_(INFO) << "FormStatusMgrTest_0006 Task called"; };
     FormStatusMgr::GetInstance().AddTaskToQueueUnique(formId, event, task);
     std::shared_ptr<FormEventQueue> formEventQueue = FormStatusMgr::GetInstance().GetFormEventQueue(formId);

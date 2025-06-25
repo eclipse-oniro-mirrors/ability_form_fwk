@@ -30,12 +30,16 @@
 #include "json_serializer.h"
 #include "permission_verification.h"
 #include "common/event/form_event_report.h"
+#include "common_event.h"
+#include "common_event_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const std::string FORM_METADATA_NAME = "ohos.extension.form";
 const std::uint32_t ERR_VERSION_CODE = 0;
+const std::string FMS_IS_READY_EVENT = "fmsIsReady";
+const std::string PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 } // namespace
 
 ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
@@ -890,8 +894,25 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             bundleVersionPair.first.c_str(), bundleVersionPair.second);
     }
     hasReloadedFormInfosState_ = true;
+    bool publishRet = PublishFmsReadyEvent();
+    if (!publishRet) {
+        HILOG_ERROR("failed to publish fmsIsReady event with permission");
+    }
     HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
     return ERR_OK;
+}
+
+bool FormInfoMgr::PublishFmsReadyEvent()
+{
+    HILOG_INFO("publish fmsIsReady event");
+    Want eventWant;
+    eventWant.SetAction(FMS_IS_READY_EVENT);
+    CommonEventData eventData;
+    eventData.SetWant(eventWant);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetSubscriberPermissions({PERMISSION_REQUIRE_FORM});
+    bool ret = EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo);
+    return ret;
 }
 
 bool FormInfoMgr::HasReloadedFormInfos()

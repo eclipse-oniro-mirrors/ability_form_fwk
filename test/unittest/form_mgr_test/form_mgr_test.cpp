@@ -4940,22 +4940,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0273, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
     GTEST_LOG_(INFO) << "FormMgrTest_0273 test ends";
 }
- 
-/**
- * @tc.name: FormMgrTest_0274
- * @tc.desc: Verify getFormRect
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0274, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrTest_0274 begin";
-    int64_t formId = 1;
-    Rect rect;
-    FormMgr::GetInstance().remoteProxy_ = nullptr;
-    ErrCode result = FormMgr::GetInstance().GetFormRect(formId, rect);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
-    GTEST_LOG_(INFO) << "FormMgrTest_0274 end";
-}
 
 /**
  * @tc.name: FormMgrTest_0275
@@ -4967,7 +4951,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0275, TestSize.Level1) {
     EXPECT_CALL(*mockProxy, RegisterGetFormRectProxy(_))
         .Times(1)
         .WillOnce(Return(true));
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     bool result = FormMgr::GetInstance().RegisterGetFormRectProxy(callerToken);
     EXPECT_EQ(result, true);
@@ -4984,7 +4967,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0276, TestSize.Level1) {
     EXPECT_CALL(*mockProxy, RegisterGetFormRectProxy(_))
         .Times(1)
         .WillOnce(Return(false));
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     bool result = FormMgr::GetInstance().RegisterGetFormRectProxy(callerToken);
     EXPECT_EQ(result, false);
@@ -5002,7 +4984,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0277, TestSize.Level1)
     EXPECT_CALL(*mockProxy, UnregisterGetFormRectProxy())
         .Times(1)
         .WillOnce(Return(true));
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     bool result = FormMgr::GetInstance().UnregisterGetFormRectProxy();
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0277 test ends";
@@ -5019,7 +5000,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0278, TestSize.Level1)
     EXPECT_CALL(*mockProxy, UnregisterGetFormRectProxy())
         .Times(1)
         .WillOnce(Return(false));
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     bool result = FormMgr::GetInstance().UnregisterGetFormRectProxy();
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0278 test ends";

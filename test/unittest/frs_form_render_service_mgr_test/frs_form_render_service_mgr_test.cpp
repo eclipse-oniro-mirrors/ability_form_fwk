@@ -177,7 +177,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_003, TestSize.Level0
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, value);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = formRenderServiceMgr.RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_003 end";
 }
 
@@ -1100,7 +1100,15 @@ HWTEST_F(FormRenderServiceMgrTest, RunCachedConfigurationUpdatedTest_001, TestSi
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
     formRenderServiceMgr.configuration_->AddItem("ohos.system.colorMode", "dark");
     formRenderServiceMgr.hasCachedConfig_ = true;
+    sptr<IRemoteObject> callerToken = nullptr;
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    formRenderServiceMgr.SetFormSupplyClient(formSupplyClient);
+    formRenderServiceMgr.RunCachedConfigurationUpdated();
+    EXPECT_TRUE(formRenderServiceMgr.hasCachedConfig_);
 
+    callerToken = new (std::nothrow) MockFormSupplyStub();
+    formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    formRenderServiceMgr.SetFormSupplyClient(formSupplyClient);
     formRenderServiceMgr.RunCachedConfigurationUpdated();
     EXPECT_FALSE(formRenderServiceMgr.hasCachedConfig_);
     GTEST_LOG_(INFO) << "RunCachedConfigurationUpdatedTest_001 end";

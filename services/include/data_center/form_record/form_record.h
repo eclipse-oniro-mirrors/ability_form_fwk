@@ -95,6 +95,7 @@ public:
     std::map<int64_t, Want> wantCacheMap;
     bool isLocationChange = false;
     bool isDataProxyUpdate = false;
+    bool isExistRecycleTask = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

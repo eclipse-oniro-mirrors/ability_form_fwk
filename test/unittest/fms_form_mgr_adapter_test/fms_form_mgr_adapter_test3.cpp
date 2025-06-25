@@ -1167,4 +1167,52 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0299, TestSize.Level0)
         formMgrAdapter.GetFormRect(formId, uid, rect));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0299 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0300
+ * @tc.desc: test RegisterGetFormRectProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0300, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0300 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> observer = nullptr;
+    auto ret = formMgrAdapter.RegisterGetFormRectProxy(observer);
+    EXPECT_EQ(ret, false);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0300 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0301
+ * @tc.desc: test UnregisterGetFormRectProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0301, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0301 start";
+    FormMgrAdapter formMgrAdapter;
+    auto ret = formMgrAdapter.UnregisterGetFormRectProxy();
+    EXPECT_EQ(ret, true);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0301 end";
+}
+
+
+/**
+ * @tc.name: FormMgrAdapter_0302
+ * @tc.desc: test GetFormRect function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0302, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0302 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    Rect rect;
+    MockCallerCheck(ERR_OK);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED,
+        formMgrAdapter.GetFormRect(formId, uid, rect));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0302 end";
+}
 }
