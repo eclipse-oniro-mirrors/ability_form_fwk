@@ -24,7 +24,6 @@
 #include "status_mgr_center/form_status.h"
 #undef private
 #include "fms_log_wrapper.h"
-#include "gmock/gmock.h"
 
 using namespace testing::ext;
 using namespace OHOS;

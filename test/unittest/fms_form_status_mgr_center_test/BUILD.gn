@@ -70,7 +70,6 @@ ohos_unittest("FmsFormStatusMgrCenterTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "googletest:gtest_main",
-    "googletest:gmock_main",
     "libxml2:libxml2",
   ]
  
