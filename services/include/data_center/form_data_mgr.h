@@ -160,12 +160,12 @@ public:
      * @param formRecord The form record.
      * @return Returns true if DataProxy Update, others on false.
      */
-    bool FormDataMgr IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) const;
+    bool IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) const;
     /**
      * @brief Set dataProxy update flage default.
      * @param formRecord The form record.
      */
-    void FormDataMgr::ResetDataProxyUpdate (FormRecord &formRecord)
+    void ResetDataProxyUpdate (FormRecord &formRecord)
     /**
      * @brief Get published form record by formId.
      * @param bundleName Bundle name.
@@ -936,11 +936,6 @@ public:
     FormRecord GetFormAbilityInfo(const FormRecord &record) const;
 
     /**
-     * @brief set form record visibility.
-     * @param formInfo Form item info.
-     * @param formRecord The form record.
-     */
-    void SetDataProxyFormVisibility(const FormItemInfo &formInfo, FormRecord &formRecord);
      * @brief Update formRecord isExistRecycleTask.
      * @param formId The id of the forms.
      * @param isExistRecycleTask Whether the form exist recycle task.
