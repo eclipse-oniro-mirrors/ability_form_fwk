@@ -18,6 +18,7 @@
 #include "status_mgr_center/form_status.h"
 #include "status_mgr_center/form_event_timeout_queue.h"
 #include "status_mgr_center/form_event_retry_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "fms_log_wrapper.h"
 
@@ -167,8 +168,9 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
         temptaskInfoQueue.pop();
         formEventQueue->PushFormEvent(eventTaskInfo);
     }
-
     HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueue().size()));
+
+    FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
 }
 
 void FormStatusMgr::AddTaskToQueuePush(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
@@ -176,12 +178,17 @@ void FormStatusMgr::AddTaskToQueuePush(const int64_t formId, const FormFsmEvent 
     std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
     FormEventTaskInfo taskInfo{formId, event, func};
     formEventQueue->PushFormEvent(taskInfo);
+
+    if (event == FormFsmEvent::RECYCLE_DATA || event == FormFsmEvent::RECYCLE_FORM) {
+        FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, true);
+    }
 }
 
 void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
-    std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
+    FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
 
+    std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
     FormEventTaskInfo taskInfo{formId, event, func};
     if (formEventQueue->IsEventQueueEmpty()) {
         formEventQueue->PushFormEvent(taskInfo);
@@ -215,6 +222,9 @@ void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
 
     auto func = eventTaskInfo.getFunc();
     auto event = eventTaskInfo.getFormEvent();
+    if (event == FormFsmEvent::RECYCLE_FORM) {
+        FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
+    }
     FormStatusMgr::GetInstance().PostFormEvent(formId, event, func);
 }
 

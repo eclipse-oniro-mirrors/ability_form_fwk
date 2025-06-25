@@ -18,7 +18,6 @@
 #include "status_mgr_center/form_status.h"
 #include "status_mgr_center/form_status_common.h"
 #include "fms_log_wrapper.h"
-#include "gmock/gmock.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -86,5 +85,35 @@ HWTEST_F(FormStatusTest, FormStatusTest_0001, TestSize.Level0)
     EXPECT_EQ(ret, false);
 
     GTEST_LOG_(INFO) << "FormStatusTest_0001 end";
+}
+
+/**
+ * @tc.name: FormStatusTest_IsFormProcessRecycle
+ * @tc.desc: Verify FormStatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusTest, FormStatusTest_IsFormProcessRecycle, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormStatusTest_IsFormProcessRecycle start";
+
+    FormStatus::GetInstance().DeleteFormStatus(1001);
+    bool result = FormStatus::GetInstance().IsFormProcessRecycle(1001);
+    EXPECT_FALSE(result);
+
+    FormStatus::GetInstance().SetFormStatus(1001, FormFsmStatus::RECYCLED);
+    result = FormStatus::GetInstance().IsFormProcessRecycle(1001);
+    EXPECT_TRUE(result);
+
+    FormStatus::GetInstance().DeleteFormStatus(1002);
+    FormStatus::GetInstance().SetFormStatus(1002, FormFsmStatus::RECYCLING_DATA);
+    result = FormStatus::GetInstance().IsFormProcessRecycle(1002);
+    EXPECT_TRUE(result);
+
+    FormStatus::GetInstance().DeleteFormStatus(1003);
+    FormStatus::GetInstance().SetFormStatus(1003, FormFsmStatus::RECYCLING);
+    result = FormStatus::GetInstance().IsFormProcessRecycle(1003);
+    EXPECT_TRUE(result);
+
+    GTEST_LOG_(INFO) << "FormStatusTest_IsFormProcessRecycle end";
 }
 }  // namespace

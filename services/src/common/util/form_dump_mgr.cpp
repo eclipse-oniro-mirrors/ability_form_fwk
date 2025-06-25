@@ -192,7 +192,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     }
 
     AppendBundleFormInfo(formRecordInfo, formInfo);
-    AppendRecycleStatus(formRecordInfo.formId, formInfo);
+    AppendFormStatus(formRecordInfo.formId, formInfo);
 }
 
 /**
@@ -258,7 +258,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             }
 
             AppendFormLocation(info.formLocation, infosResult);
-            AppendRecycleStatus(info.formId, infosResult);
+            AppendFormStatus(info.formId, infosResult);
             AppendBundleType(info.formBundleType, infosResult);
             infosResult += " \n";
         }
@@ -344,9 +344,9 @@ void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::st
     }
 }
 
-void FormDumpMgr::AppendRecycleStatus(const int64_t formId, std::string &formInfo) const
+void FormDumpMgr::AppendFormStatus(const int64_t formId, std::string &formInfo) const
 {
-    formInfo += "    recycleStatus ";
+    formInfo += "    formStatus ";
     FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
     if (status == FormFsmStatus::INIT) {
         formInfo += "[ INIT ]\n";

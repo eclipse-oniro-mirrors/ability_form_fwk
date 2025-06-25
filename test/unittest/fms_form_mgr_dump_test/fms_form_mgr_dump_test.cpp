@@ -433,30 +433,30 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_018, TestSize.Level1)
 
 /**
  * @tc.name: Dump_019
- * @tc.desc: Verify AppendRecycleStatus
+ * @tc.desc: Verify AppendFormStatus
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrDumpTest, Dump_019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Dump_019 start";
     std::string formInfo = "formInfo";
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::INIT);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RENDERED);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECYCLED);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RENDERING);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECYCLING_DATA);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECYCLING);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::RECOVERING);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     FormStatus::GetInstance().SetFormStatus(FORM_ID_ONE, FormFsmStatus::DELETING);
-    FormDumpMgr::GetInstance().AppendRecycleStatus(FORM_ID_ONE, formInfo);
+    FormDumpMgr::GetInstance().AppendFormStatus(FORM_ID_ONE, formInfo);
     GTEST_LOG_(INFO) << "Dump_019 end";
 }
 
