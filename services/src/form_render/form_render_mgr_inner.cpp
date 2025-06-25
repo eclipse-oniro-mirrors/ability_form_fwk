@@ -136,7 +136,8 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
 
     auto renderType = want.GetIntParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADD_FORM_UPDATE_FORM);
     if (renderType != Constants::ADAPTER_UPDATE_FORM ||
-        FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId) || formRecord.isIgnoreFormVisible) {
+        FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId) ||
+        FormDataMgr::GetInstance().IsDataProxyIgnoreFormVisible(formRecord)) {
         FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
         return ERR_OK;
     }

@@ -155,7 +155,12 @@ public:
      */
     bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos,
         int32_t userId = Constants::INVALID_USER_ID) const;
-
+    /**
+     * @brief DataProxy Ignore Visibility.
+     * @param formRecord The form record.
+     * @return Returns true if DataProxy Update, others on false.
+     */
+    bool FormDataMgr IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) const;
     /**
      * @brief Get published form record by formId.
      * @param bundleName Bundle name.
@@ -930,7 +935,7 @@ public:
      * @param formInfo Form item info.
      * @param formRecord The form record.
      */
-    void SetFormVisibility(const FormItemInfo &formInfo, FormRecord &formRecord);
+    void SetDataProxyFormVisibility(const FormItemInfo &formInfo, FormRecord &formRecord);
 
 private:
     /**

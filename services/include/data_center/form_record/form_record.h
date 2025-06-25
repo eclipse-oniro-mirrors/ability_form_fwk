@@ -94,6 +94,7 @@ public:
     std::vector<int32_t> conditionUpdate;
     std::map<int64_t, Want> wantCacheMap;
     bool isLocationChange = false;
+    bool isDataProxyUpdate = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

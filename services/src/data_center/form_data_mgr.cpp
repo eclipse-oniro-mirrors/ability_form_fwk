@@ -231,7 +231,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     if (formInfo.GetIgnoreFormVisibility()) {
-        FormDataMgr::GetInstance().SetFormVisibility(formInfo, newRecord);
+        newRecord.isIgnoreFormVisible = formInfo.GetIgnoreFormVisibility();
     }
 
     HILOG_DEBUG("end");
@@ -571,6 +571,32 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
         HILOG_DEBUG("formInfo not find");
         return false;
     }
+}
+
+/**
+ * @brief Get form record.
+ * @param formId The Id of the form.
+ * @param formRecord The form record.
+ * @return Set true if DataProxy Update.
+ */
+void FormDataMgr::SetDataProxyUpdate(const int64_t formId)
+{
+    HILOG_DEBUG("get form record by formId");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        info->second.isDataProxyUpdate = true;
+    }
+}
+
+/**
+ * @brief DataProxy update ignore visibility check.
+ * @param formRecord The form record.
+ * @return return true if DataProxy Update.
+ */
+bool FormDataMgr::IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) const
+{
+    return formRecord.isDataProxyUpdate && formRecord.isIgnoreFormVisible；
 }
 
 /**
@@ -3036,11 +3062,6 @@ FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
     newRecord.versionUpgrade = record.versionUpgrade;
     newRecord.needFreeInstall = record.needFreeInstall;
     return newRecord;
-}
-
-void FormDataMgr::SetFormVisibility(const FormItemInfo &formInfo, FormRecord &record)
-{
-    record.isIgnoreFormVisible = formInfo.GetIgnoreFormVisibility();
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
