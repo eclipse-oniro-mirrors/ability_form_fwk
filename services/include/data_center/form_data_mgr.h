@@ -161,6 +161,12 @@ public:
      * @return Returns true if DataProxy Update, others on false.
      */
     bool FormDataMgr IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) const;
+
+    /**
+     * @brief Set dataProxy update flage default.
+     * @param formRecord The form record.
+     */
+    void FormDataMgr::ResetDataProxyUpdate (FormRecord &formRecord)
     /**
      * @brief Get published form record by formId.
      * @param bundleName Bundle name.
