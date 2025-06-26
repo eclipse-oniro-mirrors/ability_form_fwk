@@ -596,7 +596,7 @@ void FormDataMgr::SetDataProxyUpdate(const int64_t formId)
  */
 bool FormDataMgr::IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) const
 {
-    return formRecord.isDataProxyUpdate && formRecord.isIgnoreFormVisible；
+    return formRecord.isDataProxyUpdate && formRecord.isIgnoreFormVisible;
 }
 
 /**
