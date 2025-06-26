@@ -549,7 +549,7 @@ private:
     bool lockForm_ = false;
     bool protectForm_ = false;
     std::vector<int32_t> conditionUpdate_;
-    bool isIgnoreFormVisibility_ = false;
+    bool isDataProxyIgnoreFormVisibility_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

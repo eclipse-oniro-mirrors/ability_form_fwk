@@ -75,7 +75,7 @@ public:
     bool isTimerRefresh = false;
     bool isHostRefresh = false;
     bool isDataProxy = false;
-    bool isIgnoreDataProxyFormVisible = false;
+    bool isDataProxyIgnoreFormVisible = false;
     bool isSystemApp = false;
     int32_t uid = 0;
     std::string description = "";
@@ -94,8 +94,7 @@ public:
     std::vector<int32_t> conditionUpdate;
     std::map<int64_t, Want> wantCacheMap;
     bool isLocationChange = false;
-    bool isDataProxyUpdate = false;
-    bool isExistRecycleTask = false;
+    
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

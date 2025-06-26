@@ -1555,7 +1555,7 @@ void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemI
 
     if (info.GetDataProxyIgnoreFormVisibility()) {
         needUpdate = true;
-        record.isIgnoreDataProxyFormVisible = true;
+        record.isDataProxyIgnoreFormVisible = true;
     }
 
     if (needUpdate) {

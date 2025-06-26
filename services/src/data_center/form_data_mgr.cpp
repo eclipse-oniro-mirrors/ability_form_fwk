@@ -230,7 +230,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
-    newRecord.isIgnoreFormVisible = formInfo.GetIgnoreFormVisibility();
+    newRecord.isDataProxyIgnoreFormVisible = formInfo.GetDataProxyIgnoreFormVisibility();
     HILOG_DEBUG("end");
     return newRecord;
 }
@@ -596,7 +596,7 @@ bool FormDataMgr::IsDataProxyIgnoreFormVisibility(const int64_t formId) const
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info != formRecords_.end()) {
-        return info->second.isDataProxyUpdate && info->second.isIgnoreFormVisible;
+        return info->second.isDataProxyUpdate && info->second.isDataProxyIgnoreFormVisible;
     }
     return false;
 }
