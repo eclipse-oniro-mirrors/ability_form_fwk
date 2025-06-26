@@ -157,13 +157,13 @@ public:
         int32_t userId = Constants::INVALID_USER_ID) const;
     /**
      * @brief DataProxy if Ignore Visibility.
-     * @param formRecord The form record.
+     * @param formId The Id of the form.
      * @return Returns true if DataProxy Update, others on false.
      */
     bool IsDataProxyIgnoreFormVisibility(const int64_t formId) const;
     /**
      * @brief Reset dataProxy update flag.
-     * @param formRecord The form record.
+     * @param formId The Id of the form.
      */
     void ResetDataProxyUpdate (const int64_t formId);
     /**
