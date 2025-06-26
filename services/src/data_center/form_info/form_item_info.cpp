@@ -673,12 +673,12 @@ void FormItemInfo::SetProtectForm(bool protectForm)
 
 void FormItemInfo::SetDataProxyIgnoreFormVisibility(bool visibility)
 {
-    isIgnoreFormVisibility_ = visibility;
+    isIgnoreDataProxyFormVisibility_ = visibility;
 }
 
 bool FormItemInfo::GetDataProxyIgnoreFormVisibility() const
 {
-    return isIgnoreFormVisibility_ ;
+    return isIgnoreDataProxyFormVisibility_ ;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
