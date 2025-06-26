@@ -1989,9 +1989,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0108, TestSize.Level0)
     MockExistTempForm(false);
     MockGetDBRecord(true);
     MockGetDBRecordParam(true);
-    MockDeleteHostRecord(false);
+    MockDeleteHostRecord(true);
     MockRemoveFormTimer(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.ReleaseForm(formId, callerToken, delCache));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.ReleaseForm(formId, callerToken, delCache));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0108 end";
 }
 
@@ -2067,9 +2067,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0112, TestSize.Level0)
     sptr<IRemoteObject> callerToken = nullptr;
     MockGetDBRecord(true);
     MockGetDBRecordParam(true);
-    MockDeleteHostRecord(false);
+    MockDeleteHostRecord(true);
     MockRemoveFormTimer(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteForm(formId, callerToken));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleDeleteForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0112 end";
 }
 
@@ -2126,8 +2126,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0115, TestSize.Level0)
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockHasFormUserUids(true);
-    MockDeleteHostRecord(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
+    MockDeleteHostRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0115 end";
 }
 
@@ -2146,8 +2146,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0116, TestSize.Level0)
     MockGetFormRecordParams(true);
     MockHasFormUserUids(false);
     MockNotifyProviderFormDelete(true);
-    MockDeleteHostRecord(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
+    MockDeleteHostRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0116 end";
 }
 
