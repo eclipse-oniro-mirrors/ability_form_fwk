@@ -160,17 +160,17 @@ public:
      * @param formRecord The form record.
      * @return Returns true if DataProxy Update, others on false.
      */
-    bool IsDataProxyIgnoreFormVisible(const int64_t &formId) const;
+    bool IsDataProxyIgnoreFormVisible(const int64_t formId) const;
     /**
      * @brief Reset dataProxy update flag.
      * @param formRecord The form record.
      */
-    void ResetDataProxyUpdate (const int64_t &formId);
+    void ResetDataProxyUpdate (const int64_t formId);
     /**
      * @brief check if dataProxy update.
      * @param formId The Id of the form.
      */
-    void SetDataProxyUpdate(const int64_t &formId);
+    void SetDataProxyUpdate(const int64_t formId);
     /**
      * @brief Get published form record by formId.
      * @param bundleName Bundle name.
