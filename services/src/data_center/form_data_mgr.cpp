@@ -591,15 +591,16 @@ void FormDataMgr::SetDataProxyUpdate(const int64_t formId)
  * @param formRecord The form record.
  * @return return true if DataProxy Update.
  */
-bool FormDataMgr::IsDataProxyIgnoreFormVisible(const int64_t formId) const
+bool FormDataMgr::IsDataProxyIgnoreFormVisibility(const int64_t formId) const
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info != formRecords_.end()) {
         return info->second.isDataProxyUpdate && info->second.isIgnoreFormVisible;
-}
     }
     return false;
+}
+    
 
 /**
  * @brief Set dataProxy update flage default.

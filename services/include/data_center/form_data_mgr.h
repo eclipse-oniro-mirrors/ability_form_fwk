@@ -160,7 +160,7 @@ public:
      * @param formRecord The form record.
      * @return Returns true if DataProxy Update, others on false.
      */
-    bool IsDataProxyIgnoreFormVisible(const int64_t formId) const;
+    bool IsDataProxyIgnoreFormVisibility(const int64_t formId) const;
     /**
      * @brief Reset dataProxy update flag.
      * @param formRecord The form record.
