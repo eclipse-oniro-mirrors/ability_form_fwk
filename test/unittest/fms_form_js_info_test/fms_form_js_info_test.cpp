@@ -83,8 +83,15 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_002, TestSize.Level0)
     FormJsInfo formJsInfo;
     // mock ConvertRawImageData is true
     MockConvertRawImageData(true);
-    // mock GetImageDataMap size is 130
-    MockGetImageDataMap(true);
+    // GetImageDataMap size is 130
+    sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    int32_t a = 1;
+    int32_t maxNumber = 130;
+    for (int32_t i = 0; i < maxNumber; i++) {
+        imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
+    }
+    formJsInfo.formProviderData.SetImageDataMap(imageDataMap);
     EXPECT_EQ(false, formJsInfo.ConvertRawImageData());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_002 end";
 }
