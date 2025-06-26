@@ -489,12 +489,12 @@ public:
      * @brief Set value of ignore visibility flag.
      * @param updateDuration Update duration.
      */
-    void SetIgnoreFormVisibility(bool visibility);
+    void SetDataProxyIgnoreFormVisibility(bool visibility);
     /**
      * @brief get value of ignore visibility flag.
      * @param updateDuration Update duration.
      */
-    bool GetIgnoreFormVisibility() const;
+    bool GetDataProxyIgnoreFormVisibility() const;
 
 private:
     /**

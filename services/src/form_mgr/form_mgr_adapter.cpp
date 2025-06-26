@@ -1553,9 +1553,9 @@ void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemI
         needUpdate = true;
     }
 
-    if (info.GetIgnoreFormVisibility()) {
+    if (info.GetDataProxyIgnoreFormVisibility()) {
         needUpdate = true;
-        record.isIgnoreFormVisible = true;
+        record.isIgnoreDataProxyFormVisible = true;
     }
 
     if (needUpdate) {
@@ -2073,7 +2073,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     if (!formInfo.customizeDatas.empty()) {
         for (const auto &customizeData: formInfo.customizeDatas) {
             if (customizeData.name == FORM_DATA_PROXY_IGNORE_VISIBILITY) {
-                itemInfo.SetIgnoreFormVisibility(!strcasecmp(customizeData.value.c_str(), "true"));
+                itemInfo.SetDataProxyIgnoreFormVisibility(!strcasecmp(customizeData.value.c_str(), "true"));
                 break;
             }
         }

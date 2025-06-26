@@ -671,12 +671,12 @@ void FormItemInfo::SetProtectForm(bool protectForm)
     protectForm_ = protectForm;
 }
 
-void FormItemInfo::SetIgnoreFormVisibility(bool visibility)
+void FormItemInfo::SetDataProxyIgnoreFormVisibility(bool visibility)
 {
     isIgnoreFormVisibility_ = visibility;
 }
 
-bool FormItemInfo::GetIgnoreFormVisibility() const
+bool FormItemInfo::GetDataProxyIgnoreFormVisibility() const
 {
     return isIgnoreFormVisibility_ ;
 }

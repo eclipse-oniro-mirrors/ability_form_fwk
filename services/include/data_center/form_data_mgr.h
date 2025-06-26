@@ -167,7 +167,7 @@ public:
      */
     void ResetDataProxyUpdate (const int64_t formId);
     /**
-     * @brief check if dataProxy update.
+     * @brief set dataProxy update.
      * @param formId The Id of the form.
      */
     void SetDataProxyUpdate(const int64_t formId);
