@@ -318,6 +318,10 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleGetFormRect(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE):
             return HandleNotifyUpdateFormSize(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS):
+            return HandleRegisterGetLiveFormStatusProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS):
+            return HandleUnregisterGetLiveFormStatusProxy(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1985,6 +1989,29 @@ ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParc
     ErrCode result = UpdateFormSize(formId, newDimension, *newRect);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("handle save query proxy to service");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    bool result = RegisterGetLiveFormStatusProxy(callerToken);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write proxy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+ 
+ErrCode FormMgrStub::HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    bool result = UnregisterGetLiveFormStatusProxy();
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

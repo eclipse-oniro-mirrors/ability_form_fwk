@@ -217,7 +217,8 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
     std::string &infosResult) const
 {
     HILOG_INFO("call");
-
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    FormMgrAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
     for (const auto& info : runningFormInfos) {
         if (info.hostBundleName == formHostBundleName) {
             infosResult += "  FormId [ " + std::to_string(info.formId) + " ] \n";
@@ -260,6 +261,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             AppendFormLocation(info.formLocation, infosResult);
             AppendFormStatus(info.formId, infosResult);
             AppendBundleType(info.formBundleType, infosResult);
+            AppendLiveFormStatus(std::to_string(info.formId), liveFormStatusMap, infosResult);
             infosResult += " \n";
         }
     }
@@ -378,6 +380,18 @@ void FormDumpMgr::AppendBundleType(const BundleType formBundleType, std::string 
         formInfo += "[ ATOMIC_SERVICE ]\n";
     } else {
         formInfo += "[ INVALID ]\n";
+    }
+}
+
+void FormDumpMgr::AppendLiveFormStatus(const std::string &formId,
+    const std::unordered_map<std::string, std::string> &liveFormStatusMap, std::string &formInfo) const
+{
+    formInfo += "    liveFormStatus ";
+    auto it = liveFormStatusMap.find(formId);
+    if (it == liveFormStatusMap.end()) {
+        formInfo += "[ INACTIVE ]\n";
+    } else {
+        formInfo += "[ " + it->second + " ]\n";
     }
 }
 }  // namespace AppExecFwk

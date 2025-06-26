@@ -4375,6 +4375,42 @@ ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingU
     return result;
 }
 
+bool FormMgrAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return false;
+    }
+    getLiveFormStatusCallerToken_ = callerToken;
+    return true;
+}
+ 
+bool FormMgrAdapter::UnregisterGetLiveFormStatusProxy()
+{
+    HILOG_INFO("call");
+    getLiveFormStatusCallerToken_ = nullptr;
+    return true;
+}
+ 
+ErrCode FormMgrAdapter::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
+{
+    HILOG_INFO("call");
+    if (!getLiveFormStatusCallerToken_) {
+        HILOG_ERROR("Fail, getLiveFormStatusCallerToken_ is nullptr!");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(getLiveFormStatusCallerToken_);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    ErrCode result = remoteFormHostDelegateProxy->GetLiveFormStatus(liveFormStatusMap);
+ 
+    HILOG_INFO("GetLiveFormStatus, result:%{public}d", result);
+    return result;
+}
+
 ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t callingUid)
 {
     HILOG_INFO("call");

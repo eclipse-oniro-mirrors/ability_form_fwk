@@ -1704,4 +1704,29 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_GetFormRect_001, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_GetFormRect_001 ends";
 }
+
+/*
+ * @tc.number: FormMgrProxyTest_RegisterGetLiveFormStatusProxy_001
+ * @tc.name: Verify RegisterGetLiveFormStatusProxy
+ * @tc.desc: text RegisterGetLiveFormStatusProxy function.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterGetLiveFormStatusProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterGetLiveFormStatusProxy_001 starts";
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    auto result = formMgrProxy->RegisterGetLiveFormStatusProxy(token);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterGetLiveFormStatusProxy_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UnregisterGetLiveFormStatusProxy_001
+ * @tc.name: Verify UnregisterGetLiveFormStatusProxy
+ * @tc.desc: text UnregisterGetLiveFormStatusProxy function.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterGetLiveFormStatusProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetLiveFormStatusProxy_001 starts";
+    auto result = formMgrProxy->UnregisterGetLiveFormStatusProxy();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetLiveFormStatusProxy_001 ends";
+}
 }

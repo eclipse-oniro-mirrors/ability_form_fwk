@@ -2225,5 +2225,36 @@ ErrCode FormMgr::UpdateFormSize(const int64_t formId, const std::string &newDime
     }
     return resultCode;
 }
+
+bool FormMgr::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+{
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return false;
+    }
+    return remoteProxy_->RegisterGetLiveFormStatusProxy(callerToken);
+}
+ 
+bool FormMgr::UnregisterGetLiveFormStatusProxy()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return false;
+    }
+    return remoteProxy_->UnregisterGetLiveFormStatusProxy();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

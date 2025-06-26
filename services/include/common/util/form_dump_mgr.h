@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_DUMP_MGR_H
 #define OHOS_FORM_FWK_FORM_DUMP_MGR_H
 
+#include <unordered_map>
 #include <singleton.h>
 
 #include "form_constants.h"
@@ -105,6 +106,8 @@ public:
     void DumpRunningFormInfos(const std::vector<RunningFormInfo> &runningFormInfos,
         std::string &infosResult) const;
 
+    void AppendLiveFormStatus(const std::string &formId,
+        const std::unordered_map<std::string, std::string> &liveFormStatusMap, std::string &formInfo) const;
 private:
     void AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
     void AppendFormStatus(const int64_t formId, std::string &formInfo) const;

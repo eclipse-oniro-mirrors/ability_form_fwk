@@ -62,6 +62,7 @@ typedef struct LiveFormInterfaceParam {
     bool isReady = false;
     bool result = false;
     AppExecFwk::Rect formRect;
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
 } LiveFormInterfaceParam;
 
 class JsFormRouterProxyMgr : public AppExecFwk::FormHostDelegateStub {
@@ -90,6 +91,9 @@ public:
 
     bool UnregisterGetFormRectListener();
 
+    bool RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
+
+    bool UnregisterGetLiveFormStatusListener();
 private:
     static std::mutex mutex_;
     static sptr<JsFormRouterProxyMgr> instance_;
@@ -114,6 +118,12 @@ private:
     void CallPromise(napi_value funcResult, LiveFormInterfaceParam *liveFormInterfaceParam);
     static napi_value PromiseCallback(napi_env env, napi_callback_info info);
     static bool ConvertFunctionResult(napi_env env, napi_value funcResult, AppExecFwk::Rect &rect);
+
+    napi_ref getLiveFormStatusCallbackRef_ = nullptr;
+    napi_env getLiveFormStatusEnv_;
+    ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
+    void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
+    bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
 };
 
 class PromiseCallbackInfo {

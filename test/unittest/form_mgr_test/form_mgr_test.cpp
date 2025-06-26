@@ -5004,4 +5004,68 @@ HWTEST_F(FormMgrTest, FormMgrTest_0278, TestSize.Level1)
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0278 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0279
+ * @tc.desc: Verify RegisterGetLiveFormStatusProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0279, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0279 starts";
+    EXPECT_CALL(*mockProxy, RegisterGetLiveFormStatusProxy(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    bool result = FormMgr::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_0279 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0280
+ * @tc.desc: Verify RegisterGetLiveFormStatusProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0280, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0280 starts";
+    EXPECT_CALL(*mockProxy, RegisterGetLiveFormStatusProxy(_))
+        .Times(1)
+        .WillOnce(Return(false));
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    bool result = FormMgr::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0280 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0281
+ * @tc.desc: Verify UnregisterGetLiveFormStatusProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0281, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0281 starts";
+    EXPECT_CALL(*mockProxy, UnregisterGetLiveFormStatusProxy())
+        .Times(1)
+        .WillOnce(Return(true));
+    bool result = FormMgr::GetInstance().UnregisterGetLiveFormStatusProxy();
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_0281 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0282
+ * @tc.desc: Verify UnregisterGetLiveFormStatusProxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0282, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0282 starts";
+    EXPECT_CALL(*mockProxy, UnregisterGetLiveFormStatusProxy())
+        .Times(1)
+        .WillOnce(Return(false));
+    bool result = FormMgr::GetInstance().UnregisterGetLiveFormStatusProxy();
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0282 test ends";
+}
 } // namespace

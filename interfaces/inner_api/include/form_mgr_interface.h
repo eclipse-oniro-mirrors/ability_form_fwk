@@ -877,6 +877,25 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Set get live form status proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns true for get live form status proxy register success.
+     */
+    virtual bool RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+    {
+        return false;
+    }
+ 
+    /**
+     * @brief Unregister get live form status proxy in fms.
+     * @return Returns true for get live form status proxy unregister success.
+     */
+    virtual bool UnregisterGetLiveFormStatusProxy()
+    {
+        return false;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -979,6 +998,8 @@ public:
         FORM_MGR_UNREGISTER_GET_FORM_RECT,
         FORM_MGR_GET_FORM_RECT,
         FORM_MGR_NOTIFY_UPDATE_FORM_SIZE,
+        FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS,
+        FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS,
     };
 };
 }  // namespace AppExecFwk

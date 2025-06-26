@@ -15,4 +15,5 @@ interface OHOS.AppExecFwk.IFormHostDelegate {
     [ipccode 4003] void RequestOverflow([in] long formId, [in] OverflowInfo overflowInfo, [in] boolean isOverflow);
     [ipccode 4004] void ChangeSceneAnimationState([in] long formId, [in] int state);
     [ipccode 4005] void GetFormRect([in] long formId, [inout] Rect rect);
+    [ipccode 4006] void GetLiveFormStatus([inout] Map<String, String> liveFormStatusMap);
 }

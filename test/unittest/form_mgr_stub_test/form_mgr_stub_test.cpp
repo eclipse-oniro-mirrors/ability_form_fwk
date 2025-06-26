@@ -3343,4 +3343,43 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0137, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0137 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0138
+ * @tc.name: Verify OnRemoteRequest and HandleRegisterGetLiveFormStatusProxy
+ * @tc.desc: test HandleRegisterGetLiveFormStatusProxy
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0138, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0138 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterGetLiveFormStatusProxy(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    auto result = mockFormMgrService->HandleRegisterGetLiveFormStatusProxy(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0138 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0139
+ * @tc.name: Verify OnRemoteRequest and HandleUnregisterGetLiveFormStatusProxy
+ * @tc.desc: test HandleUnregisterGetLiveFormStatusProxy
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0139, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0139 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const std::vector<int64_t> formIds;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, UnregisterGetLiveFormStatusProxy())
+        .Times(1)
+        .WillOnce(Return(true));
+    auto result = mockFormMgrService->HandleUnregisterGetLiveFormStatusProxy(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0139 ends";
+}
 }

@@ -750,6 +750,26 @@ public:
      * @return Returns error code of method execute, which ERR_OK represents success.
      */
     ErrCode GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect);
+
+    /**
+     * @brief Set get live form status proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK for setting success.
+     */
+    bool RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
+ 
+    /**
+     * @brief Unregister get live form status proxy in fms
+     * @return Return true if unregister success
+     */
+    bool UnregisterGetLiveFormStatusProxy();
+ 
+    /**
+     * @brief Get live form status.
+     * @param liveFormStatusMap The Map that stores formId and live form status.
+     * @return Returns error code of method execute, which ERR_OK represents success.
+     */
+    ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
 private:
     /**
      * @brief Get form configure info.
@@ -1350,6 +1370,8 @@ private:
     sptr<IRemoteObject> sceneanimationCallerToken_;
 
     sptr<IRemoteObject> getFormRectCallerToken_;
+
+    sptr<IRemoteObject> getLiveFormStatusCallerToken_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
