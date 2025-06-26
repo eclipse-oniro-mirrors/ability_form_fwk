@@ -1814,6 +1814,7 @@ bool FormRenderRecord::CheckManagerDelegateValid(const FormJsInfo &formJsInfo, c
             return true;
         }
     }
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto key = formJsInfo.formId;
     auto iter = formRendererGroupMap_.find(key);
     if (iter == formRendererGroupMap_.end() || iter->second == nullptr) {
