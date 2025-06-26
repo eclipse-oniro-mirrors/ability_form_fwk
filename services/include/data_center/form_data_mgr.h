@@ -167,6 +167,11 @@ public:
      */
     void ResetDataProxyUpdate (FormRecord &formRecord);
     /**
+     * @brief check if dataProxy update.
+     * @param formId The Id of the form.
+     */
+    void SetDataProxyUpdate(const int64_t &formId)；
+    /**
      * @brief Get published form record by formId.
      * @param bundleName Bundle name.
      * @param formInfo The form record.

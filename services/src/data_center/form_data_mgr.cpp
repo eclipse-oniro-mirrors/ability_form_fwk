@@ -605,8 +605,8 @@ bool FormDataMgr::IsDataProxyIgnoreFormVisible(const FormRecord &formRecord) con
  */
 void FormDataMgr::ResetDataProxyUpdate (FormRecord &formRecord)
 {
-    if (record.isDataProxyUpdate) {
-        record.isDataProxyUpdate = false;
+    if (formRecord.isDataProxyUpdate) {
+        formRecord.isDataProxyUpdate = false;
     }
 }
 
