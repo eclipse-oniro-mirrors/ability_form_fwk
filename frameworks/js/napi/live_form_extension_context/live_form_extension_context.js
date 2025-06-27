@@ -24,9 +24,4 @@ export class LiveFormExtensionContext extends UIExtensionContext {
     console.log(`setWindowBackgroundColor: ${JSON.stringify(color)}`);
     return this.__context_impl__.setWindowBackgroundColor(color);
   }
-
-  setBackgroundImage(res) {
-    console.log(`setBackgroundImage: ${JSON.stringify(res)}`);
-    return this.__context_impl__.setBackgroundImage({ 'backgroundImage': res });
-  }
 }

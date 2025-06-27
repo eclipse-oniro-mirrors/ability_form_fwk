@@ -22,26 +22,6 @@ namespace AbilityRuntime {
 using namespace OHOS::AppExecFwk;
 const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
 
-int32_t LiveFormExtensionContext::SendData(const AAFwk::WantParams &params)
-{
-    HILOG_DEBUG("SendData begin");
-#ifdef SUPPORT_SCREEN
-    sptr<Rosen::Window> uiWindow = UIExtensionContext::GetWindow();
-    if (uiWindow == nullptr) {
-        HILOG_ERROR("null uiWindow");
-        return ERR_FORM_EXTERNAL_SET_OPERATION_FAILED;
-    }
-
-    Rosen::WMError ret = uiWindow->TransferExtensionData(params);
-    if (ret != Rosen::WMError::WM_OK) {
-        HILOG_ERROR("TransferExtensionData failed, ret=%{public}d", ret);
-        return ERR_FORM_EXTERNAL_SET_OPERATION_FAILED;
-    }
-#endif // SUPPORT_SCREEN
-    HILOG_DEBUG("SendData end");
-    return ERR_OK;
-}
-
 bool LiveFormExtensionContext::SetWindowBackgroundColor(const char *color)
 {
     HILOG_DEBUG("SetWindowBackgroundColor begin");

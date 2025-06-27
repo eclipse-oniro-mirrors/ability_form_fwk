@@ -2911,7 +2911,7 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
     bool ret = ConvertNapiValueToMap(getLiveFormStatusEnv_, callResult, liveFormStatusMap);
     dataParam->result = ret;
     dataParam->liveFormStatusMap = liveFormStatusMap;
-    napi_close_handle_scope(getFormRectEnv_, scope);
+    napi_close_handle_scope(getLiveFormStatusEnv_, scope);
 }
 
 bool JsFormRouterProxyMgr::ConvertNapiValueToMap(
