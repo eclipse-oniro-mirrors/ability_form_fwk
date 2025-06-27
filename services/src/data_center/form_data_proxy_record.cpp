@@ -481,6 +481,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         formProviderData.SetImageDataState(FormProviderData::IMAGE_DATA_STATE_ADDED);
         formProviderData.SetImageDataMap(imageDataMap);
     }
+    FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
     auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     NewFormEventInfo eventInfo;
     eventInfo.formId = formId_;
@@ -511,6 +512,8 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
 
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
+
+    FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
     auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {
         receivedDataCount_ += 1;

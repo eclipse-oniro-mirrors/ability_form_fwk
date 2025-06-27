@@ -230,6 +230,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
+    newRecord.isDataProxyIgnoreFormVisible = formInfo.GetDataProxyIgnoreFormVisibility();
     HILOG_DEBUG("end");
     return newRecord;
 }
@@ -566,6 +567,51 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
     } else {
         HILOG_DEBUG("formInfo not find");
         return false;
+    }
+}
+
+/**
+ * @brief Get form record.
+ * @param formId The Id of the form.
+ * @param formRecord The form record.
+ * @return Set true if DataProxy Update.
+ */
+void FormDataMgr::SetDataProxyUpdate(const int64_t formId)
+{
+    HILOG_DEBUG("get form record by formId");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        info->second.isDataProxyUpdate = true;
+    }
+}
+
+/**
+ * @brief DataProxy update ignore visibility check.
+ * @param formRecord The form record.
+ * @return return true if DataProxy Update.
+ */
+bool FormDataMgr::IsDataProxyIgnoreFormVisibility(const int64_t formId) const
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        return info->second.isDataProxyUpdate && info->second.isDataProxyIgnoreFormVisible;
+    }
+    return false;
+}
+    
+
+/**
+ * @brief Set dataProxy update flage default.
+ * @param formRecord The form record.
+ */
+void FormDataMgr::ResetDataProxyUpdate (const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        info->second.isDataProxyUpdate = false;
     }
 }
 

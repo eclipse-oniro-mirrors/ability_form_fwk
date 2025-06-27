@@ -111,6 +111,7 @@ const std::string FORM_CLICK_CALL = "call";
 const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
+const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
 };
@@ -1551,6 +1552,12 @@ void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemI
         record.isLocationChange = true;
         needUpdate = true;
     }
+
+    if (info.GetDataProxyIgnoreFormVisibility()) {
+        needUpdate = true;
+        record.isDataProxyIgnoreFormVisible = true;
+    }
+
     if (needUpdate) {
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
     }
@@ -2062,6 +2069,15 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
     itemInfo.SetFormBundleType(formInfo.bundleType);
     itemInfo.SetConditionUpdate(formInfo.conditionUpdate);
+
+    if (!formInfo.customizeDatas.empty()) {
+        for (const auto &customizeData: formInfo.customizeDatas) {
+            if (customizeData.name == FORM_DATA_PROXY_IGNORE_VISIBILITY) {
+                itemInfo.SetDataProxyIgnoreFormVisibility(!strcasecmp(customizeData.value.c_str(), "true"));
+                break;
+            }
+        }
+    }
 
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
