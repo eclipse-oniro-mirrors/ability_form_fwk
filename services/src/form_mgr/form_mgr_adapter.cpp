@@ -3938,6 +3938,8 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
 
 ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
 {
+    HILOG_INFO("UpdateFormLocation formId = %{public}" PRId64 " formLocation = %{public}d",
+        formId, formLocation);
     // find matched formId
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
 
@@ -3949,6 +3951,10 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if ((int32_t)formRecord.formLocation != formLocation) {
+        Want locationWant;
+        locationWant.SetParam(Constants::FORM_LOCATION_KEY, formLocation);
+        FormProviderMgr::GetInstance().ConnectAmsChangeLocation(formId, formRecord, locationWant);
+        UpdateTimer(formId, formRecord);
         FormDataMgr::GetInstance().UpdateFormLocation(matchedFormId, formLocation);
         if (!formRecord.formTempFlag) {
             auto ret = HandleFormAddObserver(matchedFormId);
