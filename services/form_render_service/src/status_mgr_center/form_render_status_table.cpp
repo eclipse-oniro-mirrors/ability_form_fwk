@@ -102,6 +102,12 @@ const std::vector<FormRenderStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
     },
     {
         FormFsmStatus::RECYCLED,
+        FormFsmEvent::RECYCLE_FORM,
+        FormFsmStatus::RENDERING,
+        FormFsmProcessType::PROCESS_TASK_DIRECT,
+    },
+    {
+        FormFsmStatus::RECYCLED,
         FormFsmEvent::RECOVER_FORM,
         FormFsmStatus::RECOVERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
