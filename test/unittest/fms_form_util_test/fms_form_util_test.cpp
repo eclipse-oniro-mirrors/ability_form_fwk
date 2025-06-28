@@ -252,6 +252,32 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FormUtilTest_013_1
+ * @tc.desc: Verify StringSplit
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_013_1, TestSize.Level1)
+{ 
+    for (int i = 0; i < 42; ++i) {
+        EXPECT_EQ(FormSerialQueue::TestFormId1(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId2(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId3(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId4(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId5(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId6(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId7(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId8(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId9(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId10(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId11(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId12(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId13(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId14(i), i);
+        EXPECT_EQ(FormSerialQueue::TestFormId15(i), i);
+    }
+}
+
+/**
  * @tc.name: FormUtilTest_014
  * @tc.desc: Verify GetCurrentAccountId
  * @tc.type: FUNC
