@@ -153,6 +153,13 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
     },
     {
         FormFsmStatus::RECYCLED,
+        FormFsmEvent::RECYCLE_FORM,
+        FormFsmStatus::RECOVERING,
+        FormFsmProcessType::PROCESS_TASK_DIRECT,
+        FormEventTimeout::TIMEOUT_3_S,
+    },
+    {
+        FormFsmStatus::RECYCLED,
         FormFsmEvent::RECOVER_FORM,
         FormFsmStatus::RECOVERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
@@ -223,6 +230,13 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING = {
     {
         FormFsmStatus::RECYCLING,
         FormFsmEvent::RENDER_FORM,
+        FormFsmStatus::RECYCLING,
+        FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH,
+        FormEventTimeout::TIMEOUT_NO_NEED,
+    },
+    {
+        FormFsmStatus::RECYCLING,
+        FormFsmEvent::RECYCLE_FORM,
         FormFsmStatus::RECYCLING,
         FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH,
         FormEventTimeout::TIMEOUT_NO_NEED,
