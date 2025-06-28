@@ -17,7 +17,6 @@
 #include <ctime>
 #define private public
 #include "common/util/form_util.h"
-#include "common/util/form_trust_mgr.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "os_account_manager_wrapper.h"

@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
 class FormSerialQueue final {
 public:
     explicit FormSerialQueue(const std::string &queueName);
