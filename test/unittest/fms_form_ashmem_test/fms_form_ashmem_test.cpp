@@ -279,7 +279,7 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_013, TestSize.Level1)
 * @tc.desc: test form
 */
 HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_014, TestSize.Level1)
-{ 
+{
     for (int i = 0; i < 42; ++i) {
         EXPECT_EQ(form_ashmem_->TestFormId1(i), i);
         EXPECT_EQ(form_ashmem_->TestFormId2(i), i);
