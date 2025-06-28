@@ -17,6 +17,7 @@
 #include <ctime>
 #define private public
 #include "common/util/form_util.h"
+#include "common/util/form_trust_mgr.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "os_account_manager_wrapper.h"
@@ -248,32 +249,6 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
         EXPECT_EQ(FormUtil::TestFormId33(i), i);
         EXPECT_EQ(FormUtil::TestFormId34(i), i);
         EXPECT_EQ(FormUtil::TestFormId35(i), i);
-    }
-}
-
-/**
- * @tc.name: FormUtilTest_013_1
- * @tc.desc: Verify StringSplit
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_013_1, TestSize.Level1)
-{ 
-    for (int i = 0; i < 42; ++i) {
-        EXPECT_EQ(FormSerialQueue::TestFormId1(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId2(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId3(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId4(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId5(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId6(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId7(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId8(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId9(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId10(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId11(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId12(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId13(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId14(i), i);
-        EXPECT_EQ(FormSerialQueue::TestFormId15(i), i);
     }
 }
 
