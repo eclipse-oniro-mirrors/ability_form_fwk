@@ -35,13 +35,9 @@ public:
     static napi_value CreateJsLiveFormExtensionContext(napi_env env,
         std::shared_ptr<LiveFormExtensionContext> context);
 
-    static napi_value SetBackgroundImage(napi_env env, napi_callback_info info);
-
     static napi_value SetWindowBackgroundColor(napi_env env, napi_callback_info info);
 
 private:
-    napi_value OnSetBackgroundImage(napi_env env, NapiCallbackInfo &info);
-
     napi_value OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info);
 
 private:

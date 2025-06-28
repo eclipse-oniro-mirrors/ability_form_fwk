@@ -752,7 +752,7 @@ private:
     ErrCode HandleNotifyUpdateFormSize(MessageParcel &data, MessageParcel &reply);
 
     /**
-     * @brief Handle register getLiveFromStatus proxy in fms
+     * @brief Handle register getLiveFormStatus proxy in fms
      * @param data input param.
      * @param reply output param.
      * @return Returns ERR_OK on success, others on failure.
@@ -760,7 +760,7 @@ private:
     ErrCode HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply);
  
     /**
-     * @brief Handle unregister getLiveFromStatus proxy in fms
+     * @brief Handle unregister getLiveFormStatus proxy in fms
      * @param data input param.
      * @param reply output param.
      * @return Returns ERR_OK on success, others on failure.

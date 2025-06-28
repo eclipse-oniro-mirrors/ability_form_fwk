@@ -28,8 +28,6 @@ public:
 
     static const size_t CONTEXT_TYPE_ID;
 
-    int32_t SendData(const AAFwk::WantParams &params);
-
     bool SetWindowBackgroundColor(const char *color);
 };
 } // namespace AbilityRuntime
