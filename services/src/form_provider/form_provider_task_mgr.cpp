@@ -111,7 +111,7 @@ void FormProviderTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds
 {
     HILOG_DEBUG("call");
 
-    auto batchDeleteFunc = [&formIds, want, remoteObject]() {
+    auto batchDeleteFunc = [formIds, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().ProviderBatchDelete(formIds, want, remoteObject);
     };
     FormProviderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchDeleteFunc);
@@ -314,7 +314,7 @@ void FormProviderTaskMgr::NotifyFormDelete(const int64_t formId, const Want &wan
  * @param want The want of the request.
  * @param remoteObject Form provider proxy object.
  */
-void FormProviderTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &want,
+void FormProviderTaskMgr::ProviderBatchDelete(std::set<int64_t> formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("call");
