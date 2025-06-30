@@ -1925,7 +1925,11 @@ void FormRenderRecord::SetJsErrorCallback(JsErrorCallback callback)
 
 void FormRenderRecord::RegisterNapiUncaughtExceptionHandler()
 {
-    auto &nativeEngine = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNativeEngine();
+    auto nativeEnginePtr = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNativeEnginePointer();
+    if (nativeEnginePtr == nullptr) {
+        HILOG_ERROR("null nativeEnginePtr");
+        return;
+    }
     auto uncaughtTask = [weak = weak_from_this()](napi_value value) {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
@@ -1934,7 +1938,7 @@ void FormRenderRecord::RegisterNapiUncaughtExceptionHandler()
         }
         renderRecord->OnJsError(value);
     };
-    nativeEngine.RegisterNapiUncaughtExceptionHandler(uncaughtTask);
+    nativeEnginePtr->RegisterNapiUncaughtExceptionHandler(uncaughtTask);
 }
 
 void FormRenderRecord::OnJsError(napi_value value)
