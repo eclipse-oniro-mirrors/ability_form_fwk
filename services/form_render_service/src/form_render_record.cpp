@@ -681,6 +681,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
     if (formRendererGroup != nullptr) {
         HILOG_INFO("formRendererGroupMap emplace formId:%{public}s", std::to_string(key).c_str());
         formRendererGroupMap_.emplace(key, formRendererGroup);
+        RecordFormVisibility(key, true);
     }
     return formRendererGroup;
 }
@@ -1365,6 +1366,7 @@ int32_t FormRenderRecord::HandleOnUnlock()
 int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible)
 {
     HILOG_INFO("SetVisibleChange, formId:%{public}s", std::to_string(formId).c_str());
+    RecordFormVisibility(formId, isVisible);
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler");
@@ -1980,6 +1982,23 @@ std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const 
     napi_get_value_string_utf8(env, valueStr, valueCStr.get(), valueStrBufLength + 1, &valueStrLength);
     std::string ret(valueCStr.get(), valueStrLength);
     return ret;
+}
+
+bool FormRenderRecord::IsAllFormsInvisible()
+{
+    std::lock_guard<std::mutex> lock(visibilityMapMutex_);
+    for (const auto &iter : visibilityMap_) {
+        if (iter.second) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void FormRenderRecord::RecordFormVisibility(int64_t formId, bool isVisible)
+{
+    std::lock_guard<std::mutex> lock(visibilityMapMutex_);
+    visibilityMap_[formId] = isVisible;
 }
 
 } // namespace FormRender

@@ -42,12 +42,29 @@
 #include "common/util/form_task_common.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "status_mgr_center/form_status.h"
+#include "parameter.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr char MEMMORY_WATERMARK[] = "resourceschedule.memmgr.min.memmory.watermark";
+
+static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
+{
+    HILOG_INFO("OnMemoryWatermarkChange, key: %{public}s, value: %{public}s", key, value);
+    bool isLowMemory = (std::string(value) == "true");
+    FormDataMgr::GetInstance().SetIsLowMemory(isLowMemory);
+    if (!isLowMemory) {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(FormUtil::GetCurrentAccountId());
+    }
+}
+}
+
 FormDataMgr::FormDataMgr()
 {
     HILOG_INFO("create");
+    InitLowMemoryStatus();
 }
 FormDataMgr::~FormDataMgr()
 {
@@ -600,7 +617,7 @@ bool FormDataMgr::IsDataProxyIgnoreFormVisibility(const int64_t formId) const
     }
     return false;
 }
-    
+
 
 /**
  * @brief Set dataProxy update flage default.
@@ -3091,6 +3108,23 @@ bool FormDataMgr::UpdateFormRecordSetIsExistRecycleTask(const int64_t formId, bo
     info->second.isExistRecycleTask = isExistRecycleTask;
     HILOG_DEBUG("update form %{public}" PRId64 " isExistRecycleTask:%{public}d", formId, isExistRecycleTask);
     return true;
+}
+
+void FormDataMgr::InitLowMemoryStatus()
+{
+    std::string param = OHOS::system::GetParameter(MEMMORY_WATERMARK, "unknown");
+    isLowMemory_.store(param == "true");
+    WatchParameter(MEMMORY_WATERMARK, OnMemoryWatermarkChange, nullptr);
+}
+
+void FormDataMgr::SetIsLowMemory(bool isLowMemory)
+{
+    isLowMemory_.store(isLowMemory);
+}
+
+bool FormDataMgr::IsLowMemory() const
+{
+    return isLowMemory_.load();
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

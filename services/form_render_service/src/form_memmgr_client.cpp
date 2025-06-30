@@ -22,10 +22,17 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int32_t FORM_RENDER_SERVICE_TYPE = 3;
+constexpr int32_t FORM_RENDER_SERVICE_STATUS = 1;
 constexpr int32_t FORM_RENDER_SERVICE_SAID = -1;
+constexpr char LIB_MEMMGR_CLIENT_NAME[] = "libmemmgrclient.z.so";
+}
 
 FormMemmgrClient::FormMemmgrClient()
-{}
+{
+    NotifyProcessStatus();
+}
 
 FormMemmgrClient::~FormMemmgrClient()
 {}
@@ -35,7 +42,7 @@ void FormMemmgrClient::SetCritical(bool critical)
     int32_t pid = getprocpid();
     HILOG_INFO("pid:%{public}" PRId32 ", critical:%{public}d", pid, critical);
 
-    void *libMemmgrClientHandle = dlopen("libmemmgrclient.z.so", RTLD_NOW);
+    void *libMemmgrClientHandle = dlopen(LIB_MEMMGR_CLIENT_NAME, RTLD_NOW);
     if (!libMemmgrClientHandle) {
         HILOG_ERROR("dlopen libmemmgrclient fail");
         return;
@@ -51,8 +58,30 @@ void FormMemmgrClient::SetCritical(bool critical)
     auto setCriticalFunc = reinterpret_cast<int32_t(*)(int32_t, bool, int32_t)>(setCritical);
     if (setCriticalFunc(pid, critical, FORM_RENDER_SERVICE_SAID) != 0) {
         HILOG_ERROR("setCriticalFunc fail");
+    } else {
+        critical_.store(critical);
     }
     dlclose(libMemmgrClientHandle);
+}
+
+void FormMemmgrClient::NotifyProcessStatus()
+{
+    void *libMemMgrClientHandle = dlopen(LIB_MEMMGR_CLIENT_NAME, RTLD_NOW);
+    if (!libMemMgrClientHandle) {
+        HILOG_ERROR("dlopen libmemmgrclient library failed");
+        return;
+    }
+    void *notifyProcessStatusFunc = dlsym(libMemMgrClientHandle, "notify_process_status");
+    if (!notifyProcessStatusFunc) {
+        HILOG_ERROR("dlsm notify_process_status failed");
+        dlclose(libMemMgrClientHandle);
+        return;
+    }
+    auto notifyProcessStatus = reinterpret_cast<int(*)(int, int, int, int)>(notifyProcessStatusFunc);
+    HILOG_INFO("notify to memmgr when frs start");
+    int pid = getprocpid();
+    notifyProcessStatus(pid, FORM_RENDER_SERVICE_TYPE, FORM_RENDER_SERVICE_STATUS, FORM_RENDER_SERVICE_SAID);
+    dlclose(libMemMgrClientHandle);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

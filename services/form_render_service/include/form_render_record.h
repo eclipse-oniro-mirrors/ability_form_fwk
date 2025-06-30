@@ -147,6 +147,7 @@ public:
 
     void UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth);
     void SetJsErrorCallback(JsErrorCallback callback = nullptr);
+    bool IsAllFormsInvisible();
 private:
     class RemoteObjHash {
     public:
@@ -310,6 +311,8 @@ private:
     void OnJsError(napi_value value);
     std::string GetNativeStrFromJsTaggedObj(napi_value obj, const char* key);
 
+    void RecordFormVisibility(int64_t formId, bool isVisible);
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 
@@ -348,6 +351,8 @@ private:
     sptr<IFormSupply> formSupplyClient_;
     std::atomic<int> renderFormTasksNum = 0;
     JsErrorCallback jsErrorCallback_;
+    std::mutex visibilityMapMutex_;
+    std::unordered_map<int64_t, bool> visibilityMap_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

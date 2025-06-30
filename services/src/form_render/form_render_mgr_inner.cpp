@@ -60,6 +60,7 @@ FormRenderMgrInner::~FormRenderMgrInner()
 ErrCode FormRenderMgrInner::RenderForm(
     const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &hostToken)
 {
+    RecoverFRSOnFormActivity();
     if (atomicRerenderCount_ > 0) {
         --atomicRerenderCount_;
     } else {
@@ -162,6 +163,7 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
 ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
+    RecoverFRSOnFormActivity();
     if (mergeData) {
         nlohmann::json jsonData = formProviderData.GetData();
         formRecord.formProviderInfo.MergeData(jsonData);
@@ -215,6 +217,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
 ErrCode FormRenderMgrInner::ReloadForm(
     const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId)
 {
+    RecoverFRSOnFormActivity();
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -245,6 +248,7 @@ void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleNam
 void FormRenderMgrInner::PostOnUnlockTask()
 {
     HILOG_DEBUG("call");
+    RecoverFRSOnFormActivity();
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -257,6 +261,7 @@ void FormRenderMgrInner::PostOnUnlockTask()
 void FormRenderMgrInner::NotifyScreenOn()
 {
     HILOG_DEBUG("call");
+    RecoverFRSOnFormActivity();
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -273,6 +278,9 @@ void FormRenderMgrInner::NotifyScreenOn()
 void FormRenderMgrInner::PostSetVisibleChangeTask(int64_t formId, bool isVisible)
 {
     HILOG_INFO("call");
+    if (isVisible) {
+        RecoverFRSOnFormActivity();
+    }
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -296,6 +304,7 @@ ErrCode FormRenderMgrInner::StopRenderingForm(int64_t formId, const FormRecord &
         HILOG_ERROR("empty formRecord.bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    RecoverFRSOnFormActivity();
     Want want;
     std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
     want.SetParam(Constants::FORM_SUPPLY_UID, recordUid);
@@ -361,6 +370,7 @@ ErrCode FormRenderMgrInner::ReleaseRenderer(int64_t formId, const FormRecord &fo
         HILOG_ERROR("null connection");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    RecoverFRSOnFormActivity();
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -448,7 +458,12 @@ void FormRenderMgrInner::RerenderAllForms()
         }
     }
 
-    NotifyHostRenderServiceIsDead();
+    if (!FormDataMgr::GetInstance().IsLowMemory()) {
+        NotifyHostRenderServiceIsDead();
+    } else {
+        isFrsDiedInLowMemory_ = true;
+        HILOG_ERROR("Low memory killed FRS");
+    }
 }
 
 void FormRenderMgrInner::CleanFormHost(const sptr<IRemoteObject> &host)
@@ -628,6 +643,14 @@ void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
 
 void FormRenderMgrInner::NotifyHostRenderServiceIsDead() const
 {
+    {
+        std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
+        if (renderRemoteObj_) {
+            HILOG_WARN("FRS is not died");
+            return;
+        }
+    }
+
     std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> hostsForNotify;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
@@ -665,6 +688,7 @@ ErrCode FormRenderMgrInner::RecycleForms(
     const std::vector<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &remoteObjectOfHost)
 {
     HILOG_DEBUG("call");
+    RecoverFRSOnFormActivity();
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -681,6 +705,7 @@ ErrCode FormRenderMgrInner::RecycleForms(
 ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams)
 {
     HILOG_INFO("call");
+    RecoverFRSOnFormActivity();
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -727,6 +752,7 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
 ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
 {
     HILOG_DEBUG("call");
+    RecoverFRSOnFormActivity();
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -814,6 +840,7 @@ ErrCode FormRenderMgrInner::RenderConnectedForm(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    RecoverFRSOnFormActivity();
     std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
     if (renderRemoteObj_ == nullptr) {
         connection->UpdateFormRecord(formRecord);
@@ -872,6 +899,14 @@ ErrCode FormRenderMgrInner::CheckRenderConnectionExistById(int64_t formId)
         return ERR_OK;
     }
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
+void FormRenderMgrInner::RecoverFRSOnFormActivity()
+{
+    if (isFrsDiedInLowMemory_.load() && FormDataMgr::GetInstance().IsLowMemory()) {
+        isFrsDiedInLowMemory_ = false;
+        NotifyHostRenderServiceIsDead();
+    }
 }
 
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
