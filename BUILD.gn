@@ -258,6 +258,7 @@ ohos_shared_library("libfms") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
@@ -547,7 +548,7 @@ group("form_napi_packages") {
   }
 }
 
-group("form_ani_packages") {                                                                                                                                                              
+group("form_ani_packages") {
   deps = []
   if (ability_runtime_graphics) {
     deps += [

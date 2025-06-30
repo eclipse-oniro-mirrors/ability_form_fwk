@@ -57,6 +57,7 @@ HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_001 start";
     FormMemmgrClient::GetInstance().SetCritical(false);
+    EXPECT_EQ(false, FormMemmgrClient::GetInstance().IsCritical());
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_001 end";
 }
 
@@ -69,6 +70,7 @@ HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_002 start";
     FormMemmgrClient::GetInstance().SetCritical(true);
+    EXPECT_EQ(true, FormMemmgrClient::GetInstance().IsCritical());
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_002 end";
 }
 }  // namespace AppExecFwk

@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_MEMMGR_CLIENT_H
 
 #include <singleton.h>
+#include <atomic>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -34,6 +35,19 @@ public:
      * @param critical Indicates whether it is a critical process.
      */
     void SetCritical(bool critical);
+
+    /**
+     * @brief Get the process status.
+     */
+    inline bool IsCritical()
+    {
+        return critical_.load();
+    }
+private:
+    void NotifyProcessStatus();
+
+private:
+    std::atomic_bool critical_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

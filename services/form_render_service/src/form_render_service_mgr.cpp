@@ -72,6 +72,7 @@ int32_t FormRenderServiceMgr::RenderForm(
         formJsInfo.formSrc.c_str(),
         formJsInfo.formId);
 
+    SetCriticalTrueOnFormActivity();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null IFormSupply");
@@ -108,12 +109,12 @@ int32_t FormRenderServiceMgr::StopRenderingForm(
     const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call, formId:%{public}" PRId64, formJsInfo.formId);
+    SetCriticalTrueOnFormActivity();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null IFormSupply");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
     if (uid.empty() || eventId.empty()) {
@@ -157,6 +158,7 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const Want &want)
 {
     HILOG_INFO("formId:%{public}" PRId64 ",compId:%{public}s,uid:%{public}s", formId, compId.c_str(), uid.c_str());
+    SetCriticalTrueOnFormActivity();
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
     if (formId <= 0 || compId.empty() || uid.empty() || eventId.empty()) {
         HILOG_ERROR("param invalid");
@@ -197,6 +199,7 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
 int32_t FormRenderServiceMgr::CleanFormHost(const sptr<IRemoteObject> &hostToken)
 {
     HILOG_INFO("Form host is died,clean renderRecord");
+    SetCriticalTrueOnFormActivity();
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end();) {
         auto renderRecord = iter->second;
@@ -207,16 +210,13 @@ int32_t FormRenderServiceMgr::CleanFormHost(const sptr<IRemoteObject> &hostToken
             ++iter;
         }
     }
-    if (renderRecordMap_.empty()) {
-        HILOG_INFO("empty renderRecordMap_,FormRenderService will exit later");
-        FormMemmgrClient::GetInstance().SetCritical(false);
-    }
     return ERR_OK;
 }
 
 int32_t FormRenderServiceMgr::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("ReloadForm start");
+    SetCriticalTrueOnFormActivity();
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
         HILOG_ERROR("Get uid failed");
@@ -237,6 +237,7 @@ int32_t FormRenderServiceMgr::ReloadForm(const std::vector<FormJsInfo> &&formJsI
 int32_t FormRenderServiceMgr::OnUnlock()
 {
     HILOG_INFO("OnUnlock start");
+    SetCriticalTrueOnFormActivity();
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (isVerified_) {
         HILOG_WARN("Has been unlocked in render form, maybe miss or delay unlock event");
@@ -267,6 +268,9 @@ int32_t FormRenderServiceMgr::SetVisibleChange(const int64_t formId, bool isVisi
     }
     HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
 
+    if (isVisible) {
+        SetCriticalTrueOnFormActivity();
+    }
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
@@ -274,6 +278,9 @@ int32_t FormRenderServiceMgr::SetVisibleChange(const int64_t formId, bool isVisi
             return SET_VISIBLE_CHANGE_FAILED;
         }
         auto ret = search->second->SetVisibleChange(formId, isVisible);
+        if (!isVisible) {
+            SetCriticalFalseOnAllFormInvisible();
+        }
         if (ret != ERR_OK) {
             HILOG_ERROR("SetVisibleChange %{public}" PRId64 " failed.", formId);
             return ret;
@@ -292,6 +299,8 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
         HILOG_ERROR("null configuration");
         return;
     }
+
+    SetCriticalTrueOnFormActivity();
 
     SetConfiguration(configuration);
 
@@ -373,6 +382,7 @@ void FormRenderServiceMgr::RunCachedConfigurationUpdated()
 {
     HILOG_INFO("RunCachedConfigUpdated");
     if (hasCachedConfig_) {
+        SetCriticalTrueOnFormActivity();
         OnConfigurationUpdatedInner();
     }
 }
@@ -403,6 +413,7 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
         HILOG_ERROR("formId is negative");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
+    SetCriticalTrueOnFormActivity();
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
@@ -439,6 +450,8 @@ int32_t FormRenderServiceMgr::RecoverForm(const FormJsInfo &formJsInfo, const Wa
         HILOG_ERROR("formId is negative");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
+
+    SetCriticalTrueOnFormActivity();
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
@@ -478,6 +491,8 @@ void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
 int32_t FormRenderServiceMgr::UpdateFormSize(
     const int64_t formId, float width, float height, float borderWidth, const std::string &uid)
 {
+    SetCriticalTrueOnFormActivity();
+
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
@@ -537,9 +552,6 @@ int32_t FormRenderServiceMgr::UpdateRenderRecordByUid(const std::string &uid, Wa
         record->SetJsErrorCallback(callback);
         record->SetConfiguration(configuration_);
         result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
-        if (renderRecordMap_.empty()) {
-            FormMemmgrClient::GetInstance().SetCritical(true);
-        }
         renderRecordMap_.emplace(uid, record);
         FormRenderGCTask(uid);
     }
@@ -614,9 +626,6 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
         }
         renderRecordMap_.erase(iterator);
         HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
-        if (renderRecordMap_.empty()) {
-            FormMemmgrClient::GetInstance().SetCritical(false);
-        }
     }
     return ERR_OK;
 }
@@ -633,6 +642,28 @@ void FormRenderServiceMgr::OnJsError(const std::string &errorName, const std::st
     HILOG_ERROR("uidList: %{public}s, errorName: %{public}s, errorMsg: %{public}s", uidList.c_str(), errorName.c_str(),
         errorMsg.c_str());
     FormRenderEventReport::SendBlockFaultEvent(uidList, errorName, errorMsg);
+}
+
+void FormRenderServiceMgr::SetCriticalFalseOnAllFormInvisible()
+{
+    if (!FormMemmgrClient::GetInstance().IsCritical()) {
+        return;
+    }
+    for (const auto &iter : renderRecordMap_) {
+        if (iter.second && !iter.second->IsAllFormsInvisible()) {
+            HILOG_INFO("is not AllFormsInvisible, uid: %{public}s", iter.first.c_str());
+            return;
+        }
+    }
+    FormMemmgrClient::GetInstance().SetCritical(false);
+}
+
+void FormRenderServiceMgr::SetCriticalTrueOnFormActivity()
+{
+    if (FormMemmgrClient::GetInstance().IsCritical()) {
+        return;
+    }
+    FormMemmgrClient::GetInstance().SetCritical(true);
 }
 
 }  // namespace FormRender

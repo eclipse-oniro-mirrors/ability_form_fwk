@@ -57,7 +57,7 @@ public:
     void RemoveConnection(int64_t formId);
 
     ErrCode checkConnectionsFormIds(std::vector<int64_t> formIds, std::vector<int64_t> &needconFormIds);
- 
+
     void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj);
 
     void RerenderAllForms();
@@ -125,6 +125,15 @@ private:
 
     ErrCode CheckRenderConnectionExistById(int64_t formId);
 
+    /**
+     * Recovers the Form Render Service (FRS) process when a form event.
+     *
+     * This function is triggered to revive the FRS process under the following conditions:
+     * 1. A form event (e.g., RenderForm, RecoverForms) occurs.
+     * 2. The FRS process was previously terminated by the system's low-memory killer.
+     */
+    void RecoverFRSOnFormActivity();
+
 private:
     class RemoteObjHash {
     public:
@@ -146,6 +155,7 @@ private:
     // userId_ is Active User
     bool isActiveUser_ = true;
     int32_t userId_ = 0;
+    std::atomic_bool isFrsDiedInLowMemory_ = false;
 };
 
 /**

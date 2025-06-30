@@ -121,6 +121,9 @@ private:
     int32_t DeleteRenderRecordByUid(const std::string &uid, const std::shared_ptr<FormRenderRecord> &search);
     void OnJsError(const std::string &errorName, const std::string &errorMsg);
 
+    void SetCriticalFalseOnAllFormInvisible();
+    void SetCriticalTrueOnFormActivity();
+
 private:
     std::mutex renderRecordMutex_;
     // <uid(userId + bundleName), renderRecord>
