@@ -110,8 +110,7 @@ export namespace formInfo {
     DIMENSION_1_1 = 6,
     DIMENSION_6_4 = 7,
     DIMENSION_2_3 = 8,
-    DIMENSION_3_3 = 9,
-    DIMENSION_3_4 = 10
+    DIMENSION_3_3 = 9
   }
 
   enum FormShape {
