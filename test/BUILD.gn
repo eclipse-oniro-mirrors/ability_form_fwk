@@ -110,6 +110,7 @@ group("unittest") {
     "unittest/fms_js_form_state_observer_proxy_test:unittest",
     "unittest/fms_js_form_state_observer_stub_test:unittest",
     "unittest/fms_observer_record_test:unittest",
+    "unittest/fms_param_manager_test:unittest",
     "unittest/fms_provider_connect_proxy_test:unittest",
     "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/fms_running_form_info_test:unittest",
