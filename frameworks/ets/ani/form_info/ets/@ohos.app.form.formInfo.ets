@@ -22,9 +22,9 @@ export namespace formInfo {
     abilityName: string;
     name: string;
     displayName: string;
-    displayNameId: number;
+    displayNameId: int;
     description: string;
-    descriptionId: number;
+    descriptionId: int;
     type: FormType;
     jsComponentName: string;
     colorMode: ColorMode;
@@ -33,14 +33,14 @@ export namespace formInfo {
     formVisibleNotify: boolean;
     scheduledUpdateTime: string;
     formConfigAbility: string;
-    updateDuration: number;
-    defaultDimension: number;
-    supportDimensions: Array<number>;
+    updateDuration: int;
+    defaultDimension: int;
+    supportDimensions: Array<int>;
     customizeData: Record<string, string>;
     isDynamic: boolean;
     transparencyEnabled: boolean;
-    supportedShapes: Array<number>;
-    readonly previewImages?: Array<number>;
+    supportedShapes: Array<int>;
+    readonly previewImages?: Array<int>;
     readonly enableBlurBackground?: boolean;
     readonly renderingMode?: RenderingMode;
   }
@@ -97,8 +97,8 @@ export namespace formInfo {
   interface FormInfoFilter {
     bundleName?: string;
     moduleName?: string;
-    supportedDimensions?: Array<number>;
-    supportedShapes?: Array<number>;
+    supportedDimensions?: Array<int>;
+    supportedShapes?: Array<int>;
   }
 
   enum FormDimension {
@@ -158,7 +158,7 @@ export namespace formInfo {
     readonly moduleName: string;
     readonly abilityName: string;
     readonly formName: string;
-    readonly dimension: number;
+    readonly dimension: int;
     readonly formUsageState: FormUsageState;
     readonly formDescription: string;
     readonly extraData?: Record<string, Object>;
