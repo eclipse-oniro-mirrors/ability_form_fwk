@@ -19,15 +19,15 @@ export namespace formProvider {
 
   loadLibrary("formProvider_ani.z");
 
-  native function setFormNextRefreshTime_inner(formId: string, minute: number): void;
+  native function setFormNextRefreshTime_inner(formId: string, minute: int): void;
 
-  export function setFormNextRefreshTime(formId: string, minute: number): Promise<void> {
+  export function setFormNextRefreshTime(formId: string, minute: int): Promise<void> {
     return new Promise<void>(() => {
       setFormNextRefreshTime_inner(formId, minute);
     });
   }
 
-  export function setFormNextRefreshTime(formId: string, minute: number,
+  export function setFormNextRefreshTime(formId: string, minute: int,
     callback: AsyncCallback<void>): void {
     setFormNextRefreshTime_inner(formId, minute);
   }
