@@ -2144,7 +2144,7 @@ ErrCode FormMgrService::GetFormRect(const int64_t formId, Rect &rect)
     return FormMgrAdapter::GetInstance().GetFormRect(formId, callingUid, rect);
 }
 
-ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect)
+ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
 {
     HILOG_INFO("call");
     ErrCode ret = CheckFormPermission();
@@ -2152,7 +2152,7 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const std::string &
         HILOG_ERROR("update formSize permission denied");
         return ret;
     }
-    return FormProviderMgr::GetInstance().ConnectAmsUpdateSize(formId, newDimension, newRect);
+    return FormMgrAdapter::GetInstance().UpdateFormSize(formId, newDimension, newRect);
 }
 
 bool FormMgrService::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)

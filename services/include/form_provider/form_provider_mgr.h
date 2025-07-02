@@ -156,12 +156,12 @@ public:
 
     /**
      * @brief Connect provider for update form size.
-     * @param formId The Id of the form to update.
      * @param newDimension The dimension value to be updated.
      * @param newRect The rect value to be updated.
+     * @param formRecord The record of the form.
      * @return Returns ERR_OK on success, others on failure.
      */
-     ErrCode ConnectAmsUpdateSize(const int64_t formId, const std::string &newDimension, const Rect &newRect);
+     ErrCode ConnectAmsUpdateSize(const int32_t newDimension, const Rect &newRect, const FormRecord &formRecord);
 
 private:
     bool IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh);

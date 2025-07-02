@@ -32,7 +32,7 @@ class FormUpdateSizeConnection : public FormAbilityConnection {
 public:
     FormUpdateSizeConnection(const int64_t formId,
         const std::string &bundleName, const std::string &abilityName,
-        const std::string &newDimension, const Rect &newRect);
+        const int32_t newDimension, const Rect &newRect);
     virtual ~FormUpdateSizeConnection() = default;
 
     /**
@@ -46,7 +46,7 @@ public:
 
 private:
     Want want_;
-    std::string newDimension_;
+    int32_t newDimension_;
     Rect newRect_;
     DISALLOW_COPY_AND_MOVE(FormUpdateSizeConnection);
 };

@@ -72,6 +72,7 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
     { ERR_APPEXECFWK_FORM_SET_OPERATION_FAILED,        ERR_FORM_EXTERNAL_SET_OPERATION_FAILED },
     { ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED,         ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED },
     { ERR_APPEXECFWK_SYSTEMCAP_ERROR,                  ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR },
+    { ERR_APPEXECFWK_FORM_DIMENSION_ERROR,             ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR},
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
@@ -100,6 +101,7 @@ const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_FORM_EXTERNAL_SET_OPERATION_FAILED,         "Failed to set the live form background image." },
     { ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,          "The form can not support this operation, Please check whether "
         "the configuration information of sceneAnimationParams in your form_config is correct." },
+    {ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR,          "The dimension parameter is incorrect."},
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {

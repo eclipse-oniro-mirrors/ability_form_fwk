@@ -28,7 +28,7 @@ namespace OHOS {
 namespace AppExecFwk {
 FormUpdateSizeConnection::FormUpdateSizeConnection(const int64_t formId,
     const std::string &bundleName, const std::string &abilityName,
-    const std::string &newDimension, const Rect &newRect)
+    const int32_t newDimension, const Rect &newRect)
     :newDimension_(newDimension), newRect_(newRect)
 {
     SetFormId(formId);

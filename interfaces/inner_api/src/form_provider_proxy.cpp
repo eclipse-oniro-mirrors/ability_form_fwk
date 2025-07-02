@@ -635,7 +635,7 @@ int FormProviderProxy::NotifyFormLocationUpdate(const int64_t formId, const Want
  * @param callerToken Caller ability token.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormProviderProxy::NotifySizeChanged(const int64_t formId, const std::string &newDimension, const Rect &newRect,
+int FormProviderProxy::NotifySizeChanged(const int64_t formId, const int32_t newDimension, const Rect &newRect,
     const Want &want, const sptr<IRemoteObject> &callerToken)
 {
     int error;
@@ -650,7 +650,7 @@ int FormProviderProxy::NotifySizeChanged(const int64_t formId, const std::string
         HILOG_ERROR("write formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteString(newDimension)) {
+    if (!data.WriteInt32(newDimension)) {
         HILOG_ERROR("Write newDimension failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

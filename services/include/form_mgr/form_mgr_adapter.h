@@ -770,6 +770,14 @@ public:
      * @return Returns error code of method execute, which ERR_OK represents success.
      */
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
+
+    /**
+     * @brief Get form info by form record.
+     * @param record The record of the form.
+     * @param formInfo Form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetFormInfoByFormRecord(const FormRecord &record, FormInfo &formInfo);
 private:
     /**
      * @brief Get form configure info.

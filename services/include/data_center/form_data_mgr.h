@@ -960,6 +960,13 @@ public:
      */
     bool IsLowMemory() const;
 
+    /**
+     * @brief Set form specification.
+     * @param formId The Id of the form.
+     * @param specification specification.
+     */
+    ErrCode SetSpecification(const int64_t formId, const int32_t specification);
+
 private:
     /**
      * @brief Create form record.

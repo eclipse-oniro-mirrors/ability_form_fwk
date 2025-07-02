@@ -757,7 +757,7 @@ public:
      * @param newRect The rect value to be updated.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect) override;
+    ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect) override;
 
     /**
      * @brief Register get live form status proxy in fms.
