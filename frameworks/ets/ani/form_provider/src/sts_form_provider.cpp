@@ -115,7 +115,7 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
     return content;
 }
 
-void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, ani_double minute)
+void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, ani_int minute)
 {
     HILOG_INFO("Call");
 
