@@ -18,7 +18,8 @@
         "features": [
           "form_fwk_form_dimension_2_3",
           "form_fwk_form_dimension_3_3",
-          "form_fwk_watch_api_disable"
+          "form_fwk_watch_api_disable",
+          "form_fwk_dynamic_support"
         ],
         "adapted_system_type": [
             "standard"
