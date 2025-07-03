@@ -5070,33 +5070,33 @@ HWTEST_F(FormMgrTest, FormMgrTest_0282, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormMgrTest_0279
+ * @tc.name: FormMgrTest_0283
  * @tc.desc: Verify UpdateFormSize
  * @tc.type: FUNC
  */
-HWTEST_F(FormMgrTest, FormMgrTest_0279, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrTest_0279 starts";
+HWTEST_F(FormMgrTest, FormMgrTest_0283, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0283 starts";
     int64_t formId = -1;
     int32_t newDimension = 1;
     Rect rect;
     ErrCode result = FormMgr::GetInstance().UpdateFormSize(formId, newDimension, rect);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-    GTEST_LOG_(INFO) << "FormMgrTest_0279 test ends";
+    GTEST_LOG_(INFO) << "FormMgrTest_0283 test ends";
 }
 
 /**
- * @tc.name: FormMgrTest_0280
+ * @tc.name: FormMgrTest_0284
  * @tc.desc: Verify UpdateFormSize
  * @tc.type: FUNC
  */
-HWTEST_F(FormMgrTest, FormMgrTest_0280, TestSize.Level1)
+HWTEST_F(FormMgrTest, FormMgrTest_0284, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FormMgrTest_0280 begin";
+    GTEST_LOG_(INFO) << "FormMgrTest_0284 begin";
     int64_t formId = 1;
     int32_t newDimension = 1;
     Rect rect;
     ErrCode result = FormMgr::GetInstance().UpdateFormSize(formId, newDimension, rect);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
-    GTEST_LOG_(INFO) << "FormMgrTest_0280 end";
+    GTEST_LOG_(INFO) << "FormMgrTest_0284 end";
 }
 } // namespace
