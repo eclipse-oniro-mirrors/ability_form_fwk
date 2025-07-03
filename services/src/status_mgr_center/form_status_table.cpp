@@ -154,7 +154,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
     {
         FormFsmStatus::RECYCLED,
         FormFsmEvent::RECYCLE_FORM,
-        FormFsmStatus::RECOVERING,
+        FormFsmStatus::RECYCLING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
         FormEventTimeout::TIMEOUT_3_S,
     },

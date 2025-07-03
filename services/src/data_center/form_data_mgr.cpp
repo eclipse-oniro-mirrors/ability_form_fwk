@@ -309,7 +309,7 @@ void FormDataMgr::RecycleAllRecyclableForms() const
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-            if (FormStatus::GetInstance().GetFormStatus(itFormRecord->second.formId) != FormFsmStatus::RECYCLED) {
+            if (itFormRecord->second.recycleStatus == RecycleStatus::RECYCLABLE) {
                 formIds.emplace_back(itFormRecord->first);
             }
         }
