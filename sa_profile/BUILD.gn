@@ -11,10 +11,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
 import("//build/ohos/sa_profile/sa_profile.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ohos_sa_profile("form_sa_profile") {
-  sources = [ "403.json" ]
+  if (form_fwk_dynamic_support) {
+    sources = [ "403_dynamic.json" ]
+  } else {
+    sources = [ "403.json" ]
+  }
+  
 
   part_name = "form_fwk"
 }
