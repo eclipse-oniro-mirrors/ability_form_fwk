@@ -3126,5 +3126,18 @@ bool FormDataMgr::IsLowMemory() const
 {
     return isLowMemory_.load();
 }
+
+ErrCode FormDataMgr::SetSpecification(const int64_t formId, const int32_t specification)
+{
+    std::lock_guard<std::mutex> lockMutex(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    itFormRecord->second.specification = specification;
+    HILOG_INFO("formId:%{public}" PRId64 " specification:%{public}d", formId, specification);
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

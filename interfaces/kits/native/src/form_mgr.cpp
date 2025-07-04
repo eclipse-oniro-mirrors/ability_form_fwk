@@ -2202,12 +2202,12 @@ ErrCode FormMgr::GetFormRect(const int64_t formId, Rect &rect)
     return remoteProxy_->GetFormRect(formId, rect);
 }
 
-ErrCode FormMgr::UpdateFormSize(const int64_t formId, const std::string &newDimension, const Rect &newRect)
+ErrCode FormMgr::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
 {
     HILOG_INFO("UpdateFormSize formid:%{public}" PRId64, formId);
     if (formId <= 0) {
         HILOG_ERROR("UpdateFormSize failed, formId is invalid");
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     ErrCode resultCode = Connect();
     if (resultCode != ERR_OK) {

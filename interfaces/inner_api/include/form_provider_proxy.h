@@ -167,7 +167,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int NotifySizeChanged(const int64_t formId, const std::string &newDimension, const Rect &newRect,
+    int NotifySizeChanged(const int64_t formId, const int32_t newDimension, const Rect &newRect,
         const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
 private:

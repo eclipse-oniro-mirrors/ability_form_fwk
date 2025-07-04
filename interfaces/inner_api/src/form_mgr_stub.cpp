@@ -1980,7 +1980,7 @@ ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParc
 {
     HILOG_INFO("Call");
     int64_t formId = data.ReadInt64();
-    std::string newDimension = data.ReadString();
+    int32_t newDimension = data.ReadInt32();
     std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
     if (newRect == nullptr) {
         HILOG_ERROR("Read newRect failed");

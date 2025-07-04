@@ -2001,10 +2001,17 @@ private:
         }
         decltype(argc) convertArgc = 0;
         convertArgc++;
-        std::string newDimension("");
-        if (!ConvertFromJsValue(env, argv[PARAM1], newDimension)) {
-            HILOG_ERROR("convert newDimension failed");
-            NapiFormUtil::ThrowParamTypeError(env, "newDimension", "string");
+        int32_t newDimension;
+        if (napi_get_value_int32(env, argv[PARAM1], &newDimension) == napi_ok) {
+            if (newDimension < static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN) ||
+                newDimension > static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX)) {
+                HILOG_ERROR("newDimension not Dimension enum");
+                NapiFormUtil::ThrowParamTypeError(env, "newDimension", "Dimension enum");
+                return CreateJsUndefined(env);
+            }
+        } else {
+            HILOG_ERROR("newDimension not number");
+            NapiFormUtil::ThrowParamTypeError(env, "newDimension", "number");
             return CreateJsUndefined(env);
         }
         convertArgc++;

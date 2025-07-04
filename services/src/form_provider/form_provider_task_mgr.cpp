@@ -216,7 +216,7 @@ void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEv
  * @param remoteObject Form provider proxy object.
  * @return none.
  */
-void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const std::string &newDimension,
+void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const int32_t newDimension,
     const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("Call.");
@@ -535,7 +535,7 @@ void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const W
     }
 }
 
-void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const std::string &newDimension,
+void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const int32_t newDimension,
     const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("call");

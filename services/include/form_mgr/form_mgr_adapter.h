@@ -770,6 +770,15 @@ public:
      * @return Returns error code of method execute, which ERR_OK represents success.
      */
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
+
+    /**
+     * @brief Update form size.
+     * @param formId The Id of the form to update.
+     * @param newDimension The dimension value to be updated.
+     * @param newRect The rect value to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect);
 private:
     /**
      * @brief Get form configure info.
@@ -1256,6 +1265,14 @@ private:
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);
 
     bool IsActionAllowToPublish(const std::string &action);
+
+    /**
+     * @brief Get form info by form record.
+     * @param record The record of the form.
+     * @param formInfo Form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetFormInfoByFormRecord(const FormRecord &record, FormInfo &formInfo);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.

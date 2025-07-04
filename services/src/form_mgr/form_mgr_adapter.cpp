@@ -4524,5 +4524,56 @@ bool FormMgrAdapter::IsForegroundApp()
     }
     return checkFlag;
 }
+
+ErrCode FormMgrAdapter::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
+{
+    HILOG_INFO("call, formId:%{public} " PRId64, formId);
+    FormRecord record;
+    bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!result) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    FormInfo formInfo;
+    ErrCode errCode = GetFormInfoByFormRecord(record, formInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("fail get form info:%{public}" PRId64 "", formId);
+        return errCode;
+    }
+    if (!IsDimensionValid(formInfo, newDimension)) {
+        HILOG_ERROR("Invalid dimension");
+        return ERR_APPEXECFWK_FORM_DIMENSION_ERROR;
+    }
+    FormDataMgr::GetInstance().SetSpecification(formId, newDimension);
+    return FormProviderMgr::GetInstance().ConnectAmsUpdateSize(newDimension, newRect, record);
+}
+
+ErrCode FormMgrAdapter::GetFormInfoByFormRecord(const FormRecord &record, FormInfo &formInfo)
+{
+    HILOG_DEBUG("GetFormInfo start");
+    if (record.bundleName.empty() || record.abilityName.empty() || record.moduleName.empty()) {
+        HILOG_ERROR("invalid bundleName or abilityName or moduleName");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::vector<FormInfo> formInfos {};
+    int32_t userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(record.bundleName, record.moduleName,
+        formInfos, userId);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", userId);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    for (const auto &form : formInfos) {
+        if (form.abilityName == record.abilityName && form.moduleName == record.moduleName
+            && form.name == record.formName) {
+            formInfo = form;
+            HILOG_INFO("GetFormInfo end");
+            return ERR_OK;
+        }
+    }
+    HILOG_ERROR("fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
+        record.abilityName.c_str(), record.formName.c_str(), userId);
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

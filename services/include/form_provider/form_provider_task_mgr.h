@@ -150,7 +150,7 @@ public:
      * @param remoteObject Form provider proxy object.
      * @return none.
      */
-    void PostSizeChangedTask(const int64_t formId, const std::string &newDimension, const Rect &newRect,
+    void PostSizeChangedTask(const int64_t formId, const int32_t newDimension, const Rect &newRect,
         const Want &want, const sptr<IRemoteObject> &remoteObject);
 
 private:
@@ -255,7 +255,7 @@ private:
      * @param remoteObject Form provider proxy object.
      * @return none.
      */
-    void NotifySizeChanged(const int64_t formId, const std::string &newDimension, const Rect &newRect,
+    void NotifySizeChanged(const int64_t formId, const int32_t newDimension, const Rect &newRect,
         const Want &want, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
