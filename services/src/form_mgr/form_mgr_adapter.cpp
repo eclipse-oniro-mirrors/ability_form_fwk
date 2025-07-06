@@ -4544,8 +4544,12 @@ ErrCode FormMgrAdapter::UpdateFormSize(const int64_t formId, const int32_t newDi
         HILOG_ERROR("Invalid dimension");
         return ERR_APPEXECFWK_FORM_DIMENSION_ERROR;
     }
-    FormDataMgr::GetInstance().SetSpecification(formId, newDimension);
-    return FormProviderMgr::GetInstance().ConnectAmsUpdateSize(newDimension, newRect, record);
+    errCode = FormProviderMgr::GetInstance().ConnectAmsUpdateSize(newDimension, newRect, record);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("fail connect provider:%{public}" PRId64 "", formId);
+        return errCode;
+    }
+    return FormDataMgr::GetInstance().SetSpecification(formId, newDimension);
 }
 
 ErrCode FormMgrAdapter::GetFormInfoByFormRecord(const FormRecord &record, FormInfo &formInfo)

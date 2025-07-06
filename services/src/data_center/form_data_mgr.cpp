@@ -3129,6 +3129,11 @@ bool FormDataMgr::IsLowMemory() const
 
 ErrCode FormDataMgr::SetSpecification(const int64_t formId, const int32_t specification)
 {
+    if (specification < static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN) ||
+        specification > static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX)) {
+        HILOG_ERROR("Invalid specification");
+        return ERR_APPEXECFWK_FORM_DIMENSION_ERROR;
+    }
     std::lock_guard<std::mutex> lockMutex(formRecordMutex_);
     auto itFormRecord = formRecords_.find(formId);
     if (itFormRecord == formRecords_.end()) {

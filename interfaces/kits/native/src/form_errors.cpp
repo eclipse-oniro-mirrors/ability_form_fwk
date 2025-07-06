@@ -101,7 +101,7 @@ const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_FORM_EXTERNAL_SET_OPERATION_FAILED,         "Failed to set the live form background image." },
     { ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,          "The form can not support this operation, Please check whether "
         "the configuration information of sceneAnimationParams in your form_config is correct." },
-    {ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR,          "The dimension parameter is incorrect."},
+    { ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR,         "The dimension parameter is incorrect." },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {
