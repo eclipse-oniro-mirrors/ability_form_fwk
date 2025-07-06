@@ -24,6 +24,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
+}
 FormStatusMgr::FormStatusMgr()
 {
     HILOG_DEBUG("create FormStatusMgr");
@@ -66,7 +69,7 @@ void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event
         FormStatusMgr::GetInstance().ExecFormTask(info.processType, formId, event, func);
     };
 
-    FormStatusQueue::GetInstance().ScheduleTask(0, task);
+    FormStatusQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
 }
 
 void FormStatusMgr::CancelFormEventTimeout(const int64_t formId, std::string eventId)
