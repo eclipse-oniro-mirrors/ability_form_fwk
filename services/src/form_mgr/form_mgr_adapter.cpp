@@ -1545,6 +1545,11 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
 void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record)
 {
     bool needUpdate = false;
+    if (record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
+        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+        needUpdate = true;
+    }
+
     if (record.formLocation != info.GetFormLocation()) {
         HILOG_INFO("formLocation change oldLocation: %{public}d, newLocation: %{public}d, formId: %{public}" PRId64,
             (int)record.formLocation, (int)info.GetFormLocation(), formId);
@@ -3922,6 +3927,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             continue;
         }
 
+        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
         HILOG_INFO("formId:%{public}" PRId64 " non-recyclable", formId);

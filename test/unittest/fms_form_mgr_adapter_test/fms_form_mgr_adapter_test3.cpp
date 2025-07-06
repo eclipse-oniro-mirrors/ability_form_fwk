@@ -1259,4 +1259,25 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0305, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.GetLiveFormStatus(liveFormStatusMap));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0305 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_CheckUpdateFormRecord
+ * @tc.desc: test CheckUpdateFormRecord function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_CheckUpdateFormRecord, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_CheckUpdateFormRecord start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    FormItemInfo formItemInfo;
+    FormRecord formRecord;
+    formRecord.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+    formMgrAdapter.CheckUpdateFormRecord(formId, formItemInfo, formRecord);
+    EXPECT_EQ(RecycleStatus::NON_RECYCLABLE, formRecord.recycleStatus);
+    formRecord.recycleStatus = RecycleStatus::RECYCLABLE;
+    formMgrAdapter.CheckUpdateFormRecord(formId, formItemInfo, formRecord);
+    EXPECT_EQ(RecycleStatus::NON_RECYCLABLE, formRecord.recycleStatus);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_CheckUpdateFormRecord end";
+}
 }
