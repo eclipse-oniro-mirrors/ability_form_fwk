@@ -203,7 +203,7 @@ bool ConvertFromDataProxies(const CArrProxyData& cArrProxyData, std::vector<Form
         return false;
     }
     int32_t len = cArrProxyData.size;
-    for (uint32_t i = 0; i < len; i++) {
+    for (int32_t i = 0; i < len; i++) {
         FormDataProxy formDataProxy("", "");
         CProxyData element = cArrProxyData.head[i];
         if (!ConvertFormDataProxy(element, formDataProxy)) {
