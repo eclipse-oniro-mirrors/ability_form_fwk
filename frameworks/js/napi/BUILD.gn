@@ -252,9 +252,6 @@ ohos_shared_library("forminfo_napi") {
   if (form_fwk_form_dimension_3_3) {
     defines += [ "FORM_DIMENSION_3_3" ]
   }
-  if (form_fwk_form_dimension_3_4) {
-    defines += [ "FORM_DIMENSION_3_4" ]
-  }
 
   relative_install_dir = "module/application"
 
@@ -295,9 +292,6 @@ ohos_shared_library("forminfo") {
   }
   if (form_fwk_form_dimension_3_3) {
     defines += [ "FORM_DIMENSION_3_3" ]
-  }
-  if (form_fwk_form_dimension_3_4) {
-    defines += [ "FORM_DIMENSION_3_4" ]
   }
 
   relative_install_dir = "module/app/form"
