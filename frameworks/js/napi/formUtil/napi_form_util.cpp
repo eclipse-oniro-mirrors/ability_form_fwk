@@ -556,6 +556,8 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
         CreateSceneAnimationParamsDatas(env, formInfo.sceneAnimationParams));
     napi_set_named_property(env, objContext, "resizable", CreateJsValue(env, formInfo.resizable));
     napi_set_named_property(env, objContext, "groupId", CreateJsValue(env, formInfo.groupId));
+    napi_set_named_property(env, objContext, "distributedDeviceTypes",
+        CreateNativeArray(env, formInfo.distributedDeviceTypes));
 
     return objContext;
 }

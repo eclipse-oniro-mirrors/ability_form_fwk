@@ -572,7 +572,7 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
             hapPath = moduleInfos[Constants::MODULE_HAP_PATH_KEY].get<std::string>();
             pkgContextInfoJsonStringMap[modulePkgNamePair.first] = hapPath;
         }
-        HILOG_DEBUG("SetPkgContextInfoMap module:%{public}s, pkgName:%{public}s, hapPath:%{public}s",
+        HILOG_INFO("SetPkgContextInfoMap module:%{public}s, pkgName:%{public}s, hapPath:%{public}s",
             modulePkgNamePair.first.c_str(), pkgName.c_str(), hapPath.c_str());
     }
     if (!pkgContextInfoJsonStringMap.empty()) {
