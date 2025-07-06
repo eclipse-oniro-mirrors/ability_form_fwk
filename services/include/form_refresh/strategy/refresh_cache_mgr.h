@@ -105,6 +105,7 @@ public:
     void DelRenderTask(int64_t formId);
 
 private:
+    std::mutex overloadTaskMutex_;
     std::vector<FormTimer> overloadTask_;
     std::mutex renderTaskMapMutex_;
     std::unordered_map<int64_t, std::function<void()>> renderTaskMap_;
