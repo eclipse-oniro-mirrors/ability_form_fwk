@@ -400,7 +400,7 @@ void FormRenderServiceMgr::FormRenderGCTask(const std::string &uid)
 
 void FormRenderServiceMgr::FormRenderGC(const std::string &uid)
 {
-    HILOG_INFO("form gc, uid is %{s}public", uid.c_str());
+    HILOG_INFO("form gc, uid is %{public}s", uid.c_str());
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
         search->second->FormRenderGC();
