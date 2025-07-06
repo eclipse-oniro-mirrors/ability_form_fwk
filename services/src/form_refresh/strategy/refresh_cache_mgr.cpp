@@ -31,6 +31,7 @@ RefreshCacheMgr::~RefreshCacheMgr() {}
 void RefreshCacheMgr::AddToOverloadTaskQueue(const FormTimer &task)
 {
     HILOG_WARN("add overload formId:%{public} " PRId64 ", userId:%{public}d", task.formId, task.userId);
+    std::lock_guard<std::mutex> lock(overloadTaskMutex_);
     for (auto &item : overloadTask_) {
         if (item.formId == task.formId && item.userId == task.userId) {
             item = task;
@@ -44,6 +45,7 @@ void RefreshCacheMgr::AddToOverloadTaskQueue(const FormTimer &task)
 
 void RefreshCacheMgr::ConsumeOverloadTaskQueue()
 {
+    std::lock_guard<std::mutex> lock(overloadTaskMutex_);
     for (const auto &item : overloadTask_) {
         HILOG_INFO("cosume overload task(formId:%{public}" PRId64 ", userId:%{public}d)", item.formId, item.userId);
         RefreshData data;
