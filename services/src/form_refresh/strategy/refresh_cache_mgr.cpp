@@ -31,6 +31,7 @@ RefreshCacheMgr::~RefreshCacheMgr() {}
 void RefreshCacheMgr::AddToOverloadTaskQueue(const FormTimer &task)
 {
     HILOG_WARN("add overload formId:%{public} " PRId64 ", userId:%{public}d", task.formId, task.userId);
+    std::lock_guard<std::mutex> lock(overloadTaskMutex_);
     for (auto &item : overloadTask_) {
         if (item.formId == task.formId && item.userId == task.userId) {
             item = task;
@@ -44,14 +45,18 @@ void RefreshCacheMgr::AddToOverloadTaskQueue(const FormTimer &task)
 
 void RefreshCacheMgr::ConsumeOverloadTaskQueue()
 {
-    for (const auto &item : overloadTask_) {
+    std::vector<FormTimer> tasksToProcess;
+    {
+        std::lock_guard<std::mutex> lock(overloadTaskMutex_);
+        tasksToProcess.swap(overloadTask_);
+    }
+    for (const auto &item : tasksToProcess) {
         HILOG_INFO("cosume overload task(formId:%{public}" PRId64 ", userId:%{public}d)", item.formId, item.userId);
         RefreshData data;
         data.formId = item.formId;
         data.formTimer = item;
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_TIMER);
     }
-    overloadTask_.clear();
 }
 
 void RefreshCacheMgr::AddFlagByHealthyControl(const int64_t formId, bool isAskForProviderData)
