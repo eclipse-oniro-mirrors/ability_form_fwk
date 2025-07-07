@@ -24,6 +24,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "common/util/form_util.h"
+#include "form_render/form_render_mgr.h"
 #define private public
 #include "form_mgr/form_mgr_adapter.h"
 #include "ipc_types.h"
