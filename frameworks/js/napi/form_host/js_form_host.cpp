@@ -59,6 +59,7 @@ namespace {
     const std::set<std::string> FORM_LISTENER_TYPE = {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
+    constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -2316,11 +2317,13 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
             std::unique_lock<std::mutex> lock(dataParam->mutex);
             dataParam->isReady = true;
             dataParam->condition.notify_all();
-            delete work;
         });
     std::unique_lock<std::mutex> lock(dataParam->mutex);
-    dataParam->condition.wait(lock, [&] { return dataParam->isReady; });
+    bool isNormalRet = dataParam->condition.wait_for(
+        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
+    HILOG_INFO("Execute requestOverflow, isNormalRet:%{public}d", isNormalRet);
     bool result = dataParam->result;
+    delete work;
     delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
@@ -2479,12 +2482,13 @@ ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, in
             std::unique_lock<std::mutex> lock(dataParam->mutex);
             dataParam->isReady = true;
             dataParam->condition.notify_all();
-            delete work;
         });
     std::unique_lock<std::mutex> lock(dataParam->mutex);
-    dataParam->condition.wait(lock, [&] { return dataParam->isReady; });
+    bool isNormalRet = dataParam->condition.wait_for(
+        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
+    HILOG_INFO("Execute ChangeSceneAnimationState, isNormalRet:%{public}d", isNormalRet);
     bool result = dataParam->result;
-
+    delete work;
     delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
@@ -2615,12 +2619,14 @@ ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect
             std::unique_lock<std::mutex> lock(dataParam->mutex);
             dataParam->isReady = true;
             dataParam->condition.notify_all();
-            delete work;
         });
     std::unique_lock<std::mutex> lock(dataParam->mutex);
-    dataParam->condition.wait(lock, [&] { return dataParam->isReady; });
+    bool isNormalRet = dataParam->condition.wait_for(
+        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
+    HILOG_INFO("Execute GetFormRect, isNormalRet:%{public}d", isNormalRet);
     bool result = dataParam->result;
     rect = std::move(dataParam->formRect);
+    delete work;
     delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
