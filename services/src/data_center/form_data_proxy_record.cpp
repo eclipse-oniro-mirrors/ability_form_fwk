@@ -29,6 +29,7 @@
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
 #include "common/event/form_event_report.h"
+#include "form_mgr/form_mgr_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -184,7 +185,17 @@ void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &change
     if (changeNode.data_.size() == 0) {
         return;
     }
-    UpdateRdbDataForm(changeNode.data_);
+    std::function<void()> taskFunc = [weak = weak_from_this(), data = changeNode.data_]() {
+        auto formDataRecord = weak.lock();
+        if (formDataRecord == nullptr) {
+            HILOG_ERROR("null formDataRecord.");
+            return;
+        }
+        formDataRecord->UpdateRdbDataForm(data);
+    };
+    if (!FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc)) {
+        HILOG_ERROR("fail UpdateRdbDataForm.");
+    }
 }
 
 void FormDataProxyRecord::OnPublishedDataChange(const DataShare::PublishedDataChangeNode &changeNode)

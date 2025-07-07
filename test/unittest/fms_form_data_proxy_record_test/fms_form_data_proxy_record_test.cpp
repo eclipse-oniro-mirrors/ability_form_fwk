@@ -108,6 +108,10 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_002, TestSize.Le
     const std::vector<FormDataProxy> formDataProxies;
 
     formDataProxyRecord.OnRdbDataChange(changeNode);
+    std::vector<std::string> data_;
+    data_.push_back(R"({"string": "hello"})");
+    changeNode.data_ = data_;
+    formDataProxyRecord.OnRdbDataChange(changeNode);
     GTEST_LOG_(INFO) << "FmsFormDataMgr_002 end";
 }
 
