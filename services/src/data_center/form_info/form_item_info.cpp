@@ -688,7 +688,7 @@ void FormItemInfo::SetDistributedDeviceTypes(const std::vector<std::string> &dis
  
 bool FormItemInfo::GetDistributedDeviceTypes(std::vector<std::string>& distributedDeviceTypes) const
 {
-    if (distributedDeviceTypes_.size() > 0) {
+    if (!distributedDeviceTypes_.empty()) {
         distributedDeviceTypes.assign(distributedDeviceTypes_.begin(), distributedDeviceTypes_.end());
         return true;
     }
