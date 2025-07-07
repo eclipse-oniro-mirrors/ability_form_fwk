@@ -89,12 +89,13 @@ void FormStatusMgr::ExecFormTaskTimeout(
         return;
     }
 
-    auto timeoutTask = [formId, event, status]() {
+    auto timeoutTask = [formId, event, status, eventId]() {
         HILOG_ERROR("excute timeout, event:%{public}d, status:%{public}d, formId:%{public}" PRId64,
             static_cast<int32_t>(event),
             static_cast<int32_t>(status),
             formId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::EXECUTION_TIMEOUT);
+        FormEventTimeoutQueue::GetInstance().CancelDelayTask(std::make_pair(formId, eventId));
     };
     FormEventTimeoutQueue::GetInstance().ScheduleDelayTask(
         std::make_pair(formId, eventId), static_cast<uint32_t>(timeoutMs), timeoutTask);
