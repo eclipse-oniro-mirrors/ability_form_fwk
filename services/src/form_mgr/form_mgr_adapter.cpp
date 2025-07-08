@@ -378,6 +378,7 @@ void FormMgrAdapter::IncreaseAddFormRequestTimeOutTask(const int64_t formId)
             iter->second = AddFormResultErrorCode::TIMEOUT;
             condition_.notify_all();
         }
+        serialQueue_->CancelDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId));
     };
     serialQueue_->ScheduleDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId),
         ADD_FORM_REQUEST_TIMTOUT_PERIOD, timerTask);
