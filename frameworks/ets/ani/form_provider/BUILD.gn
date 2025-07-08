@@ -22,14 +22,14 @@ ohos_shared_library("formProvider_ani") {
     debug = false
   }
 
-  include_dirs = ["../../../../interfaces/kits/native/include"]
+  include_dirs = [ "../../../../interfaces/kits/native/include" ]
 
   sources = [ "src/sts_form_provider.cpp" ]
 
-  deps = [ 
+  deps = [
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-   ]
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
