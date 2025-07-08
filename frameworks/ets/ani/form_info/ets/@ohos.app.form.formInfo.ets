@@ -106,7 +106,7 @@ export namespace formInfo {
     Dimension_2_2 = 2,
     Dimension_2_4 = 3,
     Dimension_4_4 = 4,
-    Dimension_2_1 = 5,
+    Dimension_2_1,
     DIMENSION_1_1 = 6,
     DIMENSION_6_4 = 7,
     DIMENSION_2_3 = 8,
