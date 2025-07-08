@@ -4043,14 +4043,15 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int32_t userId = FormUtil::GetCurrentAccountId();
-    HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, enable:%{public}d", userId, formInfos.size(), enable);
+    HILOG_INFO("userId:%{public}d, bundleName:%{public}s, infosSize:%{public}zu, enable:%{public}d",
+        userId, bundleName.c_str(), formInfos.size(), enable);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_DEBUG("bundleName:%{public}s, enableForm:%{public}d, transparencyEnabled:%{public}d",
-            iter->bundleName.c_str(), iter->enableForm, iter->transparencyEnabled);
+        HILOG_DEBUG("enableForm:%{public}d, transparencyEnabled:%{public}d",
+            iter->enableForm, iter->transparencyEnabled);
         if (enable) {
             FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(iter->formId);
         }
-        if (iter->enableForm == enable || (iter->transparencyEnabled && iter->enableForm == true)) {
+        if (iter->enableForm == enable) {
             iter = formInfos.erase(iter);
             continue;
         }

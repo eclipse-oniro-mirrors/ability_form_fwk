@@ -215,7 +215,7 @@ static void initFormRecord(FormRecord &newRecord, const FormItemInfo &formInfo)
     newRecord.description = formInfo.GetDescription();
     newRecord.formLocation = formInfo.GetFormLocation();
     newRecord.isThemeForm = formInfo.GetIsThemeForm();
-    newRecord.enableForm = formInfo.IsTransparencyEnabled() ? true : formInfo.IsEnableForm();
+    newRecord.enableForm = formInfo.IsEnableForm();
     newRecord.lockForm = formInfo.IsLockForm();
     newRecord.protectForm = formInfo.IsLockForm();
 }
