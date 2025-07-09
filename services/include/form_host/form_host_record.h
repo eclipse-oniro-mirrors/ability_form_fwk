@@ -239,7 +239,7 @@ private:
         /**
          * @brief Constructor
          */
-        explicit ClientDeathRecipient(std::string hostBundleName) : hostBundleName_(hostBundleName) {};
+        explicit ClientDeathRecipient(std::string &hostBundleName) : hostBundleName_(hostBundleName) {};
         ~ClientDeathRecipient() = default;
         /**
          * @brief handle remote object died event.
