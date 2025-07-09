@@ -70,6 +70,16 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
         formInfo2.supportDimensions.push_back(1);
         formInfos.push_back(formInfo1);
         formInfos.push_back(formInfo2);
+    } else {
+        FormInfo formInfo3 = {};
+        formInfo3.window.autoDesignWidth = false;
+        formInfo3.window.designWidth = 0;
+        formInfo3.defaultFlag = true;
+        formInfo3.abilityName = "ability";
+        formInfo3.moduleName = "aa";
+        formInfo3.name = "aa";
+        formInfo3.supportDimensions.push_back(1);
+        formInfos.push_back(formInfo3);
     }
     return ERR_OK;
 }

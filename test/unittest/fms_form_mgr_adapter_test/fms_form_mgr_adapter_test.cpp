@@ -24,6 +24,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "common/util/form_util.h"
+#include "form_render/form_render_mgr.h"
 #define private public
 #include "form_mgr/form_mgr_adapter.h"
 #include "ipc_types.h"
@@ -1897,6 +1898,348 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103, TestSize.Level0)
     EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0103 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_0
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_0, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_0 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    formMgrAdapter.formIdMap_.insert(std::make_pair(formId, AddFormResultErrorCode::FAILED));
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_0 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_1
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_1, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_1 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int32_t dimensionId = 1;
+    ElementName elementName;
+    elementName.SetBundleName("bundleName");
+    elementName.SetAbilityName("ability");
+    elementName.SetModuleName("aa");
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    want.SetElement(elementName);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(true);
+    MockCheckTempEnoughForm(false);
+    MockGetBoolParam(false);
+    MockIsRequestPublishForm(true);
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "aa";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "aa";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0103_1 bmsTask called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_1 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_2
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_2, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_2 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int32_t dimensionId = 1;
+    ElementName elementName;
+    elementName.SetBundleName("bundleName");
+    elementName.SetAbilityName("ability");
+    elementName.SetModuleName("aa");
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    want.SetElement(elementName);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(false);
+    MockCheckTempEnoughForm(false);
+    MockGetBoolParam(false);
+    MockIsRequestPublishForm(true);
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "aa";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "aa";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0103_2 bmsTask called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_2 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_3
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_3, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_3 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int32_t dimensionId = 1;
+    ElementName elementName;
+    elementName.SetBundleName("bundleName");
+    elementName.SetAbilityName("ability");
+    elementName.SetModuleName("aa");
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    want.SetElement(elementName);
+    MockGetCallerBundleName(false);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(true);
+    MockCheckTempEnoughForm(false);
+    MockGetBoolParam(false);
+    MockIsRequestPublishForm(true);
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "aa";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "aa";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0103_3 bmsTask called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_3 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_4
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_4, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_4 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int32_t dimensionId = 1;
+    ElementName elementName;
+    elementName.SetBundleName("bundleName");
+    elementName.SetAbilityName("ability");
+    elementName.SetModuleName("aa");
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    want.SetElement(elementName);
+    MockGetRequestPublishFormInfo(false);
+    MockGetCallerBundleName(false);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(true);
+    MockCheckTempEnoughForm(false);
+    MockGetBoolParam(false);
+    MockIsRequestPublishForm(false);
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "aa";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "aa";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0103_4 bmsTask called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_4 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_5
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_5, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_5 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int32_t dimensionId = 1;
+    std::string bundleName = "bundleName";
+    ElementName elementName;
+    elementName.SetBundleName(bundleName);
+    elementName.SetAbilityName("ability");
+    elementName.SetModuleName("aa");
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    want.SetElement(elementName);
+    MockGetRequestPublishFormInfo(false);
+    MockGetCallerBundleName(false);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(true);
+    MockCheckTempEnoughForm(false);
+    MockGetBoolParam(false);
+    MockIsRequestPublishForm(false);
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "aa";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "bundleName";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0103_5 bmsTask called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
+    FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
+    FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
+    FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_5 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_6
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_6, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_6 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int32_t dimensionId = 1;
+    ElementName elementName;
+    elementName.SetBundleName("bundleName");
+    elementName.SetAbilityName("ability");
+    elementName.SetModuleName("aa");
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    want.SetElement(elementName);
+    MockGetRequestPublishFormInfo(false);
+    MockGetCallerBundleName(false);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(true);
+    MockCheckTempEnoughForm(false);
+    MockGetBoolParam(false);
+    MockIsRequestPublishForm(true);
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "aa";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "aa";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0103_6 bmsTask called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_6 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0103_7
+ * @tc.desc: test AddForm function with wrong ability name.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103_7, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_7 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int32_t dimensionId = 1;
+    ElementName elementName;
+    elementName.SetBundleName("bundleName");
+    elementName.SetAbilityName("ability");
+    elementName.SetModuleName("aa");
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo = {};
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    want.SetElement(elementName);
+    MockGetRequestPublishFormInfo(false);
+    MockGetCallerBundleName(false);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(true);
+    MockCheckTempEnoughForm(false);
+    MockGetBoolParam(false);
+    MockIsRequestPublishForm(false);
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "aa";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "aa";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0103_7 bmsTask called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    formMgrAdapter.formIdMap_.insert(std::make_pair(formId, AddFormResultErrorCode::UNKNOWN));
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0103_7 end";
 }
 
 /**
