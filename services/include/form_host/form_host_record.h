@@ -239,13 +239,15 @@ private:
         /**
          * @brief Constructor
          */
-        ClientDeathRecipient() = default;
+        explicit ClientDeathRecipient(std::string hostBundleName) : hostBundleName_(hostBundleName) {};
         ~ClientDeathRecipient() = default;
         /**
          * @brief handle remote object died event.
          * @param remote remote object.
          */
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    private:
+        std::string hostBundleName_ = "";
     };
 };
 }  // namespace AppExecFwk
