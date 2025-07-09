@@ -2069,7 +2069,6 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
     itemInfo.SetFormBundleType(formInfo.bundleType);
     itemInfo.SetConditionUpdate(formInfo.conditionUpdate);
-    itemInfo.SetDistributedDeviceTypes(formInfo.distributedDeviceTypes);
 
     if (!formInfo.customizeDatas.empty()) {
         for (const auto &customizeData: formInfo.customizeDatas) {

@@ -680,19 +680,5 @@ bool FormItemInfo::GetDataProxyIgnoreFormVisibility() const
 {
     return isDataProxyIgnoreFormVisibility_;
 }
-
-void FormItemInfo::SetDistributedDeviceTypes(const std::vector<std::string> &distributedDeviceTypes)
-{
-    distributedDeviceTypes_ = distributedDeviceTypes;
-}
-
-bool FormItemInfo::GetDistributedDeviceTypes(std::vector<std::string>& distributedDeviceTypes) const
-{
-    if (!distributedDeviceTypes_.empty()) {
-        distributedDeviceTypes.assign(distributedDeviceTypes_.begin(), distributedDeviceTypes_.end());
-        return true;
-    }
-    return false;
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS

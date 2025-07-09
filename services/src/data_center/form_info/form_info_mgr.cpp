@@ -124,9 +124,9 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
                 formInfo.privacyLevel = privacyLevel;
                 HILOG_INFO("LoadStageFormConfigInfo, bundleName:%{public}s, name:%{public}s, renderingMode:%{public}d, "
-                    "moduleName:%{public}s, hasDistributedForm:%{public}d, distributedDeviceTypes size:%{public}zu",
+                    "moduleName:%{public}s, hasDistributedForm:%{public}d",
                     formInfo.bundleName.c_str(), formInfo.name.c_str(), static_cast<int>(formInfo.renderingMode),
-                    formInfo.moduleName.c_str(), hasDistributedForm, extensionFormInfo.distributedDeviceTypes.size());
+                    formInfo.moduleName.c_str(), hasDistributedForm);
                 NewFormEventInfo eventInfo;
                 eventInfo.bundleName = formInfo.bundleName;
                 eventInfo.formName = formInfo.name;

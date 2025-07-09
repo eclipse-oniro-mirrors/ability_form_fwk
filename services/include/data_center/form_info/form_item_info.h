@@ -495,17 +495,6 @@ public:
      * @param updateDuration Update duration.
      */
     bool GetDataProxyIgnoreFormVisibility() const;
-    /**
-     * @brief Set value of distributedDeviceTypes.
-     * @param distributedDeviceTypes Update distributedDeviceTypes.
-     */
-    void SetDistributedDeviceTypes(const std::vector<std::string> &distributedDeviceTypes);
-    /**
-     * @brief Get distributedDeviceTypes.
-     * @return distributedDeviceTypes.
-     */
-    bool GetDistributedDeviceTypes(std::vector<std::string> &distributedDeviceTypes) const;
-
 private:
     /**
      * @brief Equal or not.
@@ -560,7 +549,6 @@ private:
     bool protectForm_ = false;
     std::vector<int32_t> conditionUpdate_;
     bool isDataProxyIgnoreFormVisibility_ = false;
-    std::vector<std::string> distributedDeviceTypes_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

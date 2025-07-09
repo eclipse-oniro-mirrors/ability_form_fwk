@@ -1306,21 +1306,4 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_002, TestSize.Leve
     formCastTempConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormCastTempConnection_002 end";
 }
-
-/**
- * @tc.name: FormItemInfo_005
- * @tc.desc: test GetDistributedDeviceTypes function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormRefreshConnectionTest, FormItemInfo_005, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormItemInfo_005 start";
-    FormItemInfo formItemInfo;
-    std::vector<std::string> outVec;
-    EXPECT_FALSE(formItemInfo.GetDistributedDeviceTypes(outVec));
-    const std::vector<std::string> vec = {"phone", "tablet"};
-    formItemInfo.SetDistributedDeviceTypes(vec);
-    EXPECT_TRUE(formItemInfo.GetDistributedDeviceTypes(outVec));
-    GTEST_LOG_(INFO) << "FormItemInfo_005 end";
-}
 }
