@@ -289,7 +289,7 @@ FormHostRecord FormHostRecord::CreateRecord(const FormItemInfo &info,
     record.SetCallerUid(callingUid);
     record.SetFormHostClient(callback);
     record.SetCallback(std::make_shared<FormHostCallback>());
-    record.SetDeathRecipient(new (std::nothrow) FormHostRecord::ClientDeathRecipient());
+    record.SetDeathRecipient(new (std::nothrow) FormHostRecord::ClientDeathRecipient(info.GetHostBundleName()));
     record.AddDeathRecipient(record.GetDeathRecipient());
     return record;
 }
@@ -300,7 +300,7 @@ FormHostRecord FormHostRecord::CreateRecord(const FormItemInfo &info,
  */
 void FormHostRecord::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    HILOG_DEBUG("Form remote died");
+    HILOG_INFO("Form remote died hostBundleName: %{public}s", hostBundleName_.c_str());
     FormHostTaskMgr::GetInstance().PostHostDiedTask(remote.promote());
 }
 
