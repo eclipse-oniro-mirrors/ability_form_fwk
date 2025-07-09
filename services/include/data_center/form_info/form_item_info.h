@@ -495,6 +495,7 @@ public:
      * @param updateDuration Update duration.
      */
     bool GetDataProxyIgnoreFormVisibility() const;
+
 private:
     /**
      * @brief Equal or not.
