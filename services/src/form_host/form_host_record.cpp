@@ -285,11 +285,12 @@ FormHostRecord FormHostRecord::CreateRecord(const FormItemInfo &info,
     const sptr<IRemoteObject> &callback, int callingUid)
 {
     FormHostRecord record;
-    record.SetHostBundleName(info.GetHostBundleName());
+    std::string bundleName = info.GetHostBundleName();
+    record.SetHostBundleName(bundleName);
     record.SetCallerUid(callingUid);
     record.SetFormHostClient(callback);
     record.SetCallback(std::make_shared<FormHostCallback>());
-    record.SetDeathRecipient(new (std::nothrow) FormHostRecord::ClientDeathRecipient(info.GetHostBundleName()));
+    record.SetDeathRecipient(new (std::nothrow) FormHostRecord::ClientDeathRecipient(bundleName));
     record.AddDeathRecipient(record.GetDeathRecipient());
     return record;
 }
