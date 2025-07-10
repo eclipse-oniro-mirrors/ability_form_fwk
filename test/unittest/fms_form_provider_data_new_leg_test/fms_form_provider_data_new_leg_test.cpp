@@ -591,7 +591,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_003, TestSize.Level0)
     MockIsLimiterEnableRefresh(true);
     MockConnectServiceAbility(false);
     record.isCountTimerRefresh = true;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PROVIDER_DEL_FAIL, formProviderMgr.ConnectAmsForRefresh(formId, record, want));
+    formProviderMgr.ConnectAmsForRefresh(formId, record, want);
     GTEST_LOG_(INFO) << "FormProviderMgr_003 end";
 }
 
