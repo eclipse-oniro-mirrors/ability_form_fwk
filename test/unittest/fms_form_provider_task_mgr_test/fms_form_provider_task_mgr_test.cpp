@@ -422,4 +422,20 @@ HWTEST_F(FormProviderTaskMgrTest, FormProviderTaskMgr_0022, TestSize.Level0)
     formTaskMgr.NotifySizeChanged(formId, newDimension, rect, want, remoteObject);
     GTEST_LOG_(INFO) << "FormProviderTaskMgr_0022 end";
 }
+
+/**
+ * @tc.name: FormProviderTaskMgr_0023
+ * @tc.desc: test NotifyFormLocationUpdate function and formProviderProxy is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderTaskMgrTest, FormProviderTaskMgr_0023, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderTaskMgr_0023 start";
+    FormProviderTaskMgr formTaskMgr;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    formTaskMgr.NotifyFormLocationUpdate(formId, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormProviderTaskMgr_0023 end";
+}
 }
