@@ -182,7 +182,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 
     std::array methods = {
         ani_native_function{
-            "setFormNextRefreshTime_inner", "Lstd/core/String;D:V", reinterpret_cast<void *>(SetFormNextRefreshTime)},
+            "setFormNextRefreshTime_inner", "Lstd/core/String;I:V", reinterpret_cast<void *>(SetFormNextRefreshTime)},
     };
 
     if (env->Namespace_BindNativeFunctions(spc, methods.data(), methods.size()) != ANI_OK) {
