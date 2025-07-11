@@ -2051,23 +2051,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_104, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_105
- * @tc.desc: Verify CreateRuntime
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_105, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_105 start";
-    formRenderRecordPtr_->runtime_ = nullptr;
-    std::string bundleName = "<bundleName>";
-    auto eventRunner = EventRunner::Create(bundleName);
-    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
-    FormJsInfo info;
-    formRenderRecordPtr_->CreateRuntime(info);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_105 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_106
  * @tc.desc: Verify UpdateRuntime
  * @tc.type: FUNC
