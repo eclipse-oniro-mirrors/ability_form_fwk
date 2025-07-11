@@ -91,8 +91,15 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
         if (extensionInfo.type != ExtensionAbilityType::FORM) {
             continue;
         }
+        HapModuleInfo sharedModule;
+        bool hasDistributedForm = LoadSharedModuleInfo(bundleInfo, sharedModule);
         std::vector<std::string> profileInfos {};
-        if (!client->GetResConfigFile(extensionInfo, FORM_METADATA_NAME, profileInfos)) {
+        if  (hasDistributedForm) {
+            if (!client->GetProfileFromSharedHap(sharedModule, extensionInfo, profileInfos)) {
+                HILOG_WARN("fail get profile info from shared hap");
+                continue;
+            }
+        } else if (!client->GetResConfigFile(extensionInfo, FORM_METADATA_NAME, profileInfos)) {
             HILOG_ERROR("fail get form metadata");
             continue;
         }
@@ -109,12 +116,17 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 if (!bundleInfo.applicationInfo.isSystemApp) {
                     formInfo.transparencyEnabled = false;
                 }
+                if (hasDistributedForm) {
+                    formInfo.package = extensionInfo.bundleName + sharedModule.moduleName;
+                    formInfo.moduleName = sharedModule.moduleName;
+                }
                 formInfo.versionCode = bundleInfo.versionCode;
                 formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
                 formInfo.privacyLevel = privacyLevel;
-                HILOG_INFO("LoadStageFormConfigInfo, bundleName: %{public}s, name: %{public}s, "
-                    "renderingMode: %{public}d",
-                    formInfo.bundleName.c_str(), formInfo.name.c_str(), static_cast<int>(formInfo.renderingMode));
+                HILOG_INFO("LoadStageFormConfigInfo, bundleName:%{public}s, name:%{public}s, renderingMode:%{public}d, "
+                    "moduleName:%{public}s, hasDistributedForm:%{public}d",
+                    formInfo.bundleName.c_str(), formInfo.name.c_str(), static_cast<int>(formInfo.renderingMode),
+                    formInfo.moduleName.c_str(), hasDistributedForm);
                 NewFormEventInfo eventInfo;
                 eventInfo.bundleName = formInfo.bundleName;
                 eventInfo.formName = formInfo.name;

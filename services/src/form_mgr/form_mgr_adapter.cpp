@@ -2113,7 +2113,7 @@ void FormMgrAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, c
 {
     auto hapPath = hapModuleInfo.hapPath;
     auto moduleName = hapModuleInfo.moduleName;
-    HILOG_DEBUG("module [%{public}s] packageName is %{public}s, hap path is %{public}s", moduleName.c_str(),
+    HILOG_INFO("module [%{public}s] packageName is %{public}s, hap path is %{public}s", moduleName.c_str(),
         hapModuleInfo.packageName.c_str(), hapPath.c_str());
     if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
         hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
