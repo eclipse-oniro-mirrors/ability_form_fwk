@@ -894,6 +894,7 @@ private:
     uint32_t NetSceneCallbackId_ = 0;
     int32_t netConTime = 0;
     int64_t lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
+    std::set<int64_t> requestPublishFormWithSnapshotSet_;
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);
 #ifdef MEM_MGR_ENABLE

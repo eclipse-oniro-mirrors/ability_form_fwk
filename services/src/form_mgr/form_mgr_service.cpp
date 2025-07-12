@@ -1872,7 +1872,9 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
         HILOG_ERROR("update formLocation form infos permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
+    bool isRequestPublishFormWithSnapshot = 
+        requestPublishFormWithSnapshotSet_.find(formId) != requestPublishFormWithSnapshotSet_.end();
+    return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation, isRequestPublishFormWithSnapshot);
 }
 
 ErrCode FormMgrService::BatchRefreshForms(const int32_t formRefreshType)
@@ -1896,8 +1898,22 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     FormEventReport::SendRequestPublicFormEvent(bundleName, formName, true);
-    return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    auto ret = FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
                                                             formId, {}, false);
+    if (ret == ERR_OK) {
+        requestPublishFormWithSnapshotSet_.insert(formId);
+        auto taskId = std::make_pair((int64_t)TaskType::UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+            static_cast<int64_t>(callingUid));
+        FormMgrQueue::GetInstance().ScheduleDelayTask(
+            taskId, IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME,
+            [this, taskId, formId]() {
+                requestPublishFormWithSnapshotSet_.erase(formId);
+                FormMgrQueue::GetInstance().CancelDelayTask(taskId);
+            }
+        );
+    }
+    return ret;
 }
 
 #ifdef RES_SCHEDULE_ENABLE

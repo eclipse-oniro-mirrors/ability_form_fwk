@@ -3943,7 +3943,8 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation,
+    const bool isRequestPublishFormWithSnapshot)
 {
     HILOG_INFO("UpdateFormLocation formId = %{public}" PRId64 " formLocation = %{public}d",
         formId, formLocation);
@@ -3957,7 +3958,11 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
             formId, formLocation);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    if ((int32_t)formRecord.formLocation != formLocation) {
+    bool isFormLocationChange = (int32_t)formRecord.formLocation != formLocation;
+    if (isFormLocationChange || (formRecord.isSystemApp && isRequestPublishFormWithSnapshot)) {
+        HILOG_INFO("UpdateFormLocation isFormLocationChange = %{public}d, isSystemApp = %{public}d, "
+            "isRequestPublishFormWithSnapshot = %{public}d", isFormLocationChange,
+            formRecord.isSystemApp, isRequestPublishFormWithSnapshot);
         Want locationWant;
         locationWant.SetParam(Constants::FORM_LOCATION_KEY, formLocation);
         FormProviderMgr::GetInstance().ConnectAmsChangeLocation(formId, formRecord, locationWant);

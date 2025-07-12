@@ -21,7 +21,8 @@ namespace AppExecFwk {
 enum class TaskType : int64_t {
     RECYCLE_FORM = 0, // add form type base 0
     RENDER_FORM,
-    DELETE_FORM_HOST_RECORD = 10000 // add form_host type base 10000
+    DELETE_FORM_HOST_RECORD = 10000, // add form_host type base 10000
+    UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
@@ -31,6 +32,7 @@ constexpr int32_t ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME = 5000; // ms
 constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_CON_NETWORK_DELAY_TIME = 500; // ms
 constexpr int32_t PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME = 500; // ms
+constexpr int32_t IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME = 2000; // ms
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

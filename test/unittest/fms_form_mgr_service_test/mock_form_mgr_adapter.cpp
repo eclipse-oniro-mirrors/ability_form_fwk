@@ -279,7 +279,8 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t uid,
     return g_updateForm;
 }
 
-int FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+int FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation,
+    const bool isRequestPublishFormWithSnapshot)
 {
     return g_updateFormLocation;
 }
