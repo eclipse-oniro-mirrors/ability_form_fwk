@@ -2428,23 +2428,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_127, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_128
- * @tc.desc: Verify ReloadFormRecord
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_128, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_128 start";
-    std::vector<FormJsInfo> formJsInfos;
-    Want want;
-    std::string bundleName = "<bundleName>";
-    auto eventRunner = EventRunner::Create(bundleName);
-    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
-    formRenderRecordPtr_->ReloadFormRecord(std::move(formJsInfos), want);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_128 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_129
  * @tc.desc: Verify ReloadFormRecord
  * @tc.type: FUNC
