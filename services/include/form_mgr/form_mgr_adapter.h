@@ -604,12 +604,14 @@ public:
     void UpdateFormCloudUpdateDuration(const std::string &bundleName);
 
     /**
-     * @brief Update formLocation with formId.
-     * @param formId The Id of the form to update.
-     * @param formLocation formLocation.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
+    * @brief Update formLocation with formId.
+    * @param formId The Id of the form to update.
+    * @param formLocation formLocation.
+    * @param isRequestPublishFormWithSnapshot is request publish form with snapshot, default is false.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation,
+        const bool isRequestPublishFormWithSnapshot = false);
 
     /**
      * @brief Update form with formRefreshType, send to form manager service.
