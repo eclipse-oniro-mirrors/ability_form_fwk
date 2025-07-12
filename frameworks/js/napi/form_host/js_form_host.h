@@ -107,39 +107,16 @@ private:
     napi_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
     napi_env changeSceneAnimationStateEnv_;
     ErrCode RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow = true);
-    void CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo, napi_value* result);
-    void RequestOverflowInner(LiveFormInterfaceParam* dataParam);
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
-    void ChangeSceneAnimationStateInner(LiveFormInterfaceParam* dataParam);
     napi_ref getFormRectCallbackRef_ = nullptr;
     napi_env getFormRectEnv_;
     ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect);
-    void GetFormRectInner(LiveFormInterfaceParam* dataParam);
-    void CallPromise(napi_value funcResult, LiveFormInterfaceParam *liveFormInterfaceParam);
-    static napi_value PromiseCallback(napi_env env, napi_callback_info info);
-    static bool ConvertFunctionResult(napi_env env, napi_value funcResult, AppExecFwk::Rect &rect);
 
     napi_ref getLiveFormStatusCallbackRef_ = nullptr;
     napi_env getLiveFormStatusEnv_;
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
-};
-
-class PromiseCallbackInfo {
-public:
-    static PromiseCallbackInfo* Create(LiveFormInterfaceParam* liveFormInterfaceParam);
- 
-    static void Destroy(PromiseCallbackInfo* callbackInfo);
- 
-    LiveFormInterfaceParam* GetJsCallBackParam();
- 
-private:
-    explicit PromiseCallbackInfo(LiveFormInterfaceParam* liveFormInterfaceParam);
- 
-    ~PromiseCallbackInfo();
- 
-    LiveFormInterfaceParam* liveFormInterfaceParam_ = nullptr;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS
