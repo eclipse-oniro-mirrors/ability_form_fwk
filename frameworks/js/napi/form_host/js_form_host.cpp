@@ -59,7 +59,6 @@ namespace {
     const std::set<std::string> FORM_LISTENER_TYPE = {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
-    constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
 }
 
 int64_t SystemTimeMillis() noexcept
