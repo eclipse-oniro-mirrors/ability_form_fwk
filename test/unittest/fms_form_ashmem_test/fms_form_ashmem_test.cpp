@@ -296,6 +296,11 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_014, TestSize.Level1)
         EXPECT_EQ(form_ashmem_->TestFormId13(i), i);
         EXPECT_EQ(form_ashmem_->TestFormId14(i), i);
         EXPECT_EQ(form_ashmem_->TestFormId15(i), i);
+        EXPECT_EQ(form_ashmem_->TestFormId16(i), i);
+        EXPECT_EQ(form_ashmem_->TestFormId17(i), i);
+        EXPECT_EQ(form_ashmem_->TestFormId18(i), i);
+        EXPECT_EQ(form_ashmem_->TestFormId19(i), i);
+        EXPECT_EQ(form_ashmem_->TestFormId20(i), i);
     }
 }
 }  // namespace AppExecFwk
