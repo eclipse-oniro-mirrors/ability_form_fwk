@@ -2301,7 +2301,7 @@ void CallMethodInThreadSafeFunction(std::string methodName, napi_env env, napi_r
     napi_create_string_utf8(env, methodName.c_str(), NAPI_AUTO_LENGTH, &methodNapi);
     napi_value callback = nullptr;
     napi_get_reference_value(env, callbackRef, &callback);
-    napi_status status = napi_create_threadsafe_function(env, callback, nullptr, methodNapi, 0, 1, dataParam, 
+    napi_status status = napi_create_threadsafe_function(env, callback, nullptr, methodNapi, 0, 1, dataParam,
         nullptr, dataParam, jsCallback, &dataParam->tsfn);
     if (status != napi_ok) {
         HILOG_ERROR("status not napi_ok");
@@ -2711,7 +2711,7 @@ void GetFormRectInner(napi_env env, napi_value callbackNapi, [[maybe_unused]] vo
 
 ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect &rect)
 {
-    HILOG_INFO("call"); 
+    HILOG_INFO("call");
     LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
         .formId = std::to_string(formId)
     };
