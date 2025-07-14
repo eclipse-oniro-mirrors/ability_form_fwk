@@ -64,6 +64,11 @@ public:
     static int TestFormId13(int &formId);
     static int TestFormId14(int &formId);
     static int TestFormId15(int &formId);
+    static int TestFormId16(int &formId);
+    static int TestFormId17(int &formId);
+    static int TestFormId18(int &formId);
+    static int TestFormId19(int &formId);
+    static int TestFormId20(int &formId);
 private:
     bool ReadFromParcel(Parcel &parcel);
 

@@ -813,5 +813,240 @@ int FormAshmem::TestFormId15(int &formId)
         default: return formId;
     }
 }
+
+int FormAshmem::TestFormId16(int &formId)
+{
+    switch (formId) {
+        case int(TestNum::Num1): return formId;
+        case int(TestNum::Num2): return formId;
+        case int(TestNum::Num3): return formId;
+        case int(TestNum::Num4): return formId;
+        case int(TestNum::Num5): return formId;
+        case int(TestNum::Num6): return formId;
+        case int(TestNum::Num7): return formId;
+        case int(TestNum::Num8): return formId;
+        case int(TestNum::Num9): return formId;
+        case int(TestNum::Num10): return formId;
+        case int(TestNum::Num11): return formId;
+        case int(TestNum::Num12): return formId;
+        case int(TestNum::Num13): return formId;
+        case int(TestNum::Num14): return formId;
+        case int(TestNum::Num15): return formId;
+        case int(TestNum::Num16): return formId;
+        case int(TestNum::Num17): return formId;
+        case int(TestNum::Num18): return formId;
+        case int(TestNum::Num19): return formId;
+        case int(TestNum::Num20): return formId;
+        case int(TestNum::Num21): return formId;
+        case int(TestNum::Num22): return formId;
+        case int(TestNum::Num23): return formId;
+        case int(TestNum::Num24): return formId;
+        case int(TestNum::Num25): return formId;
+        case int(TestNum::Num26): return formId;
+        case int(TestNum::Num27): return formId;
+        case int(TestNum::Num28): return formId;
+        case int(TestNum::Num29): return formId;
+        case int(TestNum::Num30): return formId;
+        case int(TestNum::Num31): return formId;
+        case int(TestNum::Num32): return formId;
+        case int(TestNum::Num33): return formId;
+        case int(TestNum::Num34): return formId;
+        case int(TestNum::Num35): return formId;
+        case int(TestNum::Num36): return formId;
+        case int(TestNum::Num37): return formId;
+        case int(TestNum::Num38): return formId;
+        case int(TestNum::Num39): return formId;
+        case int(TestNum::Num40): return formId;
+        default: return formId;
+    }
+}
+
+int FormAshmem::TestFormId17(int &formId)
+{
+    switch (formId) {
+        case int(TestNum::Num1): return formId;
+        case int(TestNum::Num2): return formId;
+        case int(TestNum::Num3): return formId;
+        case int(TestNum::Num4): return formId;
+        case int(TestNum::Num5): return formId;
+        case int(TestNum::Num6): return formId;
+        case int(TestNum::Num7): return formId;
+        case int(TestNum::Num8): return formId;
+        case int(TestNum::Num9): return formId;
+        case int(TestNum::Num10): return formId;
+        case int(TestNum::Num11): return formId;
+        case int(TestNum::Num12): return formId;
+        case int(TestNum::Num13): return formId;
+        case int(TestNum::Num14): return formId;
+        case int(TestNum::Num15): return formId;
+        case int(TestNum::Num16): return formId;
+        case int(TestNum::Num17): return formId;
+        case int(TestNum::Num18): return formId;
+        case int(TestNum::Num19): return formId;
+        case int(TestNum::Num20): return formId;
+        case int(TestNum::Num21): return formId;
+        case int(TestNum::Num22): return formId;
+        case int(TestNum::Num23): return formId;
+        case int(TestNum::Num24): return formId;
+        case int(TestNum::Num25): return formId;
+        case int(TestNum::Num26): return formId;
+        case int(TestNum::Num27): return formId;
+        case int(TestNum::Num28): return formId;
+        case int(TestNum::Num29): return formId;
+        case int(TestNum::Num30): return formId;
+        case int(TestNum::Num31): return formId;
+        case int(TestNum::Num32): return formId;
+        case int(TestNum::Num33): return formId;
+        case int(TestNum::Num34): return formId;
+        case int(TestNum::Num35): return formId;
+        case int(TestNum::Num36): return formId;
+        case int(TestNum::Num37): return formId;
+        case int(TestNum::Num38): return formId;
+        case int(TestNum::Num39): return formId;
+        case int(TestNum::Num40): return formId;
+        default: return formId;
+    }
+}
+
+int FormAshmem::TestFormId18(int &formId)
+{
+    switch (formId) {
+        case int(TestNum::Num1): return formId;
+        case int(TestNum::Num2): return formId;
+        case int(TestNum::Num3): return formId;
+        case int(TestNum::Num4): return formId;
+        case int(TestNum::Num5): return formId;
+        case int(TestNum::Num6): return formId;
+        case int(TestNum::Num7): return formId;
+        case int(TestNum::Num8): return formId;
+        case int(TestNum::Num9): return formId;
+        case int(TestNum::Num10): return formId;
+        case int(TestNum::Num11): return formId;
+        case int(TestNum::Num12): return formId;
+        case int(TestNum::Num13): return formId;
+        case int(TestNum::Num14): return formId;
+        case int(TestNum::Num15): return formId;
+        case int(TestNum::Num16): return formId;
+        case int(TestNum::Num17): return formId;
+        case int(TestNum::Num18): return formId;
+        case int(TestNum::Num19): return formId;
+        case int(TestNum::Num20): return formId;
+        case int(TestNum::Num21): return formId;
+        case int(TestNum::Num22): return formId;
+        case int(TestNum::Num23): return formId;
+        case int(TestNum::Num24): return formId;
+        case int(TestNum::Num25): return formId;
+        case int(TestNum::Num26): return formId;
+        case int(TestNum::Num27): return formId;
+        case int(TestNum::Num28): return formId;
+        case int(TestNum::Num29): return formId;
+        case int(TestNum::Num30): return formId;
+        case int(TestNum::Num31): return formId;
+        case int(TestNum::Num32): return formId;
+        case int(TestNum::Num33): return formId;
+        case int(TestNum::Num34): return formId;
+        case int(TestNum::Num35): return formId;
+        case int(TestNum::Num36): return formId;
+        case int(TestNum::Num37): return formId;
+        case int(TestNum::Num38): return formId;
+        case int(TestNum::Num39): return formId;
+        case int(TestNum::Num40): return formId;
+        default: return formId;
+    }
+}
+
+int FormAshmem::TestFormId19(int &formId)
+{
+    switch (formId) {
+        case int(TestNum::Num1): return formId;
+        case int(TestNum::Num2): return formId;
+        case int(TestNum::Num3): return formId;
+        case int(TestNum::Num4): return formId;
+        case int(TestNum::Num5): return formId;
+        case int(TestNum::Num6): return formId;
+        case int(TestNum::Num7): return formId;
+        case int(TestNum::Num8): return formId;
+        case int(TestNum::Num9): return formId;
+        case int(TestNum::Num10): return formId;
+        case int(TestNum::Num11): return formId;
+        case int(TestNum::Num12): return formId;
+        case int(TestNum::Num13): return formId;
+        case int(TestNum::Num14): return formId;
+        case int(TestNum::Num15): return formId;
+        case int(TestNum::Num16): return formId;
+        case int(TestNum::Num17): return formId;
+        case int(TestNum::Num18): return formId;
+        case int(TestNum::Num19): return formId;
+        case int(TestNum::Num20): return formId;
+        case int(TestNum::Num21): return formId;
+        case int(TestNum::Num22): return formId;
+        case int(TestNum::Num23): return formId;
+        case int(TestNum::Num24): return formId;
+        case int(TestNum::Num25): return formId;
+        case int(TestNum::Num26): return formId;
+        case int(TestNum::Num27): return formId;
+        case int(TestNum::Num28): return formId;
+        case int(TestNum::Num29): return formId;
+        case int(TestNum::Num30): return formId;
+        case int(TestNum::Num31): return formId;
+        case int(TestNum::Num32): return formId;
+        case int(TestNum::Num33): return formId;
+        case int(TestNum::Num34): return formId;
+        case int(TestNum::Num35): return formId;
+        case int(TestNum::Num36): return formId;
+        case int(TestNum::Num37): return formId;
+        case int(TestNum::Num38): return formId;
+        case int(TestNum::Num39): return formId;
+        case int(TestNum::Num40): return formId;
+        default: return formId;
+    }
+}
+
+int FormAshmem::TestFormId20(int &formId)
+{
+    switch (formId) {
+        case int(TestNum::Num1): return formId;
+        case int(TestNum::Num2): return formId;
+        case int(TestNum::Num3): return formId;
+        case int(TestNum::Num4): return formId;
+        case int(TestNum::Num5): return formId;
+        case int(TestNum::Num6): return formId;
+        case int(TestNum::Num7): return formId;
+        case int(TestNum::Num8): return formId;
+        case int(TestNum::Num9): return formId;
+        case int(TestNum::Num10): return formId;
+        case int(TestNum::Num11): return formId;
+        case int(TestNum::Num12): return formId;
+        case int(TestNum::Num13): return formId;
+        case int(TestNum::Num14): return formId;
+        case int(TestNum::Num15): return formId;
+        case int(TestNum::Num16): return formId;
+        case int(TestNum::Num17): return formId;
+        case int(TestNum::Num18): return formId;
+        case int(TestNum::Num19): return formId;
+        case int(TestNum::Num20): return formId;
+        case int(TestNum::Num21): return formId;
+        case int(TestNum::Num22): return formId;
+        case int(TestNum::Num23): return formId;
+        case int(TestNum::Num24): return formId;
+        case int(TestNum::Num25): return formId;
+        case int(TestNum::Num26): return formId;
+        case int(TestNum::Num27): return formId;
+        case int(TestNum::Num28): return formId;
+        case int(TestNum::Num29): return formId;
+        case int(TestNum::Num30): return formId;
+        case int(TestNum::Num31): return formId;
+        case int(TestNum::Num32): return formId;
+        case int(TestNum::Num33): return formId;
+        case int(TestNum::Num34): return formId;
+        case int(TestNum::Num35): return formId;
+        case int(TestNum::Num36): return formId;
+        case int(TestNum::Num37): return formId;
+        case int(TestNum::Num38): return formId;
+        case int(TestNum::Num39): return formId;
+        case int(TestNum::Num40): return formId;
+        default: return formId;
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
