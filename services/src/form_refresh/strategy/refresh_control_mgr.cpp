@@ -43,7 +43,7 @@ void RefreshControlMgr::SetSystemOverloadFlag(bool flag)
 }
 #endif
 
-bool RefreshControlMgr::IsSystemOverLoad()
+bool RefreshControlMgr::IsSystemOverload()
 {
 #ifdef RES_SCHEDULE_ENABLE
     if (isSystemOverload_) {
@@ -56,7 +56,7 @@ bool RefreshControlMgr::IsSystemOverLoad()
 
 bool RefreshControlMgr::IsFormInvisible(const FormRecord &record)
 {
-    if (record.formVisibleNotifyState == Constants::FORM_INVISIBLE) {
+    if (record.formVisibleNotifyState != Constants::FORM_VISIBLE) {
         HILOG_WARN("invisible formId:%{public}" PRId64, record.formId);
         return true;
     }

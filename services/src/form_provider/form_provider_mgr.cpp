@@ -238,36 +238,6 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     return ConnectAmsForRefresh(formId, refreshRecord, newWant);
 }
 
-void FormProviderMgr::DelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want)
-{
-    HILOG_INFO("start");
-
-    auto delayRefreshForms = [updatedForms, want]() {
-        for (const auto &updatedForm : updatedForms) {
-            ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
-            if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
-                HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
-                    updatedForm.formId);
-                FormProviderMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
-            }
-        }
-    };
-    FormMgrQueue::GetInstance().ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
-    HILOG_INFO("end");
-}
-
-void FormProviderMgr::PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want,
-    bool isVisibleToFresh)
-{
-    HILOG_DEBUG("start");
-
-    auto refreshForm = [formId, want, isVisibleToFresh]() {
-        FormProviderMgr::GetInstance().RefreshForm(formId, want, isVisibleToFresh);
-    };
-    FormMgrQueue::GetInstance().ScheduleTask(ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME, refreshForm);
-    HILOG_DEBUG("end");
-}
-
 ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, const Want &want)
 {
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);

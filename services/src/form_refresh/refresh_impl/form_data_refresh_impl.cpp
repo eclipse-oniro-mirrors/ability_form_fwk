@@ -24,9 +24,9 @@ namespace AppExecFwk {
 FormDataRefreshImpl::FormDataRefreshImpl() {}
 FormDataRefreshImpl::~FormDataRefreshImpl() {}
 
-int FormDataRefreshImpl::RefreshFormInput(RefreshData &data)
+int FormDataRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_CALLING_USER };
+    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_CALLING_USER };
     CheckValidFactor factor;
     factor.formId = data.formId;
     factor.record = data.record;

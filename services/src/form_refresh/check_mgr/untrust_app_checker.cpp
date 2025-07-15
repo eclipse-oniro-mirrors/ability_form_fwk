@@ -13,27 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
-#define OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
-
-#include <singleton.h>
-
-#include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/check_mgr/untrust_app_checker.h"
+#include "common/util/form_trust_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-/**
-* @class FormNetConnRefreshImpl
-* FormNetConnRefreshImpl is used to deal network reconnect refresh.
-*/
-class FormNetConnRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormNetConnRefreshImpl> {
-    DECLARE_DELAYED_REF_SINGLETON(FormNetConnRefreshImpl);
-public:
-    DISALLOW_COPY_AND_MOVE(FormNetConnRefreshImpl);
 
-    int RefreshFormRequest(RefreshData &data) override;
-};
+UntrustAppChecker::UntrustAppChecker() {}
+UntrustAppChecker::~UntrustAppChecker() {}
+
+int UntrustAppChecker::CheckValid(const CheckValidFactor &factor)
+{
+    if (!FormTrustMgr::GetInstance().IsTrust(factor.record.bundleName)) {
+        HILOG_ERROR("is untrust app, formId:%{public}" PRId64, factor.record.formId);
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
-
-#endif // OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H

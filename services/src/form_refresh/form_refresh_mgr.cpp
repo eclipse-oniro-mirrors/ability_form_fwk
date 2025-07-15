@@ -25,6 +25,7 @@
 #include "form_refresh/refresh_impl/form_data_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_force_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
+#include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -40,6 +41,7 @@ const static std::map<int32_t, IFormRefresh *> refreshMap = {
     { TYPE_DATA, &FormDataRefreshImpl::GetInstance() },
     { TYPE_FORCE, &FormForceRefreshImpl::GetInstance() },
     { TYPE_UNCONTROL, &FormRefreshAfterUncontrolImpl::GetInstance() },
+    { TYPE_APP_UPGRADE, &FormAppUpgradeRefreshImpl::GetInstance() },
 };
 
 int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
@@ -47,7 +49,7 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
     HILOG_INFO("refreshInputType:%{public}d, formId:%{public}" PRId64, refreshType, data.formId);
     auto it = refreshMap.find(refreshType);
     if (it != refreshMap.end()) {
-        int ret = it->second->RefreshFormInput(data);
+        int ret = it->second->RefreshFormRequest(data);
         if (ret != ERR_OK) {
             FormEventReport::SendFormFailedEvent(FormEventName::UPDATE_FORM_FAILED,
                 data.formId,

@@ -781,6 +781,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect);
+
+    /**
+     * @brief Delay refresh forms task when provider update.
+     * @param updatedForms Need refresh forms.
+     * @param want The want of the request.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    void DelayRefreshForms(const std::vector<FormRecord> &updatedForms, const Want &want);
 private:
     /**
      * @brief Get form configure info.
@@ -1376,6 +1384,8 @@ private:
         const sptr<IRemoteObject> &callerToken);
 
     sptr<OHOS::AppExecFwk::IAppMgr> GetAppMgr();
+
+    void PostEnterpriseAppInstallFailedRetryTask(const FormRecord &record, const Want &want);
 
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;

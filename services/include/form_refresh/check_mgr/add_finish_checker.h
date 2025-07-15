@@ -24,7 +24,7 @@ namespace OHOS {
 namespace AppExecFwk {
 /**
 * @class AddFinishChecker
-* AddFinishChecker is used to check form is system app.
+* AddFinishChecker is used to check add form event finished.
 */
 class AddFinishChecker : public IBaseChecker, public DelayedRefSingleton<AddFinishChecker> {
     DECLARE_DELAYED_REF_SINGLETON(AddFinishChecker);

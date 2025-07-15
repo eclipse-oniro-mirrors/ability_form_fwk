@@ -31,7 +31,7 @@ class FormRefreshAfterUncontrolImpl : public IFormRefresh, public DelayedRefSing
 public:
     DISALLOW_COPY_AND_MOVE(FormRefreshAfterUncontrolImpl);
 
-    int RefreshFormInput(RefreshData &data) override;
+    int RefreshFormRequest(RefreshData &data) override;
 
 private:
     bool DetectControlPoint(RefreshData &data, bool &isCountTimerRefresh, const bool isTimerRefresh);

@@ -50,7 +50,7 @@ void MockIsHealthyControl(bool mockBool)
 namespace OHOS {
 namespace AppExecFwk {
 
-inline bool RefreshControlMgr::IsSystemOverLoad()
+inline bool RefreshControlMgr::IsSystemOverload()
 {
     return g_mockIsSystemOverload;
 }

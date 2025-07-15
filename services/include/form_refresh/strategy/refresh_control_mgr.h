@@ -43,7 +43,7 @@ public:
     /**
      * @brief Whether the system load exceeding the refresh limit.
      */
-    bool IsSystemOverLoad();
+    bool IsSystemOverload();
 
     /**
      * @brief Whether the refresh form is invisible.

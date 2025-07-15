@@ -13,27 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
-#define OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
+#ifndef OHOS_FORM_FWK_UNTRUST_APP_CHECKER_H
+#define OHOS_FORM_FWK_UNTRUST_APP_CHECKER_H
 
 #include <singleton.h>
 
-#include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/check_mgr/base_checker_interface.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class FormNetConnRefreshImpl
-* FormNetConnRefreshImpl is used to deal network reconnect refresh.
+* @class UntrustAppChecker
+* UntrustAppChecker is used to check app exists in the untrust list.
 */
-class FormNetConnRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormNetConnRefreshImpl> {
-    DECLARE_DELAYED_REF_SINGLETON(FormNetConnRefreshImpl);
+class UntrustAppChecker : public IBaseChecker, public DelayedRefSingleton<UntrustAppChecker> {
+    DECLARE_DELAYED_REF_SINGLETON(UntrustAppChecker);
 public:
-    DISALLOW_COPY_AND_MOVE(FormNetConnRefreshImpl);
+    DISALLOW_COPY_AND_MOVE(UntrustAppChecker);
 
-    int RefreshFormRequest(RefreshData &data) override;
+    int CheckValid(const CheckValidFactor &factor) override;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif // OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
+#endif // OHOS_FORM_FWK_UNTRUST_APP_CHECKER_H

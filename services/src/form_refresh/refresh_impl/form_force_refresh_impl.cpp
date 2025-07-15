@@ -24,7 +24,7 @@ namespace AppExecFwk {
 FormForceRefreshImpl::FormForceRefreshImpl() {}
 FormForceRefreshImpl::~FormForceRefreshImpl() {}
 
-int FormForceRefreshImpl::RefreshFormInput(RefreshData &data)
+int FormForceRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
     const std::vector<int32_t> checkTypes = {};
     CheckValidFactor factor;

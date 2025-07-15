@@ -41,7 +41,7 @@ struct RefreshData {
 */
 class IFormRefresh {
 public:
-    virtual int RefreshFormInput(RefreshData &data) = 0;
+    virtual int RefreshFormRequest(RefreshData &data) = 0;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

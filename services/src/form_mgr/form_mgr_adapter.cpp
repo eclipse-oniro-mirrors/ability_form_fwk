@@ -4592,5 +4592,40 @@ ErrCode FormMgrAdapter::GetFormInfoByFormRecord(const FormRecord &record, FormIn
         record.abilityName.c_str(), record.formName.c_str(), userId);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
+
+void FormMgrAdapter::DelayRefreshForms(const std::vector<FormRecord> &updatedForms, const Want &want)
+{
+    HILOG_INFO("start");
+    auto delayRefreshForms = [updatedForms, want]() {
+        for (const auto &updatedForm : updatedForms) {
+            RefreshData data;
+            data.formId = updatedForm.formId;
+            data.record = updatedForm;
+            data.want = want;
+            ErrCode errCode = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_APP_UPGRADE);
+            if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
+                HILOG_WARN("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
+                    updatedForm.formId);
+                FormMgrAdapter::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm, want);
+            }
+        }
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
+    HILOG_INFO("end");
+}
+
+void FormMgrAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &record, const Want &want)
+{
+    HILOG_INFO("start");
+    auto refreshForm = [record, want]() {
+        RefreshData data;
+        data.formId = record.formId;
+        data.record = record;
+        data.want = want;
+        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_APP_UPGRADE);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME, refreshForm);
+    HILOG_INFO("end");
+}
 } // namespace AppExecFwk
 } // namespace OHOS

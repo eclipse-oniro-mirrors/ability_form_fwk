@@ -22,6 +22,7 @@
 #include "form_refresh/check_mgr/calling_bundle_checker.h"
 #include "form_refresh/check_mgr/active_user_checker.h"
 #include "form_refresh/check_mgr/add_finish_checker.h"
+#include "form_refresh/check_mgr/untrust_app_checker.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -36,11 +37,12 @@ const static std::map<int32_t, IBaseChecker *> checkerMap = {
     { TYPE_CALLING_BUNDLE, &CallingBundleChecker::GetInstance() },
     { TYPE_ACTIVE_USER, &ActiveUserChecker::GetInstance() },
     { TYPE_ADD_FINISH, &AddFinishChecker::GetInstance() },
+    { TYPE_UNTRUST_APP, &UntrustAppChecker::GetInstance() },
 };
 
 int RefreshCheckMgr::IsBaseValidPass(const std::vector<int32_t> &types, const CheckValidFactor &factor)
 {
-    if (types.size() == 0) {
+    if (types.empty()) {
         HILOG_INFO("the refresh task need't check valid, formId:%{public}" PRId64, factor.formId);
         return ERR_OK;
     }

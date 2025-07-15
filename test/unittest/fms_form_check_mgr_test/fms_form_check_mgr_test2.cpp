@@ -23,6 +23,7 @@
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "form_refresh/form_refresh_mgr.h"
 #include "data_center/form_data_mgr.h"
+#include "common/util/form_trust_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -69,7 +70,11 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshControlMgr_002, TestSi
 {
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshControlMgr_002 start";
 
-    EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsSystemOverLoad());
+    EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsSystemOverload());
+#ifdef RES_SCHEDULE_ENABLE
+    RefreshControlMgr::GetInstance().SetSystemOverloadFlag(true);
+    EXPECT_EQ(true, RefreshControlMgr::GetInstance().IsSystemOverload());
+#endif
 
     FormRecord record;
     record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
@@ -77,6 +82,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshControlMgr_002, TestSi
     record.formVisibleNotifyState = Constants::FORM_VISIBLE;
     EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsFormInvisible(record));
 
+    record.moduleName = "phone_hicar";
     EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsScreenOff(record));
 
     EXPECT_EQ(false, RefreshControlMgr::GetInstance().IsHealthyControl(record));
@@ -118,20 +124,41 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshCacheMgr_005, TestSize
     RefreshCacheMgr::GetInstance().AddToOverloadTaskQueue(timerTask);
     RefreshCacheMgr::GetInstance().ConsumeOverloadTaskQueue();
 
-    RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(FORM_ID_ONE, true);
-    RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(FORM_ID_ONE, false);
-
-    RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(FORM_ID_ONE, 0);
     int64_t formId = FORM_ID_ONE;
     FormItemInfo itemInfo;
     itemInfo.SetFormId(formId);
     FormDataMgr::GetInstance().AllotFormRecord(itemInfo, 0, 0);
+    RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(FORM_ID_ONE, true);
+    RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(FORM_ID_ONE, false);
+
+    std::vector<FormRecord> formRecords;
+    FormDataMgr::GetInstance().GetFormRecordsByUserId(0, formRecords);
+    if (formRecords.size() > 0) {
+        auto iter = formRecords.begin();
+        iter->isRefreshDuringDisableForm = true;
+        RefreshCacheMgr::GetInstance().ConsumeHealthyControlFlag(iter, 0);
+        iter->isRefreshDuringDisableForm = false;
+        iter->isUpdateDuringDisableForm = false;
+        RefreshCacheMgr::GetInstance().ConsumeHealthyControlFlag(iter, 0);
+        iter->isTimerRefresh = true;
+    }
+
+    RefreshCacheMgr::GetInstance().AddFlagByInvisible(FORM_ID_ONE, Constants::REFRESHTYPE_DEFAULT);
+    RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(FORM_ID_ONE, 0);
     RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(FORM_ID_ONE, 0);
 
     FormRecord formRecord;
     Want reqWant;
     RefreshCacheMgr::GetInstance().AddFlagByScreenOff(FORM_ID_ONE, reqWant, formRecord);
     RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
+
+    if (formRecords.size() > 0) {
+        auto iter = formRecords.begin();
+        iter->needRefresh = false;
+        RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
+        iter->formVisibleNotifyState = Constants::FORM_INVISIBLE;
+        RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
+    }
 
     auto task = []() {};
     RefreshCacheMgr::GetInstance().AddRenderTask(FORM_ID_ONE, task);

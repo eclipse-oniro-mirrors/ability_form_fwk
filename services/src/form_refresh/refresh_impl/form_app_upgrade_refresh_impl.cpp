@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 
 #include "form_refresh/strategy/refresh_check_mgr.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
@@ -21,20 +21,23 @@
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "common/util/form_util.h"
+#include "data_center/form_cache_mgr.h"
+#include "form_mgr/form_mgr_adapter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-FormNetConnRefreshImpl::FormNetConnRefreshImpl() {}
-FormNetConnRefreshImpl::~FormNetConnRefreshImpl() {}
+FormAppUpgradeRefreshImpl::FormAppUpgradeRefreshImpl() {}
+FormAppUpgradeRefreshImpl::~FormAppUpgradeRefreshImpl() {}
 
-int FormNetConnRefreshImpl::RefreshFormRequest(RefreshData &data)
+int FormAppUpgradeRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_SYSTEM_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
     CheckValidFactor factor;
     factor.formId = data.formId;
     factor.record = data.record;
-    Want reqWant;
+    factor.callerToken = data.callerToken;
+    Want reqWant(data.want);
     reqWant.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
     factor.want = reqWant;
     int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
@@ -47,19 +50,17 @@ int FormNetConnRefreshImpl::RefreshFormRequest(RefreshData &data)
         return ERR_OK;
     }
 
-    FormDataMgr::GetInstance().SetTimerRefresh(data.formId, true);
-    if (RefreshControlMgr::GetInstance().IsFormInvisible(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByInvisible(data.formId, Constants::REFRESHTYPE_NETWORKCHANGED);
-        return ERR_OK;
-    }
-
-    if (data.record.isSystemApp) {
-        reqWant.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_NETWORKCHANGED);
-    }
-
-    if (RefreshControlMgr::GetInstance().IsScreenOff(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByScreenOff(data.formId, data.want, data.record);
-        return ERR_OK;
+    if (data.record.isDataProxy) {
+        FormProviderData formProviderData;
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        if (FormCacheMgr::GetInstance().GetData(data.formId, cacheData, imageDataMap)) {
+            formProviderData.SetDataString(cacheData);
+            formProviderData.SetImageDataMap(imageDataMap);
+            FormMgrAdapter::GetInstance().UpdateForm(data.formId, data.record.uid, formProviderData);
+        }
+        HILOG_INFO("Upgrade APP data agent card update, cacheData: %{public}zu, formId:%{public}" PRId64,
+            cacheData.size(), data.formId);
     }
 
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
