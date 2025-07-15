@@ -30,6 +30,7 @@ enum CheckValidType {
     TYPE_CALLING_BUNDLE,
     TYPE_ACTIVE_USER,
     TYPE_ADD_FINISH,
+    TYPE_UNTRUST_APP,
 };
 
 /**

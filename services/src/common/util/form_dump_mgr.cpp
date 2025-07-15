@@ -374,7 +374,7 @@ void FormDumpMgr::AppendFormRefreshControlPoints(const FormRecord &formRecordInf
 #endif
 
     formInfo += "    systemOverload ";
-    bool systemOverload = RefreshControlMgr::GetInstance().IsSystemOverLoad();
+    bool systemOverload = RefreshControlMgr::GetInstance().IsSystemOverload();
     formInfo += "[" + std::to_string(systemOverload) + "]\n";
 
     formInfo += "    isInBlockList ";

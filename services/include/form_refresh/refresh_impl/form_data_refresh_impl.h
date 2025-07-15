@@ -31,7 +31,7 @@ class FormDataRefreshImpl : public IFormRefresh, public DelayedRefSingleton<Form
 public:
     DISALLOW_COPY_AND_MOVE(FormDataRefreshImpl);
 
-    int RefreshFormInput(RefreshData &data) override;
+    int RefreshFormRequest(RefreshData &data) override;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -28,9 +28,9 @@ namespace AppExecFwk {
 FormRefreshAfterUncontrolImpl::FormRefreshAfterUncontrolImpl() {}
 FormRefreshAfterUncontrolImpl::~FormRefreshAfterUncontrolImpl() {}
 
-int FormRefreshAfterUncontrolImpl::RefreshFormInput(RefreshData &data)
+int FormRefreshAfterUncontrolImpl::RefreshFormRequest(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
     CheckValidFactor factor;
     factor.formId = data.formId;
     factor.record = data.record;
@@ -57,7 +57,7 @@ int FormRefreshAfterUncontrolImpl::RefreshFormInput(RefreshData &data)
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
     refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
     refreshRecord.isTimerRefresh = isTimerRefresh;
-    ret = RefreshExecMgr::AskForProviderData(data.formId, data.record, data.want);
+    ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, data.want);
     if (ret != ERR_OK) {
         HILOG_ERROR("ask for provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
         return ret;

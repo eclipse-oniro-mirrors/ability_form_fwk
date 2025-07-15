@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
-#define OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
+#ifndef OHOS_FORM_FWK_FORM_APP_UPGRADE_REFRESH_IMPL_H
+#define OHOS_FORM_FWK_FORM_APP_UPGRADE_REFRESH_IMPL_H
 
 #include <singleton.h>
 
@@ -23,17 +23,17 @@
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class FormNetConnRefreshImpl
-* FormNetConnRefreshImpl is used to deal network reconnect refresh.
+* @class FormAppUpgradeRefreshImpl
+* FormAppUpgradeRefreshImpl is used to deal form refresh when app upgrading.
 */
-class FormNetConnRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormNetConnRefreshImpl> {
-    DECLARE_DELAYED_REF_SINGLETON(FormNetConnRefreshImpl);
+class FormAppUpgradeRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormAppUpgradeRefreshImpl> {
+    DECLARE_DELAYED_REF_SINGLETON(FormAppUpgradeRefreshImpl);
 public:
-    DISALLOW_COPY_AND_MOVE(FormNetConnRefreshImpl);
+    DISALLOW_COPY_AND_MOVE(FormAppUpgradeRefreshImpl);
 
     int RefreshFormRequest(RefreshData &data) override;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif // OHOS_FORM_FWK_FORM_NET_CONN_REFRESH_IMPL_H
+#endif // OHOS_FORM_FWK_FORM_APP_UPGRADE_REFRESH_IMPL_H

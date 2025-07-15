@@ -22,6 +22,7 @@
 #include "form_refresh/check_mgr/calling_bundle_checker.h"
 #include "form_refresh/check_mgr/active_user_checker.h"
 #include "form_refresh/check_mgr/add_finish_checker.h"
+#include "form_refresh/check_mgr/untrust_app_checker.h"
 #include "form_refresh/refresh_impl/form_data_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_force_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
@@ -29,6 +30,7 @@
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
 #include "form_refresh/refresh_impl/form_timer_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 #include "data_center/form_record/form_record.h"
 #include "form_mgr_errors.h"
 #include "common/util/form_report.h"
@@ -164,14 +166,14 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormDataRefreshImpl_007, TestS
 
     RefreshData data;
     MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormDataRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormDataRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
     MockUpdateByProviderData(ERR_APPEXECFWK_FORM_DISABLE_REFRESH);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_DISABLE_REFRESH, FormDataRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_DISABLE_REFRESH, FormDataRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockUpdateByProviderData(ERR_OK);
-    EXPECT_EQ(ERR_OK, FormDataRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormDataRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormDataRefreshImpl_007 end";
 }
 
@@ -181,14 +183,14 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormForceRefreshImpl_008, Test
 
     RefreshData data;
     MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormForceRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormForceRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormForceRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormForceRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockAskForProviderData(ERR_OK);
-    EXPECT_EQ(ERR_OK, FormForceRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormForceRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormForceRefreshImpl_008 end";
 }
 
@@ -197,24 +199,26 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormHostRefreshImpl_009, TestS
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormHostRefreshImpl_009 start";
 
     RefreshData data;
+    FormRecord formRecord;
+    data.record = formRecord;
     MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormHostRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
-    MockIsHealthyControl(true);
-    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormInput(data));
+    data.record.enableForm = false;
+    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
-    MockIsHealthyControl(false);
+    data.record.enableForm = true;
     MockIsScreenOff(true);
-    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsScreenOff(false);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormHostRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockAskForProviderData(ERR_OK);
     data.record.isSystemApp = true;
-    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormHostRefreshImpl_009 end";
 }
 
@@ -223,28 +227,30 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormNetConnRefreshImpl_010, Te
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormNetConnRefreshImpl_010 start";
 
     RefreshData data;
+    FormRecord formRecord;
+    data.record = formRecord;
     MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormNetConnRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
-    MockIsHealthyControl(true);
-    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormInput(data));
+    data.record.enableForm = false;
+    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
 
-    MockIsHealthyControl(false);
-    MockIsFormInvisible(true);
-    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormInput(data));
+    data.record.enableForm = true;
+    data.record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
+    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
 
-    MockIsFormInvisible(false);
+    data.record.formVisibleNotifyState = Constants::FORM_VISIBLE;
     MockIsScreenOff(true);
-    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsScreenOff(false);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormNetConnRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockAskForProviderData(ERR_OK);
     data.record.isSystemApp = true;
-    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormNetConnRefreshImpl_010 end";
 }
 
@@ -253,12 +259,14 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormNextTimeRefreshImpl_011, T
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormNextTimeRefreshImpl_011 start";
 
     RefreshData data;
+    FormRecord formRecord;
+    data.record = formRecord;
     MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormNextTimeRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormNextTimeRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
     data.record.isDataProxy = true;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormNextTimeRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormNextTimeRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormNextTimeRefreshImpl_011 end";
 }
 
@@ -267,32 +275,39 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormRefreshAfterUncontrolImpl_
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormRefreshAfterUncontrolImpl_012 start";
 
     RefreshData data;
+    FormRecord formRecord;
+    data.record = formRecord;
     MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
-        FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormInput(data));
+        FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
-    MockIsHealthyControl(true);
-    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormInput(data));
+    data.record.enableForm = false;
+    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
 
-    MockIsHealthyControl(false);
-    MockIsFormInvisible(true);
+    data.record.enableForm = true;
+    data.record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
     data.record.isSystemApp = true;
     data.want.SetParam(Constants::KEY_IS_TIMER, true);
     data.want.SetParam(Constants::KEY_TIMER_REFRESH, true);
     data.want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
-    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
 
-    MockIsFormInvisible(false);
+    int64_t formId = FORM_ID_ONE;
+    FormItemInfo itemInfo;
+    itemInfo.SetFormId(formId);
+    FormDataMgr::GetInstance().AllotFormRecord(itemInfo, 0, 0);
+    FormDataMgr::GetInstance().SetRefreshType(formId, Constants::REFRESHTYPE_NETWORKCHANGED);
+    data.record.formVisibleNotifyState = Constants::FORM_VISIBLE;
     MockIsScreenOff(true);
-    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsScreenOff(false);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
 
     MockAskForProviderData(ERR_OK);
-    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormRefreshAfterUncontrolImpl_012 end";
 }
 
@@ -301,7 +316,7 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormTimerRefreshImpl_013, Test
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormTimerRefreshImpl_013 start";
 
     RefreshData data;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     int64_t formId = FORM_ID_ONE;
     FormItemInfo itemInfo;
@@ -309,37 +324,76 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormTimerRefreshImpl_013, Test
     FormDataMgr::GetInstance().AllotFormRecord(itemInfo, 0, 0);
 
     data.formId = formId;
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    FormRecord formRecord;
+    data.record = formRecord;
+
+    FormTimer timerTask;
+    timerTask.isCountTimer = true;
+    timerTask.refreshType = RefreshType::TYPE_INTERVAL;
+    data.formTimer = timerTask;
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
     MockIsSystemOverload(true);
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsSystemOverload(false);
-    MockIsHealthyControl(true);
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    data.record.enableForm = false;
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
-    MockIsHealthyControl(false);
-    MockIsFormInvisible(true);
+    data.record.enableForm = true;
+    data.record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
     data.record.isSystemApp = true;
     data.want.SetParam(Constants::KEY_IS_TIMER, true);
     data.want.SetParam(Constants::KEY_TIMER_REFRESH, true);
     data.want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
-    MockIsFormInvisible(false);
+    data.record.formVisibleNotifyState = Constants::FORM_VISIBLE;
     MockIsScreenOff(true);
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsScreenOff(false);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockAskForProviderData(ERR_OK);
-    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormInput(data));
+    EXPECT_EQ(ERR_OK, FormTimerRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormTimerRefreshImpl_013 end";
+}
+
+HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_UntrustAppChecker_014, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_UntrustAppChecker_014 start";
+    CheckValidFactor reqFactor;
+    EXPECT_EQ(ERR_OK, UntrustAppChecker::GetInstance().CheckValid(reqFactor));
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_UntrustAppChecker_014 end";
+}
+
+HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormAppUpgradeRefreshImpl_015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormAppUpgradeRefreshImpl_015 start";
+
+    RefreshData data;
+    FormRecord formRecord;
+    data.record = formRecord;
+    MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+        FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsBaseValidPass(ERR_OK);
+    data.record.enableForm = false;
+    EXPECT_EQ(ERR_OK, FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    data.record.enableForm = true;
+    MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockAskForProviderData(ERR_OK);
+    EXPECT_EQ(ERR_OK, FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data));
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormAppUpgradeRefreshImpl_015 end";
 }
 }

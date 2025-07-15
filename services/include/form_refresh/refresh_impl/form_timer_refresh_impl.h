@@ -31,7 +31,7 @@ class FormTimerRefreshImpl : public IFormRefresh, public DelayedRefSingleton<For
 public:
     DISALLOW_COPY_AND_MOVE(FormTimerRefreshImpl);
 
-    int RefreshFormInput(RefreshData &data) override;
+    int RefreshFormRequest(RefreshData &data) override;
 
 private:
     int DealRefresh(const RefreshData &data);

@@ -34,7 +34,7 @@ const static std::map<int32_t, int32_t> refreshTypeMap = {
     { RefreshType::TYPE_UPDATENEXTTIME, Constants::REFRESHTYPE_UPDATENEXTTIME },
 };
 
-int FormTimerRefreshImpl::RefreshFormInput(RefreshData &data)
+int FormTimerRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
     FormRecord record;
     bool flag = FormDataMgr::GetInstance().GetFormRecord(data.formId, record);
@@ -57,7 +57,7 @@ int FormTimerRefreshImpl::RefreshFormInput(RefreshData &data)
 
 int FormTimerRefreshImpl::DealRefresh(const RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
     CheckValidFactor factor;
     factor.formId = data.formId;
     factor.record = data.record;
@@ -67,7 +67,7 @@ int FormTimerRefreshImpl::DealRefresh(const RefreshData &data)
         return ret;
     }
 
-    if (RefreshControlMgr::GetInstance().IsSystemOverLoad()) {
+    if (RefreshControlMgr::GetInstance().IsSystemOverload()) {
         RefreshCacheMgr::GetInstance().AddToOverloadTaskQueue(data.formTimer);
         return ERR_OK;
     }

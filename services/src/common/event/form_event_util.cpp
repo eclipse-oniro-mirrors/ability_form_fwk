@@ -145,7 +145,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    FormProviderMgr::GetInstance().DelayRefreshForms(updatedForms, want);
+    FormMgrAdapter::GetInstance().DelayRefreshForms(updatedForms, want);
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
 
