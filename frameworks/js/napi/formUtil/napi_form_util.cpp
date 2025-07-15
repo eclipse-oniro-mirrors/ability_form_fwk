@@ -625,8 +625,6 @@ napi_value CreateSceneAnimationParamsDatas(napi_env env, const FormSceneAnimatio
     napi_value objContext = nullptr;
     napi_create_object(env, &objContext);
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, sceneAnimationParamsDatas.abilityName));
-    napi_set_named_property(env, objContext, "isAlwaysActive",
-        CreateJsValue(env, sceneAnimationParamsDatas.isAlwaysActive));
     napi_set_named_property(env, objContext, "disabledDesktopBehaviors",
         CreateJsValue(env, sceneAnimationParamsDatas.disabledDesktopBehaviors));
     return objContext;
