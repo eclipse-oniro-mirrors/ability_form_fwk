@@ -59,7 +59,6 @@ namespace {
     const std::set<std::string> FORM_LISTENER_TYPE = {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
-    constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -2286,18 +2285,6 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
     bool isOverflow)
 {
     HILOG_INFO("call");
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(overflowEnv_, &loop);
-    if (loop == nullptr) {
-        HILOG_ERROR("Failed to get loop, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        HILOG_ERROR("Failed to new uv_work_t, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
-
     LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
         .formId = std::to_string(formId),
         .overflowInfo = overflowInfo,
@@ -2305,25 +2292,15 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
     };
     if (dataParam == nullptr) {
         HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        delete work;
         return ERR_GET_INFO_FAILED;
     }
-    work->data = dataParam;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
-            JsFormRouterProxyMgr::GetInstance()->RequestOverflowInner(dataParam);
-            std::unique_lock<std::mutex> lock(dataParam->mutex);
-            dataParam->isReady = true;
-            dataParam->condition.notify_all();
-        });
-    std::unique_lock<std::mutex> lock(dataParam->mutex);
-    bool isNormalRet = dataParam->condition.wait_for(
-        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
-    HILOG_INFO("Execute requestOverflow, isNormalRet:%{public}d", isNormalRet);
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
+    std::function<void()> executeFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
+        JsFormRouterProxyMgr::GetInstance()->RequestOverflowInner(dataParam);
+    };
+    mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::RequestOverflow");
+    HILOG_INFO("call RequestOverflow end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
-    delete work;
     delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
@@ -2452,43 +2429,21 @@ bool JsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
 ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, int32_t state)
 {
     HILOG_INFO("call");
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(overflowEnv_, &loop);
-    if (loop == nullptr) {
-        HILOG_ERROR("Failed to get loop, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        HILOG_ERROR("Failed to new uv_work_t, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
-
     LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
         .formId = std::to_string(formId),
         .state = state
     };
     if (dataParam == nullptr) {
         HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        delete work;
         return ERR_GET_INFO_FAILED;
     }
-    work->data = dataParam;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
-            JsFormRouterProxyMgr::GetInstance()->ChangeSceneAnimationStateInner(dataParam);
-            std::unique_lock<std::mutex> lock(dataParam->mutex);
-            dataParam->isReady = true;
-            dataParam->condition.notify_all();
-        });
-    std::unique_lock<std::mutex> lock(dataParam->mutex);
-    bool isNormalRet = dataParam->condition.wait_for(
-        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
-    HILOG_INFO("Execute ChangeSceneAnimationState, isNormalRet:%{public}d", isNormalRet);
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
+    std::function<void()> executeFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
+        JsFormRouterProxyMgr::GetInstance()->ChangeSceneAnimationStateInner(dataParam);
+    };
+    mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::ChangeSceneAnimationState");
+    HILOG_INFO("call ChangeSceneAnimationState end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
-    delete work;
     delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
@@ -2587,46 +2542,21 @@ bool JsFormRouterProxyMgr::UnregisterGetFormRectListener()
 ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect &rect)
 {
     HILOG_INFO("call");
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(getFormRectEnv_, &loop);
-    if (loop == nullptr) {
-        HILOG_ERROR("Failed to get loop, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        HILOG_ERROR("Failed to new uv_work_t, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
-    
     LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
         .formId = std::to_string(formId)
     };
     if (dataParam == nullptr) {
         HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        delete work;
         return ERR_GET_INFO_FAILED;
     }
-    work->data = dataParam;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
-            if (dataParam != nullptr) {
-                JsFormRouterProxyMgr::GetInstance()->GetFormRectInner(dataParam);
-            }
-            HILOG_INFO("getFormRect start notify.");
-            std::unique_lock<std::mutex> lock(dataParam->mutex);
-            dataParam->isReady = true;
-            dataParam->condition.notify_all();
-        });
-    std::unique_lock<std::mutex> lock(dataParam->mutex);
-    bool isNormalRet = dataParam->condition.wait_for(
-        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
-    HILOG_INFO("Execute GetFormRect, isNormalRet:%{public}d", isNormalRet);
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
+    std::function<void()> executeGetFormRectFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
+        JsFormRouterProxyMgr::GetInstance()->GetFormRectInner(dataParam);
+    };
+    mainHandler->PostSyncTask(executeGetFormRectFunc, "JsFormRouterProxyMgr::GetFormRect");
+    HILOG_INFO("call GetFormRect end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
     rect = std::move(dataParam->formRect);
-    delete work;
     delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
