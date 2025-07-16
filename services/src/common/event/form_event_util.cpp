@@ -561,7 +561,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     want.SetParam(Constants::PARAM_FORM_WIDTH_KEY, reCreateRecord.wantCacheMap[formId].
         GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0));
     want.SetParam(Constants::PARAM_FORM_HEIGHT_KEY, reCreateRecord.wantCacheMap[formId].
-        GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0));
+        GetDoubleParam(Constants::PARAM_FORM_HEIGHT_KEY, 0));
 
     FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want);
 }
