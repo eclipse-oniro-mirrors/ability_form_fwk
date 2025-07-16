@@ -18,6 +18,7 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "facrconnection_fuzzer:fuzztest",
     "formabilityconnection_fuzzer:fuzztest",
     "formabilityconnectionreporter_fuzzer:fuzztest",
     "formashmem_fuzzer:fuzztest",
