@@ -967,6 +967,13 @@ public:
      */
     ErrCode SetSpecification(const int64_t formId, const int32_t specification);
 
+    /**
+     * @brief set formRecord want.
+     * @param formId The Id of the form.
+     * @param want new want.
+     */
+    void SetFormRecordWant(const int64_t formId, const Want &want);
+
 private:
     /**
      * @brief Create form record.

@@ -5072,4 +5072,26 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycl
     EXPECT_EQ(formDataMgr->formRecords_[formId].isExistRecycleTask, isExistRecycleTask);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 end";
 }
+
+/**
+ * @tc.name: FmsFormDataMgrTest_SetFormRecordWant_001
+ * @tc.desc: Verify SetFormRecordWant
+ * @tc.type: FUNC
+ */
+
+ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormRecordWant_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormRecordWant_001 start";
+    int64_t formId = 1234;
+    EXPECT_EQ(formDataMgr_.formRecords_.find(formId) == formDataMgr_.formRecords_.end(), true);
+
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    Want want;
+    formRecord.wantCacheMap[formId] = want;
+    formDataMgr_.formRecords_.emplace(formId, formRecord);
+    auto itFormRecord = formDataMgr_.formRecords_.find(formId);
+    EXPECT_EQ(itFormRecord->second.wantCacheMap.size(), 0);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormRecordWant_001 end";
+}
 }

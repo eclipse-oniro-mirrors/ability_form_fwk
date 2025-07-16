@@ -3031,6 +3031,15 @@ void FormDataMgr::UpdateFormWant(const int64_t formId, const Want &want, FormRec
     record.wantCacheMap[formId] = want;
 }
 
+void FormDataMgr::SetFormRecordWant(const int64_t formId, const Want &want)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord != formRecords_.end()) {
+        itFormRecord->second.wantCacheMap[formId] = want;
+    }
+}
+
 void FormDataMgr::GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
