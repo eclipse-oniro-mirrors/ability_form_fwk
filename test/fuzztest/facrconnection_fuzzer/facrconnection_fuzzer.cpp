@@ -71,9 +71,7 @@ void FormRenderStatusMgrTest(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().OnConfigurationUpdatedInner();
     int64_t formId = fdp->ConsumeIntegralInRange(0, 1000);
     FormFsmEvent event = FormFsmEvent::RELOAD_FORM;
-    std::function<int32_t()> func = []{
-        return 1;
-    };
+    std::function<int32_t()> func = []() { return 1; };
     FormRenderStatusMgr::GetInstance().PostFormEvent(formId, event, func);
     FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     std::string eventId = fdp->ConsumeRandomLengthString();
@@ -126,7 +124,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().FormRenderGCTask(str1);
     FormRenderServiceMgr::GetInstance().FormRenderGC(str1);
     FormRenderServiceMgr::GetInstance().ConfirmUnlockState(want);
-    FormRenderServiceMgr::GetInstance().UpdateRenderRecordByUid(str1, want, formJsInfo,formSupplyClient);
+    FormRenderServiceMgr::GetInstance().UpdateRenderRecordByUid(str1, want, formJsInfo, formSupplyClient);
     FormRenderServiceMgr::GetInstance().IsRenderRecordExist(str1);
     std::shared_ptr<FormRenderRecord> search;
     FormRenderServiceMgr::GetInstance().GetRenderRecordById(search, str1);
