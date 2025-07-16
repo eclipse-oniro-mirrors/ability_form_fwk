@@ -41,6 +41,7 @@
 #include "form_host/form_host_task_mgr.h"
 #include "status_mgr_center/form_status.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
+#include "feature/memory_mgr/form_render_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -458,7 +459,7 @@ void FormRenderMgrInner::RerenderAllForms()
             item.second->SetStateDisconnected();
         }
     }
-
+    FormRenderReport::GetInstance().DeadReport();
     if (!FormDataMgr::GetInstance().IsLowMemory()) {
         NotifyHostRenderServiceIsDead();
     } else {
