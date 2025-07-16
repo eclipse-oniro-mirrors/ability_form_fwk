@@ -1732,7 +1732,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
-    // set reco formRecord want;
+    // set formRecord want;
     newWant.SetParams(wantParams);
     FormDataMgr::GetInstance().SetFormRecordWant(formId, newWant);
 
