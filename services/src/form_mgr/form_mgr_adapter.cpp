@@ -1735,7 +1735,8 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     // set formRecord want;
     Want newWant;
     newWant.SetParams(wantParams);
-    FormDataMgr::GetInstance().SetFormRecordWant(formId, newWant);
+    FormDataMgr::GetInstance().UpdateFormWant(formId, newWant, formRecord);
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
 
     FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams, callerToken);
 
