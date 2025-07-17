@@ -147,6 +147,7 @@ ohos_shared_library("libfms") {
     "services/src/feature/form_share/form_share_task_mgr.cpp",
     "services/src/feature/free_install/free_install_status_callback_proxy.cpp",
     "services/src/feature/free_install/free_install_status_callback_stub.cpp",
+    "services/src/feature/memory_mgr/form_render_report.cpp",
     "services/src/feature/param_update/param_common_event.cpp",
     "services/src/feature/param_update/param_manager.cpp",
     "services/src/feature/param_update/param_reader.cpp",

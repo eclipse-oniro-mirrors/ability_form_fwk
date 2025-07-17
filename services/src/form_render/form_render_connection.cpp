@@ -29,6 +29,7 @@
 #include "common/util/form_util.h"
 #include "ipc_skeleton.h"
 #include "want.h"
+#include "feature/memory_mgr/form_render_report.h"
 
 const int32_t MAX_FAILED_TIMES = 5;
 
@@ -60,7 +61,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         }
         return;
     }
-
+    FormRenderReport::GetInstance().FirstStartReport();
     connectState_ = ConnectState::CONNECTED;
     failedTimes = 0;
     int32_t compileMode = 0;

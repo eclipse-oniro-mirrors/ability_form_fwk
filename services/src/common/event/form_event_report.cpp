@@ -63,6 +63,8 @@ constexpr const char *EVENT_KEY_DISTRIBUTED_FORM = "DISTRIBUTED_FORM";
 constexpr const char *INVALIDEVENTNAME = "INVALIDEVENTNAME";
 constexpr const char *FORM_ERROR = "FORM_ERROR";
 constexpr const char *FORM_STORAGE_DIR_PATH = "/data/service/el1/public/database/form_storage";
+constexpr const char *EVENT_KEY_FORM_COUNT = "FORM_COUNT";
+constexpr const char *EVENT_KEY_IS_LOW_MEMORY = "IS_LOW_MEMORY";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
@@ -100,6 +102,10 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(
         FormEventName::RECYCLE_RECOVER_FORM_FAILED, "RECYCLE_RECOVER_FORM_FAILED"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_PUBLIC_FORM, "REQUEST_PUBLIC_FORM"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::FORM_RENDER_SERVICE_START,
+        "FORM_RENDER_SERVICE_START"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::FORM_RENDER_SERVICE_DEAD,
+        "FORM_RENDER_SERVICE_DEAD"),
 };
 }
 
@@ -447,6 +453,30 @@ std::string FormEventReport::ConvertEventName(const FormEventName &eventName)
         return it->second;
     }
     return INVALIDEVENTNAME;
+}
+
+void FormEventReport::SendFrsStateEvent(const FormEventName &eventName, int64_t formCount, bool isLowMemory)
+{
+    HILOG_ERROR("call");
+    const std::string name = ConvertEventName(eventName);
+    if (name == INVALIDEVENTNAME) {
+        HILOG_ERROR("invalid eventName");
+        return;
+    }
+
+    switch (eventName) {
+        case FormEventName::FORM_RENDER_SERVICE_START:
+        case FormEventName::FORM_RENDER_SERVICE_DEAD:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_MANAGER,
+                name,
+                HiSysEventType::BEHAVIOR,
+                EVENT_KEY_FORM_COUNT, formCount,
+                EVENT_KEY_IS_LOW_MEMORY, isLowMemory);
+            break;
+        default:
+            break;
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS
