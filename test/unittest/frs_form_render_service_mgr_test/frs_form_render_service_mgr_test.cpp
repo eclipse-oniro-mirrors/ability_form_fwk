@@ -20,6 +20,7 @@
 #include "form_js_info.h"
 #include "form_mgr_errors.h"
 #define private public
+#include "form_memmgr_client.h"
 #include "form_render_service_mgr.h"
 #undef private
 #include "form_supply_stub.h"
