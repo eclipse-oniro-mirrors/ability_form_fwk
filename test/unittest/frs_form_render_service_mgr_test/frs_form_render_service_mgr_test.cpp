@@ -20,6 +20,7 @@
 #include "form_js_info.h"
 #include "form_mgr_errors.h"
 #define private public
+#include "form_memmgr_client.h"
 #include "form_render_service_mgr.h"
 #undef private
 #include "form_supply_stub.h"
@@ -1112,4 +1113,35 @@ HWTEST_F(FormRenderServiceMgrTest, RunCachedConfigurationUpdatedTest_001, TestSi
     formRenderServiceMgr.RunCachedConfigurationUpdated();
     EXPECT_FALSE(formRenderServiceMgr.hasCachedConfig_);
     GTEST_LOG_(INFO) << "RunCachedConfigurationUpdatedTest_001 end";
+}
+
+/**
+ * @tc.name: RunCachedConfigurationUpdatedTest_001
+ * @tc.desc: Verify RunCachedConfigurationUpdated interface executes as expected.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetCriticalFalseOnAllFormInvisible_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetCriticalFalseOnAllFormInvisible_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.renderRecordMap_.clear();
+    formRenderServiceMgr.SetCriticalFalseOnAllFormInvisible();
+    EXPECT_FALSE(FormMemmgrClient::GetInstance().IsCritical());
+    GTEST_LOG_(INFO) << "SetCriticalFalseOnAllFormInvisible_001 end";
+}
+
+/**
+ * @tc.name: RunCachedConfigurationUpdatedTest_001
+ * @tc.desc: Verify RunCachedConfigurationUpdated interface executes as expected.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetCriticalTrueOnFormActivity_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetCriticalTrueOnFormActivity_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.renderRecordMap_.clear();
+    // No permission to set critical, so critical is false
+    formRenderServiceMgr.SetCriticalTrueOnFormActivity();
+    EXPECT_FALSE(FormMemmgrClient::GetInstance().IsCritical());
+    GTEST_LOG_(INFO) << "SetCriticalTrueOnFormActivity_001 end";
 }
