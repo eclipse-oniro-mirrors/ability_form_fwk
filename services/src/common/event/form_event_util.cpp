@@ -551,6 +551,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     reCreateRecord.isInited = record.isInited;
     reCreateRecord.versionUpgrade = record.versionUpgrade;
     reCreateRecord.isCountTimerRefresh = false;
+    reCreateRecord.formId = record.formId;
 
     Want want;
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, reCreateRecord.formName);
@@ -558,6 +559,11 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, reCreateRecord.formTempFlag);
     want.SetParam(Constants::RECREATE_FORM_KEY, true);
     want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, (int)record.renderingMode);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, reCreateRecord.formId);
+    want.SetParam(Constants::PARAM_FORM_WIDTH_KEY, reCreateRecord.wantCacheMap[formId].
+        GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0));
+    want.SetParam(Constants::PARAM_FORM_HEIGHT_KEY, reCreateRecord.wantCacheMap[formId].
+        GetDoubleParam(Constants::PARAM_FORM_HEIGHT_KEY, 0));
 
     FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want);
 }
