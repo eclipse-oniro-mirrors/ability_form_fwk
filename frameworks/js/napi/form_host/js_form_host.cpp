@@ -1990,7 +1990,7 @@ private:
         HILOG_DEBUG("call");
         if (argc != ARGS_THREE) {
             HILOG_ERROR("invalid argc");
-            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "3");
             return CreateJsUndefined(env);
         }
         int64_t formId;
@@ -2021,7 +2021,10 @@ private:
             return CreateJsUndefined(env);
         }
         if (!ConvertFormRect(env, argv[PARAM2], newRect)) {
-            HILOG_WARN("newRect is null");
+            HILOG_ERROR("convert newRect failed");
+            delete newRect;
+            NapiFormUtil::ThrowParamError(env, "The newRect is invalid");
+            return CreateJsUndefined(env);
         }
         convertArgc++;
         auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimension, *newRect);
