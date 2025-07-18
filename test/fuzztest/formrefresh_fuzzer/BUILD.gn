@@ -82,6 +82,7 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "common_event_service:cesfwk_innerkits",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "libxml2:libxml2",
     "safwk:system_ability_fwk",
