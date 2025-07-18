@@ -30,6 +30,7 @@
 #include "form_refresh/check_mgr/add_finish_checker.h"
 #include "form_refresh/check_mgr/calling_bundle_checker.h"
 #include "form_refresh/check_mgr/calling_user_checker.h"
+#include "form_refresh/check_mgr/self_form_checker.h"
 #include "form_refresh/check_mgr/system_app_checker.h"
 #include "form_refresh/refresh_impl/form_data_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_force_refresh_impl.h"
@@ -112,6 +113,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     AddFinishChecker::GetInstance().CheckValid(reqFactor);
     CallingBundleChecker::GetInstance().CheckValid(reqFactor);
     CallingUserChecker::GetInstance().CheckValid(reqFactor);
+    SelfFormChecker::GetInstance().CheckValid(reqFactor);
     SystemAppChecker::GetInstance().CheckValid(reqFactor);
     OHOS::FormRefreshTest(fdp);
     OHOS::FormStatusTest(fdp);
