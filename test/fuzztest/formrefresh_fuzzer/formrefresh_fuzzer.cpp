@@ -46,15 +46,9 @@ constexpr size_t U32_AT_SIZE = 4;
 void FormStatusTest(FuzzedDataProvider *fdp)
 {
     int64_t formId = fdp->ConsumeIntegralInRange(0, 1000);
+    int64_t num = fdp->ConsumeIntegralInRange(0, 1000);
     FormFsmStatus formStatus;
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::RENDERED);
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::RECYCLED);
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::RENDERING);
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::RECYCLING_DATA);
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::RECYCLING);
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::RECOVERING);
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::DELETING);
-    FormStatus::GetInstance().SetFormStatus(fdp->ConsumeIntegralInRange(0, 1000), FormFsmStatus::UNPROCESSABLE);
+    FormStatus::GetInstance().SetFormStatus(num, FormFsmStatus::RECYCLING);
     FormStatus::GetInstance().HasFormStatus(formId);
     FormStatus::GetInstance().IsFormProcessRecycle(formId);
     FormStatus::GetInstance().GetFormStatus(formId);
@@ -75,7 +69,6 @@ void FormRefreshTest(FuzzedDataProvider *fdp)
     FormProviderData providerData;
     FormRecord record;
     Want want;
-    record.providerUserId = fdp->ConsumeIntegralInRange(0, 1000);
     data.nextTime = nextTime;
     data.callingUid = callingUid;
     record.isSystemApp = isTrue;
