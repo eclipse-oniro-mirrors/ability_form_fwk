@@ -19,7 +19,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include "fms_log_wrapper.h"
-#include "parameters.h";
+#include "parameters.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -35,7 +35,6 @@ FormMemmgrClient::FormMemmgrClient()
 {
     criticalNotifyEnable_ = system::GetBoolParameter(CRITICAL_NOTIFY_PARAM_NAME, true);
     NotifyProcessStatus();
-    HILOG_INFO("init critical:%{public}d", IsCritical())
 }
 
 FormMemmgrClient::~FormMemmgrClient()
