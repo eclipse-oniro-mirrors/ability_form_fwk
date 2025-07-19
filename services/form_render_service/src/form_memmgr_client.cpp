@@ -33,7 +33,7 @@ constexpr char CRITICAL_NOTIFY_PARAM_NAME[] = "const.form.mem_reduce.critical_no
 
 FormMemmgrClient::FormMemmgrClient()
 {
-    criticalNotifyEnable_ = system::GetBoolParameter(CRITICAL_NOTIFY_PARAM_NAME, false);
+    criticalNotifyEnable_ = system::GetBoolParameter(CRITICAL_NOTIFY_PARAM_NAME, true);
     NotifyProcessStatus();
     HILOG_INFO("init critical:%{public}d", IsCritical())
 }
