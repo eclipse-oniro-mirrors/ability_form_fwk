@@ -46,7 +46,7 @@ void FormMemmgrClient::SetCritical(bool critical)
     int32_t pid = getprocpid();
     HILOG_INFO("pid:%{public}" PRId32 ", critical:%{public}d", pid, critical);
 
-    if (!critical && !criticalNofiryEnable_) {
+    if (!critical && !criticalNotifyEnable_) {
         HILOG_ERROR("setCritical fail, critical notify enable is false");
         return;
     }
