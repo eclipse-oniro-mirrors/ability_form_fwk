@@ -19,6 +19,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include "fms_log_wrapper.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -27,10 +28,12 @@ constexpr int32_t FORM_RENDER_SERVICE_TYPE = 3;
 constexpr int32_t FORM_RENDER_SERVICE_STATUS = 1;
 constexpr int32_t FORM_RENDER_SERVICE_SAID = -1;
 constexpr char LIB_MEMMGR_CLIENT_NAME[] = "libmemmgrclient.z.so";
+constexpr char CRITICAL_NOTIFY_PARAM_NAME[] = "const.form.mem_reduce.critical_notify_enable";
 }
 
 FormMemmgrClient::FormMemmgrClient()
 {
+    criticalNotifyEnable_ = system::GetBoolParameter(CRITICAL_NOTIFY_PARAM_NAME, true);
     NotifyProcessStatus();
 }
 
@@ -42,6 +45,10 @@ void FormMemmgrClient::SetCritical(bool critical)
     int32_t pid = getprocpid();
     HILOG_INFO("pid:%{public}" PRId32 ", critical:%{public}d", pid, critical);
 
+    if (!critical && !criticalNotifyEnable_) {
+        HILOG_ERROR("setCritical fail, critical notify enable is false");
+        return;
+    }
     void *libMemmgrClientHandle = dlopen(LIB_MEMMGR_CLIENT_NAME, RTLD_NOW);
     if (!libMemmgrClientHandle) {
         HILOG_ERROR("dlopen libmemmgrclient fail");

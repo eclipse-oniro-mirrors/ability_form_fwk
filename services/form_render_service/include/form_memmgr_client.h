@@ -48,6 +48,7 @@ private:
 
 private:
     std::atomic_bool critical_;
+    bool criticalNotifyEnable_ = true;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
