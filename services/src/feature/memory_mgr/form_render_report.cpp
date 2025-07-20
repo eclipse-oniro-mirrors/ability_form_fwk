@@ -68,7 +68,7 @@ void FormRenderReport::GetAllFormCount(int64_t &formCount)
     FormDataMgr::GetInstance().GetTempFormsCount(tempFormsCount);
     int32_t castFormsCount;
     FormDataMgr::GetInstance().GetCastFormsCount(castFormsCount);
-    formCount = tempFormsCount + castFormsCount;
+    formCount = static_cast<int64_t>(tempFormsCount) + static_cast<int64_t>(castFormsCount);
 }
 }
 }
