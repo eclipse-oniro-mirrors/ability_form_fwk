@@ -470,7 +470,7 @@ void FormEventReport::SendFrsStateEvent(const FormEventName &eventName, int64_t 
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER,
                 name,
-                HiSysEventType::BEHAVIOR,
+                HiSysEventType::FAULT,
                 EVENT_KEY_FORM_COUNT, formCount,
                 EVENT_KEY_IS_LOW_MEMORY, isLowMemory);
             break;
