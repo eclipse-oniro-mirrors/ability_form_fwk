@@ -1462,6 +1462,29 @@ int32_t FormMgrProxy::GetPublishedFormInfoById(const int64_t formId, RunningForm
     return error;
 }
 
+int32_t FormMgrProxy::GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo)
+{
+    HILOG_INFO("start");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write to formId error");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int error = GetPublishedRunningFormInfoById(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
+        data, runningFormInfo);
+    // formInfos should have been fulfilled at this point.
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail getPublishedRunningFormInfoById:%{public}d", error);
+    }
+ 
+    return error;
+}
+
 int32_t FormMgrProxy::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
 {
     HILOG_INFO("start");
@@ -1475,6 +1498,25 @@ int32_t FormMgrProxy::GetPublishedFormInfos(std::vector<RunningFormInfo> &formIn
     // formInfos should have been fulfilled at this point.
     if (error != ERR_OK) {
         HILOG_ERROR("fail GetPublishedFormInfos:%{public}d", error);
+    }
+
+    return error;
+}
+
+int32_t FormMgrProxy::GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_INFO("start");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int error = GetPublishedRunningFormInfos(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_RUNNING_FORM_INFOS,
+        data, runningFormInfos);
+    // formInfos should have been fulfilled at this point.
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail GetPublishedRunningFormInfos:%{public}d", error);
     }
 
     return error;
