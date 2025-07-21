@@ -359,11 +359,33 @@ public:
     }
 
     /**
+    * @brief This function is called by formProvider and gets forms info by formId of the calling ability.
+    *        The conditions will be retrieved by form service manager.
+    * @param formId
+    * @param runningFormInfo Return the forms' information
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    virtual int32_t GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo)
+    {
+        return 0;
+    }
+
+    /**
     * @brief This function is called by formProvider and gets forms info.
     * @param formInfos Return the forms' information
     * @return Returns ERR_OK on success, others on failure.
     */
     virtual int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
+    {
+        return 0;
+    }
+
+    /**
+    * @brief This function is called by formProvider and gets forms info.
+    * @param runningFormInfos Return the forms' information
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    virtual int32_t GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
     {
         return 0;
     }
@@ -1000,6 +1022,8 @@ public:
         FORM_MGR_NOTIFY_UPDATE_FORM_SIZE,
         FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS,
         FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS,
+        FORM_MGR_GET_PUBLISHED_RUNNING_FORM_INFO_BY_ID,
+        FORM_MGR_GET_PUBLISHED_RUNNING_FORM_INFOS,
     };
 };
 }  // namespace AppExecFwk

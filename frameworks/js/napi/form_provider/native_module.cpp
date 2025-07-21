@@ -47,6 +47,10 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
     BindNativeFunction(env, exports, "activateSceneAnimation", moduleName, JsFormProvider::ActivateSceneAnimation);
     BindNativeFunction(env, exports, "deactivateSceneAnimation", moduleName, JsFormProvider::DeactivateSceneAnimation);
     BindNativeFunction(env, exports, "getFormRect", moduleName, JsFormProvider::GetFormRect);
+    BindNativeFunction(env, exports, "getPublishedRunningFormInfos", moduleName,
+        JsFormProvider::GetPublishedRunningFormInfos);
+    BindNativeFunction(env, exports, "getPublishedRunningFormInfoById", moduleName,
+        JsFormProvider::GetPublishedRunningFormInfoById);
     return exports;
 }
 

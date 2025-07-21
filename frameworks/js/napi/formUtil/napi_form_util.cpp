@@ -594,6 +594,36 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     return objContext;
 }
 
+napi_value CreateNewRunningFormInfos(napi_env env, const std::vector<RunningFormInfo> &runningFormInfos)
+{
+    napi_value arrayValue = nullptr;
+    napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
+    uint32_t index = 0;
+    for (const auto &runningFormInfo : runningFormInfos) {
+        napi_set_element(env, arrayValue, index++, CreateNewRunningFormInfo(env, runningFormInfo));
+    }
+    return arrayValue;
+}
+ 
+napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("call");
+ 
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
+ 
+    std::string formStr = std::to_string(runningFormInfo.formId);
+    napi_set_named_property(env, objContext, "formId", CreateJsValue(env, formStr));
+    napi_set_named_property(env, objContext, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
+    napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
+    napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
+    napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
+    napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
+ 
+    return objContext;
+}
+
 napi_value CreateFormCustomizeDatas(napi_env env, const std::vector<FormCustomizeData> &customizeDatas)
 {
     napi_value objContext = nullptr;

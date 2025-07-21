@@ -322,6 +322,10 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleRegisterGetLiveFormStatusProxy(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS):
             return HandleUnregisterGetLiveFormStatusProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_RUNNING_FORM_INFO_BY_ID):
+            return HandleGetPublishedRunningFormInfoById(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_RUNNING_FORM_INFOS):
+            return HandleGetPublishedRunningFormInfos(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1093,6 +1097,22 @@ int32_t FormMgrStub::HandleGetPublishedFormInfoById(MessageParcel &data, Message
     return result;
 }
 
+int32_t FormMgrStub::HandleGetPublishedRunningFormInfoById(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    int64_t formId = data.ReadInt64();
+    // write result of calling FMS into reply.
+    RunningFormInfo runningFormInfo;
+    // call FormMgrService to get formInfo.
+    int32_t result = GetPublishedRunningFormInfoById(formId, runningFormInfo);
+    reply.WriteInt32(result);
+    if (result == ERR_OK && !reply.WriteParcelable(&runningFormInfo)) {
+        HILOG_ERROR("write failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
 int32_t FormMgrStub::HandleGetPublishedFormInfos(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
@@ -1102,6 +1122,21 @@ int32_t FormMgrStub::HandleGetPublishedFormInfos(MessageParcel &data, MessagePar
     int32_t result = GetPublishedFormInfos(infos);
     reply.WriteBool(result);
     if (result == ERR_OK && !WriteParcelableVector(infos, reply)) {
+        HILOG_ERROR("write failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleGetPublishedRunningFormInfos(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    // write result of calling FMS into reply.
+    std::vector<RunningFormInfo> runningFormInfos;
+    // call FormMgrService to get formInfos into runningFormInfos.
+    int32_t result = GetPublishedRunningFormInfos(runningFormInfos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK && !WriteParcelableVector(runningFormInfos, reply)) {
         HILOG_ERROR("write failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
