@@ -40,6 +40,7 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
       return;
     }
 
+    this.context.formId = this.liveFormInfo.formId;
     this.context.setWindowBackgroundColor('#00FFFFFF')
       .then(() => {
           console.info('setWindowBackgroundColor succeed');

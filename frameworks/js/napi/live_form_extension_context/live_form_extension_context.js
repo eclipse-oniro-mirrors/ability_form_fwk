@@ -16,6 +16,7 @@
 let UIExtensionContext = requireNapi('application.UIExtensionContext');
 
 export class LiveFormExtensionContext extends UIExtensionContext {
+  formId = '';
   constructor(obj) {
     super(obj);
   }
@@ -23,5 +24,10 @@ export class LiveFormExtensionContext extends UIExtensionContext {
   setWindowBackgroundColor(color) {
     console.log(`setWindowBackgroundColor: ${JSON.stringify(color)}`);
     return this.__context_impl__.setWindowBackgroundColor(color);
+  }
+
+  startAbilityByLiveForm(want) {
+    hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${JSON.stringify(want)}`);
+    return this.__context_impl__.startAbilityByLiveForm(want, this.formId);
   }
 }

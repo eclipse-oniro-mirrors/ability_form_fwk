@@ -16,11 +16,14 @@
 #include "live_form_extension_context.h"
 #include "fms_log_wrapper.h"
 #include "form_errors.h"
+#include "form_constants.h"
+#include "form_mgr.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
 using namespace OHOS::AppExecFwk;
 const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
+const std::string REQUEST_METHOD = "startAbilityByLiveForm";
 
 bool LiveFormExtensionContext::SetWindowBackgroundColor(const char *color)
 {
@@ -40,6 +43,25 @@ bool LiveFormExtensionContext::SetWindowBackgroundColor(const char *color)
 #endif // SUPPORT_SCREEN
     HILOG_DEBUG("SetWindowBackgroundColor end");
     return true;
+}
+
+ErrCode LiveFormExtensionContext::StartAbilityByFms(const AAFwk::Want &want, const std::string &formId)
+{
+    HILOG_INFO("StartAbilityByFms want: %{public}s", want.ToString().c_str());
+    AAFwk::Want wantToHost(want);
+    wantToHost.SetAction(Constants::FORM_PAGE_ACTION);
+    wantToHost.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM);
+    wantToHost.SetParam(Constants::PARMA_REQUEST_METHOD, REQUEST_METHOD);
+    wantToHost.SetParam(Constants::PARAM_FORM_ID, formId);
+ 
+    HILOG_INFO("StartAbilityByFms wantToHost: %{public}s", wantToHost.ToString().c_str());
+    ErrCode err = AppExecFwk::FormMgr::GetInstance().StartAbilityByFms(wantToHost);
+    if (err != ERR_OK) {
+        HILOG_ERROR("StartAbilityByFms fail, ret = %{public}d", err);
+        return err;
+    }
+    HILOG_INFO("StartAbilityByFms success");
+    return ERR_OK;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS
