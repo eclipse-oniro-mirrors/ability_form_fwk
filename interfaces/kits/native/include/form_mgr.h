@@ -423,12 +423,29 @@ public:
     int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo);
 
     /**
+    * @brief This function is called by formProvider and gets form info by the formId of the calling ability.
+    *        The formId will be retrieved by form service manager.
+    * @param formId The formId of the calling ability
+    * @param runningFormInfo Return the form' information of the calling formId
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo);
+
+    /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved by form service manager.
     * @param formInfos Return the forms' information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos);
+
+    /**
+    * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
+    *        The bundle name will be retrieved by form service manager.
+    * @param runningFormInfos Return the forms' information of the calling bundle name
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
 
     /**
      * @brief Get all running form infos.

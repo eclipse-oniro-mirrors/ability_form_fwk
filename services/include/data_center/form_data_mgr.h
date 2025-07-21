@@ -181,6 +181,18 @@ public:
      */
     ErrCode GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
         const int64_t &formId, int32_t userId = Constants::INVALID_USER_ID) const;
+
+    /**
+     * @brief Get published form record by formId.
+     * @param bundleName Bundle name.
+     * @param runningFormInfo The form record.
+     * @param formId The Id of the form.
+     * @param userId User ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetPublishedRunningFormInfoById(const std::string &bundleName, RunningFormInfo &runningFormInfo,
+        const int64_t formId, int32_t userId = Constants::INVALID_USER_ID) const;
+
     /**
      * @brief Get published form records.
      * @param bundleName Bundle name.
@@ -189,6 +201,16 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetPublishedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
+        int32_t userId = Constants::INVALID_USER_ID) const;
+
+    /**
+     * @brief Get published form records.
+     * @param bundleName Bundle name.
+     * @param runningFormInfos The form record list.
+     * @param userId User ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetPublishedRunningFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos,
         int32_t userId = Constants::INVALID_USER_ID) const;
 
     /**

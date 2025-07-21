@@ -1038,5 +1038,80 @@ napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* 
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
+
+napi_value JsFormProvider::GetPublishedRunningFormInfos(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetPublishedRunningFormInfos);
+}
+ 
+napi_value JsFormProvider::OnGetPublishedRunningFormInfos(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+ 
+    NapiAsyncTask::CompleteCallback complete =
+        [](napi_env env, NapiAsyncTask &task, int32_t status) {
+            std::vector<RunningFormInfo> runningFormInfos;
+            auto ret = FormMgr::GetInstance().GetPublishedRunningFormInfos(runningFormInfos);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+            task.ResolveWithNoError(env, CreateRunningFormInfos(env, runningFormInfos));
+        };
+ 
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetPublishedRunningFormInfos",
+        env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormProvider::GetPublishedRunningFormInfoById(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetPublishedRunningFormInfoById);
+}
+ 
+napi_value JsFormProvider::OnGetPublishedRunningFormInfoById(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+    if (CheckParamNum(env, argc, ARGS_SIZE_ONE, ARGS_SIZE_TWO) == false) {
+        return CreateJsUndefined(env);
+    }
+    napi_valuetype paramZeroType = napi_undefined;
+    napi_typeof(env, argv[PARAM0], &paramZeroType);
+    if (paramZeroType != napi_string) {
+        NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+        return CreateJsUndefined(env);
+    }
+    int64_t formId = 0;
+    std::string strFormId;
+    if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
+        HILOG_ERROR("ConvertFromJsValue failed");
+        NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+        return CreateJsUndefined(env);
+    }
+    if (!ConvertStringToInt64(strFormId, formId)) {
+        HILOG_ERROR("convert form string failed");
+        NapiFormUtil::ThrowParamError(env, "Failed to convert formId.");
+        return CreateJsUndefined(env);
+    }
+ 
+    HILOG_INFO("before GetPublishedRunningFormInfoById, formId:%{public}" PRId64, formId);
+    NapiAsyncTask::CompleteCallback complete =
+        [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
+            RunningFormInfo runningFormInfo;
+            auto ret = FormMgr::GetInstance().GetPublishedRunningFormInfoById(formId, runningFormInfo);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+            task.ResolveWithNoError(env, CreateRunningFormInfo(env, runningFormInfo));
+        };
+ 
+    napi_value lastParam = (argc == ARGS_SIZE_TWO) ? argv[PARAM1] : nullptr;
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetPublishedRunningFormInfoById",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+    return result;
+}
 }  // namespace AbilityRuntime
 }  // namespace OHOS

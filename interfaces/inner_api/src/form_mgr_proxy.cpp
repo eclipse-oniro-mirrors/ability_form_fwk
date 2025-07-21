@@ -907,6 +907,18 @@ int FormMgrProxy::GetPublishedFormInfoById(IFormMgr::Message code, MessageParcel
     return error;
 }
 
+int FormMgrProxy::GetPublishedRunningFormInfoById(IFormMgr::Message code, MessageParcel &data,
+                                                  RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("GetPublishedRunningFormInfoById start");
+    auto error = GetParcelableInfo<RunningFormInfo>(code, data, runningFormInfo);
+    if (error != ERR_OK) {
+        HILOG_ERROR("get parcelable info failed");
+    }
+ 
+    return error;
+}
+
 int FormMgrProxy::GetPublishedFormInfos(IFormMgr::Message code, MessageParcel &data,
                                         std::vector<RunningFormInfo> &formInfos)
 {
@@ -944,6 +956,28 @@ ErrCode FormMgrProxy::GetRunningFormInfos(IFormMgr::Message code, MessageParcel 
         HILOG_ERROR("read replyResult failed");
         return error;
     }
+    return GetParcelableInfos<RunningFormInfo>(reply, runningFormInfos);
+}
+
+int FormMgrProxy::GetPublishedRunningFormInfos(IFormMgr::Message code, MessageParcel &data,
+                                               std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("GetPublishedFormInfos start");
+    int error;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(code, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send transact cmd fail");
+        return error;
+    }
+ 
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("read reply result fail");
+        return error;
+    }
+ 
     return GetParcelableInfos<RunningFormInfo>(reply, runningFormInfos);
 }
 
