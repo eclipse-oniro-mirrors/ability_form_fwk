@@ -1272,7 +1272,6 @@ int32_t FormMgr::GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runn
     if (errCode != ERR_OK) {
         HILOG_ERROR("failed errCode:%{public}d", errCode);
         return errCode;
-
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {

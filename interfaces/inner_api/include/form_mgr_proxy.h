@@ -805,7 +805,7 @@ private:
     int32_t GetPublishedRunningFormInfoById(IFormMgr::Message code, MessageParcel &data,
         RunningFormInfo &runningFormInfo);
     int32_t GetPublishedRunningFormInfos(IFormMgr::Message code, MessageParcel &data,
-        std::vector<RunningFormInfo> &runningFormInfos)
+        std::vector<RunningFormInfo> &runningFormInfos);
 private:
     static inline BrokerDelegator<FormMgrProxy> delegator_;
 };
