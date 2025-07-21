@@ -16,6 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORMREFRESH_FUZZER_H
 #define OHOS_FORM_FWK_FORMREFRESH_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "facrconnection_fuzzer"
+#define FUZZ_PROJECT_NAME "formrefresh_fuzzer"
 
 #endif // OHOS_FORM_FWK_FORMREFRESH_FUZZER_H
