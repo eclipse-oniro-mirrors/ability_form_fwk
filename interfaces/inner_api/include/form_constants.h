@@ -76,6 +76,7 @@ namespace Constants {
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE = 1;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_CONTROL_CENTER = 2;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;
+    constexpr int32_t PAGE_ROUTER_SERVICE_CODE_LIVE_FORM = 4;
     constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
     constexpr const char* PARAM_OPEN_FORM_EDIT_VIEW = "openFormEditView";
     constexpr const char* PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
@@ -273,6 +274,20 @@ namespace Constants {
         {Dimension::DIMENSION_6_4, "6*4"},
         {Dimension::DIMENSION_2_3, "2*3"},
         {Dimension::DIMENSION_3_3, "3*3"}
+    };
+
+    struct StatusInfo {
+        std::string activeState;
+        bool isVisible;
+    };
+ 
+    const std::map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
+        {"00", {"INACTIVE", false}},
+        {"01", {"INACTIVE", true}},
+        {"10", {"PAUSE", false}},
+        {"11", {"PAUSE", true}},
+        {"20", {"ACTIVE", false}},
+        {"21", {"ACTIVE", true}},
     };
 
     enum class RenderingMode : int8_t {

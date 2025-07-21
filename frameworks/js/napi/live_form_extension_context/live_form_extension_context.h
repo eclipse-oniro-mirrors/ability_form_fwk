@@ -29,6 +29,8 @@ public:
     static const size_t CONTEXT_TYPE_ID;
 
     bool SetWindowBackgroundColor(const char *color);
+
+    ErrCode StartAbilityByFms(const AAFwk::Want &want, const std::string &formId);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

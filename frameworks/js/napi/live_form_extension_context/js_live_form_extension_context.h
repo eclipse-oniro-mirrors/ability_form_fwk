@@ -37,8 +37,12 @@ public:
 
     static napi_value SetWindowBackgroundColor(napi_env env, napi_callback_info info);
 
+    static napi_value StartAbilityByLiveForm(napi_env env, napi_callback_info info);
+
 private:
     napi_value OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info);
+
+    napi_value OnStartAbilityByLiveForm(napi_env env, NapiCallbackInfo &info);
 
 private:
     std::weak_ptr<LiveFormExtensionContext> context_;

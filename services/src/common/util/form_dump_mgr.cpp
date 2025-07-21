@@ -405,8 +405,15 @@ void FormDumpMgr::AppendLiveFormStatus(const std::string &formId,
     auto it = liveFormStatusMap.find(formId);
     if (it == liveFormStatusMap.end()) {
         formInfo += "[ INACTIVE ]\n";
+        return;
+    }
+ 
+    std::string status = it->second;
+    auto iter = Constants::LIVE_FORM_STATUS_MAP.find(status);
+    if (iter == Constants::LIVE_FORM_STATUS_MAP.end()) {
+        formInfo += "[ INACTIVE ]\n";
     } else {
-        formInfo += "[ " + it->second + " ]\n";
+        formInfo += "[ " + iter->second.activeState + " ]\n";
     }
 }
 }  // namespace AppExecFwk
