@@ -151,6 +151,9 @@ int32_t FormRenderServiceMgr::StopRenderingForm(
             formJsInfo.formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
     }
 
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    SetCriticalFalseOnAllFormInvisible();
+
     return ERR_OK;
 }
 
@@ -193,6 +196,9 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
     }
 
     FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
+
+    SetCriticalFalseOnAllFormInvisible();
+
     return ERR_OK;
 }
 
@@ -210,6 +216,9 @@ int32_t FormRenderServiceMgr::CleanFormHost(const sptr<IRemoteObject> &hostToken
             ++iter;
         }
     }
+
+    SetCriticalFalseOnAllFormInvisible();
+
     return ERR_OK;
 }
 
@@ -250,6 +259,9 @@ int32_t FormRenderServiceMgr::OnUnlock()
             iter.second->OnUnlock();
         }
     }
+    
+    SetCriticalFalseOnAllFormInvisible();
+
     return ERR_OK;
 }
 
@@ -327,6 +339,9 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
         return;
     }
     OnConfigurationUpdatedInner();
+
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    SetCriticalFalseOnAllFormInvisible();
 }
 
 void FormRenderServiceMgr::OnConfigurationUpdatedInner()
@@ -384,6 +399,9 @@ void FormRenderServiceMgr::RunCachedConfigurationUpdated()
     if (hasCachedConfig_) {
         SetCriticalTrueOnFormActivity();
         OnConfigurationUpdatedInner();
+
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        SetCriticalFalseOnAllFormInvisible();
     }
 }
 
@@ -440,6 +458,10 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
 
     FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
+
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    SetCriticalFalseOnAllFormInvisible();
+    
     return ERR_OK;
 }
 
