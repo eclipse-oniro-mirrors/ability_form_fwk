@@ -2078,7 +2078,7 @@ bool FormMgr::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
     return remoteProxy_->RegisterOverflowProxy(callerToken);
 }
@@ -2094,7 +2094,7 @@ bool FormMgr::UnregisterOverflowProxy()
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
     return remoteProxy_->UnregisterOverflowProxy();
 }
@@ -2138,7 +2138,7 @@ bool FormMgr::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
     return remoteProxy_->RegisterChangeSceneAnimationStateProxy(callerToken);
 }
@@ -2154,7 +2154,7 @@ bool FormMgr::UnregisterChangeSceneAnimationStateProxy()
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
     return remoteProxy_->UnregisterChangeSceneAnimationStateProxy();
 }
@@ -2194,7 +2194,7 @@ bool FormMgr::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
     return remoteProxy_->RegisterGetFormRectProxy(callerToken);
 }
@@ -2210,7 +2210,7 @@ bool FormMgr::UnregisterGetFormRectProxy()
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
     return remoteProxy_->UnregisterGetFormRectProxy();
 }
