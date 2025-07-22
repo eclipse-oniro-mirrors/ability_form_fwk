@@ -438,6 +438,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler");
         DeleteFormRequest(formId, compId);
+        RecordFormVisibility(formId, false);
         return;
     }
 
@@ -842,6 +843,7 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
         }
         if (!compId.empty()) {
             search->second->DeleteForm(compId);
+            RecordFormVisibility(formId, false);
             HILOG_ERROR("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
             if (search->second->IsFormRequestsEmpty()) {
                 formRendererGroupMap_.erase(formId);
