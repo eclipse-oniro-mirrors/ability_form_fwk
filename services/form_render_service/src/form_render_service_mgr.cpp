@@ -402,7 +402,6 @@ void FormRenderServiceMgr::RunCachedConfigurationUpdated()
 
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         SetCriticalFalseOnAllFormInvisible();
-
     }
 }
 
