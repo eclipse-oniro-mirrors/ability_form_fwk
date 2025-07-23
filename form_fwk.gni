@@ -94,3 +94,11 @@ declare_args() {
     form_runtime_power = false
   }
 }
+
+declare_args() {
+  hiappevent_global_part_enabled = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.hiviewdfx_hiappevent)) {
+    hiappevent_global_part_enabled = true
+  }
+}
