@@ -359,33 +359,11 @@ public:
     }
 
     /**
-    * @brief This function is called by formProvider and gets forms info by formId of the calling ability.
-    *        The conditions will be retrieved by form service manager.
-    * @param formId
-    * @param runningFormInfo Return the forms' information
-    * @return Returns ERR_OK on success, others on failure.
-    */
-    virtual int32_t GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo)
-    {
-        return 0;
-    }
-
-    /**
     * @brief This function is called by formProvider and gets forms info.
     * @param formInfos Return the forms' information
     * @return Returns ERR_OK on success, others on failure.
     */
     virtual int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
-    {
-        return 0;
-    }
-
-    /**
-    * @brief This function is called by formProvider and gets forms info.
-    * @param runningFormInfos Return the forms' information
-    * @return Returns ERR_OK on success, others on failure.
-    */
-    virtual int32_t GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
     {
         return 0;
     }
