@@ -659,32 +659,6 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
 }
 
 /**
- * @brief Get published form record by formId.
- * @param bundleName Bundle name.
- * @param runningFormInfo The form record.
- * @param formId The Id of the form.
- * @param userId User ID.
- * @return Returns ERR_OK on success, others on failure.
- */
-ErrCode FormDataMgr::GetPublishedRunningFormInfoById(const std::string &bundleName, RunningFormInfo &runningFormInfo,
-    const int64_t formId, int32_t userId) const
-{
-    HILOG_DEBUG("get form record by bundleName:%{public}s & formId:%{public}" PRId64, bundleName.c_str(), formId);
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-        if (bundleName == itFormRecord->second.bundleName && formId == itFormRecord->second.formId &&
-            (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
-            runningFormInfo.formId = itFormRecord->second.formId;
-            FillBasicRunningFormInfoByFormRecord(itFormRecord->second, runningFormInfo);
-            HILOG_DEBUG("getPublishedRunningFormInfoById success, formId:%{public}" PRId64, formId);
-            return ERR_OK;
-        }
-    }
-    HILOG_WARN("runningFormInfo not find");
-    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-}
-
-/**
  * @brief Get published form records.
  * @param bundleName Bundle name.
  * @param formInfos The form record list.
@@ -712,35 +686,6 @@ ErrCode FormDataMgr::GetPublishedFormInfos(const std::string &bundleName, std::v
         HILOG_DEBUG("formInfo not find");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
-}
-
-/**
- * @brief Get published form records.
- * @param bundleName Bundle name.
- * @param formInfos The form record list.
- * @param userId User ID.
- * @return Returns ERR_OK on success, others on failure.
- */
-ErrCode FormDataMgr::GetPublishedRunningFormInfos(const std::string &bundleName,
-    std::vector<RunningFormInfo> &runningFormInfos, int32_t userId) const
-{
-    HILOG_DEBUG("get form record by bundleName:%{public}s", bundleName.c_str());
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-        if (bundleName == itFormRecord->second.bundleName &&
-            (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
-            RunningFormInfo runningFormInfo;
-            runningFormInfo.formId = itFormRecord->second.formId;
-            FillBasicRunningFormInfoByFormRecord(itFormRecord->second, runningFormInfo);
-            runningFormInfos.emplace_back(runningFormInfo);
-        }
-    }
-    if (!runningFormInfos.empty()) {
-        HILOG_DEBUG("GetPublishedFormInfos success, size:%{public}zu", runningFormInfos.size());
-        return ERR_OK;
-    }
-    HILOG_WARN("runningFormInfo not find");
-    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 
 /**

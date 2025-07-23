@@ -374,15 +374,6 @@ public:
     int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override;
 
     /**
-    * @brief This function is called by formProvider and gets forms info by the formId of the calling ability.
-    *        The formId will be retrieved here.
-    * @param formId Filter that contains attributes that the formInfos have to have.
-    * @param runningFormInfo Return the forms' information of the calling formId
-    * @return Returns ERR_OK on success, others on failure.
-    */
-    int32_t GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo) override;
-
-    /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved here.
     * @param filter Filter that contains attributes that the formInfos have to have.
@@ -390,14 +381,6 @@ public:
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos) override;
-
-    /**
-    * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
-    *        The bundle name will be retrieved here.
-    * @param runningFormInfos Return the forms' information of the calling bundle name
-    * @return Returns ERR_OK on success, others on failure.
-    */
-    int32_t GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos) override;
 
     /**
      * @brief Acquire form data by formId.

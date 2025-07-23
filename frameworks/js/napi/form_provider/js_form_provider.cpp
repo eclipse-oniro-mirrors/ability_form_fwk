@@ -1051,12 +1051,12 @@ napi_value JsFormProvider::OnGetPublishedRunningFormInfos(napi_env env, size_t a
     NapiAsyncTask::CompleteCallback complete =
         [](napi_env env, NapiAsyncTask &task, int32_t status) {
             std::vector<RunningFormInfo> runningFormInfos;
-            auto ret = FormMgr::GetInstance().GetPublishedRunningFormInfos(runningFormInfos);
+            auto ret = FormMgr::GetInstance().GetPublishedFormInfos(runningFormInfos);
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }
-            task.ResolveWithNoError(env, CreateRunningFormInfos(env, runningFormInfos));
+            task.ResolveWithNoError(env, CreateNewRunningFormInfos(env, runningFormInfos));
         };
  
     napi_value result = nullptr;
@@ -1099,12 +1099,12 @@ napi_value JsFormProvider::OnGetPublishedRunningFormInfoById(napi_env env, size_
     NapiAsyncTask::CompleteCallback complete =
         [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
             RunningFormInfo runningFormInfo;
-            auto ret = FormMgr::GetInstance().GetPublishedRunningFormInfoById(formId, runningFormInfo);
+            auto ret = FormMgr::GetInstance().GetPublishedFormInfoById(formId, runningFormInfo);
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }
-            task.ResolveWithNoError(env, CreateRunningFormInfo(env, runningFormInfo));
+            task.ResolveWithNoError(env, CreateNewRunningFormInfo(env, runningFormInfo));
         };
  
     napi_value lastParam = (argc == ARGS_SIZE_TWO) ? argv[PARAM1] : nullptr;

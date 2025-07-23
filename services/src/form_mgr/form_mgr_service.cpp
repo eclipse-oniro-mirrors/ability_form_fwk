@@ -1226,20 +1226,6 @@ int32_t FormMgrService::GetPublishedFormInfoById(const int64_t formId, RunningFo
     return FormDataMgr::GetInstance().GetPublishedFormInfoById(callerBundleName, formInfo, formId);
 }
 
-int32_t FormMgrService::GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo)
-{
-    HILOG_DEBUG("call");
-    std::string callerBundleName;
-    ErrCode ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("get host bundle name failed");
-        return ret;
-    }
-    HILOG_DEBUG("flows to getPublishedRunningFormInfoById callerBundleName%{public}s & formId:%{public}" PRId64,
-    callerBundleName.c_str(), formId);
-    return FormDataMgr::GetInstance().GetPublishedRunningFormInfoById(callerBundleName, runningFormInfo, formId);
-}
-
 int32_t FormMgrService::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
 {
     HILOG_DEBUG("call");
@@ -1251,19 +1237,6 @@ int32_t FormMgrService::GetPublishedFormInfos(std::vector<RunningFormInfo> &form
     }
     HILOG_INFO("flows to GetPublishedFormInfos");
     return FormDataMgr::GetInstance().GetPublishedFormInfos(callerBundleName, formInfos);
-}
-
-int32_t FormMgrService::GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
-{
-    HILOG_DEBUG("call");
-    std::string callerBundleName;
-    ErrCode ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("get host bundle name failed");
-        return ret;
-    }
-    HILOG_INFO("flows to GetPublishedRunningFormInfos callerBundleName:%{public}s", callerBundleName.c_str());
-    return FormDataMgr::GetInstance().GetPublishedRunningFormInfos(callerBundleName, runningFormInfos);
 }
 
 int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
