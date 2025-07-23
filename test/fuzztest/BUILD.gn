@@ -60,6 +60,7 @@ group("fuzztest") {
     "formprovidermgr_fuzzer:fuzztest",
     "formproviderproxy_fuzzer:fuzztest",
     "formproviderstub_fuzzer:fuzztest",
+    "formrefresh_fuzzer:fuzztest",
     "formrenderconnection_fuzzer:fuzztest",
     "formrendereventreport_fuzzer:fuzztest",
     "formrenderimpl_fuzzer:fuzztest",
