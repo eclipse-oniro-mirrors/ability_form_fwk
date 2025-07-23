@@ -1234,22 +1234,6 @@ int32_t FormMgr::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo 
     return remoteProxy_->GetPublishedFormInfoById(formId, formInfo);
 }
 
-int32_t FormMgr::GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo)
-{
-    HILOG_DEBUG("call");
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("failed errCode:%{public}d", errCode);
-        return errCode;
-    }
-    std::shared_lock<std::shared_mutex> lock(connectMutex_);
-    if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    return remoteProxy_->GetPublishedRunningFormInfoById(formId, runningFormInfo);
-}
-
 int32_t FormMgr::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
 {
     HILOG_DEBUG("call");
@@ -1263,22 +1247,6 @@ int32_t FormMgr::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->GetPublishedFormInfos(formInfos);
-}
-
-int32_t FormMgr::GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
-{
-    HILOG_DEBUG("call");
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("failed errCode:%{public}d", errCode);
-        return errCode;
-    }
-    std::shared_lock<std::shared_mutex> lock(connectMutex_);
-    if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    return remoteProxy_->GetPublishedRunningFormInfos(runningFormInfos);
 }
 
 bool FormMgr::IsRequestPublishFormSupported()

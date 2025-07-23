@@ -318,27 +318,11 @@ public:
     int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override;
 
     /**
-     * @brief This function is called by formProvider and gets forms info by the formId of the calling ability.
-     *        The formId will be retrieved by form service manager.
-     * @param formId
-     * @param runningFormInfo Return the form' information of the calling formId
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t GetPublishedRunningFormInfoById(const int64_t formId, RunningFormInfo &runningFormInfo) override;
-
-    /**
     * @brief This function is called by formProvider and gets forms info.
     * @param formInfos Return the forms' information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos) override;
-
-    /**
-    * @brief This function is called by formProvider and gets forms info.
-    * @param runningFormInfos Return the forms' information of the calling bundle name
-    * @return Returns ERR_OK on success, others on failure.
-    */
-    int32_t GetPublishedRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos) override;
 
     /**
      * @brief Check if the request of publishing a form is supported by the host.
@@ -802,10 +786,6 @@ private:
         std::vector<RunningFormInfo> &runningFormInfos);
     int32_t GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances);
     bool WriteFormDataProxies(MessageParcel &data, const std::vector<FormDataProxy> &formDataProxies);
-    int32_t GetPublishedRunningFormInfoById(IFormMgr::Message code, MessageParcel &data,
-        RunningFormInfo &runningFormInfo);
-    int32_t GetPublishedRunningFormInfos(IFormMgr::Message code, MessageParcel &data,
-        std::vector<RunningFormInfo> &runningFormInfos);
 private:
     static inline BrokerDelegator<FormMgrProxy> delegator_;
 };

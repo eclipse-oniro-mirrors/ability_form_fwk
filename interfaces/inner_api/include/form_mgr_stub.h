@@ -288,28 +288,12 @@ private:
     int32_t HandleGetPublishedFormInfoById(MessageParcel &data, MessageParcel &reply);
 
     /**
-     * @brief Handle GetPublishedRunningFormInfoById message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleGetPublishedRunningFormInfoById(MessageParcel &data, MessageParcel &reply);
-
-    /**
      * @brief Handle GetPublishedFormInfos message.
      * @param data input param.
      * @param reply output param.
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetPublishedFormInfos(MessageParcel &data, MessageParcel &reply);
-
-    /**
-     * @brief Handle GetPublishedRunningFormInfos message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleGetPublishedRunningFormInfos(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Handle share form message.
