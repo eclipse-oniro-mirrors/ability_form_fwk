@@ -25,6 +25,11 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
+constexpr int32_t MAX_NUM = 1000;
+constexpr int32_t MIN_NUM = 0;
+constexpr uint8_t NUM_TWO = 2;
+
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
@@ -33,6 +38,12 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     FormJsInfo formJsInfo;
+    formJsInfo.formId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formJsInfo.formName = fdp->ConsumeRandomLengthString();
+    formJsInfo.bundleName = fdp->ConsumeRandomLengthString();
+    formJsInfo.abilityName = fdp->ConsumeRandomLengthString();
+    formJsInfo.moduleName = fdp->ConsumeRandomLengthString();
+    formJsInfo.formTempFlag = fdp->ConsumeRandomLengthString().size() % NUM_TWO;
     Parcel parcel;
     formJsInfo.Marshalling(parcel);
     formJsInfo.Unmarshalling(parcel);

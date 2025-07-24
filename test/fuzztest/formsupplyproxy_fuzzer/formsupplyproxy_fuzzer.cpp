@@ -39,6 +39,10 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     sptr<IRemoteObject> impl = nullptr;
     FormSupplyProxy formSupplyProxy(impl);
     MessageParcel datal;
+    std::string provider = fdp->ConsumeRandomLengthString();
+    Want wantArg;
+    Want want;
+    formSupplyProxy.OnAcquireStateResult(FormState::UNKNOWN, provider, wantArg, want);
     return formSupplyProxy.WriteInterfaceToken(datal);
 }
 }
