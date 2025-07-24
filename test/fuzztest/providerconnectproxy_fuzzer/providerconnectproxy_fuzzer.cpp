@@ -29,6 +29,10 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
+constexpr int32_t MAX_NUM = 1000;
+constexpr int32_t MIN_NUM = 0;
+
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
@@ -39,7 +43,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     sptr<IRemoteObject> impl = nullptr;
     ProviderConnectProxy providerConnectProxy(impl);
     MessageParcel datas;
-    uint32_t code = fdp->ConsumeIntegralInRange(0, 1000);
+    uint32_t code = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
