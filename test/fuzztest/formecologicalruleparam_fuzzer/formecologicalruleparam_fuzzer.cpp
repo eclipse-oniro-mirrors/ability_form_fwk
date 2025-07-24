@@ -30,14 +30,19 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
+constexpr int32_t MAX_NUM = 1000;
+constexpr int32_t MIN_NUM = 0;
+constexpr size_t MAX_LENGTH = 5;
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     FormErmsCallerInfo formErmsCallerInfo;
-    formErmsCallerInfo.uid = fdp->ConsumeIntegralInRange(0, 1000);
-    formErmsCallerInfo.pid = fdp->ConsumeIntegralInRange(0, 1000);
-    formErmsCallerInfo.packageName = fdp->ConsumeRandomLengthString(5);
-    formErmsCallerInfo.callerAppType = fdp->ConsumeIntegralInRange(0, 1000);
-    formErmsCallerInfo.targetAppType = fdp->ConsumeIntegralInRange(0, 1000);
+    formErmsCallerInfo.uid = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formErmsCallerInfo.pid = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formErmsCallerInfo.packageName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formErmsCallerInfo.callerAppType = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formErmsCallerInfo.targetAppType = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formErmsCallerInfo.ToString();
     Parcel parcel;
     formErmsCallerInfo.Marshalling(parcel);
