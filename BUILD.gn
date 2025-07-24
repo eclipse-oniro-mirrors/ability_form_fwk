@@ -503,6 +503,7 @@ ohos_shared_library("form_manager") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "ipc:ipc_single",
     "jsoncpp:jsoncpp",
     "napi:ace_napi",
     "os_account:os_account_innerkits",
