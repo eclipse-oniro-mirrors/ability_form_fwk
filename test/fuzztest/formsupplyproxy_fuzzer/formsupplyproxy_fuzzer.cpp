@@ -42,7 +42,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::string provider = fdp->ConsumeRandomLengthString();
     Want wantArg;
     Want want;
-    formSupplyProxy.OnAcquireStateResult(FormState::UNKNOWN, provider,wantArg, want);
+    formSupplyProxy.OnAcquireStateResult(FormState::UNKNOWN, provider, wantArg, want);
     return formSupplyProxy.WriteInterfaceToken(datal);
 }
 }
