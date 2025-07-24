@@ -528,4 +528,18 @@ HWTEST_F(FormReportTest, FormReport_033, TestSize.Level1)
     auto statisticIt = formReport.GetStatistic().find(testFormId);
     EXPECT_NE(statisticIt, formReport.GetStatistic().end());
 }
+
+
+/**
+ * @tc.name: FormReport_034
+ * @tc.desc: test HasFormId function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_034, TestSize.Level1)
+{
+    formReport.InsertFormId(testFormId);
+    EXPECT_TRUE(formReport.HasFormId(testFormId));
+    formReport.RemoveFormId(testFormId);
+    EXPECT_FALSE(formReport.HasFormId(testFormId));
+}
 } // namespace

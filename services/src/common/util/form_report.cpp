@@ -167,7 +167,7 @@ void FormReport::GetAddFormFinish(int64_t formId, bool &addFormFinish)
         addFormFinish = formStatisticMap_[formId].addFormFinish;
     }
 }
- 
+
 void FormReport::SetAddFormFinish(int64_t formId)
 {
     std::lock_guard<std::mutex> guard(formReport_);
@@ -182,15 +182,21 @@ void FormReport::SetAddFormFinish(int64_t formId)
 void FormReport::InsertFormId(int64_t formId)
 {
     std::lock_guard<std::mutex> guard(formIdsMutex_);
-    FormIds.insert(formId);
+    formIds_.insert(formId);
 }
 
 void FormReport::RemoveFormId(int64_t formId)
 {
     std::lock_guard<std::mutex> guard(formIdsMutex_);
-    if (FormIds.find(formId) != FormIds.end()) {
-        FormIds.erase(formId);
+    if (formIds_.find(formId) != formIds_.end()) {
+        formIds_.erase(formId);
     }
+}
+
+bool FormReport::HasFormId(int64_t formId)
+{
+    std::lock_guard<std::mutex> guard(formIdsMutex_);
+    return formIds_.find(formId) != formIds_.end();
 }
 
 void FormReport::HandleAddFormStatistic(int64_t formId)
@@ -201,7 +207,7 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
         HILOG_INFO("invalid formId:%{public}" PRId64, formId);
         return;
     }
-    if (FormIds.find(formId) != FormIds.end()) {
+    if (HasFormId(formId)) {
         HILOG_ERROR("hisysevent yet formid:%{public}" PRId64, formId);
         return;
     }

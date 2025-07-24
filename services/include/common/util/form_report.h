@@ -67,13 +67,14 @@ public:
     void HandleFirstUpdateStatistic(int64_t formId);
     void InsertFormId(int64_t formId);
     void RemoveFormId(int64_t formId);
+    bool HasFormId(int64_t formId);
     std::unordered_map<int64_t, FormStatistic>& GetStatistic();
 
 private:
     mutable std::mutex formReport_;
     mutable std::mutex formIdsMutex_;
     std::unordered_map<int64_t, FormStatistic> formStatisticMap_;
-    std::set<int64_t> FormIds;
+    std::set<int64_t> formIds_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
