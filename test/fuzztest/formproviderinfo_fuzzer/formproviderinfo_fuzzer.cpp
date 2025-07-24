@@ -35,6 +35,12 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formProviderInfo.SetImageDataMap(imageDataMap);
     formProviderInfo.GetImageDataMap();
     nlohmann::json addJsonData;
+    std::string key1 = fdp->ConsumeRandomLengthString();
+    std::string value1 = fdp->ConsumeRandomLengthString();
+    std::string key2 = fdp->ConsumeRandomLengthString();
+    std::string value2 = fdp->ConsumeRandomLengthString();
+    std::string jsonStr = "{\"" + key1 + "\" : " + value1 + ", \"" + key2 + "\" : " + value2 +"}";
+    addJsonData = nlohmann::json::parse(jsonStr, nullptr, false);
     formProviderInfo.MergeData(addJsonData);
     formProviderInfo.NeedCache();
     Parcel parcel;

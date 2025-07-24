@@ -33,10 +33,15 @@ namespace OHOS {
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     FormErmsCallerInfo formErmsCallerInfo;
+    formErmsCallerInfo.uid = fdp->ConsumeIntegralInRange(0, 1000);
+    formErmsCallerInfo.pid = fdp->ConsumeIntegralInRange(0, 1000);
+    formErmsCallerInfo.packageName = fdp->ConsumeRandomLengthString(5);
+    formErmsCallerInfo.callerAppType = fdp->ConsumeIntegralInRange(0, 1000);
+    formErmsCallerInfo.targetAppType = fdp->ConsumeIntegralInRange(0, 1000);
     formErmsCallerInfo.ToString();
     Parcel parcel;
-    formErmsCallerInfo.ReadFromParcel(parcel);
     formErmsCallerInfo.Marshalling(parcel);
+    formErmsCallerInfo.ReadFromParcel(parcel);
     formErmsCallerInfo.Unmarshalling(parcel);
     return true;
 }

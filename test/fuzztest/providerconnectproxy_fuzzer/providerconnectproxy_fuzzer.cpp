@@ -39,6 +39,11 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     sptr<IRemoteObject> impl = nullptr;
     ProviderConnectProxy providerConnectProxy(impl);
     MessageParcel datas;
+    uint32_t code = fdp->ConsumeIntegralInRange(0, 1000);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    providerConnectProxy.SendTransactCmd(code, data, reply, option);
     return providerConnectProxy.WriteInterfaceToken(datas);
 }
 }

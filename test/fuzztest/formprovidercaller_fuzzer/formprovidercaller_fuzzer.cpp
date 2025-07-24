@@ -40,7 +40,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormProviderCaller formProviderCaller(callerToken);
     formProviderCaller.IsSameToken(callerToken);
     FormJsInfo formJsInfo;
-    int64_t formId = 1;
+    int64_t formId = fdp->ConsumeIntegralInRange(0, 1000);
     formProviderCaller.GetFormJsInfo(formId, formJsInfo);
     formProviderCaller.IsFormEmpty();
     sptr<IRemoteObject> token = nullptr;

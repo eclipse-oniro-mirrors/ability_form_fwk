@@ -33,6 +33,12 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     FormJsInfo formJsInfo;
+    formJsInfo.formId = fdp->ConsumeIntegralInRange(0, 1000);
+    formJsInfo.formName = fdp->ConsumeRandomLengthString();
+    formJsInfo.bundleName = fdp->ConsumeRandomLengthString();
+    formJsInfo.abilityName = fdp->ConsumeRandomLengthString();
+    formJsInfo.moduleName = fdp->ConsumeRandomLengthString();
+    formJsInfo.formTempFlag = fdp->ConsumeRandomLengthString().size() % 2;
     Parcel parcel;
     formJsInfo.Marshalling(parcel);
     formJsInfo.Unmarshalling(parcel);

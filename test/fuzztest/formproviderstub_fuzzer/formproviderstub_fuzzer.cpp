@@ -26,7 +26,7 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr size_t U32_AT_SIZE = 4;
-const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.appexecfwk.FormMgr";
+const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.appexecfwk.FormProvider";
 
 class FormProviderStubFuzzTest : public FormProviderStub {
 public:

@@ -37,7 +37,7 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     FormCallerMgr formCallerMgr;
-    int64_t formId = 1;
+    int64_t formId = fdp->ConsumeIntegralInRange(0, 1000);
     formCallerMgr.RemoveFormHostCaller(formId);
     sptr<IRemoteObject> callerToken = nullptr;
     formCallerMgr.RemoveFormHostCaller(callerToken);
