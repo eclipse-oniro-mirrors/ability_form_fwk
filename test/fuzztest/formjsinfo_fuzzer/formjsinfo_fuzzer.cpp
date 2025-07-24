@@ -28,6 +28,7 @@ namespace OHOS {
 
 constexpr int32_t MAX_NUM = 1000;
 constexpr int32_t MIN_NUM = 0;
+constexpr uint8_t NUM_TWO = 2;
 
 uint32_t GetU32Data(const char* ptr)
 {
@@ -42,7 +43,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formJsInfo.bundleName = fdp->ConsumeRandomLengthString();
     formJsInfo.abilityName = fdp->ConsumeRandomLengthString();
     formJsInfo.moduleName = fdp->ConsumeRandomLengthString();
-    formJsInfo.formTempFlag = fdp->ConsumeRandomLengthString().size() % 2;
+    formJsInfo.formTempFlag = fdp->ConsumeRandomLengthString().size() % NUM_TWO;
     Parcel parcel;
     formJsInfo.Marshalling(parcel);
     formJsInfo.Unmarshalling(parcel);
