@@ -29,6 +29,10 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
+constexpr int32_t MAX_NUM = 1000;
+constexpr int32_t MIN_NUM = 0;
+
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
@@ -40,7 +44,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormProviderCaller formProviderCaller(callerToken);
     formProviderCaller.IsSameToken(callerToken);
     FormJsInfo formJsInfo;
-    int64_t formId = fdp->ConsumeIntegralInRange(0, 1000);
+    int64_t formId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formProviderCaller.GetFormJsInfo(formId, formJsInfo);
     formProviderCaller.IsFormEmpty();
     sptr<IRemoteObject> token = nullptr;
