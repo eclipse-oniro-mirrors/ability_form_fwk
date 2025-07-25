@@ -370,8 +370,8 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
 {
     char *base = nullptr;
     int fd = ReadFileDescriptor(parcel);
-    fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
     if (!CheckAshmemSize(fd, bufferSize)) {
+        close(fd);
         HILOG_INFO("ReadAshmemDataFromParcel check ashmem size failed, fd:[%{public}d].", fd);
         return nullptr;
     }
@@ -444,8 +444,9 @@ bool FormProviderData::WriteFileDescriptor(Parcel &parcel, int fd) const
         return false;
     }
     sptr<IPCFileDescriptor> descriptor = new IPCFileDescriptor(dupFd);
-    fdsan_close_with_tag(dupFd, Constants::FORM_DOMAIN_ID);
-    return parcel.WriteObject<IPCFileDescriptor>(descriptor);
+    bool result = parcel.WriteObject<IPCFileDescriptor>(descriptor);
+    close(dupFd);
+    return result;
 }
 
 bool FormProviderData::WriteAshmemDataToParcel(Parcel &parcel, size_t size, const char* dataPtr) const
