@@ -568,8 +568,11 @@ int32_t FormRenderServiceMgr::UpdateRenderRecordByUid(const std::string &uid, Wa
             return RENDER_FORM_FAILED;
         }
 
-        auto callback = [](const std::string &errorName, const std::string &errorMsg) {
-            FormRenderServiceMgr::GetInstance().OnJsError(errorName, errorMsg);
+        auto callback = [this](const std::string &errorName, const std::string &errorMsg) {
+            auto taskFunc = [errorName, errorMsg]() {
+                FormRenderServiceMgr::GetInstance().OnJsError(errorName, errorMsg);
+            };
+            this->serialQueue_->ScheduleDelayTask("OnJsErrorTask", 0, taskFunc);
         };
         record->SetJsErrorCallback(callback);
         record->SetConfiguration(configuration_);
