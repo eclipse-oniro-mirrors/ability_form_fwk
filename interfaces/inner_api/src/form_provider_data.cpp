@@ -371,8 +371,8 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
     char *base = nullptr;
     int fd = ReadFileDescriptor(parcel);
     if (!CheckAshmemSize(fd, bufferSize)) {
-        close(fd);
         HILOG_INFO("ReadAshmemDataFromParcel check ashmem size failed, fd:[%{public}d].", fd);
+        close(fd);
         return nullptr;
     }
     if (bufferSize <= 0 || bufferSize > MAX_BUFFER_SIZE) {
