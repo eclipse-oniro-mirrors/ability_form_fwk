@@ -29,6 +29,14 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+const static std::set<int> ERROR_CODE_WHITE_LIST = {
+    ERR_OK,
+    ERR_APPEXECFWK_FORM_INVALID_PARAM,
+    ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+    ERR_APPEXECFWK_FORM_DISABLE_REFRESH
+};
+}
 
 FormRefreshMgr::FormRefreshMgr() {}
 FormRefreshMgr::~FormRefreshMgr() {}
@@ -50,7 +58,7 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
     auto it = refreshMap.find(refreshType);
     if (it != refreshMap.end()) {
         int ret = it->second->RefreshFormRequest(data);
-        if (ret != ERR_OK) {
+        if (ERROR_CODE_WHITE_LIST.find(ret) == ERROR_CODE_WHITE_LIST.end()) {
             FormEventReport::SendFormFailedEvent(FormEventName::UPDATE_FORM_FAILED,
                 data.formId,
                 data.record.bundleName,
