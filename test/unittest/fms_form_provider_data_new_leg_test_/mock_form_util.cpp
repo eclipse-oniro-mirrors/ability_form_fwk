@@ -15,32 +15,26 @@
 
 #include "mock_form_data_proxy_record_test.h"
 
+using namespace OHOS::AppExecFwk;
+
 namespace {
-    bool g_mockConnectServiceAbilityRet = true;
+    int32_t g_currentAccountId = Constants::ANY_USERID;
+
 }
 
 namespace OHOS {
-void MockConnectServiceAbility(bool mockRet)
+void MockGetCurrentAccountIdRet(int32_t userId)
 {
-    g_mockConnectServiceAbilityRet = mockRet;
+    g_currentAccountId = userId;
 }
 } // namespace OHOS
 
 namespace OHOS {
 namespace AppExecFwk {
-FormAmsHelper::FormAmsHelper()
-{}
-
-FormAmsHelper::~FormAmsHelper()
-{}
-
-ErrCode FormAmsHelper::ConnectServiceAbility(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+int FormUtil::GetCurrentAccountId()
 {
-    if (g_mockConnectServiceAbilityRet) {
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
-    return ERR_OK;
+    GTEST_LOG_(INFO) << "GetCurrentAccountId called " << g_currentAccountId;
+    return g_currentAccountId;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
