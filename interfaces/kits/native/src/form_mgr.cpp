@@ -18,6 +18,9 @@
 #include "appexecfwk_errors.h"
 #include "fms_log_wrapper.h"
 #include "form_caller_mgr.h"
+#ifdef NO_RUNTIME_EMULATOR
+#include "form_event_hiappevent.h"
+#endif
 #include "form_errors.h"
 #include "form_mgr_errors.h"
 #include "running_form_info.h"
@@ -1858,6 +1861,11 @@ ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBinding
     const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("call");
+#ifdef NO_RUNTIME_EMULATOR
+    int64_t processorId = FormEventHiAppEvent::AddProcessor();
+    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64"", processorId);
+    time_t beginTime = time(nullptr);
+#endif
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("errCode:%{public}d", errCode);
@@ -1868,7 +1876,18 @@ ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBinding
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
+    ErrCode ret = remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData,
+        formBindingData, formId);
+#ifdef NO_RUNTIME_EMULATOR
+    PublishFormData publishFormData = {
+    want.GetElement().GetBundleName(),
+    want.GetElement().GetAbilityName(),
+    want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
+    want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
+    want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
+    FormEventHiAppEvent::WriteRequestPublishFormEndEvent(ret, beginTime, publishFormData, processorId);
+#endif
+    return ret;
 }
 
 int32_t FormMgr::BatchRefreshForms(const int32_t formRefreshType)

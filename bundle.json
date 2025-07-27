@@ -50,6 +50,7 @@
               "ability_base",
               "ets_runtime",
               "eventhandler",
+              "hiappevent",
               "hitrace",
               "access_token",
               "data_share",

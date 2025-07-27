@@ -378,6 +378,9 @@ ohos_shared_library("fmskit_native") {
   if (form_fwk_watch_api_disable) {
     defines += [ "WATCH_API_DISABLE" ]
   }
+  if (hiappevent_global_part_enabled) {
+    defines += [ "NO_RUNTIME_EMULATOR" ]
+  }
 }
 
 ################################### fmskit_provider_client ########################################
@@ -453,6 +456,7 @@ ohos_shared_library("form_manager") {
   sources = [
     "interfaces/inner_api/src/form_ashmem.cpp",
     "interfaces/inner_api/src/form_ecological_rule_param.cpp",
+    "interfaces/inner_api/src/form_event_hiappevent.cpp",
     "interfaces/inner_api/src/form_host_proxy.cpp",
     "interfaces/inner_api/src/form_host_stub.cpp",
     "interfaces/inner_api/src/form_info_filter.cpp",
@@ -513,6 +517,13 @@ ohos_shared_library("form_manager") {
   subsystem_name = "ability"
   innerapi_tags = [ "platformsdk" ]
   part_name = "form_fwk"
+
+  defines = []
+  if (hiappevent_global_part_enabled) {
+    defines += [ "NO_RUNTIME_EMULATOR" ]
+
+    external_deps += [ "hiappevent:hiappevent_innerapi" ]
+  }
 }
 
 ohos_prebuilt_etc("form_config") {
