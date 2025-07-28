@@ -1,0 +1,7 @@
+# Code owners for ArkUI form_fwk
+
+[AAFWK ABILITY]
+frameworks/ @aafwk_ability
+interfaces/ @aafwk_ability
+services/ @aafwk_ability
+test/ @aafwk_ability
