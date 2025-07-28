@@ -77,7 +77,6 @@ void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterato
         Want want;
         want.SetElementName(record->bundleName, record->abilityName);
         want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-        want.SetParam(Constants::RECREATE_FORM_KEY, true);
         want.SetParam(Constants::PARAM_MODULE_NAME_KEY, record->moduleName);
         want.SetParam(Constants::PARAM_FORM_NAME_KEY, record->formName);
         want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, record->specification);

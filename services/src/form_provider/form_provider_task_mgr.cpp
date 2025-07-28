@@ -75,7 +75,7 @@ void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Wa
 void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
 
     auto notifyFormUpdateFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyFormUpdate(formId, want, remoteObject);
@@ -267,7 +267,7 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
 void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
