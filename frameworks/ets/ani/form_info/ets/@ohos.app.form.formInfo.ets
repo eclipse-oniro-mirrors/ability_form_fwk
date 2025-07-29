@@ -15,7 +15,7 @@
 
 import Want from '@ohos.app.ability.Want';
 
-export namespace formInfo {
+export default namespace formInfo {
   interface FormInfo {
     bundleName: string;
     moduleName: string;
@@ -27,7 +27,6 @@ export namespace formInfo {
     descriptionId: int;
     type: FormType;
     jsComponentName: string;
-    colorMode: ColorMode;
     isDefault: boolean;
     updateEnabled: boolean;
     formVisibleNotify: boolean;
@@ -179,5 +178,48 @@ export namespace formInfo {
     FORM_MANAGER_NEGATIVE_SCREEN = 5,
     SCREEN_LOCK = 6,
     AI_SUGGESTION = 7,
+  }
+
+  export class formInfoInner implements FormInfo {
+    public bundleName: string = '';
+    public moduleName: string = '';
+    public abilityName: string = '';
+    public name: string = '';
+    public displayName: string = '';
+    public displayNameId: int = 0;
+    public description: string = '';
+    public descriptionId: int = 0;
+    public type: FormType = FormType.JS;
+    public jsComponentName: string = '';
+    public isDefault: boolean = false;
+    public updateEnabled: boolean = false;
+    public formVisibleNotify: boolean = false;
+    public scheduledUpdateTime: string = '';
+    public formConfigAbility: string = '';
+    public updateDuration: int = 0;
+    public defaultDimension: int = 0;
+    public supportDimensions: Array<int> = {};
+    public customizeData: Record<string, string> = {};
+    public isDynamic: boolean = false;
+    public transparencyEnabled: boolean = false;
+    public supportedShapes: Array<int> = {};
+    public previewImages?: Array<int> = {};
+    public enableBlurBackground?: boolean = false;
+    public renderingMode?: RenderingMode = RenderingMode.AUTO_COLOR;
+  }
+
+  export class runningFormInfoInner implements RunningFormInfo {
+    public formId: string = '';
+    public bundleName: string = '';
+    public hostBundleName: string = '';
+    public formLocation: FormLocation = FormLocation.OTHER;
+    public visibilityType: VisibilityType = VisibilityType.UNKNOWN;
+    public moduleName: string = '';
+    public abilityName: string = '';
+    public formName: string = '';
+    public dimension: int = 0;
+    public formUsageState: FormUsageState = FormUsageState.USED;
+    public formDescription: string = '';
+    public extraData?: Record<string, Object> = {};
   }
 }
