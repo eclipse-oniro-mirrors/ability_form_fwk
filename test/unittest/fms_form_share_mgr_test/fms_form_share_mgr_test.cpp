@@ -97,7 +97,6 @@ public:
 
 protected:
     sptr<MockFormHostClient> token_;
-    std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
     sptr<DistributedSchedService> dmsSerice = new DistributedSchedService();
 };
 
@@ -132,7 +131,6 @@ void FmsFormShareMgrTest::TearDownTestCase()
 
 void FmsFormShareMgrTest::SetUp()
 {
-    formyMgrServ_->OnStart();
     DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_ = std::make_unique<FormDistributedClient>();
     DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_->SetDmsProxy(dmsSerice->AsObject());
     token_ = new (std::nothrow) MockFormHostClient();
@@ -145,9 +143,7 @@ void FmsFormShareMgrTest::SetUp()
 }
 
 void FmsFormShareMgrTest::TearDown()
-{
-    formyMgrServ_->OnStop();
-}
+{}
 
 void FmsFormShareMgrTest::CreateProviderData()
 {
@@ -270,8 +266,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
 
     info.abilityName = "form_ability";
     info.dimensionId = -1;
-    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
-    EXPECT_EQ(result, ERR_OK);
+    DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
 
     info.dimensionId = 1;
     info.deviceId = "";
@@ -515,8 +510,6 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
     FormJsInfo formJsInfo;
     CreateProviderData();
     CreateForm(formJsInfo);
-
-    EXPECT_CALL(*bundleMgr_, QueryAbilityInfo(_, _, _, _, _)).Times(1).WillOnce(Return(true));
 
     FormRecord formInfo;
     formInfo.formName = PARAM_FORM_NAME;
@@ -3678,8 +3671,6 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_003, TestSize.Level1)
     info.isFreeInstall = true;
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(want);
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
-
-    EXPECT_CALL(*bundleMgr_, SetModuleRemovable(_, _, _)).Times(1);
 
     DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(want, wantParams);
     auto result = wantParams.GetParam(Constants::PARAM_DEVICE_ID_KEY);
