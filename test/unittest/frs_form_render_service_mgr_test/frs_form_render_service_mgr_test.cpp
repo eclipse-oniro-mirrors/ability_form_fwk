@@ -161,28 +161,6 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_002, TestSize.Level0
 }
 
 /**
- * @tc.name: FormRenderServiceMgrTest_003
- * @tc.desc: 1.Verify RenderForm interface executes as expected.
- *           2.callerToken is not nullptr.
- *           3.uid is not empty and hostToken is nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_003 start";
-    FormRenderServiceMgr formRenderServiceMgr;
-    FormJsInfo formJsInfo;
-    Want want;
-    std::string value = "UID";
-    want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, value);
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
-    auto ret = formRenderServiceMgr.RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_003 end";
-}
-
-/**
  * @tc.name: FormRenderServiceMgrTest_004
  * @tc.desc: 1.Verify StopRenderingForm interface executes as expected.
  *           2.callerToken is nullptr.

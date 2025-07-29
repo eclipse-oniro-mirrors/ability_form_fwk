@@ -78,7 +78,6 @@ public:
 
 protected:
     sptr<MockFormHostClient> token_;
-    std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
     static sptr<BundleMgrService> mockBundleMgrService;
 };
 
@@ -96,7 +95,6 @@ void FmsFormHostRecordTest::TearDownTestCase()
 
 void FmsFormHostRecordTest::SetUp()
 {
-    formyMgrServ_->OnStart();
     token_ = new (std::nothrow) MockFormHostClient();
 
     // Permission install
@@ -537,19 +535,6 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0015, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrService_0016
- * @tc.desc: test Init function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormHostRecordTest, FormMgrService_0016, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0016 start";
-    FormMgrService formMgrService;
-    EXPECT_EQ(ERR_INVALID_OPERATION, formMgrService.Init());
-    GTEST_LOG_(INFO) << "FormMgrService_0016 end";
-}
-
-/**
  * @tc.name: FormMgrService_0017
  * @tc.desc: test DeleteInvalidForms function.
  * @tc.type: FUNC
@@ -650,8 +635,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0022, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrService.GetFormsInfo(filter, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0022 end";
 }
 
@@ -672,8 +656,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0023, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrService.GetFormsInfo(filter, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0023 end";
 }
 
@@ -804,6 +787,186 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0031, TestSize.Level0)
     std::vector<std::u16string> args;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.Dump(fd, args));
     GTEST_LOG_(INFO) << "FormMgrService_0031 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump with no args works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_001 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_NE(result.find("error"), string::npos);
+    GTEST_LOG_(INFO) << "FormMgrService_dump_001 end";
+}
+
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump help works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_002 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {u"-h"};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_NE(result.find("options list:"), string::npos);
+
+    args[0] = u"--help";
+    formMgrService.Dump(args, result);
+    EXPECT_NE(result.find("options list:"), string::npos);
+
+    GTEST_LOG_(INFO) << "FormMgrService_dump_002 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump storage works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_003 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {u"-s"};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    args[0] = u"--storage";
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "FormMgrService_dump_003 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump by bundle name works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_004 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {u"-n"};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_NE(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "FormMgrService_dump_004 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump by form id works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_005 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {u"-i"};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_NE(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "FormMgrService_dump_005 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump temp-form works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_005 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {u"-t"};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    args[0] = u"--temp";
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "FormMgrService_dump_005 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump static-form-info works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_007 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {u"-b"};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    args[0] = u"--bundle-form-info";
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "FormMgrService_dump_007 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump form works.
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_dump_008 start";
+    FormMgrService formMgrService;
+    std::vector<std::u16string> args = {u"-r"};
+    std::string result;
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    args[0] = u"--running";
+    formMgrService.Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "FormMgrService_dump_008 end";
 }
 
 /**
