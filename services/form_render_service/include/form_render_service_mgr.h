@@ -119,7 +119,6 @@ private:
         const FormJsInfo &formJsInfo, const Want &want, const std::string &uid, const std::string &statusData);
     int32_t RecycleFormByUid(const std::string &uid, std::string &statusData, const int64_t formId);
     int32_t DeleteRenderRecordByUid(const std::string &uid, const std::shared_ptr<FormRenderRecord> &search);
-    void OnJsError(const std::string &errorName, const std::string &errorMsg);
 
     void SetCriticalFalseOnAllFormInvisible();
     void SetCriticalTrueOnFormActivity();

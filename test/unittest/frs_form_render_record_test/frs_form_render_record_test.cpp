@@ -2807,3 +2807,42 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_149, TestSize.Level1)
     formRenderRecordPtr_->AddFormRequest(formJsInfo, want);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_149 end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_150
+ * @tc.desc: Verify RegisterUncatchableErrorHandler
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_150, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_150 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->RegisterUncatchableErrorHandler();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_150 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_151
+ * @tc.desc: Verify GetNativeStrFromJsTaggedObj
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_151, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_151 start";
+    std::string result = formRenderRecordPtr_->GetNativeStrFromJsTaggedObj(nullptr, "testKey");
+    EXPECT_EQ(result, "");
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_151 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_152
+ * @tc.desc: Verify OnJsError
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_152, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_152 start";
+    formRenderRecordPtr_->OnJsError(nullptr);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_152 end";
+}

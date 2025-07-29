@@ -259,7 +259,7 @@ int32_t FormRenderServiceMgr::OnUnlock()
             iter.second->OnUnlock();
         }
     }
-    
+
     SetCriticalFalseOnAllFormInvisible();
 
     return ERR_OK;
@@ -461,7 +461,7 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
 
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     SetCriticalFalseOnAllFormInvisible();
-    
+
     return ERR_OK;
 }
 
@@ -567,14 +567,6 @@ int32_t FormRenderServiceMgr::UpdateRenderRecordByUid(const std::string &uid, Wa
             HILOG_ERROR("null record");
             return RENDER_FORM_FAILED;
         }
-
-        auto callback = [this](const std::string &errorName, const std::string &errorMsg) {
-            auto taskFunc = [errorName, errorMsg]() {
-                FormRenderServiceMgr::GetInstance().OnJsError(errorName, errorMsg);
-            };
-            this->serialQueue_->ScheduleDelayTask("OnJsErrorTask", 0, taskFunc);
-        };
-        record->SetJsErrorCallback(callback);
         record->SetConfiguration(configuration_);
         result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
         if (renderRecordMap_.empty()) {
@@ -656,20 +648,6 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
         HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
     }
     return ERR_OK;
-}
-
-void FormRenderServiceMgr::OnJsError(const std::string &errorName, const std::string &errorMsg)
-{
-    std::string uidList;
-    {
-        std::lock_guard<std::mutex> lock(renderRecordMutex_);
-        for (const auto &iter : renderRecordMap_) {
-            uidList += iter.first;
-        }
-    }
-    HILOG_ERROR("uidList: %{public}s, errorName: %{public}s, errorMsg: %{public}s", uidList.c_str(), errorName.c_str(),
-        errorMsg.c_str());
-    FormRenderEventReport::SendBlockFaultEvent(uidList, errorName, errorMsg);
 }
 
 /**
