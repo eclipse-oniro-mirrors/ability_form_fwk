@@ -445,7 +445,9 @@ bool FormProviderData::WriteFileDescriptor(Parcel &parcel, int fd) const
     }
     sptr<IPCFileDescriptor> descriptor = new IPCFileDescriptor(dupFd);
     bool result = parcel.WriteObject<IPCFileDescriptor>(descriptor);
-    close(dupFd);
+    if (!result) {
+        close(dupFd);
+    }
     return result;
 }
 
