@@ -131,7 +131,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().RecoverFormByUid(formJsInfo, want, str1, str2);
     FormRenderServiceMgr::GetInstance().RecycleFormByUid(str1, str2, num2);
     FormRenderServiceMgr::GetInstance().DeleteRenderRecordByUid(str1, search);
-    FormRenderServiceMgr::GetInstance().OnJsError(str3, str);
     OHOS::FormRenderStatusMgrTest(fdp);
     return true;
 }

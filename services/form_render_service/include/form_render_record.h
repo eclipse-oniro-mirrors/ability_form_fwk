@@ -64,7 +64,6 @@ private:
 
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
-    using JsErrorCallback = std::function<void(const std::string &, const std::string &)>;
     /**
      * @brief Create a FormRenderRecord.
      * @param bundleName The bundleName of form bundle.
@@ -146,7 +145,6 @@ public:
     size_t FormCount();
 
     void UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth);
-    void SetJsErrorCallback(JsErrorCallback callback = nullptr);
     bool IsAllFormsInvisible();
 private:
     class RemoteObjHash {
@@ -307,7 +305,7 @@ private:
     void DeleteAndUpdateRecycledFormCompIds(int64_t formId,
         const std::pair<std::vector<std::string>, std::string>& compIds, const bool needUpdate);
 
-    void RegisterNapiUncaughtExceptionHandler();
+    void RegisterUncatchableErrorHandler();
     void OnJsError(napi_value value);
     std::string GetNativeStrFromJsTaggedObj(napi_value obj, const char* key);
 
@@ -350,7 +348,6 @@ private:
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
     std::atomic<int> renderFormTasksNum = 0;
-    JsErrorCallback jsErrorCallback_;
     std::mutex visibilityMapMutex_;
     std::unordered_map<int64_t, bool> visibilityMap_;
 };

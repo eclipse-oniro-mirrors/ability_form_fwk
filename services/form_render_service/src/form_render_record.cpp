@@ -515,7 +515,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         return false;
     }
     hapPath_ = formJsInfo.jsFormCodePath;
-    RegisterNapiUncaughtExceptionHandler();
+    RegisterUncatchableErrorHandler();
     return true;
 }
 
@@ -1922,42 +1922,42 @@ void FormRenderRecord::InsertRecycledFormCompIds(
     recycledFormCompIds_.emplace(formId, compIds);
 }
 
-void FormRenderRecord::SetJsErrorCallback(JsErrorCallback callback)
-{
-    jsErrorCallback_ = callback;
-}
-
-void FormRenderRecord::RegisterNapiUncaughtExceptionHandler()
+void FormRenderRecord::RegisterUncatchableErrorHandler()
 {
     auto nativeEnginePtr = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNativeEnginePointer();
     if (nativeEnginePtr == nullptr) {
         HILOG_ERROR("null nativeEnginePtr");
         return;
     }
-    auto uncaughtTask = [weak = weak_from_this()](napi_value value) {
+    auto uncatchableTask = [weak = weak_from_this()](panda::TryCatch &trycatch) {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("null renderRecord");
             return;
         }
-        renderRecord->OnJsError(value);
+        auto exception = trycatch.GetAndClearException();
+        if (!exception.IsEmpty() && !exception->IsHole()) {
+            napi_value obj = reinterpret_cast<napi_value>(*exception);
+            renderRecord->OnJsError(obj);
+        }
     };
-    nativeEnginePtr->RegisterNapiUncaughtExceptionHandler(uncaughtTask);
+    panda::JSNApi::RegisterUncatchableErrorHandler(const_cast<EcmaVM *>(nativeEnginePtr->GetEcmaVm()), uncatchableTask);
 }
 
 void FormRenderRecord::OnJsError(napi_value value)
 {
+    HILOG_ERROR("call, bundleName:  %{public}s", bundleName_.c_str());
     std::string errorName = GetNativeStrFromJsTaggedObj(value, "name");
     std::string errorMsg = GetNativeStrFromJsTaggedObj(value, "message");
-    std::string topStack = GetNativeStrFromJsTaggedObj(value, "topstack");
     std::string stack = GetNativeStrFromJsTaggedObj(value, "stack");
-    HILOG_ERROR("errorMsg: %{public}s", errorMsg.c_str());
-    HILOG_ERROR("errorName: %{public}s", errorName.c_str());
-    HILOG_ERROR("topStack: %{public}s", topStack.c_str());
-    HILOG_ERROR("stack: %{public}s", stack.c_str());
-    if (jsErrorCallback_) {
-        jsErrorCallback_(bundleName_ + errorName, errorMsg + stack);
+    std::string errorCode = GetNativeStrFromJsTaggedObj(value, "code");
+    std::string summary = "Error name:" + errorName + "\n" + "Error message:" + errorMsg + "\n";
+    if (!errorCode.empty()) {
+        summary += "Error code:" + errorCode + "\n";
     }
+    HILOG_ERROR("summary: %{public}s", summary.c_str());
+    HILOG_ERROR("stack: %{public}s", stack.c_str());
+    FormRenderEventReport::SendBlockFaultEvent(bundleName_, summary, stack);
 }
 
 std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const char* key)
@@ -1969,6 +1969,11 @@ std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const 
 
     napi_value valueStr = nullptr;
     napi_env env = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNapiEnv();
+    bool hasProperty = false;
+    napi_has_named_property(env, obj, key, &hasProperty);
+    if (!hasProperty) {
+        return "";
+    }
     napi_get_named_property(env, obj, key, &valueStr);
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, valueStr, &valueType);
