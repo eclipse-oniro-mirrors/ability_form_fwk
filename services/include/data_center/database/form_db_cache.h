@@ -182,6 +182,18 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t formId, const int32_t formLocation);
+
+    /**
+     * @brief Get multi app version code of form from DB.
+     * @return Returns version code.
+     */
+    uint32_t GetMultiAppFormVersionCode(const std::string &bundleName);
+
+    /**
+     * @brief Save or update the multi app version code of form in DB.
+     * @param versionCode version code.
+     */
+    void UpdateMultiAppFormVersionCode(const std::string &bundleName, uint32_t versionCode);
 private:
     /**
      * @brief Save or update form data to DbCache and DB.
@@ -199,6 +211,8 @@ private:
 #endif
     mutable std::mutex formDBInfosMutex_;
     std::vector<FormDBInfo> formDBInfos_;
+    mutable std::mutex multiAppFormVersionCodeMutex_;
+    std::map<std::string, uint32_t> multiAppFormVersionCodeMap_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

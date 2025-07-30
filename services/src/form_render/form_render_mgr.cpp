@@ -21,8 +21,10 @@
 #include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_cache_mgr.h"
+#include "data_center/database/form_db_cache.h"
 #include "form_constants.h"
 #include "data_center/form_data_mgr.h"
+#include "data_center/form_info/form_info_mgr.h"
 #include "common/event/form_event_report.h"
 #include "form_host_interface.h"
 #include "form_mgr_errors.h"
@@ -98,10 +100,16 @@ ErrCode FormRenderMgr::RenderForm(
     want.SetParams(wantParams);
     std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
     want.SetParam(Constants::FORM_SUPPLY_UID, recordUid);
+    bool renderState = false;
     {
         std::lock_guard<std::mutex> lock(isVerifiedMutex_);
-        want.SetParam(Constants::FORM_RENDER_STATE, isVerified_ || isScreenUnlocked_);
+        renderState = isVerified_ || isScreenUnlocked_;
+        want.SetParam(Constants::FORM_RENDER_STATE, renderState);
     }
+    if (!renderState && CheckMultiAppFormVersionCode(formRecord)) {
+        want.SetParam(Constants::FORM_RENDER_WITHOUT_UNLOCK_STATE, true);
+    }
+
     if (formRecord.privacyLevel > 0) {
         InitRenderInner(true, formRecord.userId);
         return sandboxInners_[formRecord.userId]->RenderForm(formRecord, want, hostToken);
@@ -365,11 +373,11 @@ void FormRenderMgr::OnScreenUnlock(int32_t userId)
     if (isVerified && !isSecondMounted_) {
         isSecondMounted_ = true;
     }
-    
+
     if (isScreenUnlocked_) {
         return;
     }
-    
+
     // el2 path maybe not unlocked, should not acquire data
     isScreenUnlocked_ = true;
     if (!isVerified_) {
@@ -384,7 +392,7 @@ void FormRenderMgr::OnUnlock(int32_t userId)
     if (isSecondMounted_) {
         return;
     }
-    
+
     {
         std::lock_guard<std::mutex> lock(isVerifiedMutex_);
         isSecondMounted_ = true;
@@ -511,12 +519,12 @@ ErrCode FormRenderMgr::checkConnectionsFormIds(std::vector<int64_t> formIds, int
     }
     return iter->second->checkConnectionsFormIds(formIds, needconFormIds);
 }
- 
+
 void FormRenderMgr::reAddConnections(std::vector<int64_t> formIds,
     int32_t userId, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_ERROR("reAddConnections - Connect formIds, ");
- 
+
     sptr<IFormHost> hostClient = iface_cast<IFormHost>(remoteObject);
     if (hostClient == nullptr) {
         HILOG_ERROR("null hostClient");
@@ -724,6 +732,29 @@ void FormRenderMgr::UpdateFormSize(const int64_t &formId, float width, float hei
     if (sandboxIter != sandboxInners_.end()) {
         sandboxIter->second->UpdateFormSize(formId, width, height, borderWidth);
     }
+}
+
+bool FormRenderMgr::CheckMultiAppFormVersionCode(const FormRecord &formRecord)
+{
+    FormInfo formInfo;
+    if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo) != ERR_OK) {
+        return false;
+    }
+    bool isMultiAppForm = FormInfoMgr::GetInstance().IsMultiAppForm(formInfo) && formRecord.isSystemApp;
+    if (!isMultiAppForm) {
+        return false;
+    }
+    uint32_t versionCode = formInfo.versionCode;
+    uint32_t cacheCode = FormDbCache::GetInstance().GetMultiAppFormVersionCode(formRecord.bundleName);
+    if (versionCode >= cacheCode) {
+        if (versionCode > cacheCode) {
+            FormDbCache::GetInstance().UpdateMultiAppFormVersionCode(formRecord.bundleName, versionCode);
+        }
+        HILOG_INFO("formId:%{public}" PRId64 ", isMultiAppForm:%{public}d, versionCode:%{public}u",
+            formRecord.formId, isMultiAppForm, versionCode);
+        return true;
+    }
+    return false;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -507,6 +507,9 @@ void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
                 iter.second->OnUnlock();
             }
         }
+    } else if (renderWant.GetBoolParam(Constants::FORM_RENDER_WITHOUT_UNLOCK_STATE, false)) {
+        HILOG_WARN("The current form allow render without unlocked");
+        renderWant.SetParam(Constants::FORM_RENDER_STATE, true);
     }
 }
 

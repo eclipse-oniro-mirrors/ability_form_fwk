@@ -411,4 +411,18 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_015, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, FormDbCache::GetInstance().UpdateFormLocation(formId, formLocation));
     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_015 end";
 }
+
+/**
+ * @tc.number: FmsFormDbRecordTest_016
+ * @tc.name: GetMultiAppFormVersionCode
+*/
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_016, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_016 start";
+    std::string bundleName = "TestBundleName";
+    FormDbCache::GetInstance().UpdateMultiAppFormVersionCode(bundleName, 100);
+    uint32_t code = FormDbCache::GetInstance().GetMultiAppFormVersionCode(bundleName);
+    EXPECT_EQ(code, 100);
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_016 end";
+}
 }

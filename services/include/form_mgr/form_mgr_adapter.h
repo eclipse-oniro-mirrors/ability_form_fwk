@@ -649,7 +649,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock);
-    
+
     /**
      * @brief this interface is invoked when the application protect status changes.
      * @param bundleName BundleName of the form host.
@@ -697,7 +697,7 @@ public:
      * @return Return true for overflow proxy unregister success, false otherwise
      */
     bool UnregisterOverflowProxy();
-    
+
     /**
      * @brief Request overflow with specific range
      * @param formId The id of the form to request overflow
@@ -721,7 +721,7 @@ public:
      * @return Return true for change sceneAnimation state proxy unregister success, false otherwise
      */
     bool UnregisterChangeSceneAnimationStateProxy();
-    
+
     /**
      * @brief Change SceneAnimation State.
      * @param formId The formId.
@@ -743,7 +743,7 @@ public:
      * @return Return true if unregister success
      */
     bool UnregisterGetFormRectProxy();
- 
+
     /**
      * @brief Get the form rect.
      * @param formId The formId.
@@ -759,13 +759,13 @@ public:
      * @return Returns ERR_OK for setting success.
      */
     bool RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
- 
+
     /**
      * @brief Unregister get live form status proxy in fms
      * @return Return true if unregister success
      */
     bool UnregisterGetLiveFormStatusProxy();
- 
+
     /**
      * @brief Get live form status.
      * @param liveFormStatusMap The Map that stores formId and live form status.
@@ -1268,8 +1268,8 @@ private:
 
     ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
 
-    bool CheckIsMultiAppForm(FormInfo &formInfo);
-    
+    bool IsMultiAppForm(FormInfo &formInfo);
+
     void SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation);
 
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);
