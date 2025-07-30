@@ -530,5 +530,32 @@ int32_t FormDbCache::GetAllFormInfoSize()
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     return static_cast<int32_t>(formDBInfos_.size());
 }
+
+uint32_t FormDbCache::GetMultiAppFormVersionCode(const std::string &bundleName)
+{
+    std::lock_guard<std::mutex> lock(multiAppFormVersionCodeMutex_);
+    auto iter = multiAppFormVersionCodeMap_.find(bundleName);
+    if (iter != multiAppFormVersionCodeMap_.end()) {
+        return iter->second;
+    }
+    std::string versionCode;
+    if (FormInfoRdbStorageMgr::GetInstance().GetMultiAppFormVersionCode(bundleName, versionCode) != ERR_OK) {
+        return 0;
+    }
+    uint32_t code = std::atoi(versionCode.c_str());
+    multiAppFormVersionCodeMap_.emplace(bundleName, code);
+    return code;
+}
+
+void FormDbCache::UpdateMultiAppFormVersionCode(const std::string &bundleName, uint32_t versionCode)
+{
+    std::lock_guard<std::mutex> lock(multiAppFormVersionCodeMutex_);
+    auto iter = multiAppFormVersionCodeMap_.find(bundleName);
+    if (iter != multiAppFormVersionCodeMap_.end() && iter->second == versionCode) {
+        return;
+    }
+    multiAppFormVersionCodeMap_[bundleName] = versionCode;
+    FormInfoRdbStorageMgr::GetInstance().UpdateMultiAppFormVersionCode(bundleName, std::to_string(versionCode));
+}
 } // namespace AppExecFwk
 } // namespace OHOS

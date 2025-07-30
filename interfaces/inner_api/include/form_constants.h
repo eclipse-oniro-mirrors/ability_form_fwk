@@ -280,7 +280,7 @@ namespace Constants {
         std::string activeState;
         bool isVisible;
     };
- 
+
     const std::map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
         {"00", {"INACTIVE", false}},
         {"01", {"INACTIVE", true}},
@@ -355,6 +355,8 @@ namespace Constants {
 
     // The state of whether the ArkTs card can be rendered
     constexpr const char FORM_RENDER_STATE[] = "ohos.extra.param.key.form_render_state";
+    // The state of whether the ArkTs card can be rendered without being unlocked
+    constexpr const char FORM_RENDER_WITHOUT_UNLOCK_STATE[] = "ohos.extra.param.key.form_render_without_unlock_state";
 
     //CallEvent
     constexpr const char* FORM_CALL_EVENT_PARAMS = "params";

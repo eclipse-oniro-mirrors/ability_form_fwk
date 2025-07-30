@@ -1538,7 +1538,8 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
         }
         formConfigInfo.SetLockForm(isBundleProtect);
     } else {
-        bool isMultiAppForm = CheckIsMultiAppForm(formInfo) && formConfigInfo.GetSystemAppFlag();
+        bool isMultiAppForm = FormInfoMgr::GetInstance().IsMultiAppForm(formInfo) &&
+            formConfigInfo.GetSystemAppFlag();
         formConfigInfo.SetLockForm(isBundleProtect && !isMultiAppForm);
     }
 }
@@ -4096,19 +4097,6 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
     return ERR_OK;
 }
 
-bool FormMgrAdapter::CheckIsMultiAppForm(FormInfo &formInfo)
-{
-    bool isMultiAppForm = false;
-    for (auto dataIter = formInfo.customizeDatas.begin(); dataIter != formInfo.customizeDatas.end();) {
-        if (Constants::IS_MULTI_APP_FORM == dataIter->name && Constants::IS_MULTI_APP_FORM_TRUE == dataIter->value) {
-            isMultiAppForm = true;
-            break;
-        }
-        ++dataIter;
-    }
-    return isMultiAppForm;
-}
-
 ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
     HILOG_INFO("SwitchLockForms entry");
@@ -4130,7 +4118,7 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
         bool isSystemApp = iter->isSystemApp;
         FormInfo formInfo;
         FormInfoMgr::GetInstance().GetFormsInfoByRecord(*iter, formInfo);
-        bool isMultiAppForm = CheckIsMultiAppForm(formInfo);
+        bool isMultiAppForm = FormInfoMgr::GetInstance().IsMultiAppForm(formInfo);
         if (iter->lockForm == lock || (isSystemApp && isMultiAppForm)) {
             iter = formInfos.erase(iter);
             continue;
@@ -4413,7 +4401,7 @@ bool FormMgrAdapter::UnregisterGetFormRectProxy()
     getFormRectCallerToken_ = nullptr;
     return true;
 }
- 
+
 ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)
 {
     HILOG_INFO("call");
@@ -4427,7 +4415,7 @@ ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingU
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     ErrCode result = remoteFormHostDelegateProxy->GetFormRect(formId, rect);
- 
+
     HILOG_DEBUG("GetFormRect, result:%{public}d", result);
     return result;
 }
@@ -4442,14 +4430,14 @@ bool FormMgrAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &c
     getLiveFormStatusCallerToken_ = callerToken;
     return true;
 }
- 
+
 bool FormMgrAdapter::UnregisterGetLiveFormStatusProxy()
 {
     HILOG_INFO("call");
     getLiveFormStatusCallerToken_ = nullptr;
     return true;
 }
- 
+
 ErrCode FormMgrAdapter::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("call");
@@ -4463,7 +4451,7 @@ ErrCode FormMgrAdapter::GetLiveFormStatus(std::unordered_map<std::string, std::s
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     ErrCode result = remoteFormHostDelegateProxy->GetLiveFormStatus(liveFormStatusMap);
- 
+
     HILOG_INFO("GetLiveFormStatus, result:%{public}d", result);
     return result;
 }

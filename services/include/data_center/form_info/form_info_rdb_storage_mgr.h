@@ -104,12 +104,26 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormVersionCode(std::string &versionCode);
- 
+
     /**
      * @brief Save or update the version code of form in DB.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormVersionCode();
+
+    /**
+     * @brief Get multi app version code of form from DB.
+     * @param versionCode version code.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetMultiAppFormVersionCode(const std::string &bundleName, std::string &versionCode);
+
+    /**
+     * @brief Save or update the multi app version code of form in DB.
+     * @param versionCode version code.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateMultiAppFormVersionCode(const std::string &bundleName, const std::string &versionCode);
 private:
     void SaveEntries(const std::unordered_map<std::string, std::string> &value,
         std::vector<InnerFormInfo> &innerFormInfos);

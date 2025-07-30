@@ -1408,3 +1408,24 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0023, TestSize.Level1)
     }
     GTEST_LOG_(INFO) << "FormInfoMgrTest0023 end";
 }
+
+/**
+ * @tc.name: FormInfoMgrTest0024
+ * @tc.number: IsMultiAppForm
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0024, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0024 start";
+    std::string bundleName = "com.form.provider.service";
+    FormInfo info = GetTestFormInfo();
+    bool ret = formInfoMgr_.IsMultiAppForm(info);
+    EXPECT_FALSE(ret);
+    FormCustomizeData data = {
+        .name = Constants::IS_MULTI_APP_FORM,
+        .value = Constants::IS_MULTI_APP_FORM_TRUE
+    };
+    info.customizeDatas.push_back(data);
+    ret = formInfoMgr_.IsMultiAppForm(info);
+    EXPECT_TRUE(ret);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0024 end";
+}

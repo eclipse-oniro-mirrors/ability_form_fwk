@@ -274,11 +274,11 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
     auto entryIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [](const auto &hapInfo) {
         return (hapInfo.moduleType == ModuleType::ENTRY) && (!hapInfo.formWidgetModule.empty());
     });
- 
+
     if (entryIt == hapModuleInfoEnd) {
         return false;
     }
- 
+
     auto sharedIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [entryIt](const auto &hapInfo) {
         return (hapInfo.moduleType == ModuleType::SHARED) && (!hapInfo.formExtensionModule.empty()) &&
             ((entryIt->name == hapInfo.formExtensionModule) && (entryIt->formWidgetModule == hapInfo.name));
@@ -1025,6 +1025,19 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
         appFormVisibleNotify = iter->second;
     }
     return ERR_OK;
+}
+
+bool FormInfoMgr::IsMultiAppForm(const FormInfo &formInfo)
+{
+    bool isMultiAppForm = false;
+    for (auto dataIter = formInfo.customizeDatas.begin(); dataIter != formInfo.customizeDatas.end();) {
+        if (Constants::IS_MULTI_APP_FORM == dataIter->name && Constants::IS_MULTI_APP_FORM_TRUE == dataIter->value) {
+            isMultiAppForm = true;
+            break;
+        }
+        ++dataIter;
+    }
+    return isMultiAppForm;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
