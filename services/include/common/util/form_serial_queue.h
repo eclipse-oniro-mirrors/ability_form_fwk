@@ -29,10 +29,10 @@ public:
     explicit FormSerialQueue(const std::string &queueName);
     ~FormSerialQueue();
     bool ScheduleTask(uint64_t ms, std::function<void()> func);
-    void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
-    void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
-    void ScheduleDelayTask(const std::pair<int64_t, std::string> &eventMsg, uint32_t ms, std::function<void()> func);
-    void CancelDelayTask(const std::pair<int64_t, std::string> &eventMsg);
+    bool ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
+    bool CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
+    bool ScheduleDelayTask(const std::pair<int64_t, std::string> &eventMsg, uint32_t ms, std::function<void()> func);
+    bool CancelDelayTask(const std::pair<int64_t, std::string> &eventMsg);
 private:
     std::shared_mutex mutex_;
     std::map<std::pair<int64_t, int64_t>, ffrt::task_handle> taskMap_;

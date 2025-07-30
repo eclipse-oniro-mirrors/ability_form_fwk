@@ -36,6 +36,7 @@
 #include "form_mgr/form_mgr_adapter.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "status_mgr_center/form_event_retry_mgr.h"
+#include "status_mgr_center/form_status_task_mgr.h"
 #include "common/util/form_task_common.h"
 
 namespace OHOS {
@@ -388,6 +389,7 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
                 return;
             }
             remoteFormHost->OnRecycleForm(formId);
+            FormStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
         };
         FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event, reCycleForm);
     }

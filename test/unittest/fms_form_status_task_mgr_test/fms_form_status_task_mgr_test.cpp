@@ -279,4 +279,21 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0014, TestSize.Level1)
     EXPECT_EQ(iface_cast<IFormRender>(remoteObject), nullptr);
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0014 end";
 }
+
+/**
+ * @tc.name: FormStatusTaskMgr_RecycleTimeout
+ * @tc.desc: Verify ScheduleRecycleTimeout and CancelRecycleTimeout
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_RecycleTimeout, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormStatusTaskMgr_RecycleTimeout start";
+ 
+    int64_t formId = 123;
+    EXPECT_EQ(true, FormStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId));
+    EXPECT_EQ(true, FormStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
+    EXPECT_EQ(false, FormStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
+ 
+    GTEST_LOG_(INFO) << "FormStatusTaskMgr_RecycleTimeout end";
+}
 }

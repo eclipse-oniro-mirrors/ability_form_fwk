@@ -21,6 +21,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace FormRender {
+namespace {
+constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 3000;
+}
 FormRenderStatusTaskMgr::FormRenderStatusTaskMgr()
 {
     HILOG_DEBUG("create FormRenderStatusTaskMgr");
@@ -142,5 +146,37 @@ void FormRenderStatusTaskMgr::OnRecycleFormDone(
     };
     FormRenderStatusMgr::GetInstance().PostFormEvent(formId, event, replyTask);
 }
+
+bool FormRenderStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
+{
+    FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
+ 
+    std::lock_guard<std::mutex> lock(serialQueueMutex_);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return false;
+    }
+ 
+    std::string str = std::to_string(formId);
+    auto timeoutTask = [formId]() {
+        HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
+        FormRenderStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::UNPROCESSABLE);
+        FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
+    };
+    return serialQueue_->ScheduleDelayTask(str, WAIT_RELEASE_RENDERER_TIMEOUT, timeoutTask);
+}
+ 
+bool FormRenderStatusTaskMgr::CancelRecycleTimeout(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(serialQueueMutex_);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return false;
+    }
+ 
+    std::string str = std::to_string(formId);
+    return serialQueue_->CancelDelayTask(str);
+}
+}  // namespace FormRender
 }  // namespace AppExecFwk
 }  // namespace OHOS

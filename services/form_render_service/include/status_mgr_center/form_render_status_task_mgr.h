@@ -22,14 +22,24 @@
 
 #include "status_mgr_center/form_status_common.h"
 #include "form_supply_proxy.h"
+#include "form_render_serial_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace FormRender {
 using Want = OHOS::AAFwk::Want;
 class FormRenderStatusTaskMgr final : public DelayedRefSingleton<FormRenderStatusTaskMgr> {
     DECLARE_DELAYED_REF_SINGLETON(FormRenderStatusTaskMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormRenderStatusTaskMgr);
+
+    void SetSerialQueue(const std::shared_ptr<FormRenderSerialQueue> &serialQueue)
+    {
+        if (serialQueue == nullptr) {
+            return;
+        }
+        serialQueue_ = serialQueue;
+    }
 
     /**
      * @brief Callback function after form rendering is completed
@@ -73,7 +83,26 @@ public:
      * @param formSupplyClient Smart pointer to form supply client
      */
     void OnRecycleFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+
+    /**
+     * @brief Schedules form recycle timeout task
+     * @param formId Form ID
+     * @return bool Returns true if the timeout was successfully scheduled, false otherwise
+     */
+    bool ScheduleRecycleTimeout(const int64_t formId);
+
+    /**
+     * @brief Cancel form recycle timeout task
+     * @param formId Form ID
+     * @return bool Returns true if the timeout was successfully canceled, false otherwise
+     */
+    bool CancelRecycleTimeout(const int64_t formId);
+
+private:
+    std::mutex serialQueueMutex_;
+    std::shared_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
 };
+}  // namespace FormRender
 }  // namespace AppExecFwk
 }  // namespace OHOS
 #endif  // OHOS_FORM_FWK_FORM_RENDER_STATUS_TASK_MGR_H
