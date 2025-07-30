@@ -458,6 +458,7 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
     }
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
 
     FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
 
