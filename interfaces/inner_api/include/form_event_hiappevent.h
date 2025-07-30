@@ -32,8 +32,8 @@ struct PublishFormData {
 class FormEventHiAppEvent {
 public:
     static int64_t AddProcessor();
-    static void WriteRequestPublishFormEndEvent(const int errCode, const time_t beginTime,
-        const PublishFormData& publishFormData, const int64_t processorId);
+    static void WriteAppFormEndEvent(const int errCode, const time_t beginTime, const std::string &apiName,
+        const PublishFormData &publishFormData, const int64_t processorId);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

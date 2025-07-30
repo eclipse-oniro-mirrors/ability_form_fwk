@@ -70,12 +70,14 @@ int64_t FormEventHiAppEvent::AddProcessor()
 #endif
 }
 
-void FormEventHiAppEvent::WriteRequestPublishFormEndEvent(const int errCode, const time_t beginTime,
-    const PublishFormData& publishFormData, const int64_t processorId)
+void FormEventHiAppEvent::WriteAppFormEndEvent(const int errCode, const time_t beginTime,
+    const std::string &apiName, const PublishFormData &publishFormData, const int64_t processorId)
 {
 #ifdef NO_RUNTIME_EMULATOR
-    const std::string apiName = "requestPublishForm";
-    std::string transId = std::string("traceId_") + std::to_string(std::rand());
+    if (processorId <= 0) {
+        return;
+    }
+    std::string transId = "traceId_" + std::to_string(std::rand());
     HiAppEvent::Event event("api_diagnostic", "api_exec_end", HiAppEvent::BEHAVIOR);
     int32_t result = (errCode == ERR_OK) ? EVENT_RESULT_SUCCESS : EVENT_RESULT_FAIL;
     event.AddParam("trans_id", transId);
@@ -90,9 +92,7 @@ void FormEventHiAppEvent::WriteRequestPublishFormEndEvent(const int errCode, con
     event.AddParam("form_dimension", publishFormData.formDimension);
     event.AddParam("module_name", publishFormData.moduleName);
     event.AddParam("form_name", publishFormData.formName);
-    if (processorId > 0) {
-        Write(event);
-    }
+    Write(event);
 #endif
 }
 } // namespace AppExecFwk
