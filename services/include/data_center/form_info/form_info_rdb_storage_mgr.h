@@ -113,6 +113,7 @@ public:
 
     /**
      * @brief Get multi app version code of form from DB.
+     * @param bundleName Bundlename.
      * @param versionCode version code.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -120,6 +121,7 @@ public:
 
     /**
      * @brief Save or update the multi app version code of form in DB.
+     * @param bundleName Bundlename.
      * @param versionCode version code.
      * @return Returns ERR_OK on success, others on failure.
      */

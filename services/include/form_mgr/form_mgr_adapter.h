@@ -1268,8 +1268,6 @@ private:
 
     ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
 
-    bool IsMultiAppForm(FormInfo &formInfo);
-
     void SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation);
 
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);

@@ -185,12 +185,14 @@ public:
 
     /**
      * @brief Get multi app version code of form from DB.
+     * @param bundleName Bundlename.
      * @return Returns version code.
      */
     uint32_t GetMultiAppFormVersionCode(const std::string &bundleName);
 
     /**
      * @brief Save or update the multi app version code of form in DB.
+     * @param bundleName Bundlename.
      * @param versionCode version code.
      */
     void UpdateMultiAppFormVersionCode(const std::string &bundleName, uint32_t versionCode);

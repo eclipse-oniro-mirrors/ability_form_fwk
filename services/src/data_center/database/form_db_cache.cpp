@@ -23,6 +23,7 @@
 #include "data_center/database/form_db_info.h"
 #include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
+#include "common/util/form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -539,10 +540,11 @@ uint32_t FormDbCache::GetMultiAppFormVersionCode(const std::string &bundleName)
         return iter->second;
     }
     std::string versionCode;
-    if (FormInfoRdbStorageMgr::GetInstance().GetMultiAppFormVersionCode(bundleName, versionCode) != ERR_OK) {
+    if (FormInfoRdbStorageMgr::GetInstance().GetMultiAppFormVersionCode(bundleName, versionCode) != ERR_OK ||
+        versionCode.empty()) {
         return 0;
     }
-    uint32_t code = std::atoi(versionCode.c_str());
+    uint32_t code = static_cast<uint32_t>(FormUtil::ConvertStringToInt(versionCode));
     multiAppFormVersionCodeMap_.emplace(bundleName, code);
     return code;
 }
