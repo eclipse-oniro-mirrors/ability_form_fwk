@@ -750,8 +750,8 @@ bool FormRenderMgr::CheckMultiAppFormVersionCode(const FormRecord &formRecord)
         if (versionCode > cacheCode) {
             FormDbCache::GetInstance().UpdateMultiAppFormVersionCode(formRecord.bundleName, versionCode);
         }
-        HILOG_INFO("formId:%{public}" PRId64 ", isMultiAppForm:%{public}d, versionCode:%{public}u",
-            formRecord.formId, isMultiAppForm, versionCode);
+        HILOG_INFO("check version code ok, bundleName: %{public}s, formId:%{public}" PRId64,
+            formRecord.bundleName.c_str(), formRecord.formId);
         return true;
     }
     return false;
