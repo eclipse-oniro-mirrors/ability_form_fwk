@@ -81,12 +81,9 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 void FormDataProxyMgr::UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("update subscribe form data. formId:%{public}" PRId64, formId);
-    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
-    auto search = formDataProxyRecordMap_.find(formId);
-    if (search != formDataProxyRecordMap_.end()) {
-        if (search->second != nullptr) {
-            search->second->UpdateSubscribeFormData(formDataProxies);
-        }
+    std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
+    if (recordPtr != nullptr) {
+        recordPtr->UpdateSubscribeFormData(formDataProxies);
     }
 }
 
@@ -111,26 +108,20 @@ bool FormDataProxyMgr::ConsumeFormDataProxies(int64_t formId, std::vector<FormDa
 
 void FormDataProxyMgr::EnableSubscribeFormData(const std::vector<int64_t> &formIds)
 {
-    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     for (const auto &formId : formIds) {
-        auto search = formDataProxyRecordMap_.find(formId);
-        if (search != formDataProxyRecordMap_.end()) {
-            if (search->second != nullptr) {
-                search->second->EnableSubscribeFormData();
-            }
+        std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
+        if (recordPtr != nullptr) {
+            recordPtr->EnableSubscribeFormData();
         }
     }
 }
 
 void FormDataProxyMgr::DisableSubscribeFormData(const std::vector<int64_t> &formIds)
 {
-    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     for (const auto &formId : formIds) {
-        auto search = formDataProxyRecordMap_.find(formId);
-        if (search != formDataProxyRecordMap_.end()) {
-            if (search->second != nullptr) {
-                search->second->DisableSubscribeFormData();
-            }
+        std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
+        if (recordPtr != nullptr) {
+            recordPtr->DisableSubscribeFormData();
         }
     }
 }
@@ -146,25 +137,31 @@ void FormDataProxyMgr::RetryFailureSubscribes()
 void FormDataProxyMgr::GetFormSubscribeInfo(
     const int64_t formId, std::vector<std::string> &subscribedKeys, int32_t &count)
 {
-    auto search = formDataProxyRecordMap_.find(formId);
-    if (search != formDataProxyRecordMap_.end()) {
-        if (search->second != nullptr) {
-            search->second->GetFormSubscribeInfo(subscribedKeys, count);
-        }
+    std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
+    if (recordPtr != nullptr) {
+        recordPtr->GetFormSubscribeInfo(subscribedKeys, count);
     }
 }
 
 void FormDataProxyMgr::UnsubscribeFormDataById(int64_t formId)
 {
     HILOG_DEBUG("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
+    std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
+    if (recordPtr != nullptr) {
+        recordPtr->UnsubscribeFormData();
+    }
+    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+    formDataProxyRecordMap_.erase(formId);
+}
+
+std::shared_ptr<FormDataProxyRecord> GetFormDataProxyRecord(int64 formId)
+{
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
-        if (search->second != nullptr) {
-            search->second->UnsubscribeFormData();
-        }
-        formDataProxyRecordMap_.erase(formId);
+        return search->second;
     }
+    return nullptr;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
