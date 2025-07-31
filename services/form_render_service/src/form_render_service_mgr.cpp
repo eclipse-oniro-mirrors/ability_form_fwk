@@ -55,6 +55,7 @@ using namespace OHOS::AAFwk::GlobalConfigurationKey;
 FormRenderServiceMgr::FormRenderServiceMgr()
 {
     serialQueue_ = std::make_unique<FormRenderSerialQueue>(FORM_RENDER_SERIAL_QUEUE);
+    FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
 }
 
 FormRenderServiceMgr::~FormRenderServiceMgr() = default;
@@ -191,6 +192,7 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
     search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
     HILOG_INFO("end,isRenderGroupEmpty:%{public}d", isRenderGroupEmpty);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     if (isRenderGroupEmpty) {
         search->second->Release();
     }
@@ -456,6 +458,7 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
     }
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
 
     FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
 

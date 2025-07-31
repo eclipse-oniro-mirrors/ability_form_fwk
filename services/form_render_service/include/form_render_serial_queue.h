@@ -30,8 +30,8 @@ public:
     explicit FormRenderSerialQueue(const std::string &queueName);
     ~FormRenderSerialQueue();
     bool ScheduleTask(uint64_t ms, std::function<void()> func);
-    void ScheduleDelayTask(const std::string &taskName, uint32_t ms, std::function<void()> func);
-    void CancelDelayTask(const std::string &taskName);
+    bool ScheduleDelayTask(const std::string &taskName, uint32_t ms, std::function<void()> func);
+    bool CancelDelayTask(const std::string &taskName);
 private:
     std::shared_mutex mutex_;
     std::map<std::string, ffrt::task_handle> taskMap_;

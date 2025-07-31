@@ -20,6 +20,7 @@
 #include "common/event/form_event_report.h"
 #include "status_mgr_center/form_status_queue.h"
 #include "status_mgr_center/form_status_mgr.h"
+#include "status_mgr_center/form_status.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "data_center/form_record/form_record_report.h"
 #include "form_provider/form_supply_callback.h"
@@ -28,6 +29,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 3000;
+constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
+}
 FormStatusTaskMgr::FormStatusTaskMgr()
 {}
 
@@ -88,6 +93,7 @@ void FormStatusTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &c
     HILOG_DEBUG("start");
 
     auto deleterenderForm = [formId, compId, uid, remoteObject]() {
+        FormStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
         FormStatusTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
     };
     FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM, deleterenderForm);
@@ -131,6 +137,34 @@ void FormStatusTaskMgr::PostStopRenderingForm(
 
     FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::DELETE_FORM, deleterenderForm);
     HILOG_DEBUG("end");
+}
+
+/**
+ * @brief Schedules form recycle timeout task
+ * @param formId Form ID
+ * @return bool Returns true if the timeout was successfully scheduled, false otherwise
+ */
+bool FormStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
+{
+    FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));
+ 
+    auto timeoutTask = [formId]() {
+        HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
+        FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::UNPROCESSABLE);
+        FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));
+    };
+    return FormStatusQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG), WAIT_RELEASE_RENDERER_TIMEOUT, timeoutTask);
+}
+
+/**
+ * @brief Cancel form recycle timeout task
+ * @param formId Form ID
+ * @return bool Returns true if the timeout was successfully canceled, false otherwise
+ */
+bool FormStatusTaskMgr::CancelRecycleTimeout(const int64_t formId)
+{
+    return FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));
 }
 
 void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,

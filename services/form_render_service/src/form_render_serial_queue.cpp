@@ -53,7 +53,7 @@ bool FormRenderSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func
     return true;
 }
 
-void FormRenderSerialQueue::ScheduleDelayTask(const std::string &taskName,
+bool FormRenderSerialQueue::ScheduleDelayTask(const std::string &taskName,
     uint32_t ms, std::function<void()> func)
 {
     HILOG_DEBUG("begin to ScheduleDelayTask %{public}s", taskName.c_str());
@@ -61,29 +61,32 @@ void FormRenderSerialQueue::ScheduleDelayTask(const std::string &taskName,
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("submit_h return null");
-        return;
+        return false;
     }
     taskMap_[taskName] = std::move(task_handle);
     HILOG_DEBUG("ScheduleDelayTask success");
+    return true;
 }
 
-void FormRenderSerialQueue::CancelDelayTask(const std::string &taskName)
+bool FormRenderSerialQueue::CancelDelayTask(const std::string &taskName)
 {
     HILOG_DEBUG("begin to CancelDelayTask %{public}s", taskName.c_str());
     std::unique_lock<std::shared_mutex> lock(mutex_);
     auto item = taskMap_.find(taskName);
     if (item == taskMap_.end()) {
         HILOG_DEBUG("invalid task,CancelDelayTask %{public}s failed", taskName.c_str());
-        return;
+        return false;
     }
     if (item->second != nullptr) {
         int32_t ret = queue_.cancel(item->second);
         if (ret != 0) {
             HILOG_ERROR("CancelDelayTask %{public}s failed,errCode:%{public}d", taskName.c_str(), ret);
+            return false;
         }
     }
     taskMap_.erase(taskName);
     HILOG_DEBUG("CancelDelayTask success");
+    return true;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

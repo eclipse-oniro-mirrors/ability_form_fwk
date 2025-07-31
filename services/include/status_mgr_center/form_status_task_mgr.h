@@ -73,6 +73,20 @@ public:
      */
     void PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
+    /**
+     * @brief Schedules form recycle timeout task
+     * @param formId Form ID
+     * @return bool Returns true if the timeout was successfully scheduled, false otherwise
+     */
+    bool ScheduleRecycleTimeout(const int64_t formId);
+ 
+    /**
+     * @brief Cancel form recycle timeout task
+     * @param formId Form ID
+     * @return bool Returns true if the timeout was successfully canceled, false otherwise
+     */
+    bool CancelRecycleTimeout(const int64_t formId);
+
 private:
     void RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
         const sptr<IRemoteObject> &remoteObjectOfRender);

@@ -40,14 +40,16 @@ public:
      * @param eventMsg Event message containing form ID and event ID
      * @param ms Delay time
      * @param func Function to execute
+     * @return True if the task is scheduled successfully, false otherwise
      */
-    void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint64_t ms, std::function<void()> func);
+    bool ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint64_t ms, std::function<void()> func);
 
     /**
      * @brief Cancel a delayed task
      * @param eventMsg Event message containing form ID and event ID
+     * @return True if the task is canceled successfully, false otherwise
      */
-    void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
+    bool CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
 
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;

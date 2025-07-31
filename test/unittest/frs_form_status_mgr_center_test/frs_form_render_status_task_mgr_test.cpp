@@ -25,6 +25,7 @@
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
+using namespace OHOS::AppExecFwk::FormRender;
 
 namespace {
 const int64_t FORM_ID = 123;
@@ -234,5 +235,29 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecycleForm,
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRecycleForm end";
+}
+
+/**
+ * @tc.name: FormRenderStatusTaskMgrTest_RecycleTimeout
+ * @tc.desc: Verify ScheduleRecycleTimeout and CancelRecycleTimeout
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_RecycleTimeout, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_RecycleTimeout start";
+ 
+    int64_t formId = FORM_ID;
+    FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(nullptr);
+    EXPECT_EQ(false, FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId));
+    EXPECT_EQ(false, FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
+ 
+    std::string queueStr = "FormRenderSerialQueue";
+    std::shared_ptr<FormRenderSerialQueue> serialQueue = std::make_unique<FormRenderSerialQueue>(queueStr);
+    FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue);
+    EXPECT_EQ(false, FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
+    EXPECT_EQ(true, FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId));
+    EXPECT_EQ(true, FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
+ 
+    GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_RecycleTimeout end";
 }
 }  // namespace

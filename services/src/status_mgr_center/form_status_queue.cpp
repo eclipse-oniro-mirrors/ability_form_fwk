@@ -43,27 +43,27 @@ bool FormStatusQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
     return serialQueue_->ScheduleTask(ms, func);
 }
 
-void FormStatusQueue::ScheduleDelayTask(
+bool FormStatusQueue::ScheduleDelayTask(
     const std::pair<int64_t, int64_t> &eventMsg, uint64_t ms, std::function<void()> func)
 {
     HILOG_INFO("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
-        return;
+        return false;
     }
 
-    serialQueue_->ScheduleDelayTask(eventMsg, ms, func);
+    return serialQueue_->ScheduleDelayTask(eventMsg, ms, func);
 }
 
-void FormStatusQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
+bool FormStatusQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
 {
     HILOG_INFO("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
-        return;
+        return false;
     }
 
-    serialQueue_->CancelDelayTask(eventMsg);
+    return serialQueue_->CancelDelayTask(eventMsg);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

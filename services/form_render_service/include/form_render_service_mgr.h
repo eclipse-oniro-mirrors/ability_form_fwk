@@ -24,9 +24,9 @@
 #include "bundle_mgr_interface.h"
 #include "context_impl.h"
 #include "event_handler.h"
+#include "form_supply_proxy.h"
 #include "form_render_record.h"
 #include "form_render_serial_queue.h"
-#include "form_supply_proxy.h"
 #include "js_runtime.h"
 #include "runtime.h"
 #include "want.h"
@@ -129,7 +129,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
     std::chrono::steady_clock::time_point configUpdateTime_ = std::chrono::steady_clock::now();
-    std::unique_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
+    std::shared_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
     bool isVerified_ = false;
