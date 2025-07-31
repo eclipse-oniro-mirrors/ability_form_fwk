@@ -144,8 +144,6 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-
     // test exec
     MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
@@ -225,8 +223,6 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_004, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-
     // test exec
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
@@ -268,8 +264,6 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_005, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-
     // test exec
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
@@ -311,8 +305,6 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_006, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-
     // test exec
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
@@ -372,8 +364,6 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-
     // test exec
     MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
@@ -418,8 +408,6 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-
     // test exec
     MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));

@@ -167,7 +167,6 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     int32_t callingUid {20000001};
     MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
@@ -225,7 +224,6 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_002, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     int32_t callingUid {20000001};
     MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
