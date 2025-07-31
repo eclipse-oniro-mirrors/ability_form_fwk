@@ -618,6 +618,11 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
     const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("call");
+#ifdef NO_RUNTIME_EMULATOR
+    int64_t processorId = FormEventHiAppEvent::AddProcessor();
+    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
+    time_t beginTime = time(nullptr);
+#endif
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("errCode:%{public}d", errCode);
@@ -631,7 +636,18 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
     if (formDataProxies.empty()) {
         return remoteProxy_->RequestPublishForm(want, withFormBindingData, formBindingData, formId);
     }
-    return remoteProxy_->RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
+    ErrCode ret = remoteProxy_->RequestPublishProxyForm(want, withFormBindingData, formBindingData,
+        formId, formDataProxies);
+#ifdef NO_RUNTIME_EMULATOR
+    PublishFormData publishFormData = {
+    want.GetElement().GetBundleName(),
+    want.GetElement().GetAbilityName(),
+    want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
+    want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
+    want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
+    FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "RequestPublishForm", publishFormData, processorId);
+#endif
+    return ret;
 }
 
 
@@ -1863,7 +1879,7 @@ ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBinding
     HILOG_INFO("call");
 #ifdef NO_RUNTIME_EMULATOR
     int64_t processorId = FormEventHiAppEvent::AddProcessor();
-    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64"", processorId);
+    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
     time_t beginTime = time(nullptr);
 #endif
     ErrCode errCode = Connect();
@@ -1885,7 +1901,8 @@ ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBinding
     want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
     want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
     want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
-    FormEventHiAppEvent::WriteRequestPublishFormEndEvent(ret, beginTime, publishFormData, processorId);
+    FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "RequestPublishFormWithSnapshot",
+        publishFormData, processorId);
 #endif
     return ret;
 }

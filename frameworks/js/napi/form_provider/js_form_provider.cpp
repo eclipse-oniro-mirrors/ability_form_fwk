@@ -20,6 +20,9 @@
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#ifdef NO_RUNTIME_EMULATOR
+#include "form_event_hiappevent.h"
+#endif
 #include "form_instance.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
@@ -336,6 +339,11 @@ napi_value JsFormProvider::OpenFormManager(napi_env env, napi_callback_info info
 napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("call");
+#ifdef NO_RUNTIME_EMULATOR
+    int64_t processorId = FormEventHiAppEvent::AddProcessor();
+    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
+    time_t beginTime = time(nullptr);
+#endif
     Want want;
     if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], want)) {
         HILOG_ERROR("fail convert want");
@@ -367,6 +375,13 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnOpenFormManager",
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
+#ifdef NO_RUNTIME_EMULATOR
+    PublishFormData publishFormData = {bundleName, abilityName
+        want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
+        want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
+        want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
+    FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManager", publishFormData, processorId);
+#endif
     return result;
 }
 
@@ -378,6 +393,11 @@ napi_value JsFormProvider::OpenFormManagerCrossBundle(napi_env env, napi_callbac
 napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("call");
+#ifdef NO_RUNTIME_EMULATOR
+    int64_t processorId = FormEventHiAppEvent::AddProcessor();
+    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
+    time_t beginTime = time(nullptr);
+#endif
     Want want;
     if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], want)) {
         HILOG_ERROR("fail convert want");
@@ -400,7 +420,14 @@ napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t arg
     if (ret != ERR_OK) {
         NapiFormUtil::ThrowByInternalErrorCode(env, ret);
     }
- 
+#ifdef NO_RUNTIME_EMULATOR
+    PublishFormData publishFormData = {bundleName, abilityName
+        want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
+        want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
+        want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
+    FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManagerCrossBundle", publishFormData,
+        processorId);
+#endif
     return CreateJsUndefined(env);
 }
 
