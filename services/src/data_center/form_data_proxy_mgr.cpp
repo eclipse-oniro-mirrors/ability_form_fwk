@@ -154,7 +154,7 @@ void FormDataProxyMgr::UnsubscribeFormDataById(int64_t formId)
     formDataProxyRecordMap_.erase(formId);
 }
 
-std::shared_ptr<FormDataProxyRecord> GetFormDataProxyRecord(int64 formId)
+std::shared_ptr<FormDataProxyRecord> GetFormDataProxyRecord(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
