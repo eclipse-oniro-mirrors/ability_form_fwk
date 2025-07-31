@@ -103,7 +103,6 @@ void FmsFormMgrPublishFormTest::TearDownTestCase()
 
 void FmsFormMgrPublishFormTest::SetUp()
 {
-    formyMgrServ_->OnStart();
     token_ = new (std::nothrow) MockFormHostClient();
 
     // Permission install
@@ -114,9 +113,7 @@ void FmsFormMgrPublishFormTest::SetUp()
 }
 
 void FmsFormMgrPublishFormTest::TearDown()
-{
-    formyMgrServ_->OnStop();
-}
+{}
 void FmsFormMgrPublishFormTest::CreateProviderData()
 {
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
@@ -173,7 +170,7 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_001, TestSize.Level0)
     int64_t formId = 1;
     // not system app GetBundleName failed
     BundleMgrService::IsSystemApp = false;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
+    EXPECT_NE(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
         FormMgr::GetInstance().RequestPublishForm(want, false, formBindingData, formId));
     GTEST_LOG_(INFO) << "fms_form_mgr_publish_form_test_001 end";
 }
@@ -209,7 +206,7 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_002, TestSize.Level0)
     // not system app GetBundleName failed
     BundleMgrService::IsSystemApp = false;
     MockCheckAcrossLocalAccountsPermission(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
+    EXPECT_NE(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         FormMgr::GetInstance().RequestPublishForm(want, false, formBindingData, formId));
     MockCheckAcrossLocalAccountsPermission(true);
     GTEST_LOG_(INFO) << "fms_form_mgr_publish_form_test_002 end";

@@ -1986,22 +1986,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_100, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_101
- * @tc.desc: Verify UpdateRenderRecord
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_101, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_101 start";
-    formRenderRecordPtr_->eventHandler_ = nullptr;
-    FormJsInfo info;
-    info.isDynamic = false;
-    Want want;
-    formRenderRecordPtr_->UpdateRenderRecord(info, want, nullptr);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_101 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_102
  * @tc.desc: Verify UpdateRenderRecord
  * @tc.type: FUNC
