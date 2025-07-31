@@ -43,6 +43,7 @@ public:
     // will run only once
     void RetryFailureSubscribes();
     void GetFormSubscribeInfo(const int64_t formId, std::vector<std::string> &subscribedKeys, int32_t &count);
+    std::shared_ptr<FormDataProxyRecord> GetFormDataProxyRecord(int64_t formId);
 
 private:
     void UnsubscribeFormDataById(int64_t formId);
