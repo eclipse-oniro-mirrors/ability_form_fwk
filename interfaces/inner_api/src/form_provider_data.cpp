@@ -377,13 +377,14 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
     }
     if (bufferSize <= 0 || bufferSize > MAX_BUFFER_SIZE) {
         HILOG_INFO("malloc parameter bufferSize:[%{public}d] error.", bufferSize);
+        close(fd);
         return nullptr;
     }
 
     void *ptr = ::mmap(nullptr, bufferSize, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
-        // do not close fd here. fd will be closed in FileDescriptor, ::close(fd)
         HILOG_INFO("ReadImageData map failed, errno:%{public}d", errno);
+        close(fd);
         return nullptr;
     }
     if (fd == -1) {
