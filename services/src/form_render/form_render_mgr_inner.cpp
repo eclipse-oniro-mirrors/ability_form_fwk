@@ -462,7 +462,7 @@ void FormRenderMgrInner::RerenderAllForms()
     if (!FormDataMgr::GetInstance().IsLowMemory()) {
         NotifyHostRenderServiceIsDead();
     } else {
-        FormRenderReport::GetInstance().ReportFRSDead();
+        FormRenderReport::GetInstance().RecordFRSDead();
         isFrsDiedInLowMemory_ = true;
         HILOG_ERROR("Low memory killed FRS");
     }
