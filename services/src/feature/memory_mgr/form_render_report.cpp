@@ -22,10 +22,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-/**
- * @class FormRenderReady
- * FormRenderReady is used to call frs report.
- */
 
 namespace {
     constexpr int8_t FRS_DEAD = 0;
@@ -33,6 +29,10 @@ namespace {
     constexpr int8_t FRS_STATUS_MAX_COUNT = 20;
 }
 
+/**
+ * @class FormRenderReady
+ * FormRenderReady is used to call frs report.
+ */
 FormRenderReport::FormRenderReport() {}
 
 FormRenderReport::~FormRenderReport() {}
