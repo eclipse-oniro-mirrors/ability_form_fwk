@@ -526,6 +526,11 @@ ohos_shared_library("formprovider") {
 
   subsystem_name = "ability"
   part_name = "form_fwk"
+
+  defines = []
+  if (hiappevent_global_part_enabled) {
+    defines += [ "NO_RUNTIME_EMULATOR" ]
+  }
 }
 
 ################################### formagent_napi ########################################

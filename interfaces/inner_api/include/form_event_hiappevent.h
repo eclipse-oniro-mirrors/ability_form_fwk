@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <string>
 
+#include "fms_log_wrapper.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 struct PublishFormData {
