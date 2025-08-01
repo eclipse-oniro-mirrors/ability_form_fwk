@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -618,7 +618,10 @@ ohos_shared_library("formerror_napi") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = [ "${form_fwk_napi_path}/formUtil" ]
+  include_dirs = [
+    "${form_fwk_napi_path}/formUtil",
+    "${form_fwk_path}/interfaces/inner_api/include",
+  ]
 
   sources = [
     "form_error/form_error_module.cpp",
@@ -763,7 +766,9 @@ ohos_shared_library("form_edit_extension") {
     "ability_base:want",
     "ability_runtime:ability_context_native",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:abilitykit_utils",
     "ability_runtime:app_context",
+    "ability_runtime:extensionkit_native",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "ability_runtime:ui_extension",
@@ -938,7 +943,9 @@ ohos_shared_library("live_form_extension") {
     "ability_base:want",
     "ability_runtime:ability_context_native",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:abilitykit_utils",
     "ability_runtime:app_context",
+    "ability_runtime:extensionkit_native",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "ability_runtime:ui_extension",
