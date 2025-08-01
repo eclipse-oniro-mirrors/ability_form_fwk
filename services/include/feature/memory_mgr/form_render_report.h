@@ -23,7 +23,7 @@ namespace AppExecFwk {
 
 struct FormRenderStatusRecord {
     bool isLowMemory;
-    int8_t status;
+    uint8_t status;
     int32_t formCount;
     int64_t occurrenceTime;
 };
@@ -39,7 +39,7 @@ public:
 
     void RecordFRSStart();
 
-    void ReportFRSDead();
+    void RecordFRSDead();
 
     void ReportFRSStatus();
 
