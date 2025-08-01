@@ -1,4 +1,6 @@
 # Code owners for ArkUI form_fwk
+[ArkTs1.2 Permission]
+frameworks/js/napi/BUILD.gn  @jeremiah1106 required_reviewers=1
 
 [AAFWK ABILITY]
 frameworks/ @aafwk_ability
