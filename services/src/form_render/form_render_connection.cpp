@@ -61,7 +61,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         }
         return;
     }
-    FormRenderReport::GetInstance().FirstStartReport();
+    FormRenderReport::GetInstance().RecordFRSStart();
     connectState_ = ConnectState::CONNECTED;
     failedTimes = 0;
     int32_t compileMode = 0;

@@ -20,6 +20,14 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+
+struct FormRenderStatusRecord {
+    bool isLowMemory;
+    uint8_t status;
+    int32_t formCount;
+    int64_t occurrenceTime;
+};
+
 /**
  * @class FormRenderReport
  * FormRenderReport is used to call frs ready.
@@ -29,17 +37,20 @@ class FormRenderReport final : public DelayedRefSingleton<FormRenderReport> {
 public:
     DISALLOW_COPY_AND_MOVE(FormRenderReport);
 
-    bool IsFirstLoad();
+    void RecordFRSStart();
 
-    void FirstStartReport();
+    void RecordFRSDead();
 
-    void DeadReport();
+    void ReportFRSStatus();
 
 private:
+    int32_t GetAllFormsCount();
+    void RecordFRSStatus(uint8_t status);
 
-    void GetAllFormCount(int64_t &formCount);
-
-    std::atomic_bool isFirstLoad_ = true;
+private:
+    std::vector<FormRenderStatusRecord> frsStatusRecords_;
+    std::mutex frsStatusRecordsMutex_;
+    std::atomic_bool isFRSFirstLoaded_ = true;
 };
 }
 }

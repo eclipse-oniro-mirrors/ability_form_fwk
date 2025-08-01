@@ -36,6 +36,7 @@
 #include "data_center/form_record/form_record_report.h"
 #include "data_center/form_data_mgr.h"
 #include "form_refresh/form_refresh_mgr.h"
+#include "feature/memory_mgr/form_render_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1372,7 +1373,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
     HILOG_INFO("end");
 }
 
-void FormTimerMgr::FormRefreshCountReport()
+void FormTimerMgr::FormPeriodReport()
 {
     HILOG_INFO("init base Refresh count task");
     if (limiterTimerReportId_ != 0L) {
@@ -1385,7 +1386,10 @@ void FormTimerMgr::FormRefreshCountReport()
     timerOption->SetRepeat(true);
     int64_t interval = Constants::MS_PER_DAY / timeSpeed_;
     timerOption->SetInterval(interval);
-    auto timeCallback = []() { FormRecordReport::GetInstance().HandleFormRefreshCount(); };
+    auto timeCallback = []() {
+        FormRecordReport::GetInstance().HandleFormRefreshCount();
+        FormRenderReport::GetInstance().ReportFRSStatus();
+    };
     timerOption->SetCallbackInfo(timeCallback);
     limiterTimerReportId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     int64_t timeInSec = GetBootTimeMs();
@@ -1542,7 +1546,7 @@ void FormTimerMgr::Init()
     limiterTimerId_ = 0L;
     limiterTimerReportId_ = 0L;
     reportDiskUseTimerId_ = 0L;
-    FormRefreshCountReport();
+    FormPeriodReport();
     CreateLimiterTimer();
     HILOG_INFO("end");
 }

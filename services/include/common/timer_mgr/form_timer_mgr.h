@@ -378,7 +378,7 @@ private:
 
     bool IsNeedUpdate();
 
-    void FormRefreshCountReport();
+    void FormPeriodReport();
     void ClearDiskInfoReportTimer();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
