@@ -75,6 +75,7 @@ void FormEventHiAppEvent::WriteAppFormEndEvent(const int errCode, const time_t b
 {
 #ifdef NO_RUNTIME_EMULATOR
     if (processorId <= 0) {
+        HILOG_ERROR("Not an APP process.");
         return;
     }
     std::string transId = "traceId_" + std::to_string(std::rand());
