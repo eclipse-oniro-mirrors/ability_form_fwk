@@ -61,7 +61,7 @@ void FormRenderReport::RecordFRSStatus(uint8_t status)
     if (frsStatusRecords_.size() < FRS_STATUS_MAX_COUNT) {
         int64_t formCount = GetAllFormsCount();
         bool isLowMemory = FormDataMgr::GetInstance().IsLowMemory();
-        HILOG_INFO("formCount:  %{public}ld, isLowMemory: %{public}d", formCount, isLowMemory);
+        HILOG_INFO("formCount:  %{public}" PRId64 ", isLowMemory: %{public}d", formCount, isLowMemory);
         FormRenderStatusRecord record = {
             .isLowMemory = isLowMemory,
             .status = status,
