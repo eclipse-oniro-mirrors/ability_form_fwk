@@ -20,18 +20,18 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-/**
- * @class FormRenderReport
- * FormRenderReport is used to call frs ready.
- */
 
- struct FormRenderStatusRecord {
+struct FormRenderStatusRecord {
     bool isLowMemory;
     int8_t status;
     int32_t formCount;
     int64_t occurrenceTime;
 };
 
+/**
+ * @class FormRenderReport
+ * FormRenderReport is used to call frs ready.
+ */
 class FormRenderReport final : public DelayedRefSingleton<FormRenderReport> {
     DECLARE_DELAYED_REF_SINGLETON(FormRenderReport)
 public:
