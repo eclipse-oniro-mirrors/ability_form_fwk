@@ -46,7 +46,7 @@ void FormRenderReport::RecordFRSStart()
     }
 }
 
-void FormRenderReport::ReportFRSDead()
+void FormRenderReport::RecordFRSDead()
 {
     HILOG_INFO("call");
     if (!isFRSFirstLoaded_.load()) {
