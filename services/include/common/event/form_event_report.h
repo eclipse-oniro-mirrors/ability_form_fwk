@@ -170,7 +170,11 @@ public:
         bool withSnapshot = false);
     static void SendFormFailedEvent(const FormEventName &eventName, int64_t formId, const std::string &bundleName,
         const std::string &formName, int32_t errorType, int32_t errorCode = 0);
-    static void SendFrsStateEvent(const FormEventName &eventName, int64_t formCount, bool isLowMemory);
+    static void SendFRSStatusEvent(
+        const std::vector<bool> &isLowMemoryList,
+        const std::vector<uint8_t> &statusList,
+        const std::vector<int32_t> &formCountList,
+        const std::vector<int64_t> &occurrenceTimeList);
 private:
     static std::string ConvertEventName(const FormEventName &eventName);
 };
