@@ -2256,7 +2256,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_118, TestSize.Level1)
 
 /**
  * @tc.name: FormRenderRecordTest_119
- * @tc.desc: Verify AddFormRequest
+ * @tc.desc: Verify UpdateFormRequest
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_119, TestSize.Level1)
@@ -2273,11 +2273,24 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_119, TestSize.Level1)
     requests.emplace(formRequest.compId, formRequest);
     formRenderRecordPtr_->formRequests_.emplace(formId, requests);
     formRequest.hasRelease = true;
-    EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
-        false);
-    formRenderRecordPtr_->AddFormRequest(formId, formRequest, true);
-    EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
-        true);
+
+    Want want;
+    want.SetParam(OHOS::AppExecFwk::Constants::FORM_RENDER_COMP_ID, "1");
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, UPDATE_RENDERING_FORM);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    formRenderRecordPtr_->UpdateFormRequest(formJsInfo, want);
+    EXPECT_EQ(formRenderRecordPtr_->formRequests_.empty(), true);
+
+    want.RemoveParam(Constants::FORM_RENDER_TYPE_KEY);
+    EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId) != formRenderRecordPtr_->formRequests_.end(), true);
+
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, UPDATE_RENDERING_FORM);
+    formRenderRecordPtr_->UpdateFormRequest(formJsInfo, want);
+    formJsInfo.formData = "{\"aaa\":\"bbb\"}";
+    auto formRequest = formRenderRecordPtr_->formRequests_.find(formId);
+    EXPECT_EQ(formRequest != formRenderRecordPtr_->formRequests_.end(), true);
+    EXPECT_EQ(formRequest.second.formJsInfo.formData, formJsInfo.formData);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_119 end";
 }
 
