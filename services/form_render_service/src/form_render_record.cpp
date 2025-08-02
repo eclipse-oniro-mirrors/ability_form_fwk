@@ -714,15 +714,10 @@ void FormRenderRecord::UpdateFormRequest(const FormJsInfo &formJsInfo, const Wan
         return;
     }
 
-    int64_t formId = formJsInfo.formId;
-    std::lock_guard<std::mutex> lock(formRequestsMutex_);
-    auto iter = formRequests_.find(formId);
-    if (iter == formRequests_.end()) {
-        HILOG_WARN("not find form request, formId:%{public}" PRId64, formId);
+    std::unordered_map<std::string, Ace::FormRequest> formRequests;
+    if (!GetFormRequestByFormId(formJsInfo.formId, formRequests)) {
         return;
     }
-
-    std::unordered_map<std::string, Ace::FormRequest> formRequests = iter->second;
 
     for (const auto &iter : formRequests) {
         auto formRequest = iter.second;
@@ -792,7 +787,7 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         }
         if (compMaxId == formRequest.compId) {
             AddRenderer(formJsInfo, formRequest.want);
-            UpdateFormRequestReleaseState(formId, formRequest.compId, false);
+            UpdateFormRequestReleaseState(formJsInfo.formId, formRequest.compId, false);
         }
     }
 
@@ -1167,7 +1162,7 @@ void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsI
 
     for (const auto &form : formJsInfos) {
         std::unordered_map<std::string, Ace::FormRequest> formRequests;
-        if (GetFormRequestByFormId(form.formId, formRequests)) {
+        if (!GetFormRequestByFormId(form.formId, formRequests)) {
             continue;
         }
 

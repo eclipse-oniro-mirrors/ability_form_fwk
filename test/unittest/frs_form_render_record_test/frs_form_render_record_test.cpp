@@ -43,6 +43,7 @@ constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_ID = 1;
+constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
 }
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
@@ -2267,30 +2268,32 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_119, TestSize.Level1)
     formRenderRecordPtr_->formRequests_.clear();
 
     int64_t formId = FORM_ID;
-    Ace::FormRequest formRequest;
-    formRequest.compId = "compId";
-    std::unordered_map<std::string, Ace::FormRequest> requests;
-    requests.emplace(formRequest.compId, formRequest);
-    formRenderRecordPtr_->formRequests_.emplace(formId, requests);
-    formRequest.hasRelease = true;
+    std::string compId = "119";
 
     Want want;
-    want.SetParam(OHOS::AppExecFwk::Constants::FORM_RENDER_COMP_ID, "1");
-    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, UPDATE_RENDERING_FORM);
+    want.SetParam(FORM_RENDERER_COMP_ID, compId);
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
     FormJsInfo formJsInfo;
     formJsInfo.formId = formId;
     formRenderRecordPtr_->UpdateFormRequest(formJsInfo, want);
     EXPECT_EQ(formRenderRecordPtr_->formRequests_.empty(), true);
 
     want.RemoveParam(Constants::FORM_RENDER_TYPE_KEY);
+    formRenderRecordPtr_->UpdateFormRequest(formJsInfo, want);
     EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId) != formRenderRecordPtr_->formRequests_.end(), true);
 
-    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, UPDATE_RENDERING_FORM);
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
+    formJsInfo.formProviderData = FormProviderData("{\"aaa\":\"bbb\"}");
     formRenderRecordPtr_->UpdateFormRequest(formJsInfo, want);
-    formJsInfo.formData = "{\"aaa\":\"bbb\"}";
-    auto formRequest = formRenderRecordPtr_->formRequests_.find(formId);
-    EXPECT_EQ(formRequest != formRenderRecordPtr_->formRequests_.end(), true);
-    EXPECT_EQ(formRequest.second.formJsInfo.formData, formJsInfo.formData);
+
+    auto formRequestIter = formRenderRecordPtr_->formRequests_.find(formId);
+    EXPECT_EQ(formRequestIter != formRenderRecordPtr_->formRequests_.end(), true);
+
+    auto formRequestMap = formRequestIter->second;
+    EXPECT_EQ(formRequestMap.find(compId) != formRequestMap.end(), true);
+    
+    auto formRequest = formRequestMap.find(compId)->second;
+    EXPECT_EQ(formRequest.formJsInfo.formData, formJsInfo.formProviderData.GetDataString());
     GTEST_LOG_(INFO) << "FormRenderRecordTest_119 end";
 }
 
