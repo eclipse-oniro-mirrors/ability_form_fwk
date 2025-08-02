@@ -84,7 +84,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
 {
     HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     std::vector<FormRecord> formInfos;
-    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
         return;
     }
 
@@ -552,6 +552,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     reCreateRecord.versionUpgrade = record.versionUpgrade;
     reCreateRecord.isCountTimerRefresh = false;
     reCreateRecord.formId = record.formId;
+    reCreateRecord.providerUserId = record.providerUserId;
 
     Want want;
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, reCreateRecord.formName);

@@ -38,7 +38,6 @@ int FormAppUpgradeRefreshImpl::RefreshFormRequest(RefreshData &data)
     factor.record = data.record;
     factor.callerToken = data.callerToken;
     Want reqWant(data.want);
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
     factor.want = reqWant;
     int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
     if (ret != ERR_OK) {

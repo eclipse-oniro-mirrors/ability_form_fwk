@@ -1281,6 +1281,12 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormInfoByFormRecord(const FormRecord &record, FormInfo &formInfo);
+
+    /**
+     * @brief Get calling user ID.
+     * @return Returns user ID.
+     */
+    int32_t GetCallingUserId();
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
