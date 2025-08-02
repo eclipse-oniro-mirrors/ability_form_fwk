@@ -401,6 +401,8 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             return RENDER_FORM_FAILED;
         }
 
+        UpdateFormRequest(formJsInfo, want);
+
         std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
         auto task = [thisWeakPtr, formJsInfo, want, formSupplyClient, renderType]() {
             HILOG_INFO("HandleUpdateInJsThread begin");
@@ -703,6 +705,50 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
     return formRendererGroup;
 }
 
+void FormRenderRecord::UpdateFormRequest(const FormJsInfo &formJsInfo, const Want &want)
+{
+    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+    HILOG_DEBUG("renderType is %{public}d", renderType);
+    if (renderType == Constants::RENDER_FORM) {
+        AddFormRequest(formJsInfo, want);
+        return;
+    }
+
+    int64_t formId = formJsInfo.formId;
+    std::unordered_map<std::string, Ace::FormRequest> formRequests;
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    auto iter = formRequests_.find(formId);
+    if (iter == formRequests_.end()) {
+        HILOG_WARN("not find form request, formId:%{public}" PRId64, formId);
+        return;
+    }
+
+    formRequests = iter->second;
+    std::string compMaxId = "0";
+    for (const auto &iter : formRequests) {
+        if (iter.second.compId > compMaxId) {
+            compMaxId = iter.second.compId;
+        }
+    }
+
+    for (const auto &iter : formRequests) {
+        auto formRequest = iter.second;
+        MergeFormData(formRequest, formJsInfo);
+        if (!formRequest.hasRelease) {
+            AddFormRequest(formJsInfo.formId, formRequest);
+            continue;
+        }
+        if (formJsInfo.isDynamic) {
+            // recover form by updating task, need update provider data to formRequests_
+            AddFormRequest(formJsInfo.formId, formRequest);
+            continue;
+        }
+        if (compMaxId == formRequest.compId) {
+            AddFormRequest(formJsInfo.formId, formRequest);
+        }
+    }
+}
+
 void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
 {
     HILOG_INFO("Update record in js thread, formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
@@ -736,7 +782,6 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
     HILOG_DEBUG("renderType is %{public}d", renderType);
     if (renderType == Constants::RENDER_FORM) {
         AddRenderer(formJsInfo, want);
-        AddFormRequest(formJsInfo, want);
         return;
     }
 
@@ -755,22 +800,17 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
     bool isDynamicFormNeedRecover = false;
     for (const auto& iter : formRequests) {
         auto formRequest = iter.second;
-        MergeFormData(formRequest, formJsInfo);
         if (!formRequest.hasRelease) {
             UpdateRenderer(formJsInfo);
-            AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
         if (formJsInfo.isDynamic) {
             isDynamicFormNeedRecover = true;
-            // recover form by updating task, need update provider data to formRequests_
-            AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
         if (compMaxId == formRequest.compId) {
             AddRenderer(formJsInfo, formRequest.want);
-            formRequest.hasRelease = false;
-            AddFormRequest(formJsInfo.formId, formRequest);
+            UpdateFormRequestReleaseState(formId, formRequest.compId, false);
         }
     }
 
@@ -1169,18 +1209,19 @@ void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsI
         return;
     }
 
-    std::lock_guard<std::mutex> lock(formRequestsMutex_);
     for (const auto &form : formJsInfos) {
-        auto iter = formRequests_.find(form.formId);
-        if (iter == formRequests_.end()) {
+        std::unordered_map<std::string, Ace::FormRequest> formRequests;
+        if (GetFormRequestByFormId(form.formId, formRequests)) {
             continue;
         }
 
-        for (const auto& formRequest : iter->second) {
+        for (const auto &formRequest : formRequests) {
             if (!formRequest.second.hasRelease) {
                 continue;
             }
 
+            UpdateFormRequest(form, formRequest.second.want);
+            
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
             auto task = [thisWeakPtr, form, want = formRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
@@ -1628,12 +1669,7 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
         return;
     }
 
-    if (RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, formRequests)) {
-        for (auto formRequestIter : formRequests) {
-            formRequestIter.second.hasRelease = false;
-            AddFormRequest(formId, formRequestIter.second, true);
-        }
-    }
+    RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, formRequests);
 }
 
 bool FormRenderRecord::GetAndDeleteRecycledCompIds(const int64_t &formId,
@@ -1686,7 +1722,11 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         currentRequestIndex = groupRequests.size() - 1;
         HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
     }
-    return RecoverRenderer(groupRequests, currentRequestIndex);
+    bool success = RecoverRenderer(groupRequests, currentRequestIndex);
+    if (success) {
+        UpdateFormRequestReleaseState(formId, currentCompId, false);
+    }
+    return success;
 }
 
 void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, const FormJsInfo &formJsInfo,

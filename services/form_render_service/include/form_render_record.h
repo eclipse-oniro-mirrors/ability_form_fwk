@@ -174,6 +174,8 @@ private:
     std::shared_ptr<Ace::FormRendererGroup> CreateFormRendererGroupLock(const FormJsInfo &formJsInfo,
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime);
 
+    void UpdateFormRequest(const FormJsInfo &formJsInfo, const Want &want);
+
     void HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want);
 
     bool HandleDeleteInJsThread(int64_t formId, const std::string &compId);
