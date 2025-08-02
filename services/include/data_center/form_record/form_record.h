@@ -96,6 +96,7 @@ public:
     bool isLocationChange = false;
     bool isExistRecycleTask = false;
     bool isDataProxyUpdate = false;
+    bool isDistributedForm = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

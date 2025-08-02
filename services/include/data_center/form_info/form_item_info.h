@@ -495,6 +495,16 @@ public:
      * @param updateDuration Update duration.
      */
     bool GetDataProxyIgnoreFormVisibility() const;
+    /**
+     * @brief Get whether is distributed.
+     * @return True for distributed, false for not distributed.
+     */
+    bool IsDistributedForm() const;
+    /**
+     * @brief Set whether is distributed.
+     * @param isDistributed True for distributed, false for not distributed.
+     */
+    void SetDistributedForm(bool isDistributed);
 
 private:
     /**
@@ -550,6 +560,7 @@ private:
     bool protectForm_ = false;
     std::vector<int32_t> conditionUpdate_;
     bool isDataProxyIgnoreFormVisibility_ = false;
+    bool isDistributedForm_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -680,5 +680,15 @@ bool FormItemInfo::GetDataProxyIgnoreFormVisibility() const
 {
     return isDataProxyIgnoreFormVisibility_;
 }
+
+bool FormItemInfo::IsDistributedForm() const
+{
+    return isDistributedForm_;
+}
+
+void FormItemInfo::SetDistributedForm(bool isDistributed)
+{
+    isDistributedForm_ = isDistributed;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

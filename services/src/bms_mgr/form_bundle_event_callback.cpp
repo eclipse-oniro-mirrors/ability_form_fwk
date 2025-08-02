@@ -17,6 +17,7 @@
 
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 #include "form_mgr/form_mgr_queue.h"
+#include "feature/bundle_distributed/form_distributed_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -75,6 +76,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
             // Ensure clear forbidden form db when bundle uninstall
             // Health contol will set again when reinstall
             FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
+            FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleName, false);
         };
         FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {

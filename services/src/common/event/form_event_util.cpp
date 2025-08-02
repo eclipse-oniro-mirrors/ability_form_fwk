@@ -33,10 +33,13 @@
 #include "common/util/form_util.h"
 #include "form_provider/form_provider_mgr.h"
 #include "want.h"
+#include "feature/bundle_distributed/form_distributed_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
+constexpr int NORMAL_BUNDLE_MODULE_LENGTH = 1;
+
 void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formRecord)
 {
     formRecord.modulePkgNameMap.clear();
@@ -105,7 +108,9 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     std::vector<FormRecord> updatedForms;
     for (FormRecord& formRecord : formInfos) {
         int64_t formId = formRecord.formId;
-        HILOG_INFO("bundle update, formName:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
+        HILOG_INFO("bundle update, formName:%{public}s, moduleName:%{public}s, isDistributedForm:%{public}d, "
+            "formId:%{public}" PRId64, formRecord.formName.c_str(), formRecord.moduleName.c_str(),
+            formRecord.isDistributedForm, formId);
         if (bundleInfo.versionCode == formRecord.versionCode) {
             HILOG_WARN("form: %{public}s, versionCode is same. formId:%{public}" PRId64,
                        formRecord.formName.c_str(), formId);
@@ -244,6 +249,18 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     if (targetForms.empty()) {
         HILOG_ERROR("empty targetForms");
         return false;
+    }
+
+    bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name);
+    HILOG_INFO("bundleName: %{public}s, IsBundleDistributed: %{public}d, formId:%{public}" PRId64,
+        bundleInfo.name.c_str(), IsBundleDistributed, formId);
+    if (formRecord.isDistributedForm != IsBundleDistributed) {
+        // The format of the installation package has changed.
+        formRecord.moduleName = targetForms.front().moduleName;
+        if (!IsBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
+            // whole package install finished
+            formRecord.isDistributedForm = IsBundleDistributed;
+        }
     }
 
     FormInfo updatedForm;

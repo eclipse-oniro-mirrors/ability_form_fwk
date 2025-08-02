@@ -213,6 +213,7 @@ ohos_shared_library("libfms") {
     "services/src/status_mgr_center/form_status_queue.cpp",
     "services/src/status_mgr_center/form_status_table.cpp",
     "services/src/status_mgr_center/form_status_task_mgr.cpp",
+    "services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
   ]
 
   configs = [
