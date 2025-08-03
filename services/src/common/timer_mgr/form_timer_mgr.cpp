@@ -1352,7 +1352,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
       | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
     timerOption->SetType(flag);
     timerOption->SetRepeat(true);
-    int64_t interval = TIMER_UPDATE_INTERVAL;
+    int64_t interval = TIMER_UPDATE_INTERVAL / timeSpeed_;
     timerOption->SetInterval(interval);
     auto timeCallback = []() { FormTimerMgr::GetInstance().OnIntervalTimeOut(); };
     timerOption->SetCallbackInfo(timeCallback);
