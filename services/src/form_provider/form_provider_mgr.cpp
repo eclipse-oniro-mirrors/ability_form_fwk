@@ -310,7 +310,7 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
 ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want)
 {
     HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s, "
-        "needFreeInstall:%{public}d, isCountTimerRefresh:%{public}d, userid:%{public}d", formId,
+        "needFreeInstall:%{public}d, isCountTimerRefresh:%{public}d, userId:%{public}d", formId,
         record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall, record.isCountTimerRefresh,
         record.providerUserId);
 
