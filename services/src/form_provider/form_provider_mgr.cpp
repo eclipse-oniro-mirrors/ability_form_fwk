@@ -310,8 +310,9 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
 ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want)
 {
     HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s, "
-        "needFreeInstall:%{public}d, isCountTimerRefresh:%{public}d", formId, record.bundleName.c_str(),
-        record.abilityName.c_str(), record.needFreeInstall, record.isCountTimerRefresh);
+        "needFreeInstall:%{public}d, isCountTimerRefresh:%{public}d, userId:%{public}d", formId,
+        record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall, record.isCountTimerRefresh,
+        record.providerUserId);
 
     sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want,
         record.bundleName, record.abilityName, record.needFreeInstall);
@@ -334,7 +335,8 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRe
         }
     }
 
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formRefreshConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(connectWant, formRefreshConnection,
+        record.providerUserId);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed");
         if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {

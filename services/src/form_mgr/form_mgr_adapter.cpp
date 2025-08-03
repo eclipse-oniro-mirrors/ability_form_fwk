@@ -3250,26 +3250,27 @@ int FormMgrAdapter::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
 int FormMgrAdapter::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormInfoMgr::GetInstance().GetAllFormsInfo(formInfos);
+    return FormInfoMgr::GetInstance().GetAllFormsInfo(formInfos, GetCallingUserId());
 }
 
 int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, formInfos);
+    return FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, formInfos, GetCallingUserId());
 }
 
 int FormMgrAdapter::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormInfoMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
+    return FormInfoMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos, GetCallingUserId());
 }
 
 int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName,
     const std::string &moduleName, std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    return FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName,
+        formInfos, GetCallingUserId());
 }
 
 bool FormMgrAdapter::IsRequestPublishFormSupported()
@@ -4636,6 +4637,12 @@ void FormMgrAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &r
     };
     FormMgrQueue::GetInstance().ScheduleTask(ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME, refreshForm);
     HILOG_INFO("end");
+}
+
+int32_t FormMgrAdapter::GetCallingUserId()
+{
+    int callingUid = IPCSkeleton::GetCallingUid();
+    return callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

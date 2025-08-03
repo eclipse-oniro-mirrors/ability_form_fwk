@@ -3094,6 +3094,7 @@ FormRecord FormDataMgr::GetFormAbilityInfo(const FormRecord &record) const
     newRecord.isInited = record.isInited;
     newRecord.versionUpgrade = record.versionUpgrade;
     newRecord.needFreeInstall = record.needFreeInstall;
+    newRecord.providerUserId = record.providerUserId;
     return newRecord;
 }
 

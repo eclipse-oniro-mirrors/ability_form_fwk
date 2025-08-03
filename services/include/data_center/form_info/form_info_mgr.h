@@ -106,7 +106,7 @@ public:
 
     ErrCode Remove(const std::string &bundleName, int32_t userId);
 
-    ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos);
+    ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByBundle(
         const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
