@@ -41,14 +41,15 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const int REQUEST_UPDATE_AT_CODE = 1;
-const int REQUEST_LIMITER_CODE = 2;
-const int REQUEST_DYNAMIC_CODE = 3;
-const int SHIFT_BIT_LENGTH = 32;
-const int NANO_TO_SECOND =  1000000000;
-const std::string FMS_TIME_SPEED = "fms.time_speed";
+constexpr int REQUEST_UPDATE_AT_CODE = 1;
+constexpr int REQUEST_LIMITER_CODE = 2;
+constexpr int REQUEST_DYNAMIC_CODE = 3;
+constexpr int SHIFT_BIT_LENGTH = 32;
+constexpr int NANO_TO_SECOND =  1000000000;
+constexpr char FMS_TIME_SPEED[] = "fms.time_speed";
 // Specified custom timer event publisher uid, publisher must be foundation
-const int32_t FOUNDATION_UID = 5523;
+constexpr int32_t FOUNDATION_UID = 5523;
+constexpr int64_t TIMER_UPDATE_INTERVAL = 5 * 60 * 1000;
 } // namespace
 
 FormTimerMgr::FormTimerMgr()
@@ -1351,7 +1352,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
       | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
     timerOption->SetType(flag);
     timerOption->SetRepeat(true);
-    int64_t interval = Constants::MIN_PERIOD / timeSpeed_;
+    int64_t interval = TIMER_UPDATE_INTERVAL / timeSpeed_;
     timerOption->SetInterval(interval);
     auto timeCallback = []() { FormTimerMgr::GetInstance().OnIntervalTimeOut(); };
     timerOption->SetCallbackInfo(timeCallback);
