@@ -41,7 +41,7 @@ const std::string FORM_METADATA_NAME = "ohos.extension.form";
 const std::uint32_t ERR_VERSION_CODE = 0;
 const std::string FMS_IS_READY_EVENT = "fmsIsReady";
 const std::string PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
-constexpr int DISTRIBUETD_BUNDLE_MODULE_LENGTH = 2;
+constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
 } // namespace
 
 ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
@@ -289,7 +289,7 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
         return false;
     }
 
-    if (bundleInfo.hapModuleInfos.size() < DISTRIBUETD_BUNDLE_MODULE_LENGTH) {
+    if (bundleInfo.hapModuleInfos.size() < DISTRIBUTED_BUNDLE_MODULE_LENGTH) {
         // Install distributed hap package
         return true;
     }
@@ -547,7 +547,7 @@ void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
         return;
     }
 
-    if (bundleInfo.hapModuleInfos.size() < DISTRIBUETD_BUNDLE_MODULE_LENGTH) {
+    if (bundleInfo.hapModuleInfos.size() < DISTRIBUTED_BUNDLE_MODULE_LENGTH) {
         // install a part of distributed app package, do not clear for now
         return;
     }

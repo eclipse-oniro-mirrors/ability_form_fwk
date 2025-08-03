@@ -79,6 +79,7 @@ void FormDistributedMgr::SetBundleDistributedStatus(const std::string &bundleNam
         return;
     }
 
+    HILOG_INFO("set bundle: %{public}s distributed status: %{public}d", bundleName.c_str(), isDistributed);
     auto iter = formBundleDistributedSet_.find(bundleName);
     if (isDistributed && iter == formBundleDistributedSet_.end()) {
         formBundleDistributedSet_.insert(bundleName);
@@ -93,7 +94,7 @@ bool FormDistributedMgr::IsBundleDistributedInit()
 {
     std::unique_lock<std::shared_mutex> lock(bundleDistributedSetMutex_);
     if (!isInitialized_ && !Init()) {
-        HILOG_ERROR("Form bundle forbid mgr not init");
+        HILOG_ERROR("Form bundle distributed mgr not init");
         return false;
     }
     return true;
