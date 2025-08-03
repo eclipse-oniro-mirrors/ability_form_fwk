@@ -248,6 +248,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     newRecord.isDataProxyIgnoreFormVisible = formInfo.GetDataProxyIgnoreFormVisibility();
+    newRecord.isDistributedForm = formInfo.IsDistributedForm();
     HILOG_DEBUG("end");
     return newRecord;
 }

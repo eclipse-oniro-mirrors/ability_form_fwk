@@ -89,6 +89,8 @@ private:
     void GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInfos,
         const std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames);
 
+    void ClearDistributedFormInfos(int32_t userId);
+
     std::string bundleName_ {};
     mutable std::shared_timed_mutex formInfosMutex_ {};
     std::vector<AAFwk::FormInfoStorage> formInfoStorages_ {};

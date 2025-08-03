@@ -89,6 +89,7 @@
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
 #include "status_mgr_center/form_status.h"
+#include "feature/bundle_distributed/form_distributed_mgr.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -2081,7 +2082,6 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
     itemInfo.SetFormBundleType(formInfo.bundleType);
     itemInfo.SetConditionUpdate(formInfo.conditionUpdate);
-
     if (!formInfo.customizeDatas.empty()) {
         for (const auto &customizeData: formInfo.customizeDatas) {
             if (customizeData.name == FORM_DATA_PROXY_IGNORE_VISIBILITY) {
@@ -2090,7 +2090,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
             }
         }
     }
-
+    itemInfo.SetDistributedForm(FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name));
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
 }

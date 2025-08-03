@@ -1,0 +1,62 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+config("Form_Bundle_Distributed_config") {
+  include_dirs = [ "${form_fwk_path}/services/include" ]
+}
+
+# ohos_unittest is a template that will add gtest as deps.
+ohos_unittest("FormBundleDistributedTest") {
+  module_out_path = "form_fwk/form_fwk/form_mgr"
+
+  configs = [ ":Form_Bundle_Distributed_config" ]
+
+  sources = [
+    "${form_fwk_path}/services/src/common/event/form_event_report.cpp",
+    "${form_fwk_path}/services/src/common/util/form_util.cpp",
+    "${form_fwk_path}/services/src/data_center/database/form_rdb_data_mgr.cpp",
+    "${form_fwk_path}/services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
+    "form_bundle_distributed_mgr_test.cpp",
+  ]
+
+  deps = [ "${form_fwk_path}:fmskit_native" ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:ability_deps_wrapper",
+    "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "common_event_service:cesfwk_core",
+    "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "form_fwk:form_manager",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_core",
+    "relational_store:native_rdb",
+    "samgr:samgr_proxy",
+  ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = [ ":FormBundleDistributedTest" ]
+}

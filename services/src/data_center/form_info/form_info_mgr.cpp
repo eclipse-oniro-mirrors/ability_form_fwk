@@ -32,6 +32,7 @@
 #include "common/event/form_event_report.h"
 #include "common_event.h"
 #include "common_event_manager.h"
+#include "feature/bundle_distributed/form_distributed_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -40,6 +41,7 @@ const std::string FORM_METADATA_NAME = "ohos.extension.form";
 const std::uint32_t ERR_VERSION_CODE = 0;
 const std::string FMS_IS_READY_EVENT = "fmsIsReady";
 const std::string PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
+constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
 } // namespace
 
 ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
@@ -93,6 +95,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
         }
         HapModuleInfo sharedModule;
         bool hasDistributedForm = LoadSharedModuleInfo(bundleInfo, sharedModule);
+        FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleInfo.name, hasDistributedForm);
         std::vector<std::string> profileInfos {};
         if  (hasDistributedForm) {
             if (!client->GetProfileFromSharedHap(sharedModule, extensionInfo, profileInfos)) {
@@ -259,11 +262,18 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
             HILOG_DEBUG("Add new userId, user:%{public}d", userId);
             formInfoStorages_.emplace_back(userId, finalFormInfos);
         }
-    } else {
-        HILOG_DEBUG("The new package of %{public}s does not contain a card, clear it", bundleName_.c_str());
-        formInfoStorages_.clear();
+        return UpdateFormInfoStorageLocked();
     }
 
+    bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_);
+    HILOG_INFO("The new package of %{public}s does not contain a card, IsBundleDistributed:%{public}d.",
+        bundleName_.c_str(), IsBundleDistributed);
+    if (IsBundleDistributed) {
+        ClearDistributedFormInfos(userId);
+    } else {
+        HILOG_INFO("clear normal app formInfos, bundleName: %{public}s", bundleName_.c_str());
+        formInfoStorages_.clear();
+    }
     return UpdateFormInfoStorageLocked();
 }
 
@@ -277,6 +287,11 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
 
     if (entryIt == hapModuleInfoEnd) {
         return false;
+    }
+
+    if (bundleInfo.hapModuleInfos.size() < DISTRIBUTED_BUNDLE_MODULE_LENGTH) {
+        // Install distributed hap package
+        return true;
     }
 
     auto sharedIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [entryIt](const auto &hapInfo) {
@@ -515,6 +530,29 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
         }
     }
     HILOG_INFO("used form num: %{public}zu", formDBNames.size());
+}
+
+void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
+{
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("get IBundleMgr failed");
+        return;
+    }
+
+    BundleInfo bundleInfo;
+    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES;
+    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName_, flag, bundleInfo, userId))) {
+        HILOG_ERROR("get bundleInfo failed");
+        return;
+    }
+
+    if (bundleInfo.hapModuleInfos.size() < DISTRIBUTED_BUNDLE_MODULE_LENGTH) {
+        // install a part of distributed app package, do not clear for now
+        return;
+    }
+    HILOG_INFO("clear distributed app formInfos, bundleName: %{public}s", bundleName_.c_str());
+    formInfoStorages_.clear();
 }
 
 FormInfoMgr::FormInfoMgr()
