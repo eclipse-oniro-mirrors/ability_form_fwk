@@ -58,6 +58,7 @@ bool FormDistributedMgr::IsBundleDistributed(const std::string &bundleName)
     }
 
     if (!IsBundleDistributedInit()) {
+        HILOG_ERROR("distributed mgr init failed, get status error");
         return false;
     }
 
@@ -73,12 +74,12 @@ void FormDistributedMgr::SetBundleDistributedStatus(const std::string &bundleNam
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(bundleDistributedSetMutex_);
     if (!isInitialized_ && !Init()) {
         HILOG_ERROR("Form bundle distributed mgr not init");
         return;
     }
 
+    std::unique_lock<std::shared_mutex> lock(bundleDistributedSetMutex_);
     HILOG_INFO("set bundle: %{public}s distributed status: %{public}d", bundleName.c_str(), isDistributed);
     auto iter = formBundleDistributedSet_.find(bundleName);
     if (isDistributed && iter == formBundleDistributedSet_.end()) {

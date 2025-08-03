@@ -136,6 +136,7 @@ ohos_shared_library("libfms") {
     "services/src/data_center/form_info/form_info_storage.cpp",
     "services/src/data_center/form_info/form_item_info.cpp",
     "services/src/data_center/form_record/form_record_report.cpp",
+    "services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
     "services/src/feature/bundle_forbidden/form_bundle_forbid_mgr.cpp",
     "services/src/feature/bundle_lock/form_bundle_lock_mgr.cpp",
     "services/src/feature/bundle_lock/form_exempt_lock_mgr.cpp",
@@ -213,7 +214,6 @@ ohos_shared_library("libfms") {
     "services/src/status_mgr_center/form_status_queue.cpp",
     "services/src/status_mgr_center/form_status_table.cpp",
     "services/src/status_mgr_center/form_status_task_mgr.cpp",
-    "services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
   ]
 
   configs = [

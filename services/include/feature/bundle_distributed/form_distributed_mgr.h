@@ -50,7 +50,7 @@ public:
     /**
      * @brief Set whether bundle is distributed.
      * @param bundleName Bundle name to be set.
-     * @param isDistributed True fot distributed, false for not distributed.
+     * @param isDistributed True for distributed, false for not distributed.
      */
     void SetBundleDistributedStatus(const std::string &bundleName, bool isDistributed);
 

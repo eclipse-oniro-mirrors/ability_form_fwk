@@ -115,6 +115,7 @@ group("unittest") {
     "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/fms_running_form_info_test:unittest",
     "unittest/form_basic_info_mgr_test:unittest",
+    "unittest/form_bundle_distributed_mgr_test:unittest",
     "unittest/form_bundle_forbid_mgr_test:unittest",
     "unittest/form_bundle_lock_mgr_test:unittest",
     "unittest/form_errors_test:unittest",
