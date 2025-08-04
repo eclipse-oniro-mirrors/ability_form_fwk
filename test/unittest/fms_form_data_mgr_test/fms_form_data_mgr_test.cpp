@@ -5072,4 +5072,30 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycl
     EXPECT_EQ(formDataMgr->formRecords_[formId].isExistRecycleTask, isExistRecycleTask);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 end";
 }
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_001 start";
+    formDataMgr_.formRecords_.clear();
+    int64_t formId = FORM_ID_ONE;
+    FormRecord formRecord;
+    formRecord.isVisible = true;
+    formDataMgr_.formRecords_.emplace(formId, formRecord);
+    bool formIsVisible = formDataMgr_.GetFormVisible(FORM_ID_ONE);
+    EXPECT_TRUE(formIsVisible);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_001 end";
+}
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_002 start";
+    formDataMgr_.formRecords_.clear();
+    int64_t formId = FORM_ID_ONE;
+    FormRecord formRecord;
+    formRecord.isVisible = false;
+    formDataMgr_.formRecords_.emplace(formId, formRecord);
+    bool formIsVisible = formDataMgr_.GetFormVisible(FORM_ID_ONE);
+    EXPECT_FALSE(formIsVisible);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_002 end";
+}
 }
