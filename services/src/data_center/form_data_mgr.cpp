@@ -3146,5 +3146,15 @@ ErrCode FormDataMgr::SetSpecification(const int64_t formId, const int32_t specif
     HILOG_INFO("formId:%{public}" PRId64 " specification:%{public}d", formId, specification);
     return ERR_OK;
 }
+
+bool FormDataMgr::GetFormVisible(int64_t formId)
+{
+    std::lock_guard<std::shared_mutex> lock(formVisibleMapMutex_);
+    auto search = formVisibleMap_.find(formId);
+    if (search != formVisibleMap_.end()) {
+        return search->second;
+    }
+    return false;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
