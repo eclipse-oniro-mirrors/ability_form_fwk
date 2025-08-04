@@ -401,6 +401,7 @@ namespace Constants {
     const std::string VERSION_FILE_NAME = "version.txt";
 
     constexpr const char* FMC_DEFAULT_VERSION = "10.10.25.100";
+    constexpr const char* FORM_IS_VISIBLE = "FORM_IS_VISIBLE";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
