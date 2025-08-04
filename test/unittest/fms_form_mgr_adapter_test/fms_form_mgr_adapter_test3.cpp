@@ -664,6 +664,11 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
     Want want;
     auto ret = formMgrAdapter.RecoverForms(formIds, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    ret = formMgrAdapter.RecoverForms(formIds, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0274 end";
 }
 
