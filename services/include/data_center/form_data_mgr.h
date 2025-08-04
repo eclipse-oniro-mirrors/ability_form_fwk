@@ -1091,6 +1091,12 @@ private:
      * @brief Init low memory state.
      */
     void InitLowMemoryStatus();
+    
+    /**
+     * @brief Get the visibility of the card.
+     * @param formId form id.
+     */
+    bool GetFormVisible(int64_t formId);
 
 private:
     void GetUnusedFormInstancesByFilter(
