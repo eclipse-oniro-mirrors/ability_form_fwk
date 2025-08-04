@@ -3940,6 +3940,10 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " not exist", formId);
             continue;
         }
+        if (!record.isDynamic) {
+            HILOG_WARN("form %{public}" PRId64 " is static form", formId);
+            continue;
+        }
         // Recovery is performed only when the form has been recycled or is recycling, or when there is a
         // recycling task in the queue.
         if (!(FormStatus::GetInstance().IsFormProcessRecycle(formId) || record.isExistRecycleTask)) {

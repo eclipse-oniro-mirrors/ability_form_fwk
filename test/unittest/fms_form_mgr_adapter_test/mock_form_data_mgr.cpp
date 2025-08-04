@@ -261,6 +261,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         formRecord.formVisibleNotify = true;
         formRecord.uid = 0;
         formRecord.updateDuration = UPDATE_DURATION * Constants::TIME_CONVERSION;
+        formRecord.isDynamic = false;
     }
     return g_mockGetFormRecordRet;
 }
