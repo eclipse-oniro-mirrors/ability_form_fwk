@@ -968,6 +968,12 @@ public:
      */
     ErrCode SetSpecification(const int64_t formId, const int32_t specification);
 
+    /**
+     * @brief Get the visibility of the card.
+     * @param formId form id.
+     */
+    bool GetFormVisible(int64_t formId);
+
 private:
     /**
      * @brief Create form record.
@@ -1091,12 +1097,6 @@ private:
      * @brief Init low memory state.
      */
     void InitLowMemoryStatus();
-    
-    /**
-     * @brief Get the visibility of the card.
-     * @param formId form id.
-     */
-    bool GetFormVisible(int64_t formId);
 
 private:
     void GetUnusedFormInstancesByFilter(
