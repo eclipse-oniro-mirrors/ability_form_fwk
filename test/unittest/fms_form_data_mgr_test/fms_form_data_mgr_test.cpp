@@ -5076,12 +5076,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycl
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_001 start";
-    formDataMgr_.formRecords_.clear();
-    int64_t formId = FORM_ID_ONE;
-    FormRecord formRecord;
-    formRecord.isVisible = true;
-    formDataMgr_.formRecords_.emplace(formId, formRecord);
-    bool formIsVisible = formDataMgr_.GetFormVisible(FORM_ID_ONE);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    int64_t formId = FORM_ID_ZERO;
+    formDataMgr->SetFormVisible(formId, true);
+    bool formIsVisible = formDataMgr->GetFormVisible(FORM_ID_ZERO);
     EXPECT_TRUE(formIsVisible);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_001 end";
 }
@@ -5089,12 +5087,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_001, TestSize.Lev
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_002 start";
-    formDataMgr_.formRecords_.clear();
-    int64_t formId = FORM_ID_ONE;
-    FormRecord formRecord;
-    formRecord.isVisible = false;
-    formDataMgr_.formRecords_.emplace(formId, formRecord);
-    bool formIsVisible = formDataMgr_.GetFormVisible(FORM_ID_ONE);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    int64_t formId = FORM_ID_ZERO;
+    formDataMgr->SetFormVisible(formId, false);
+    bool formIsVisible = formDataMgr->GetFormVisible(FORM_ID_ZERO);
     EXPECT_FALSE(formIsVisible);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_002 end";
 }
