@@ -32,6 +32,8 @@ namespace AppExecFwk {
 namespace {
 constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 3000;
 constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
+constexpr int64_t RELEASE_RENDER_DELAY_TIME = 20;
+constexpr int64_t RELEASE_RENDER_DELAY_MSG = 2;
 }
 FormStatusTaskMgr::FormStatusTaskMgr()
 {}
@@ -94,7 +96,7 @@ void FormStatusTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &c
 
     auto deleterenderForm = [formId, compId, uid, remoteObject]() {
         FormStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
-        FormStatusTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
+        FormStatusTaskMgr::GetInstance().PostDelayReleaseRenderer(formId, compId, uid, remoteObject);
     };
     FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM, deleterenderForm);
     HILOG_DEBUG("end");
@@ -253,6 +255,19 @@ void FormStatusTaskMgr::ReleaseRenderer(
         HILOG_ERROR("fail release form renderer");
     }
     HILOG_INFO("end formId: %{public}" PRId64, formId);
+}
+
+bool FormStatusTaskMgr::PostDelayReleaseRenderer(
+    int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
+{
+    FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, RELEASE_RENDER_DELAY_MSG));
+ 
+    auto recycleForm = [formId, compId, uid, remoteObject]() {
+        FormStatusTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
+        FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, RELEASE_RENDER_DELAY_MSG));
+    };
+    return FormStatusQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair(formId, RELEASE_RENDER_DELAY_MSG), RELEASE_RENDER_DELAY_TIME, recycleForm);
 }
 
 void FormStatusTaskMgr::StopRenderingForm(

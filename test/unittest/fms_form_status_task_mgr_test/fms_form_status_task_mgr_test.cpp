@@ -296,4 +296,23 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_RecycleTimeout, TestSize.Level
  
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_RecycleTimeout end";
 }
+
+/**
+ * @tc.name: FormStatusTaskMgr_PostDelayReleaseRenderer
+ * @tc.desc: Verify PostDelayReleaseRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_PostDelayReleaseRenderer, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormStatusTaskMgr_PostDelayReleaseRenderer start";
+    std::shared_ptr<FormStatusTaskMgr> formTaskMgr = std::make_shared<FormStatusTaskMgr>();
+    ASSERT_NE(formTaskMgr, nullptr);
+    int64_t formId = 0;
+    std::string compId = "compId";
+    std::string uid = "uid";
+    sptr<IRemoteObject> remoteObject = nullptr;
+    bool ret = formTaskMgr->PostDelayReleaseRenderer(formId, compId, uid, remoteObject);
+    EXPECT_EQ(true, ret);
+    GTEST_LOG_(INFO) << "FormStatusTaskMgr_PostDelayReleaseRenderer end";
+}
 }
