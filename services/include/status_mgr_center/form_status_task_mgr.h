@@ -96,6 +96,9 @@ private:
     void ReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
 
+    bool PostDelayReleaseRenderer(
+        int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
+
     void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
