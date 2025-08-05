@@ -110,6 +110,9 @@ ErrCode FormRenderMgr::RenderForm(
         want.SetParam(Constants::FORM_RENDER_WITHOUT_UNLOCK_STATE, true);
     }
 
+    bool formIsVisible = FormDataMgr::GetInstance().GetFormVisible(formRecord.formId);
+    want.SetParam(Constants::FORM_IS_VISIBLE, formIsVisible);
+    
     if (formRecord.privacyLevel > 0) {
         InitRenderInner(true, formRecord.userId);
         return sandboxInners_[formRecord.userId]->RenderForm(formRecord, want, hostToken);

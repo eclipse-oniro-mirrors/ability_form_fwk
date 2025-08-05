@@ -5072,4 +5072,26 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycl
     EXPECT_EQ(formDataMgr->formRecords_[formId].isExistRecycleTask, isExistRecycleTask);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 end";
 }
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_001 start";
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    int64_t formId = FORM_ID_ZERO;
+    formDataMgr->SetFormVisible(formId, true);
+    bool formIsVisible = formDataMgr->GetFormVisible(FORM_ID_ZERO);
+    EXPECT_TRUE(formIsVisible);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_001 end";
+}
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_002 start";
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    int64_t formId = FORM_ID_ZERO;
+    formDataMgr->SetFormVisible(formId, false);
+    bool formIsVisible = formDataMgr->GetFormVisible(FORM_ID_ZERO);
+    EXPECT_FALSE(formIsVisible);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_002 end";
+}
 }
