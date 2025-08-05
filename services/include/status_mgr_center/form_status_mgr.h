@@ -35,11 +35,10 @@ class FormStatusMgr final : public DelayedRefSingleton<FormStatusMgr> {
 
 public:
     /**
-     * @brief Posts a form event
+     * @brief Post a form event
      * @param formId The ID of the form
      * @param event The event to trigger
      * @param func The function to handle the event (default is nullptr)
-     * @return The event handling result
      */
     void PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func = nullptr);
 
@@ -79,6 +78,15 @@ private:
      */
     void ExecFormTaskTimeout(
         const int64_t formId, FormEventTimeout timeoutMs, FormFsmEvent event, FormFsmStatus status);
+
+    /**
+     * @brief Executing a State Machine Task
+     * @param formId The ID of the form
+     * @param event The event to trigger
+     * @param func The function to handle the event (default is nullptr)
+     * @return True on success, false on fail.
+     */
+    bool ExecStatusMachineTask(const int64_t formId, const FormFsmEvent event, std::function<void()> func = nullptr);
 
     /**
      * @brief Form task execution function
