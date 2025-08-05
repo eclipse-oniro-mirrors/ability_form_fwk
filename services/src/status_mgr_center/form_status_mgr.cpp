@@ -83,14 +83,15 @@ bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEve
         FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::INIT);
     }
     FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
- 
+
     FormStatusMachineInfo info;
     if (!FormStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
+        HILOG_ERROR("get form status info failed, formId:%{public}" PRId64, formId);
         return false;
     }
- 
+
     HILOG_INFO("state transition, formId:%{public}" PRId64
-                ", status is %{public}d, event is %{public}d, nextStatus is %{public}d.",
+        ", status is %{public}d, event is %{public}d, nextStatus is %{public}d.",
         formId,
         static_cast<int32_t>(status),
         static_cast<int32_t>(event),
@@ -98,10 +99,10 @@ bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEve
 
     // state machine switches to the next state.
     FormStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
- 
+
     // state machine timeout process
     FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, info.timeoutMs, event, status);
- 
+
     // state machine excute
     FormStatusMgr::GetInstance().ExecFormTask(info.processType, formId, event, func);
     return true;

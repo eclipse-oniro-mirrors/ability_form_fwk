@@ -245,9 +245,9 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_ExecStatusMachineTask, TestSize.Le
 
     int64_t formId = FORM_ID;
     FormStatusMgr::GetInstance().DeleteFormEventId(formId);
-    static bool result = false;
-    auto task = []() {
-        GTEST_LOG_(INFO) << "FormStatusMgrTest_ExecStatusMachineTask Task called zlx";
+    bool result = false;
+    auto task = [&result]() mutable {
+        GTEST_LOG_(INFO) << "FormStatusMgrTest_ExecStatusMachineTask Task called";
         result = true;
     };
     bool ret = FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, FormFsmEvent::RENDER_FORM_DONE, task);
