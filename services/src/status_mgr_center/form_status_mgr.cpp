@@ -24,9 +24,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-namespace {
-constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
-}
 FormStatusMgr::FormStatusMgr()
 {
     HILOG_DEBUG("create FormStatusMgr");
@@ -40,36 +37,10 @@ FormStatusMgr::~FormStatusMgr()
 void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
     auto task = [formId, event, func]() {
-        // get status machine info
-        if (!FormStatus::GetInstance().HasFormStatus(formId)) {
-            HILOG_INFO("create new status.");
-            FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::INIT);
-        }
-        FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
-
-        FormStatusMachineInfo info;
-        if (!FormStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
-            return;
-        }
-
-        HILOG_INFO("state transition, formId:%{public}" PRId64
-                   ", status is %{public}d, event is %{public}d, nextStatus is %{public}d.",
-            formId,
-            static_cast<int32_t>(status),
-            static_cast<int32_t>(event),
-            static_cast<int32_t>(info.nextStatus));
-
-        // state machine switches to the next state.
-        FormStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
-
-        // state machine timeout process
-        FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, info.timeoutMs, event, status);
-
-        // state machine excute
-        FormStatusMgr::GetInstance().ExecFormTask(info.processType, formId, event, func);
+        FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, event, func);
     };
 
-    FormStatusQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    FormStatusQueue::GetInstance().ScheduleTask(0, task);
 }
 
 void FormStatusMgr::CancelFormEventTimeout(const int64_t formId, std::string eventId)
@@ -97,11 +68,44 @@ void FormStatusMgr::ExecFormTaskTimeout(
             static_cast<int32_t>(event),
             static_cast<int32_t>(status),
             formId);
-        FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::EXECUTION_TIMEOUT);
+        FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, FormFsmEvent::EXECUTION_TIMEOUT);
         FormEventTimeoutQueue::GetInstance().CancelDelayTask(std::make_pair(formId, eventId));
     };
     FormEventTimeoutQueue::GetInstance().ScheduleDelayTask(
         std::make_pair(formId, eventId), static_cast<uint32_t>(timeoutMs), timeoutTask);
+}
+
+bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
+{
+    // get status machine info
+    if (!FormStatus::GetInstance().HasFormStatus(formId)) {
+        HILOG_INFO("create new status.");
+        FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::INIT);
+    }
+    FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
+
+    FormStatusMachineInfo info;
+    if (!FormStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
+        HILOG_ERROR("get form status info failed, formId:%{public}" PRId64, formId);
+        return false;
+    }
+
+    HILOG_INFO("state transition, formId:%{public}" PRId64
+        ", status is %{public}d, event is %{public}d, nextStatus is %{public}d.",
+        formId,
+        static_cast<int32_t>(status),
+        static_cast<int32_t>(event),
+        static_cast<int32_t>(info.nextStatus));
+
+    // state machine switches to the next state.
+    FormStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
+
+    // state machine timeout process
+    FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, info.timeoutMs, event, status);
+
+    // state machine excute
+    FormStatusMgr::GetInstance().ExecFormTask(info.processType, formId, event, func);
+    return true;
 }
 
 void FormStatusMgr::ExecFormTask(
@@ -229,7 +233,8 @@ void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
     if (event == FormFsmEvent::RECYCLE_FORM) {
         FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
     }
-    FormStatusMgr::GetInstance().PostFormEvent(formId, event, func);
+
+    FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, event, func);
 }
 
 void FormStatusMgr::ProcessTaskDelete(const int64_t formId)
@@ -263,7 +268,7 @@ void FormStatusMgr::ProcessTaskFromRetry(const int64_t formId)
 
     auto func = formEventInfo.getFunc();
     auto event = formEventInfo.getFormEvent();
-    FormStatusMgr::GetInstance().PostFormEvent(formId, event, func);
+    FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, event, func);
 }
 
 bool FormStatusMgr::HasFormEventQueue(const int64_t formId)

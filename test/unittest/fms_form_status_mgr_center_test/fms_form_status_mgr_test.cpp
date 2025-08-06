@@ -233,4 +233,32 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0007, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "FormStatusMgrTest_0007 end";
 }
+
+/**
+ * @tc.name: FormStatusMgrTest_ExecStatusMachineTask
+ * @tc.desc: Verify ExecStatusMachineTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_ExecStatusMachineTask, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_ExecStatusMachineTask start";
+
+    int64_t formId = FORM_ID;
+    FormStatusMgr::GetInstance().DeleteFormEventId(formId);
+    bool result = false;
+    auto task = [&result]() mutable {
+        GTEST_LOG_(INFO) << "FormStatusMgrTest_ExecStatusMachineTask Task called";
+        result = true;
+    };
+    bool ret = FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, FormFsmEvent::RENDER_FORM_DONE, task);
+    EXPECT_EQ(ret, false);
+    EXPECT_EQ(result, false);
+
+    FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::RENDERED);
+    ret = FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, FormFsmEvent::RENDER_FORM, task);
+    EXPECT_EQ(ret, true);
+    EXPECT_EQ(result, true);
+
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_ExecStatusMachineTask end";
+}
 }  // namespace
