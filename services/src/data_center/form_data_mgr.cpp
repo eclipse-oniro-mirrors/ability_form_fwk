@@ -3154,7 +3154,8 @@ bool FormDataMgr::GetFormVisible(int64_t formId)
     if (search != formVisibleMap_.end()) {
         return search->second;
     }
-    return false;
+    // When visibility is not set, it is visible by default
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
