@@ -379,8 +379,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     const sptr<IRemoteObject> hostRemoteObj)
 {
     HILOG_DEBUG("Updated record");
-    bool formIsVisible = want.GetBoolParam(Constants::FORM_IS_VISIBLE, false);
-    RecordFormVisibility(formJsInfo.formId, formIsVisible);
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     if (renderType == Constants::RENDER_FORM) {
         // Manager delegate proxy invalid, do not render form
@@ -388,6 +386,8 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             return RENDER_FORM_FAILED;
         }
         renderFormTasksNum++;
+        bool formIsVisible = want.GetBoolParam(Constants::FORM_IS_VISIBLE, false);
+        RecordFormVisibility(formJsInfo.formId, formIsVisible);
     }
     {
         // Some resources need to be initialized in a JS thread
