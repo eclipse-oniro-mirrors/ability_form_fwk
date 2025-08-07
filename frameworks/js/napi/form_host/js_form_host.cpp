@@ -1996,7 +1996,7 @@ private:
         int64_t formId;
         if (!ConvertFromId(env, argv[PARAM0], formId)) {
             HILOG_ERROR("Convert formId failed");
-            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FORM_ID_NOT_EXIST);
             return CreateJsUndefined(env);
         }
         decltype(argc) convertArgc = 0;
@@ -2006,12 +2006,12 @@ private:
             if (newDimension < static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN) ||
                 newDimension > static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX)) {
                 HILOG_ERROR("newDimension not Dimension enum");
-                NapiFormUtil::ThrowParamTypeError(env, "newDimension", "Dimension enum");
+                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR);
                 return CreateJsUndefined(env);
             }
         } else {
             HILOG_ERROR("newDimension not number");
-            NapiFormUtil::ThrowParamTypeError(env, "newDimension", "number");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR);
             return CreateJsUndefined(env);
         }
         convertArgc++;
