@@ -430,6 +430,7 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_
         case FormEventName::DELETE_FORM_FAILED:
         case FormEventName::UPDATE_FORM_FAILED:
         case FormEventName::RECYCLE_RECOVER_FORM_FAILED:
+        case FormEventName::CONNECT_FORM_ABILITY_FAILED:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER, FORM_ERROR,
                 HiSysEventType::FAULT,

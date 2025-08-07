@@ -57,6 +57,7 @@ enum class AddFormFiledErrorType : int64_t {
     NUMBER_EXCEEDING_LIMIT = 1,
     CONNECT_FORM_RENDER_FAILED,
     CONNECT_FORM_PROVIDER_FAILED,
+    SUBSCRIBE_DATA_SHARE_FAILED,
 };
 
 enum class UpdateFormErrorType : int64_t {
@@ -77,6 +78,11 @@ enum class RecycleRecoverFormErrorType : int64_t {
     RECYCLE_FORM_FAILED = 1,
     RECOVER_FORM_FAILED,
     CHECK_FORM_STATUS_FAILED
+};
+
+enum class ConnectFormAbilityErrorType : int64_t {
+    ACQUIRE_FORM_FAILED = 1,
+    UPDATE_FORM_FAILED,
 };
 
 struct NewFormEventInfo {
@@ -141,6 +147,7 @@ enum class FormEventName {
     UPDATE_FORM_FAILED,
     RECYCLE_RECOVER_FORM_FAILED,
     REQUEST_PUBLIC_FORM,
+    CONNECT_FORM_ABILITY_FAILED,
 };
 
 class FormEventReport {
