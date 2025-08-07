@@ -428,7 +428,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
 
     if (hostRemoteObj == nullptr) {
         HILOG_WARN("null hostRemoteObj");
-        return RENDER_FORM_FAILED;
+        return ERR_OK;
     }
     return AddHostByFormId(formJsInfo.formId, hostRemoteObj);
 }
