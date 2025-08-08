@@ -31,6 +31,9 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
+    if (fdp == nullptr) {
+        return true;
+    }
     FormAshmem formAshmem;
     std::string name = fdp->ConsumeRandomLengthString();
     int32_t sizes = fdp->ConsumeIntegral<int32_t>();
