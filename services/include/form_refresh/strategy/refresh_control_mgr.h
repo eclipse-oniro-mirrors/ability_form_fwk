@@ -60,6 +60,11 @@ public:
      */
     bool IsHealthyControl(const FormRecord &record);
 
+    /**
+     * @brief Whether the form need fresh.
+     */
+    bool IsNeedToFresh(FormRecord &record, bool isVisibleToFresh);
+
 private:
 #ifdef RES_SCHEDULE_ENABLE
     bool isSystemOverload_ = false;

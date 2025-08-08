@@ -17,6 +17,8 @@
 
 #include "fms_log_wrapper.h"
 #include "common/util/form_trust_mgr.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/form_record/form_record_report.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
@@ -85,6 +87,26 @@ bool RefreshControlMgr::IsHealthyControl(const FormRecord &record)
     }
 
     return false;
+}
+
+bool RefreshControlMgr::IsNeedToFresh(FormRecord &record, bool isVisibleToFresh)
+{
+    bool isEnableRefresh = FormDataMgr::GetInstance().IsEnableRefresh(record.formId);
+    HILOG_INFO("isEnableRefresh is %{public}d", isEnableRefresh);
+    if (isEnableRefresh) {
+        return true;
+    }
+    HILOG_INFO("isVisibleToFresh is %{public}d, record.isVisible is %{public}d", isVisibleToFresh, record.isVisible);
+    if (isVisibleToFresh) {
+        if (!record.isVisible) {
+            FormRecordReport::GetInstance().IncreaseUpdateTimes(record.formId,
+                HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
+        }
+        return record.isVisible;
+    }
+    bool isEnableUpdate = FormDataMgr::GetInstance().IsEnableUpdate(record.formId);
+    HILOG_INFO("isEnableUpdate is %{public}d", isEnableUpdate);
+    return isEnableUpdate;
 }
 
 } // namespace AppExecFwk

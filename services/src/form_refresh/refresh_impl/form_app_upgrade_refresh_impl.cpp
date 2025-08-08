@@ -49,6 +49,11 @@ int FormAppUpgradeRefreshImpl::RefreshFormRequest(RefreshData &data)
         return ERR_OK;
     }
 
+    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
+        FormDataMgr::GetInstance().SetNeedRefresh(data.formId, true);
+        return ERR_OK;
+    }
+
     if (data.record.isDataProxy) {
         FormProviderData formProviderData;
         std::string cacheData;
