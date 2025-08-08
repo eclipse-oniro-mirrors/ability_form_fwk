@@ -17,6 +17,8 @@
 
 #include "fms_log_wrapper.h"
 #include "common/util/form_trust_mgr.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/form_record/form_record_report.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
