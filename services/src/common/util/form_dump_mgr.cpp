@@ -21,6 +21,7 @@
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_trust_mgr.h"
 #include "data_center/form_cache_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
 #include "status_mgr_center/form_status.h"
@@ -53,6 +54,12 @@ const static std::unordered_map<Constants::FormLocation, std::string> formLocati
     { Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN, "[ FORM_MANAGER_NEGATIVE_SCREEN ]\n" },
     { Constants::FormLocation::SCREEN_LOCK, "[ SCREEN_LOCK ]\n" },
     { Constants::FormLocation::AI_SUGGESTION, "[ AI_SUGGESTION ]\n" },
+};
+
+const static std::unordered_map<FormVisibilityType, std::string> formVisibilityTypeMap_ = {
+    { FormVisibilityType::UNKNOWN, "[ UNKNOWN ] \n" },
+    { FormVisibilityType::VISIBLE, "[ VISIBLE ] \n" },
+    { FormVisibilityType::INVISIBLE, "[ INVISIBLE ] \n" },
 };
 
 FormDumpMgr::FormDumpMgr() {}
@@ -222,7 +229,8 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
 
     AppendBundleFormInfo(formRecordInfo, formInfo);
     AppendFormStatus(formRecordInfo.formId, formInfo);
-    AppendFormRefreshControlPoints(formRecordInfo, formInfo);
+    AppendFormRefreshControlPoints(formInfo, formRecordInfo.enableForm, formRecordInfo.bundleName,
+                                   formRecordInfo.formId);
 }
 
 /**
@@ -260,20 +268,12 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             infosResult += "    dimension [ " + std::to_string(info.dimension) + " ] \n";
 
             infosResult += "    formVisibility ";
-            switch (info.formVisiblity) {
-                case FormVisibilityType::UNKNOWN:
-                    infosResult += "[ UNKNOWN ] \n";
-                    break;
-                case FormVisibilityType::VISIBLE:
-                    infosResult += "[ VISIBLE ] \n";
-                    break;
-                case FormVisibilityType::INVISIBLE:
-                    infosResult += "[ INVISIBLE ] \n";
-                    break;
-                default:
-                    infosResult += "[ UNKNOWN_TYPE ] \n";
-                    break;
+            std::string visibilityType = "[ UNKNOWN_TYPE ] \n";
+            const auto iter = formVisibilityTypeMap_.find(info.formVisiblity);
+            if (iter != formVisibilityTypeMap_.end()) {
+                visibilityType = iter->second;
             }
+            infosResult += visibilityType;
 
             infosResult += "    FormUsageState ";
             switch (info.formUsageState) {
@@ -290,6 +290,10 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
 
             AppendFormLocation(info.formLocation, infosResult);
             AppendFormStatus(info.formId, infosResult);
+            FormRecord formRecord;
+            if (FormDataMgr::GetInstance().GetFormRecord(info.formId, formRecord)) {
+                AppendFormRefreshControlPoints(infosResult, formRecord.enableForm, info.bundleName, info.formId);
+            }
             AppendBundleType(info.formBundleType, infosResult);
             AppendLiveFormStatus(std::to_string(info.formId), liveFormStatusMap, infosResult);
             infosResult += " \n";
@@ -362,10 +366,11 @@ void FormDumpMgr::AppendFormStatus(const int64_t formId, std::string &formInfo) 
     formInfo += formStatus;
 }
 
-void FormDumpMgr::AppendFormRefreshControlPoints(const FormRecord &formRecordInfo, std::string &formInfo) const
+void FormDumpMgr::AppendFormRefreshControlPoints(
+    std::string &formInfo, const bool enableForm, const std::string &bundleName, const int64_t formId) const
 {
-    formInfo += "    isDigitalBalance ";
-    formInfo += "[" + std::to_string(!formRecordInfo.enableForm) + "]\n";
+    formInfo += "    enableForm ";
+    formInfo += "[" + std::to_string(!enableForm) + "]\n";
 
 #ifdef SUPPORT_POWER
     formInfo += "    screenOff ";
@@ -378,11 +383,11 @@ void FormDumpMgr::AppendFormRefreshControlPoints(const FormRecord &formRecordInf
     formInfo += "[" + std::to_string(systemOverload) + "]\n";
 
     formInfo += "    isInBlockList ";
-    bool isTrust = FormTrustMgr::GetInstance().IsTrust(formRecordInfo.bundleName);
+    bool isTrust = FormTrustMgr::GetInstance().IsTrust(bundleName);
     formInfo += "[" + std::to_string(!isTrust) + "]\n";
 
     formInfo += "    refreshCount ";
-    int32_t timerRefreshedCount = FormTimerMgr::GetInstance().GetRefreshCount(formRecordInfo.formId);
+    int32_t timerRefreshedCount = FormTimerMgr::GetInstance().GetRefreshCount(formId);
     formInfo += "[" + std::to_string(timerRefreshedCount) + "]\n";
 }
 
