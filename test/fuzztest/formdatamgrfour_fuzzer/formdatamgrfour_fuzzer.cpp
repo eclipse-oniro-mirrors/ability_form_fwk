@@ -49,7 +49,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::map<int64_t, bool> foundFormsMap;
     bool flag = fdp->ConsumeBool();
     foundFormsMap.emplace(formId, flag);
-    FormDataMgr::GetInstance().GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    FormDataMgr::GetInstance().GetNoHostInvalidTempForms(userId,
+        callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     FormDataMgr::GetInstance().BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
     FormDataMgr::GetInstance().DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
     FormDataMgr::GetInstance().DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
