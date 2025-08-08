@@ -54,6 +54,10 @@ int FormRefreshAfterUncontrolImpl::RefreshFormRequest(RefreshData &data)
         return ERR_OK;
     }
 
+    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
+        return ERR_OK;
+    }
+
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
     refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
     refreshRecord.isTimerRefresh = isTimerRefresh;

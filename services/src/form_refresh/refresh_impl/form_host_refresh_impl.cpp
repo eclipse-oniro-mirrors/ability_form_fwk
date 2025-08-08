@@ -59,6 +59,10 @@ int FormHostRefreshImpl::RefreshFormRequest(RefreshData &data)
         return ERR_OK;
     }
 
+    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
+        return ERR_OK;
+    }
+
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
     ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, reqWant);
     if (ret != ERR_OK) {

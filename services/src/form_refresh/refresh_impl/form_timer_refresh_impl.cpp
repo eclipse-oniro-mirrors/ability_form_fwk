@@ -86,6 +86,10 @@ int FormTimerRefreshImpl::DealRefresh(const RefreshData &data)
         return ERR_OK;
     }
 
+    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(newData.record, false)) {
+        return ERR_OK;
+    }
+
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(newData.record);
     refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
     refreshRecord.isTimerRefresh = isTimerRefresh;
