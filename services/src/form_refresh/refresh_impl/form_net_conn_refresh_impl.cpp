@@ -63,6 +63,7 @@ int FormNetConnRefreshImpl::RefreshFormRequest(RefreshData &data)
     }
 
     if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
+        FormDataMgr::GetInstance().SetNeedRefresh(data.formId, true);
         return ERR_OK;
     }
 
