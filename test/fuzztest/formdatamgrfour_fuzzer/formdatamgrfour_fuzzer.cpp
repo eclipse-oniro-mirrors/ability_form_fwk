@@ -32,6 +32,9 @@ namespace OHOS {
 constexpr size_t U32_AT_SIZE = 4;
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
+    if (fdp == nullptr) {
+        return true;
+    }
     int32_t userId = fdp->ConsumeIntegral<int32_t>();
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
     std::vector<int64_t> removedFormIds;
