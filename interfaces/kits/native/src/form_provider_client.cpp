@@ -174,7 +174,7 @@ int FormProviderClient::NotifyFormUpdate(
             break;
         }
 
-        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s, formId:%{public}" PRId64, ownerAbility->GetAbilityName().c_str(), formId);
         ownerAbility->OnUpdate(formId, want.GetParams());
     } while (false);
 

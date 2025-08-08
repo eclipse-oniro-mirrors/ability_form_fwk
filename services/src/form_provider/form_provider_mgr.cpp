@@ -41,6 +41,7 @@
 #include "form_mgr/form_mgr_queue.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "common/util/form_task_common.h"
+#include "common/event/form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -338,11 +339,12 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRe
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(connectWant, formRefreshConnection,
         record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
-        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
-            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
-        }
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+        errorCode = (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) ?
+            ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED : ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+        HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
+        FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
+            record.bundleName, "", static_cast<int32_t>(ConnectFormAbilityErrorType::UPDATE_FORM_FAILED), errorCode);
+        return errorCode;
     }
 
     if (record.isCountTimerRefresh) {

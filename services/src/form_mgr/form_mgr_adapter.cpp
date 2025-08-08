@@ -916,7 +916,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("call");
+    HILOG_INFO("call, formIds size:%{public}zu", formIds.size());
     if (callerToken == nullptr) {
         HILOG_ERROR("null callerToken");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1048,7 +1048,7 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
     std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("start, formVisibleType:%{public}d", formVisibleType);
     FilterDataByVisibleType(formInstanceMaps, eventMaps, formVisibleType);
     for (auto formObserver : formObservers_) {
         NotifyWhetherFormsVisible(formObserver.first, formObserver.second, formInstanceMaps, formVisibleType);
@@ -1905,7 +1905,9 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         want, formAcquireConnection, record.providerUserId);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     if (errorCode != ERR_OK && errorCode != ERR_ECOLOGICAL_CONTROL_STATUS) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
+        FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
+            record.bundleName, "", static_cast<int32_t>(ConnectFormAbilityErrorType::ACQUIRE_FORM_FAILED), errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -4303,7 +4305,7 @@ void FormMgrAdapter::PostVisibleNotify(const std::vector<int64_t> &formIds,
     const int32_t formVisibleType, int32_t visibleNotifyDelay,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_INFO("call, formIds size:%{public}zu", formIds.size());
 
     auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken]() {
         FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
@@ -4312,6 +4314,7 @@ void FormMgrAdapter::PostVisibleNotify(const std::vector<int64_t> &formIds,
 
     bool ret = FormMgrQueue::GetInstance().ScheduleTask(visibleNotifyDelay, task);
     if (!ret) {
+        HILOG_WARN("post visible notify task failed, exec now");
         FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
             formInstanceMaps, eventMaps, formVisibleType, callerToken);
     }
