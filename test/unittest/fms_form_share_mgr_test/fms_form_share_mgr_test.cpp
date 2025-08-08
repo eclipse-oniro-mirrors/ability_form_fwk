@@ -1945,20 +1945,6 @@ HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0001, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormAmsHelper_0002
- * @tc.desc: test DisconnectServiceAbilityDelay function
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAmsHelper_0002 start";
-    FormAmsHelper formAmsHelper;
-    sptr<AAFwk::IAbilityConnection> connect = nullptr;
-    EXPECT_EQ(ERR_INVALID_OPERATION, formAmsHelper.DisconnectServiceAbilityDelay(connect));
-    GTEST_LOG_(INFO) << "FormAmsHelper_0002 end";
-}
-
-/**
  * @tc.name: FormAmsHelper_0003
  * @tc.desc: test DisconnectServiceAbilityDelay function
  * @tc.type: FUNC

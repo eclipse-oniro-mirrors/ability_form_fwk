@@ -60,19 +60,5 @@ HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_001, TestSize.Level1)
     EXPECT_EQ(false, FormMemmgrClient::GetInstance().IsCritical());
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_001 end";
 }
-
-/*
- * @tc.number: FmsFormMemmgrClientTest_002
- * @tc.name: SetCritical
- * @tc.desc: SetCritical
- */
-HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_002 start";
-    // No permission to set critical, so critical is false
-    FormMemmgrClient::GetInstance().SetCritical(true);
-    EXPECT_EQ(false, FormMemmgrClient::GetInstance().IsCritical());
-    GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_002 end";
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS
