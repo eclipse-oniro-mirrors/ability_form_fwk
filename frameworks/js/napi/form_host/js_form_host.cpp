@@ -2287,8 +2287,8 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
     HILOG_INFO("call");
     std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
     dataParam->formId = std::to_string(formId);
-    dataParam->formIdoverflowInfo = overflowInfo;
-    dataParam->formIdisOverflow = isOverflow;
+    dataParam->overflowInfo = overflowInfo;
+    dataParam->isOverflow = isOverflow;
     std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
     std::function<void()> executeFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
         JsFormRouterProxyMgr::GetInstance()->RequestOverflowInner(dataParam);

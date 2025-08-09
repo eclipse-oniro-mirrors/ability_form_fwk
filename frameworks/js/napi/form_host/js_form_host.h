@@ -139,7 +139,7 @@ private:
  
     ~PromiseCallbackInfo();
  
-    std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam_ = nullptr;
+    std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam_;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS
