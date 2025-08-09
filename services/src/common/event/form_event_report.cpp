@@ -105,6 +105,8 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(
         FormEventName::RECYCLE_RECOVER_FORM_FAILED, "RECYCLE_RECOVER_FORM_FAILED"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_PUBLIC_FORM, "REQUEST_PUBLIC_FORM"),
+    std::map<FormEventName, std::string>::value_type(
+        FormEventName::CONNECT_FORM_ABILITY_FAILED, "CONNECT_FORM_ABILITY_FAILED"),
 };
 }
 
