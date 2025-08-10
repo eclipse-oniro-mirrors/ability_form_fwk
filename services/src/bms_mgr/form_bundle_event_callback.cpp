@@ -76,7 +76,8 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
             // Ensure clear forbidden form db when bundle uninstall
             // Health contol will set again when reinstall
             FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
-            FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleName, false);
+            DistributedModule distributedModule;
+            FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleName, false, distributedModule);
         };
         FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {

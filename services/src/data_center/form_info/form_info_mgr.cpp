@@ -95,7 +95,11 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
         }
         HapModuleInfo sharedModule;
         bool hasDistributedForm = LoadSharedModuleInfo(bundleInfo, sharedModule);
-        FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleInfo.name, hasDistributedForm);
+        DistributedModule distributedModule;
+        distributedModule.entryModule = bundleInfo.entryModuleName;
+        distributedModule.uiModule = sharedModule.moduleName;
+        FormDistributedMgr::GetInstance().SetBundleDistributedStatus(
+            bundleInfo.name, hasDistributedForm, distributedModule);
         std::vector<std::string> profileInfos {};
         if  (hasDistributedForm) {
             if (!client->GetProfileFromSharedHap(sharedModule, extensionInfo, profileInfos)) {
@@ -121,7 +125,6 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 }
                 if (hasDistributedForm) {
                     formInfo.package = extensionInfo.bundleName + sharedModule.moduleName;
-                    formInfo.moduleName = sharedModule.moduleName;
                 }
                 formInfo.versionCode = bundleInfo.versionCode;
                 formInfo.bundleType = bundleInfo.applicationInfo.bundleType;

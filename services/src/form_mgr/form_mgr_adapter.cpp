@@ -2093,6 +2093,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
         }
     }
     itemInfo.SetDistributedForm(FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name));
+    itemInfo.SetUiModuleName(FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name));
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
 }

@@ -97,6 +97,7 @@ public:
     bool isExistRecycleTask = false;
     bool isDataProxyUpdate = false;
     bool isDistributedForm = false;
+    std::string uiModule = "";
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

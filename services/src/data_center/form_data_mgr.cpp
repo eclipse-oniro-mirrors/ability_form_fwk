@@ -199,7 +199,10 @@ static void initFormRecord(FormRecord &newRecord, const FormItemInfo &formInfo)
     newRecord.isEnableUpdate = formInfo.IsEnableUpdateFlag();
     newRecord.formTempFlag = formInfo.IsTemporaryForm();
     newRecord.formVisibleNotify = formInfo.IsFormVisibleNotify();
-    newRecord.jsFormCodePath = formInfo.GetHapSourceByModuleName(newRecord.moduleName);
+    newRecord.isDistributedForm = formInfo.IsDistributedForm();
+    newRecord.uiModule = formInfo.GetUiModuleName();
+    newRecord.jsFormCodePath =
+        formInfo.GetHapSourceByModuleName(newRecord.isDistributedForm ? newRecord.uiModule : newRecord.moduleName);
     newRecord.formSrc = formInfo.GetFormSrc();
     newRecord.formWindow = formInfo.GetFormWindow();
     newRecord.versionName = formInfo.GetVersionName();
@@ -248,7 +251,6 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     newRecord.isDataProxyIgnoreFormVisible = formInfo.GetDataProxyIgnoreFormVisibility();
-    newRecord.isDistributedForm = formInfo.IsDistributedForm();
     HILOG_DEBUG("end");
     return newRecord;
 }
@@ -264,7 +266,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.bundleName = record.bundleName;
     formInfo.abilityName = record.abilityName;
     formInfo.formName = record.formName;
-    formInfo.moduleName = record.moduleName;
+    formInfo.moduleName = record.isDistributedForm ? record.uiModule : record.moduleName;
     formInfo.formTempFlag = record.formTempFlag;
     formInfo.jsFormCodePath = record.jsFormCodePath;
     formInfo.formSrc = record.formSrc;
