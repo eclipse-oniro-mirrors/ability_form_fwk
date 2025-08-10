@@ -212,6 +212,7 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormHostRefreshImpl_009, TestS
     MockIsScreenOff(true);
     EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
+    data.record.isVisible = true;
     MockIsScreenOff(false);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
@@ -244,6 +245,7 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormNetConnRefreshImpl_010, Te
     MockIsScreenOff(true);
     EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
 
+    data.record.isVisible = true;
     MockIsScreenOff(false);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
@@ -302,6 +304,7 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormRefreshAfterUncontrolImpl_
     MockIsScreenOff(true);
     EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
 
+    data.record.isVisible = true;
     MockIsScreenOff(false);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
@@ -389,6 +392,7 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormAppUpgradeRefreshImpl_015,
     EXPECT_EQ(ERR_OK, FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     data.record.enableForm = true;
+    data.record.isVisible = true;
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data));
 
