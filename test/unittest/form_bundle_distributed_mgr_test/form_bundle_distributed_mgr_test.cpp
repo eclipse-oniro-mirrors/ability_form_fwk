@@ -50,10 +50,11 @@ HWTEST_F(FormBundleDistributedMgrTest, bundleDistributedMgr_001, TestSize.Level1
  */
 HWTEST_F(FormBundleDistributedMgrTest, bundleDistributedMgr_002, TestSize.Level1)
 {
-    bundleDistributedMgr_.SetBundleDistributedStatus("", true);
-    bundleDistributedMgr_.SetBundleDistributedStatus(BUNDLE_NAME, true);
+    DistributedModule distributedModule;
+    bundleDistributedMgr_.SetBundleDistributedStatus("", true, distributedModule);
+    bundleDistributedMgr_.SetBundleDistributedStatus(BUNDLE_NAME, true, distributedModule);
     EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME), true);
-    bundleDistributedMgr_.SetBundleDistributedStatus(BUNDLE_NAME, false);
+    bundleDistributedMgr_.SetBundleDistributedStatus(BUNDLE_NAME, false, distributedModule);
     EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME), false);
 }
 } // namespace

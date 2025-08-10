@@ -505,6 +505,16 @@ public:
      * @param isDistributed True for distributed, false for not distributed.
      */
     void SetDistributedForm(bool isDistributed);
+    /**
+     * @brief Set ui moduleName.
+     * @param uiModule distributed moduleName.
+     */
+    void SetUiModuleName(const std::string &uiModule);
+    /**
+     * @brief Get distributed ui moduleName.
+     * @return Ui moduleName.
+     */
+    std::string GetUiModuleName() const;
 
 private:
     /**
@@ -561,6 +571,7 @@ private:
     std::vector<int32_t> conditionUpdate_;
     bool isDataProxyIgnoreFormVisibility_ = false;
     bool isDistributedForm_ = false;
+    std::string uiModule_ = "";
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -20,11 +20,17 @@
 #include <shared_mutex>
 #include <singleton.h>
 #include <string>
+#include "nlohmann/json.hpp"
 
 #include "data_center/database/form_rdb_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+struct DistributedModule {
+    std::string entryModule{""};
+    std::string uiModule{""};
+};
+
 /**
  * @class FormDistributedMgr
  * Form distributed manager.
@@ -33,6 +39,11 @@ class FormDistributedMgr final : public DelayedRefSingleton<FormDistributedMgr> 
     DECLARE_DELAYED_REF_SINGLETON(FormDistributedMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormDistributedMgr);
+
+    /**
+     * @brief pre-processing when fms start.
+     */
+    void Start();
 
     /**
      * @brief Init form bundle distributed mgr.
@@ -52,7 +63,15 @@ public:
      * @param bundleName Bundle name to be set.
      * @param isDistributed True for distributed, false for not distributed.
      */
-    void SetBundleDistributedStatus(const std::string &bundleName, bool isDistributed);
+    void SetBundleDistributedStatus(
+        const std::string &bundleName, bool isDistributed, const DistributedModule &distributedModule);
+
+    /**
+     * @brief Get distributed app ui moduleName.
+     * @param bundleName Bundle name.
+     * @return ui moduleName.
+     */
+    std::string GetUiModuleName(const std::string &bundleName);
 
 private:
     /**
@@ -61,10 +80,21 @@ private:
      */
     bool IsBundleDistributedInit();
 
+    /**
+     * @brief delete useless distributed table.
+     */
+    void DeleteUnuseTableAfterReboot();
+
+    std::string ToString(const DistributedModule &distributedModule);
+
+    bool TransJsonToObj(const nlohmann::json &jsonObject, DistributedModule &distributedModule);
+
+    void SaveEntries(const std::unordered_map<std::string, std::string> &value);
+
 private:
     bool isInitialized_ = false;
-    std::set<std::string> formBundleDistributedSet_;
-    mutable std::shared_mutex bundleDistributedSetMutex_;
+    std::unordered_map<std::string, DistributedModule> distributedBundleMap_;
+    mutable std::shared_mutex bundleDistributedMapMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -58,7 +58,8 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
                 {Constants::MODULE_HAP_PATH_KEY, hapPath}
             };
             formRecord.modulePkgNameMap.emplace(std::make_pair(moduleName, moduleInfos.dump()));
-            if (moduleName == formRecord.moduleName) {
+            if ((formRecord.isDistributedForm && moduleName == formRecord.uiModule) ||
+                (!formRecord.isDistributedForm && moduleName == formRecord.moduleName)) {
                 formRecord.jsFormCodePath = hapPath;
             }
         }
@@ -256,10 +257,10 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         bundleInfo.name.c_str(), IsBundleDistributed, formId);
     if (formRecord.isDistributedForm != IsBundleDistributed) {
         // The format of the installation package has changed.
-        formRecord.moduleName = targetForms.front().moduleName;
         if (!IsBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
             // whole package install finished
             formRecord.isDistributedForm = IsBundleDistributed;
+            formRecord.uiModule = FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name);
         }
     }
 
