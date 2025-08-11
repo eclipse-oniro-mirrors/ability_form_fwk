@@ -696,7 +696,7 @@ void FormItemInfo::SetUiModuleName(const std::string &uiModule)
     uiModule_ = uiModule;
 }
 
-std::string FormItemInfo::GetUiModuleName() const
+const std::string& FormItemInfo::GetUiModuleName() const
 {
     return uiModule_;
 }

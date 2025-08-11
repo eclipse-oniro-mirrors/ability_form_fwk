@@ -43,7 +43,7 @@ public:
     bool isCountTimerRefresh = false;
     std::string packageName = "";
     std::string bundleName = "";
-    std::string moduleName = "";
+    std::string moduleName = ""; // ExtensionAbility module name
     std::string abilityName = "";
     std::string formName = "";
     int32_t specification;
@@ -97,7 +97,7 @@ public:
     bool isExistRecycleTask = false;
     bool isDataProxyUpdate = false;
     bool isDistributedForm = false;
-    std::string uiModule = "";
+    std::string uiModule = ""; // widget module name
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

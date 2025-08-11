@@ -70,18 +70,19 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
         // Check if current bundle contains FA forms.
         LoadAbilityFormConfigInfo(bundleInfo, formInfos);
         // Check if current bundle contains Stage forms.
-        LoadStageFormConfigInfo(bundleInfo, formInfos);
+        LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
         return ERR_OK;
     }
     if (bundleInfo.abilityInfos[0].isStageBasedModel) {
-        LoadStageFormConfigInfo(bundleInfo, formInfos);
+        LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
     } else {
         LoadAbilityFormConfigInfo(bundleInfo, formInfos);
     }
     return ERR_OK;
 }
 
-ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos)
+ErrCode FormInfoHelper::LoadStageFormConfigInfo(
+    const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos, int32_t userId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::shared_ptr<BundleMgrClient> client = DelayedSingleton<BundleMgrClient>::GetInstance();
@@ -96,6 +97,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
         HapModuleInfo sharedModule;
         bool hasDistributedForm = LoadSharedModuleInfo(bundleInfo, sharedModule);
         DistributedModule distributedModule;
+        distributedModule.userId = userId;
         distributedModule.entryModule = bundleInfo.entryModuleName;
         distributedModule.uiModule = sharedModule.moduleName;
         FormDistributedMgr::GetInstance().SetBundleDistributedStatus(
@@ -268,7 +270,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
         return UpdateFormInfoStorageLocked();
     }
 
-    bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_);
+    bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, userId);
     HILOG_INFO("The new package of %{public}s does not contain a card, IsBundleDistributed:%{public}d.",
         bundleName_.c_str(), IsBundleDistributed);
     if (IsBundleDistributed) {

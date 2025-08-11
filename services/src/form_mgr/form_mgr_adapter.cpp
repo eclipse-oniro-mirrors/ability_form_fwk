@@ -2092,8 +2092,9 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
             }
         }
     }
-    itemInfo.SetDistributedForm(FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name));
-    itemInfo.SetUiModuleName(FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name));
+    int32_t userId = GetCallingUserId();
+    itemInfo.SetDistributedForm(FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, userId));
+    itemInfo.SetUiModuleName(FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, userId));
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
 }

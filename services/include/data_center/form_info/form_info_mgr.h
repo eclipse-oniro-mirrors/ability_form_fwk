@@ -39,7 +39,8 @@ public:
 private:
     static ErrCode LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos);
 
-    static ErrCode LoadStageFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos);
+    static ErrCode LoadStageFormConfigInfo(
+        const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     static std::shared_ptr<Global::Resource::ResourceManager> GetResourceManager(const BundleInfo &bundleInfo);
 

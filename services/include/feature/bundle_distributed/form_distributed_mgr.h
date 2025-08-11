@@ -27,8 +27,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 struct DistributedModule {
-    std::string entryModule{""};
-    std::string uiModule{""};
+    int32_t userId = -1;
+    std::string entryModule;
+    std::string uiModule;
+    std::string extraValue;
 };
 
 /**
@@ -54,14 +56,16 @@ public:
     /**
      * @brief Get whether bundle is distributed.
      * @param bundleName Bundle name to be check.
+     * @param userId calling userId to be check.
      * @return True for distributed, false for not distributed.
      */
-    bool IsBundleDistributed(const std::string &bundleName);
+    bool IsBundleDistributed(const std::string &bundleName, int32_t userId);
 
     /**
      * @brief Set whether bundle is distributed.
      * @param bundleName Bundle name to be set.
      * @param isDistributed True for distributed, false for not distributed.
+     * @param distributedModule distributed data.
      */
     void SetBundleDistributedStatus(
         const std::string &bundleName, bool isDistributed, const DistributedModule &distributedModule);
@@ -69,9 +73,10 @@ public:
     /**
      * @brief Get distributed app ui moduleName.
      * @param bundleName Bundle name.
+     * @param userId calling userId.
      * @return ui moduleName.
      */
-    std::string GetUiModuleName(const std::string &bundleName);
+    std::string GetUiModuleName(const std::string &bundleName, int32_t userId);
 
 private:
     /**
@@ -80,16 +85,13 @@ private:
      */
     bool IsBundleDistributedInit();
 
-    /**
-     * @brief delete useless distributed table.
-     */
-    void DeleteUnuseTableAfterReboot();
+    void AlterTableAddColumn();
 
-    std::string ToString(const DistributedModule &distributedModule);
+    void LoadDataFromDb();
 
-    bool TransJsonToObj(const nlohmann::json &jsonObject, DistributedModule &distributedModule);
+    void SaveDataToDb(const std::string &bundleName, const DistributedModule &distributedModule);
 
-    void SaveEntries(const std::unordered_map<std::string, std::string> &value);
+    void DeleteDataInDb(const std::string &bundleName, int32_t userId);
 
 private:
     bool isInitialized_ = false;

@@ -77,6 +77,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
             // Health contol will set again when reinstall
             FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
             DistributedModule distributedModule;
+            distributedModule.userId = userId;
             FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleName, false, distributedModule);
         };
         FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);

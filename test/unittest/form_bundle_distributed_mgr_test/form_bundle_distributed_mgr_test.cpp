@@ -39,8 +39,8 @@ void FormBundleDistributedMgrTest::TearDown() {}
  */
 HWTEST_F(FormBundleDistributedMgrTest, bundleDistributedMgr_001, TestSize.Level1)
 {
-    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(""), false);
-    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME), false);
+    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed("", 0), false);
+    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME, 0), false);
 }
 
 /**
@@ -52,9 +52,10 @@ HWTEST_F(FormBundleDistributedMgrTest, bundleDistributedMgr_002, TestSize.Level1
 {
     DistributedModule distributedModule;
     bundleDistributedMgr_.SetBundleDistributedStatus("", true, distributedModule);
+    distributedModule.userId = 100;
     bundleDistributedMgr_.SetBundleDistributedStatus(BUNDLE_NAME, true, distributedModule);
-    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME), true);
+    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME, 100), true);
     bundleDistributedMgr_.SetBundleDistributedStatus(BUNDLE_NAME, false, distributedModule);
-    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME), false);
+    EXPECT_EQ(bundleDistributedMgr_.IsBundleDistributed(BUNDLE_NAME, 100), false);
 }
 } // namespace
