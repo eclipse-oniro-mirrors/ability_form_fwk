@@ -213,6 +213,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
     std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
     want.SetParam(Constants::FORM_SUPPLY_UID, recordUid);
+    want.SetParam(Constants::FORM_LOCATION_KEY, static_cast<int32_t>(formRecord.formLocation));
     return GetConnectionAndRenderForm(formRecord, want);
 }
 

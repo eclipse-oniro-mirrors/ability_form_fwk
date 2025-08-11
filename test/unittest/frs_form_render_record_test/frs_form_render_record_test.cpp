@@ -2291,7 +2291,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_119, TestSize.Level1)
 
     auto formRequestMap = formRequestIter->second;
     EXPECT_EQ(formRequestMap.find(compId) != formRequestMap.end(), true);
-    
+
     auto formRequest = formRequestMap.find(compId)->second;
     EXPECT_EQ(formRequest.formJsInfo.formData, formJsInfo.formProviderData.GetDataString());
     GTEST_LOG_(INFO) << "FormRenderRecordTest_119 end";
@@ -2845,4 +2845,43 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_152, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_152 start";
     formRenderRecordPtr_->OnJsError(nullptr);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_152 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_153
+ * @tc.desc: Verify RuntimeMemoryMonitor
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_153, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_153 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->RuntimeMemoryMonitor();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_153 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_154
+ * @tc.desc: Verify AddWatchDogThreadMonitor
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_154, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_154 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->AddWatchDogThreadMonitor();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_154 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_155
+ * @tc.desc: Verify RemoveWatchDogThreadMonitor
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_155, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_155 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->RemoveWatchDogThreadMonitor();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_155 end";
 }

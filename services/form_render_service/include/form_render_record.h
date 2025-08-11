@@ -62,6 +62,11 @@ private:
     std::string dumpInfo_;
 };
 
+struct FormLocationInfo {
+    std::string formName;
+    uint32_t formLocation;
+};
+
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
     /**
@@ -196,6 +201,8 @@ private:
 
     void AddWatchDogThreadMonitor();
 
+    void RemoveWatchDogThreadMonitor();
+
     void OnRenderingBlock(const std::string &bundleName);
 
     void OnNotifyRefreshForm(const int64_t &formId);
@@ -303,6 +310,11 @@ private:
 
     void RecordFormVisibility(int64_t formId, bool isVisible);
 
+    void RecordFormLocation(int64_t formId, const FormLocationInfo &formLocation);
+    void DeleteFormLocation(int64_t formId);
+    void ParseFormLocationMap(std::vector<std::string> &formName, std::vector<uint32_t> &formLocation);
+    void RuntimeMemoryMonitor();
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 
@@ -342,6 +354,8 @@ private:
     std::atomic<int> renderFormTasksNum = 0;
     std::mutex visibilityMapMutex_;
     std::unordered_map<int64_t, bool> visibilityMap_;
+    std::mutex formLocationMutex_;
+    std::unordered_map<int64_t, FormLocationInfo> formLocationMap_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
