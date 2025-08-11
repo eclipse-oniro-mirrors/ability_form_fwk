@@ -407,10 +407,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
 
         std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
         auto task = [thisWeakPtr, formJsInfo, want, formSupplyClient, renderType]() {
-            HILOG_INFO("HandleUpdateInJsThread begin");
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
-                HILOG_ERROR("null renderRecord");
+                HILOG_ERROR("null renderRecord, formId:%{public}" PRId64, formJsInfo.formId);
                 return;
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
@@ -751,7 +750,6 @@ bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
     } else {
         UpdateRuntime(formJsInfo);
     }
-    HILOG_INFO("BeforeHandleUpdateForm end");
     return true;
 }
 
@@ -1174,7 +1172,7 @@ void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsI
             }
 
             UpdateFormRequest(form, formRequest.second.want);
-            
+
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
             auto task = [thisWeakPtr, form, want = formRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
@@ -1982,18 +1980,18 @@ std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const 
 bool FormRenderRecord::IsAllFormsInvisible()
 {
     std::lock_guard<std::mutex> lock(visibilityMapMutex_);
-    for (const auto &iter : visibilityMap_) {
-        if (iter.second) {
-            return false;
-        }
-    }
-    return true;
+    return visibilityMap_.empty();
 }
 
 void FormRenderRecord::RecordFormVisibility(int64_t formId, bool isVisible)
 {
+    HILOG_INFO("call formId: %{public}ld, isVisible: %{public}d", formId, isVisible);
     std::lock_guard<std::mutex> lock(visibilityMapMutex_);
-    visibilityMap_[formId] = isVisible;
+    if (isVisible) {
+        visibilityMap_[formId] = isVisible;
+    } else {
+        visibilityMap_.erase(formId);
+    }
 }
 
 } // namespace FormRender
