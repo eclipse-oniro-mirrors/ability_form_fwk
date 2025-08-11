@@ -255,13 +255,13 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
 
     bool isBundleDistributed =
         FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, formRecord.providerUserId);
-    HILOG_INFO("bundleName: %{public}s, IsBundleDistributed: %{public}d, formId:%{public}" PRId64,
-        bundleInfo.name.c_str(), IsBundleDistributed, formId);
-    if (formRecord.isDistributedForm != IsBundleDistributed) {
+    HILOG_INFO("bundleName: %{public}s, isBundleDistributed: %{public}d, formId:%{public}" PRId64,
+        bundleInfo.name.c_str(), isBundleDistributed, formId);
+    if (formRecord.isDistributedForm != isBundleDistributed) {
         // The format of the installation package has changed.
-        if (!IsBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
+        if (!isBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
             // whole package install finished
-            formRecord.isDistributedForm = IsBundleDistributed;
+            formRecord.isDistributedForm = isBundleDistributed;
             formRecord.uiModule =
                 FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, formRecord.providerUserId);
             HILOG_INFO("form pack format change, uiModule:%{public}s", formRecord.uiModule.c_str());
