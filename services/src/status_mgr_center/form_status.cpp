@@ -15,6 +15,7 @@
 
 #include "status_mgr_center/form_status.h"
 #include "fms_log_wrapper.h"
+#include "form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -83,6 +84,9 @@ bool FormStatus::IsFormProcessRecycle(const int64_t formId)
         HILOG_DEBUG("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
         return false;
     }
+    HILOG_INFO("formId:%{public}" PRId64 ", curStatus:%{public}s",
+        formId,
+        FormStatusPrint::FormStatusToString(iter->second).c_str());
 
     return iter->second == FormFsmStatus::RECYCLED || iter->second == FormFsmStatus::RECYCLING_DATA ||
            iter->second == FormFsmStatus::RECYCLING;

@@ -343,7 +343,10 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
 void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_ERROR("Receive error form FMS, errorCode:%{public}d, errorMsg:%{public}s", errorCode, errorMsg.c_str());
+    HILOG_ERROR("Receive error form FMS, errorCode:%{public}d, errorMsg:%{public}s, etsFormIds_ size:%{public}zu",
+        errorCode,
+        errorMsg.c_str(),
+        etsFormIds_.size());
     std::lock_guard<std::mutex> lock(callbackMutex_);
     for (auto formIdIter = etsFormIds_.begin(); formIdIter != etsFormIds_.end();) {
         int64_t formId = *formIdIter;
@@ -356,7 +359,7 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
         ++formIdIter;
 
         const std::set<std::shared_ptr<FormCallbackInterface>> &callbackSet = callbackMapIter->second;
-        HILOG_DEBUG("callbackSet.size:%{public}zu", callbackSet.size());
+        HILOG_INFO("callbackSet.size:%{public}zu", callbackSet.size());
         for (const auto &callback : callbackSet) {
             if (callback == nullptr) {
                 HILOG_ERROR("null FormCallback");
