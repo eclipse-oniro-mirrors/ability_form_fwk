@@ -1985,7 +1985,7 @@ bool FormRenderRecord::IsAllFormsInvisible()
 
 void FormRenderRecord::RecordFormVisibility(int64_t formId, bool isVisible)
 {
-    HILOG_INFO("call formId: %{public}ld, isVisible: %{public}d", formId, isVisible);
+    HILOG_INFO("call formId: %{public}" PRId64 ", isVisible: %{public}d", formId, isVisible);
     std::lock_guard<std::mutex> lock(visibilityMapMutex_);
     if (isVisible) {
         visibilityMap_[formId] = isVisible;
