@@ -16,6 +16,7 @@
 #include "status_mgr_center/form_status_table.h"
 #include <unordered_map>
 #include "fms_log_wrapper.h"
+#include "form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -438,14 +439,11 @@ FormStatusTable::~FormStatusTable()
 
 bool FormStatusTable::GetFormStatusInfo(FormFsmStatus curStatus, FormFsmEvent event, FormStatusMachineInfo &info)
 {
-    HILOG_INFO(
-        "status is %{public}d, event is %{public}d.", static_cast<int32_t>(curStatus), static_cast<int32_t>(event));
-
     auto iter = FORM_STATUS_TABLE.find(curStatus);
     if (iter == FORM_STATUS_TABLE.end()) {
-        HILOG_ERROR("form status error, curStatus is %{public}d, event is %{public}d.",
-            static_cast<int32_t>(curStatus),
-            static_cast<int32_t>(event));
+        HILOG_ERROR("form status error, curStatus is %{public}s, event is %{public}s.",
+            FormStatusPrint::FormStatusToString(curStatus).c_str(),
+            FormStatusPrint::FormEventToString(event).c_str());
         return false;
     }
 
@@ -457,9 +455,9 @@ bool FormStatusTable::GetFormStatusInfo(FormFsmStatus curStatus, FormFsmEvent ev
         }
     }
 
-    HILOG_ERROR("form status error, curStatus is %{public}d, event is %{public}d.",
-        static_cast<int32_t>(curStatus),
-        static_cast<int32_t>(event));
+    HILOG_ERROR("form status error, curStatus is %{public}s, event is %{public}s.",
+        FormStatusPrint::FormStatusToString(curStatus).c_str(),
+        FormStatusPrint::FormEventToString(event).c_str());
     return false;
 }
 }  // namespace AppExecFwk

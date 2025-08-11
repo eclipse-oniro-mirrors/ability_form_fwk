@@ -21,6 +21,7 @@
 #include "data_center/form_data_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "fms_log_wrapper.h"
+#include "form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -64,9 +65,9 @@ void FormStatusMgr::ExecFormTaskTimeout(
     }
 
     auto timeoutTask = [formId, event, status, eventId]() {
-        HILOG_ERROR("excute timeout, event:%{public}d, status:%{public}d, formId:%{public}" PRId64,
-            static_cast<int32_t>(event),
-            static_cast<int32_t>(status),
+        HILOG_ERROR("excute timeout, event:%{public}s, status:%{public}s, formId:%{public}" PRId64,
+            FormStatusPrint::FormEventToString(event).c_str(),
+            FormStatusPrint::FormStatusToString(status).c_str(),
             formId);
         FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, FormFsmEvent::EXECUTION_TIMEOUT);
         FormEventTimeoutQueue::GetInstance().CancelDelayTask(std::make_pair(formId, eventId));
@@ -91,11 +92,12 @@ bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEve
     }
 
     HILOG_INFO("state transition, formId:%{public}" PRId64
-        ", status is %{public}d, event is %{public}d, nextStatus is %{public}d.",
+        ", status is %{public}s, event is %{public}s, nextStatus is %{public}s, processType is %{public}d.",
         formId,
-        static_cast<int32_t>(status),
-        static_cast<int32_t>(event),
-        static_cast<int32_t>(info.nextStatus));
+        FormStatusPrint::FormStatusToString(status).c_str(),
+        FormStatusPrint::FormEventToString(event).c_str(),
+        FormStatusPrint::FormStatusToString(info.nextStatus).c_str(),
+        static_cast<int32_t>(info.processType));
 
     // state machine switches to the next state.
     FormStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
@@ -111,7 +113,6 @@ bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEve
 void FormStatusMgr::ExecFormTask(
     FormFsmProcessType processType, const int64_t formId, const FormFsmEvent event, std::function<void()> func)
 {
-    HILOG_INFO("processType is %{public}d.", static_cast<int32_t>(processType));
     switch (processType) {
         case FormFsmProcessType::PROCESS_TASK_DIRECT:
             ProcessTaskDirect(formId, event, func);
@@ -166,7 +167,8 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
             HILOG_INFO("formEventQueue is empty.");
             break;
         }
-        if (eventTaskInfo.getFormEvent() == FormFsmEvent::RENDER_FORM) {
+        if (eventTaskInfo.getFormEvent() == FormFsmEvent::RENDER_FORM ||
+            eventTaskInfo.getFormEvent() == FormFsmEvent::DELETE_FORM) {
             temptaskInfoQueue.push(eventTaskInfo);
         }
     }

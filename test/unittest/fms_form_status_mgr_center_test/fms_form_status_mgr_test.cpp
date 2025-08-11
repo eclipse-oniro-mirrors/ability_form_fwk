@@ -24,6 +24,7 @@
 #include "status_mgr_center/form_status.h"
 #undef private
 #include "fms_log_wrapper.h"
+#include "form_status_print.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -260,5 +261,35 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_ExecStatusMachineTask, TestSize.Le
     EXPECT_EQ(result, true);
 
     GTEST_LOG_(INFO) << "FormStatusMgrTest_ExecStatusMachineTask end";
+}
+
+/**
+ * @tc.name: FormStatusMgrTest_FormStatusToString
+ * @tc.desc: Verify FormStatusToString
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_FormStatusToString, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_FormStatusToString start";
+ 
+    std::string status = FormStatusPrint::FormStatusToString(FormFsmStatus::INIT).c_str();
+    EXPECT_EQ(status, "[INIT]");
+ 
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_FormStatusToString end";
+}
+ 
+/**
+ * @tc.name: FormStatusMgrTest_FormEventToString
+ * @tc.desc: Verify FormEventToString
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_FormEventToString, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_FormEventToString start";
+ 
+    std::string event = FormStatusPrint::FormEventToString(FormFsmEvent::RENDER_FORM).c_str();
+    EXPECT_EQ(event, "[RENDER_FORM]");
+ 
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_FormEventToString end";
 }
 }  // namespace

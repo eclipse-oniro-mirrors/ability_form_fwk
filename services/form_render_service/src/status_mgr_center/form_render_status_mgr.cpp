@@ -18,6 +18,7 @@
 #include "status_mgr_center/form_render_status_table.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
+#include "form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -46,11 +47,11 @@ int32_t FormRenderStatusMgr::PostFormEvent(
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
-    HILOG_INFO("formId:%{public}" PRId64 ", status is %{public}d, event is %{public}d, nextStatus is %{public}d.",
+    HILOG_INFO("formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s, nextStatus is %{public}s.",
         formId,
-        static_cast<int32_t>(status),
-        static_cast<int32_t>(event),
-        static_cast<int32_t>(info.nextStatus));
+        FormStatusPrint::FormStatusToString(status).c_str(),
+        FormStatusPrint::FormEventToString(event).c_str(),
+        FormStatusPrint::FormStatusToString(info.nextStatus).c_str());
 
     // state machine switches to the next state.
     FormRenderStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
@@ -62,7 +63,6 @@ int32_t FormRenderStatusMgr::PostFormEvent(
 int32_t FormRenderStatusMgr::ExecFormTask(FormFsmProcessType processType, const int64_t formId,
     const FormFsmEvent event, const FormFsmStatus status, std::function<int32_t()> func)
 {
-    HILOG_INFO("processType is %{public}d.", static_cast<int32_t>(processType));
     switch (processType) {
         case FormFsmProcessType::PROCESS_TASK_DIRECT:
             return ProcessTaskDirect(func);
@@ -117,10 +117,10 @@ int32_t FormRenderStatusMgr::ProcessTaskDelete(const int64_t formId)
 
 int32_t FormRenderStatusMgr::PrintTaskInfo(const int64_t formId, const FormFsmEvent event, const FormFsmStatus status)
 {
-    HILOG_ERROR("formId:%{public}" PRId64 ", status is %{public}d, event is %{public}d.",
+    HILOG_ERROR("formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s.",
         formId,
-        static_cast<int32_t>(status),
-        static_cast<int32_t>(event));
+        FormStatusPrint::FormStatusToString(status).c_str(),
+        FormStatusPrint::FormEventToString(event).c_str());
     return ERR_OK;
 }
 }  // namespace AppExecFwk
