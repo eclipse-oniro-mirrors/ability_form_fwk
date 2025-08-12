@@ -21,14 +21,16 @@ export namespace formProvider {
 
   native function setFormNextRefreshTime_inner(formId: string, minute: int): void;
 
-  export function setFormNextRefreshTime(formId: string, minute: int): Promise<void> {
+  export function setFormNextRefreshTimeReturnsPromise(formId: string, minute: int): Promise<void> {
     return new Promise<void>(() => {
       setFormNextRefreshTime_inner(formId, minute);
     });
   }
 
-  export function setFormNextRefreshTime(formId: string, minute: int,
+  export function setFormNextRefreshTimeWithCallback(formId: string, minute: int,
     callback: AsyncCallback<void>): void {
     setFormNextRefreshTime_inner(formId, minute);
   }
+
+  overload setFormNextRefreshTime { setFormNextRefreshTimeReturnsPromise, setFormNextRefreshTimeWithCallback }
 }
