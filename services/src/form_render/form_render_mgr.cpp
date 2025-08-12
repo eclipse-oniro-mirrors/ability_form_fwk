@@ -699,7 +699,7 @@ ErrCode FormRenderMgr::RecoverForms(const std::vector<int64_t> &formIds, const W
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }
 
-void FormRenderMgr::DisconnectAllRenderConnections(int userId)
+void FormRenderMgr::DisconnectAllRenderConnections(int32_t userId)
 {
     HILOG_INFO("userId: %{public}d", userId);
     auto renderIter = renderInners_.find(userId);
