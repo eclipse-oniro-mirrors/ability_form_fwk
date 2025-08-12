@@ -203,6 +203,9 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
     int32_t lastUserId = lastUserId_;
     lastUserId_ = userId;
     HILOG_INFO("switch to userId: (%{public}d)", userId);
+    if (FormRenderMgr::GetInstance().GetFRSDiedInLowMemoryByUid(userId)) {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+    }
 
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId, lastUserId, this]() {
         if (userId != MAIN_USER_ID) {

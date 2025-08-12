@@ -906,10 +906,15 @@ ErrCode FormRenderMgrInner::CheckRenderConnectionExistById(int64_t formId)
 
 void FormRenderMgrInner::RecoverFRSOnFormActivity()
 {
-    if (isFrsDiedInLowMemory_.load() && FormDataMgr::GetInstance().IsLowMemory()) {
-        isFrsDiedInLowMemory_ = false;
+    if (isFrsDiedInLowMemory_.exchange(false)) {
         NotifyHostRenderServiceIsDead();
     }
+}
+
+bool FormRenderMgrInner::GetIsFRSDiedInLowMemory()
+{
+    HILOG_INFO("call isFrsDiedInLowMemory_ %{public}d", isFrsDiedInLowMemory_.load());
+    return isFrsDiedInLowMemory_;
 }
 
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)

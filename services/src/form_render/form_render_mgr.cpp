@@ -760,5 +760,16 @@ bool FormRenderMgr::CheckMultiAppFormVersionCode(const FormRecord &formRecord)
     }
     return false;
 }
+
+bool FormRenderMgr::GetFRSDiedInLowMemoryByUid(int32_t userId)
+{
+    HILOG_INFO("call");
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        return renderIter->second->GetIsFRSDiedInLowMemory();
+    }
+    HILOG_WARN("not find renderInner userId: %{public}d", userId);
+    return false;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
