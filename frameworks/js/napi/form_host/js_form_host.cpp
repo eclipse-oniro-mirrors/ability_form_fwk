@@ -59,6 +59,7 @@ namespace {
     const std::set<std::string> FORM_LISTENER_TYPE = {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
+    constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -2768,39 +2769,25 @@ bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("call");
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(getLiveFormStatusEnv_, &loop);
-    if (loop == nullptr) {
-        HILOG_ERROR("Failed to get loop");
-        return ERR_GET_INFO_FAILED;
-    }
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        HILOG_ERROR("Failed to new uv_work_t");
-        return ERR_GET_INFO_FAILED;
-    }
  
     LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {};
     if (dataParam == nullptr) {
         HILOG_ERROR("Failed to new dataParam");
-        delete work;
         return ERR_GET_INFO_FAILED;
     }
  
-    work->data = dataParam;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            LiveFormInterfaceParam* dataParam = (LiveFormInterfaceParam*)work->data;
-            JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam);
-            HILOG_INFO("getLiveFormStatus start notify.");
-            std::unique_lock<std::mutex> lock(dataParam->mutex);
-            dataParam->isReady = true;
-            dataParam->condition.notify_all();
-            delete work;
-        });
+    auto task = [dataParam] () {
+        JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam);
+        HILOG_INFO("getLiveFormStatus start notify.");
+        std::unique_lock<std::mutex> lock(dataParam->mutex);
+        dataParam->isReady = true;
+        dataParam->condition.notify_all();
+    };
+
+    napi_send_event(getLiveFormStatusEnv_, task, napi_eprio_immediate);
     std::unique_lock<std::mutex> lock(dataParam->mutex);
-    dataParam->condition.wait(lock, [&] { return dataParam->isReady; });
+    dataParam->condition.wait_for(
+        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
     delete dataParam;
