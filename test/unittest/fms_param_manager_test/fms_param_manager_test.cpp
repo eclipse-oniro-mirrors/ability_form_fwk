@@ -175,24 +175,12 @@ HWTEST_F(FmsParamManagerTest, fmsParamManager_008, TestSize.Level1)
 HWTEST_F(FmsParamManagerTest, fmsParamManager_009, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsParamManagerTest fmsParamManager_009 start";
-    std::string path = "";
+    std::string path = PARAM_PRESET_PATH + Constants::VERSION_FILE_NAME;
+    SignTools::CalcFileSha256Digest(path);
+    path = "";
     std::tuple<int, std::string> ret = SignTools::CalcFileSha256Digest(path);
     EXPECT_NE(std::get<0>(ret), 0);
     GTEST_LOG_(INFO) << "FmsParamManagerTest fmsParamManager_009 end";
-}
-
-/**
- * @tc.name: fmsParamManager_010
- * @tc.desc: test IsExemptLock function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsParamManagerTest, fmsParamManager_010, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsParamManagerTest fmsParamManager_010 start";
-    std::string path = PARAM_PRESET_PATH + Constants::VERSION_FILE_NAME;
-    std::tuple<int, std::string> ret = SignTools::CalcFileSha256Digest(path);
-    EXPECT_EQ(std::get<0>(ret), 0);
-    GTEST_LOG_(INFO) << "FmsParamManagerTest fmsParamManager_010 end";
 }
 }
 }

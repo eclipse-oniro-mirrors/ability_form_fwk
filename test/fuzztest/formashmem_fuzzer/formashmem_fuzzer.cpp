@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
@@ -28,238 +29,26 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
+    if (fdp == nullptr) {
+        return true;
+    }
     FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
+    std::string name = fdp->ConsumeRandomLengthString();
+    int32_t sizes = fdp->ConsumeIntegral<int32_t>();
     formAshmem.WriteToAshmem(name, nullptr, sizes);
     formAshmem.GetAshmemSize();
     formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI8(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI9(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI10(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI11(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI12(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI13(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI14(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI15(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI16(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
-}
-
-bool DoSomethingInterestingWithMyAPI17(const char* data, size_t size)
-{
-    FormAshmem formAshmem;
-    std::string name(data);
-    int32_t sizes = static_cast<int32_t>(GetU32Data(data));
-    formAshmem.WriteToAshmem(name, nullptr, sizes);
-    formAshmem.GetAshmemSize();
-    formAshmem.GetAshmem();
-    return formAshmem.GetAshmemFd();
+    formAshmem.GetAshmemFd();
+    return true;
 }
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
-

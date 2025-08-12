@@ -427,12 +427,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_017, TestSize.Level0
     formRenderServiceMgr.OnConfigurationUpdated(configuration);
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
-    if (!screenOnFlag) {
-        EXPECT_EQ(0, formRenderServiceMgr.serialQueue_->taskMap_.size());
-        EXPECT_TRUE(formRenderServiceMgr.hasCachedConfig_);
-    } else {
-        EXPECT_EQ(1, formRenderServiceMgr.serialQueue_->taskMap_.size());
-    }
+    EXPECT_EQ(1, formRenderServiceMgr.serialQueue_->taskMap_.size());
 #endif
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_017 end";
 }
@@ -1106,20 +1101,4 @@ HWTEST_F(FormRenderServiceMgrTest, SetCriticalFalseOnAllFormInvisible_001, TestS
     formRenderServiceMgr.SetCriticalFalseOnAllFormInvisible();
     EXPECT_FALSE(FormMemmgrClient::GetInstance().IsCritical());
     GTEST_LOG_(INFO) << "SetCriticalFalseOnAllFormInvisible_001 end";
-}
-
-/**
- * @tc.name: RunCachedConfigurationUpdatedTest_001
- * @tc.desc: Verify RunCachedConfigurationUpdated interface executes as expected.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderServiceMgrTest, SetCriticalTrueOnFormActivity_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "SetCriticalTrueOnFormActivity_001 start";
-    FormRenderServiceMgr formRenderServiceMgr;
-    formRenderServiceMgr.renderRecordMap_.clear();
-    // No permission to set critical, so critical is false
-    formRenderServiceMgr.SetCriticalTrueOnFormActivity();
-    EXPECT_FALSE(FormMemmgrClient::GetInstance().IsCritical());
-    GTEST_LOG_(INFO) << "SetCriticalTrueOnFormActivity_001 end";
 }

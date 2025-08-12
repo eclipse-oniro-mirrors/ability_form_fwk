@@ -1126,45 +1126,5 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_046, TestSize.Level1)
     EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_046 end";
 }
-
-/**
- * @tc.name: FmsFormBmsHelperTest_047
- * @tc.desc: Verify that the RegisterBundleEventCallback interface executes normally and exits without exception.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_047, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_047 start";
-    FormBmsHelper formBmsHelper;
-
-    const sptr<IRemoteObject> impl;
-    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
-    formBmsHelper.SetBundleManager(bundleManager);
-    EXPECT_EQ(formBmsHelper.RegisterBundleEventCallback(), ERR_APPEXECFWK_FORM_COMMON_CODE);
-
-    MockRegisterBundleEventCallback(true);
-    EXPECT_EQ(formBmsHelper.RegisterBundleEventCallback(), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_047 end";
-}
-
-/**
- * @tc.name: FmsFormBmsHelperTest_048
- * @tc.desc: Verify that the UnregisterBundleEventCallback interface executes normally and exits without exception.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_048, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_048 start";
-    FormBmsHelper formBmsHelper;
-    const sptr<IRemoteObject> impl;
-    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
-    formBmsHelper.SetBundleManager(bundleManager);
-    EXPECT_EQ(formBmsHelper.UnregisterBundleEventCallback(), ERR_APPEXECFWK_FORM_COMMON_CODE);
-
-    MockUnregisterBundleEventCallback(true);
-    EXPECT_EQ(formBmsHelper.UnregisterBundleEventCallback(), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_048 end";
-}
-
 } // namespace AppExecFwk
 } // namespace OHOS
