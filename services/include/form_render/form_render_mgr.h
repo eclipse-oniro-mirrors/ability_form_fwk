@@ -124,7 +124,7 @@ public:
 
     bool CheckMultiAppFormVersionCode(const FormRecord &formRecord);
 
-    bool GetFRSDiedInLowMemoryByUid(int userId);
+    bool GetFRSDiedInLowMemoryByUid(int32_t userId);
     
 private:
     void InitRenderInner(bool isSandbox, int32_t userId);
