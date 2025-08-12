@@ -94,6 +94,9 @@ public:
     void RerenderAllFormsImmediate();
 
     void DisconnectAllRenderConnections();
+
+    bool GetIsFRSDiedInLowMemory();
+    
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection, int32_t level) const;
 
