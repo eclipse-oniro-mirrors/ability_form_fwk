@@ -23,6 +23,8 @@
 #include <thread>
 #include <unistd.h>
 #include <utility>
+#include <fstream>
+#include <sstream>
 
 #include "status_mgr_center/form_render_status_task_mgr.h"
 #include "ecmascript/napi/include/jsnapi.h"
@@ -45,18 +47,16 @@ namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
-constexpr int32_t TIMEOUT = 10 * 1000;
+constexpr size_t THREAD_BLOCK_TIMEOUT = 10 * 1000;
+constexpr int32_t MEMORY_MONITOR_INTERVAL = Constants::MS_PER_DAY * 3;
+constexpr size_t RUNTIME_MEMORY_LIMIT = 16 * 1024 * 1024;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr size_t THREAD_NAME_LEN = 15;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
 constexpr char FORM_RENDERER_PROCESS_ON_ADD_SURFACE[] = "ohos.extra.param.key.process_on_add_surface";
-
-inline uint64_t GetCurrentTickMillseconds()
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count();
-}
+constexpr char RENDERING_BLOCK_MONITOR_PREFIX[] = "RenderingBlockMonitorTask_";
+constexpr char MEMORY_MONITOR_PREFIX[] = "MemoryMonitorTask_";
 
 inline std::string GetThreadNameByBundle(const std::string &bundleName)
 {
@@ -64,6 +64,35 @@ inline std::string GetThreadNameByBundle(const std::string &bundleName)
         return bundleName;
     }
     return bundleName.substr(bundleName.length() - THREAD_NAME_LEN);
+}
+
+uint64_t GetPss()
+{
+    pid_t pid = getprocpid();
+    std::string filePath = "/proc/" + std::to_string(pid) + "/smaps_rollup";
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        HILOG_ERROR("pid:%{public}d get pss failed", pid);
+        return 0;
+    }
+    std::string line;
+    int64_t pss = 0;
+    int64_t swapPss = 0;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string key;
+        int64_t value;
+        std::string unit;
+        if (iss >> key >> value >> unit) {
+            if (key == "Pss:") {
+                pss = value;
+            } else if (key == "SwapPss:") {
+                swapPss = value;
+            }
+        }
+    }
+    file.close();
+    return pss + swapPss;
 }
 }
 
@@ -150,6 +179,7 @@ FormRenderRecord::~FormRenderRecord()
     };
     eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
     Release();
+    RemoveWatchDogThreadMonitor();
 }
 
 bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
@@ -195,6 +225,7 @@ void FormRenderRecord::HandleDeleteRendererGroup(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     formRendererGroupMap_.erase(formId);
+    DeleteFormLocation(formId);
 }
 
 bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool needMonitored)
@@ -248,17 +279,30 @@ void FormRenderRecord::AddWatchDogThreadMonitor()
     HILOG_INFO("add watchDog monitor, bundleName is %{public}s, uid is %{public}s",
         bundleName_.c_str(), uid_.c_str());
 
-    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto watchdogTask = [thisWeakPtr]() {
-        auto renderRecord = thisWeakPtr.lock();
+    auto threadBlockMonitorTask = [weak = weak_from_this()]() {
+        auto renderRecord = weak.lock();
         if (renderRecord) {
             renderRecord->Timer();
         }
     };
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(RENDERING_BLOCK_MONITOR_PREFIX + bundleName_,
+        threadBlockMonitorTask, THREAD_BLOCK_TIMEOUT);
 
-    std::string eventHandleName;
-    eventHandleName.append(bundleName_).append(std::to_string(GetCurrentTickMillseconds()));
-    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(eventHandleName, watchdogTask, TIMEOUT);
+    auto memoryMonitorTask = [weak = weak_from_this()]() {
+        auto renderRecord = weak.lock();
+        if (renderRecord) {
+            renderRecord->RuntimeMemoryMonitor();
+        }
+    };
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(MEMORY_MONITOR_PREFIX + bundleName_, memoryMonitorTask,
+        MEMORY_MONITOR_INTERVAL);
+}
+
+void FormRenderRecord::RemoveWatchDogThreadMonitor()
+{
+    HILOG_INFO("remove watchDog monitor, bundleName: %{public}s", bundleName_.c_str());
+    OHOS::HiviewDFX::Watchdog::GetInstance().RemovePeriodicalTask(RENDERING_BLOCK_MONITOR_PREFIX + bundleName_);
+    OHOS::HiviewDFX::Watchdog::GetInstance().RemovePeriodicalTask(MEMORY_MONITOR_PREFIX + bundleName_);
 }
 
 void FormRenderRecord::OnRenderingBlock(const std::string &bundleName)
@@ -299,8 +343,8 @@ void FormRenderRecord::Timer()
             HILOG_INFO("Print block form's process id %{public}d and thread %{public}d call stack %{public}s",
                 processId_, jsThreadId_, traceStr.c_str());
         }
-        FormRenderEventReport::SendBlockFaultEvent(bundleName_, "THREAD_BLOCK_" + std::to_string(TIMEOUT) + "ms",
-            traceStr);
+        FormRenderEventReport::SendBlockFaultEvent(bundleName_, "THREAD_BLOCK_" +
+            std::to_string(THREAD_BLOCK_TIMEOUT) + "ms", traceStr);
         OnRenderingBlock(bundleName_);
     }
 }
@@ -378,7 +422,6 @@ bool FormRenderRecord::HasRenderFormTask()
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> hostRemoteObj)
 {
-    HILOG_DEBUG("Updated record");
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     if (renderType == Constants::RENDER_FORM) {
         // Manager delegate proxy invalid, do not render form
@@ -389,6 +432,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         bool formIsVisible = want.GetBoolParam(Constants::FORM_IS_VISIBLE, false);
         RecordFormVisibility(formJsInfo.formId, formIsVisible);
     }
+    int32_t formLocation = want.GetIntParam(Constants::FORM_LOCATION_KEY, -1);
+    FormLocationInfo location = { formJsInfo.formName, formLocation };
+    RecordFormLocation(formJsInfo.formId, location);
     {
         // Some resources need to be initialized in a JS thread
         if (!CheckEventHandler(true, formJsInfo.isDynamic)) {
@@ -864,11 +910,13 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
             HILOG_ERROR("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
             if (search->second->IsFormRequestsEmpty()) {
                 formRendererGroupMap_.erase(formId);
+                DeleteFormLocation(formId);
             }
             return false;
         }
         search->second->DeleteForm();
         formRendererGroupMap_.erase(formId);
+        DeleteFormLocation(formId);
     }
     RemoveHostByFormId(formId);
     return true;
@@ -1050,6 +1098,7 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
         compIds = search->second->GetOrderedAndCurrentCompIds();
         search->second->DeleteForm();
         formRendererGroupMap_.erase(formId);
+        DeleteFormLocation(formId);
         isRenderGroupEmpty = formRendererGroupMap_.empty();
     }
     DeleteRecycledFormCompIds(formId);
@@ -1994,6 +2043,65 @@ void FormRenderRecord::RecordFormVisibility(int64_t formId, bool isVisible)
     }
 }
 
+void FormRenderRecord::RecordFormLocation(int64_t formId, const FormLocationInfo &formLocation)
+{
+    std::lock_guard<std::mutex> lock(formLocationMutex_);
+    formLocationMap_[formId] = formLocation;
+}
+
+void FormRenderRecord::DeleteFormLocation(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formLocationMutex_);
+    formLocationMap_.erase(formId);
+}
+
+void FormRenderRecord::ParseFormLocationMap(std::vector<std::string> &formName, std::vector<uint32_t> &formLocation)
+{
+    std::lock_guard<std::mutex> lock(formLocationMutex_);
+    for (const auto &iter : formLocationMap_) {
+        const FormLocationInfo &locationInfo = iter.second;
+        formName.emplace_back(locationInfo.formName);
+        formLocation.emplace_back(locationInfo.formLocation);
+    }
+}
+
+void FormRenderRecord::RuntimeMemoryMonitor()
+{
+    if (runtime_ == nullptr || eventHandler_ == nullptr) {
+        return;
+    }
+
+    auto nativeEnginePtr = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNativeEnginePointer();
+    if (nativeEnginePtr == nullptr) {
+        HILOG_ERROR("null nativeEnginePtr");
+        return;
+    }
+
+    size_t totalSize = 0;
+    size_t usedSize = 0;
+    size_t objSize = 0;
+    size_t limitSize = 0;
+    // GetHeap must be called on the UI thread.
+    auto task = [nativeEnginePtr, &totalSize, &usedSize, &objSize, &limitSize]() {
+        totalSize = nativeEnginePtr->GetHeapTotalSize();
+        usedSize = nativeEnginePtr->GetHeapUsedSize();
+        objSize = nativeEnginePtr->GetHeapObjectSize();
+        limitSize = nativeEnginePtr->GetHeapLimitSize();
+    };
+    eventHandler_->PostSyncTask(task, "RuntimeMemoryMonitorTask");
+
+    uint64_t processMemory = GetPss();
+    HILOG_INFO("processMemory: %{public}" PRIu64 ", bundleName: %{public}s, totalSize: %{public}zu, "
+        "usedSize: %{public}zu, objSize: %{public}zu, limitSize: %{public}zu", processMemory, bundleName_.c_str(),
+        totalSize, usedSize, objSize, limitSize);
+    if (totalSize > RUNTIME_MEMORY_LIMIT) {
+        std::vector<std::string> formName;
+        std::vector<uint32_t> formLocation;
+        ParseFormLocationMap(formName, formLocation);
+        FormRenderEventReport::SendRuntimeMemoryLeakEvent(bundleName_, processMemory,
+            static_cast<uint64_t>(totalSize), formName, formLocation);
+    }
+}
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS

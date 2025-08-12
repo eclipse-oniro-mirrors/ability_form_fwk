@@ -44,6 +44,8 @@ public:
         const std::string &errorMsg);
     static void StartReleaseTimeoutReportTimer(int64_t formId, const std::string &uid);
     static void StopReleaseTimeoutReportTimer(int64_t formId);
+    static void SendRuntimeMemoryLeakEvent(const std::string &bundleName, uint64_t processMemory,
+        uint64_t runtimeMemory, std::vector<std::string> &formName, std::vector<uint32_t> &formLocation);
 
 private:
     static std::unordered_map<int64_t, int32_t> waitReleaseTimerMap_;

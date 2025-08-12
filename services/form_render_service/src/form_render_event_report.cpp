@@ -33,6 +33,9 @@ namespace {
     constexpr const char *EVENT_KEY_ERROR_MSG = "ERROR_MSG";
     constexpr const char *EVENT_KEY_ERROR_TYPE = "ERROR_TYPE";
     constexpr const char *EVENT_KEY_ERROR_CODE = "ERROR_CODE";
+    constexpr const char *EVENT_KEY_PROCESS_MEMORY = "PROCESS_MEMORY";
+    constexpr const char *EVENT_KEY_BUNDLE_MEMORY = "BUNDLE_MEMORY";
+    constexpr const char *EVENT_KEY_FORM_LOCATION = "FORM_LOCATION";
     constexpr int64_t RECYCLE_FORM_FAILED = 1;
     constexpr int64_t WAIT_RELEASE_RENDERER_ERROR_CODE = 400;
     constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 2000;
@@ -114,5 +117,20 @@ void FormRenderEventReport::StopReleaseTimeoutReportTimer(int64_t formId)
     }
 }
 
+void FormRenderEventReport::SendRuntimeMemoryLeakEvent(const std::string &bundleName, uint64_t processMemory,
+    uint64_t runtimeMemory, std::vector<std::string> &formName, std::vector<uint32_t> &formLocation)
+{
+    HILOG_INFO("runtime memory leak, bundleName: %{public}s processMemory: %{public}" PRIu64
+        ", runtimeMemory: %{public}" PRIu64, bundleName.c_str(), processMemory, runtimeMemory);
+
+    HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER,
+        "FORM_MEMORY_LEAK",
+        HiSysEvent::EventType::FAULT,
+        EVENT_KEY_BUNDLE_NAME, bundleName,
+        EVENT_KEY_PROCESS_MEMORY, processMemory,
+        EVENT_KEY_BUNDLE_MEMORY, runtimeMemory,
+        EVENT_KEY_FORM_NAME, formName,
+        EVENT_KEY_FORM_LOCATION, formLocation);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -170,3 +170,11 @@ REQUEST_PUBLIC_FORM:
   BUNDLE_NAME: {type: STRING, desc: bundle name}
   FORM_NAME: {type: STRING, desc: form name}
   WITH_SNAPSHOT: {type: BOOL, desc: with snapshot}
+
+FORM_MEMORY_LEAK:
+  __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form memory leak}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}
+  PROCESS_MEMORY: {type: UINT64, desc: process memory size}
+  BUNDLE_MEMORY: {type: UINT64, desc: bundle memory size}
+  FORM_NAME: {type: STRING, arrsize: 10, desc: form name}
+  FORM_LOCATION: {type: UINT32, arrsize: 10, desc: form location}
