@@ -514,7 +514,7 @@ public:
      * @brief Get distributed ui moduleName.
      * @return Ui moduleName.
      */
-    std::string GetUiModuleName() const;
+    const std::string& GetUiModuleName() const;
 
 private:
     /**
@@ -530,7 +530,7 @@ private:
     std::string packageName_ = "";
     std::string providerBundleName_ = "";
     std::string hostBundleName_ = "";
-    std::string moduleName_ = "";
+    std::string moduleName_ = ""; // ExtensionAbility module name
     std::string abilityName_ = "";
     std::string formName_ = "";
     int32_t specificationId_ = 0;
@@ -571,7 +571,7 @@ private:
     std::vector<int32_t> conditionUpdate_;
     bool isDataProxyIgnoreFormVisibility_ = false;
     bool isDistributedForm_ = false;
-    std::string uiModule_ = "";
+    std::string uiModule_ = ""; // widget module name
 };
 } // namespace AppExecFwk
 } // namespace OHOS

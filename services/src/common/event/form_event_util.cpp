@@ -60,6 +60,7 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
             formRecord.modulePkgNameMap.emplace(std::make_pair(moduleName, moduleInfos.dump()));
             if ((formRecord.isDistributedForm && moduleName == formRecord.uiModule) ||
                 (!formRecord.isDistributedForm && moduleName == formRecord.moduleName)) {
+                HILOG_INFO("update jsFormCodePath, isDistributedForm:%{public}d", formRecord.isDistributedForm);
                 formRecord.jsFormCodePath = hapPath;
             }
         }
@@ -107,16 +108,19 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     }
     std::vector<int64_t> removedForms;
     std::vector<FormRecord> updatedForms;
+    bool isBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, userId);
     for (FormRecord& formRecord : formInfos) {
         int64_t formId = formRecord.formId;
         HILOG_INFO("bundle update, formName:%{public}s, moduleName:%{public}s, isDistributedForm:%{public}d, "
-            "formId:%{public}" PRId64, formRecord.formName.c_str(), formRecord.moduleName.c_str(),
-            formRecord.isDistributedForm, formId);
-        if (bundleInfo.versionCode == formRecord.versionCode) {
-            HILOG_WARN("form: %{public}s, versionCode is same. formId:%{public}" PRId64,
+            "isBundleDistributed:%{public}d, formId:%{public}" PRId64, formRecord.formName.c_str(),
+            formRecord.moduleName.c_str(), formRecord.isDistributedForm, isBundleDistributed, formId);
+        if (bundleInfo.versionCode == formRecord.versionCode && formRecord.isDistributedForm == isBundleDistributed) {
+            HILOG_WARN("form: %{public}s, versionCode is same and no package format change. formId:%{public}" PRId64,
                        formRecord.formName.c_str(), formId);
             continue;
         }
+
+        formRecord.versionCode = bundleInfo.versionCode;
         if (ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo)) {
             updatedForms.emplace_back(formRecord);
             continue;
@@ -252,15 +256,18 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         return false;
     }
 
-    bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name);
-    HILOG_INFO("bundleName: %{public}s, IsBundleDistributed: %{public}d, formId:%{public}" PRId64,
-        bundleInfo.name.c_str(), IsBundleDistributed, formId);
-    if (formRecord.isDistributedForm != IsBundleDistributed) {
+    bool isBundleDistributed =
+        FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, formRecord.providerUserId);
+    HILOG_INFO("bundleName: %{public}s, isBundleDistributed: %{public}d, formId:%{public}" PRId64,
+        bundleInfo.name.c_str(), isBundleDistributed, formId);
+    if (formRecord.isDistributedForm != isBundleDistributed) {
         // The format of the installation package has changed.
-        if (!IsBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
+        if (!isBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
             // whole package install finished
-            formRecord.isDistributedForm = IsBundleDistributed;
-            formRecord.uiModule = FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name);
+            formRecord.isDistributedForm = isBundleDistributed;
+            formRecord.uiModule =
+                FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, formRecord.providerUserId);
+            HILOG_INFO("form pack format change, uiModule:%{public}s", formRecord.uiModule.c_str());
         }
     }
 
