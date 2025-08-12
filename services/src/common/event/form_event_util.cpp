@@ -108,16 +108,19 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     }
     std::vector<int64_t> removedForms;
     std::vector<FormRecord> updatedForms;
+    bool isBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, userId);
     for (FormRecord& formRecord : formInfos) {
         int64_t formId = formRecord.formId;
         HILOG_INFO("bundle update, formName:%{public}s, moduleName:%{public}s, isDistributedForm:%{public}d, "
-            "formId:%{public}" PRId64, formRecord.formName.c_str(), formRecord.moduleName.c_str(),
-            formRecord.isDistributedForm, formId);
-        if (bundleInfo.versionCode == formRecord.versionCode) {
-            HILOG_WARN("form: %{public}s, versionCode is same. formId:%{public}" PRId64,
+            "isBundleDistributed:%{public}d, formId:%{public}" PRId64, formRecord.formName.c_str(),
+            formRecord.moduleName.c_str(), formRecord.isDistributedForm, isBundleDistributed, formId);
+        if (bundleInfo.versionCode == formRecord.versionCode && formRecord.isDistributedForm == isBundleDistributed) {
+            HILOG_WARN("form: %{public}s, versionCode is same and no package format change. formId:%{public}" PRId64,
                        formRecord.formName.c_str(), formId);
             continue;
         }
+
+        formRecord.versionCode = bundleInfo.versionCode;
         if (ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo)) {
             updatedForms.emplace_back(formRecord);
             continue;
