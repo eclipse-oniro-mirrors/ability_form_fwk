@@ -21,6 +21,7 @@
 #include <string>
 
 #include "data_center/database/form_rdb_data_mgr.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -55,6 +56,13 @@ public:
      * @param result
      */
     void GetUntrustAppNameList(std::string &result);
+
+    /**
+     * @brief Handle untrust application connect failed.
+     * @param updatedForms Need connect forms.
+     * @param userId Current active userId.
+     */
+    void HandleConnectFailed(const std::vector<FormRecord> &updatedForms, int32_t userId);
 private:
     std::map<std::string, int32_t> unTrustList_;
     mutable std::mutex unTrustListMutex_;

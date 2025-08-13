@@ -53,8 +53,9 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormEventUtil::HandleProviderRemoved(bundleName, userIds);
     BundlePackInfo bundlePackInfo;
     BundleInfo bundleInfo;
+    bool needReload = true;
     FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo, bundleInfo);
-    FormEventUtil::HandleBundleFormInfoChanged(bundleName, userIds);
+    FormEventUtil::HandleBundleFormInfoChanged(bundleName, userIds, needReload);
     FormEventUtil::HandleUpdateFormCloud(bundleName);
     FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userIds);
     FormEventUtil::HandleBundleDataCleared(bundleName, userIds);

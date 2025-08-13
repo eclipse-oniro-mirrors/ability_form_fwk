@@ -73,8 +73,10 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
     }
 }
 }
-void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId)
+
+void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId, bool &needReload)
 {
+    needReload = FormTrustMgr::GetInstance().IsTrust(bundleName);
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);
     FormInfoMgr::GetInstance().UpdateStaticFormInfos(bundleName, userId);
 }
@@ -84,9 +86,10 @@ void FormEventUtil::HandleUpdateFormCloud(const std::string &bundleName)
     FormMgrAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
 }
 
-void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId)
+void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId, const bool needReload)
 {
-    HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_WARN(
+        "bundleName:%{public}s, userId:%{public}d, needReload:%{public}d", bundleName.c_str(), userId, needReload);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
         return;
@@ -152,7 +155,11 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
     FormMgrAdapter::GetInstance().DelayRefreshForms(updatedForms, want);
-    FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
+    if (needReload) {
+        FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
+    } else {
+        FormTrustMgr::GetInstance().HandleConnectFailed(updatedForms, userId);
+    }
 }
 
 void FormEventUtil::HandleOnUnlock(int32_t userId)
