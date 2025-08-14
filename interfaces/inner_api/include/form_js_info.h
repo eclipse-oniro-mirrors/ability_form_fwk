@@ -62,6 +62,7 @@ struct FormJsInfo : public Parcelable {
     bool ConvertRawImageData();
     bool WritePkgNameMap(Parcel &parcel) const;
     void ReadPkgNameMap(Parcel &parcel);
+    FormJsInfo CopyFormJsInfoWithoutFormData();
 };
 } // namespace AppExecFwk
 } // namespace OHOS

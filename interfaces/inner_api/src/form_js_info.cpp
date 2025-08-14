@@ -319,5 +319,30 @@ void FormJsInfo::ReadPkgNameMap(Parcel &parcel)
         modulePkgNameMap.emplace(key, val);
     }
 }
+
+FormJsInfo FormJsInfo::CopyFormJsInfoWithoutFormData()
+{
+    FormJsInfo copyFormJsInfo;
+    copyFormJsInfo.formName = formName;
+    copyFormJsInfo.bundleName = bundleName;
+    copyFormJsInfo.abilityName = abilityName;
+    copyFormJsInfo.moduleName = moduleName;
+    copyFormJsInfo.modulePkgNameMap = modulePkgNameMap;
+    copyFormJsInfo.formTempFlag = formTempFlag;
+    copyFormJsInfo.jsFormCodePath = jsFormCodePath;
+    copyFormJsInfo.formData = "";
+    copyFormJsInfo.imageDataMap = {};
+    copyFormJsInfo.formProviderData = FormProviderData();
+    copyFormJsInfo.formSrc = "";
+    copyFormJsInfo.formWindow = formWindow;
+    copyFormJsInfo.versionCode = versionCode;
+    copyFormJsInfo.versionName = versionName;
+    copyFormJsInfo.compatibleVersion = compatibleVersion;
+    copyFormJsInfo.type = type;
+    copyFormJsInfo.uiSyntax = uiSyntax;
+    copyFormJsInfo.isDynamic = isDynamic;
+    copyFormJsInfo.transparencyEnabled = transparencyEnabled;
+    return copyFormJsInfo;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
