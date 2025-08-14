@@ -52,10 +52,15 @@ const std::string FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
 
+const static std::unordered_set<std::string> configItemList_ = {
+    SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE
+};
+
 FormRenderServiceMgr::FormRenderServiceMgr()
 {
     serialQueue_ = std::make_unique<FormRenderSerialQueue>(FORM_RENDER_SERIAL_QUEUE);
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
+    appliedConfig_ = std::make_shared<AppExecFwk::Configuration>();
 }
 
 FormRenderServiceMgr::~FormRenderServiceMgr() = default;
@@ -354,13 +359,17 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
         return;
     }
 
+    // Retrieve configuration items that have not yet been issued for execution
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> applyConfig = GetNeedApplyConfig();
+    // Update all configuration item caches
+    CacheAppliedConfig();
     configUpdateTime_ = std::chrono::steady_clock::now();
     size_t allFormCount = 0;
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
             if (iter->second) {
-                iter->second->UpdateConfiguration(configuration_, formSupplyClient);
+                iter->second->UpdateConfiguration(applyConfig, formSupplyClient);
                 allFormCount += iter->second->FormCount();
             }
         }
@@ -376,10 +385,9 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
 
 void FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config)
 {
+    std::lock_guard<std::mutex> lock(configMutex_);
     if (config != nullptr && configuration_ != nullptr) {
-        const auto checkConfigItem = {
-            SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE};
-        for (const auto &item : checkConfigItem) {
+        for (const auto &item : configItemList_) {
             std::string newValue = config->GetItem(item);
             std::string oldValue = configuration_->GetItem(item);
             if (newValue.empty() && !oldValue.empty()) {
@@ -683,6 +691,42 @@ void FormRenderServiceMgr::SetCriticalTrueOnFormActivity()
     FormMemmgrClient::GetInstance().SetCritical(true);
 }
 
+std::shared_ptr<OHOS::AppExecFwk::Configuration> FormRenderServiceMgr::GetNeedApplyConfig()
+{
+    std::lock_guard<std::mutex> lock(configMutex_);
+    if (configuration_ == nullptr || appliedConfig_ == nullptr) {
+        HILOG_ERROR("configuration_ or appliedConfig_ is null");
+        return nullptr;
+    }
+
+    auto config = std::make_shared<OHOS::AppExecFwk::Configuration>(*configuration_);
+    for (const auto &item : configItemList_) {
+        std::string oldValue = appliedConfig_->GetItem(item);
+        std::string newValue = configuration_->GetItem(item);
+        if (newValue.empty() || newValue == oldValue) {
+            config->RemoveItem(item);
+        }
+    }
+    HILOG_INFO("need apply config:%{public}s", config->GetName().c_str());
+    return config;
+}
+
+void FormRenderServiceMgr::CacheAppliedConfig()
+{
+    std::lock_guard<std::mutex> lock(configMutex_);
+    if (configuration_ == nullptr || appliedConfig_ == nullptr) {
+        HILOG_ERROR("configuration_ or appliedConfig_ is null");
+        return;
+    }
+
+    for (const auto &item : configItemList_) {
+        std::string value = configuration_->GetItem(item);
+        if (!value.empty()) {
+            appliedConfig_->AddItem(item, value);
+        }
+    }
+    HILOG_INFO("already applied config:%{public}s", appliedConfig_->GetName().c_str());
+}
 }  // namespace FormRender
 }  // namespace AppExecFwk
 }  // namespace OHOS

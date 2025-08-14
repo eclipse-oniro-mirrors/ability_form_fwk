@@ -123,11 +123,17 @@ private:
     void SetCriticalFalseOnAllFormInvisible();
     void SetCriticalTrueOnFormActivity();
 
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> GetNeedApplyConfig();
+    void CacheAppliedConfig();
+
 private:
     std::mutex renderRecordMutex_;
     // <uid(userId + bundleName), renderRecord>
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_;
+    std::mutex configMutex_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
+    // The configuration items have already been applied to ArkUI.
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> appliedConfig_;
     std::chrono::steady_clock::time_point configUpdateTime_ = std::chrono::steady_clock::now();
     std::shared_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
     std::mutex formSupplyMutex_;
