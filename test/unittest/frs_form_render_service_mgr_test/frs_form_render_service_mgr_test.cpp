@@ -1102,3 +1102,45 @@ HWTEST_F(FormRenderServiceMgrTest, SetCriticalFalseOnAllFormInvisible_001, TestS
     EXPECT_FALSE(FormMemmgrClient::GetInstance().IsCritical());
     GTEST_LOG_(INFO) << "SetCriticalFalseOnAllFormInvisible_001 end";
 }
+
+/**
+ * @tc.name: GetNeedApplyConfigTest_001
+ * @tc.desc: Verify GetNeedApplyConfigTest interface executes as expected.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, GetNeedApplyConfigTest_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetNeedApplyConfigTest_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> applyConfig = formRenderServiceMgr.GetNeedApplyConfig();
+    EXPECT_FALSE(applyConfig);
+
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    formRenderServiceMgr.configuration_->AddItem("ohos.system.colorMode", "dark");
+    formRenderServiceMgr.SetConfiguration(configuration);
+    applyConfig = formRenderServiceMgr.GetNeedApplyConfig();
+    EXPECT_TRUE(applyConfig);
+    EXPECT_EQ(applyConfig->GetItem("ohos.system.colorMode"), "dark");
+    GTEST_LOG_(INFO) << "GetNeedApplyConfigTest_001 end";
+}
+
+/**
+ * @tc.name: cacheAppliedConfig_001
+ * @tc.desc: Verify CacheAppliedConfig interface executes as expected.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, cacheAppliedConfig_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "cacheAppliedConfig_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.CacheAppliedConfig();
+    EXPECT_EQ(formRenderServiceMgr.appliedConfig_->GetItem("ohos.system.colorMode"), "");
+
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    formRenderServiceMgr.configuration_->AddItem("ohos.system.colorMode", "dark");
+    formRenderServiceMgr.CacheAppliedConfig();
+    EXPECT_EQ(formRenderServiceMgr.appliedConfig_->GetItem("ohos.system.colorMode"), "dark");
+    GTEST_LOG_(INFO) << "cacheAppliedConfig_001 end";
+}
