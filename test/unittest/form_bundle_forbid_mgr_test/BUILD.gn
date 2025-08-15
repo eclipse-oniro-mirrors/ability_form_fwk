@@ -24,7 +24,7 @@ ohos_unittest("FormBundleForbidTest") {
   configs = [ ":Form_Bundle_Forbid_config" ]
 
   sources = [
-    "${form_fwk_path}/services/src/common/event/form_event_report.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_event_report.cpp",
     "${form_fwk_path}/services/src/common/util/form_util.cpp",
     "${form_fwk_path}/services/src/data_center/database/form_rdb_data_mgr.cpp",
     "${form_fwk_path}/services/src/feature/bundle_forbidden/form_bundle_forbid_mgr.cpp",
