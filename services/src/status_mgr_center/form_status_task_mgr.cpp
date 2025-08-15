@@ -300,7 +300,7 @@ void FormStatusTaskMgr::StopRenderingForm(
 void FormStatusTaskMgr::RenderForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("render form formId: %{public}" PRId64, formRecord.formId);
+    HILOG_INFO("render form formId: %{public}" PRId64, formRecord.formId, 1);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
