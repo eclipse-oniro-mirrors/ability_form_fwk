@@ -54,6 +54,7 @@ ohos_fuzztest("FormBmsHelperFuzzTest") {
     "device_manager:devicemanagersdk",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "safwk:system_ability_fwk",

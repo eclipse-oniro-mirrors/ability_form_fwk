@@ -17,10 +17,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
 #include "data_center/form_data_mgr.h"
+#include "bms_mgr/form_bundle_event_callback.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -28,209 +30,41 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
+    if (fdp == nullptr) {
+        return true;
+    }
     FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
+    int callingUid = fdp->ConsumeIntegral<int>();
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    FormDataMgr::GetInstance().AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
     sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormDataMgr::GetInstance().AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
     FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormDataMgr::GetInstance().CreateHostRecord(formInfo, callerToken, callingUid, record);
+    FormDataMgr::GetInstance().CreateFormRecord(formInfo, callingUid, userId);
     FormRecord records;
     FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
-    FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
-    FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
-    FormRecord records;
-    FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
-    FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
-    FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
-    FormRecord records;
-    FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
-    FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
-    FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
-    FormRecord records;
-    FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
-    FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
-    FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
-    FormRecord records;
-    FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
-    FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
-    FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
-    FormRecord records;
-    FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
-    FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
-    FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
-    FormRecord records;
-    FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
-{
-    FormDataMgr formDataMgr;
-    FormItemInfo formInfo;
-    int callingUid = static_cast<int>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.DeleteFormRecord(formId);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
-    FormHostRecord record;
-    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
-    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
-    FormRecord records;
-    FormJsInfo formInfos;
-    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
-    formDataMgr.CheckTempEnoughForm();
-    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
-    formDataMgr.DeleteTempForm(formId);
-    formDataMgr.ExistTempForm(formId);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, records, formInfos);
+    FormDataMgr::GetInstance().CheckTempEnoughForm();
+    int32_t currentUserId = fdp->ConsumeIntegral<int32_t>();
+    FormDataMgr::GetInstance().CheckEnoughForm(callingUid, currentUserId);
+    FormDataMgr::GetInstance().DeleteTempForm(formId);
+    FormDataMgr::GetInstance().ExistTempForm(formId);
+    FormBundleEventCallback formBundleEventCallback;
+    EventFwk::CommonEventData eventData;
+    formBundleEventCallback.OnReceiveEvent(eventData);
+    Want want;
+    std::vector<std::string> actions = {EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED,
+        EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED, BMS_EVENT_ADDITIONAL_INFO_CHANGED};
+    std::string action = actions.at(fdp->ConsumeIntegralInRange<size_t>(0, actions.size() - 1));
+    want.SetAction(action);
+    eventData.SetWant(want);
+    formBundleEventCallback.OnReceiveEvent(eventData);
     return true;
 }
 }
@@ -238,30 +72,7 @@ bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
-

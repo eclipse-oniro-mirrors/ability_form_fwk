@@ -17,13 +17,14 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "form_constants.h"
-#include "common/util/form_util.h"
 #define private public
 #define protected public
 #include "feature/free_install/free_install_status_callback_proxy.h"
 #include "feature/free_install/free_install_status_callback_stub.h"
+#include "common/util/form_util.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -31,8 +32,6 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-constexpr uint8_t ENABLE = 2;
 class FreeInstallStatusCallBackStubFuzzTest : public FreeInstallStatusCallBackStub {
 public:
     FreeInstallStatusCallBackStubFuzzTest() = default;
@@ -40,38 +39,39 @@ public:
     void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) override
     {}
 };
-uint32_t GetU32Data(const char* ptr)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
+    if (fdp == nullptr) {
+        return true;
+    }
     FormUtil formUtil;
-    std::string formName(data, size);
-    int32_t specificationId = static_cast<int32_t>(GetU32Data(data));
-    bool isTemporaryForm = *data % ENABLE;
+    std::string formName = fdp->ConsumeRandomLengthString();
+    int32_t specificationId = fdp->ConsumeIntegral<int32_t>();
+    bool isTemporaryForm = fdp->ConsumeBool();
     Want want;
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, formName);
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, specificationId);
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, isTemporaryForm);
-
-    std::string uri(data, size);
-    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    std::string uri = fdp->ConsumeRandomLengthString();
+    int32_t connectId = fdp->ConsumeIntegral<int32_t>();
     want.SetParam(Constants::FORM_CONNECT_ID, connectId);
     want.SetParam(Constants::FORM_SUPPLY_INFO, uri);
-    
-    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    int64_t udidHash = fdp->ConsumeIntegral<int64_t>();
     formUtil.GenerateFormId(udidHash);
-    uint64_t formId = static_cast<uint64_t>(GetU32Data(data));
-    uint64_t udidHashs = static_cast<uint64_t>(GetU32Data(data));
+    uint64_t formId = fdp->ConsumeIntegral<uint64_t>();
+    uint64_t udidHashs = fdp->ConsumeIntegral<uint64_t>();
     formUtil.PaddingUdidHash(formId, udidHashs);
     formUtil.GetCurrentNanosecond();
     formUtil.GetCurrentMillisecond();
     formUtil.GetCurrentAccountId();
     formUtil.GetNowMillisecond();
-    std::string strInfo(data, size);
-    int64_t convertValue = static_cast<int64_t>(GetU32Data(data));
+    formUtil.DeleteFormId(udidHash);
+    int radix = fdp->ConsumeIntegral<int>();
+    formUtil.ConvertStringToInt(formName, radix);
+    formUtil.ConvertStringToLongLong(formName, radix);
+    formUtil.CheckIsFRSCall();
+    std::string strInfo = fdp->ConsumeRandomLengthString();
+    int64_t convertValue = fdp->ConsumeIntegral<int64_t>();
     formUtil.ConvertStringToInt64(strInfo, convertValue);
     sptr<IRemoteObject> impl = nullptr;
     FreeInstallStatusCallBackProxy freeInstallStatusCallBackProxy(impl);
@@ -79,7 +79,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     MessageParcel datas;
     MessageParcel reply;
     freeInstallStatusCallBackStubFuzzTest.OnInstallFinishedInner(datas, reply);
-    uint32_t code = static_cast<uint32_t>(GetU32Data(data));
+    uint32_t code = fdp->ConsumeIntegral<uint32_t>();
     MessageOption option;
     freeInstallStatusCallBackStubFuzzTest.OnRemoteRequest(code, datas, reply, option);
     return formUtil.GenerateUdidHash(udidHash);
@@ -89,30 +89,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
-
