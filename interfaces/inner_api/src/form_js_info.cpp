@@ -320,7 +320,7 @@ void FormJsInfo::ReadPkgNameMap(Parcel &parcel)
     }
 }
 
-FormJsInfo FormJsInfo::CopyFormJsInfoWithoutFormData()
+FormJsInfo FormJsInfo::CopyFormJsInfoWithoutFormData() const
 {
     FormJsInfo copyFormJsInfo;
     copyFormJsInfo.formName = formName;
