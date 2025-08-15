@@ -181,7 +181,7 @@ private:
 
     void UpdateFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
-    void HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want);
+    int32_t HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want);
 
     bool HandleDeleteInJsThread(int64_t formId, const std::string &compId);
 
@@ -211,7 +211,7 @@ private:
 
     bool BeforeHandleUpdateForm(const FormJsInfo &formJsInfo);
 
-    void HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want);
+    int32_t HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want);
 
     void MergeFormData(Ace::FormRequest &formRequest, const FormJsInfo &formJsInfo);
 
@@ -240,7 +240,7 @@ private:
 
     void ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient);
 
-    void ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos);
+    int32_t ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos);
 
     int32_t HandleRecycleForm(const int64_t &formId, std::string &statusData);
 
@@ -314,6 +314,7 @@ private:
     void DeleteFormLocation(int64_t formId);
     void ParseFormLocationMap(std::vector<std::string> &formName, std::vector<uint32_t> &formLocation);
     void RuntimeMemoryMonitor();
+    void PostReAddRecycledForms(const FormJsInfo &formJsInfo, const Want &want);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;

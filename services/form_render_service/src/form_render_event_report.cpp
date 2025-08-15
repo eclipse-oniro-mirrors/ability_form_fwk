@@ -25,20 +25,24 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    static constexpr char DOMAIN_PERFORMANCE[] = "PERFORMANCE";
-    constexpr const char *EVENT_KEY_FORM_ID = "FORM_ID";
-    constexpr const char *EVENT_KEY_FORM_NAME = "FORM_NAME";
-    constexpr const char *EVENT_KEY_BUNDLE_NAME = "BUNDLE_NAME";
-    constexpr const char *EVENT_KEY_ERROR_NAME = "ERROR_NAME";
-    constexpr const char *EVENT_KEY_ERROR_MSG = "ERROR_MSG";
-    constexpr const char *EVENT_KEY_ERROR_TYPE = "ERROR_TYPE";
-    constexpr const char *EVENT_KEY_ERROR_CODE = "ERROR_CODE";
-    constexpr const char *EVENT_KEY_PROCESS_MEMORY = "PROCESS_MEMORY";
-    constexpr const char *EVENT_KEY_BUNDLE_MEMORY = "BUNDLE_MEMORY";
-    constexpr const char *EVENT_KEY_FORM_LOCATION = "FORM_LOCATION";
-    constexpr int64_t RECYCLE_FORM_FAILED = 1;
-    constexpr int64_t WAIT_RELEASE_RENDERER_ERROR_CODE = 400;
-    constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 2000;
+static constexpr char DOMAIN_PERFORMANCE[] = "PERFORMANCE";
+constexpr const char *EVENT_KEY_FORM_ID = "FORM_ID";
+constexpr const char *EVENT_KEY_FORM_NAME = "FORM_NAME";
+constexpr const char *EVENT_KEY_BUNDLE_NAME = "BUNDLE_NAME";
+constexpr const char *EVENT_KEY_ERROR_NAME = "ERROR_NAME";
+constexpr const char *EVENT_KEY_ERROR_MSG = "ERROR_MSG";
+constexpr const char *EVENT_KEY_ERROR_TYPE = "ERROR_TYPE";
+constexpr const char *EVENT_KEY_ERROR_CODE = "ERROR_CODE";
+constexpr const char *EVENT_KEY_PROCESS_MEMORY = "PROCESS_MEMORY";
+constexpr const char *EVENT_KEY_BUNDLE_MEMORY = "BUNDLE_MEMORY";
+constexpr const char *EVENT_KEY_FORM_LOCATION = "FORM_LOCATION";
+constexpr const char *INVALIDEVENTNAME = "INVALIDEVENTNAME";
+constexpr int64_t RECYCLE_FORM_FAILED = 1;
+constexpr int64_t WAIT_RELEASE_RENDERER_ERROR_CODE = 400;
+constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 2000;
+const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
+    std::map<FormEventName, std::string>::value_type(FormEventName::RELOAD_FORM_FAILED, "RELOAD_FORM_FAILED"),
+};
 }
 
 using namespace std;
@@ -82,7 +86,37 @@ void FormRenderEventReport::SendBlockFaultEvent(const std::string &bundleName, c
         EVENT_KEY_ERROR_MSG, errorMsg);
 }
 
-	// After RecycleForm is executed, it will proceed to ReleaseRenderer.
+std::string FormRenderEventReport::ConvertEventName(const FormEventName &eventName)
+{
+    auto it = EVENT_NAME_MAP.find(eventName);
+    if (it != EVENT_NAME_MAP.end()) {
+        return it->second;
+    }
+    return INVALIDEVENTNAME;
+}
+ 
+void FormRenderEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_t formId,
+    const std::string &bundleName, const std::string &formName, int32_t errorType, int32_t errorCode)
+{
+    std::string name = ConvertEventName(eventName);
+    if (name == INVALIDEVENTNAME) {
+        HILOG_ERROR("invalid eventName");
+        return;
+    }
+
+    HiSysEventWrite(
+        HiSysEvent::Domain::FORM_MANAGER,
+        "FORM_ERROR",
+        HiSysEvent::EventType::FAULT,
+        EVENT_KEY_FORM_ID, formId,
+        EVENT_KEY_BUNDLE_NAME, bundleName,
+        EVENT_KEY_FORM_NAME, formName,
+        EVENT_KEY_ERROR_NAME, name,
+        EVENT_KEY_ERROR_TYPE, errorType,
+        EVENT_KEY_ERROR_CODE, errorCode);
+}
+
+// After RecycleForm is executed, it will proceed to ReleaseRenderer.
 // If ReleaseRenderer is not called within the timeout period, a card recycling failure will be reported.
 void FormRenderEventReport::StartReleaseTimeoutReportTimer(int64_t formId, const std::string &uid)
 {

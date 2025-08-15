@@ -232,22 +232,43 @@ int32_t FormRenderServiceMgr::CleanFormHost(const sptr<IRemoteObject> &hostToken
 int32_t FormRenderServiceMgr::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("ReloadForm start");
+
+    std::string bundleName = want.GetStringParam(Constants::PARAM_BUNDLE_NAME_KEY);
+    if (bundleName.empty()) {
+        HILOG_ERROR("GetBundleName failed");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+ 
+    int32_t ret = ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Reload form record failed, ret = %{public}d", ret);
+        FormRenderEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
+            0,
+            bundleName,
+            "",
+            static_cast<int32_t>(ReloadFormErrorType::RELOAD_FORM_RELOAD_FORM_ERROR),
+            ret);
+    }
+ 
+    return ret;
+}
+
+int32_t FormRenderServiceMgr::ReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
+{
     SetCriticalTrueOnFormActivity();
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
         HILOG_ERROR("Get uid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    if (!IsRenderRecordExist(uid)) {
-        HILOG_ERROR("RenderRecord not find");
-        return RELOAD_FORM_FAILED;
-    }
     std::shared_ptr<FormRenderRecord> search = nullptr;
     GetRenderRecordById(search, uid);
     if (search != nullptr) {
-        search->ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
+        return search->ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
     }
-    return ERR_OK;
+
+    HILOG_ERROR("Not exist renderRecord");
+    return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD;
 }
 
 int32_t FormRenderServiceMgr::OnUnlock()

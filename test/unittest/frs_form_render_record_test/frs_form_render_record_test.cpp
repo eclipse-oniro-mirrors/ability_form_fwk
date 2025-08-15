@@ -649,7 +649,9 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_028, TestSize.Level0)
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     Want want;
-    formRenderRecordPtr_->HandleUpdateForm(formJsInfo, want);
+    static std::shared_ptr<FormRenderRecord> formRenderRecordPtr = FormRenderRecord::Create("bundleName", "uid");
+    int32_t ret = formRenderRecordPtr->HandleUpdateForm(formJsInfo, want);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_028 end";
 }
 
@@ -666,7 +668,10 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_029, TestSize.Level0)
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     Want want;
-    formRenderRecordPtr_->HandleUpdateForm(formJsInfo, want);
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
+    static std::shared_ptr<FormRenderRecord> formRenderRecordPtr = FormRenderRecord::Create("bundleName", "uid");
+    int32_t ret = formRenderRecordPtr->HandleUpdateForm(formJsInfo, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_FORM_REQUEST);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_029 end";
 }
 
@@ -2164,11 +2169,25 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_112, TestSize.Level1)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_113, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_113 start";
+    int64_t formId = 1;
     FormJsInfo formJsInfo;
-    formJsInfo.formId = 1;
+    formJsInfo.formId = formId;
     Want want;
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
-    formRenderRecordPtr_->HandleUpdateForm(formJsInfo, want);
+
+    Ace::FormRequest formRequest;
+    formRequest.compId = "compId";
+    std::unordered_map<std::string, Ace::FormRequest> requests;
+    requests.emplace(formRequest.compId, formRequest);
+    static std::shared_ptr<FormRenderRecord> formRenderRecordPtr = FormRenderRecord::Create("bundleName", "uid");
+    formRenderRecordPtr->formRequests_.emplace(formId, requests);
+    formRequest.hasRelease = true;
+    EXPECT_EQ(formRenderRecordPtr->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
+        false);
+    formRenderRecordPtr->AddFormRequest(formId, formRequest);
+
+    int32_t ret = formRenderRecordPtr->HandleUpdateForm(formJsInfo, want);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_113 end";
 }
 

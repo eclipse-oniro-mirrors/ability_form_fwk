@@ -773,16 +773,16 @@ void FormRenderRecord::UpdateFormRequest(const FormJsInfo &formJsInfo, const Wan
     }
 }
 
-void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
+int32_t FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
 {
     HILOG_INFO("Update record in js thread, formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
     bool ret = BeforeHandleUpdateForm(formJsInfo);
     if (!ret) {
         HILOG_ERROR("Handle Update Form prepare failed");
-        return;
+        return ERR_APPEXECFWK_FORM_RUNTIME_FAILED;
     }
 
-    HandleUpdateForm(formJsInfo, want);
+    return HandleUpdateForm(formJsInfo, want);
 }
 
 bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
@@ -799,19 +799,19 @@ bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
     return true;
 }
 
-void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want)
+int32_t FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_DEBUG("renderType is %{public}d", renderType);
     if (renderType == Constants::RENDER_FORM) {
         AddRenderer(formJsInfo, want);
-        return;
+        return ERR_OK;
     }
 
     std::unordered_map<std::string, Ace::FormRequest> formRequests;
     if (!GetFormRequestByFormId(formJsInfo.formId, formRequests)) {
         OnNotifyRefreshForm(formJsInfo.formId);
-        return;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_FORM_REQUEST;
     }
     std::string compMaxId = "0";
     for (const auto& iter : formRequests) {
@@ -842,6 +842,8 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         bool isHandleClickEvent = false;
         HandleRecoverForm(formJsInfo, statusData, isHandleClickEvent);
     }
+
+    return ERR_OK;
 }
 
 void FormRenderRecord::MergeFormData(Ace::FormRequest &formRequest, const FormJsInfo &formJsInfo)
@@ -1201,12 +1203,36 @@ void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupply
     HILOG_INFO("ReAdd all recycled forms end");
 }
 
-void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos)
+void FormRenderRecord::PostReAddRecycledForms(const FormJsInfo &formJsInfo, const Want &want)
+{
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr, formJsInfo, newWant = want]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord) {
+            int32_t ret = renderRecord->HandleUpdateInJsThread(formJsInfo, newWant);
+            if (ret != ERR_OK) {
+                FormRenderEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
+                    formJsInfo.formId,
+                    formJsInfo.bundleName,
+                    formJsInfo.formName,
+                    static_cast<int32_t>(ReloadFormErrorType::RELOAD_FORM_UPDATE_FORM_ERROR),
+                    ret);
+            }
+        }
+    };
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("null eventHandler_");
+        return;
+    }
+    eventHandler_->PostTask(task, "ReAddRecycledForms");
+}
+
+int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos)
 {
     HILOG_INFO("ReAdd recycled forms start");
     if (!CheckEventHandler(false, true)) {
         HILOG_ERROR("CheckEventHandler failed");
-        return;
+        return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
 
     for (const auto &form : formJsInfos) {
@@ -1221,19 +1247,12 @@ void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsI
             }
 
             UpdateFormRequest(form, formRequest.second.want);
-
-            std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr, form, want = formRequest.second.want]() {
-                auto renderRecord = thisWeakPtr.lock();
-                if (renderRecord) {
-                    renderRecord->HandleUpdateInJsThread(form, want);
-                }
-            };
-            eventHandler_->PostTask(task, "ReAddRecycledForms");
+            PostReAddRecycledForms(form, formRequest.second.want);
         }
     }
 
     HILOG_INFO("ReAdd recycled forms end");
+    return ERR_OK;
 }
 
 void FormRenderRecord::HandleDestroyInJsThread()
@@ -1271,11 +1290,10 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
     if (eventHandler == nullptr) {
         if (!CheckEventHandler(true, true)) {
             HILOG_ERROR("null eventHandler");
-            return RELOAD_FORM_FAILED;
+            return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
 
-        ReAddRecycledForms(formJsInfos);
-        return ERR_OK;
+        return ReAddRecycledForms(formJsInfos);
     }
 
     if (ReAddIfHapPathChanged(formJsInfos)) {
@@ -1293,8 +1311,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
         renderRecord->HandleReloadFormRecord(std::move(ids), want);
     };
     eventHandler->PostTask(task, "ReloadFormRecord");
-    ReAddRecycledForms(formJsInfos);
-    return ERR_OK;
+    return ReAddRecycledForms(formJsInfos);
 }
 
 bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos)
@@ -1323,8 +1340,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
         CreateEventHandler(bundleName_, true);
     }
-    ReAddRecycledForms(formJsInfos);
-    return true;
+    return ReAddRecycledForms(formJsInfos) == ERR_OK;
 }
 
 void FormRenderRecord::HandleReleaseAllRendererInJsThread()

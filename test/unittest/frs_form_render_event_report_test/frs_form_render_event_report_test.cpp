@@ -104,5 +104,27 @@ HWTEST_F(FormRenderEventReportTest, FormMemoryGuardTest_001, TestSize.Level0)
     FormMemoryGuard formMemoryGuard;
     GTEST_LOG_(INFO) << "FormMemoryGuardTest_001 test ends";
 }
+
+/**
+ * @tc.name: FormRenderEventReportTest_SendFormFailedEvent
+ * @tc.desc: Check SendFormFailedEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issuesI9MVRJ
+ */
+HWTEST_F(FormRenderEventReportTest, FormRenderEventReportTest_SendFormFailedEvent, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderEventReportTest_SendFormFailedEvent begin";
+    std::string bundleName = "testBundleName";
+    std::string formName = "testFormName";
+    FormEventName eventName = static_cast<FormEventName>(-1);
+    EXPECT_EQ(FormRenderEventReport::ConvertEventName(eventName), "INVALIDEVENTNAME");
+    FormRenderEventReport::SendFormFailedEvent(eventName, 0, bundleName, formName, 0, 0);
+
+    eventName = FormEventName::RELOAD_FORM_FAILED;
+    EXPECT_EQ(FormRenderEventReport::ConvertEventName(eventName), "RELOAD_FORM_FAILED");
+    FormRenderEventReport::SendFormFailedEvent(eventName, 0, bundleName, formName, 0, 0);
+
+    GTEST_LOG_(INFO) << "FormRenderEventReportTest_SendFormFailedEvent test ends";
+}
 } // namespace AppExecFwk
 } // namespace OHOS
