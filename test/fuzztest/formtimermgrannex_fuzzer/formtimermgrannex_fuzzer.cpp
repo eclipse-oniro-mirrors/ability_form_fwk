@@ -52,7 +52,6 @@ void FormRefreshLimiterTest(FuzzedDataProvider *fdp)
     formRefreshLimiter.MarkRemind(formId);
     formRefreshLimiter.DeleteItem(formId);
     formRefreshLimiter.ResetLimit();
-
 }
 
 void FormTimeMgrTest(FuzzedDataProvider *fdp)

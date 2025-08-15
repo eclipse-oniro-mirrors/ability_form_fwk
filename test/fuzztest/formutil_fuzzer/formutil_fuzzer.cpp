@@ -69,7 +69,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int radix = fdp->ConsumeIntegral<int>();
     formUtil.ConvertStringToInt(formName, radix);
     formUtil.ConvertStringToLongLong(formName, radix);
-    formUtil.CheckIsFRSCall();
     std::string strInfo = fdp->ConsumeRandomLengthString();
     int64_t convertValue = fdp->ConsumeIntegral<int64_t>();
     formUtil.ConvertStringToInt64(strInfo, convertValue);

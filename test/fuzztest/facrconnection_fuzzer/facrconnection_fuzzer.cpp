@@ -146,6 +146,10 @@ void FormRenderStatusMgrTest(FuzzedDataProvider *fdp)
 {
     OHOS::FormBasicInfoMgrTest(fdp);
     OHOS::FormRenderStatusTaskMgrTest(fdp);
+    std::string str1 = fdp->ConsumeRandomLengthString();
+    FormRenderServiceMgr::GetInstance().FormRenderGCTask(str1);
+    FormRenderServiceMgr::GetInstance().FormRenderGC(str1);
+    FormRenderServiceMgr::GetInstance().IsRenderRecordExist(str1);
     FormRenderServiceMgr::GetInstance().RunCachedConfigurationUpdated();
     FormRenderServiceMgr::GetInstance().OnUnlock();
     FormRenderServiceMgr::GetInstance().GetFormSupplyClient();
@@ -181,7 +185,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     bool isTrue = fdp->ConsumeBool();
     FormJsInfo formJsInfo;
     formJsInfo.formId = num2;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) FormSupplyStubFuzzTest();;
+    sptr<IRemoteObject> callerToken;
+    callerToken = new (std::nothrow) FormSupplyStubFuzzTest();
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, num1);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, str1);
@@ -207,11 +212,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().UpdateFormSize(num2, num3, num3, num3, str1);
     sptr<IFormSupply> formSupplyClient;
     FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
-    FormRenderServiceMgr::GetInstance().FormRenderGCTask(str1);
-    FormRenderServiceMgr::GetInstance().FormRenderGC(str1);
     FormRenderServiceMgr::GetInstance().ConfirmUnlockState(want);
     FormRenderServiceMgr::GetInstance().UpdateRenderRecordByUid(str1, want, formJsInfo, formSupplyClient);
-    FormRenderServiceMgr::GetInstance().IsRenderRecordExist(str1);
     std::shared_ptr<FormRenderRecord> search;
     FormRenderServiceMgr::GetInstance().GetRenderRecordById(search, str1);
     FormRenderServiceMgr::GetInstance().RecoverFormByUid(formJsInfo, want, str1, str2);
