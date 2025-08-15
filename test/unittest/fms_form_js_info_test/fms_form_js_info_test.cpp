@@ -223,5 +223,20 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_009, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 end";
 }
 
+/**
+ * @tc.name: FmsFormJsInfoTest_010
+ * @tc.desc: text the FormJsInfo::CopyFormJsInfoWithoutFormData
+ * @tc.type: FUNC
+ * @tc.require: #I5SNG1
+ */
+HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_010 start";
+    FormJsInfo formJsInfo;
+    formJsInfo.formSrc = "123456";
+    FormJsInfo copyFormJsInfo = formJsInfo.CopyFormJsInfoWithoutFormData();
+    EXPECT_EQ(copyFormJsInfo.formSrc, "");
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_010 end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS
