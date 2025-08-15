@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "common/event/form_event_report.h"
-#include "common/event/form_event_util.h"
+#include "form_event_report.h"
 
 #include <map>
 
+#include "form_file_util.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 
@@ -393,12 +393,12 @@ void FormEventReport::SendDiskUseEvent()
 {
     std::vector<std::string> files;
     std::vector<std::uint64_t> filesSize;
-    FormEventUtil::GetDirFiles(FORM_STORAGE_DIR_PATH, files);
+    FormFileUtil::GetDirFiles(FORM_STORAGE_DIR_PATH, files);
     if (files.empty()) {
         HILOG_ERROR("files is empty, not report disk use info");
         return;
     }
-    FormEventUtil::GetFilesSize(files, filesSize);
+    FormFileUtil::GetFilesSize(files, filesSize);
     files.push_back(FORM_STORAGE_DIR_PATH);
     HiSysEventWrite(HiSysEvent::Domain::FILEMANAGEMENT, "USER_DATA_SIZE",
         HiSysEvent::EventType::STATISTIC,

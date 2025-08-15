@@ -17,7 +17,7 @@
 #include "form_render_interface.h"
 #include "fms_log_wrapper.h"
 #include "common/util/form_util.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "status_mgr_center/form_status_queue.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "status_mgr_center/form_status.h"
@@ -325,7 +325,7 @@ void FormStatusTaskMgr::RenderForm(
     }
     if (error != ERR_OK) {
         RemoveConnection(connectId);
-        HILOG_ERROR("fail add form renderer");
+        HILOG_ERROR("fail add form renderer, errCode: %{public}d", error);
     }
 
     HILOG_DEBUG("end");

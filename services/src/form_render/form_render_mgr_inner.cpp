@@ -24,7 +24,7 @@
 #include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
 #include "data_center/form_data_mgr.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "form_host_interface.h"
 #include "form_mgr_errors.h"
 #include "form_render/form_render_task_mgr.h"
@@ -101,7 +101,7 @@ ErrCode FormRenderMgrInner::RenderForm(
             formRecord.formId,
             formRecord.bundleName,
             formRecord.formName,
-            static_cast<int32_t>(AddFormFiledErrorType::CONNECT_FORM_RENDER_FAILED),
+            static_cast<int32_t>(AddFormFailedErrorType::CONNECT_FORM_RENDER_FAILED),
             errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }

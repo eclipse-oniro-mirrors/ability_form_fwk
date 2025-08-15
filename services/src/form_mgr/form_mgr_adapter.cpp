@@ -75,7 +75,7 @@
 #include "os_account_manager.h"
 #include "parameters.h"
 #include "system_ability_definition.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "common/util/form_report.h"
 #include "data_center/form_cust_config_mgr.h"
 #include "data_center/form_record/form_record_report.h"
@@ -1276,7 +1276,7 @@ ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecor
             formId,
             record.bundleName,
             record.formName,
-            static_cast<int32_t>(AddFormFiledErrorType::CONNECT_FORM_PROVIDER_FAILED));
+            static_cast<int32_t>(AddFormFailedErrorType::CONNECT_FORM_PROVIDER_FAILED));
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;

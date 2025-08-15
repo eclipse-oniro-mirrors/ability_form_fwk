@@ -22,6 +22,7 @@
 #include "form_event_hiappevent.h"
 #endif
 #include "form_errors.h"
+#include "form_event_report.h"
 #include "form_mgr_errors.h"
 #include "running_form_info.h"
 #include "if_system_ability_manager.h"
@@ -87,7 +88,17 @@ int FormMgr::AddForm(
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return remoteProxy_->AddForm(formId, want, callerToken, formInfo);
+
+    errCode = remoteProxy_->AddForm(formId, want, callerToken, formInfo);
+    if (errCode != ERR_OK) {
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
+            formInfo.formId,
+            formInfo.bundleName,
+            formInfo.formName,
+            static_cast<int32_t>(AddFormFailedErrorType::ADD_FORM_FAILED),
+            errCode);
+    }
+    return errCode;
 }
 
 /**
