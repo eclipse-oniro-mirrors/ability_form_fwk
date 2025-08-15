@@ -854,7 +854,7 @@ void FormRenderRecord::MergeFormData(Ace::FormRequest &formRequest, const FormJs
 
     std::map<std::string, sptr<FormAshmem>> imageMap = formRequest.formJsInfo.imageDataMap;
     formRequest.formJsInfo = formJsInfo;
-    //if imageDataMap of formJsInfo is empty, do not replace
+    // if imageDataMap of formJsInfo is empty, do not replace
     if (formJsInfo.imageDataMap.size() == 0) {
         formRequest.formJsInfo.imageDataMap = imageMap;
     }
@@ -1847,6 +1847,8 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
     if (search != formRendererGroupMap_.end()) {
         auto group = search->second;
         group->UpdateFormSizeOfFormRequests(width, height, borderWidth);
+    } else {
+        HILOG_WARN("formRendererGroup not find, formId:%{public}" PRId64, formId);
     }
 }
 

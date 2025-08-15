@@ -402,16 +402,6 @@ void FormMgrAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, const
     }
 }
 
-AddFormResultErrorCode FormMgrAdapter::GetFormResultErrCode(const int64_t formId)
-{
-    std::lock_guard<std::mutex> lock(formResultMutex_);
-    const auto iter = formIdMap_.find(formId);
-    if (iter != formIdMap_.end()) {
-        return iter->second;
-    }
-    return AddFormResultErrorCode::SUCCESS;
-}
-
 ErrCode FormMgrAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates)
 {
     std::lock_guard<std::mutex> lock(formResultMutex_);

@@ -101,7 +101,8 @@ ErrCode FormRenderMgrInner::RenderForm(
             formRecord.formId,
             formRecord.bundleName,
             formRecord.formName,
-            static_cast<int32_t>(AddFormFiledErrorType::CONNECT_FORM_RENDER_FAILED));
+            static_cast<int32_t>(AddFormFiledErrorType::CONNECT_FORM_RENDER_FAILED),
+            errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
