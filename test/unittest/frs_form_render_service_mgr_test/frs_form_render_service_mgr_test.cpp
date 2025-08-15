@@ -260,9 +260,13 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_009, TestSize.Level0
     FormRenderServiceMgr formRenderServiceMgr;
     std::vector<FormJsInfo> formJsInfos;
     Want want;
+    std::string bundleName = "bundleName";
+    want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderServiceMgr.ReloadForm(std::move(formJsInfos), want));
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderServiceMgr.ReloadForm(std::move(formJsInfos), want));
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD, formRenderServiceMgr.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_009 end";
 }
 
@@ -281,8 +285,11 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_010, TestSize.Level0
     Want want;
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    std::string bundleName = "bundleName";
+    want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
     formRenderServiceMgr.renderRecordMap_.emplace(value, nullptr);
-    EXPECT_EQ(ERR_OK, formRenderServiceMgr.ReloadForm(std::move(formJsInfos), want));
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD, formRenderServiceMgr.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_010 end";
 }
 
@@ -301,6 +308,8 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_011, TestSize.Level0
     Want want;
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    std::string bundleName = "bundleName";
+    want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
     formRenderServiceMgr.renderRecordMap_.emplace(value, formRenderRecord);
     EXPECT_EQ(ERR_OK, formRenderServiceMgr.ReloadForm(std::move(formJsInfos), want));

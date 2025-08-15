@@ -230,6 +230,7 @@ ErrCode FormRenderMgrInner::ReloadForm(
     Want want;
     FillBundleInfo(want, bundleName);
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
+    want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
     FormRenderTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords),
         want, remoteObject);
     return ERR_OK;

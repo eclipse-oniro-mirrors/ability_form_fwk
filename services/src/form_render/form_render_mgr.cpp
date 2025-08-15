@@ -164,15 +164,26 @@ ErrCode FormRenderMgr::ReloadForm(
             normalRecords.emplace_back(record);
         }
     }
+    ErrCode ret = ERR_OK;
     auto renderIter = renderInners_.find(userId);
     if (!normalRecords.empty() && renderIter != renderInners_.end()) {
-        renderIter->second->ReloadForm(std::move(normalRecords), bundleName, userId);
+        ErrCode normalRet = renderIter->second->ReloadForm(std::move(normalRecords), bundleName, userId);
+        ret = normalRet != ERR_OK ? normalRet : ret;
     }
     auto sandboxIter = sandboxInners_.find(userId);
     if (!sandboxRecords.empty() && sandboxIter != sandboxInners_.end()) {
-        sandboxIter->second->ReloadForm(std::move(sandboxRecords), bundleName, userId);
+        ErrCode sandboxRet = sandboxIter->second->ReloadForm(std::move(sandboxRecords), bundleName, userId);
+        ret = sandboxRet != ERR_OK ? sandboxRet : ret;
     }
-    return ERR_OK;
+    if (ret != ERR_OK) {
+        FormEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
+            0,
+            bundleName,
+            "",
+            static_cast<int32_t>(ReloadFormErrorType::RELOAD_FORM_FRS_DEAD),
+            ret);
+    }
+    return ret;
 }
 
 void FormRenderMgr::PostOnUnlockTask()

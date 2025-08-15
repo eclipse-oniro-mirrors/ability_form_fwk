@@ -19,6 +19,7 @@
 #include <string>
 
 #include "hisysevent.h"
+#include "form_event_report_define.h"
 
 using HiSysEventType = OHOS::HiviewDFX::HiSysEvent::EventType;
 using HiSysEvent = OHOS::HiviewDFX::HiSysEvent;
@@ -42,12 +43,16 @@ public:
     static void SendPerformanceEvent(SceneType sceneType, PerformanceEventInfo &eventInfo);
     static void SendBlockFaultEvent(const std::string &bundleName, const std::string &errorName,
         const std::string &errorMsg);
+    static void SendFormFailedEvent(const FormEventName &eventName, int64_t formId, const std::string &bundleName,
+        const std::string &formName, int32_t errorType, int32_t errorCode = 0);
     static void StartReleaseTimeoutReportTimer(int64_t formId, const std::string &uid);
     static void StopReleaseTimeoutReportTimer(int64_t formId);
     static void SendRuntimeMemoryLeakEvent(const std::string &bundleName, uint64_t processMemory,
         uint64_t runtimeMemory, std::vector<std::string> &formName, std::vector<uint32_t> &formLocation);
 
 private:
+    static std::string ConvertEventName(const FormEventName &eventName);
+
     static std::unordered_map<int64_t, int32_t> waitReleaseTimerMap_;
 };
 } // namespace AppExecFwk

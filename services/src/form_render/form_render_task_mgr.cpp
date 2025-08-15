@@ -20,6 +20,7 @@
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
 #include "form_render/form_render_queue.h"
+#include "common/event/form_event_report.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_record/form_record.h"
 
@@ -150,6 +151,12 @@ void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, 
         return;
     }
 
+    std::string bundleName = want.GetStringParam(Constants::PARAM_BUNDLE_NAME_KEY);
+    if (bundleName.empty()) {
+        HILOG_ERROR("GetBundleName failed");
+        return;
+    }
+
     std::vector<FormJsInfo> formJsInfos;
     for (const auto &formRecord : formRecords) {
         FormJsInfo formInfo;
@@ -160,6 +167,12 @@ void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, 
     int32_t error = remoteFormRender->ReloadForm(std::move(formJsInfos), want);
     if (error != ERR_OK) {
         HILOG_ERROR("fail reload form");
+        FormEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
+            0,
+            bundleName,
+            "",
+            static_cast<int32_t>(ReloadFormErrorType::RELOAD_FORM_FRS_DEAD),
+            error);
         return;
     }
     HILOG_INFO("end");
