@@ -13,7 +13,11 @@
  * limitations under the License.
  */
 
+let hilog = requireNapi('hilog');
 let UIExtensionContext = requireNapi('application.UIExtensionContext');
+
+const domainID = 0xD001301;
+const TAG = 'FormManagerService';
 
 export class LiveFormExtensionContext extends UIExtensionContext {
   formId = '';
@@ -21,9 +25,9 @@ export class LiveFormExtensionContext extends UIExtensionContext {
     super(obj);
   }
 
-  setWindowBackgroundColor(color) {
-    console.log(`setWindowBackgroundColor: ${JSON.stringify(color)}`);
-    return this.__context_impl__.setWindowBackgroundColor(color);
+  setWindowBackgroundColor() {
+    hilog.sLogI(domainID, TAG, 'setWindowBackgroundColor');
+    return this.__context_impl__.setWindowBackgroundColor();
   }
 
   startAbilityByLiveForm(want) {
