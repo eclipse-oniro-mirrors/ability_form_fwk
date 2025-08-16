@@ -17,11 +17,13 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "data_center/form_info/form_info_storage.h"
 #define private public
 #define protected public
 #include "common/util/form_dump_mgr.h"
+#include "common/util/form_serial_queue.h"
 #include "form_provider/form_supply_callback.h"
 #undef private
 #undef protected
@@ -30,16 +32,103 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-constexpr uint8_t ENABLE = 2;
-uint32_t GetU32Data(const char* ptr)
+constexpr int32_t INDEX_MAX = 2;
+void FormSerialQueueTest(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
+    std::string queueName = fdp->ConsumeRandomLengthString();
+    FormSerialQueue formSerialQueue(queueName);
+    uint64_t ms = fdp->ConsumeIntegral<uint64_t>();
+    uint32_t msg = fdp->ConsumeIntegral<uint32_t>();
+    auto testTask = []() {};
+    int64_t num1 = fdp->ConsumeIntegral<int64_t>();
+    int64_t num2 = fdp->ConsumeIntegral<int64_t>();
+    int64_t num3 = fdp->ConsumeIntegral<int64_t>();
+    std::string str1 = fdp->ConsumeRandomLengthString();
+    std::pair<int64_t, int64_t> eventMsg = std::make_pair(num1, num2);
+    std::pair<int64_t, std::string> eventMsgStr = std::make_pair(num3, str1);
+    formSerialQueue.ScheduleTask(ms, testTask);
+    formSerialQueue.ScheduleDelayTask(eventMsg, msg, testTask);
+    formSerialQueue.CancelDelayTask(eventMsg);
+    formSerialQueue.ScheduleDelayTask(eventMsgStr, msg, testTask);
+    formSerialQueue.CancelDelayTask(eventMsgStr);
 }
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+void FormDumpMgrTestPartOne(FuzzedDataProvider *fdp)
 {
+    FormDumpMgr formDumpMgr;
+    std::vector<Constants::FormLocation> locations = {Constants::FormLocation::OTHER,
+        Constants::FormLocation::DESKTOP, Constants::FormLocation::FORM_CENTER,
+        Constants::FormLocation::FORM_MANAGER, Constants::FormLocation::NEGATIVE_SCREEN,
+        Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN,
+        Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN,
+        Constants::FormLocation::SCREEN_LOCK, Constants::FormLocation::AI_SUGGESTION};
+    Constants::FormLocation formLocation = locations.at(fdp->ConsumeIntegralInRange<size_t>(0, locations.size() - 1));
+    std::string infosResult = fdp->ConsumeRandomLengthString();
+    formDumpMgr.AppendFormLocation(formLocation, infosResult);
+    std::vector<BundleType> formBundleTypes = {BundleType::APP, BundleType::ATOMIC_SERVICE, BundleType::SHARED};
+    BundleType formBundleType = formBundleTypes.at(fdp->ConsumeIntegralInRange<size_t>(0, formBundleTypes.size() - 1));
+    std::string formInfo = fdp->ConsumeRandomLengthString();
+    formDumpMgr.AppendBundleType(formBundleType, formInfo);
+    std::string key = fdp->ConsumeRandomLengthString();
+    std::string value = fdp->ConsumeRandomLengthString();
+    std::unordered_map<std::string, std::string> liveFormStatusMap = {{key, value}};
+    std::string formId = fdp->ConsumeRandomLengthString();
+    formDumpMgr.AppendLiveFormStatus(formId, liveFormStatusMap, formInfo);
+}
+
+void FormDumpMgrTest(FuzzedDataProvider *fdp)
+{
+    FormDumpMgr formDumpMgr;
+    FormDBInfo formDBInfo;
+    std::vector<FormDBInfo> storageInfos;
+    storageInfos.emplace_back(formDBInfo);
+    std::string formInfoes = fdp->ConsumeRandomLengthString();
+    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfoes);
+    FormRecord formRecord;
+    std::vector<FormRecord> formRecordInfos;
+    formRecordInfos.emplace_back(formRecord);
+    formDumpMgr.DumpFormInfos(formRecordInfos, formInfoes);
+    FormHostRecord formHostRecord;
+    std::string formInfo = fdp->ConsumeRandomLengthString();
+    formDumpMgr.DumpFormHostInfo(formHostRecord, formInfo);
+    formDumpMgr.DumpFormInfo(formRecord, formInfo);
+    formDumpMgr.DumpTemporaryFormInfos(formRecordInfos, formInfo);
+    std::vector<FormInfo> bundleFormInfos;
+    formDumpMgr.DumpStaticBundleFormInfos(bundleFormInfos, formInfo);
+    int32_t tokenId = fdp->ConsumeIntegral<int32_t>();
+    std::string bundleName = fdp->ConsumeRandomLengthString();
+    int32_t instIndex = fdp->ConsumeIntegral<int32_t>();
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    formDumpMgr.DumpHasFormVisible(tokenId, bundleName, userId, instIndex, formInfo);
+    std::vector<std::string> subscribedKeys;
+    int32_t index = fdp->ConsumeIntegralInRange(0, INDEX_MAX);
+    for (int32_t i = 0; i < index; i++) {
+        subscribedKeys.push_back(fdp->ConsumeRandomLengthString());
+    }
+    int64_t count = fdp->ConsumeIntegral<int64_t>();
+    std::string formHostBundleName = fdp->ConsumeRandomLengthString();
+    RunningFormInfo runningFormInfo;
+    runningFormInfo.hostBundleName = formHostBundleName;
+    std::vector<FormVisibilityType> formVisiblitys = {FormVisibilityType::UNKNOWN,
+        FormVisibilityType::VISIBLE, FormVisibilityType::INVISIBLE};
+    std::vector<FormUsageState> usageStates = {FormUsageState::USED, FormUsageState::UNUSED};
+    runningFormInfo.formVisiblity = formVisiblitys.at(fdp->ConsumeIntegralInRange<size_t>(0,
+        formVisiblitys.size() - 1));
+    runningFormInfo.formUsageState = usageStates.at(fdp->ConsumeIntegralInRange<size_t>(0,
+        usageStates.size() - 1));
+    std::vector<RunningFormInfo> runningFormInfos = {runningFormInfo};
+    formDumpMgr.DumpFormSubscribeInfo(subscribedKeys, count, formInfo);
+    std::string infosResult = fdp->ConsumeRandomLengthString();
+    formDumpMgr.AppendRunningFormInfos(formHostBundleName, runningFormInfos, infosResult);
+    formDumpMgr.DumpRunningFormInfos(runningFormInfos, infosResult);
+    OHOS::FormDumpMgrTestPartOne(fdp);
+}
+
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
+{
+    if (fdp == nullptr) {
+        return true;
+    }
     FormSupplyCallback formSupplyCallback;
     formSupplyCallback.GetInstance();
     FormProviderInfo formProviderInfo;
@@ -47,55 +136,33 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formSupplyCallback.OnAcquire(formProviderInfo, want);
     formSupplyCallback.OnEventHandle(want);
     FormState state = FormState::UNKNOWN;
-    std::string provider(data, size);
+    std::string provider = fdp->ConsumeRandomLengthString();
     Want wantArg;
     formSupplyCallback.OnAcquireStateResult(state, provider, wantArg, want);
     sptr<FormAbilityConnection> connection = nullptr;
     formSupplyCallback.AddConnection(connection);
-    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    int32_t connectId = fdp->ConsumeIntegral<int32_t>();
     formSupplyCallback.RemoveConnection(connectId);
     formSupplyCallback.CanDisconnect(connection);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string remoteDeviceId(data, size);
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
+    std::string remoteDeviceId = fdp->ConsumeRandomLengthString();
     AAFwk::WantParams wantParams;
-    int64_t requestCode = static_cast<int64_t>(GetU32Data(data));
-    bool result = *data % ENABLE;
+    int64_t requestCode = fdp->ConsumeIntegral<int64_t>();
+    bool result = fdp->ConsumeBool();
     formSupplyCallback.OnShareAcquire(formId, remoteDeviceId, wantParams, requestCode, result);
     sptr<IRemoteObject> hostToken = nullptr;
     formSupplyCallback.RemoveConnection(formId, hostToken);
     formSupplyCallback.HandleHostDied(hostToken);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
     FormInfo info;
     std::vector<FormInfo> formInfos;
     formInfos.emplace_back(info);
     AAFwk::FormInfoStorage formInfoStorage(userId, formInfos);
     formInfoStorage.GetAllFormsInfo(userId, formInfos);
-    std::string moduleName(data, size);
+    std::string moduleName = fdp->ConsumeRandomLengthString();
     formInfoStorage.GetFormsInfoByModule(userId, moduleName, formInfos);
-    FormDumpMgr formDumpMgr;
-    FormDBInfo formDBInfo;
-    std::vector<FormDBInfo> storageInfos;
-    storageInfos.emplace_back(formDBInfo);
-    std::string formInfoes(data, size);
-    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfoes);
-    FormRecord formRecord;
-    std::vector<FormRecord> formRecordInfos;
-    formRecordInfos.emplace_back(formRecord);
-    formDumpMgr.DumpFormInfos(formRecordInfos, formInfoes);
-    FormHostRecord formHostRecord;
-    std::string formInfo(data, size);
-    formDumpMgr.DumpFormHostInfo(formHostRecord, formInfo);
-    formDumpMgr.DumpFormInfo(formRecord, formInfo);
-    formDumpMgr.DumpTemporaryFormInfos(formRecordInfos, formInfo);
-    std::vector<FormInfo> bundleFormInfos;
-    formDumpMgr.DumpStaticBundleFormInfos(bundleFormInfos, formInfo);
-    int32_t tokenId = static_cast<int32_t>(GetU32Data(data));
-    std::string bundleName(data, size);
-    int32_t instIndex = static_cast<int32_t>(GetU32Data(data));
-    formDumpMgr.DumpHasFormVisible(tokenId, bundleName, userId, instIndex, formInfo);
-    std::vector<std::string> subscribedKeys;
-    int64_t count = static_cast<int64_t>(GetU32Data(data));
-    formDumpMgr.DumpFormSubscribeInfo(subscribedKeys, count, formInfo);
+    OHOS::FormDumpMgrTest(fdp);
+    OHOS::FormSerialQueueTest(fdp);
     return formSupplyCallback.IsRemoveConnection(formId, hostToken);
 }
 }
@@ -103,30 +170,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
-

@@ -17,10 +17,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
 #include "data_center/database/form_db_cache.h"
+#include "data_center/database/form_db_info.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -28,185 +30,125 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+constexpr int32_t INDEX_MAX = 5;
+const nlohmann::json JSON_FORMS = R"({})"_json;
+
+void GenerateMapData(FuzzedDataProvider *fdp, std::set<int64_t> &matchedFormIds,
+    std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap, std::map<int64_t, bool> &foundFormsMap)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
-    FormDbCache formDbCache;
-    formDbCache.Start();
-    FormDBInfo formDBInfo;
-    formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
-    formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    std::vector<FormDBInfo> removedDBForms;
-    std::vector<FormDBInfo> formDBInfos;
-    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
-    removedDBForms.emplace_back(formDBInfo);
-    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
-    return true;
+    int32_t index = fdp->ConsumeIntegralInRange(0, INDEX_MAX);
+    for (int32_t i = 0; i < index; i++) {
+        int64_t formId = fdp->ConsumeIntegral<int64_t>();
+        matchedFormIds.insert(formId);
+        std::string bundleName = fdp->ConsumeRandomLengthString();
+        std::string abilityName = fdp->ConsumeRandomLengthString();
+        FormIdKey formIdKey(bundleName, abilityName);
+        std::set<int64_t> formIds = {};
+        int32_t indexj = fdp->ConsumeIntegralInRange(0, INDEX_MAX);
+        for (int32_t j = 0; j < indexj; j++) {
+            int64_t dbFormId = fdp->ConsumeIntegral<int64_t>();
+            formIds.insert(dbFormId);
+        }
+        noHostDBFormsMap[formIdKey] = formIds;
+        int64_t foundFormId = fdp->ConsumeIntegral<int64_t>();
+        bool isFound = fdp->ConsumeBool();
+        foundFormsMap[foundFormId] = isFound;
+    }
 }
 
-bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+void GenerateFormDBInfo(FuzzedDataProvider *fdp, FormDBInfo &info)
 {
-    FormDbCache formDbCache;
-    formDbCache.Start();
-    FormDBInfo formDBInfo;
-    formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
-    formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    std::vector<FormDBInfo> removedDBForms;
-    std::vector<FormDBInfo> formDBInfos;
-    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
-    removedDBForms.emplace_back(formDBInfo);
-    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
-    return true;
+    std::vector<Constants::FormLocation> formLocations = {Constants::FormLocation::OTHER,
+        Constants::FormLocation::DESKTOP, Constants::FormLocation::FORM_CENTER,
+        Constants::FormLocation::FORM_MANAGER, Constants::FormLocation::NEGATIVE_SCREEN,
+        Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN,
+        Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN,
+        Constants::FormLocation::SCREEN_LOCK, Constants::FormLocation::AI_SUGGESTION};
+    info.formId = fdp->ConsumeIntegral<int64_t>();
+    info.userId = fdp->ConsumeIntegral<int32_t>();
+    info.providerUserId = fdp->ConsumeIntegral<int32_t>();
+    info.formName = fdp->ConsumeRandomLengthString();
+    info.bundleName = fdp->ConsumeRandomLengthString();
+    info.moduleName = fdp->ConsumeRandomLengthString();
+    info.abilityName = fdp->ConsumeRandomLengthString();
+    info.formUserUids = {};
+    info.formLocation = formLocations[fdp->ConsumeIntegralInRange<size_t>(0, formLocations.size() - 1)];
+    info.isThemeForm = fdp->ConsumeBool();
+    info.enableForm = fdp->ConsumeBool();
+    info.lockForm = fdp->ConsumeBool();
+    int32_t indexj = fdp->ConsumeIntegralInRange(0, INDEX_MAX);
+    for (int32_t j = 0; j < indexj; j++) {
+        int formUserUid = fdp->ConsumeIntegral<int>();
+        info.formUserUids.push_back(formUserUid);
+    }
 }
 
-bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+std::vector<FormDBInfo> GetFormDBInfos(FuzzedDataProvider *fdp)
 {
-    FormDbCache formDbCache;
-    formDbCache.Start();
-    FormDBInfo formDBInfo;
-    formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
-    formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    std::vector<FormDBInfo> removedDBForms;
-    std::vector<FormDBInfo> formDBInfos;
-    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
-    removedDBForms.emplace_back(formDBInfo);
-    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
-    return true;
+    std::vector<FormDBInfo> formDBInfos = {};
+    int32_t index = fdp->ConsumeIntegralInRange(0, INDEX_MAX);
+    for (int32_t i = 0; i < index; i++) {
+        FormDBInfo info;
+        OHOS::GenerateFormDBInfo(fdp, info);
+        formDBInfos.push_back(info);
+    }
+    return formDBInfos;
 }
 
-bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+void InnerFormInfoTest(FuzzedDataProvider *fdp)
 {
-    FormDbCache formDbCache;
-    formDbCache.Start();
+    InnerFormInfo innerFormInfo;
     FormDBInfo formDBInfo;
-    formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
-    formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    std::vector<FormDBInfo> removedDBForms;
-    std::vector<FormDBInfo> formDBInfos;
-    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
-    removedDBForms.emplace_back(formDBInfo);
-    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
-    return true;
+    OHOS::GenerateFormDBInfo(fdp, formDBInfo);
+    innerFormInfo.formDBInfo_ = formDBInfo;
+    int callingUid = fdp->ConsumeIntegral<int>();
+    nlohmann::json jsonObject = JSON_FORMS;
+    innerFormInfo.ToJson(jsonObject);
+    innerFormInfo.AddUserUid(callingUid);
+    innerFormInfo.DeleteUserUid(callingUid);
 }
 
-bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
+    if (fdp == nullptr) {
+        return true;
+    }
+    OHOS::InnerFormInfoTest(fdp);
     FormDbCache formDbCache;
+    formDbCache.formDBInfos_ = OHOS::GetFormDBInfos(fdp);
     formDbCache.Start();
     FormDBInfo formDBInfo;
     formDbCache.SaveFormInfo(formDBInfo);
     formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
     formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    int32_t hostUid = fdp->ConsumeIntegral<int32_t>();
     formDbCache.IsHostOwner(formId, hostUid);
     formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::string bundleName = fdp->ConsumeRandomLengthString();
+    std::string moduleName = fdp->ConsumeRandomLengthString();
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    int32_t callingUid = fdp->ConsumeIntegral<int32_t>();
+    uint32_t versionCode = fdp->ConsumeIntegral<uint32_t>();
     std::vector<FormDBInfo> removedDBForms;
     std::vector<FormDBInfo> formDBInfos;
     formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
     removedDBForms.emplace_back(formDBInfo);
     formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
-{
-    FormDbCache formDbCache;
-    formDbCache.Start();
-    FormDBInfo formDBInfo;
-    formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
-    formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    std::vector<FormDBInfo> removedDBForms;
-    std::vector<FormDBInfo> formDBInfos;
-    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
-    removedDBForms.emplace_back(formDBInfo);
-    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
-{
-    FormDbCache formDbCache;
-    formDbCache.Start();
-    FormDBInfo formDBInfo;
-    formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
-    formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    std::vector<FormDBInfo> removedDBForms;
-    std::vector<FormDBInfo> formDBInfos;
-    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
-    removedDBForms.emplace_back(formDBInfo);
-    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
-    return true;
-}
-
-bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
-{
-    FormDbCache formDbCache;
-    formDbCache.Start();
-    FormDBInfo formDBInfo;
-    formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    formDbCache.DeleteFormInfo(formId);
-    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
-    formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    std::vector<FormDBInfo> removedDBForms;
-    std::vector<FormDBInfo> formDBInfos;
-    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
-    removedDBForms.emplace_back(formDBInfo);
-    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    formDbCache.GetAllFormInfo(formDBInfos);
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    formDbCache.UpdateDBRecord(formId, record);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    std::set<int64_t> matchedFormIds = {};
+    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap = {};
+    std::map<int64_t, bool> foundFormsMap = {};
+    OHOS::GenerateMapData(fdp, matchedFormIds, noHostDBFormsMap, foundFormsMap);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostDBFormsMap, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostDBFormsMap, foundFormsMap);
+    formDbCache.GetMultiAppFormVersionCode(bundleName);
+    formDbCache.UpdateMultiAppFormVersionCode(bundleName, versionCode);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
     return true;
 }
 }
@@ -214,30 +156,7 @@ bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
-

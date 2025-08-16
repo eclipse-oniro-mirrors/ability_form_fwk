@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
@@ -29,21 +30,22 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
+    if (fdp == nullptr) {
+        return true;
+    }
     FormRenderEventReport::GetNowMillisecond();
     PerformanceEventInfo eventInfo;
     FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
-    std::string bundleName(data, size);
-    std::string errorName(data, size);
-    std::string errorMsg(data, size);
+    std::string bundleName = fdp->ConsumeRandomLengthString();
+    std::string errorName = fdp->ConsumeRandomLengthString();
+    std::string errorMsg = fdp->ConsumeRandomLengthString();
     FormRenderEventReport::SendBlockFaultEvent(bundleName, errorName, errorMsg);
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
+    std::string uid = fdp->ConsumeRandomLengthString();
+    FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
+    FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
     return true;
 }
 }
@@ -51,30 +53,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
-
