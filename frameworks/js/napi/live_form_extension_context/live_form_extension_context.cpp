@@ -24,8 +24,9 @@ namespace AbilityRuntime {
 using namespace OHOS::AppExecFwk;
 const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
 const std::string REQUEST_METHOD = "startAbilityByLiveForm";
+const std::string TRANSPARENT_COLOR = "#00FFFFFF";
 
-bool LiveFormExtensionContext::SetWindowBackgroundColor(const char *color)
+bool LiveFormExtensionContext::SetWindowBackgroundColor()
 {
     HILOG_DEBUG("SetWindowBackgroundColor begin");
 #ifdef SUPPORT_SCREEN
@@ -35,7 +36,7 @@ bool LiveFormExtensionContext::SetWindowBackgroundColor(const char *color)
         return false;
     }
 
-    Rosen::WMError ret = uiWindow->SetBackgroundColor(color);
+    Rosen::WMError ret = uiWindow->SetBackgroundColor(TRANSPARENT_COLOR);
     if (ret != Rosen::WMError::WM_OK) {
         HILOG_ERROR("SetBackgroundColor failed, ret=%{public}d", ret);
         return false;

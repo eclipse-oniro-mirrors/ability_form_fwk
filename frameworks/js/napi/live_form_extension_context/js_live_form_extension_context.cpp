@@ -29,9 +29,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 using namespace OHOS::AppExecFwk;
 namespace {
-constexpr size_t ARGC_ONE = 1;
 constexpr size_t ARGC_TWO = 2;
-constexpr int32_t INDEX_ZERO = 0;
 } // namespace
 
 void JsLiveFormExtensionContext::Finalizer(napi_env env, void *data, void *hint)
@@ -77,20 +75,9 @@ napi_value JsLiveFormExtensionContext::StartAbilityByLiveForm(napi_env env, napi
 
 napi_value JsLiveFormExtensionContext::OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("param size: %{public}d", static_cast<int32_t>(info.argc));
-    if (info.argc != ARGC_ONE) {
-        HILOG_ERROR("argc is not one");
-        return CreateJsUndefined(env);
-    }
-
-    std::string color;
-    if (!AppExecFwk::UnwrapStringFromJS2(env, info.argv[INDEX_ZERO], color)) {
-        HILOG_ERROR("parse param failed");
-        return CreateJsUndefined(env);
-    }
-
+    HILOG_DEBUG("called");
     NapiAsyncTask::CompleteCallback complete =
-        [weak = context_, color](napi_env env, NapiAsyncTask &task, int32_t status) {
+        [weak = context_](napi_env env, NapiAsyncTask &task, int32_t status) {
         HILOG_DEBUG("OnSetWindowBackgroundColor begin");
         auto context = weak.lock();
         if (!context) {
@@ -100,7 +87,7 @@ napi_value JsLiveFormExtensionContext::OnSetWindowBackgroundColor(napi_env env, 
             return;
         }
 
-        bool isSuccess = context->SetWindowBackgroundColor(color.c_str());
+        bool isSuccess = context->SetWindowBackgroundColor();
         if (!isSuccess) {
             HILOG_ERROR("SetWindowBackgroundColor failed");
             task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),

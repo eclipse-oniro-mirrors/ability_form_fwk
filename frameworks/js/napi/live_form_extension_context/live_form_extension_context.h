@@ -28,7 +28,7 @@ public:
 
     static const size_t CONTEXT_TYPE_ID;
 
-    bool SetWindowBackgroundColor(const char *color);
+    bool SetWindowBackgroundColor();
 
     ErrCode StartAbilityByFms(const AAFwk::Want &want, const std::string &formId);
 };
