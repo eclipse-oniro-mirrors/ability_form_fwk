@@ -50,10 +50,12 @@ ErrCode LiveFormExtensionContext::StartAbilityByFms(const AAFwk::Want &want, con
 {
     HILOG_INFO("StartAbilityByFms want: %{public}s", want.ToString().c_str());
     AAFwk::Want wantToHost(want);
+    wantToHost.SetParam(Constants::PARAM_JSON_WANT_KEY, want.ToString());
+    wantToHost.SetModuleName("");
     wantToHost.SetAction(Constants::FORM_PAGE_ACTION);
     wantToHost.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM);
     wantToHost.SetParam(Constants::PARMA_REQUEST_METHOD, REQUEST_METHOD);
-    wantToHost.SetParam(Constants::PARAM_FORM_ID, formId);
+    wantToHost.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, formId);
  
     HILOG_INFO("StartAbilityByFms wantToHost: %{public}s", wantToHost.ToString().c_str());
     ErrCode err = AppExecFwk::FormMgr::GetInstance().StartAbilityByFms(wantToHost);
