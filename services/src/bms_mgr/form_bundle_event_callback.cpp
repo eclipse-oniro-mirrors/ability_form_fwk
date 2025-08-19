@@ -55,10 +55,11 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
         HILOG_WARN("bundleName:%{public}s changed", bundleName.c_str());
-        FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId);
-        std::function<void()> taskFunc = [bundleName, userId]() {
+        bool needReload = true;
+        FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId, needReload);
+        std::function<void()> taskFunc = [bundleName, userId, needReload]() {
             FormEventUtil::HandleUpdateFormCloud(bundleName);
-            FormEventUtil::HandleProviderUpdated(bundleName, userId);
+            FormEventUtil::HandleProviderUpdated(bundleName, userId, needReload);
         };
         FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {

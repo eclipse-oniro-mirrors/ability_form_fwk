@@ -32,9 +32,9 @@ const std::string KEY_UID = "uid";
 const std::string KEY_USER_ID = "userId";
 class FormEventUtil {
 public:
-    static void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId);
+    static void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId, bool &needReload);
     static void HandleUpdateFormCloud(const std::string &bundleName);
-    static void HandleProviderUpdated(const std::string &bundleName, const int userId);
+    static void HandleProviderUpdated(const std::string &bundleName, const int userId, const bool needReload = true);
     static void HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId);
     static void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
     static void HandleBundleDataCleared(const std::string &bundleName, int32_t userId);
@@ -66,6 +66,8 @@ private:
     static void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
     static void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
     static UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg);
+    static void HandleFormReload(const std::string &bundleName, const int userId, const bool needReload,
+        const std::vector<FormRecord> &updatedForms);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

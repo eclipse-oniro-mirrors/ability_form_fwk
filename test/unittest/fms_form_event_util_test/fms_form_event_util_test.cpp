@@ -485,7 +485,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_024, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormEventUtil_024 start";
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
-    FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId);
+    bool needReload = false;
+    FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId, needReload);
+    EXPECT_EQ(true, needReload);
     GTEST_LOG_(INFO) << "FormEventUtil_024 end";
 }
 

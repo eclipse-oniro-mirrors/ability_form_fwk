@@ -17,6 +17,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_render/form_render_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -93,6 +94,16 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
             if (ret != ERR_OK) {
                 HILOG_ERROR("InsertData failed, key:%{public}s", bundleName.c_str());
             }
+        }
+    }
+}
+
+void FormTrustMgr::HandleConnectFailed(const std::vector<FormRecord> &updatedForms, int32_t userId)
+{
+    for (const auto &formRecord : updatedForms) {
+        if (formRecord.userId == userId) {
+            FormRenderMgr::GetInstance().HandleConnectFailed(
+                formRecord.formId, ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED);
         }
     }
 }
