@@ -59,8 +59,8 @@ enum class AddFormFailedErrorType : int64_t {
     // Failed to create SurfaceNode
     UI_CONTENT_INIT_FAILED,
     // Failed to mount SurfaceNode
-    SURFACE_CREATE_FAILED,
-    SURFACE_REUSE_FAILED,
+    SURFACE_NODE_CREATE_FAILED,
+    SURFACE_NODE_REUSE_FAILED,
 };
 
 enum class UpdateFormErrorType : int64_t {
@@ -158,8 +158,6 @@ enum class FormEventName {
     RECYCLE_RECOVER_FORM_FAILED,
     REQUEST_PUBLIC_FORM,
     CONNECT_FORM_ABILITY_FAILED,
-    FORM_RENDER_SERVICE_START,
-    FORM_RENDER_SERVICE_DEAD,
     RELOAD_FORM_FAILED,
     RENDER_FORM_FAILED,
 };
