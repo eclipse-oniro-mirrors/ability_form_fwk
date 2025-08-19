@@ -1022,7 +1022,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_049, TestSize.Level0)
     FormJsInfo info;
     info.isDynamic = false;
     Want want;
-    EXPECT_EQ(formRenderRecordPtr_->UpdateRenderRecord(info, want, nullptr), RENDER_FORM_FAILED);
+    EXPECT_EQ(formRenderRecordPtr_->UpdateRenderRecord(info, want, nullptr), ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_049 end";
 }
 
@@ -1039,7 +1039,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_050, TestSize.Level0)
     FormJsInfo info;
     info.isDynamic = false;
     Want want;
-    EXPECT_EQ(formRenderRecordPtr_->UpdateRenderRecord(info, want, nullptr), RENDER_FORM_FAILED);
+    EXPECT_EQ(formRenderRecordPtr_->UpdateRenderRecord(info, want, nullptr), ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_050 end";
 }
 
