@@ -94,7 +94,7 @@ std::string FormRenderEventReport::ConvertEventName(const FormEventName &eventNa
     }
     return INVALIDEVENTNAME;
 }
- 
+
 void FormRenderEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_t formId,
     const std::string &bundleName, const std::string &formName, int32_t errorType, int32_t errorCode)
 {
@@ -159,7 +159,7 @@ void FormRenderEventReport::SendRuntimeMemoryLeakEvent(const std::string &bundle
 
     HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER,
         "FORM_MEMORY_LEAK",
-        HiSysEvent::EventType::FAULT,
+        HiSysEvent::EventType::STATISTIC,
         EVENT_KEY_BUNDLE_NAME, bundleName,
         EVENT_KEY_PROCESS_MEMORY, processMemory,
         EVENT_KEY_BUNDLE_MEMORY, runtimeMemory,
