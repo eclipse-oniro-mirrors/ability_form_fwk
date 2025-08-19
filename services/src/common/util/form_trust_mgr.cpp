@@ -101,10 +101,10 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
 void HandleConnectFailed(const std::vector<FormRecord> &updatedForms, int32_t userId)
 {
     for (const auto &formRecord : updatedForms) {
-        if (formRecord.userId != userId) {
-            continue;
+        if (formRecord.userId == userId) {
+            FormRenderMgr::GetInstance().HandleConnectFailed(
+                formRecord.formId, ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED);
         }
-        FormRenderMgr::GetInstance().HandleConnectFailed(formRecord.formId, ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED);
     }
 }
 } // namespace AppExecFwk
