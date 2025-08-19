@@ -440,7 +440,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         // Some resources need to be initialized in a JS thread
         if (!CheckEventHandler(true, formJsInfo.isDynamic)) {
             HILOG_ERROR("null eventHandler_ ");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
         std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
 

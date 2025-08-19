@@ -24,7 +24,6 @@ class FormFileUtil {
 public:
     static void GetDirFiles(const std::string &path, std::vector<std::string> &files);
     static void GetFilesSize(std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize);
-
 };
 } // namespace AppExecFwk
 } // namespace OHOS
