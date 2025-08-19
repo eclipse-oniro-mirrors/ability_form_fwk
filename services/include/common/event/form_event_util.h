@@ -66,6 +66,8 @@ private:
     static void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
     static void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
     static UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg);
+    static void HandleFormReload(const std::string &bundleName, const int userId, const bool needReload,
+        const std::vector<FormRecord> &updatedForms);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

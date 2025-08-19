@@ -150,6 +150,12 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         }
     }
 
+    HandleFormReload(bundleName, userId, needReload, updatedForms);
+}
+
+void FormEventUtil::HandleFormReload(
+    const std::string &bundleName, const int userId, const bool needReload, const std::vector<FormRecord> &updatedForms)
+{
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);

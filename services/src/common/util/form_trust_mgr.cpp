@@ -98,7 +98,7 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
     }
 }
 
-void HandleConnectFailed(const std::vector<FormRecord> &updatedForms, int32_t userId)
+void FormTrustMgr::HandleConnectFailed(const std::vector<FormRecord> &updatedForms, int32_t userId)
 {
     for (const auto &formRecord : updatedForms) {
         if (formRecord.userId == userId) {
