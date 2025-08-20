@@ -150,6 +150,7 @@ public:
     size_t FormCount();
 
     void UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth);
+    bool IsFormVisible(int64_t formId);
     bool IsAllFormsInvisible();
 private:
     class RemoteObjHash {
