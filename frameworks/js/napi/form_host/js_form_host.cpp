@@ -2769,15 +2769,9 @@ bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("call");
- 
-    LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {};
-    if (dataParam == nullptr) {
-        HILOG_ERROR("Failed to new dataParam");
-        return ERR_GET_INFO_FAILED;
-    }
- 
+    std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
     auto task = [dataParam] () {
-        JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam);
+        JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
         HILOG_INFO("getLiveFormStatus start notify.");
         std::unique_lock<std::mutex> lock(dataParam->mutex);
         dataParam->isReady = true;
@@ -2790,7 +2784,6 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
         lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
-    delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
 
