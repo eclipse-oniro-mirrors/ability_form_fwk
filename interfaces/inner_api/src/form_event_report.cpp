@@ -398,8 +398,9 @@ void FormEventReport::SendDiskUseEvent()
         HILOG_ERROR("files is empty, not report disk use info");
         return;
     }
-    FormFileUtil::GetFilesSize(files, filesSize);
+    auto totalSize = FormFileUtil::GetFilesSize(files, filesSize);
     files.push_back(FORM_STORAGE_DIR_PATH);
+    filesSize.emplace_back(totalSize);
     HiSysEventWrite(HiSysEvent::Domain::FILEMANAGEMENT, "USER_DATA_SIZE",
         HiSysEvent::EventType::STATISTIC,
         "COMPONENT_NAME", "form_fwk",

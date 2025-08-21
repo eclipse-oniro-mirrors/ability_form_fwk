@@ -52,17 +52,20 @@ void FormFileUtil::GetDirFiles(const std::string &path, std::vector<std::string>
     closedir(dir);
 }
  
-void FormFileUtil::GetFilesSize(std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize)
+int64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize)
 {
     struct stat statbuf = {0};
     uint64_t totalSize = 0;
     for (auto &file : files) {
-        if (stat(file.c_str(), &statbuf) == 0) {
+        auto ret = stat(file.c_str(), &statbuf);
+        if (ret == 0) {
             filesSize.emplace_back(static_cast<uint64_t>(statbuf.st_size));
             totalSize += static_cast<uint64_t>(statbuf.st_size);
+        } else {
+            HILOG_WARN("failed to stat file, errno: %{public}d", errno);
         }
     }
-    filesSize.emplace_back(totalSize);
+    return totalSize;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
