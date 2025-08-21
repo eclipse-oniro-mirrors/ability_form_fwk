@@ -426,7 +426,8 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     if (renderType == Constants::RENDER_FORM) {
         // Manager delegate proxy invalid, do not render form
         if (!CheckManagerDelegateValid(formJsInfo, want)) {
-            return RENDER_FORM_FAILED;
+            HILOG_WARN("Form node has been released");
+            return ERR_APPEXECFWK_FORM_FORM_NODE_RELEASED;
         }
         renderFormTasksNum++;
         bool formIsVisible = want.GetBoolParam(Constants::FORM_IS_VISIBLE, false);
@@ -439,14 +440,14 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         // Some resources need to be initialized in a JS thread
         if (!CheckEventHandler(true, formJsInfo.isDynamic)) {
             HILOG_ERROR("null eventHandler_ ");
-            return RENDER_FORM_FAILED;
+            return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
         std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
 
         sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
         if (formSupplyClient == nullptr) {
             HILOG_ERROR("null formSupplyClient");
-            return RENDER_FORM_FAILED;
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
         UpdateFormRequest(formJsInfo, want);
@@ -472,10 +473,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         eventHandler->PostTask(task, "UpdateRenderRecord");
     }
 
-    if (hostRemoteObj == nullptr) {
-        HILOG_WARN("null hostRemoteObj");
-        return ERR_OK;
-    }
     return AddHostByFormId(formJsInfo.formId, hostRemoteObj);
 }
 
@@ -855,7 +852,7 @@ void FormRenderRecord::MergeFormData(Ace::FormRequest &formRequest, const FormJs
 
     std::map<std::string, sptr<FormAshmem>> imageMap = formRequest.formJsInfo.imageDataMap;
     formRequest.formJsInfo = formJsInfo;
-    //if imageDataMap of formJsInfo is empty, do not replace
+    // if imageDataMap of formJsInfo is empty, do not replace
     if (formJsInfo.imageDataMap.size() == 0) {
         formRequest.formJsInfo.imageDataMap = imageMap;
     }
@@ -1848,6 +1845,8 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
     if (search != formRendererGroupMap_.end()) {
         auto group = search->second;
         group->UpdateFormSizeOfFormRequests(width, height, borderWidth);
+    } else {
+        HILOG_WARN("formRendererGroup not find, formId:%{public}" PRId64, formId);
     }
 }
 
@@ -1900,6 +1899,11 @@ std::shared_ptr<EventHandler> FormRenderRecord::GetEventHandler()
 
 int32_t FormRenderRecord::AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj)
 {
+    if (hostRemoteObj == nullptr) {
+        HILOG_WARN("null hostRemoteObj");
+        return ERR_OK;
+    }
+
     std::lock_guard<std::mutex> lock(hostsMapMutex_);
     auto iter = hostsMapForFormId_.find(formId);
     if (iter == hostsMapForFormId_.end()) {

@@ -17,7 +17,7 @@
 
 #include "fms_log_wrapper.h"
 #define private public
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #undef private
 
 using namespace testing;

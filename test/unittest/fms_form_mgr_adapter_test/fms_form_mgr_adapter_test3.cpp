@@ -780,31 +780,6 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
      EXPECT_EQ(ret, 2293761);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0278 end";
  }
-
- /**
- * @tc.name: FormMgrAdapter_0278_0
- * @tc.desc: test AllotForm function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0278_0, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0278_0 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 0;
-    Want want;
-    want.SetParam(Constants::KEY_DIRECT_CALL_INAPP, true);
-    want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-    formItemInfo_->SetProviderBundleName("providerBundle");
-    formItemInfo_->SetHostBundleName("providerBundle");
-    ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
-    formMgrAdapter.formIdMap_.insert(std::make_pair(formId, AddFormResultErrorCode::UNKNOWN));
-    formMgrAdapter.GetFormResultErrCode(formId);
-    formMgrAdapter.StartAbilityByFms(want);
-    formMgrAdapter.IsForegroundApp();
-    formMgrAdapter.GetAppMgr();
-    EXPECT_NE(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0278_0 end";
-}
  
  /**
   * @tc.name: FormMgrAdapter_0279

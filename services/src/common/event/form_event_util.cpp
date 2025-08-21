@@ -741,47 +741,5 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
-
-void FormEventUtil::GetDirFiles(const std::string &path, std::vector<std::string> &files)
-{
-    DIR *dir = opendir(path.c_str());
-    if (dir == nullptr) {
-        HILOG_ERROR("failed to open file: %{public}s, error: %{public}d", path.c_str(), errno);
-        return;
-    }
- 
-    std::string pathStringWithDelimiter;
-    while (true) {
-        struct dirent *ptr = readdir(dir);
-        if (ptr == nullptr) {
-            HILOG_INFO("The file has been traversed");
-            break;
-        }
- 
-        // current dir OR parent dir
-        if ((strcmp(ptr->d_name, ".") == 0) || (strcmp(ptr->d_name, "..") == 0)) {
-            continue;
-        } else if (ptr->d_type == DT_DIR) {
-            pathStringWithDelimiter = IncludeTrailingPathDelimiter(path) + std::string(ptr->d_name);
-            GetDirFiles(pathStringWithDelimiter, files);
-        } else {
-            files.push_back(IncludeTrailingPathDelimiter(path) + std::string(ptr->d_name));
-        }
-    }
-    closedir(dir);
-}
- 
-void FormEventUtil::GetFilesSize(std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize)
-{
-    struct stat statbuf = {0};
-    uint64_t totalSize = 0;
-    for (auto &file : files) {
-        if (stat(file.c_str(), &statbuf) == 0) {
-            filesSize.emplace_back(static_cast<uint64_t>(statbuf.st_size));
-            totalSize += static_cast<uint64_t>(statbuf.st_size);
-        }
-    }
-    filesSize.emplace_back(totalSize);
-}
 } // namespace AppExecFwk
 } // namespace OHOS

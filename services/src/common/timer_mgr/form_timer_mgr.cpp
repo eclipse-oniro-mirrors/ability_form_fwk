@@ -32,7 +32,7 @@
 #include "time_service_client.h"
 #include "time_common.h"
 #include "want.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "data_center/form_record/form_record_report.h"
 #include "data_center/form_data_mgr.h"
 #include "form_refresh/form_refresh_mgr.h"

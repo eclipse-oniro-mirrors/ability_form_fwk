@@ -28,7 +28,7 @@
 #include "common/util/form_util.h"
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "form_mgr/form_mgr_queue.h"
 
 namespace OHOS {
