@@ -32,10 +32,12 @@ void FormFileUtil::GetDirFiles(const std::string &path, std::vector<std::string>
     }
  
     std::string pathStringWithDelimiter;
-    while (true) {
+    bool shouldExit = false;
+    while (!shouldExit) {
         struct dirent *ptr = readdir(dir);
         if (ptr == nullptr) {
             HILOG_INFO("The file has been traversed");
+            shouldExit = true;
             break;
         }
  
