@@ -1806,9 +1806,12 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
         HILOG_ERROR("Create formRendererGroup failed");
         return false;
     }
-    auto task = [formRendererGroup, groupRequests, currentRequestIndex]() {
+    bool isVisible = IsFormVisible(currentRequest.formJsInfo.formId);
+    auto task = [formRendererGroup, groupRequests, currentRequestIndex, isVisible]() {
         HILOG_INFO("execute recover form task");
         formRendererGroup->RecoverRenderer(groupRequests, currentRequestIndex);
+        // Re-notify visibility after form recovery.
+        formRendererGroup->SetVisibleChange(isVisible);
     };
     // the formrenderer_ must be initialized using a sync task
     eventHandler_->PostSyncTask(task, "RecoverRenderer");
@@ -2040,6 +2043,16 @@ std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const 
     napi_get_value_string_utf8(env, valueStr, valueCStr.get(), valueStrBufLength + 1, &valueStrLength);
     std::string ret(valueCStr.get(), valueStrLength);
     return ret;
+}
+
+bool FormRenderRecord::IsFormVisible(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(visibilityMapMutex_);
+    auto iter = visibilityMap_.find(formId);
+    if (iter != visibilityMap_.end()) {
+        return iter->second;
+    }
+    return false;
 }
 
 bool FormRenderRecord::IsAllFormsInvisible()

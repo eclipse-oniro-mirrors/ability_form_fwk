@@ -2904,3 +2904,20 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_155, TestSize.Level1)
     formRenderRecordPtr_->RemoveWatchDogThreadMonitor();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_155 end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_156
+ * @tc.desc: Verify IsFormVisible
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_156, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_156 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->visibilityMap_.clear();
+    int64_t formId = 100;
+    EXPECT_FALSE(formRenderRecordPtr_->IsFormVisible(formId));
+    formRenderRecordPtr_->RecordFormVisibility(formId, true);
+    EXPECT_TRUE(formRenderRecordPtr_->IsFormVisible(formId));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_156 end";
+}
