@@ -136,7 +136,7 @@ void FormRenderEventReport::StartReleaseTimeoutReportTimer(int64_t formId, const
     const std::string taskName = "FRS_WaitReleaseRenderer_" + std::to_string(formId);
     int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer(taskName, WAIT_RELEASE_RENDERER_TIMEOUT,
         timeoutCallback, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
-    HILOG_INFO("waiting form release, formId: %{public}" PRId64 "timerId: %{public}d", formId, timerId);
+    HILOG_INFO("waiting form release, formId: %{public}" PRId64 ", timerId: %{public}d", formId, timerId);
     FormRenderEventReport::waitReleaseTimerMap_.emplace(formId, timerId);
 }
 

@@ -110,7 +110,6 @@ ohos_shared_library("libfms") {
     "services/src/common/connection/form_ability_connection_reporter.cpp",
     "services/src/common/event/form_event_handler.cpp",
     "services/src/common/event/form_event_notify_connection.cpp",
-    "services/src/common/event/form_event_report.cpp",
     "services/src/common/event/form_event_util.cpp",
     "services/src/common/event/system_event/form_sys_event_receiver.cpp",
     "services/src/common/event/system_event/form_systemload_listener.cpp",
@@ -364,6 +363,7 @@ ohos_shared_library("fmskit_native") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "hisysevent:libhisysevent",
   ]
 
   public_external_deps = [
@@ -484,6 +484,8 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
     "interfaces/inner_api/src/provider_connect_stub.cpp",
     "interfaces/inner_api/src/running_form_info.cpp",
+    "interfaces/inner_api/src/form_event_report.cpp",
+    "interfaces/inner_api/src/form_file_util.cpp",
   ]
 
   configs = [ ":formmgr_log_config" ]
@@ -514,6 +516,7 @@ ohos_shared_library("form_manager") {
     "napi:ace_napi",
     "os_account:os_account_innerkits",
     "samgr:samgr_proxy",
+    "hisysevent:libhisysevent",
   ]
 
   subsystem_name = "ability"

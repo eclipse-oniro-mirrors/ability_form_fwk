@@ -20,7 +20,7 @@
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_data_proxy_record.h"
 #include "common/util/form_util.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "form_mgr_errors.h"
 
 namespace OHOS {
@@ -68,7 +68,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         HILOG_ERROR("SubscribeFormData failed, ret:%{public}d", ret);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
             formId, formRecord.bundleName, formRecord.formName,
-            static_cast<int32_t>(AddFormFiledErrorType::SUBSCRIBE_DATA_SHARE_FAILED), ret);
+            static_cast<int32_t>(AddFormFailedErrorType::SUBSCRIBE_DATA_SHARE_FAILED), ret);
         return ret;
     }
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);

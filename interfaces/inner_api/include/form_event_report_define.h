@@ -33,7 +33,7 @@ struct FormEventInfo {
     bool distributedForm = false;
 };
 
-enum class CallDbFiledErrorType : int64_t {
+enum class CallDbFailedErrorType : int64_t {
     LOAD_DATABASE_FAILED = 1,
     DATABASE_RESET_CONNECT_FAILED,
     DATABASE_SAVE_FORMID_FAILED,
@@ -42,16 +42,25 @@ enum class CallDbFiledErrorType : int64_t {
     DATABASE_EXIT_ABNORMAL,
 };
 
-enum class InitFmsFiledErrorType : int64_t {
+enum class InitFmsFailedErrorType : int64_t {
     LOAD_FORM_DB_FAILED = 1,
     PUBLISH_SER_FAILED,
 };
 
-enum class AddFormFiledErrorType : int64_t {
+enum class AddFormFailedErrorType : int64_t {
     NUMBER_EXCEEDING_LIMIT = 1,
     CONNECT_FORM_RENDER_FAILED,
     CONNECT_FORM_PROVIDER_FAILED,
     SUBSCRIBE_DATA_SHARE_FAILED,
+    // Sending the card addition request to FMS failed or FMS failed to process the card addition request
+    ADD_FORM_FAILED,
+    // Sending a RenderForm request to FRS failed or an exception occurred while FRS processed the RenderForm request
+    RENDER_FORM_FAILED,
+    // Failed to create SurfaceNode
+    UI_CONTENT_INIT_FAILED,
+    // Failed to mount SurfaceNode
+    SURFACE_NODE_CREATE_FAILED,
+    SURFACE_NODE_REUSE_FAILED,
 };
 
 enum class UpdateFormErrorType : int64_t {
@@ -150,6 +159,7 @@ enum class FormEventName {
     REQUEST_PUBLIC_FORM,
     CONNECT_FORM_ABILITY_FAILED,
     RELOAD_FORM_FAILED,
+    RENDER_FORM_FAILED,
 };
  
 enum class RequestFormType : int8_t {

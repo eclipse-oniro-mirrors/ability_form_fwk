@@ -75,7 +75,7 @@
 #include "os_account_manager.h"
 #include "parameters.h"
 #include "system_ability_definition.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "common/util/form_report.h"
 #include "data_center/form_cust_config_mgr.h"
 #include "data_center/form_record/form_record_report.h"
@@ -400,16 +400,6 @@ void FormMgrAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, const
         iter->second = state;
         condition_.notify_all();
     }
-}
-
-AddFormResultErrorCode FormMgrAdapter::GetFormResultErrCode(const int64_t formId)
-{
-    std::lock_guard<std::mutex> lock(formResultMutex_);
-    const auto iter = formIdMap_.find(formId);
-    if (iter != formIdMap_.end()) {
-        return iter->second;
-    }
-    return AddFormResultErrorCode::SUCCESS;
 }
 
 ErrCode FormMgrAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates)
@@ -1286,7 +1276,7 @@ ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecor
             formId,
             record.bundleName,
             record.formName,
-            static_cast<int32_t>(AddFormFiledErrorType::CONNECT_FORM_PROVIDER_FAILED));
+            static_cast<int32_t>(AddFormFailedErrorType::CONNECT_FORM_PROVIDER_FAILED));
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
