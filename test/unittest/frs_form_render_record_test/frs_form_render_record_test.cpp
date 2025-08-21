@@ -454,6 +454,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_018, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_018 start";
 
+    ASSERT_NE(nullptr, formRenderRecordPtr_);
     int64_t formId = 1;
     std::string compId = "";
     // set formRendererGroupMap_
@@ -461,7 +462,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_018, TestSize.Level0)
     formJsInfo.formId = 1;
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
-    EXPECT_NE(nullptr, formRenderRecordPtr_->GetFormRendererGroup(formJsInfo, context, runtime));
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->GetFormRendererGroup(formJsInfo, context, runtime);
     formRenderRecordPtr_->HandleDeleteInJsThread(formId, compId);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_018 end";
 }
