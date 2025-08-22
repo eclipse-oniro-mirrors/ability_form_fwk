@@ -125,7 +125,6 @@ void FormRenderStatusTaskMgrTest(FuzzedDataProvider *fdp)
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
     std::string eventId = std::to_string(formId);
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
         formId, FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
