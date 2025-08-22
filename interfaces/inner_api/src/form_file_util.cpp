@@ -54,17 +54,18 @@ void FormFileUtil::GetDirFiles(const std::string &path, std::vector<std::string>
     closedir(dir);
 }
  
-int64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize)
+uint64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::vector<std::uint64_t> &filesSize)
 {
     struct stat statbuf = {0};
     uint64_t totalSize = 0;
     for (auto &file : files) {
         auto ret = stat(file.c_str(), &statbuf);
+        int err = errno;
         if (ret == 0) {
             filesSize.emplace_back(static_cast<uint64_t>(statbuf.st_size));
             totalSize += static_cast<uint64_t>(statbuf.st_size);
         } else {
-            HILOG_WARN("failed to stat file, errno: %{public}d", errno);
+            HILOG_WARN("failed to stat file, errno: %{public}d", err);
         }
     }
     return totalSize;
