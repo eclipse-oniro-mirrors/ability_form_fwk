@@ -1622,7 +1622,7 @@ int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &
 }
 
 int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::string &statusData,
-    const bool &isRecoverFormToHandleClickEvent, const std::string &eventId)
+    const bool isRecoverFormToHandleClickEvent, const std::string &eventId)
 {
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId:%{public}s", std::to_string(formId).c_str());
