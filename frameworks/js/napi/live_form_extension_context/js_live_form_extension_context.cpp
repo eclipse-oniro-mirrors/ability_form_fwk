@@ -24,6 +24,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_errors.h"
+#include "form_mgr_errors.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -139,16 +140,20 @@ napi_value JsLiveFormExtensionContext::OnStartAbilityByLiveForm(napi_env env, Na
                 FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
             return;
         }
- 
+
         ErrCode errCode = context->StartAbilityByFms(want, formId);
-        if (errCode != ERR_OK) {
-            HILOG_ERROR("StartAbilityByFms failed");
-            task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
-                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
+        if (errCode == ERR_OK) {
+            task.ResolveWithNoError(env, CreateJsUndefined(env));
             return;
         }
- 
-        task.ResolveWithNoError(env, CreateJsUndefined(env));
+
+        if (errCode == ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED || errCode == ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME) {
+            task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED),
+                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED)));
+        } else {
+            task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
+                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
+        }
     };
  
     napi_value result = nullptr;
