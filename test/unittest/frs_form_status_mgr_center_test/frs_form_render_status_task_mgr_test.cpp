@@ -245,6 +245,7 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecycleForm,
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
 
     std::string eventId = std::to_string(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
