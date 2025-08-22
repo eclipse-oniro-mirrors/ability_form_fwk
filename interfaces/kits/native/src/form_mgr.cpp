@@ -90,7 +90,9 @@ int FormMgr::AddForm(
     }
 
     errCode = remoteProxy_->AddForm(formId, want, callerToken, formInfo);
-    if (errCode != ERR_OK) {
+    if (errCode != ERR_OK && errCode != ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS &&
+        errCode != ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS) {
+        // The fault of card quantity exceeds the limit is not reported here
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
             formInfo.formId,
             formInfo.bundleName,
