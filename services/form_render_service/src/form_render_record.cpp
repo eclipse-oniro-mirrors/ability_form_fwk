@@ -461,8 +461,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
             renderRecord->MarkRenderFormTaskDone(renderType);
+            std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
             FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
-                FormFsmEvent::RENDER_FORM_DONE, formSupplyClient, want);
+                FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
             HILOG_INFO("HandleUpdateInJsThread end");
         };
         if (eventHandler == nullptr) {
@@ -1620,8 +1621,8 @@ int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &
     return ERR_OK;
 }
 
-int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
-    const std::string &statusData, const bool &isRecoverFormToHandleClickEvent, const Want &want)
+int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::string &statusData,
+    const bool &isRecoverFormToHandleClickEvent, const std::string &eventId)
 {
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId:%{public}s", std::to_string(formId).c_str());
@@ -1638,7 +1639,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
     }
 
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto task = [thisWeakPtr, formJsInfo, statusData, isRecoverFormToHandleClickEvent, formSupplyClient, want]() {
+    auto task = [thisWeakPtr, formJsInfo, statusData, isRecoverFormToHandleClickEvent, formSupplyClient, eventId]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord");
@@ -1646,7 +1647,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
         FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formJsInfo.formId,
-            FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient, want);
+            FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
     };
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler_ ");

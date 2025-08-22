@@ -36,16 +36,15 @@ FormRenderStatusTaskMgr::~FormRenderStatusTaskMgr()
 }
 
 void FormRenderStatusTaskMgr::OnRenderFormDone(
-    const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want)
+    const int64_t formId, const FormFsmEvent event, const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
         return;
     }
 
-    auto replyTask = [formId, event, formSupplyClient, want] {
+    auto replyTask = [formId, event, eventId, formSupplyClient] {
         Want replyWant;
-        std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
         if (eventId.empty()) {
             replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL));
         } else {
@@ -82,16 +81,15 @@ void FormRenderStatusTaskMgr::OnRecycleForm(const int64_t formId, const FormFsmE
 }
 
 void FormRenderStatusTaskMgr::OnRecoverFormDone(
-    const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want)
+    const int64_t formId, const FormFsmEvent event, const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
         return;
     }
 
-    auto replyTask = [formId, event, formSupplyClient, want] {
+    auto replyTask = [formId, event, eventId, formSupplyClient] {
         Want replyWant;
-        std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
         if (eventId.empty()) {
             replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL));
         } else {
@@ -104,16 +102,15 @@ void FormRenderStatusTaskMgr::OnRecoverFormDone(
 }
 
 void FormRenderStatusTaskMgr::OnDeleteFormDone(
-    const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want)
+    const int64_t formId, const FormFsmEvent event, const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
         return;
     }
 
-    auto replyTask = [formId, event, formSupplyClient, want] {
+    auto replyTask = [formId, event, eventId, formSupplyClient] {
         Want replyWant;
-        std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
         if (eventId.empty()) {
             replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL));
         } else {
@@ -126,16 +123,15 @@ void FormRenderStatusTaskMgr::OnDeleteFormDone(
 }
 
 void FormRenderStatusTaskMgr::OnRecycleFormDone(
-    const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want)
+    const int64_t formId, const FormFsmEvent event, const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
         return;
     }
 
-    auto replyTask = [formId, event, formSupplyClient, want] {
+    auto replyTask = [formId, event, eventId, formSupplyClient] {
         Want replyWant;
-        std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
         if (eventId.empty()) {
             replyWant.SetParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL));
         } else {

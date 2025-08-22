@@ -1788,10 +1788,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_088, TestSize.Level1)
     ASSERT_NE(formRenderRecordPtr_, nullptr);
     FormJsInfo formJsInfo;
     std::string statusData;
-    Want want;
-    std::string value = "EVENT_ID";
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, value);
-    EXPECT_EQ(formRenderRecordPtr_->RecoverForm(formJsInfo, statusData, true, want), ERR_OK);
+    std::string eventId = "EVENT_ID";
+    EXPECT_EQ(formRenderRecordPtr_->RecoverForm(formJsInfo, statusData, true, eventId), ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_088 end";
 }
 

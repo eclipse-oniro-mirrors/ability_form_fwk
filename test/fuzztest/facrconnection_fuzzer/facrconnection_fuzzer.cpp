@@ -104,36 +104,36 @@ void FormRenderStatusTaskMgrTest(FuzzedDataProvider *fdp)
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
     Want want;
     std::string statusData = std::to_string(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, nullptr, want);
-    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, nullptr, want);
-    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, nullptr, want);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, nullptr, want);
+    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, "", nullptr);
+    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, "", nullptr);
+    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, "", nullptr);
+    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, "", nullptr);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, nullptr);
     sptr<IRemoteObject> callerToken = new (std::nothrow) FormSupplyStubFuzzTest();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
     FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-        formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::RENDER_FORM_DONE, "", formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
-        formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::RECOVER_FORM_DONE, "", formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-        formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::DELETE_FORM_DONE, "", formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
-        formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::RECYCLE_FORM_DONE, "", formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
     std::string eventId = std::to_string(formId);
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-        formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
-        formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-        formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::DELETE_FORM_DONE, eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
-        formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient, want);
+        formId, FormFsmEvent::RECYCLE_FORM_DONE, eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
         formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(nullptr);
