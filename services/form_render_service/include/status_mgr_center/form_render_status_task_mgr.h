@@ -46,8 +46,10 @@ public:
      * @param formId Form ID
      * @param event Form State Machine event
      * @param formSupplyClient Smart pointer to form supply client
+     * @param want Form parameter object
      */
-    void OnRenderFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnRenderFormDone(
+        const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want);
 
     /**
      * @brief Callback function after form recycling data is completed
@@ -65,24 +67,30 @@ public:
      * @param formId Form ID
      * @param event Form State Machine event
      * @param formSupplyClient Smart pointer to form supply client
+     * @param want Form parameter object
      */
-    void OnRecoverFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnRecoverFormDone(
+        const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want);
 
     /**
      * @brief Callback function after form deletion is completed
      * @param formId Form ID
      * @param event Form State Machine event
      * @param formSupplyClient Smart pointer to form supply client
+     * @param want Form parameter object
      */
-    void OnDeleteFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnDeleteFormDone(
+        const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want);
 
     /**
      * @brief Callback function after form recycling is completed
      * @param formId Form ID
      * @param event Form State Machine event
      * @param formSupplyClient Smart pointer to form supply client
+     * @param want Form parameter object
      */
-    void OnRecycleFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnRecycleFormDone(
+        const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient, const Want &want);
 
     /**
      * @brief Schedules form recycle timeout task

@@ -87,14 +87,6 @@ int32_t FormRenderServiceMgr::RenderForm(
     SetFormSupplyClient(formSupplyClient);
     HILOG_DEBUG("connectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    if (eventId.empty()) {
-        HILOG_ERROR("GetTid failed");
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
-    HILOG_INFO("eventId:%{public}s", eventId.c_str());
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formJsInfo.formId, eventId);
-
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
         HILOG_ERROR("GetUid failed");
@@ -104,8 +96,8 @@ int32_t FormRenderServiceMgr::RenderForm(
     const auto result = UpdateRenderRecordByUid(uid, formRenderWant, formJsInfo, formSupplyClient);
     if (result != ERR_OK) {
         HILOG_ERROR("render form failed");
-        FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-            formJsInfo.formId, FormFsmEvent::RENDER_FORM_FAIL, formSupplyClient);
+        FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
+            FormFsmEvent::RENDER_FORM_FAIL, formSupplyClient, want);
     }
     formSupplyClient->OnRenderTaskDone(formJsInfo.formId, formRenderWant);
     return result;
@@ -122,12 +114,10 @@ int32_t FormRenderServiceMgr::StopRenderingForm(
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    if (uid.empty() || eventId.empty()) {
-        HILOG_ERROR("GetUid or GetEventid failed");
+    if (uid.empty()) {
+        HILOG_ERROR("GetUid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formJsInfo.formId, eventId);
 
     bool isRenderGroupEmpty = false;
     sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
@@ -151,10 +141,10 @@ int32_t FormRenderServiceMgr::StopRenderingForm(
     if (isRenderGroupEmpty) {
         formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
         FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-            formJsInfo.formId, FormFsmEvent::DELETE_FORM_FINISH, formSupplyClient);
+            formJsInfo.formId, FormFsmEvent::DELETE_FORM_FINISH, formSupplyClient, want);
     } else {
         FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-            formJsInfo.formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
+            formJsInfo.formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient, want);
     }
 
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
@@ -168,12 +158,10 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
 {
     HILOG_INFO("formId:%{public}" PRId64 ",compId:%{public}s,uid:%{public}s", formId, compId.c_str(), uid.c_str());
     SetCriticalTrueOnFormActivity();
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    if (formId <= 0 || compId.empty() || uid.empty() || eventId.empty()) {
+    if (formId <= 0 || compId.empty() || uid.empty()) {
         HILOG_ERROR("param invalid");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
 
     sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
     if (formSupplyClient == nullptr) {
@@ -196,7 +184,8 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
 
     search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
     HILOG_INFO("end,isRenderGroupEmpty:%{public}d", isRenderGroupEmpty);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
+        formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient, want);
     FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     if (isRenderGroupEmpty) {
         search->second->Release();
@@ -465,13 +454,11 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
     SetCriticalTrueOnFormActivity();
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    if (uid.empty() || eventId.empty()) {
-        HILOG_ERROR("empty uid or eventId, formId:%{public}" PRId64, formId);
+    if (uid.empty()) {
+        HILOG_ERROR("empty uid, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
 
     std::string statusData;
     const auto result = RecycleFormByUid(uid, statusData, formId);
@@ -508,12 +495,10 @@ int32_t FormRenderServiceMgr::RecoverForm(const FormJsInfo &formJsInfo, const Wa
     SetCriticalTrueOnFormActivity();
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    if (uid.empty() || eventId.empty()) {
-        HILOG_ERROR("empty uid or eventId, formId:%{public}" PRId64, formId);
+    if (uid.empty()) {
+        HILOG_ERROR("empty uid, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formJsInfo.formId, eventId);
     HILOG_INFO("formId:%{public}" PRId64 ", connectId:%{public}d, uid:%{public}s",
         formId,
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L),
@@ -635,7 +620,7 @@ int32_t FormRenderServiceMgr::RecoverFormByUid(
             HILOG_ERROR("null renderRecord of %{public}" PRId64, formJsInfo.formId);
             return RECYCLE_FORM_FAILED;
         }
-        return search->second->RecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
+        return search->second->RecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent, want);
     }
     HILOG_ERROR("can't find render record of %{public}" PRId64, formJsInfo.formId);
     return RENDER_FORM_FAILED;

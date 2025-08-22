@@ -116,18 +116,22 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRenderFormDo
 {
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRenderFormDone start";
 
+    Want want;
     int64_t formId = FORM_ID;
-    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, nullptr);
+    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, nullptr, want);
 
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
+        formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient, want);
 
     std::string eventId = std::to_string(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
+        formId, FormFsmEvent::RENDER_FORM_DONE, formSupplyClient, want);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRenderFormDone end";
 }
@@ -141,18 +145,22 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecoverFormD
 {
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRecoverFormDone start";
 
+    Want want;
     int64_t formId = FORM_ID;
-    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, nullptr);
+    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, nullptr, want);
 
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
+        formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient, want);
 
     std::string eventId = std::to_string(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
+        formId, FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient, want);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRecoverFormDone end";
 }
@@ -166,18 +174,22 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnDeleteFormDo
 {
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnDeleteFormDone start";
 
+    Want want;
     int64_t formId = FORM_ID;
-    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, nullptr);
+    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, nullptr, want);
 
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
+        formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient, want);
 
     std::string eventId = std::to_string(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
+        formId, FormFsmEvent::DELETE_FORM_DONE, formSupplyClient, want);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnDeleteFormDone end";
 }
@@ -191,18 +203,22 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecycleFormD
 {
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRecycleFormDone start";
 
+    Want want;
     int64_t formId = FORM_ID;
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, nullptr);
+    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, nullptr, want);
 
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
+        formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient, want);
 
     std::string eventId = std::to_string(formId);
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
     eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient);
+    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
+        formId, FormFsmEvent::RECYCLE_FORM_DONE, formSupplyClient, want);
 
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_OnRecycleFormDone end";
 }
@@ -245,19 +261,19 @@ HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_OnRecycleForm,
 HWTEST_F(FormRenderStatusTaskMgrTest, FormRenderStatusTaskMgrTest_RecycleTimeout, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_RecycleTimeout start";
- 
+
     int64_t formId = FORM_ID;
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(nullptr);
     EXPECT_EQ(false, FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId));
     EXPECT_EQ(false, FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
- 
+
     std::string queueStr = "FormRenderSerialQueue";
     std::shared_ptr<FormRenderSerialQueue> serialQueue = std::make_unique<FormRenderSerialQueue>(queueStr);
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue);
     EXPECT_EQ(false, FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
     EXPECT_EQ(true, FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId));
     EXPECT_EQ(true, FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId));
- 
+
     GTEST_LOG_(INFO) << "FormRenderStatusTaskMgrTest_RecycleTimeout end";
 }
 }  // namespace
