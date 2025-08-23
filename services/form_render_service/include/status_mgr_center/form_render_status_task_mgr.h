@@ -45,9 +45,11 @@ public:
      * @brief Callback function after form rendering is completed
      * @param formId Form ID
      * @param event Form State Machine event
+     * @param eventId The ID of the event
      * @param formSupplyClient Smart pointer to form supply client
      */
-    void OnRenderFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnRenderFormDone(const int64_t formId, const FormFsmEvent event, const std::string &eventId,
+        const sptr<IFormSupply> formSupplyClient);
 
     /**
      * @brief Callback function after form recycling data is completed
@@ -64,25 +66,31 @@ public:
      * Callback function after form recovery is completed
      * @param formId Form ID
      * @param event Form State Machine event
+     * @param eventId The ID of the event
      * @param formSupplyClient Smart pointer to form supply client
      */
-    void OnRecoverFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnRecoverFormDone(const int64_t formId, const FormFsmEvent event, const std::string &eventId,
+        const sptr<IFormSupply> formSupplyClient);
 
     /**
      * @brief Callback function after form deletion is completed
      * @param formId Form ID
      * @param event Form State Machine event
+     * @param eventId The ID of the event
      * @param formSupplyClient Smart pointer to form supply client
      */
-    void OnDeleteFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnDeleteFormDone(const int64_t formId, const FormFsmEvent event, const std::string &eventId,
+        const sptr<IFormSupply> formSupplyClient);
 
     /**
      * @brief Callback function after form recycling is completed
      * @param formId Form ID
      * @param event Form State Machine event
+     * @param eventId The ID of the event
      * @param formSupplyClient Smart pointer to form supply client
      */
-    void OnRecycleFormDone(const int64_t formId, const FormFsmEvent event, const sptr<IFormSupply> formSupplyClient);
+    void OnRecycleFormDone(const int64_t formId, const FormFsmEvent event, const std::string &eventId,
+        const sptr<IFormSupply> formSupplyClient);
 
     /**
      * @brief Schedules form recycle timeout task
