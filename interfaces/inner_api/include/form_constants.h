@@ -280,7 +280,7 @@ namespace Constants {
 
     struct StatusInfo {
         std::string activeState;
-        bool isVisible;
+        bool isSupportLauncher;
     };
 
     const std::map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {

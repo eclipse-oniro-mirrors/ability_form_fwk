@@ -2447,6 +2447,23 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
             return ERR_APPEXECFWK_FORM_NOT_TRUST;
         }
         HILOG_DEBUG("This application is a foreground program");
+    } else if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM) {
+        HILOG_DEBUG("support launcher check start");
+        std::unordered_map<std::string, std::string> liveFormStatusMap;
+        GetLiveFormStatus(liveFormStatusMap);
+        const std::string formId = want.GetStringParam(Constants::PARAM_LIVE_FORM_ID_KEY);
+        auto it = liveFormStatusMap.find(formId);
+        if (it == liveFormStatusMap.end()) {
+            HILOG_ERROR("This live form is non-existent, formId:%{public}s", formId.c_str());
+            return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+        }
+        std::string status = it->second;
+        auto iter = Constants::LIVE_FORM_STATUS_MAP.find(status);
+        if (iter == Constants::LIVE_FORM_STATUS_MAP.end() || !iter->second.isSupportLauncher) {
+            HILOG_ERROR("This live form is not support launcher, status:%{public}s", status.c_str());
+            return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+        }
+        HILOG_DEBUG("support launcher check success");
     }
 
     ElementName elementName = want.GetElement();
