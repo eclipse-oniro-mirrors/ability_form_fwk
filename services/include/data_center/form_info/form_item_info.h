@@ -487,12 +487,11 @@ public:
     void SetConditionUpdate(const std::vector<int32_t> &conditionUpdate);
     /**
      * @brief Set value of ignore visibility flag.
-     * @param updateDuration Update duration.
+     * @param True of visibility mean form visible, otherwise invisible.
      */
     void SetDataProxyIgnoreFormVisibility(bool visibility);
     /**
      * @brief get value of ignore visibility flag.
-     * @param updateDuration Update duration.
      */
     bool GetDataProxyIgnoreFormVisibility() const;
     /**

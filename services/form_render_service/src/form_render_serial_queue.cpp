@@ -77,16 +77,17 @@ bool FormRenderSerialQueue::CancelDelayTask(const std::string &taskName)
         HILOG_DEBUG("invalid task,CancelDelayTask %{public}s failed", taskName.c_str());
         return false;
     }
+    bool result = true;
     if (item->second != nullptr) {
         int32_t ret = queue_.cancel(item->second);
         if (ret != 0) {
             HILOG_ERROR("CancelDelayTask %{public}s failed,errCode:%{public}d", taskName.c_str(), ret);
-            return false;
+            result = false;
         }
     }
     taskMap_.erase(taskName);
     HILOG_DEBUG("CancelDelayTask success");
-    return true;
+    return result;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

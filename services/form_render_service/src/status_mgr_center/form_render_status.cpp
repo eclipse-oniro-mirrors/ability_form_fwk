@@ -40,7 +40,7 @@ FormFsmStatus FormRenderStatus::GetFormStatus(const int64_t formId)
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
         HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
-        return FormFsmStatus::INIT;
+        return FormFsmStatus::UNPROCESSABLE;
     }
 
     return iter->second;

@@ -46,8 +46,8 @@ constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
 constexpr int32_t FORM_CLIENT_INVALID = -1;
 constexpr int64_t MIN_DURATION_MS = 1500;
 constexpr int64_t TASK_ONCONFIGURATIONUPDATED_DELAY_MS = 1000;
-const std::string TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
 const std::string FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
+const std::string TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
 }  // namespace
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -77,7 +77,6 @@ int32_t FormRenderServiceMgr::RenderForm(
         formJsInfo.jsFormCodePath.c_str(),
         formJsInfo.formSrc.c_str(),
         formJsInfo.formId);
-
     SetCriticalTrueOnFormActivity();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
@@ -114,6 +113,7 @@ int32_t FormRenderServiceMgr::StopRenderingForm(
         HILOG_ERROR("null IFormSupply");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
+
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
     if (uid.empty() || eventId.empty()) {
@@ -331,9 +331,7 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
         HILOG_ERROR("null configuration");
         return;
     }
-
     SetCriticalTrueOnFormActivity();
-
     SetConfiguration(configuration);
 
 #ifdef SUPPORT_POWER
@@ -454,6 +452,7 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
         HILOG_ERROR("formId is negative");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
+
     SetCriticalTrueOnFormActivity();
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
@@ -567,7 +566,7 @@ bool FormRenderServiceMgr::IsRenderRecordExist(const std::string &uid)
 {
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     auto iterator = renderRecordMap_.find(uid);
-    return iterator != renderRecordMap_.end();
+    return iterator != renderRecordMap_.end() && iterator->second != nullptr;
 }
 
 int32_t FormRenderServiceMgr::UpdateRenderRecordByUid(const std::string &uid, Want &formRenderWant,
@@ -680,6 +679,7 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
  */
 void FormRenderServiceMgr::SetCriticalFalseOnAllFormInvisible()
 {
+    HILOG_INFO("critical:%{public}d", FormMemmgrClient::GetInstance().IsCritical());
     if (!FormMemmgrClient::GetInstance().IsCritical()) {
         return;
     }
@@ -695,6 +695,7 @@ void FormRenderServiceMgr::SetCriticalFalseOnAllFormInvisible()
 
 void FormRenderServiceMgr::SetCriticalTrueOnFormActivity()
 {
+    HILOG_INFO("critical:%{public}d", FormMemmgrClient::GetInstance().IsCritical());
     if (FormMemmgrClient::GetInstance().IsCritical()) {
         return;
     }
