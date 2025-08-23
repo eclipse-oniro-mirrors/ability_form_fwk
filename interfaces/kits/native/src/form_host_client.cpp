@@ -266,7 +266,7 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
     std::lock_guard<std::mutex> lock(formStateCallbackMutex_);
     auto iter = formStateCallbackMap_.find(key);
     if (iter == formStateCallbackMap_.end()) {
-        HILOG_ERROR("state callback not found");
+        HILOG_INFO("state callback not found");
     } else {
         std::set<std::shared_ptr<FormStateCallbackInterface>> &callbackSet = iter->second;
         for (auto &callback: callbackSet) {

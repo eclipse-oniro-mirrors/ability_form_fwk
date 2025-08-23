@@ -782,7 +782,7 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
-   
+    
    /**
      * @brief Register getFormRect proxy in fms.
      * @param callerToken The form host proxy.
@@ -805,15 +805,6 @@ public:
     ErrCode GetFormRect(const int64_t formId, Rect &rect);
 
     /**
-     * @brief Update form size.
-     * @param formId The Id of the form to update.
-     * @param newDimension The dimension value to be updated.
-     * @param newRect The rect value to be updated.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect);
-
-    /**
      * @brief Register getLiveFormStatus proxy in fms.
      * @param callerToken The form host proxy.
      * @return Returns true for form register success
@@ -825,6 +816,16 @@ public:
      * @return Return true if unregister success
      */
     bool UnregisterGetLiveFormStatusProxy();
+    
+    /**
+     * @brief Update form size.
+     * @param formId The Id of the form to update.
+     * @param newDimension The dimension value to be updated.
+     * @param newRect The rect value to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect);
+
 private:
     /**
      * @brief Connect form manager service.
