@@ -81,7 +81,7 @@ int FormMgr::AddForm(
     }
     // Perform read lock control. Do not assign a value to remoteProxy_ in subsequent operations.
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
-    
+
     // To prevent the obtained value of remoteProxy_ from being null,
     // the system checks whether the value of remoteProxy_ is null.
     if (remoteProxy_ == nullptr) {
@@ -912,7 +912,7 @@ ErrCode FormMgr::Connect()
             HILOG_ERROR("fail add death recipient to FormMgrService");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
-    
+
         remoteProxy_ = iface_cast<IFormMgr>(remoteObject);
         if (remoteProxy_ == nullptr) {
             HILOG_ERROR("null remoteProxy_");
@@ -1961,7 +1961,7 @@ int32_t FormMgr::EnableForms(const std::string bundleName, const bool enable)
     if (errCode != ERR_OK) {
         return errCode;
     }
-    
+
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
