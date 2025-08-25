@@ -1637,14 +1637,8 @@ bool FormTimerMgr::IsActiveUser(int32_t userId)
 bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(dynamicMutex_);
-    std::list<DynamicRefreshItem>::iterator itItem;
-    for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
-        if (itItem->formId == formId) {
-            break;
-        }
-        ++itItem;
-    }
-
+    auto itItem = std::find_if(dynamicRefreshTasks_.begin(), dynamicRefreshTasks_.end(),
+        [formId](const auto &it) { return it.formId == formId; });
     if (itItem == dynamicRefreshTasks_.end()) {
         HILOG_WARN("can't find dynamic refresh task, just restore. formId:%{public}" PRId64, formId);
         SetIntervalEnableFlag(formId, true);
