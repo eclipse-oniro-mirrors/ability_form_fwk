@@ -181,7 +181,6 @@ public:
      */
     ErrCode GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
         const int64_t &formId, int32_t userId = Constants::INVALID_USER_ID) const;
-
     /**
      * @brief Get published form records.
      * @param bundleName Bundle name.
@@ -315,7 +314,7 @@ public:
      * @param refreshType the form refresh type.
      */
     void GetRefreshType(const int64_t formId, int &refreshType);
-
+    
     /**
      * @brief Set needAddForm for FormRecord.
      * @param formId The Id of the form.
@@ -336,26 +335,26 @@ public:
      * @param timerRefresh true or false.
      */
     void SetTimerRefresh(const int64_t formId, const bool timerRefresh);
-
+    
     /**
     * @brief Set isHostRefresh for FormRecord.
     * @param formId The Id of the form.
     * @param hostRefresh true or false.
     */
     void SetHostRefresh(const int64_t formId, const bool hostRefresh);
-
+ 
     /**
     * @brief Clear want cache for FormRecord.
     * @param formId The Id of the form.
     */
     void ClearWantCache(const int64_t formId);
-
+    
     /**
     * @brief Clear host refresh flag.
     * @param formId The Id of the form.
     */
     void ClearHostRefreshFlag(const int64_t formId);
-
+    
     /**
      * @brief Get updated form info.
      * @param record FormRecord.
@@ -822,7 +821,7 @@ public:
      * @param lock Ture or false.
      */
     ErrCode GetFormLock(const int64_t formId, bool &lock);
-
+    
     /**
      * @brief Set form protect or disprotect.
      * @param formId The Id of the form.
@@ -954,7 +953,7 @@ public:
      * @param isLowMemory is low memory.
      */
     void SetIsLowMemory(bool isLowMemory);
-
+ 
     /**
      * @brief Get low memory state.
      * @return Returns true on low memory state.

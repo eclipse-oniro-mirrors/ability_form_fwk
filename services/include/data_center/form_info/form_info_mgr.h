@@ -139,7 +139,7 @@ public:
     bool HasReloadedFormInfos();
 
     ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
-        int32_t providerUserId, bool &appFormVisibleNofify);
+        int32_t providerUserId, bool &appFormVisibleNotify);
     bool IsMultiAppForm(const FormInfo &formInfo);
 
 private:

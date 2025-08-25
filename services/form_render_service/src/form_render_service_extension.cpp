@@ -16,11 +16,14 @@
 #include "form_render_service_extension.h"
 
 #include "ability_info.h"
+#include "background_task_mgr_helper.h"
 #include "context_impl.h"
+#include "efficiency_resource_info.h"
 #include "fms_log_wrapper.h"
 #include "form_render_impl.h"
 #include "form_render_service_mgr.h"
 #include "hitrace_meter.h"
+#include "resource_type.h"
 #include "service_extension_context.h"
 
 namespace OHOS {
@@ -50,12 +53,17 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
         FormRenderServiceMgr::GetInstance().SetConfiguration(context->GetConfiguration());
     }
 
+    // Prevents FRS-processe from being frozen (Phone, WGR, PC only)
+    OHOS::BackgroundTaskMgr::EfficiencyResourceInfo resourceInfo(
+        OHOS::BackgroundTaskMgr::ResourceType::Type::CPU, true, 0, "", true);
+    auto ret = OHOS::BackgroundTaskMgr::BackgroundTaskMgrHelper::ApplyEfficiencyResources(resourceInfo);
     HILOG_INFO("FormRenderServiceExtension OnStart begin");
 }
 
 void FormRenderServiceExtension::OnStop()
 {
     ServiceExtension::OnStop();
+    auto ret = OHOS::BackgroundTaskMgr::BackgroundTaskMgrHelper::ResetAllEfficiencyResources();
     HILOG_INFO("FormRenderServiceExtension OnStop begin");
 }
 
