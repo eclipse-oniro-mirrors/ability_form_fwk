@@ -425,4 +425,102 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_016, TestSize.Level0)
     EXPECT_EQ(code, 100);
     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_016 end";
 }
+
+/**
+ * @tc.number: FmsFormDbRecordTest_017
+ * @tc.name: DeleteFormDBInfoCache
+*/
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_017, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_017 start";
+
+    int64_t formId = 100;
+    FormDBInfo formDbInfo(formId, formRecord_);
+    FormDbCache::GetInstance().SaveFormInfo(formDbInfo);
+    FormDbCache::GetInstance().DeleteFormDBInfoCache(formId);
+
+    auto &formDBInfos = FormDbCache::GetInstance().formDBInfos_;
+    auto iter = find(formDBInfos.begin(), formDBInfos.end(), formDbInfo);
+    EXPECT_EQ(iter, formDBInfos.end());
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_017 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_018
+ * @tc.name: FindAndUpdateFormDBInfoCache
+*/
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_018, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_018 start";
+
+    int64_t formId = 100;
+    FormDbCache::GetInstance().formDBInfos_.clear();
+    FormDBInfo formDbInfo(formId, formRecord_);
+    FormDBInfo findInfo;
+    EXPECT_FALSE(FormDbCache::GetInstance().FindAndSaveFormDBInfoCache(formDbInfo, findInfo));
+    EXPECT_TRUE(FormDbCache::GetInstance().FindAndSaveFormDBInfoCache(formDbInfo, findInfo));
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_018 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_019
+ * @tc.name: FindAndUpdateFormLocation
+*/
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_019, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_019 start";
+
+    int64_t formId = 100;
+    FormDbCache::GetInstance().formDBInfos_.clear();
+    FormDBInfo formDbInfo(formId, formRecord_);
+    formDbInfo.formLocation = Constants::FormLocation::OTHER;
+
+    FormDbCache::GetInstance().SaveFormInfo(formDbInfo);
+
+    FormDBInfo findInfo;
+    FormDbCache::GetInstance().FindAndUpdateFormLocation(formId,
+        static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION), findInfo);
+    EXPECT_EQ(findInfo.formLocation, formDbInfo.formLocation);
+
+    auto &formDBInfos = FormDbCache::GetInstance().formDBInfos_;
+    auto iter = find(formDBInfos.begin(), formDBInfos.end(), formDbInfo);
+    EXPECT_EQ(iter->formLocation, Constants::FormLocation::AI_SUGGESTION);
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_019 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_020
+ * @tc.name: GetFormDBInfoCacheByBundleName
+*/
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_020, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_020 start";
+    int64_t formId = 100;
+    FormDBInfo formDbInfo(formId, formRecord_);
+    formDbInfo.bundleName = "testBundleName";
+    formDbInfo.providerUserId = 200;
+    FormDbCache::GetInstance().SaveFormInfo(formDbInfo);
+    std::vector<FormDBInfo> findInfos;
+    FormDbCache::GetInstance().GetFormDBInfoCacheByBundleName(formDbInfo.bundleName, formDbInfo.providerUserId,
+        findInfos);
+    EXPECT_TRUE(findInfos.size() > 0);
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_020 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_021
+ * @tc.name: GetFormDBInfoCacheByUserId
+*/
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_021, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_021 start";
+    int64_t formId = 100;
+    FormDBInfo formDbInfo(formId, formRecord_);
+    formDbInfo.providerUserId = 200;
+    FormDbCache::GetInstance().SaveFormInfo(formDbInfo);
+    std::vector<FormDBInfo> findInfos;
+    FormDbCache::GetInstance().GetFormDBInfoCacheByUserId(formDbInfo.providerUserId, findInfos);
+    EXPECT_TRUE(findInfos.size() > 0);
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_021 end";
+}
 }

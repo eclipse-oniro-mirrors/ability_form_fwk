@@ -65,12 +65,10 @@ void FormDbCache::Start()
 ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
 {
     HILOG_INFO("formId:%{public}" PRId64, formDBInfo.formId);
-    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
-    if (iter != formDBInfos_.end()) {
-        if (iter->Compare(formDBInfo) == false) {
+    FormDBInfo tmpInfo;
+    if (FindAndSaveFormDBInfoCache(formDBInfo, tmpInfo)) {
+        if (tmpInfo.Compare(formDBInfo) == false) {
             HILOG_WARN("need update, formId[%{public}" PRId64 "]", formDBInfo.formId);
-            *iter = formDBInfo;
             InnerFormInfo innerFormInfo(formDBInfo);
             return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
         } else {
@@ -78,7 +76,6 @@ ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
             return ERR_OK;
         }
     } else {
-        formDBInfos_.emplace_back(formDBInfo);
         InnerFormInfo innerFormInfo(formDBInfo);
         return FormInfoRdbStorageMgr::GetInstance().SaveStorageFormData(innerFormInfo);
     }
@@ -118,20 +115,11 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
 ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 {
     HILOG_INFO("form: %{public}" PRId64, formId);
-    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    FormDBInfo tmpForm;
-    tmpForm.formId = formId;
-    auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), tmpForm);
-    if (iter == formDBInfos_.end()) {
-        HILOG_WARN("not find form:%{public}" PRId64, formId);
-    } else {
-        formDBInfos_.erase(iter);
-    }
+    DeleteFormDBInfoCache(formId);
     if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId)) == ERR_OK) {
         return ERR_OK;
-    } else {
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 /**
  * @brief Delete form data in DbCache and DB with formId.
@@ -143,19 +131,15 @@ ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, c
     std::vector<FormDBInfo> &removedDBForms)
 {
     HILOG_INFO("bundleName: %{public}s", bundleName.c_str());
-    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    std::vector<FormDBInfo>::iterator itRecord;
-    for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
-        if ((bundleName == itRecord->bundleName) && (userId == itRecord->providerUserId)) {
-            int64_t formId = itRecord->formId;
-            if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId)) == ERR_OK) {
-                removedDBForms.emplace_back(*itRecord);
-                itRecord = formDBInfos_.erase(itRecord);
-            } else {
-                itRecord++;
-            }
+    GetFormDBInfoCacheByBundleName(bundleName, userId, removedDBForms);
+
+    for (auto iter = removedDBForms.begin(); iter != removedDBForms.end();) {
+        if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(iter->formId)) == ERR_OK) {
+            DeleteFormDBInfoCache(iter->formId);
+            iter++;
         } else {
-            itRecord++;
+            HILOG_WARN("delete storage form data failed, formId:%{public}" PRId64, iter->formId);
+            iter = removedDBForms.erase(iter);
         }
     }
     return ERR_OK;
@@ -305,19 +289,13 @@ int FormDbCache::GetMatchCount(const std::string &bundleName, const std::string 
 void FormDbCache::DeleteDBFormsByUserId(const int32_t userId)
 {
     HILOG_INFO("userId: %{public}d", userId);
-    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    std::vector<FormDBInfo>::iterator itRecord;
-    for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
-        if (userId == itRecord->providerUserId) {
-            int64_t formId = itRecord->formId;
-            if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId)) == ERR_OK) {
-                itRecord = formDBInfos_.erase(itRecord);
-            } else {
-                HILOG_ERROR("fail delete form, formId[%{public}" PRId64 "]", formId);
-                itRecord++;
-            }
+    std::vector<FormDBInfo> removedDBForms;
+    GetFormDBInfoCacheByUserId(userId, removedDBForms);
+    for (auto &info : removedDBForms) {
+        if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(info.formId)) == ERR_OK) {
+            DeleteFormDBInfoCache(info.formId);
         } else {
-            itRecord++;
+            HILOG_ERROR("fail delete form, formId[%{public}" PRId64 "]", info.formId);
         }
     }
 }
@@ -484,15 +462,10 @@ bool FormDbCache::IsHostOwner(int64_t formId, int32_t hostUid)
 
 ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t formLocation)
 {
-    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    std::vector<FormDBInfo>::iterator itRecord;
-    for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
-        if (itRecord->formId == formId) {
-            itRecord->formLocation = (Constants::FormLocation)formLocation;
-            InnerFormInfo innerFormInfo(*itRecord);
-            return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
-        }
-        ++itRecord;
+    FormDBInfo dbInfo;
+    if (FindAndUpdateFormLocation(formId, formLocation, dbInfo)) {
+        InnerFormInfo innerFormInfo(dbInfo);
+        return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
     }
     return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
 }
@@ -558,6 +531,69 @@ void FormDbCache::UpdateMultiAppFormVersionCode(const std::string &bundleName, u
     }
     multiAppFormVersionCodeMap_[bundleName] = versionCode;
     FormInfoRdbStorageMgr::GetInstance().UpdateMultiAppFormVersionCode(bundleName, std::to_string(versionCode));
+}
+
+void FormDbCache::DeleteFormDBInfoCache(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    FormDBInfo tmpForm;
+    tmpForm.formId = formId;
+    auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), tmpForm);
+    if (iter == formDBInfos_.end()) {
+        HILOG_WARN("not find form:%{public}" PRId64, formId);
+    } else {
+        formDBInfos_.erase(iter);
+    }
+}
+
+bool FormDbCache::FindAndSaveFormDBInfoCache(const FormDBInfo &formDBInfo, FormDBInfo &findInfo)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
+    if (iter != formDBInfos_.end()) {
+        findInfo = *iter;
+        if (iter->Compare(formDBInfo) == false) {
+            *iter = formDBInfo;
+        }
+        return true;
+    }
+    formDBInfos_.emplace_back(formDBInfo);
+    return false;
+}
+
+bool FormDbCache::FindAndUpdateFormLocation(int64_t formId, int32_t formLocation, FormDBInfo &findInfo)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    FormDBInfo tmpForm;
+    tmpForm.formId = formId;
+    auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), tmpForm);
+    if (iter != formDBInfos_.end()) {
+        findInfo = *iter;
+        iter->formLocation = static_cast<Constants::FormLocation>(formLocation);
+        return true;
+    }
+    return false;
+}
+
+void FormDbCache::GetFormDBInfoCacheByBundleName(const std::string &bundleName, const int32_t providerUserId,
+    std::vector<FormDBInfo> &dbFormInfos)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (const auto &info : formDBInfos_) {
+        if ((bundleName == info.bundleName) && (providerUserId == info.providerUserId)) {
+            dbFormInfos.emplace_back(info);
+        }
+    }
+}
+
+void FormDbCache::GetFormDBInfoCacheByUserId(const int32_t providerUserId, std::vector<FormDBInfo> &dbFormInfos)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (const auto &info : formDBInfos_) {
+        if (providerUserId == info.providerUserId) {
+            dbFormInfos.emplace_back(info);
+        }
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

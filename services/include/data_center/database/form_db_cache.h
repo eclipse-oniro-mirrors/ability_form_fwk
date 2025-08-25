@@ -211,6 +211,14 @@ private:
      */
     void DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap);
 #endif
+
+    void DeleteFormDBInfoCache(int64_t formId);
+    bool FindAndSaveFormDBInfoCache(const FormDBInfo &formDBInfo, FormDBInfo &findInfo);
+    bool FindAndUpdateFormLocation(int64_t formId, int32_t formLocation, FormDBInfo &findInfo);
+    void GetFormDBInfoCacheByBundleName(const std::string &bundleName, const int32_t providerUserId,
+        std::vector<FormDBInfo> &dbFormInfos);
+    void GetFormDBInfoCacheByUserId(const int32_t providerUserId, std::vector<FormDBInfo> &dbFormInfos);
+
     mutable std::mutex formDBInfosMutex_;
     std::vector<FormDBInfo> formDBInfos_;
     mutable std::mutex multiAppFormVersionCodeMutex_;
