@@ -1479,4 +1479,18 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0088, Function | MediumTest | Lev
     formTimerMgr->ExecTimerTask(timerTask);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0088 end";
 }
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0089
+ * @tc.name: IsDynamicTimerExpired.
+ * @tc.desc: test IsDynamicTimerExpired function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 start";
+    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
+    ASSERT_NE(nullptr, formTimerMgr);
+    EXPECT_TRUE(formTimerMgr->IsDynamicTimerExpired(PARAM_FORM_ID_VALUE_1));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 end";
+}
 }

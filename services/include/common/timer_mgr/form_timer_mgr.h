@@ -382,6 +382,7 @@ private:
     void ClearDiskInfoReportTimer();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
+    bool IsDynamicTimerExpired(int64_t formId);
 
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
