@@ -930,12 +930,23 @@ void FormTimerMgr::OnIntervalTimeOut()
             "currentTime:%{public}" PRId64 ", refreshTime:%{public}" PRId64 ", isEnable:%{public}d",
             intervalTask.formId, intervalTask.period, currentTime,
             intervalTask.refreshTime, intervalTask.isEnable);
-        if (((currentTime - intervalTask.refreshTime) >= intervalTask.period ||
-            std::abs((currentTime - intervalTask.refreshTime) - intervalTask.period) < Constants::ABS_TIME) &&
-            intervalTask.isEnable && refreshLimiter_.IsEnableRefresh(intervalTask.formId)) {
-            intervalTask.refreshTime = currentTime;
-            updateList.emplace_back(intervalTask);
+        if (!((currentTime - intervalTask.refreshTime) >= intervalTask.period ||
+            std::abs((currentTime - intervalTask.refreshTime) - intervalTask.period) <
+            (Constants::ABS_TIME / timeSpeed_))) {
+            continue;
         }
+
+        // Verify if the next refresh will expire
+        if (!intervalTask.isEnable && !IsDynamicTimerExpired(intervalTask.formId)) {
+            continue;
+        }
+
+        if (!refreshLimiter_.IsEnableRefresh(intervalTask.formId)) {
+            continue;
+        }
+
+        intervalTask.refreshTime = currentTime;
+        updateList.emplace_back(intervalTask);
     }
 
     if (!updateList.empty()) {
@@ -1621,6 +1632,37 @@ bool FormTimerMgr::IsActiveUser(int32_t userId)
         return true;
     }
     return false;
+}
+
+bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(dynamicMutex_);
+    std::list<DynamicRefreshItem>::iterator itItem;
+    for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
+        if (itItem->formId == formId) {
+            break;
+        }
+        ++itItem;
+    }
+
+    if (itItem == dynamicRefreshTasks_.end()) {
+        HILOG_WARN("can't find dynamic refresh task, just restore. formId:%{public}" PRId64, formId);
+        SetIntervalEnableFlag(formId, true);
+        return true;
+    }
+
+    auto timeInSec = GetBootTimeMs();
+    if (itItem->settedTime > timeInSec) {
+        HILOG_INFO("dynamic refresh task wait trigger. formId:%{public}" PRId64, formId);
+        return false;
+    }
+
+    HILOG_WARN("dynamic refresh timed out without triggering. formId:%{public}" PRId64, formId);
+    SetIntervalEnableFlag(formId, true);
+    dynamicRefreshTasks_.erase(itItem);
+    dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
+    UpdateDynamicAlarm();
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
