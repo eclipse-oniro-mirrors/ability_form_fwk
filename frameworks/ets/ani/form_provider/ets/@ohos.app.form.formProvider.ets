@@ -17,7 +17,7 @@ import { AsyncCallback } from '@ohos.base';
 
 export namespace formProvider {
 
-  loadLibrary("formProvider_ani.z");
+  loadLibraryWithPermissionCheck("formProvider_ani.z", "@ohos.app.form.formProvider");
 
   native function setFormNextRefreshTime_inner(formId: string, minute: number): void;
 

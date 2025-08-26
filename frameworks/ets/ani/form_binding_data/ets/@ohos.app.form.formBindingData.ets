@@ -15,7 +15,7 @@
 
 export namespace formBindingData {
 
-  loadLibrary("formBindingData_ani.z");
+  loadLibraryWithPermissionCheck("formBindingData_ani.z", "@ohos.app.form.formBindingData");
 
   interface ProxyData {
     key: string;
