@@ -2343,23 +2343,15 @@ void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataPara
     napi_value callResult = nullptr;
     napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, &callResult);
     if (status != napi_ok) {
+        HILOG_INFO("RequestOverflowInner fail");
         dataParam->result = false;
+        napi_get_and_clear_last_exception(overflowEnv_, &callResult);
         napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
 
-    napi_valuetype returnType;
-    napi_typeof(overflowEnv_, callResult, &returnType);
-
-    bool result = false;
-    if (returnType == napi_undefined) {
-        dataParam->result = false;
-        napi_close_handle_scope(overflowEnv_, scope);
-        return;
-    }
-
-    napi_get_value_bool(overflowEnv_, callResult, &result);
-    dataParam->result = result;
+    HILOG_INFO("RequestOverflowInner success");
+    dataParam->result = true;
     napi_close_handle_scope(overflowEnv_, scope);
 }
 
@@ -2483,23 +2475,15 @@ void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam
     napi_value callResult = nullptr;
     napi_status status = napi_call_function(changeSceneAnimationStateEnv_, nullptr, myCallback, 1, args, &callResult);
     if (status != napi_ok) {
+        HILOG_INFO("ChangeSceneAnimationStateInner fail");
         dataParam->result = false;
+        napi_get_and_clear_last_exception(changeSceneAnimationStateEnv_, &callResult);
         napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
         return;
     }
 
-    napi_valuetype returnType;
-    napi_typeof(changeSceneAnimationStateEnv_, callResult, &returnType);
-
-    if (returnType == napi_undefined) {
-        dataParam->result = false;
-        napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
-        return;
-    }
-
-    bool result = false;
-    napi_get_value_bool(changeSceneAnimationStateEnv_, callResult, &result);
-    dataParam->result = result;
+    HILOG_INFO("ChangeSceneAnimationStateInner success");
+    dataParam->result = true;
     napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
 }
 
