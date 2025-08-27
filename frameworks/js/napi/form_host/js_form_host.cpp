@@ -2340,11 +2340,11 @@ void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataPara
     }
 
     napi_value args[] = { requestObj };
-    napi_value callResult = nullptr;
-    napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, &callResult);
+    napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, nullptr);
     if (status != napi_ok) {
         HILOG_INFO("RequestOverflowInner fail");
         dataParam->result = false;
+        napi_value callResult = nullptr;
         napi_get_and_clear_last_exception(overflowEnv_, &callResult);
         napi_close_handle_scope(overflowEnv_, scope);
         return;
@@ -2472,11 +2472,11 @@ void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam
     }
 
     napi_value args[] = { requestObj };
-    napi_value callResult = nullptr;
-    napi_status status = napi_call_function(changeSceneAnimationStateEnv_, nullptr, myCallback, 1, args, &callResult);
+    napi_status status = napi_call_function(changeSceneAnimationStateEnv_, nullptr, myCallback, 1, args, nullptr);
     if (status != napi_ok) {
         HILOG_INFO("ChangeSceneAnimationStateInner fail");
         dataParam->result = false;
+        napi_value callResult = nullptr;
         napi_get_and_clear_last_exception(changeSceneAnimationStateEnv_, &callResult);
         napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
         return;
