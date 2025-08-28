@@ -80,6 +80,7 @@ enum class DeleteFormErrorType : int32_t {
 enum class RecycleRecoverFormErrorType : int32_t {
     RECYCLE_FORM_FAILED = 1,
     RECOVER_FORM_FAILED,
+    RELEASE_FORM_FAILED,
     CHECK_FORM_STATUS_FAILED
 };
 

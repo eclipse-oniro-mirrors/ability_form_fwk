@@ -40,7 +40,6 @@ namespace {
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RENDER_FORM_ID = -1;
 constexpr int32_t RENDER_FORM_FAILED = -1;
-constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_ID = 1;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
@@ -1266,7 +1265,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_061, TestSize.Level0)
 
     int64_t formId = 15;
     std::string statusData("test");
-    EXPECT_EQ(RECYCLE_FORM_FAILED, formRenderRecordPtr_->HandleRecycleForm(formId, statusData));
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP, formRenderRecordPtr_->HandleRecycleForm(formId, statusData));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_061 end";
 }
 
@@ -1285,7 +1285,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_062, TestSize.Level0)
     int64_t formId = 15;
     std::string statusData("test");
     formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
-    EXPECT_EQ(RECYCLE_FORM_FAILED, formRenderRecordPtr_->HandleRecycleForm(formId, statusData));
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP, formRenderRecordPtr_->HandleRecycleForm(formId, statusData));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_062 end";
 }
 
@@ -1729,7 +1730,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_085, TestSize.Level1)
 
     int64_t formId = FORM_ID;
     std::string statusData;
-    EXPECT_EQ(formRenderRecordPtr_->RecycleForm(formId, statusData), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderRecordPtr_->RecycleForm(formId, statusData), ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_085 end";
 }
 
@@ -1748,7 +1749,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_086, TestSize.Level1)
     int64_t formId = FORM_ID;
     formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
     std::string statusData;
-    EXPECT_EQ(formRenderRecordPtr_->RecycleForm(formId, statusData), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderRecordPtr_->RecycleForm(formId, statusData), ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_086 end";
 }
 

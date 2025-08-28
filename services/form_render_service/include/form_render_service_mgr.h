@@ -126,6 +126,11 @@ private:
     std::shared_ptr<OHOS::AppExecFwk::Configuration> GetNeedApplyConfig();
     void CacheAppliedConfig();
     int32_t ReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want);
+    int32_t ProcessRenderForm(const FormJsInfo &formJsInfo, const Want &want);
+    int32_t ProcessRecycleForm(const int64_t formId, const Want &want, std::string &statusDataOut);
+    int32_t ProcessReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid, const Want &want);
+    int32_t ProcessRecoverForm(const FormJsInfo &formJsInfo, const Want &want);
+    int32_t ProcessStopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, bool &isRenderGroupEmptyOut);
 
 private:
     std::mutex renderRecordMutex_;

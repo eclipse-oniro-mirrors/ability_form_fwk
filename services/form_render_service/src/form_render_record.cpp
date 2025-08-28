@@ -1582,10 +1582,10 @@ void FormRenderRecord::HandleFormRenderGC()
 int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &statusData)
 {
     HILOG_INFO("RecycleForm begin, formId:%{public}s", std::to_string(formId).c_str());
-    int32_t result = RECYCLE_FORM_FAILED;
+    int32_t result = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (!CheckEventHandler(true, true)) {
         HILOG_ERROR("null eventHandler_");
-        return RENDER_FORM_FAILED;
+        return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
 
     auto task = [thisWeakPtr = weak_from_this(), formId, &statusData, &result]() {
@@ -1610,11 +1610,11 @@ int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &
     auto search = formRendererGroupMap_.find(formId);
     if (search == formRendererGroupMap_.end()) {
         HILOG_ERROR("invalid FormRendererGroup");
-        return RECYCLE_FORM_FAILED;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     if (!search->second) {
         HILOG_ERROR("FormRendererGroup was founded but null");
-        return RECYCLE_FORM_FAILED;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
 
     search->second->RecycleForm(statusData);

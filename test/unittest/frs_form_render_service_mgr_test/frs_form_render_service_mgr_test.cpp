@@ -124,6 +124,13 @@ public:
     const int number_ = 1;
 };
 
+static void SetFormSupplyClient(FormRenderServiceMgr &formRenderServiceMgr)
+{
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    formRenderServiceMgr.SetFormSupplyClient(formSupplyClient);
+}
+
 /**
  * @tc.name: FormRenderServiceMgrTest_001
  * @tc.desc: 1.Verify RenderForm interface executes as expected.
@@ -138,26 +145,65 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_001, TestSize.Level0
     Want want;
     sptr<IRemoteObject> callerToken = nullptr;
     auto ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_001 end";
 }
 
 /**
  * @tc.name: FormRenderServiceMgrTest_002
- * @tc.desc: 1.Verify RenderForm interface executes as expected.
- *           2.callerToken is not nullptr.
- *           3.uid is empty.
+ * @tc.desc: Verify RenderForm.
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_002 start";
+
     FormJsInfo formJsInfo;
     Want want;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    const std::string value = "UID";
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, value);
+    ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
+    EXPECT_EQ(ret, ERR_OK);
+
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_002 end";
+}
+
+/**
+ * @tc.name: FormRenderServiceMgrTest_003
+ * @tc.desc: Verify ProcessRenderForm.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_003 start";
+
+    FormJsInfo formJsInfo;
+    Want want;
+    sptr<IRemoteObject> callerToken = nullptr;
+    auto ret = FormRenderServiceMgr::GetInstance().ProcessRenderForm(formJsInfo, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    std::string value = "UID";
+    want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    FormRenderServiceMgr::GetInstance().SetFormSupplyClient(nullptr);
+    ret = FormRenderServiceMgr::GetInstance().ProcessRenderForm(formJsInfo, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
+
+    callerToken = new (std::nothrow) MockFormSupplyStub();
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
+    ret = FormRenderServiceMgr::GetInstance().ProcessRenderForm(formJsInfo, want);
+    EXPECT_EQ(ret, ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_003 end";
 }
 
 /**
@@ -174,7 +220,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_004, TestSize.Level0
     Want want;
     sptr<IRemoteObject> callerToken = nullptr;
     auto ret = formRenderServiceMgr.StopRenderingForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_004 end";
 }
 
@@ -190,7 +236,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_005, TestSize.Level0
     FormRenderServiceMgr formRenderServiceMgr;
     FormJsInfo formJsInfo;
     Want want;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = formRenderServiceMgr.StopRenderingForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_005 end";
@@ -318,9 +364,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_011, TestSize.Level0
 
 /**
  * @tc.name: FormRenderServiceMgrTest_012
- * @tc.desc: 1.Verify StopRenderingForm interface executes as expected.
- *           2.search != renderRecordMap_.end()
- *           3.search->second is not nullptr
+ * @tc.desc: Verify StopRenderingForm
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_012, TestSize.Level0)
@@ -330,13 +374,23 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_012, TestSize.Level0
     FormJsInfo formJsInfo;
     Want want;
     std::string value = "UID";
-    want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, value);
-    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
-    formRenderServiceMgr.renderRecordMap_.emplace(value, formRenderRecord);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = formRenderServiceMgr.StopRenderingForm(formJsInfo, want, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    want.SetParam(Constants::FORM_STATUS_EVENT_ID, value);
+    ret = formRenderServiceMgr.StopRenderingForm(formJsInfo, want, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    ret = formRenderServiceMgr.StopRenderingForm(formJsInfo, want, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD);
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    formRenderServiceMgr.renderRecordMap_.emplace(value, formRenderRecord);
+    ret = formRenderServiceMgr.StopRenderingForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_OK);
+
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_012 end";
 }
 
@@ -531,11 +585,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_022, TestSize.Level0
     int64_t formId{-1};
     std::string compId{"1"};
     std::string uid{"202410101010"};
-    std::string eventId = "123";
     Want want;
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     EXPECT_EQ(
-        formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+        formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_022 end";
 }
 
@@ -554,7 +606,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_023, TestSize.Level0
     std::string uid{"202410101010"};
     std::string eventId = "123";
     Want want;
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
+    SetFormSupplyClient(formRenderServiceMgr);
     EXPECT_EQ(
         formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_023 end";
@@ -576,6 +628,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_024, TestSize.Level0
     std::string eventId = "123";
     Want want;
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
+    SetFormSupplyClient(formRenderServiceMgr);
     EXPECT_EQ(
         formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_024 end";
@@ -597,29 +650,10 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_025, TestSize.Level0
     std::string eventId = "123";
     Want want;
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-    EXPECT_EQ(formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), RENDER_FORM_FAILED);
+    SetFormSupplyClient(formRenderServiceMgr);
+    EXPECT_EQ(
+        formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_025 end";
-}
-
-/**
- * @tc.name: FormRenderServiceMgrTest_026
- * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
- *           2.call SetConfiguration
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_026, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_026 start";
-    FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{15};
-    std::string compId{"15"};
-    std::string uid{"202410101010"};
-    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
-    std::string eventId = "123";
-    Want want;
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
-    EXPECT_EQ(formRenderServiceMgr.ReleaseRenderer(formId, compId, uid, want), RENDER_FORM_FAILED);
-    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_026 end";
 }
 
 /**
@@ -692,7 +726,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_030, TestSize.Level0
     int64_t formId{0};
     Want want;
 
-    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_030 end";
 }
 
@@ -706,10 +740,10 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_031, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_031 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{3};
+    int64_t formId{0};
     Want want;
-
-    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    SetFormSupplyClient(formRenderServiceMgr);
+    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_031 end";
 }
 
@@ -724,11 +758,9 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_032, TestSize.Level0
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_032 start";
     FormRenderServiceMgr formRenderServiceMgr;
     int64_t formId{3};
-    std::string uid{"202410101010"};
     Want want;
-    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
-    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    SetFormSupplyClient(formRenderServiceMgr);
+    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_032 end";
 }
 
@@ -744,11 +776,10 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_033, TestSize.Level0
     FormRenderServiceMgr formRenderServiceMgr;
     int64_t formId{3};
     Want want;
+    SetFormSupplyClient(formRenderServiceMgr);
     std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
-    want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
-    formRenderServiceMgr.renderRecordMap_.emplace("2024101010", nullptr);
-    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_033 end";
 }
 
@@ -764,12 +795,13 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_034, TestSize.Level0
     FormRenderServiceMgr formRenderServiceMgr;
     int64_t formId{3};
     Want want;
+    SetFormSupplyClient(formRenderServiceMgr);
     std::string uid{"202410101010"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
     formRenderServiceMgr.renderRecordMap_.emplace("2024101010", formRenderRecord);
-    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderServiceMgr.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_034 end";
 }
 
@@ -818,7 +850,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_036, TestSize.Level0
     Want want;
     FormJsInfo info;
     info.formId = formId;
-    EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_036 end";
 }
 
@@ -836,6 +868,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_037, TestSize.Level0
     Want want;
     FormJsInfo info;
     info.formId = formId;
+    SetFormSupplyClient(formRenderServiceMgr);
     EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_037 end";
 }
@@ -850,14 +883,14 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_038, TestSize.Level0
 {
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_038 start";
     FormRenderServiceMgr formRenderServiceMgr;
-    int64_t formId{3};
+    int64_t formId{0};
     Want want;
     std::string uid{"202410101010"};
-    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
     FormJsInfo info;
     info.formId = formId;
-    EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), RENDER_FORM_FAILED);
+    SetFormSupplyClient(formRenderServiceMgr);
+    EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_038 end";
 }
 
@@ -876,12 +909,14 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_039, TestSize.Level0
     FormJsInfo info;
     info.formId = formId;
     std::string uid{"202410101010"};
-    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     std::string val{"non"};
     want.SetParam(Constants::FORM_STATUS_DATA, val);
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, uid);
-    formRenderServiceMgr.renderRecordMap_.emplace("2024101010", nullptr);
-    EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), RECYCLE_FORM_FAILED);
+    SetFormSupplyClient(formRenderServiceMgr);
+    EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    EXPECT_EQ(formRenderServiceMgr.RecoverForm(info, want), ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_039 end";
 }
 
@@ -908,7 +943,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_040, TestSize.Level0
 
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
-    EXPECT_TRUE(formSupplyClient);
+    formRenderServiceMgr.SetFormSupplyClient(formSupplyClient);
     formRenderRecord->formSupplyClient_ = formSupplyClient;
 
     formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
