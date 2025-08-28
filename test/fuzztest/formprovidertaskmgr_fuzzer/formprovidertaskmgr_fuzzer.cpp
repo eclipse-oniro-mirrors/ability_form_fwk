@@ -17,9 +17,11 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #include "form_provider/form_provider_task_mgr.h"
+#include "form_provider/form_provider_queue.h"
 #define protected public
 
 #undef private
@@ -30,18 +32,32 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+void FormProviderQueueTest(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
+    uint64_t ms64 = fdp->ConsumeIntegral<uint64_t>();
+    std::function<void()> func = []() { return 1; };
+    uint32_t ms32 = fdp->ConsumeIntegral<uint32_t>();
+    const std::pair<int64_t, int64_t> eventMsg;
+    bool isTrue = fdp->ConsumeBool();
+    if (isTrue) {
+        FormProviderQueue::GetInstance().serialQueue_ = nullptr;
+    }
+    FormProviderQueue::GetInstance().ScheduleTask(ms64, func);
+    FormProviderQueue::GetInstance().ScheduleDelayTask(eventMsg, ms32, func);
+    FormProviderQueue::GetInstance().CancelDelayTask(eventMsg);
 }
-void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
+    if (fdp == nullptr) {
+        return true;
+    }
     FormProviderTaskMgr formTaskMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr.PostAcquireTask(formId, want, remoteObject);
+    formTaskMgr.PostRefreshLocationTask(formId, want, remoteObject);
     formTaskMgr.PostRefreshTask(formId, want, remoteObject);
     formTaskMgr.PostDeleteTask(formId, want, remoteObject);
     std::set<int64_t> formIds;
@@ -49,15 +65,18 @@ void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formTaskMgr.PostProviderBatchDeleteTask(formIds, want, remoteObject);
     formTaskMgr.PostCastTempTask(formId, want, remoteObject);
     Want wantArg;
-    std::string provider(data, size);
+    std::string provider = fdp->ConsumeRandomLengthString();
     formTaskMgr.PostAcquireStateTask(wantArg, provider, want, remoteObject);
     formTaskMgr.PostAcquireDataTask(formId, want, remoteObject);
-    std::string message(data, size);
+    std::string message = fdp->ConsumeRandomLengthString();
     formTaskMgr.PostFormEventTask(formId, message, want, remoteObject);
     std::vector<int64_t> formEvent;
     formEvent.emplace_back(formId);
-    int32_t formVisibleType = static_cast<int32_t>(GetU32Data(data));
+    int32_t formVisibleType = fdp->ConsumeIntegral<int32_t>();
     formTaskMgr.PostEventNotifyTask(formEvent, formVisibleType, want, remoteObject);
+    int32_t newDimension = fdp->ConsumeIntegral<int32_t>();
+    Rect newRect;
+    formTaskMgr.PostSizeChangedTask(formId, newDimension, newRect, want, remoteObject);
     formTaskMgr.AcquireProviderFormInfo(formId, want, remoteObject);
     formTaskMgr.NotifyFormUpdate(formId, want, remoteObject);
     formTaskMgr.NotifyFormDelete(formId, want, remoteObject);
@@ -67,7 +86,13 @@ void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formTaskMgr.AcquireFormData(formId, want, remoteObject);
     formTaskMgr.FireFormEvent(formId, message, want, remoteObject);
     formTaskMgr.EventNotify(formEvent, formVisibleType, want, remoteObject);
+    AppExecFwk::Configuration configuration;
+    formTaskMgr.NotifyConfigurationUpdate(configuration, want, remoteObject);
+    formTaskMgr.NotifyFormLocationUpdate(formId, want, remoteObject);
+    formTaskMgr.NotifySizeChanged(formId, newDimension, newRect, want, remoteObject);
     formTaskMgr.RemoveConnection(formId);
+    OHOS::FormProviderQueueTest(fdp);
+    return true;
 }
 }
 
@@ -95,9 +120,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     free(ch);
     ch = nullptr;
     return 0;
 }
-
