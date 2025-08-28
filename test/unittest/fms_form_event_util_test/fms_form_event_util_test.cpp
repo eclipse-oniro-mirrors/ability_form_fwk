@@ -1141,4 +1141,32 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_058, TestSize.Level1)
     FormEventUtil::HandleUpdateFormCloud(bundleName);
     GTEST_LOG_(INFO) << "FormEventUtil_058 end";
 }
+
+/**
+ * @tc.name: FormEventUtil_059
+ * @tc.desc: test ProviderFormUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_059, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_059 start";
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.isDistributedForm = true;
+
+    std::vector<FormInfo> targetForms;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_HOST_BUNDLE_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.name = FORM_NAME;
+    targetForms.emplace_back(formInfo);
+    BundleInfo bundleInfo;
+    bundleInfo.versionCode = 1;
+    MockGetUpdatedForm(false);
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo));
+    EXPECT_EQ(1, formRecord.versionCode);
+    GTEST_LOG_(INFO) << "FormEventUtil_059 end";
+}
 }
