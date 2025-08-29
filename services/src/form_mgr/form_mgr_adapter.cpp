@@ -510,8 +510,10 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     HILOG_INFO("getDbRet:%{public}d, isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
     if (getDbRet == ERR_OK && dbInfo.isThemeForm) {
         int32_t ret = DeleteThemeForm(formId);
-        FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED, formId, dbInfo.bundleName,
-            dbInfo.formName, static_cast<int32_t>(DeleteFormErrorType::DELETE_THEME_FORM_FAILED), ret);
+        if (ret != ERR_OK) {
+            FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED, formId, dbInfo.bundleName,
+                dbInfo.formName, static_cast<int32_t>(DeleteFormErrorType::DELETE_THEME_FORM_FAILED), ret);
+        }
         return ret;
     }
 #endif
