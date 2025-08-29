@@ -124,7 +124,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.DeleteFormInfo(formId);
     int32_t hostUid = fdp->ConsumeIntegral<int32_t>();
     formDbCache.IsHostOwner(formId, hostUid);
-    formDbCache.UpdateFormLocation(formId, hostUid);
     std::string bundleName = fdp->ConsumeRandomLengthString();
     std::string moduleName = fdp->ConsumeRandomLengthString();
     int32_t userId = fdp->ConsumeIntegral<int32_t>();
