@@ -173,6 +173,8 @@ public:
     static long long ConvertStringToLongLong(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
 
     static bool IsActiveUser(const int32_t userId);
+
+    static void GetActiveUsers(std::vector<int32_t> &activeList);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

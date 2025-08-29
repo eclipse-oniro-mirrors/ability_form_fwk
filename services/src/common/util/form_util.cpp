@@ -1970,5 +1970,14 @@ bool FormUtil::IsActiveUser(const int32_t userId)
     auto iter = std::find(activeList.begin(), activeList.end(), userId);
     return iter != activeList.end() && errCode == ERR_OK;
 }
+
+bool FormUtil::GetActiveUsers(std::vector<int32_t> &activeList)
+{
+    ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("QueryActiveOsAccountIds failed");
+        return;
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS
