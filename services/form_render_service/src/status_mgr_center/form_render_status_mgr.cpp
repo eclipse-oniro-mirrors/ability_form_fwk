@@ -108,6 +108,10 @@ void FormRenderStatusMgr::DeleteFormEventId(const int64_t formId)
 
 int32_t FormRenderStatusMgr::ProcessTaskDirect(std::function<int32_t()> func)
 {
+    if (func == nullptr) {
+        return ERR_OK;
+    }
+
     return func();
 }
 
