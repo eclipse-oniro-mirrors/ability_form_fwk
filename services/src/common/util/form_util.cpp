@@ -1971,7 +1971,7 @@ bool FormUtil::IsActiveUser(const int32_t userId)
     return iter != activeList.end() && errCode == ERR_OK;
 }
 
-bool FormUtil::GetActiveUsers(std::vector<int32_t> &activeList)
+void FormUtil::GetActiveUsers(std::vector<int32_t> &activeList)
 {
     ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (errCode != ERR_OK) {
