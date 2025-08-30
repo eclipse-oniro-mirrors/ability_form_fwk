@@ -48,6 +48,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderConnection.SetStateConnecting();
     formRenderConnection.SetStateDisconnected();
     formRenderConnection.UpdateWantParams(wantParams);
+    formRenderConnection.UpdateFormRecord(formRecord);
     return true;
 }
 }

@@ -23,6 +23,9 @@
 #define private public
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
 #include "form_refresh/refresh_impl/form_timer_refresh_impl.h"
+#include "form_refresh/strategy/refresh_cache_mgr.h"
+#include "form_refresh/strategy/refresh_control_mgr.h"
+#include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 #undef private
 #include "message_parcel.h"
 #include "securec.h"
@@ -43,6 +46,49 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr size_t U32_AT_SIZE = 4;
+void RefreshControlMgrTest(FuzzedDataProvider *fdp)
+{
+    FormRecord record;
+    record.formVisibleNotifyState = fdp->ConsumeIntegral<int>();
+    record.enableForm = fdp->ConsumeBool();
+    record.isVisible = fdp->ConsumeBool();
+    record.isDataProxy = fdp->ConsumeBool();
+    bool isVisibleToFresh = fdp->ConsumeBool();
+    RefreshControlMgr::GetInstance().IsSystemOverload();
+    RefreshControlMgr::GetInstance().IsFormInvisible(record);
+    RefreshControlMgr::GetInstance().IsScreenOff(record);
+    RefreshControlMgr::GetInstance().IsHealthyControl(record);
+    RefreshControlMgr::GetInstance().IsNeedToFresh(record, isVisibleToFresh);
+    RefreshData data;
+    data.record = record;
+    FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data);
+}
+
+void RefreshCacheMgrTest(FuzzedDataProvider *fdp)
+{
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    int64_t taskFormId = fdp->ConsumeIntegral<int64_t>();
+    int32_t taskUserId = fdp->ConsumeIntegral<int32_t>();
+    int32_t refreshType = fdp->ConsumeIntegral<int32_t>();
+    FormTimer task;
+    task.formId = taskFormId;
+    task.userId = taskUserId;
+    bool isAskForProviderData = fdp->ConsumeBool();
+    Want want;
+    FormRecord record;
+    std::function<void()> func = []() { return 1; };
+    RefreshCacheMgr::GetInstance().AddToOverloadTaskQueue(task);
+    RefreshCacheMgr::GetInstance().ConsumeOverloadTaskQueue();
+    RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(formId, isAskForProviderData);
+    RefreshCacheMgr::GetInstance().AddFlagByInvisible(formId, refreshType);
+    RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formId, userId);
+    RefreshCacheMgr::GetInstance().AddFlagByScreenOff(formId, want, record);
+    RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
+    RefreshCacheMgr::GetInstance().AddRenderTask(formId, func);
+    RefreshCacheMgr::GetInstance().DelRenderTask(formId);
+}
+
 void FormStatusTest(FuzzedDataProvider *fdp)
 {
     int64_t formId = fdp->ConsumeIntegralInRange(0, 1000);
@@ -94,6 +140,9 @@ void FormRefreshTest(FuzzedDataProvider *fdp)
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
+    if (fdp == nullptr) {
+        return true;
+    }
     bool isTrue = (fdp->ConsumeIntegralInRange(0, 1000)) % 2;
     bool isFalse = (fdp->ConsumeIntegralInRange(0, 1000)) % 2;
     int32_t num = fdp->ConsumeIntegralInRange(0, 1000);
@@ -117,6 +166,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     SystemAppChecker::GetInstance().CheckValid(reqFactor);
     OHOS::FormRefreshTest(fdp);
     OHOS::FormStatusTest(fdp);
+    OHOS::RefreshCacheMgrTest(fdp);
+    OHOS::RefreshControlMgrTest(fdp);
     return true;
 }
 }
@@ -150,4 +201,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     ch = nullptr;
     return 0;
 }
-
