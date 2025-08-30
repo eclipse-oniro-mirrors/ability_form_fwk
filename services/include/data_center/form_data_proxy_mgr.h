@@ -49,7 +49,7 @@ public:
 private:
     void UnsubscribeFormDataById(int64_t formId);
     // when data share connect fail, try again
-    void RetrySubscribeProxy(const FormRecord &record, const std::vector<FormDataProxy> &formDataProxies,
+    void RetrySubscribeProxy(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
         uint32_t tokenId, const AAFwk::Want &want, int32_t leftRetryTimes);
 
 private:

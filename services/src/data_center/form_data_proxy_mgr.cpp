@@ -75,7 +75,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
             formId, formRecord.bundleName, formRecord.formName,
             static_cast<int32_t>(AddFormFailedErrorType::SUBSCRIBE_DATA_SHARE_FAILED), ret);
-        RetrySubscribeProxy(formRecord, formDataProxies, appInfo.accessTokenId, want, SUBSCRIBE_PROXY_RETRY_TIMES);
+        RetrySubscribeProxy(formId, formDataProxies, appInfo.accessTokenId, want, SUBSCRIBE_PROXY_RETRY_TIMES);
         return ret;
     }
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
@@ -177,35 +177,41 @@ std::shared_ptr<FormDataProxyRecord> FormDataProxyMgr::GetFormDataProxyRecord(in
     return nullptr;
 }
 
-void FormDataProxyMgr::RetrySubscribeProxy(const FormRecord &record, const std::vector<FormDataProxy> &formDataProxies,
+void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
     uint32_t tokenId, const AAFwk::Want &want, int32_t leftRetryTimes)
 {
     if (leftRetryTimes <= 0) {
-        HILOG_WARN("retried max times, formId:%{public}" PRId64, record.formId);
+        HILOG_WARN("retried max times, formId:%{public}" PRId64, formId);
         return;
     }
 
-    auto delyaSubsProxyTask = [record, formDataProxies, tokenId, want, leftRetryTimes, this]() {
+    auto delaySubsProxyTask = [formId, formDataProxies, tokenId, want, leftRetryTimes]() {
+        FormRecord record;
+        if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
+            HILOG_ERROR("not exist such form:%{public}" PRId64, formId);
+            return;
+        }
+
         std::shared_ptr<FormDataProxyRecord> formDataProxyRecord = std::make_shared<FormDataProxyRecord>(
-            record.formId, record.bundleName, record.uiSyntax, tokenId, record.uid);
+            formId, record.bundleName, record.uiSyntax, tokenId, record.uid);
         formDataProxyRecord->SetWant(want);
         auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
         if (ret == ERR_OK) {
-            HILOG_INFO("subscribe data proxy success, formId:%{public}" PRId64, record.formId);
-            std::lock_guard<std::mutex> lock(this->formDataProxyRecordMutex_);
-            this->formDataProxyRecordMap_[record.formId] = formDataProxyRecord;
+            HILOG_INFO("subscribe data proxy success, formId:%{public}" PRId64, formId);
+            std::lock_guard<std::mutex> lock(FormDataProxyMgr::GetInstance().formDataProxyRecordMutex_);
+            FormDataProxyMgr::GetInstance().formDataProxyRecordMap_[formId] = formDataProxyRecord;
             return;
         }
 
         auto newLeftTimes = leftRetryTimes;
         --newLeftTimes;
-        HILOG_WARN("retry failed, %{public}d attempts remaining, formId:%{public}" PRId64, newLeftTimes, record.formId);
-        FormDataProxyMgr::GetInstance().RetrySubscribeProxy(record, formDataProxies, tokenId, want, newLeftTimes);
+        HILOG_WARN("retry failed, %{public}d attempts remaining, formId:%{public}" PRId64, newLeftTimes, formId);
+        FormDataProxyMgr::GetInstance().RetrySubscribeProxy(formId, formDataProxies, tokenId, want, newLeftTimes);
     };
 
-    HILOG_INFO("post subs proxy task, formId:%{public}" PRId64, record.formId);
-    FormMgrQueue::GetInstance().ScheduleDelayTask(std::make_pair(SUBSCRIBE_PROXY_RETRY_TASK, record.formId),
-        SUBSCRIBE_PROXY_RETRY_DELAY_TIME_MS, delyaSubsProxyTask);
+    HILOG_INFO("post subs proxy task, formId:%{public}" PRId64, formId);
+    FormMgrQueue::GetInstance().ScheduleDelayTask(std::make_pair(SUBSCRIBE_PROXY_RETRY_TASK, formId),
+        SUBSCRIBE_PROXY_RETRY_DELAY_TIME_MS, delaySubsProxyTask);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
