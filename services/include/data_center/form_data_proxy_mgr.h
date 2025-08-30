@@ -20,6 +20,7 @@
 #include <singleton.h>
 
 #include "data_center/form_data_proxy_record.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -47,6 +48,9 @@ public:
 
 private:
     void UnsubscribeFormDataById(int64_t formId);
+    // when data share connect fail, try again
+    void RetrySubscribeProxy(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
+        uint32_t tokenId, const AAFwk::Want &want, int32_t leftRetryTimes);
 
 private:
     std::mutex formDataProxyRecordMutex_;
