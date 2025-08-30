@@ -1942,7 +1942,7 @@ bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
 {
     HILOG_DEBUG("call");
     if (!CheckCallerIsSystemApp()) {
-        return true;
+        return false;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleForbidden",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
@@ -1984,7 +1984,7 @@ bool FormMgrService::IsFormBundleProtected(const std::string &bundleName, int64_
 {
     HILOG_DEBUG("call");
     if (!CheckCallerIsSystemApp()) {
-        return true;
+        return false;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleProtected",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
@@ -2153,7 +2153,7 @@ bool FormMgrService::UnregisterGetFormRectProxy()
     HILOG_INFO("call");
     return FormMgrAdapter::GetInstance().UnregisterGetFormRectProxy();
 }
- 
+
 ErrCode FormMgrService::GetFormRect(const int64_t formId, Rect &rect)
 {
     HILOG_INFO("call");
@@ -2177,7 +2177,7 @@ bool FormMgrService::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &c
     HILOG_INFO("call");
     return FormMgrAdapter::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);
 }
- 
+
 bool FormMgrService::UnregisterGetLiveFormStatusProxy()
 {
     HILOG_INFO("call");
