@@ -45,9 +45,13 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formErmsCallerInfo.targetAppType = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formErmsCallerInfo.ToString();
     Parcel parcel;
-    formErmsCallerInfo.Marshalling(parcel);
     formErmsCallerInfo.ReadFromParcel(parcel);
-    formErmsCallerInfo.Unmarshalling(parcel);
+    bool isTrue = fdp->ConsumeBool();
+    if (formErmsCallerInfo.uid == formErmsCallerInfo.pid && isTrue) {
+        formErmsCallerInfo.Unmarshalling(parcel);
+        formErmsCallerInfo.Marshalling(parcel);
+        formErmsCallerInfo.Unmarshalling(parcel);
+    }
     return true;
 }
 }
