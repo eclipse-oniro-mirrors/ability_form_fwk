@@ -18,6 +18,7 @@
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
+#include "common/util/form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -55,13 +56,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
         HILOG_WARN("bundleName:%{public}s changed", bundleName.c_str());
-        bool needReload = true;
-        FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId, needReload);
-        std::function<void()> taskFunc = [bundleName, userId, needReload]() {
-            FormEventUtil::HandleUpdateFormCloud(bundleName);
-            FormEventUtil::HandleProviderUpdated(bundleName, userId, needReload);
-        };
-        FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
+        HandleBundleChange(bundleName);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         int appIndex = want.GetIntParam("appIndex", 0);
@@ -92,5 +87,25 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     }
 }
 
+void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName)
+{
+    std::vector<int32_t> activeList;
+    FormUtil::GetActiveUsers(activeList);
+    if (activeList.empty()) {
+        HILOG_ERROR("can't not find active user, do not handle bundle change");
+        return;
+    }
+
+    HILOG_INFO("active user list len:%{public}zu", activeList.size());
+    for (const int32_t userId : activeList) {
+        bool needReload = true;
+        FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId, needReload);
+        std::function<void()> taskFunc = [bundleName, userId, needReload]() {
+            FormEventUtil::HandleUpdateFormCloud(bundleName);
+            FormEventUtil::HandleProviderUpdated(bundleName, userId, needReload);
+        };
+        FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

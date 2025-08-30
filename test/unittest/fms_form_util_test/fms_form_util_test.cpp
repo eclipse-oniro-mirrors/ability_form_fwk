@@ -814,5 +814,12 @@ HWTEST_F(FormUtilTest, FormUtilTest_030, TestSize.Level1)
     MockQueryActiveOsAccountIdsParams(false);
     EXPECT_EQ(false, FormUtil::IsActiveUser(accountId));
 }
+
+HWTEST_F(FormUtilTest, FormUtilTest_031, TestSize.Level1)
+{
+    std::vector<int32_t> activeList;
+    FormUtil::GetActiveUsers(activeList);
+    EXPECT_EQ(true, activeList.empty());
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
