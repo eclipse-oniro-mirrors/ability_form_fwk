@@ -2286,15 +2286,10 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
     bool isOverflow)
 {
     HILOG_INFO("call");
-    LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
-        .formId = std::to_string(formId),
-        .overflowInfo = overflowInfo,
-        .isOverflow = isOverflow
-    };
-    if (dataParam == nullptr) {
-        HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
+    std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
+    dataParam->formId = std::to_string(formId);
+    dataParam->overflowInfo = overflowInfo;
+    dataParam->isOverflow = isOverflow;
     std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
     std::function<void()> executeFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
         JsFormRouterProxyMgr::GetInstance()->RequestOverflowInner(dataParam);
@@ -2302,11 +2297,10 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::RequestOverflow");
     HILOG_INFO("call RequestOverflow end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
-    delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
 
-void JsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataParam)
+void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
 {
     HILOG_INFO("call");
     napi_handle_scope scope = nullptr;
@@ -2422,14 +2416,9 @@ bool JsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
 ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, int32_t state)
 {
     HILOG_INFO("call");
-    LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
-        .formId = std::to_string(formId),
-        .state = state
-    };
-    if (dataParam == nullptr) {
-        HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
+    std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
+    dataParam->formId = std::to_string(formId);
+    dataParam->state = state;
     std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
     std::function<void()> executeFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
         JsFormRouterProxyMgr::GetInstance()->ChangeSceneAnimationStateInner(dataParam);
@@ -2437,11 +2426,10 @@ ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, in
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::ChangeSceneAnimationState");
     HILOG_INFO("call ChangeSceneAnimationState end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
-    delete dataParam;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
 
-void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(LiveFormInterfaceParam* dataParam)
+void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
 {
     HILOG_INFO("call");
     napi_handle_scope scope = nullptr;
@@ -2527,13 +2515,9 @@ bool JsFormRouterProxyMgr::UnregisterGetFormRectListener()
 ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect &rect)
 {
     HILOG_INFO("call");
-    LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
-        .formId = std::to_string(formId)
-    };
-    if (dataParam == nullptr) {
-        HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
-    }
+    std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
+    dataParam->formId = std::to_string(formId);
+    
     std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
     std::function<void()> executeGetFormRectFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
         JsFormRouterProxyMgr::GetInstance()->GetFormRectInner(dataParam);
@@ -2541,12 +2525,11 @@ ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect
     mainHandler->PostSyncTask(executeGetFormRectFunc, "JsFormRouterProxyMgr::GetFormRect");
     HILOG_INFO("call GetFormRect end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
-    rect = std::move(dataParam->formRect);
-    delete dataParam;
+    rect = dataParam->formRect;
     return result ? ERR_OK : ERR_GET_INFO_FAILED;
 }
 
-void CallBackReturn(const Rect &item, LiveFormInterfaceParam* liveFormInterfaceParam, bool ret)
+void CallBackReturn(const Rect &item, std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam, bool ret)
 {
     if (liveFormInterfaceParam == nullptr) {
         HILOG_INFO("getFormRect callback param has been released");
@@ -2557,7 +2540,7 @@ void CallBackReturn(const Rect &item, LiveFormInterfaceParam* liveFormInterfaceP
     HILOG_INFO("getFormRect end.");
 }
  
-void JsFormRouterProxyMgr::GetFormRectInner(LiveFormInterfaceParam *dataParam)
+void JsFormRouterProxyMgr::GetFormRectInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
 {
     HILOG_INFO("call");
     napi_handle_scope scope = nullptr;
@@ -2612,7 +2595,7 @@ void JsFormRouterProxyMgr::GetFormRectInner(LiveFormInterfaceParam *dataParam)
     napi_close_handle_scope(getFormRectEnv_, scope);
 }
  
-void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, LiveFormInterfaceParam *params)
+void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, std::shared_ptr<LiveFormInterfaceParam> params)
 {
     HILOG_INFO("call");
     napi_value promiseThen = nullptr;
@@ -2881,13 +2864,13 @@ bool JsFormRouterProxyMgr::ConvertNapiValueToMap(
     return true;
 }
 
-PromiseCallbackInfo::PromiseCallbackInfo(LiveFormInterfaceParam* liveFormInterfaceParam)
+PromiseCallbackInfo::PromiseCallbackInfo(std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam)
     : liveFormInterfaceParam_(liveFormInterfaceParam)
 {}
  
 PromiseCallbackInfo::~PromiseCallbackInfo() = default;
  
-PromiseCallbackInfo* PromiseCallbackInfo::Create(LiveFormInterfaceParam* liveFormInterfaceParam)
+PromiseCallbackInfo* PromiseCallbackInfo::Create(std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam)
 {
     return new (std::nothrow) PromiseCallbackInfo(liveFormInterfaceParam);
 }
@@ -2897,7 +2880,7 @@ void PromiseCallbackInfo::Destroy(PromiseCallbackInfo *callbackInfo)
     delete callbackInfo;
 }
  
-LiveFormInterfaceParam* PromiseCallbackInfo::GetJsCallBackParam()
+std::shared_ptr<LiveFormInterfaceParam> PromiseCallbackInfo::GetJsCallBackParam()
 {
     return liveFormInterfaceParam_;
 }

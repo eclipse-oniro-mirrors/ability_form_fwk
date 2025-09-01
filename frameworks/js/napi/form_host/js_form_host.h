@@ -108,14 +108,14 @@ private:
     napi_env changeSceneAnimationStateEnv_;
     ErrCode RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow = true);
     void CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo, napi_value* result);
-    void RequestOverflowInner(LiveFormInterfaceParam* dataParam);
+    void RequestOverflowInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
-    void ChangeSceneAnimationStateInner(LiveFormInterfaceParam* dataParam);
+    void ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     napi_ref getFormRectCallbackRef_ = nullptr;
     napi_env getFormRectEnv_;
     ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect);
-    void GetFormRectInner(LiveFormInterfaceParam* dataParam);
-    void CallPromise(napi_value funcResult, LiveFormInterfaceParam *liveFormInterfaceParam);
+    void GetFormRectInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
+    void CallPromise(napi_value funcResult, std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam);
     static napi_value PromiseCallback(napi_env env, napi_callback_info info);
     static bool ConvertFunctionResult(napi_env env, napi_value funcResult, AppExecFwk::Rect &rect);
 
@@ -128,18 +128,18 @@ private:
 
 class PromiseCallbackInfo {
 public:
-    static PromiseCallbackInfo* Create(LiveFormInterfaceParam* liveFormInterfaceParam);
+    static PromiseCallbackInfo* Create(std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam);
  
     static void Destroy(PromiseCallbackInfo* callbackInfo);
  
-    LiveFormInterfaceParam* GetJsCallBackParam();
+    std::shared_ptr<LiveFormInterfaceParam> GetJsCallBackParam();
  
 private:
-    explicit PromiseCallbackInfo(LiveFormInterfaceParam* liveFormInterfaceParam);
+    explicit PromiseCallbackInfo(std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam);
  
     ~PromiseCallbackInfo();
  
-    LiveFormInterfaceParam* liveFormInterfaceParam_ = nullptr;
+    std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam_;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS
