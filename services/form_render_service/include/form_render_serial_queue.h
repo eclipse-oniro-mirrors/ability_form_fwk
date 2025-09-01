@@ -33,7 +33,7 @@ public:
     bool ScheduleDelayTask(const std::string &taskName, uint32_t ms, std::function<void()> func);
     bool CancelDelayTask(const std::string &taskName);
 private:
-    std::shared_mutex mutex_;
+    ffrt::shared_mutex mutex_;
     std::map<std::string, ffrt::task_handle> taskMap_;
     ffrt::queue queue_;
 };

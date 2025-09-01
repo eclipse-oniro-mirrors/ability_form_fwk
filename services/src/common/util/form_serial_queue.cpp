@@ -42,7 +42,7 @@ bool FormSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
         HILOG_ERROR("invalid ms,ScheduleTask failed");
         return false;
     }
-    std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("null task_handle");
@@ -56,7 +56,7 @@ bool FormSerialQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &event
     uint32_t ms, std::function<void()> func)
 {
     HILOG_DEBUG("begin to ScheduleDelayTask");
-    std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("null task_handle");
@@ -70,7 +70,7 @@ bool FormSerialQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &event
 bool FormSerialQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
 {
     HILOG_DEBUG("begin to CancelDelayTask");
-    std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
     auto item = taskMap_.find(eventMsg);
     if (item == taskMap_.end()) {
         HILOG_ERROR("invalid task");
@@ -92,7 +92,7 @@ bool FormSerialQueue::ScheduleDelayTask(
     const std::pair<int64_t, std::string> &eventMsg, uint32_t ms, std::function<void()> func)
 {
     HILOG_DEBUG("begin to ScheduleDelayTask");
-    std::unique_lock<std::shared_mutex> lock(stringTaskMutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(stringTaskMutex_);
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("null task_handle");
@@ -106,7 +106,7 @@ bool FormSerialQueue::ScheduleDelayTask(
 bool FormSerialQueue::CancelDelayTask(const std::pair<int64_t, std::string> &eventMsg)
 {
     HILOG_DEBUG("begin to CancelDelayTask");
-    std::unique_lock<std::shared_mutex> lock(stringTaskMutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(stringTaskMutex_);
     auto item = stringTaskMap_.find(eventMsg);
     if (item == stringTaskMap_.end()) {
         HILOG_ERROR("invalid task");
