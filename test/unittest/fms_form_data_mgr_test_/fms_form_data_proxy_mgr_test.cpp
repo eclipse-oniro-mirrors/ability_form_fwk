@@ -294,8 +294,8 @@ HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_006, TestSize.Level0)
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItem, callingUid);
     formRecord.isDataProxy = true;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
-    formDataProxyMgr.RetrySubscribeProxy(formRecord, formDataProxies, 0, want, 0);
-    formDataProxyMgr.RetrySubscribeProxy(formRecord, formDataProxies, 0, want, 1);
+    formDataProxyMgr.RetrySubscribeProxy(formId, formDataProxies, 0, want, 0);
+    formDataProxyMgr.RetrySubscribeProxy(formId, formDataProxies, 0, want, 1);
     GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_006 end";
 }
 }
