@@ -49,14 +49,14 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         return;
     }
 
-    HILOG_INFO("action:%{public}s", action.c_str());
+    HILOG_INFO("action:%{public}s, userId:%{public}d", action.c_str(), userId);
 
     wptr<FormBundleEventCallback> weakThis = this;
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED ||
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
         HILOG_WARN("bundleName:%{public}s changed", bundleName.c_str());
-        HandleBundleChange(bundleName);
+        HandleBundleChange(bundleName, action, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         int appIndex = want.GetIntParam("appIndex", 0);
@@ -87,13 +87,18 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     }
 }
 
-void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName)
+void FormBundleEventCallback::HandleBundleChange(
+    const std::string &bundleName, const std::string &action, int32_t userId)
 {
     std::vector<int32_t> activeList;
-    FormUtil::GetActiveUsers(activeList);
-    if (activeList.empty()) {
-        HILOG_ERROR("can't not find active user, do not handle bundle change");
-        return;
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED) {
+        activeList.emplace_back(userId);
+    } else {
+        FormUtil::GetActiveUsers(activeList);
+        auto iter = std::find(activeList.begin(), activeList.end(), userId);
+        if (iter == activeList.end()) {
+            activeList.emplace_back(userId);
+        }
     }
 
     HILOG_INFO("active user list len:%{public}zu", activeList.size());
