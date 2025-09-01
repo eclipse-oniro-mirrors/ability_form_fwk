@@ -4115,7 +4115,11 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
 
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, lock:%{public}d", userId, formInfos.size(), lock);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d", iter->bundleName.c_str(), iter->lockForm);
+        HILOG_INFO("bundleName:%{public}s, lockForm:%{public}d", iter->bundleName.c_str(), iter->lockForm);
+        if (!lock) {
+            // When unlocking the app lock, it is necessary to clear the exemption data.
+            FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
+        }
         bool isSystemApp = iter->isSystemApp;
         FormInfo formInfo;
         FormInfoMgr::GetInstance().GetFormsInfoByRecord(*iter, formInfo);
@@ -4127,9 +4131,6 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
         iter->lockForm = lock;
         FormDataMgr::GetInstance().SetFormLock(iter->formId, lock);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
-        if (!lock) {
-            FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
-        }
         ++iter;
     }
 
