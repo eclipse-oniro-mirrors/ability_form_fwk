@@ -43,7 +43,7 @@ bool FormRenderSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func
         HILOG_ERROR("invalid ms,ScheduleTask failed");
         return false;
     }
-    std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("submit_h return null");
@@ -57,7 +57,11 @@ bool FormRenderSerialQueue::ScheduleDelayTask(const std::string &taskName,
     uint32_t ms, std::function<void()> func)
 {
     HILOG_DEBUG("begin to ScheduleDelayTask %{public}s", taskName.c_str());
-    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (ms > (std::numeric_limits<uint64_t>::max() / CONVERSION_FACTOR)) {
+        HILOG_ERROR("invalid ms,ScheduleTask failed");
+        return false;
+    }
+    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("submit_h return null");
@@ -71,7 +75,7 @@ bool FormRenderSerialQueue::ScheduleDelayTask(const std::string &taskName,
 bool FormRenderSerialQueue::CancelDelayTask(const std::string &taskName)
 {
     HILOG_DEBUG("begin to CancelDelayTask %{public}s", taskName.c_str());
-    std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
     auto item = taskMap_.find(taskName);
     if (item == taskMap_.end()) {
         HILOG_DEBUG("invalid task,CancelDelayTask %{public}s failed", taskName.c_str());
