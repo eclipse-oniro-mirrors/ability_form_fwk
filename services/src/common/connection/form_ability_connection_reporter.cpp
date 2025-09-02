@@ -57,7 +57,7 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
         return;
     }
     auto appMgr = GetAppMgr();
-    if (appMgr == nullptr ) {
+    if (appMgr == nullptr) {
         HILOG_ERROR("AppMgr is nullptr");
         return;
     }
