@@ -937,7 +937,11 @@ void FormTimerMgr::OnIntervalTimeOut()
         }
 
         // Verify if the next refresh will expire
-        if (!intervalTask.isEnable && !IsDynamicTimerExpired(intervalTask.formId)) {
+        bool isDynamicTimerExpired = IsDynamicTimerExpired(intervalTask.formId);
+        if (isDynamicTimerExpired) {
+            intervalTask.isEnable = true;
+        }
+        if (!intervalTask.isEnable && !isDynamicTimerExpired) {
             continue;
         }
 
@@ -1641,7 +1645,6 @@ bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
         [formId](const auto &it) { return it.formId == formId; });
     if (itItem == dynamicRefreshTasks_.end()) {
         HILOG_WARN("can't find dynamic refresh task, just restore. formId:%{public}" PRId64, formId);
-        SetIntervalEnableFlag(formId, true);
         return true;
     }
 
@@ -1652,7 +1655,6 @@ bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
     }
 
     HILOG_WARN("dynamic refresh timed out without triggering. formId:%{public}" PRId64, formId);
-    SetIntervalEnableFlag(formId, true);
     dynamicRefreshTasks_.erase(itItem);
     dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
     UpdateDynamicAlarm();
