@@ -815,7 +815,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_030, TestSize.Level1)
     EXPECT_EQ(false, FormUtil::IsActiveUser(accountId));
 }
 
-HWTEST_F(FormUtilTest, FormUtilTest_031, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_031, TestSize.Level0)
 {
     std::vector<int32_t> activeList;
     FormUtil::GetActiveUsers(activeList);
