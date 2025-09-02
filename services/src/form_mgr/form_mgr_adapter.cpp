@@ -1517,7 +1517,7 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
     auto formId = formConfigInfo.GetFormId();
     // exempt form are never unlocked
     if (formId > 0 && FormExemptLockMgr::GetInstance().IsExemptLock(formId)) {
-        formConfigInfo.SetLockForm(false);
+        formConfigInfo.SetLockForm(true);
         return;
     }
 
@@ -4115,11 +4115,8 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
 
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, lock:%{public}d", userId, formInfos.size(), lock);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_INFO("bundleName:%{public}s, lockForm:%{public}d", iter->bundleName.c_str(), iter->lockForm);
-        if (!lock) {
-            // When unlocking the app lock, it is necessary to clear the exemption data.
-            FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
-        }
+        HILOG_INFO("bundleName:%{public}s, lockForm:%{public}d, formId:%{public}" PRId64,
+            iter->bundleName.c_str(), iter->lockForm, iter->formId);
         bool isSystemApp = iter->isSystemApp;
         FormInfo formInfo;
         FormInfoMgr::GetInstance().GetFormsInfoByRecord(*iter, formInfo);
@@ -4131,12 +4128,15 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
         iter->lockForm = lock;
         FormDataMgr::GetInstance().SetFormLock(iter->formId, lock);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
+        if (!lock) {
+            FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
+        }
         ++iter;
     }
 
     ErrCode res = ProtectLockForms(bundleName, userId, lock);
     if (res != ERR_OK) {
-        HILOG_ERROR("ProtectLockForms faild when executing the switchLockForms");
+        HILOG_ERROR("protectLockForms faild when executing the switchLockForms");
         return res;
     }
     return ERR_OK;
