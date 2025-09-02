@@ -57,6 +57,10 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
         return;
     }
     auto appMgr = GetAppMgr();
+    if (appMgr == nullptr) {
+        HILOG_ERROR("AppMgr is nullptr");
+        return;
+    }
     std::vector<AppExecFwk::RunningProcessInfo> infos;
     int32_t userId = FormUtil::GetCurrentAccountId();
     int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
