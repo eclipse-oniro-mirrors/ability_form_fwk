@@ -1515,9 +1515,9 @@ void FormMgrAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo 
 void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo)
 {
     auto formId = formConfigInfo.GetFormId();
-    // exempt form are never unlocked
     if (formId > 0 && FormExemptLockMgr::GetInstance().IsExemptLock(formId)) {
-        formConfigInfo.SetLockForm(false);
+        // exempt form must belong to a locked application
+        formConfigInfo.SetLockForm(true);
         return;
     }
 
@@ -1530,6 +1530,7 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
             FormDbCache::GetInstance().UpdateDBRecord(formId, record);
         }
         formConfigInfo.SetLockForm(isBundleProtect);
+        formConfigInfo.SetProtectForm(isBundleProtect);
     } else {
         bool isMultiAppForm = FormInfoMgr::GetInstance().IsMultiAppForm(formInfo) &&
             formConfigInfo.GetSystemAppFlag();
@@ -4115,11 +4116,8 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
 
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, lock:%{public}d", userId, formInfos.size(), lock);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_INFO("bundleName:%{public}s, lockForm:%{public}d", iter->bundleName.c_str(), iter->lockForm);
-        if (!lock) {
-            // When unlocking the app lock, it is necessary to clear the exemption data.
-            FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
-        }
+        HILOG_INFO("bundleName:%{public}s, lockForm:%{public}d, formId:%{public}" PRId64,
+            iter->bundleName.c_str(), iter->lockForm, iter->formId);
         bool isSystemApp = iter->isSystemApp;
         FormInfo formInfo;
         FormInfoMgr::GetInstance().GetFormsInfoByRecord(*iter, formInfo);
@@ -4131,6 +4129,9 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
         iter->lockForm = lock;
         FormDataMgr::GetInstance().SetFormLock(iter->formId, lock);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
+        if (!lock) {
+            FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
+        }
         ++iter;
     }
 
