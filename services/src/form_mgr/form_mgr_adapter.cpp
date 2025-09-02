@@ -1515,8 +1515,8 @@ void FormMgrAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo 
 void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo)
 {
     auto formId = formConfigInfo.GetFormId();
-    // exempt form are never unlocked
     if (formId > 0 && FormExemptLockMgr::GetInstance().IsExemptLock(formId)) {
+        // exempt form must belong to a locked application
         formConfigInfo.SetLockForm(true);
         return;
     }
@@ -1530,6 +1530,7 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
             FormDbCache::GetInstance().UpdateDBRecord(formId, record);
         }
         formConfigInfo.SetLockForm(isBundleProtect);
+        formConfigInfo.SetProtectForm(isBundleProtect);
     } else {
         bool isMultiAppForm = FormInfoMgr::GetInstance().IsMultiAppForm(formInfo) &&
             formConfigInfo.GetSystemAppFlag();
@@ -4136,7 +4137,7 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
 
     ErrCode res = ProtectLockForms(bundleName, userId, lock);
     if (res != ERR_OK) {
-        HILOG_ERROR("protectLockForms faild when executing the switchLockForms");
+        HILOG_ERROR("ProtectLockForms faild when executing the switchLockForms");
         return res;
     }
     return ERR_OK;
