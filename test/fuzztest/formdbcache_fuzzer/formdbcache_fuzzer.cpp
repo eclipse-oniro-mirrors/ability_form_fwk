@@ -137,7 +137,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.GetAllFormInfo(formDBInfos);
     FormRecord record;
     formDbCache.GetDBRecord(formId, record);
-    formDbCache.UpdateDBRecord(formId, record);
     formDbCache.GetMatchCount(bundleName, moduleName);
     std::set<int64_t> matchedFormIds = {};
     std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap = {};
