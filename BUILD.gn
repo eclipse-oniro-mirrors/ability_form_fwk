@@ -547,16 +547,20 @@ group("form_napi_packages") {
   }
 }
 
-group("form_ani_packages") {                                                                                                                                                              
+group("form_ani_packages") {
   deps = []
   if (ability_runtime_graphics) {
     deps += [
       "${form_fwk_ani_path}/form_binding_data:formBindingData_ani",
       "${form_fwk_ani_path}/form_binding_data:form_binding_data_etc",
+      "${form_fwk_ani_path}/form_edit_extension_ability:form_edit_extension_ability_etc",
+      "${form_fwk_ani_path}/form_edit_extension_ability:form_edit_extension_context_etc",
       "${form_fwk_ani_path}/form_provider:formProvider_ani",
       "${form_fwk_ani_path}/form_provider:form_provider_etc",
       "${form_fwk_ani_path}/form_info:form_info_etc",
       "${form_fwk_ani_path}/form_error:form_error_etc",
+      "${form_fwk_ani_path}/form_util:formutil_ani",
+      "${form_fwk_ani_path}/utils:util_ani",
     ]
   }
 }
