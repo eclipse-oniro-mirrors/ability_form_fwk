@@ -99,6 +99,7 @@ group("unittest") {
     "unittest/fms_form_supply_callback_test:unittest",
     "unittest/fms_form_supply_proxy_test:unittest",
     "unittest/fms_form_supply_stub_test:unittest",
+    "unittest/fms_form_surface_info_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_systemload_listener_test:unittest",
     "unittest/fms_form_timer_mgr_new_test:unittest",
