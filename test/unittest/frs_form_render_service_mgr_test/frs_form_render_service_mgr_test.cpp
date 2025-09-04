@@ -43,6 +43,7 @@ constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t ERR_FAILED = -1;
+constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
 }  // namespace
 
 class FormRenderServiceMgrTest : public testing::Test {
@@ -1187,4 +1188,34 @@ HWTEST_F(FormRenderServiceMgrTest, cacheAppliedConfig_001, TestSize.Level0)
     formRenderServiceMgr.CacheAppliedConfig();
     EXPECT_EQ(formRenderServiceMgr.appliedConfig_->GetItem("ohos.system.colorMode"), "dark");
     GTEST_LOG_(INFO) << "cacheAppliedConfig_001 end";
+}
+
+/**
+ * @tc.name: UpdateFormSize_001
+ * @tc.desc: Verify UpdateFormSize.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, UpdateFormSize_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateFormSize_001 start";
+    int64_t formId{1};
+    float width{100};
+    float height{100};
+    float borderWidth{100};
+    std::string uid{"uid"};
+    FormRenderServiceMgr formRenderServiceMgr;
+    int32_t ret = formRenderServiceMgr.UpdateFormSize(formId, width, height, borderWidth, uid);
+    EXPECT_EQ(ret, UPDATE_FORM_SIZE_FAILED);
+
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
+    ret = formRenderServiceMgr.UpdateFormSize(formId, width, height, borderWidth, uid);
+    EXPECT_EQ(ret, UPDATE_FORM_SIZE_FAILED);
+
+    std::string uidNew{"uidNew"};
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uidNew);
+    formRenderServiceMgr.renderRecordMap_.emplace(uidNew, formRenderRecord);
+    ret = formRenderServiceMgr.UpdateFormSize(formId, width, height, borderWidth, uidNew);
+    EXPECT_EQ(ret, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UpdateFormSize_001 end";
 }

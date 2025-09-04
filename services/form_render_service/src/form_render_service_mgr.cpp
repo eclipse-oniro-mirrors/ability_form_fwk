@@ -83,8 +83,7 @@ int32_t FormRenderServiceMgr::RenderForm(
     int32_t ret = ProcessRenderForm(formJsInfo, want);
     if (ret != ERR_OK) {
         HILOG_ERROR("RenderForm failed, formId: %{public}" PRId64 " ret: %{public}d", formJsInfo.formId, ret);
-        FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-            formJsInfo.formId, FormFsmEvent::RENDER_FORM_FAIL, eventId, formSupplyClient);
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formJsInfo.formId, FormFsmEvent::RENDER_FORM_FAIL);
     }
 
     return ret;
@@ -522,8 +521,13 @@ int32_t FormRenderServiceMgr::RecycleForm(const int64_t formId, const Want &want
 
     std::string statusData = "";
     int32_t ret = ProcessRecycleForm(formId, want, statusData);
-    FormFsmEvent event = ret == ERR_OK ? FormFsmEvent::RECYCLE_DATA_DONE : FormFsmEvent::RECYCLE_DATA_FAIL;
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(formId, event, statusData, want, formSupplyClient);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("recycleForm fail, formId: %{public}" PRId64 " ret: %{public}d", formId, ret);
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_DATA_FAIL);
+    } else {
+        FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
+            formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
+    }
 
     return ret;
 }
@@ -578,8 +582,7 @@ int32_t FormRenderServiceMgr::RecoverForm(const FormJsInfo &formJsInfo, const Wa
     int32_t ret = ProcessRecoverForm(formJsInfo, want);
     if (ret != ERR_OK) {
         HILOG_ERROR("RecoverForm failed, formId: %{public}" PRId64 " ret: %{public}d", formJsInfo.formId, ret);
-        FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
-            formJsInfo.formId, FormFsmEvent::RECOVER_FORM_FAIL, eventId, formSupplyClient);
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formJsInfo.formId, FormFsmEvent::RECOVER_FORM_FAIL);
     }
 
     return ret;
