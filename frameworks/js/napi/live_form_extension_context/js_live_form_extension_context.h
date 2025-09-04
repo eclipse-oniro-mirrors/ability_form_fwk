@@ -18,6 +18,7 @@
 
 #include "native_engine/native_engine.h"
 #include "live_form_extension_context.h"
+#include "js_ui_extension_context.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -39,10 +40,27 @@ public:
 
     static napi_value StartAbilityByLiveForm(napi_env env, napi_callback_info info);
 
+    static napi_value ConnectAbility(napi_env env, napi_callback_info info);
+
+    static napi_value DisconnectAbility(napi_env env, napi_callback_info info);
+
+    static napi_value StartAbilityByCall(napi_env env, napi_callback_info info);
+
 private:
     napi_value OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info);
 
     napi_value OnStartAbilityByLiveForm(napi_env env, NapiCallbackInfo &info);
+
+    napi_value OnConnectAbility(napi_env env, NapiCallbackInfo &info);
+
+    napi_value OnDisconnectAbility(napi_env env, NapiCallbackInfo &info);
+
+    napi_value OnStartAbilityByCall(napi_env env, NapiCallbackInfo &info);
+
+    bool CheckConnectionParam(napi_env env, napi_value value,
+        sptr<JSUIExtensionConnection> &connection, AAFwk::Want &want);
+
+    bool CheckCallerIsSystemApp();
 
 private:
     std::weak_ptr<LiveFormExtensionContext> context_;
