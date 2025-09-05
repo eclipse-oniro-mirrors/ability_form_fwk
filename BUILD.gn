@@ -479,6 +479,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_status_print.cpp",
     "interfaces/inner_api/src/form_supply_proxy.cpp",
     "interfaces/inner_api/src/form_supply_stub.cpp",
+    "interfaces/inner_api/src/form_surface_info.cpp",
     "interfaces/inner_api/src/js_form_state_observer_proxy.cpp",
     "interfaces/inner_api/src/js_form_state_observer_stub.cpp",
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
