@@ -649,17 +649,16 @@ bool FormRdbDataMgr::IsFormRdbLoaded()
 
 ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
 {
-    if (rdbStore_ == nullptr) {
-        HILOG_ERROR("null FormInfoRdbStore");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     if (rdbOperateRet != NativeRdb::E_SQLITE_CORRUPT) {
         HILOG_INFO("errorCode:%{public}" PRId32, rdbOperateRet);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     std::unique_lock<std::shared_mutex> guard(rdbStoreMutex_);
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     int64_t curTime = FormUtil::GetCurrentMillisecond();
     if ((curTime - lastRdbBuildTime_) <= MIN_FORM_RDB_REBUILD_INTERVAL) {
         return ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD;
