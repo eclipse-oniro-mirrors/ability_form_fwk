@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <random>
 #include "form_event_hiappevent.h"
 #include "form_ecological_rule_interface.h"
 #ifdef NO_RUNTIME_EMULATOR
@@ -78,7 +79,8 @@ void FormEventHiAppEvent::WriteAppFormEndEvent(const int errCode, const time_t b
         HILOG_ERROR("Not an APP process.");
         return;
     }
-    std::string transId = "traceId_" + std::to_string(std::rand());
+    std::random_device rd;
+    std::string transId = "traceId_" + std::to_string(rd());
     HiAppEvent::Event event("api_diagnostic", "api_exec_end", HiAppEvent::BEHAVIOR);
     int32_t result = (errCode == ERR_OK) ? EVENT_RESULT_SUCCESS : EVENT_RESULT_FAIL;
     event.AddParam("trans_id", transId);
