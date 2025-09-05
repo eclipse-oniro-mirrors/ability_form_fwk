@@ -1292,7 +1292,7 @@ std::shared_ptr<WantAgent> FormTimerMgr::GetDynamicWantAgent(int64_t nextTime, i
     want->SetAction(Constants::ACTION_UPDATEATTIMER);
     want->SetParam(Constants::KEY_ACTION_TYPE, Constants::TYPE_DYNAMIC_UPDATE);
     int nextTimeRight = static_cast<int>(nextTime);
-    int nextTimLeft = static_cast<int>(nextTime >> SHIFT_BIT_LENGTH);
+    int nextTimLeft = static_cast<int>(static_cast<uint64_t>(nextTime) >> SHIFT_BIT_LENGTH);
 
     want->SetParam(Constants::KEY_WAKEUP_TIME_LEFT, nextTimLeft);
     want->SetParam(Constants::KEY_WAKEUP_TIME_RIGHT, nextTimeRight);
@@ -1607,9 +1607,8 @@ void FormTimerMgr::TimerReceiver::OnReceiveEvent(const EventFwk::CommonEventData
         } else if (type == Constants::TYPE_DYNAMIC_UPDATE) {
             int updateTimeLeft = want.GetIntParam(Constants::KEY_WAKEUP_TIME_LEFT, -1);
             int updateTimeRight = want.GetIntParam(Constants::KEY_WAKEUP_TIME_RIGHT, -1);
-            int64_t updateTime = static_cast<int64_t>(updateTimeLeft);
-            updateTime = updateTime << SHIFT_BIT_LENGTH;
-            updateTime |= updateTimeRight;
+            int64_t updateTime = static_cast<int64_t>(((static_cast<uint64_t>(updateTimeLeft) <<
+                SHIFT_BIT_LENGTH) | static_cast<uint64_t>(updateTimeRight)));
             if (updateTime <= 0) {
                 HILOG_ERROR("invalid updateTime:%{public}" PRId64 "", updateTime);
                 return;
