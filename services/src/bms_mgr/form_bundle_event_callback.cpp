@@ -56,7 +56,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
         HILOG_WARN("bundleName:%{public}s changed", bundleName.c_str());
-        HandleBundleChange(bundleName, action, userId);
+        HandleBundleChange(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         int appIndex = want.GetIntParam("appIndex", 0);
@@ -87,20 +87,14 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     }
 }
 
-void FormBundleEventCallback::HandleBundleChange(
-    const std::string &bundleName, const std::string &action, int32_t userId)
+void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName, int32_t userId)
 {
     std::vector<int32_t> activeList;
-    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED) {
+    FormUtil::GetActiveUsers(activeList);
+    auto iter = std::find(activeList.begin(), activeList.end(), userId);
+    if (iter == activeList.end()) {
         activeList.emplace_back(userId);
-    } else {
-        FormUtil::GetActiveUsers(activeList);
-        auto iter = std::find(activeList.begin(), activeList.end(), userId);
-        if (iter == activeList.end()) {
-            activeList.emplace_back(userId);
-        }
     }
-
     HILOG_INFO("active user list len:%{public}zu", activeList.size());
     for (const int32_t userId : activeList) {
         bool needReload = true;

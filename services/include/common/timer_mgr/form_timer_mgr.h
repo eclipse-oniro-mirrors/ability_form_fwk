@@ -383,6 +383,7 @@ private:
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
     bool IsDynamicTimerExpired(int64_t formId);
+    bool UpdateAtTimerAlarmDetail(FormTimer &timerTask);
 
     mutable std::recursive_mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
