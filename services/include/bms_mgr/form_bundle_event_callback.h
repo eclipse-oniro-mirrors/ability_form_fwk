@@ -44,7 +44,7 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(FormBundleEventCallback);
 
-    void HandleBundleChange(const std::string &bundleName, const std::string &action, int32_t userId);
+    void HandleBundleChange(const std::string &bundleName, int32_t userId);
 };
 } // namespace OHOS
 } // namespace AppExecFwk
