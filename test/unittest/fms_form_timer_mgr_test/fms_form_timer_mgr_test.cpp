@@ -1504,8 +1504,8 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0090, Function | MediumTest | Lev
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
     ASSERT_NE(nullptr, formTimerMgr);
-    FormTimer timerTask;
-    EXPECT_TRUE(formTimerMgr->UpdateAtTimerAlarmDetail(timerTask));
+    FormTimer task;
+    EXPECT_TRUE(formTimerMgr->UpdateAtTimerAlarmDetail(task));
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 end";
 }
 }
