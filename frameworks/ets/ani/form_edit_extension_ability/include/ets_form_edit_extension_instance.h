@@ -13,32 +13,15 @@
  * limitations under the License.
  */
 
+#ifndef OHOS_FORM_FWK_ETS_FORM_EDIT_EXTENSION_INSTANCE_H
+#define OHOS_FORM_FWK_ETS_FORM_EDIT_EXTENSION_INSTANCE_H
+
 #include "form_edit_extension.h"
-#include "hilog_tag_wrapper.h"
-#include "js_form_edit_extension.h"
-#include "runtime.h"
-#include "form_edit_extension_context.h"
-#include "ets_form_edit_extension_instance.h"
+
 namespace OHOS {
 namespace AbilityRuntime {
-FormEditExtension::FormEditExtension()
-{
-    TAG_LOGI(AAFwkTag::FORM_EDIT_EXT, "call");
-}
 
-FormEditExtension *FormEditExtension::Create(const std::unique_ptr<Runtime> &runtime)
-{
-    if (!runtime) {
-        return new FormEditExtension();
-    }
-    switch (runtime->GetLanguage()) {
-        case Runtime::Language::JS:
-            return JsFormEditExtension::Create(runtime);
-        case Runtime::Language::ETS:
-            return CreateETSFormEditExtension(runtime);
-        default:
-            return new FormEditExtension();
-    }
-}
+FormEditExtension *CreateETSFormEditExtension(const std::unique_ptr<Runtime> &runtime);
 } // namespace AbilityRuntime
 } // namespace OHOS
+#endif // ifndefOHOS_FORM_FWK_ETS_FORM_EDIT_EXTENSION_INSTANCE_H

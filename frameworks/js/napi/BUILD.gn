@@ -731,7 +731,10 @@ ohos_shared_library("form_edit_extension") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = ["form_edit_extension_context/"]
+  include_dirs = [
+    "form_edit_extension_context/",
+    "form_edit_extension_ability/",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/include/",]
 
   sources = [
     "form_edit_extension_ability/form_edit_extension.cpp",
@@ -739,6 +742,7 @@ ohos_shared_library("form_edit_extension") {
     "form_edit_extension_context/form_edit_extension_context.cpp",
     "form_edit_extension_context/js_form_edit_extension_context.cpp",
     "form_edit_extension_context/js_form_edit_extension_impl.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_instance.cpp",
   ]
 
   configs = [ ":fmskit_config" ]
@@ -805,6 +809,53 @@ ohos_shared_library("form_edit_extension_module") {
   }
 
   relative_install_dir = "extensionability"
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_shared_library("form_edit_extension_ani") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  include_dirs = [
+    "form_edit_extension_context/",
+    "form_edit_extension_ability/",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/include/",]
+
+  sources = [
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_context.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_impl.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [
+    ":form_edit_extension",
+    "${form_fwk_ani_path}/utils:util_ani",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:fmskit_provider_client",
+    "${form_fwk_path}:form_manager",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ani_common",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_context",
+    "ability_runtime:runtime",
+    "ability_runtime:ui_extension",
+    "ability_runtime:ui_extension_ani",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "runtime_core:ani",
+  ]
+
   subsystem_name = "ability"
   part_name = "form_fwk"
 }

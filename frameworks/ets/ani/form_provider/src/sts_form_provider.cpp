@@ -171,7 +171,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
 
-    const char *spaceName = "@ohos.app.form.formProvider.formProvider";
+    const char *spaceName = "L@ohos/app/form/formProvider/formProvider;";
     ani_namespace spc;
 
     ani_status ret = env->FindNamespace(spaceName, &spc);
@@ -182,7 +182,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 
     std::array methods = {
         ani_native_function{
-            "setFormNextRefreshTime_inner", "C{std.core.String}i:", reinterpret_cast<void *>(SetFormNextRefreshTime)},
+            "setFormNextRefreshTime_inner", "Lstd/core/String;I:V", reinterpret_cast<void *>(SetFormNextRefreshTime)},
     };
 
     if (env->Namespace_BindNativeFunctions(spc, methods.data(), methods.size()) != ANI_OK) {
