@@ -33,7 +33,10 @@ ohos_fuzztest("FormErrorsFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "formerrors_fuzzer.cpp" ]
+  sources = [
+    "${form_fwk_path}/services/src/form_mgr/form_mgr_queue.cpp",
+    "formerrors_fuzzer.cpp"
+  ]
 
   deps = [
     "${form_fwk_path}:fms_target",
@@ -51,6 +54,7 @@ ohos_fuzztest("FormErrorsFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "ffrt:libffrt",
     "form_fwk:form_manager",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
