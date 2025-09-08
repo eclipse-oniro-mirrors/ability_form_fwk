@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
@@ -29,22 +30,21 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
+    if (fdp == nullptr) {
+        return true;
+    }
     FormErrors formErrors;
-    int errorCode = static_cast<int>(GetU32Data(data));
+    int errorCode = fdp->ConsumeIntegral<int>();
     formErrors.InitErrorMessageMap();
-    int32_t internalErrorCode = static_cast<int32_t>(GetU32Data(data));
+    int32_t internalErrorCode = fdp->ConsumeIntegral<int32_t>();
     formErrors.QueryExternalErrorCode(internalErrorCode);
-    int32_t externalErrorCode = static_cast<int32_t>(GetU32Data(data));
+    int32_t externalErrorCode = fdp->ConsumeIntegral<int32_t>();
     formErrors.QueryExternalErrorMessage(internalErrorCode, externalErrorCode);
     formErrors.GetErrorMsgByExternalErrorCode(externalErrorCode);
-    return formErrors.GetErrorMessage(errorCode) == "aa";
+    formErrors.GetErrorMessage(errorCode);
+    return true;
 }
 }
 
@@ -72,9 +72,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     free(ch);
     ch = nullptr;
     return 0;
 }
-
