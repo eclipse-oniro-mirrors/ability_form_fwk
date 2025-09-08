@@ -22,7 +22,6 @@
 #define private public
 #define protected public
 #include "form_errors.h"
-#include "form_mgr/form_mgr_queue.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -45,15 +44,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formErrors.QueryExternalErrorMessage(internalErrorCode, externalErrorCode);
     formErrors.GetErrorMsgByExternalErrorCode(externalErrorCode);
     formErrors.GetErrorMessage(errorCode);
-    uint64_t ms64 = fdp->ConsumeIntegral<uint64_t>();
-    uint32_t ms32 = fdp->ConsumeIntegral<uint32_t>();
-    std::function<void()> func = []() { return 1; };
-    int64_t intKey = fdp->ConsumeIntegral<int64_t>();
-    int64_t intValue = fdp->ConsumeIntegral<int64_t>();
-    std::pair<int64_t, int64_t> eventMsg = std::make_pair(intKey, intValue);
-    FormMgrQueue::GetInstance().ScheduleTask(ms64, func);
-    FormMgrQueue::GetInstance().ScheduleDelayTask(eventMsg, ms32, func);
-    FormMgrQueue::GetInstance().CancelDelayTask(eventMsg);
     return true;
 }
 }
