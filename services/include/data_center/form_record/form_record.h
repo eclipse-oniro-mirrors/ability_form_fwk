@@ -81,7 +81,7 @@ public:
     std::string description = "";
     int32_t privacyLevel = 0;
     bool isNeedNotify = true;
-    RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
+    LowMemoryRecycleStatus lowMemoryRecycleStatus = LowMemoryRecycleStatus::NON_RECYCLABLE;
     Constants::FormLocation formLocation;
     bool isThemeForm = false;
     BundleType formBundleType = BundleType::APP;
@@ -98,6 +98,8 @@ public:
     bool isDataProxyUpdate = false;
     bool isDistributedForm = false;
     std::string uiModule = ""; // widget module name
+    // user expect form recycled status
+    bool expectRecycled = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

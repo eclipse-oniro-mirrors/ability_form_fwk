@@ -140,14 +140,18 @@ HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_002 start";
     int64_t formId = 1;
     std::vector<FormDataProxy> formDataProxies;
+    std::vector<FormDataProxy> getFormDataProxies;
+
+    FormDataProxyMgr::GetInstance().formDataProxiesMap_.clear();
+    bool ret = FormDataProxyMgr::GetInstance().ConsumeFormDataProxies(formId, getFormDataProxies);
+    EXPECT_EQ(ret, false);
 
     FormDataProxy formDataProxy("test", "0002");
     formDataProxies.push_back(formDataProxy);
     FormDataProxyMgr::GetInstance().ProduceFormDataProxies(formId, formDataProxies);
     EXPECT_EQ(FormDataProxyMgr::GetInstance().formDataProxiesMap_.size(), 1);
 
-    std::vector<FormDataProxy> getFormDataProxies;
-    bool ret = FormDataProxyMgr::GetInstance().ConsumeFormDataProxies(formId, getFormDataProxies);
+    ret = FormDataProxyMgr::GetInstance().ConsumeFormDataProxies(formId, getFormDataProxies);
     EXPECT_EQ(ret, true);
 
     GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_002 end";

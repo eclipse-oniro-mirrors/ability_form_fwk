@@ -48,6 +48,7 @@ private:
 
     void ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
+    void RestoreFormsRecycledStatus(const std::vector<FormRecord> &&formRecords);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

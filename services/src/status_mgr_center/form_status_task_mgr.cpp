@@ -54,6 +54,10 @@ void FormStatusTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, co
     HILOG_DEBUG("start");
 
     for (const int64_t formId : formIds) {
+        if (!FormDataMgr::GetInstance().IsExpectRecycled(formId)) {
+            HILOG_WARN("form not need recycle, formId: %{public}" PRId64, formId);
+            continue;
+        }
         auto recycleForm = [formId, remoteObjectOfHost, remoteObjectOfRender]() {
             FormStatusTaskMgr::GetInstance().RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
         };
@@ -115,6 +119,7 @@ void FormStatusTaskMgr::PostRenderForm(
 
     auto renderForm = [formRecord, want, remoteObject]() {
         FormStatusTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
+        FormStatusTaskMgr::GetInstance().RestoreFormRecycledStatus(formRecord, remoteObject);
     };
 
     FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RENDER_FORM, renderForm);
@@ -149,7 +154,7 @@ void FormStatusTaskMgr::PostStopRenderingForm(
 bool FormStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
 {
     FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));
- 
+
     auto timeoutTask = [formId]() {
         HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
         FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::UNPROCESSABLE);
@@ -267,7 +272,7 @@ bool FormStatusTaskMgr::PostDelayReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
     FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, RELEASE_RENDER_DELAY_MSG));
- 
+
     auto recycleForm = [formId, compId, uid, remoteObject]() {
         FormStatusTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
         FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, RELEASE_RENDER_DELAY_MSG));
@@ -349,6 +354,27 @@ void FormStatusTaskMgr::RemoveConnection(int32_t connectId)
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
+}
+
+void FormStatusTaskMgr::RestoreFormRecycledStatus(const FormRecord &formRecord, const sptr<IRemoteObject> &remoteObject)
+{
+    if (!FormDataMgr::GetInstance().IsExpectRecycled(formRecord.formId)) {
+        return;
+    }
+    HILOG_INFO("form is expect recycled, formId: %{public}" PRId64, formRecord.formId);
+    auto recycleForm = [formRecord, remoteObject]() {
+        std::vector<FormHostRecord> formHostRecord;
+        FormDataMgr::GetInstance().GetFormHostRecord(formRecord.formId, formHostRecord);
+        auto formUserUids = formRecord.formUserUids;
+        for (auto &hostRecord : formHostRecord) {
+            auto iter = std::find(formUserUids.begin(), formUserUids.end(), hostRecord.GetCallerUid());
+            if (iter != formUserUids.end()) {
+                FormStatusTaskMgr::GetInstance().RecycleForm(formRecord.formId, hostRecord.GetFormHostClient(),
+                    remoteObject);
+            }
+        }
+    };
+    FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RECYCLE_DATA, recycleForm);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

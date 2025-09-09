@@ -42,7 +42,7 @@ struct RunningFormInfo : public Parcelable {
     Constants::FormLocation formLocation;
     FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
     FormUsageState formUsageState = FormUsageState::USED;
-    RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
+    LowMemoryRecycleStatus lowMemoryRecycleStatus = LowMemoryRecycleStatus::NON_RECYCLABLE;
     BundleType formBundleType = BundleType::APP;
     int32_t appIndex = 0;
     int32_t userId = -1;

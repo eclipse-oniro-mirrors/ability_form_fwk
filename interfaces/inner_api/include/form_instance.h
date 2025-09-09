@@ -32,7 +32,7 @@ enum class FormVisibilityType {
     INVISIBLE,
 };
 
-enum class RecycleStatus {
+enum class LowMemoryRecycleStatus {
     RECYCLABLE,
     RECYCLED,
     NON_RECYCLABLE,
