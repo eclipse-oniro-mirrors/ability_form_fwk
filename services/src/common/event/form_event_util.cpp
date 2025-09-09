@@ -120,7 +120,6 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
             continue;
         }
 
-        formRecord.versionCode = bundleInfo.versionCode;
         if (ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo)) {
             updatedForms.emplace_back(formRecord);
             continue;
@@ -269,6 +268,11 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
                 FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, formRecord.providerUserId);
             HILOG_INFO("form pack format change, uiModule:%{public}s", formRecord.uiModule.c_str());
         }
+    }
+
+    // normal or standalone package install finish, update version info
+    if (!isBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
+        formRecord.versionCode = bundleInfo.versionCode;
     }
 
     FormInfo updatedForm;
