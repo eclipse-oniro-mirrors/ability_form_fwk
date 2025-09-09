@@ -312,7 +312,7 @@ void FormDataMgr::RecycleAllRecyclableForms() const
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-            if (itFormRecord->second.recycleStatus == RecycleStatus::RECYCLABLE) {
+            if (itFormRecord->second.lowMemoryRecycleStatus == LowMemoryRecycleStatus::RECYCLABLE) {
                 formIds.emplace_back(itFormRecord->first);
             }
         }
@@ -2302,7 +2302,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.description = formRecord.description;
     runningFormInfo.formLocation = formRecord.formLocation;
     runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
-    runningFormInfo.recycleStatus = formRecord.recycleStatus;
+    runningFormInfo.lowMemoryRecycleStatus = formRecord.lowMemoryRecycleStatus;
     runningFormInfo.formBundleType = formRecord.formBundleType;
     runningFormInfo.userId = formRecord.userId;
 }
@@ -3158,6 +3158,28 @@ bool FormDataMgr::GetFormVisible(int64_t formId)
     }
     // When visibility is not set, it is visible by default
     return true;
+}
+
+void FormDataMgr::SetExpectRecycledStatus(const std::vector<int64_t> &formIds, bool isExpectRecycled)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto formId : formIds) {
+        auto info = formRecords_.find(formId);
+        if (info == formRecords_.end()) {
+            continue;
+        }
+        info->second.expectRecycled = isExpectRecycled;
+    }
+}
+
+bool FormDataMgr::IsExpectRecycled(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        return false;
+    }
+    return info->second.expectRecycled;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

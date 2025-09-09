@@ -79,7 +79,7 @@ public:
      * @return bool Returns true if the timeout was successfully scheduled, false otherwise
      */
     bool ScheduleRecycleTimeout(const int64_t formId);
- 
+
     /**
      * @brief Cancel form recycle timeout task
      * @param formId Form ID
@@ -104,6 +104,8 @@ private:
     void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void RemoveConnection(int32_t connectId);
+
+    void RestoreFormRecycledStatus(const FormRecord &formRecord, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

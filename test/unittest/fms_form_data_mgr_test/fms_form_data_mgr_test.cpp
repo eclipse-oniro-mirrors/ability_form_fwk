@@ -3333,7 +3333,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRecordsByFormType_001, TestSi
     record1.formBundleType = BundleType::APP;
     record1.formVisibleNotifyState = static_cast<int32_t>(FormVisibilityType::VISIBLE);
     formDataMgr_.formRecords_.emplace(formId, record1);
-    
+
     FormRecord record2;
     formId = 2;
     record2.formBundleType = BundleType::ATOMIC_SERVICE;
@@ -4245,7 +4245,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetHostRefresh_001, TestSize.Lev
     EXPECT_EQ(formDataMgr_.formRecords_.find(formId) == formDataMgr_.formRecords_.end(), true);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostRefresh_001 end";
 }
- 
+
 /**
  * @tc.number: FmsFormDataMgrTest_SetHostRefresh_002
  * @tc.name: SetHostRefresh
@@ -4263,7 +4263,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetHostRefresh_002, TestSize.Lev
     EXPECT_EQ(itFormRecord->second.isHostRefresh, true);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostRefresh_002 end";
 }
- 
+
 /**
  * @tc.number: FmsFormDataMgrTest_ClearWantCache_001
  * @tc.name: ClearWantCache
@@ -4278,7 +4278,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearWantCache_001, TestSize.Lev
     EXPECT_EQ(formDataMgr_.formRecords_.find(formId) == formDataMgr_.formRecords_.end(), true);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_001 end";
 }
- 
+
 /**
  * @tc.number: FmsFormDataMgrTest_ClearWantCache_002
  * @tc.name: ClearWantCache
@@ -4683,7 +4683,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_008, TestSize.Level0)
 
     // init record
     FormRecord record1 = formDataMgr_.CreateFormRecord(formItemInfo1, callingUid1, formId1);
-    record1.recycleStatus = RecycleStatus::RECYCLABLE;
+    record1.lowMemoryRecycleStatus = LowMemoryRecycleStatus::RECYCLABLE;
     FormRecord record2 = formDataMgr_.CreateFormRecord(formItemInfo2, callingUid2, formId2);
     formDataMgr_.formRecords_.emplace(formId1, record1);
     formDataMgr_.formRecords_.emplace(formId2, record2);
@@ -5023,7 +5023,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_014, TestSize.Level0)
         formDataMgr_.clientRecords_.end());
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_Coverage_014 end";
 }
- 
+
 /**
  * @tc.name: FmsFormDataMgrTest_PostDelayRecheckWhetherNeedCleanFormHostTask_001
  * @tc.desc: Verify PostDelayRecheckWhetherNeedCleanFormHostTask

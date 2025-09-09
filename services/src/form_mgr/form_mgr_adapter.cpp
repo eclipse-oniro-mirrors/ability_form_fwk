@@ -1541,8 +1541,8 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
 void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record)
 {
     bool needUpdate = false;
-    if (record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
-        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+    if (record.lowMemoryRecycleStatus != LowMemoryRecycleStatus::NON_RECYCLABLE) {
+        record.lowMemoryRecycleStatus = LowMemoryRecycleStatus::NON_RECYCLABLE;
         needUpdate = true;
     }
 
@@ -3841,7 +3841,7 @@ int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
             HILOG_WARN("form %{public}" PRId64 " not ETS form", formId);
             continue;
         }
-        if (record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
+        if (record.lowMemoryRecycleStatus != LowMemoryRecycleStatus::NON_RECYCLABLE) {
             HILOG_WARN("form %{public}" PRId64 " is already RECYCLABLE or RECYCLED", formId);
             continue;
         }
@@ -3851,7 +3851,7 @@ int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
             continue;
         }
 
-        record.recycleStatus = RecycleStatus::RECYCLABLE;
+        record.lowMemoryRecycleStatus = LowMemoryRecycleStatus::RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
         HILOG_INFO("formId:%{public}" PRId64 " recyclable", formId);
@@ -3913,6 +3913,7 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    FormDataMgr::GetInstance().SetExpectRecycledStatus(validFormIds, true);
     FormDataMgr::GetInstance().RecycleForms(validFormIds, callingUid, want);
     return ERR_OK;
 }
@@ -3953,7 +3954,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             continue;
         }
 
-        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+        record.lowMemoryRecycleStatus = LowMemoryRecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
         HILOG_INFO("formId:%{public}" PRId64 " non-recyclable", formId);
@@ -3964,6 +3965,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    FormDataMgr::GetInstance().SetExpectRecycledStatus(validFormIds, false);
     FormRenderMgr::GetInstance().RecoverForms(validFormIds, want.GetParams());
     return ERR_OK;
 }

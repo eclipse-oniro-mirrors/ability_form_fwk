@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "form_render/form_render_task_mgr.h"
- 
+
 #include "form_render_interface.h"
 #include "form_js_info.h"
 #include "form_constants.h"
@@ -175,7 +175,26 @@ void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, 
             error);
         return;
     }
+    RestoreFormsRecycledStatus(std::move(formRecords));
+
     HILOG_INFO("end");
+}
+
+void FormRenderTaskMgr::RestoreFormsRecycledStatus(const std::vector<FormRecord> &&formRecords)
+{
+    int32_t callingUid = 0;
+    std::vector<int64_t> recycleForms;
+    for (const auto &formRecord : formRecords) {
+        if (FormDataMgr::GetInstance().IsExpectRecycled(formRecord.formId)) {
+            HILOG_INFO("form is expect recycled, formId: %{public}" PRId64, formRecord.formId);
+            recycleForms.emplace_back(formRecord.formId);
+            if (!formRecord.formUserUids.empty() && !callingUid) {
+                callingUid = *formRecord.formUserUids.begin();
+            }
+        }
+    }
+
+    FormDataMgr::GetInstance().RecycleForms(recycleForms, callingUid, Want());
 }
 } // namespace AppExecFwk
 } // namespace OHOS

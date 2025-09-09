@@ -111,7 +111,7 @@ ErrCode FormRenderMgrInner::RenderForm(
 void FormRenderMgrInner::CheckIfFormRecycled(FormRecord &formRecord, Want& want) const
 {
     if (FormStatus::GetInstance().GetFormStatus(formRecord.formId) == FormFsmStatus::RECYCLED) {
-        formRecord.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+        formRecord.lowMemoryRecycleStatus = LowMemoryRecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         std::string statusData;
         if (FormInfoRdbStorageMgr::GetInstance().LoadStatusData(
