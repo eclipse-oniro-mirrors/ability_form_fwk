@@ -1315,7 +1315,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_CheckUpdateFormRecord, TestSize.
  * @tc.desc: test SwitchLockForms function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SwitchLockForms, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SwitchLockForms, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_SwitchLockForms start";
     FormMgrAdapter formMgrAdapter;
