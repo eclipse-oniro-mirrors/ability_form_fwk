@@ -1535,6 +1535,7 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
         bool isMultiAppForm = FormInfoMgr::GetInstance().IsMultiAppForm(formInfo) &&
             formConfigInfo.GetSystemAppFlag();
         formConfigInfo.SetLockForm(isBundleProtect && !isMultiAppForm);
+        formConfigInfo.SetProtectForm(isBundleProtect && !isMultiAppForm);
     }
 }
 
