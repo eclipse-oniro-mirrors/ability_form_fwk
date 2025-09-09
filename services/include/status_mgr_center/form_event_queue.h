@@ -61,8 +61,9 @@ public:
     /**
      * @brief Push form event to queue
      * @param eventInfo Form event task information
+     * @return Returns true if execute success, false otherwise.
      */
-    void PushFormEvent(FormEventTaskInfo &eventInfo);
+    bool PushFormEvent(FormEventTaskInfo &eventInfo);
 
     /**
      * @brief Pop form event from queue
