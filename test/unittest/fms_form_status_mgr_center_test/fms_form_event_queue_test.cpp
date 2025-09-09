@@ -24,6 +24,8 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 namespace {
+constexpr int32_t EVENT_QUEUE_SIZE_MAX = 100;
+
 class FormEventQueueTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -62,15 +64,22 @@ HWTEST_F(FormEventQueueTest, FormEventQueueTest_0001, TestSize.Level0)
 
     auto task = []() { GTEST_LOG_(INFO) << "FmsFormHostQueueTest_001 Task called"; };
     FormEventTaskInfo taskInfo{formId, FormFsmEvent::RENDER_FORM, task};
-    formEventQueue->PushFormEvent(taskInfo);
+    bool ret = formEventQueue->PushFormEvent(taskInfo);
+    EXPECT_EQ(ret, true);
     EXPECT_EQ(formEventQueue->IsEventQueueEmpty(), false);
     EXPECT_EQ(formEventQueue->PopFormEvent(eventTaskInfo), true);
 
+    for (int i = 0; i < EVENT_QUEUE_SIZE_MAX; i++) {
+        formEventQueue->PushFormEvent(taskInfo);
+    }
+    ret = formEventQueue->PushFormEvent(taskInfo);
+    EXPECT_EQ(ret, false);
+
     formId = 321;
     FormEventTaskInfo eTaskInfo{formId, FormFsmEvent::RENDER_FORM, task};
-    formEventQueue->PushFormEvent(eTaskInfo);
-    int32_t size = (formEventQueue->GetEventQueue()).size();
-    EXPECT_EQ(size, 0);
+    ret = formEventQueue->PushFormEvent(eTaskInfo);
+    EXPECT_EQ(ret, false);
+
     GTEST_LOG_(INFO) << "FormEventQueueTest_0001 end";
 }
 

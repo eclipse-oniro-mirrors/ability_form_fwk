@@ -69,7 +69,7 @@ void FormStatusMgr::ExecFormTaskTimeout(
             FormStatusPrint::FormEventToString(event).c_str(),
             FormStatusPrint::FormStatusToString(status).c_str(),
             formId);
-        FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, FormFsmEvent::EXECUTION_TIMEOUT);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::EXECUTION_TIMEOUT);
         FormEventTimeoutQueue::GetInstance().CancelDelayTask(std::make_pair(formId, eventId));
     };
     FormEventTimeoutQueue::GetInstance().ScheduleDelayTask(
@@ -158,7 +158,10 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
     std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
 
     FormEventTaskInfo taskInfo{formId, event, func};
-    formEventQueue->PushFormEvent(taskInfo);
+    if (!(formEventQueue->PushFormEvent(taskInfo))) {
+        HILOG_ERROR("push form event error, formId :%{public}" PRId64 ". ", formId);
+        return;
+    }
 
     std::queue<FormEventTaskInfo> temptaskInfoQueue;
     while (!formEventQueue->IsEventQueueEmpty()) {
