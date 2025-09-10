@@ -409,7 +409,6 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
         return;
     }
     OnConfigurationUpdatedInner();
-
 }
 
 void FormRenderServiceMgr::OnConfigurationUpdatedInner()
