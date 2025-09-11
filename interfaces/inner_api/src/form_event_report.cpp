@@ -86,8 +86,7 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::INIT_FMS_FAILED, "INIT_FMS_FAILED"),
     std::map<FormEventName, std::string>::value_type(FormEventName::CALLEN_DB_FAILED, "CALLEN_DB_FAILED"),
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM_FAILED, "ADD_FORM_FAILED"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::FIRST_ADD_FORM_DURATION, "FIRST_ADD_FORM_DURATION"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::FIRST_ADD_FORM_DURATION, "FIRST_ADD_FORM_DURATION"),
     std::map<FormEventName, std::string>::value_type(
         FormEventName::FIRST_UPDATE_FORM_DURATION, "FIRST_UPDATE_FORM_DURATION"),
     std::map<FormEventName, std::string>::value_type(
@@ -96,8 +95,7 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(
         FormEventName::INVALID_PUBLISH_FORM_TO_HOST, "INVALID_PUBLISH_FORM_TO_HOST"),
     std::map<FormEventName, std::string>::value_type(FormEventName::UNBIND_FORM_APP, "UNBIND_FORM_APP"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::CONDITION_UPDATE_FORM, "CONDITION_UPDATE_FORM"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::CONDITION_UPDATE_FORM, "CONDITION_UPDATE_FORM"),
     std::map<FormEventName, std::string>::value_type(
         FormEventName::LOAD_STAGE_FORM_CONFIG_INFO, "LOAD_STAGE_FORM_CONFIG_INFO"),
     std::map<FormEventName, std::string>::value_type(FormEventName::DELETE_FORM_FAILED, "DELETE_FORM_FAILED"),
@@ -107,6 +105,7 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_PUBLIC_FORM, "REQUEST_PUBLIC_FORM"),
     std::map<FormEventName, std::string>::value_type(
         FormEventName::CONNECT_FORM_ABILITY_FAILED, "CONNECT_FORM_ABILITY_FAILED"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::FORM_NODE_ERROR, "FORM_NODE_ERROR"),
 };
 }
 
@@ -434,6 +433,7 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_
         case FormEventName::UPDATE_FORM_FAILED:
         case FormEventName::RECYCLE_RECOVER_FORM_FAILED:
         case FormEventName::CONNECT_FORM_ABILITY_FAILED:
+        case FormEventName::FORM_NODE_ERROR:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER, FORM_ERROR,
                 HiSysEventType::FAULT,
