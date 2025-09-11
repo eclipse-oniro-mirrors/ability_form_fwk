@@ -270,7 +270,7 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
     const sptr<IRemoteObject> &remoteObject)
 {
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    HILOG_INFO("call, formId:%{public}" PRId64", connectId:%{public}d" , formId, connectId);
+    HILOG_INFO("call, formId:%{public}" PRId64", connectId:%{public}d", formId, connectId);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
