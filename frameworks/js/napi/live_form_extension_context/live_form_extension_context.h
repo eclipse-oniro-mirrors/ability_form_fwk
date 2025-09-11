@@ -18,6 +18,9 @@
 
 #include "ui_extension_context.h"
 
+#include "caller_callback.h"
+#include "local_call_container.h"
+
 namespace OHOS {
 namespace AbilityRuntime {
 class LiveFormExtensionContext : public UIExtensionContext {
@@ -31,6 +34,20 @@ public:
     bool SetWindowBackgroundColor();
 
     ErrCode StartAbilityByFms(const AAFwk::Want &want, const std::string &formId);
+
+    ErrCode StartAbilityByCall(const AAFwk::Want &want, const std::shared_ptr<CallerCallBack> &callback);
+
+    ErrCode ReleaseCall(const std::shared_ptr<CallerCallBack> &callback);
+
+    void ClearFailedCallConnection(const std::shared_ptr<CallerCallBack> &callback);
+
+    std::shared_ptr<LocalCallContainer> GetLocalCallContainer()
+    {
+        return localCallContainer_;
+    }
+
+private:
+    std::shared_ptr<LocalCallContainer> localCallContainer_ = nullptr;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS
