@@ -252,6 +252,8 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail acquire providerFormInfo");
+    } else {
+        DelayedFormExitDetect(connectId);
     }
     FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
 }
@@ -267,9 +269,8 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
 void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call, formId:%{public}" PRId64, formId);
-
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    HILOG_INFO("call, formId:%{public}" PRId64", connectId:%{public}d" , formId, connectId);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
@@ -280,7 +281,10 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail notify form update");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
 }
 
 /**
@@ -305,7 +309,10 @@ void FormProviderTaskMgr::NotifyFormDelete(const int64_t formId, const Want &wan
     if (error != ERR_OK) {
         HILOG_ERROR("fail NotifyFormDelete");
         RemoveConnection(connectId);
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
 }
 
 /**
@@ -364,7 +371,10 @@ void FormProviderTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want,
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("acquire providerFormInfo failed");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
 }
 
 /**
@@ -391,7 +401,10 @@ void FormProviderTaskMgr::AcquireState(const Want &wantArg, const std::string &p
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("acquire formState failed");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
     HILOG_INFO("end");
 }
 
@@ -448,7 +461,10 @@ void FormProviderTaskMgr::FireFormEvent(const int64_t formId, const std::string 
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fire messageEvent to formProvider failed");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
 }
 
 /**
@@ -475,7 +491,10 @@ void FormProviderTaskMgr::EventNotify(const std::vector<int64_t> &formEvents, co
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail send event notify");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
 }
 
 void FormProviderTaskMgr::RemoveConnection(int32_t connectId)
@@ -505,7 +524,10 @@ void FormProviderTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configurat
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("acquire providerFormInfo failed");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
 }
 
 void FormProviderTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
@@ -532,7 +554,10 @@ void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const W
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail notify form update");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
 }
 
 void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const int32_t newDimension,
@@ -551,7 +576,21 @@ void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const int32_t 
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail notify form update");
+        return;
     }
+
+    DelayedFormExitDetect(connectId);
+}
+
+void FormProviderTaskMgr::DelayedFormExitDetect(int32_t connectId)
+{
+    auto detectFunc = [connectId]() {
+        HILOG_INFO("form exit timeout, handle it. connectId:%{public}d", connectId);
+        FormProviderTaskMgr::GetInstance().RemoveConnection(connectId);
+    };
+    FormProviderQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair(Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId)),
+        Constants::DETECT_FORM_EXIT_TIMEOUT_DELAY, detectFunc);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -24,6 +24,7 @@
 #include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
 #include "form_provider/form_provider_task_mgr.h"
+#include "form_provider/form_provider_queue.h"
 #include "form_render/form_render_mgr.h"
 #include "feature/form_share/form_share_mgr.h"
 #include "common/util/form_util.h"
@@ -140,10 +141,11 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
 int FormSupplyCallback::OnEventHandle(const Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("call");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     std::string supplyInfo = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
-    HILOG_DEBUG("%{public}d,%{public}s", connectId, supplyInfo.c_str());
+    HILOG_INFO("connectId:%{public}d, supplyInfo:%{public}s", connectId, supplyInfo.c_str());
+    FormProviderQueue::GetInstance().CancelDelayTask(
+        std::make_pair(Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId)));
     RemoveConnection(connectId);
     HILOG_INFO("end");
     return ERR_OK;
@@ -217,10 +219,10 @@ void FormSupplyCallback::RemoveConnection(int32_t connectId)
     if (connection != nullptr) {
         if (CanDisconnect(connection)) {
             FormAmsHelper::GetInstance().DisconnectServiceAbility(connection);
-            HILOG_INFO("disconnect service ability");
+            HILOG_INFO("disconnect service ability, connectId:%{public}d", connectId);
         } else {
             FormAmsHelper::GetInstance().DisconnectServiceAbilityDelay(connection);
-            HILOG_INFO("disconnect service ability delay");
+            HILOG_INFO("disconnect service ability delay, connectId:%{public}d", connectId);
         }
     }
     HILOG_DEBUG("end");

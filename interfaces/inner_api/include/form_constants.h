@@ -406,6 +406,9 @@ namespace Constants {
 
     constexpr const char* FMC_DEFAULT_VERSION = "10.10.25.100";
     constexpr const char* FORM_IS_VISIBLE = "ohos.extra.param.key.form_is_visible";
+
+    constexpr int64_t DETECT_FORM_EXIT_DELAY_TASK = 30000; // task type base
+    constexpr int64_t DETECT_FORM_EXIT_TIMEOUT_DELAY = 10 * 1000;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
