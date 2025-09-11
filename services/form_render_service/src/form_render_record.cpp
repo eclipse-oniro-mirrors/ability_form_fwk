@@ -460,8 +460,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
             renderRecord->MarkRenderFormTaskDone(renderType);
+            std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
             FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
-                FormFsmEvent::RENDER_FORM_DONE, formSupplyClient);
+                FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
             HILOG_INFO("HandleUpdateInJsThread end");
         };
         if (eventHandler == nullptr) {
@@ -1584,10 +1585,10 @@ void FormRenderRecord::HandleFormRenderGC()
 int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &statusData)
 {
     HILOG_INFO("RecycleForm begin, formId:%{public}s", std::to_string(formId).c_str());
-    int32_t result = RECYCLE_FORM_FAILED;
+    int32_t result = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (!CheckEventHandler(true, true)) {
         HILOG_ERROR("null eventHandler_");
-        return RENDER_FORM_FAILED;
+        return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
 
     auto task = [thisWeakPtr = weak_from_this(), formId, &statusData, &result]() {
@@ -1612,19 +1613,19 @@ int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &
     auto search = formRendererGroupMap_.find(formId);
     if (search == formRendererGroupMap_.end()) {
         HILOG_ERROR("invalid FormRendererGroup");
-        return RECYCLE_FORM_FAILED;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     if (!search->second) {
         HILOG_ERROR("FormRendererGroup was founded but null");
-        return RECYCLE_FORM_FAILED;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
 
     search->second->RecycleForm(statusData);
     return ERR_OK;
 }
 
-int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
-    const std::string &statusData, const bool &isRecoverFormToHandleClickEvent)
+int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::string &statusData,
+    const bool isRecoverFormToHandleClickEvent, const std::string &eventId)
 {
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId:%{public}s", std::to_string(formId).c_str());
@@ -1641,7 +1642,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
     }
 
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto task = [thisWeakPtr, formJsInfo, statusData, isRecoverFormToHandleClickEvent, formSupplyClient]() {
+    auto task = [thisWeakPtr, formJsInfo, statusData, isRecoverFormToHandleClickEvent, formSupplyClient, eventId]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord");
@@ -1649,7 +1650,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
         FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formJsInfo.formId,
-            FormFsmEvent::RECOVER_FORM_DONE, formSupplyClient);
+            FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
     };
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler_ ");
