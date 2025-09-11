@@ -589,7 +589,7 @@ void FormProviderTaskMgr::DelayedFormExitDetect(int32_t connectId)
         FormProviderTaskMgr::GetInstance().RemoveConnection(connectId);
     };
     FormProviderQueue::GetInstance().ScheduleDelayTask(
-        std::make_pair(Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId)),
+        { Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId) },
         Constants::DETECT_FORM_EXIT_TIMEOUT_DELAY, detectFunc);
 }
 } // namespace AppExecFwk

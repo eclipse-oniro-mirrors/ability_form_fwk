@@ -145,7 +145,7 @@ int FormSupplyCallback::OnEventHandle(const Want &want)
     std::string supplyInfo = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
     HILOG_INFO("connectId:%{public}d, supplyInfo:%{public}s", connectId, supplyInfo.c_str());
     FormProviderQueue::GetInstance().CancelDelayTask(
-        std::make_pair(Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId)));
+        { Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId) });
     RemoveConnection(connectId);
     HILOG_INFO("end");
     return ERR_OK;
