@@ -1340,6 +1340,7 @@ private:
     std::unique_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::mutex formResultMutex_;
     std::condition_variable condition_;
+    std::map<int64_t, int32_t> formReconnectMap_;
 #ifdef THEME_MGR_ENABLE
     /**
      * @brief Fill ThemeFormInfo with want and formId
