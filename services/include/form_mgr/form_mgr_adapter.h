@@ -789,6 +789,21 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     void DelayRefreshForms(const std::vector<FormRecord> &updatedForms, const Want &want);
+
+    /**
+     * @brief Reacquire form info from form provider.
+     * @param formId The Id of the form..
+     * @param info Form configure info.
+     * @param wantParams WantParams of the request.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ReAcquireProviderFormInfoAsync(int64_t formId, const FormItemInfo &info, const WantParams &wantParams);
+
+    /**
+     * @brief Clear reconnect num.
+     * @param formId The Id of the form..
+     */
+    void ClearReconnectNum(int64_t formId);
 private:
     /**
      * @brief Get form configure info.

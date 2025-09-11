@@ -113,6 +113,7 @@ const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.supp
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
+constexpr int32_t RECONNECT_NUMS = 2;
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
 };
@@ -1654,6 +1655,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
         FormDataMgr::GetInstance().SetNeedAddForm(formId, false);
 
+        ClearReconnectNum(formId);
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
         if (errorCode != ERR_OK) {
@@ -4649,6 +4651,33 @@ int32_t FormMgrAdapter::GetCallingUserId()
 {
     int callingUid = IPCSkeleton::GetCallingUid();
     return callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+}
+
+ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(int64_t formId,
+    const FormItemInfo &info, const WantParams &wantParams)
+{
+    HILOG_INFO("reconnect bundleName:%{public}s,formId:%{public}" PRId64,
+        info.GetProviderBundleName().c_str(), formId);
+    auto iter = formReconnectMap_.find(formId);
+    if (iter == formReconnectMap_.end()) {
+        formReconnectMap_.insert(std::make_pair(formId, 1));
+    } else {
+        iter->second++;
+        if (iter->second > RECONNECT_NUMS) {
+            HILOG_ERROR("reconnect fail");
+            ClearReconnectNum(formId);
+            return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+        }
+    }
+    return AcquireProviderFormInfoAsync(formId, info, wantParams);
+}
+
+void FormMgrAdapter::ClearReconnectNum(int64_t formId)
+{
+    auto iter = formReconnectMap_.find(formId);
+    if (iter != formReconnectMap_.end()) {
+        formReconnectMap_.erase(formId);
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

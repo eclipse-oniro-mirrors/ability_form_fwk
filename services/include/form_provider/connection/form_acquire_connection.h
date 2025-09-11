@@ -75,6 +75,7 @@ public:
 private:
     FormItemInfo info_;
     WantParams wantParams_;
+    bool isConnected_ = false;
     std::function<void(const std::string &bundleName)> onFormAblityConnectCb_;
     std::function<void(const std::string &bundleName)> onFormAblityDisconnectCb_;
 
