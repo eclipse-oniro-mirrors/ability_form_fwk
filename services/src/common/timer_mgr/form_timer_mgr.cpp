@@ -940,12 +940,7 @@ void FormTimerMgr::OnIntervalTimeOut()
 
         // Verify if the next refresh will expire
         if (!intervalTask.isEnable) {
-            bool isDynamicTimerExpired = IsDynamicTimerExpired(intervalTask.formId);
-            if (isDynamicTimerExpired) {
-                intervalTask.isEnable = true;
-            } else {
-                continue;
-            }
+            continue;
         }
 
         if (!refreshLimiter_.IsEnableRefresh(intervalTask.formId)) {

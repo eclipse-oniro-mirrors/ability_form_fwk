@@ -1485,7 +1485,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0088, Function | MediumTest | Lev
  * @tc.name: IsDynamicTimerExpired.
  * @tc.desc: test IsDynamicTimerExpired function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, Function | MediumTest | Level0)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
