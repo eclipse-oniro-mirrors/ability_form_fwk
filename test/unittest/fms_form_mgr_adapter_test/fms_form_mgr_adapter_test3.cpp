@@ -1328,7 +1328,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SwitchLockForms, TestSize.Level1
  * @tc.desc: test ReAcquireProviderFormInfoAsync function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0306, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0306, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_0306 start";
     FormMgrAdapter formMgrAdapter;
