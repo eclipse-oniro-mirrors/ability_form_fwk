@@ -983,6 +983,7 @@ public:
     /**
      * @brief get expect recycled status
      * @param formId form id.
+     * @return Returns true if the form should be recycled
      */
     bool IsExpectRecycled(int64_t formId);
 private:
