@@ -21,6 +21,7 @@
 #include "common/util/form_report.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_mgr/form_mgr_adapter.h"
 #include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_task_mgr.h"
 #include "common/util/form_util.h"
@@ -28,6 +29,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+    constexpr int32_t DISCONNECT_ERROR = -1;
+}
+
 FormAcquireConnection::FormAcquireConnection(const int64_t formId, const FormItemInfo &info,
     const WantParams &wantParams, const sptr<IRemoteObject> hostToken) : info_(info), wantParams_(wantParams)
 {
@@ -50,6 +55,8 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
             element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
+    isConnected_ = true;
+    FormMgrAdapter::GetInstance().ClearReconnectNum(GetFormId());
     FormReport::GetInstance().SetEndBindTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
     onFormAppConnect();
 #ifdef RES_SCHEDULE_ENABLE
@@ -87,10 +94,15 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
  */
 void FormAcquireConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
+    HILOG_INFO("formId:%{public}" PRId64 ",resultCode:%{public}d ,isConnected:%{public}d",
+        GetFormId(), resultCode, isConnected_);
     FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityDisconnectDoneCallback();
 #endif
+    if (!isConnected_ && resultCode == DISCONNECT_ERROR) {
+        FormMgrAdapter::GetInstance().ReAcquireProviderFormInfoAsync(info_, wantParams_);
+    }
 }
 
 void FormAcquireConnection::SetFormAbilityConnectCb(

@@ -789,6 +789,21 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     void DelayRefreshForms(const std::vector<FormRecord> &updatedForms, const Want &want);
+
+    /**
+     * @brief Reacquire form info from form provider.
+     * @param formId The Id of the form.
+     * @param info Form configure info.
+     * @param wantParams WantParams of the request.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams);
+
+    /**
+     * @brief Clear reconnect num.
+     * @param formId The Id of the form.
+     */
+    void ClearReconnectNum(int64_t formId);
 private:
     /**
      * @brief Get form configure info.
@@ -1325,6 +1340,8 @@ private:
     std::unique_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::mutex formResultMutex_;
     std::condition_variable condition_;
+    std::map<int64_t, int32_t> formReconnectMap_;
+    std::mutex reconnectMutex_;
 #ifdef THEME_MGR_ENABLE
     /**
      * @brief Fill ThemeFormInfo with want and formId
