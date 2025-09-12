@@ -12,14 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-let Caller = requireNapi('application.Caller');
-let ExtensionContext = requireNapi('application.ExtensionContext');
+
 let hilog = requireNapi('hilog');
+let UIExtensionContext = requireNapi('application.UIExtensionContext');
 
 const domainID = 0xD001301;
 const TAG = 'FormManagerService';
 
-export class LiveFormExtensionContext extends ExtensionContext {
+export class LiveFormExtensionContext extends UIExtensionContext {
   formId = '';
   constructor(obj) {
     super(obj);
@@ -33,32 +33,5 @@ export class LiveFormExtensionContext extends ExtensionContext {
   startAbilityByLiveForm(want) {
     hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${JSON.stringify(want)}`);
     return this.__context_impl__.startAbilityByLiveForm(want, this.formId);
-  }
-
-  connectServiceExtensionAbility(want, options) {
-    hilog.sLogI(domainID, TAG, `connectServiceExtensionAbility: ${JSON.stringify(want)}`);
-    return this.__context_impl__.connectServiceExtensionAbility(want, options);
-  }
-
-  disconnectServiceExtensionAbility(connection) {
-    hilog.sLogI(domainID, TAG, `disconnectServiceExtensionAbility: ${connection}`);
-    return this.__context_impl__.disconnectServiceExtensionAbility(connection);
-  }
-
-  startAbilityByCall(want) {
-    hilog.sLogI(domainID, TAG, `startAbilityByCall: ${JSON.stringify(want)}`);
-    return new Promise(async (resolve, reject) => {
-      let callee = null;
-      try {
-        callee = await this.__context_impl__.startAbilityByCall(want);
-      } catch (error) {
-        hilog.sLogI(domainID, TAG, 'LiveFormExtensionContext::startAbilityByCall Obtain remoteObject failed');
-        reject(error);
-        return;
-      }
-
-      resolve(new Caller(callee));
-      hilog.sLogI(domainID, TAG, 'LiveFormExtensionContext::startAbilityByCall success');
-    });
   }
 }

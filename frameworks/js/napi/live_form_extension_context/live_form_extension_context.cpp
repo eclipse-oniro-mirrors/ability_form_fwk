@@ -14,7 +14,6 @@
  */
 
 #include "live_form_extension_context.h"
-#include "connection_manager.h"
 #include "fms_log_wrapper.h"
 #include "form_errors.h"
 #include "form_constants.h"
@@ -26,7 +25,6 @@ using namespace OHOS::AppExecFwk;
 const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
 const std::string REQUEST_METHOD = "startAbilityByLiveForm";
 const std::string TRANSPARENT_COLOR = "#00FFFFFF";
-constexpr int32_t DEFAULT_ACCOUNT_ID = -1;
 
 bool LiveFormExtensionContext::SetWindowBackgroundColor()
 {
@@ -67,36 +65,6 @@ ErrCode LiveFormExtensionContext::StartAbilityByFms(const AAFwk::Want &want, con
     }
     HILOG_INFO("StartAbilityByFms success");
     return ERR_OK;
-}
-
-ErrCode LiveFormExtensionContext::StartAbilityByCall(const AAFwk::Want &want,
-    const std::shared_ptr<CallerCallBack> &callback)
-{
-    HILOG_DEBUG("call");
-    if (localCallContainer_ == nullptr) {
-        localCallContainer_ = std::make_shared<LocalCallContainer>();
-    }
-    return localCallContainer_->StartAbilityByCallInner(want, callback, token_, DEFAULT_ACCOUNT_ID);
-}
-
-ErrCode LiveFormExtensionContext::ReleaseCall(const std::shared_ptr<CallerCallBack> &callback)
-{
-    HILOG_DEBUG("call");
-    if (localCallContainer_ == nullptr) {
-        HILOG_ERROR("null localCallContainer_");
-        return ERR_INVALID_VALUE;
-    }
-    return localCallContainer_->ReleaseCall(callback);
-}
-
-void LiveFormExtensionContext::ClearFailedCallConnection(const std::shared_ptr<CallerCallBack> &callback)
-{
-    HILOG_DEBUG("call");
-    if (localCallContainer_ == nullptr) {
-        HILOG_ERROR("null localCallContainer_");
-        return;
-    }
-    localCallContainer_->ClearFailedCallConnection(callback);
 }
 } // namespace AbilityRuntime
 } // namespace OHOS
