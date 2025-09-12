@@ -101,7 +101,7 @@ void FormAcquireConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
     OnFormAbilityDisconnectDoneCallback();
 #endif
     if (!isConnected_ && resultCode == DISCONNECT_ERROR) {
-        FormMgrAdapter::GetInstance().ReAcquireProviderFormInfoAsync(GetFormId(), info_, wantParams_);
+        FormMgrAdapter::GetInstance().ReAcquireProviderFormInfoAsync(info_, wantParams_);
     }
 }
 

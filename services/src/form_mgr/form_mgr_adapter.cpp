@@ -4653,31 +4653,29 @@ int32_t FormMgrAdapter::GetCallingUserId()
     return callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
 }
 
-ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(int64_t formId,
-    const FormItemInfo &info, const WantParams &wantParams)
+ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams)
 {
     HILOG_INFO("reconnect bundleName:%{public}s,formId:%{public}" PRId64,
-        info.GetProviderBundleName().c_str(), formId);
-    auto iter = formReconnectMap_.find(formId);
+        info.GetProviderBundleName().c_str(), info.GetFormId());
+    std::lock_guard<std::mutex> lock(reconnectMutex_);
+    auto iter = formReconnectMap_.find(info.GetFormId());
     if (iter == formReconnectMap_.end()) {
-        formReconnectMap_.insert(std::make_pair(formId, 1));
+        formReconnectMap_.emplace(info.GetFormId(), 1);
     } else {
         iter->second++;
         if (iter->second > RECONNECT_NUMS) {
             HILOG_ERROR("reconnect fail");
-            ClearReconnectNum(formId);
+            formReconnectMap_.erase(info.GetFormId());
             return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
         }
     }
-    return AcquireProviderFormInfoAsync(formId, info, wantParams);
+    return AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
 }
 
 void FormMgrAdapter::ClearReconnectNum(int64_t formId)
 {
-    auto iter = formReconnectMap_.find(formId);
-    if (iter != formReconnectMap_.end()) {
-        formReconnectMap_.erase(formId);
-    }
+    std::lock_guard<std::mutex> lock(reconnectMutex_);
+    formReconnectMap_.erase(formId);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

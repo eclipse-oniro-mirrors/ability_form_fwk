@@ -1322,4 +1322,24 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SwitchLockForms, TestSize.Level1
     EXPECT_EQ(ERR_OK, formMgrAdapter.SwitchLockForms("bundleName", 0, false));
     GTEST_LOG_(INFO) << "FormMgrAdapter_SwitchLockForms end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0306
+ * @tc.desc: test ReAcquireProviderFormInfoAsync function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0306, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0306 start";
+    FormMgrAdapter formMgrAdapter;
+    FormItemInfo info;
+    info.SetFormId(1);
+    sptr<IRemoteObject> callerToken = nullptr;
+    WantParams wantParams;
+    formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams);
+    formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+        formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0306 end";
+}
 }
