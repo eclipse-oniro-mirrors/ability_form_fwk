@@ -71,8 +71,14 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
             static_cast<int32_t>(AddFormFiledErrorType::SUBSCRIBE_DATA_SHARE_FAILED), ret);
         return ret;
     }
-    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
-    formDataProxyRecordMap_[formId] = formDataProxyRecord;
+    {
+        std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+        formDataProxyRecordMap_[formId] = formDataProxyRecord;
+    }
+    if (!FormDataMgr::GetInstance().GetFormVisible(formId)) {
+        HILOG_INFO("form is invisible, disable subscribe. formId:%{public}" PRId64, formId);
+        DisableSubscribeFormData({ formId });
+    }
     return ERR_OK;
 }
 
