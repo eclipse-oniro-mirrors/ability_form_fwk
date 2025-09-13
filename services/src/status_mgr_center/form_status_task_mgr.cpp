@@ -200,6 +200,8 @@ void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObj
             formRecord.formName,
             static_cast<int32_t>(RecycleRecoverFormErrorType::RECYCLE_FORM_FAILED),
             error);
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_DATA_FAIL);
     }
 }
 
@@ -223,14 +225,16 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
 
     int32_t error = remoteFormRender->RecoverForm(formJsInfo, newWant);
     if (error != ERR_OK) {
+        HILOG_ERROR("RecoverForm fail formId: %{public}" PRId64 " error: %{public}d", formJsInfo.formId, error);
         RemoveConnection(connectId);
-        HILOG_ERROR("fail recover form");
         FormEventReport::SendFormFailedEvent(FormEventName::RECYCLE_RECOVER_FORM_FAILED,
             record.formId,
             record.bundleName,
             record.formName,
             static_cast<int64_t>(RecycleRecoverFormErrorType::RECOVER_FORM_FAILED),
             error);
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(record.formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(record.formId, FormFsmEvent::RECOVER_FORM_FAIL);
     }
     HILOG_DEBUG("end");
 }
@@ -252,7 +256,9 @@ void FormStatusTaskMgr::ReleaseRenderer(
 
     int32_t error = remoteFormDeleteRender->ReleaseRenderer(formId, compId, uid, newWant);
     if (error != ERR_OK) {
-        HILOG_ERROR("fail release form renderer");
+        HILOG_ERROR("ReleaseRenderer fail formId: %{public}" PRId64 " error: %{public}d", formId, error);
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM_FAIL);
     }
     HILOG_INFO("end formId: %{public}" PRId64, formId);
 }
@@ -291,8 +297,10 @@ void FormStatusTaskMgr::StopRenderingForm(
 
     int32_t error = remoteFormDeleteRender->StopRenderingForm(formInfo, newWant, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
+        HILOG_ERROR("StopRenderingForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
         RemoveConnection(connectId);
-        HILOG_ERROR("fail add form renderer");
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formInfo.formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formInfo.formId, FormFsmEvent::DELETE_FORM_FAIL);
     }
     HILOG_INFO("end");
 }
@@ -324,8 +332,10 @@ void FormStatusTaskMgr::RenderForm(
             formRecord.formId, HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
     }
     if (error != ERR_OK) {
+        HILOG_ERROR("StopRenderingForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
         RemoveConnection(connectId);
-        HILOG_ERROR("fail add form renderer");
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formRecord.formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RENDER_FORM_FAIL);
     }
 
     HILOG_DEBUG("end");

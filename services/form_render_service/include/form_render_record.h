@@ -145,7 +145,7 @@ public:
     int32_t RecycleForm(const int64_t &formId, std::string &statusData);
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const std::string &statusData,
-        const bool &isRecoverFormToHandleClickEvent);
+        const bool isRecoverFormToHandleClickEvent, const std::string &eventId);
 
     size_t FormCount();
 

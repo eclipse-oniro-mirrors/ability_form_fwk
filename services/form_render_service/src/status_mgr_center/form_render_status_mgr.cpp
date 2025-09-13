@@ -22,6 +22,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int32_t ERR_APPEXECFWK_FORM_UNKNOWN_PROCESS_TYPE = -1;
+}
 FormRenderStatusMgr::FormRenderStatusMgr()
 {
     HILOG_DEBUG("create FormRenderStatusMgr");
@@ -105,6 +108,10 @@ void FormRenderStatusMgr::DeleteFormEventId(const int64_t formId)
 
 int32_t FormRenderStatusMgr::ProcessTaskDirect(std::function<int32_t()> func)
 {
+    if (func == nullptr) {
+        return ERR_OK;
+    }
+
     return func();
 }
 
@@ -121,7 +128,7 @@ int32_t FormRenderStatusMgr::PrintTaskInfo(const int64_t formId, const FormFsmEv
         formId,
         FormStatusPrint::FormStatusToString(status).c_str(),
         FormStatusPrint::FormEventToString(event).c_str());
-    return ERR_OK;
+    return ERR_APPEXECFWK_FORM_UNKNOWN_PROCESS_TYPE;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
