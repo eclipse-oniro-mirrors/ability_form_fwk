@@ -50,6 +50,7 @@ constexpr char FMS_TIME_SPEED[] = "fms.time_speed";
 // Specified custom timer event publisher uid, publisher must be foundation
 constexpr int32_t FOUNDATION_UID = 5523;
 constexpr int64_t TIMER_UPDATE_INTERVAL = 5 * 60 * 1000;
+constexpr int64_t TIMER_UPDATEAT_CREATE_BEHIND_TRIGGER = 10 * 1000;
 } // namespace
 
 FormTimerMgr::FormTimerMgr()
@@ -534,7 +535,8 @@ bool FormTimerMgr::AddUpdateAtTimer(const FormTimer &task)
             HILOG_ERROR("UpdateLimiterAlarm failed");
             return false;
         }
-        if (!UpdateAtTimerAlarm()) {
+        FormTimer newTask(task.formId, task.hour, task.min, task.userId);
+        if (!UpdateAtTimerAlarmDetail(newTask)) {
             HILOG_ERROR("updateAtTimerAlarm failed");
             return false;
         }
@@ -969,89 +971,8 @@ void FormTimerMgr::OnIntervalTimeOut()
  */
 bool FormTimerMgr::UpdateAtTimerAlarm()
 {
-    struct tm tmAtTime = {0};
-    auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    struct tm* ptm = localtime_r(&tt, &tmAtTime);
-    if (ptm == nullptr) {
-        HILOG_ERROR("localtime error");
-        return false;
-    }
-
-    long nowAtTime = tmAtTime.tm_hour * Constants::MIN_PER_HOUR + tmAtTime.tm_min;
-    int64_t currentTime = FormUtil::GetCurrentMillisecond();
-    UpdateAtItem foundItem;
-    bool found = FindNextAtTimerItem(nowAtTime, foundItem);
-    if (!found) {
-        {
-            std::lock_guard<std::mutex> lock(updateAtMutex_);
-            if (!updateAtTimerTasks_.empty()) {
-                HILOG_WARN("updateAtTimerTasks_ not empty");
-                return true;
-            }
-        }
-        {
-            std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
-            ClearUpdateAtTimerResource();
-        }
-        atTimerWakeUpTime_ = LONG_MAX;
-        HILOG_INFO("no update at task in system now");
-        return true;
-    }
-
-    long nextWakeUpTime = foundItem.updateAtTime;
-    tmAtTime.tm_sec = 0;
-    tmAtTime.tm_hour = foundItem.refreshTask.hour;
-    tmAtTime.tm_min = foundItem.refreshTask.min;
-    int64_t selectTime = FormUtil::GetMillisecondFromTm(tmAtTime);
-    if (selectTime < currentTime) {
-        selectTime += Constants::MS_PER_DAY;
-        nextWakeUpTime += (Constants::HOUR_PER_DAY * Constants::MIN_PER_HOUR);
-    }
-    HILOG_INFO("selectTime:%{public}" PRId64 ", currentTime:%{public}" PRId64,
-        selectTime, currentTime);
-
-    int64_t timeInSec = GetBootTimeMs();
-    HILOG_INFO("timeInSec:%{public}" PRId64 ".", timeInSec);
-    int64_t nextTime = timeInSec + (selectTime - currentTime);
-    HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
-    if (nextTime == atTimerWakeUpTime_) {
-        HILOG_WARN("end, wakeUpTime not change, no need update alarm");
-        return true;
-    }
-
-    auto timerOption = std::make_shared<FormTimerOption>();
-    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
-      | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
-    HILOG_DEBUG("timerOption type is %{public}d", flag);
-    timerOption->SetType(flag);
-    timerOption->SetRepeat(false);
-    timerOption->SetInterval(0);
-    int32_t userId = foundItem.refreshTask.userId;
-    std::shared_ptr<WantAgent> wantAgent = GetUpdateAtWantAgent(foundItem.updateAtTime, userId);
-    if (wantAgent == nullptr) {
-        HILOG_ERROR("create wantAgent failed");
-        return false;
-    }
-    timerOption->SetWantAgent(wantAgent);
-
-    atTimerWakeUpTime_ = nextTime;
-    {
-        std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
-        if (currentUpdateAtWantAgent_ != nullptr) {
-            ClearUpdateAtTimerResource();
-        }
-        currentUpdateAtWantAgent_ = wantAgent;
-        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
-        bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
-            static_cast<uint64_t>(nextTime));
-        if (!bRet) {
-            HILOG_ERROR("init update at timer task error");
-            return false;
-        }
-    }
-
-    HILOG_INFO("end");
-    return true;
+    FormTimer timerTask;
+    return UpdateAtTimerAlarmDetail(timerTask);
 }
 
 int64_t FormTimerMgr::GetBootTimeMs()
@@ -1659,6 +1580,97 @@ bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
     dynamicRefreshTasks_.erase(itItem);
     dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
     UpdateDynamicAlarm();
+    return true;
+}
+
+bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
+{
+    struct tm tmAtTime = {0};
+    auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    struct tm* ptm = localtime_r(&tt, &tmAtTime);
+    if (ptm == nullptr) {
+        HILOG_ERROR("localtime error");
+        return false;
+    }
+
+    long nowAtTime = tmAtTime.tm_hour * Constants::MIN_PER_HOUR + tmAtTime.tm_min;
+    int64_t currentTime = FormUtil::GetCurrentMillisecond();
+    UpdateAtItem foundItem;
+    bool found = FindNextAtTimerItem(nowAtTime, foundItem);
+    if (!found) {
+        {
+            std::lock_guard<std::mutex> lock(updateAtMutex_);
+            if (!updateAtTimerTasks_.empty()) {
+                HILOG_WARN("updateAtTimerTasks_ not empty");
+                return true;
+            }
+        }
+        {
+            std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
+            ClearUpdateAtTimerResource();
+        }
+        atTimerWakeUpTime_ = LONG_MAX;
+        HILOG_INFO("no update at task in system now");
+        return true;
+    }
+
+    tmAtTime.tm_sec = 0;
+    tmAtTime.tm_hour = foundItem.refreshTask.hour;
+    tmAtTime.tm_min = foundItem.refreshTask.min;
+    int64_t selectTime = FormUtil::GetMillisecondFromTm(tmAtTime);
+    int64_t diffTime = selectTime - currentTime;
+    // Create updateAt timer that triggers within 10 seconds, request a refresh proactively.
+    if (std::abs(diffTime) <= TIMER_UPDATEAT_CREATE_BEHIND_TRIGGER && timerTask.formId > 0) {
+        HILOG_WARN("the timer was created late, actively request a refresh. formId:%{public}" PRId64, timerTask.formId);
+        timerTask.refreshType = RefreshType::TYPE_UPDATETIMES;
+        ExecTimerTask(timerTask);
+    }
+    if (diffTime < 0) {
+        selectTime += Constants::MS_PER_DAY;
+    }
+    HILOG_INFO("selectTime:%{public}" PRId64 ", currentTime:%{public}" PRId64, selectTime, currentTime);
+
+    int64_t timeInSec = GetBootTimeMs();
+    HILOG_INFO("timeInSec:%{public}" PRId64 ".", timeInSec);
+    int64_t nextTime = timeInSec + (selectTime - currentTime);
+    HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
+    if (nextTime == atTimerWakeUpTime_) {
+        HILOG_WARN("end, wakeUpTime not change, no need update alarm");
+        return true;
+    }
+
+    auto timerOption = std::make_shared<FormTimerOption>();
+    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
+      | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
+    HILOG_DEBUG("timerOption type is %{public}d", flag);
+    timerOption->SetType(flag);
+    timerOption->SetRepeat(false);
+    timerOption->SetInterval(0);
+    int32_t userId = foundItem.refreshTask.userId;
+    std::shared_ptr<WantAgent> wantAgent = GetUpdateAtWantAgent(foundItem.updateAtTime, userId);
+    if (wantAgent == nullptr) {
+        HILOG_ERROR("create wantAgent failed");
+        return false;
+    }
+    timerOption->SetWantAgent(wantAgent);
+
+    atTimerWakeUpTime_ = nextTime;
+    {
+        std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
+        if (currentUpdateAtWantAgent_ != nullptr) {
+            ClearUpdateAtTimerResource();
+        }
+        currentUpdateAtWantAgent_ = wantAgent;
+        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
+            static_cast<uint64_t>(nextTime));
+        if (!bRet) {
+            HILOG_ERROR("init update at timer task error");
+            return false;
+        }
+    }
+
+    HILOG_INFO("end");
     return true;
 }
 }  // namespace AppExecFwk
