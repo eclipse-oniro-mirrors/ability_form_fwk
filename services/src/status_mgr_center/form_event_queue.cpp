@@ -18,6 +18,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int32_t EVENT_QUEUE_SIZE_MAX = 100;
+}
 FormEventQueue::FormEventQueue(int64_t formId) : formId_(formId)
 {
     HILOG_INFO("create FormEventQueue, formId :%{public}" PRId64 ". ", formId_);
@@ -28,15 +31,21 @@ FormEventQueue::~FormEventQueue()
     HILOG_INFO("destroy FormEventQueue, formId :%{public}" PRId64 ". ", formId_);
 }
 
-void FormEventQueue::PushFormEvent(FormEventTaskInfo &eventInfo)
+bool FormEventQueue::PushFormEvent(FormEventTaskInfo &eventInfo)
 {
     std::lock_guard<std::mutex> lock(eventQueueMutex_);
     HILOG_INFO("formId :%{public}" PRId64 ". ", formId_);
     if (eventInfo.getFormId() != formId_) {
         HILOG_ERROR("formId is invalid");
-        return;
+        return false;
     }
+    if (eventQueue_.size() >= EVENT_QUEUE_SIZE_MAX) {
+        HILOG_ERROR("queue size reached max, formId :%{public}" PRId64 ".", formId_);
+        return false;
+    }
+
     eventQueue_.push(eventInfo);
+    return true;
 }
 
 bool FormEventQueue::PopFormEvent(FormEventTaskInfo &eventInfo)
