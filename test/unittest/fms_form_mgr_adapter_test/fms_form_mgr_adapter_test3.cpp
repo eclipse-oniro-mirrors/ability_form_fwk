@@ -1310,4 +1310,17 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_CheckUpdateFormRecord, TestSize.
     EXPECT_EQ(RecycleStatus::NON_RECYCLABLE, formRecord.recycleStatus);
     GTEST_LOG_(INFO) << "FormMgrAdapter_CheckUpdateFormRecord end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_SwitchLockForms
+ * @tc.desc: test SwitchLockForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SwitchLockForms, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SwitchLockForms start";
+    FormMgrAdapter formMgrAdapter;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.SwitchLockForms("bundleName", 0, false));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SwitchLockForms end";
+}
 }

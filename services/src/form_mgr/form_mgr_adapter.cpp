@@ -1523,9 +1523,9 @@ void FormMgrAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo 
 void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo)
 {
     auto formId = formConfigInfo.GetFormId();
-    // exempt form are never unlocked
     if (formId > 0 && FormExemptLockMgr::GetInstance().IsExemptLock(formId)) {
-        formConfigInfo.SetLockForm(false);
+        // exempt form must belong to a locked application
+        formConfigInfo.SetLockForm(true);
         return;
     }
 
@@ -1538,10 +1538,12 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
             FormDbCache::GetInstance().UpdateDBRecord(formId, record);
         }
         formConfigInfo.SetLockForm(isBundleProtect);
+        formConfigInfo.SetProtectForm(isBundleProtect);
     } else {
         bool isMultiAppForm = FormInfoMgr::GetInstance().IsMultiAppForm(formInfo) &&
             formConfigInfo.GetSystemAppFlag();
         formConfigInfo.SetLockForm(isBundleProtect && !isMultiAppForm);
+        formConfigInfo.SetProtectForm(isBundleProtect && !isMultiAppForm);
     }
 }
 
@@ -4123,7 +4125,8 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
 
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, lock:%{public}d", userId, formInfos.size(), lock);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d", iter->bundleName.c_str(), iter->lockForm);
+        HILOG_INFO("bundleName:%{public}s, lockForm:%{public}d, formId:%{public}" PRId64,
+            iter->bundleName.c_str(), iter->lockForm, iter->formId);
         bool isSystemApp = iter->isSystemApp;
         FormInfo formInfo;
         FormInfoMgr::GetInstance().GetFormsInfoByRecord(*iter, formInfo);
