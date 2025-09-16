@@ -220,7 +220,7 @@ static void initFormRecord(FormRecord &newRecord, const FormItemInfo &formInfo)
     newRecord.isThemeForm = formInfo.GetIsThemeForm();
     newRecord.enableForm = formInfo.IsEnableForm();
     newRecord.lockForm = formInfo.IsLockForm();
-    newRecord.protectForm = formInfo.IsLockForm();
+    newRecord.protectForm = formInfo.IsProtectForm();
 }
 
 /**
