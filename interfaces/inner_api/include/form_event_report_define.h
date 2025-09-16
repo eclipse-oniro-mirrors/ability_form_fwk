@@ -161,6 +161,8 @@ enum class FormEventName {
     CONNECT_FORM_ABILITY_FAILED,
     RELOAD_FORM_FAILED,
     FORM_NODE_ERROR,
+    FORM_STATUS_ERROR,
+    FORM_EVENT_QUEUE_OVER_LIMIT,
 };
  
 enum class RequestFormType : int8_t {

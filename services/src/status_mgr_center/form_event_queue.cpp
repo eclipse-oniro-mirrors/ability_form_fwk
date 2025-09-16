@@ -14,7 +14,10 @@
  */
 
 #include "status_mgr_center/form_event_queue.h"
+#include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
+#include "form_event_report.h"
+#include "status_mgr_center/form_status.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -41,6 +44,7 @@ bool FormEventQueue::PushFormEvent(FormEventTaskInfo &eventInfo)
     }
     if (eventQueue_.size() >= EVENT_QUEUE_SIZE_MAX) {
         HILOG_ERROR("queue size reached max, formId :%{public}" PRId64 ". ", formId_);
+        ReportQueueOverLimit(formId_);
         return false;
     }
 
@@ -65,7 +69,7 @@ bool FormEventQueue::IsEventQueueEmpty()
 {
     std::lock_guard<std::mutex> lock(eventQueueMutex_);
     if (eventQueue_.empty()) {
-        HILOG_INFO("eventQueue_ is empty, formId :%{public}" PRId64 ". ", formId_);
+        HILOG_INFO("eventQueue_ is empty, formId :%{public}" PRId64 ".", formId_);
         return true;
     }
     HILOG_INFO("eventQueue_ not empty, formId :%{public}" PRId64 ". ", formId_);
@@ -76,6 +80,29 @@ const std::queue<FormEventTaskInfo> &FormEventQueue::GetEventQueue()
 {
     std::lock_guard<std::mutex> lock(eventQueueMutex_);
     return eventQueue_;
+}
+
+bool FormEventQueue::ReportQueueOverLimit(const int64_t formId)
+{
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", formId);
+        return false;
+    }
+    if (eventQueue_.empty()) {
+        HILOG_ERROR("eventQueue_ is empty, formId :%{public}" PRId64 ".", formId);
+        return false;
+    }
+
+    FormEventTaskInfo eventInfo = eventQueue_.front();
+    FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
+    FormEventReport::SendFormFailedEvent(FormEventName::FORM_EVENT_QUEUE_OVER_LIMIT,
+        formId,
+        formRecord.bundleName,
+        formRecord.formName,
+        static_cast<int32_t>(status),
+        static_cast<int32_t>(eventInfo.getFormEvent()));
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

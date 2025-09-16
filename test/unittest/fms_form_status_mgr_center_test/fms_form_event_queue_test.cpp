@@ -15,7 +15,10 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include "data_center/form_data_mgr.h"
+#define private public
 #include "status_mgr_center/form_event_queue.h"
+#undef private
 #include "status_mgr_center/form_status_common.h"
 #include "fms_log_wrapper.h"
 
@@ -102,5 +105,42 @@ HWTEST_F(FormEventQueueTest, FormEventQueueTest_0002, TestSize.Level0)
     EXPECT_EQ(taskInfo.getFormEvent(), formEvent);
 
     GTEST_LOG_(INFO) << "FormEventQueueTest_0002 end";
+}
+
+/**
+ * @tc.name: FormEventQueueTest_ReportQueueOverLimit
+ * @tc.desc: Verify ReportQueueOverLimit func
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormEventQueueTest, FormEventQueueTest_ReportQueueOverLimit, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventQueueTest_ReportQueueOverLimit start";
+
+    int64_t formId = 1;
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+
+    std::shared_ptr<FormEventQueue> formEventQueue = std::make_shared<FormEventQueue>(formId);
+    ASSERT_NE(formEventQueue, nullptr);
+    bool ret = formEventQueue->ReportQueueOverLimit(formId);
+    EXPECT_EQ(ret, false);
+
+    FormItemInfo formInfo;
+    formInfo.SetFormId(formId);
+    formInfo.SetProviderBundleName("bundleName");
+    formInfo.SetFormName("formName");
+    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formInfo, 100, 100);
+    EXPECT_EQ(formId, formRecord.formId);
+    ret = formEventQueue->ReportQueueOverLimit(formId);
+    EXPECT_EQ(ret, false);
+
+    auto task = []() { GTEST_LOG_(INFO) << "FormEventQueueTest_ReportQueueOverLimit Task called"; };
+    FormEventTaskInfo taskInfo{formId, FormFsmEvent::RENDER_FORM, task};
+    ret = formEventQueue->PushFormEvent(taskInfo);
+    EXPECT_EQ(ret, true);
+
+    ret = formEventQueue->ReportQueueOverLimit(formId);
+    EXPECT_EQ(ret, true);
+
+    GTEST_LOG_(INFO) << "FormEventQueueTest_ReportQueueOverLimit end";
 }
 }  // namespace
