@@ -229,7 +229,6 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const Want &want)
 {
     HILOG_INFO("formId:%{public}" PRId64 ",compId:%{public}s,uid:%{public}s", formId, compId.c_str(), uid.c_str());
-    SetCriticalTrueOnFormActivity();
     if (formId <= 0 || compId.empty() || uid.empty()) {
         HILOG_ERROR("param invalid");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
