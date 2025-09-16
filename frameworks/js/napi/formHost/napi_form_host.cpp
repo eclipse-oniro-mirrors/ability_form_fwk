@@ -129,7 +129,7 @@ static napi_value GetFormIds(napi_env env, napi_value value, ErrCode &errCode, s
 
 napi_value ParseFormStateInfo(napi_env env, FormStateInfo &stateInfo)
 {
-    napi_handle_scope scope;
+    napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         return nullptr;
@@ -161,7 +161,7 @@ void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
     napi_env env = asyncCallbackInfo->env;
 
     if (asyncCallbackInfo->callback != nullptr) {
-        napi_handle_scope scope;
+        napi_handle_scope scope = nullptr;
         napi_open_handle_scope(env, &scope);
         if (scope == nullptr) {
             delete asyncCallbackInfo;
@@ -207,7 +207,7 @@ void AcquireFormStatePromiseComplete(uv_work_t *work, int32_t status)
     napi_env env = asyncCallbackInfo->env;
 
     if (asyncCallbackInfo->result != ERR_OK) {
-        napi_handle_scope scope;
+        napi_handle_scope scope = nullptr;
         napi_open_handle_scope(env, &scope);
         if (scope == nullptr) {
             delete asyncCallbackInfo;
@@ -221,7 +221,7 @@ void AcquireFormStatePromiseComplete(uv_work_t *work, int32_t status)
         napi_reject_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
         napi_close_handle_scope(env, scope);
     } else {
-        napi_handle_scope scope;
+        napi_handle_scope scope = nullptr;
         napi_open_handle_scope(env, &scope);
         if (scope == nullptr) {
             delete asyncCallbackInfo;
@@ -689,7 +689,7 @@ napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallb
             auto *asyncCallbackInfo = (AsyncNotifyFormsVisibleCallbackInfo *) data;
 
             if (asyncCallbackInfo->callback != nullptr) {
-                napi_handle_scope scope;
+                napi_handle_scope scope = nullptr;
                 napi_open_handle_scope(env, &scope);
                 if (scope == nullptr) {
                     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
