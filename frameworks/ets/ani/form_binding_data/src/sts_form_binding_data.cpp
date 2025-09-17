@@ -31,13 +31,13 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     }
     ani_status status = ANI_OK;
     ani_class formBindingDataCls;
-    if ((status = env->FindClass("L@ohos/app/form/formBindingData/formBindingData/FormBindingDataInner;",
+    if ((status = env->FindClass("@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner",
         &formBindingDataCls)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
     ani_method objectMethod;
-    if ((status = env->Class_FindMethod(formBindingDataCls, "<ctor>", ":V", &objectMethod)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(formBindingDataCls, "<ctor>", ":", &objectMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
@@ -53,7 +53,7 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
         return formBindingDataObj;
     }
     ani_class stringClass;
-    if ((status = env->FindClass("Lstd/core/String;", &stringClass)) != ANI_OK) {
+    if ((status = env->FindClass("std.core.String", &stringClass)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
@@ -91,7 +91,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
 
-    const char *spaceName = "L@ohos/app/form/formBindingData/formBindingData;";
+    const char *spaceName = "@ohos.app.form.formBindingData.formBindingData";
     ani_namespace spc;
     if (env->FindNamespace(spaceName, &spc) != ANI_OK) {
         HILOG_ERROR("Not found %{public}s ", spaceName);
