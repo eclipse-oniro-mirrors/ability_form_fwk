@@ -354,7 +354,7 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
 {
     std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
     if (statusData.empty()) {
-        HILOG_WARN("status data of %{public}" PRId64 " is empty", formId);
+        HILOG_DEBUG("status data of %{public}" PRId64 " is empty", formId);
         statusData = EMPTY_STATUS_DATA;
     }
     if (FormInfoRdbStorageMgr::GetInstance().UpdateStatusData(std::to_string(formId), statusData) != ERR_OK) {

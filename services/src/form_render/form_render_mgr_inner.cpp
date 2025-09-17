@@ -196,7 +196,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
         FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
     }
 
-    HILOG_INFO("enableForm:%{public}d, protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
+    HILOG_DEBUG("enableForm:%{public}d, protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
     if (!formRecord.enableForm) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formRecord.formId, true);

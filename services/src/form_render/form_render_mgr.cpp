@@ -126,8 +126,6 @@ ErrCode FormRenderMgr::RenderForm(
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
-    HILOG_INFO("update formId:%{public}" PRId64 ",%{public}zu", formId, formProviderData.GetDataString().length());
-
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
@@ -135,7 +133,8 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int32_t formUserId = formRecord.userId;
-    HILOG_INFO("update formUserId:%{public}d", formUserId);
+    HILOG_INFO("update formUserId:%{public}d formId:%{public}" PRId64 ",%{public}zu",
+        formUserId, formId, formProviderData.GetDataString().length());
     if (formRecord.privacyLevel > 0) {
         auto iter = sandboxInners_.find(formUserId);
         if (iter == sandboxInners_.end()) {

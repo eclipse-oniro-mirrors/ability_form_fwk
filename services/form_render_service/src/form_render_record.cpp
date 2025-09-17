@@ -230,14 +230,12 @@ void FormRenderRecord::HandleDeleteRendererGroup(int64_t formId)
 
 bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool needMonitored)
 {
-    HILOG_INFO("call");
     std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
     if (eventHandler_) {
         HILOG_DEBUG("EventHandle is exist,no need to create a new one");
         return true;
     }
     // Create event runner
-    HILOG_INFO("Create eventHandle");
     if (eventRunner_ == nullptr) {
         eventRunner_ = EventRunner::Create(GetThreadNameByBundle(bundleName));
         if (eventRunner_ == nullptr) {
@@ -540,7 +538,6 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         return true;
     }
 
-    HILOG_INFO("Create a new runtime");
     if (eventRunner_ == nullptr) {
         HILOG_ERROR("null eventRunner_");
         return false;
@@ -572,7 +569,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
 {
     if (IsFormContextExist(formJsInfo)) {
-        HILOG_WARN("context is exist. %{public}s", formJsInfo.bundleName.c_str());
+        HILOG_DEBUG("context is exist. %{public}s", formJsInfo.bundleName.c_str());
         return false;
     }
     if (!runtime_) {
@@ -685,7 +682,6 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
 
 std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const FormJsInfo &formJsInfo, const Want &want)
 {
-    HILOG_INFO("Create a new context");
     auto context = std::make_shared<AbilityRuntime::ContextImpl>();
     if (context == nullptr) {
         HILOG_ERROR("Create context failed");
@@ -717,7 +713,6 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
 std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(const FormJsInfo &formJsInfo,
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
-    HILOG_INFO("Get formRendererGroup");
     if (GetEventHandlerNeedReset()) {
         return nullptr;
     }
@@ -740,7 +735,6 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
 std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGroupLock(const FormJsInfo &formJsInfo,
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
-    HILOG_INFO("Create formRendererGroup");
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
         return nullptr;
@@ -1111,7 +1105,6 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
 
 void FormRenderRecord::Release()
 {
-    HILOG_INFO("Release runtime and eventHandler");
     std::shared_ptr<EventHandler> eventHandler = eventHandler_;
     std::shared_ptr<EventRunner> eventRunner = eventRunner_;
     {
@@ -1939,7 +1932,6 @@ bool FormRenderRecord::GetFormRequestByFormId(
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     auto iter = formRequests_.find(formId);
     if (iter == formRequests_.end()) {
-        HILOG_WARN("not find form request,formId:%{public}" PRId64, formId);
         return false;
     }
 
@@ -1957,7 +1949,6 @@ void FormRenderRecord::SetEventHandlerNeedResetFlag(bool needReset)
 bool FormRenderRecord::GetEventHandlerNeedReset()
 {
     std::lock_guard<std::shared_mutex> lock(eventHandlerReset_);
-    HILOG_INFO("eventHandleNeedReset: %{public}d", eventHandleNeedReset);
     return eventHandleNeedReset;
 }
 

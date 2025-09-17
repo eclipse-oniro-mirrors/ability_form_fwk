@@ -34,7 +34,7 @@ FormStatusQueue::~FormStatusQueue()
 
 bool FormStatusQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return false;
