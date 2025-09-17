@@ -129,8 +129,11 @@ static napi_value GetFormIds(napi_env env, napi_value value, ErrCode &errCode, s
 
 napi_value ParseFormStateInfo(napi_env env, FormStateInfo &stateInfo)
 {
-    napi_handle_scope scope;
+    napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        return nullptr;
+    }
     napi_value formStateInfoObject = nullptr;
     napi_create_object(env, &formStateInfoObject);
     napi_value jsValue = WrapWant(env, stateInfo.want);
@@ -158,8 +161,15 @@ void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
     napi_env env = asyncCallbackInfo->env;
 
     if (asyncCallbackInfo->callback != nullptr) {
-        napi_handle_scope scope;
+        napi_handle_scope scope = nullptr;
         napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
+            delete work;
+            work = nullptr;
+            return;
+        }
         napi_value callback;
         napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
         InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
@@ -197,15 +207,29 @@ void AcquireFormStatePromiseComplete(uv_work_t *work, int32_t status)
     napi_env env = asyncCallbackInfo->env;
 
     if (asyncCallbackInfo->result != ERR_OK) {
-        napi_handle_scope scope;
+        napi_handle_scope scope = nullptr;
         napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
+            delete work;
+            work = nullptr;
+            return;
+        }
         napi_value result;
         InnerCreatePromiseRetMsg(env, asyncCallbackInfo->result, &result);
         napi_reject_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
         napi_close_handle_scope(env, scope);
     } else {
-        napi_handle_scope scope;
+        napi_handle_scope scope = nullptr;
         napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
+            delete work;
+            work = nullptr;
+            return;
+        }
         napi_value result = ParseFormStateInfo(env, asyncCallbackInfo->stateInfo);
         napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
         napi_close_handle_scope(env, scope);
@@ -665,8 +689,13 @@ napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallb
             auto *asyncCallbackInfo = (AsyncNotifyFormsVisibleCallbackInfo *) data;
 
             if (asyncCallbackInfo->callback != nullptr) {
-                napi_handle_scope scope;
+                napi_handle_scope scope = nullptr;
                 napi_open_handle_scope(env, &scope);
+                if (scope == nullptr) {
+                    napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+                    delete asyncCallbackInfo;
+                    return;
+                }
                 napi_value callback;
                 napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
                 InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
