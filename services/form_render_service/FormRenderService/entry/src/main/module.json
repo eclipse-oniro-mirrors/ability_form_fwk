@@ -7,7 +7,10 @@
       "default",
       "tablet",
       "2in1",
-      "wearable"
+      "wearable",
+      "phone",
+      "tv",
+      "car"
     ],
     "deliveryWithInstall": true,
     "installationFree": false,
