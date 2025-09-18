@@ -1365,7 +1365,8 @@ napi_value NapiFormHost::OnReleaseForm(napi_env env,
         (napi_env env, NapiAsyncTask &task, int32_t status) {
             auto ret = ERR_COMMON;
             if (errCode != ERR_OK) {
-                NapiFormUtil::RejectCurrentTask(env, task, errCode);
+                auto retCode = QueryRetCode(errCode);
+                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
                 return ;
             }
             ret = FormMgr::GetInstance().ReleaseForm(formId, FormHostClient::GetInstance(), isReleaseCache);
@@ -1373,7 +1374,8 @@ napi_value NapiFormHost::OnReleaseForm(napi_env env,
                 auto result = QueryRetCode(ret);
                 task.Resolve(env, CreateJsValue(env, result));
             } else {
-                NapiFormUtil::RejectCurrentTask(env, task, ret);
+                auto retCode = QueryRetCode(ret);
+                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
                 return;
             }
     };
