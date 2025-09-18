@@ -30,12 +30,12 @@ namespace OHOS {
 namespace AbilityRuntime {
 using namespace OHOS::AppExecFwk::FormRender;
 
-FormRenderServiceExtension* FormRenderServiceExtension::Create(const std::unique_ptr<Runtime>& runtime)
+FormRenderServiceExtension *FormRenderServiceExtension::Create(const std::unique_ptr<Runtime>& runtime)
 {
-    return new (std::nothrow) FormRenderServiceExtension(static_cast<Runtime&>(*runtime));
+    return new (std::nothrow) FormRenderServiceExtension(runtime);
 }
 
-FormRenderServiceExtension::FormRenderServiceExtension(Runtime& runtime) : runtime_(runtime) {}
+FormRenderServiceExtension::FormRenderServiceExtension(const std::unique_ptr<Runtime> &runtime) : runtime_(runtime) {}
 FormRenderServiceExtension::~FormRenderServiceExtension() = default;
 
 void FormRenderServiceExtension::Init(const std::shared_ptr<AbilityLocalRecord> &record,
@@ -52,7 +52,9 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
     if (context) {
         FormRenderServiceMgr::GetInstance().SetConfiguration(context->GetConfiguration());
     }
-
+    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb([this]() -> const std::unique_ptr<Runtime>& {
+        return runtime_;
+    });
     // Prevents FRS-processe from being frozen (Phone, WGR, PC only)
     OHOS::BackgroundTaskMgr::EfficiencyResourceInfo resourceInfo(
         OHOS::BackgroundTaskMgr::ResourceType::Type::CPU, true, 0, "", true);

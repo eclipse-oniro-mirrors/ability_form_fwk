@@ -1219,3 +1219,21 @@ HWTEST_F(FormRenderServiceMgrTest, UpdateFormSize_001, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "UpdateFormSize_001 end";
 }
+
+/**
+ * @tc.name: SetMainRuntimeCb_001
+ * @tc.desc: Verify SetMainRuntimeCb.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetMainRuntimeCb_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 start";
+    std::unique_ptr<Runtime> runtime = nullptr;
+    auto cb = [&runtime]() -> const std::unique_ptr<Runtime> & {
+        return runtime;
+    };
+    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb(cb);
+    EXPECT_EQ(FormRenderServiceMgr::GetInstance().mainRuntimeCb_(), nullptr);
+
+    GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 end";
+}
