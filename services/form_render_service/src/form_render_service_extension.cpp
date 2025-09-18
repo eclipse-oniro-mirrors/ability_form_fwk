@@ -52,7 +52,7 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
     if (context) {
         FormRenderServiceMgr::GetInstance().SetConfiguration(context->GetConfiguration());
     }
-    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb([this]() -> const std::unique_ptr<Runtime> & {
+    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb([this]() -> const std::unique_ptr<Runtime>& {
         return runtime_;
     });
     // Prevents FRS-processe from being frozen (Phone, WGR, PC only)
