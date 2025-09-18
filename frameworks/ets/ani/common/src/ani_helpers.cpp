@@ -136,7 +136,7 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
 void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &formDataProxies,
     ani_ref proxiesArrayRef)
 {
-    size_t formDataProxiesArrayLen;
+    size_t formDataProxiesArrayLen = 0;
     env->Array_GetLength(static_cast<ani_array>(proxiesArrayRef), &formDataProxiesArrayLen);
     for (size_t i = 0; i < formDataProxiesArrayLen; i++) {
         HILOG_INFO("Iterating proxies");
@@ -182,7 +182,7 @@ int64_t FormIdAniStrtoInt64(ani_env *env, ani_string formId)
     return formIdNum;
 }
 
-ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int& enumValue)
+ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
 {
     HILOG_INFO("Call GetEnumValueInt");
 
@@ -223,14 +223,14 @@ ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int& enumValue)
     return ANI_OK;
 }
 
-void SetStringProperty(ani_env *env, ani_object obj, const char* propName, const std::string& value)
+void SetStringProperty(ani_env *env, ani_object obj, const char *propName, const std::string &value)
 {
     ani_string anistr{};
     env->String_NewUTF8(value.c_str(), value.size(), &anistr);
     env->Object_SetPropertyByName_Ref(obj, propName, anistr);
 }
 
-bool AniParseInt32(ani_env* env, const ani_ref& aniInt, int32_t& out)
+bool AniParseInt32(ani_env *env, const ani_ref &aniInt, int32_t &out)
 {
     ani_int tmp;
     ani_status status;
@@ -244,7 +244,7 @@ bool AniParseInt32(ani_env* env, const ani_ref& aniInt, int32_t& out)
 }
 
 
-bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int32_t>& out)
+bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t> &out)
 {
     ani_size size;
     if (env->Array_GetLength(array, &size) != ANI_OK) {
@@ -254,8 +254,8 @@ bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int3
 
     for (ani_size i = 0; i < size; ++i) {
         ani_ref elementRef;
-        if (env->Array_Get_Ref(array, i, &elementRef) != ANI_OK) {
-            HILOG_ERROR("Array_Get_Ref failed at index %{public}zu!", i);
+        if (env->Array_Get(array, i, &elementRef) != ANI_OK) {
+            HILOG_ERROR("Array_Get failed at index %{public}zu!", i);
             return false;
         }
         int32_t value;
@@ -317,27 +317,22 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
     return true;
 }
 
-ani_array_ref CreateAniArrayIntFromStdVector(ani_env *env, std::vector<int32_t> vec)
+ani_array CreateAniArrayIntFromStdVector(ani_env *env, std::vector<int32_t> vec)
 {
-    ani_array_ref array = nullptr;
+    ani_array array = nullptr;
     ani_ref undefined_ref;
     if (env->GetUndefined(&undefined_ref) != ANI_OK) {
         HILOG_ERROR("GetUndefined failed");
     }
     
     if (!vec.empty()) {
-        ani_class intCls = nullptr;
-        if (ANI_OK != env->FindClass("std.core.Int", &intCls)) {
-            HILOG_ERROR("Cannot find int class");
-            return array;
-        }
-        env->Array_New_Ref(intCls, vec.size(), undefined_ref, &array);
+        env->Array_New(vec.size(), undefined_ref, &array);
         ani_size index = 0;
         for (auto value : vec) {
             ani_object valueAni = createInt(env, value);
-            ani_status status = env->Array_Set_Ref(array, index, valueAni);
+            ani_status status = env->Array_Set(array, index, valueAni);
             if (status != ANI_OK) {
-                HILOG_ERROR("Array_Set_Ref failed, status code: %{public}d", status);
+                HILOG_ERROR("Array_Set failed, status code: %{public}d", status);
                 break;
             }
             index++;
@@ -346,7 +341,7 @@ ani_array_ref CreateAniArrayIntFromStdVector(ani_env *env, std::vector<int32_t> 
     return array;
 }
 
-void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::RunningFormInfo& formInfo)
+void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::RunningFormInfo &formInfo)
 {
     // Set basic integer properties
     env->Object_SetPropertyByName_Int(formInfoAni, "dimension", formInfo.dimension);
@@ -366,7 +361,7 @@ void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExe
     env->Object_SetPropertyByName_Int(formInfoAni, "visibilityType", static_cast<int>(formInfo.formVisiblity));
 }
 
-void SetFormInfoFields(ani_env* env, ani_object formInfoAni, const AppExecFwk::FormInfo& formInfo)
+void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo)
 {
     // Set boolean properties
     env->Object_SetPropertyByName_Boolean(formInfoAni, "isDefault", formInfo.defaultFlag);
@@ -396,16 +391,16 @@ void SetFormInfoFields(ani_env* env, ani_object formInfoAni, const AppExecFwk::F
     SetStringProperty(env, formInfoAni, "formConfigAbility", formInfo.formConfigAbility);
     SetStringProperty(env, formInfoAni, "scheduledUpdateTime", formInfo.scheduledUpdateTime);
     // Set array properties
-    ani_array_ref supportDimensionAni = CreateAniArrayIntFromStdVector(env, formInfo.supportDimensions);
+    ani_array supportDimensionAni = CreateAniArrayIntFromStdVector(env, formInfo.supportDimensions);
     if (supportDimensionAni != nullptr) {
         env->Object_SetPropertyByName_Ref(formInfoAni, "supportDimensions", supportDimensionAni);
     }
-    ani_array_ref supportedShapesAni = CreateAniArrayIntFromStdVector(env, formInfo.supportShapes);
+    ani_array supportedShapesAni = CreateAniArrayIntFromStdVector(env, formInfo.supportShapes);
     if (supportedShapesAni != nullptr) {
         env->Object_SetPropertyByName_Ref(formInfoAni, "supportedShapes", supportedShapesAni);
     }
     std::vector<int32_t> formPreviewImagesIntAni(formInfo.formPreviewImages.begin(), formInfo.formPreviewImages.end());
-    ani_array_ref formPreviewImagesAni = CreateAniArrayIntFromStdVector(env, formPreviewImagesIntAni);
+    ani_array formPreviewImagesAni = CreateAniArrayIntFromStdVector(env, formPreviewImagesIntAni);
     if (formPreviewImagesAni != nullptr) {
         env->Object_SetPropertyByName_Ref(formInfoAni, "previewImages", formPreviewImagesAni);
     }
@@ -415,7 +410,7 @@ void SetFormInfoFields(ani_env* env, ani_object formInfoAni, const AppExecFwk::F
     }
 }
 
-ani_object CreateANIObject(ani_env *env, const char* className)
+ani_object CreateANIObject(ani_env *env, const char *className)
 {
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
@@ -449,7 +444,7 @@ void CheckIfRefValidOrThrow(ani_env *env, ani_object obj)
     }
 }
 
-void CheckEnvOrThrow(ani_env* env)
+void CheckEnvOrThrow(ani_env *env)
 {
     if (env == nullptr) {
         HILOG_ERROR("ani_env is nullptr");
@@ -496,7 +491,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
     return true;
 }
 
-ani_class GetANIClass(ani_env *env, const char* className)
+ani_class GetANIClass(ani_env *env, const char *className)
 {
     ani_status status = ANI_OK;
     ani_class cls{};
@@ -507,7 +502,7 @@ ani_class GetANIClass(ani_env *env, const char* className)
     return cls;
 }
 
-ani_ref GetMemberRef(ani_env *env, ani_object object, const char* class_name, const std::string& member)
+ani_ref GetMemberRef(ani_env *env, ani_object object, const char *class_name, const std::string &member)
 {
     ani_status status = ANI_OK;
     ani_class cls = GetANIClass(env, class_name);
@@ -578,35 +573,6 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
         return;
     }
     HILOG_INFO("End");
-}
-
-ani_object NewRecordClass(ani_env *env)
-{
-    HILOG_INFO("Call");
-    CheckEnvOrThrow(env);
-    
-    ani_object recordObj = {};
-    ani_status status = ANI_ERROR;
-    ani_class recordCls;
-    if (ANI_OK != (status = env->FindClass("escompat.Record", &recordCls))) {
-        HILOG_ERROR("FindClass status = %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(AppExecFwk::ERR_FORM_EXTERNAL_PARAM_INVALID));
-        return nullptr;
-    }
-    ani_method ctor;
-    if (ANI_OK != (status = env->Class_FindMethod(recordCls, "<ctor>", nullptr, &ctor))) {
-        HILOG_ERROR("Class_FindMethod status = %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(AppExecFwk::ERR_FORM_EXTERNAL_PARAM_INVALID));
-        return nullptr;
-    }
-
-    if (ANI_OK != (status = env->Object_New(recordCls, ctor, &recordObj))) {
-        HILOG_ERROR("Object_New status = %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(AppExecFwk::ERR_FORM_EXTERNAL_PARAM_INVALID));
-        return nullptr;
-    }
-    HILOG_INFO("End");
-    return recordObj;
 }
 
 ani_object CreateFormInfoAniArrayFromVec(ani_env *env, const std::vector<AppExecFwk::FormInfo> &formInfos)

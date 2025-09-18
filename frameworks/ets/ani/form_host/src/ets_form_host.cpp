@@ -129,7 +129,7 @@ ani_object GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filter
         HILOG_ERROR("Cannot get bundle name from filter");
     }
 
-    ani_array_ref supportDimensionAni;
+    ani_array supportDimensionAni;
     if (env->Object_GetPropertyByName_Ref(filterObj, "supportedDimensions",
         reinterpret_cast<ani_ref*>(&supportDimensionAni))) {
         HILOG_ERROR("Cannot get support Dimension Ani");
@@ -142,7 +142,7 @@ ani_object GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filter
         AniParseIntArray(env, supportDimensionAni, filter.supportDimensions);
     }
 
-    ani_array_ref supportedShapes;
+    ani_array supportedShapes;
     if (env->Object_GetPropertyByName_Ref(filterObj, "supportedShapes", reinterpret_cast<ani_ref*>(&supportedShapes))) {
         HILOG_ERROR("Cannot get support Dimension Ani");
     }
@@ -407,7 +407,7 @@ void NotifyInvisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj)
     HILOG_DEBUG("End");
 }
 
-void UpdateFormLocation(ani_env* env, ani_string formId, ani_object formLocation)
+void UpdateFormLocation(ani_env *env, ani_string formId, ani_object formLocation)
 {
     HILOG_DEBUG("Call");
 

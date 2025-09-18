@@ -175,7 +175,7 @@ void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
     HILOG_DEBUG("End");
 }
 
-ani_boolean IsRequestPublishFormSupported(ani_env* env)
+ani_boolean IsRequestPublishFormSupported(ani_env *env)
 {
     HILOG_INFO("Call");
     CheckEnvOrThrow(env);
@@ -200,7 +200,7 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function{"openFormManager_inner", "C{@ohos.app.ability.Want.Want}:",
             reinterpret_cast<void *>(OpenFormManager)},
         ani_native_function{"isRequestPublishFormSupported_inner", ":z",
-            reinterpret_cast<void*>(IsRequestPublishFormSupported)},
+            reinterpret_cast<void *>(IsRequestPublishFormSupported)},
     };
     return methods;
 }
