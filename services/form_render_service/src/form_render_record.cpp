@@ -1137,7 +1137,6 @@ void FormRenderRecord::Release()
 void FormRenderRecord::HandleReleaseInJsThread()
 {
     if (runtime_) {
-        runtime_->ForceFullGC();
         runtime_.reset();
     }
     ReleaseHapFileHandle();

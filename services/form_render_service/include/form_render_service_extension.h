@@ -28,7 +28,7 @@ namespace AbilityRuntime {
 class FormRenderServiceExtension : public ServiceExtension,
                                    public std::enable_shared_from_this<FormRenderServiceExtension> {
 public:
-    explicit FormRenderServiceExtension(Runtime &runtime);
+    explicit FormRenderServiceExtension(const std::unique_ptr<Runtime> &runtime);
     ~FormRenderServiceExtension() override;
 
     /**
@@ -135,7 +135,7 @@ public:
 private:
     void GetSrcPath(std::string &srcPath);
 
-    Runtime& runtime_;
+    const std::unique_ptr<Runtime> &runtime_;
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

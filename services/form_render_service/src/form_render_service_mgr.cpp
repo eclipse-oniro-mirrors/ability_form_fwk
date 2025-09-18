@@ -252,6 +252,8 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
     FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     if (isRenderGroupEmpty) {
         search->second->Release();
+        // after form recycled, call gc to release the abc file cache.
+        MainThreadForceFullGC();
     }
 
     FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
@@ -286,7 +288,7 @@ int32_t FormRenderServiceMgr::ReloadForm(const std::vector<FormJsInfo> &&formJsI
         HILOG_ERROR("GetBundleName failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
- 
+
     int32_t ret = ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
     if (ret != ERR_OK) {
         HILOG_ERROR("Reload form record failed, ret = %{public}d", ret);
@@ -297,7 +299,7 @@ int32_t FormRenderServiceMgr::ReloadForm(const std::vector<FormJsInfo> &&formJsI
             static_cast<int32_t>(ReloadFormErrorType::RELOAD_FORM_RELOAD_FORM_ERROR),
             ret);
     }
- 
+
     return ret;
 }
 
@@ -820,6 +822,31 @@ void FormRenderServiceMgr::CacheAppliedConfig()
         }
     }
     HILOG_INFO("already applied config:%{public}s", appliedConfig_->GetName().c_str());
+}
+
+void FormRenderServiceMgr::SetMainRuntimeCb(std::function<const std::unique_ptr<Runtime> &()> &&cb)
+{
+    mainRuntimeCb_ = std::move(cb);
+}
+
+void FormRenderServiceMgr::MainThreadForceFullGC()
+{
+    HILOG_INFO("call");
+    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    if (mainHandler == nullptr) {
+        HILOG_ERROR("null mainHandler");
+        return;
+    }
+
+    auto task = []() {
+        if (FormRenderServiceMgr::GetInstance().mainRuntimeCb_ == nullptr ||
+            FormRenderServiceMgr::GetInstance().mainRuntimeCb_() == nullptr) {
+            HILOG_ERROR("null runtime");
+            return;
+        }
+        FormRenderServiceMgr::GetInstance().mainRuntimeCb_()->ForceFullGC(0);
+    };
+    mainHandler->PostTask(task, "MainThreadForceFullGC");
 }
 }  // namespace FormRender
 }  // namespace AppExecFwk

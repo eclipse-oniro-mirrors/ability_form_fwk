@@ -107,8 +107,12 @@ public:
     sptr<IFormSupply> GetFormSupplyClient();
 
     void SetCriticalFalseOnAllFormInvisible();
-    
+
     void SetCriticalTrueOnFormActivity();
+
+    void SetMainRuntimeCb(std::function<const std::unique_ptr<Runtime> &()> &&cb);
+
+    void MainThreadForceFullGC();
 
 private:
     void FormRenderGCTask(const std::string &uid);
@@ -146,6 +150,7 @@ private:
     sptr<IFormSupply> formSupplyClient_;
     bool isVerified_ = false;
     bool hasCachedConfig_ = false;
+    std::function<const std::unique_ptr<Runtime> &()> mainRuntimeCb_ = nullptr;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
