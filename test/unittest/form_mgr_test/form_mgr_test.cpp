@@ -466,7 +466,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0017, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0018, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0018 starts";
-    FormErrors::GetInstance().InitErrorMessageMap();
     int errCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
 
@@ -1110,7 +1109,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0052, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0053, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0053 starts";
-    FormErrors::GetInstance().InitErrorMessageMap();
     int errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
     auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
 

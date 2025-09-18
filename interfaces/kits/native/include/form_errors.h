@@ -25,31 +25,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-enum {
-    ERR_FORM_EXTERNAL_PERMISSION_DENIED = 201,
-    ERR_FORM_EXTERNAL_NOT_SYSTEM_APP = 202,
-    ERR_FORM_EXTERNAL_PARAM_INVALID = 401,
-    ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR = 801,
-    ERR_FORM_EXTERNAL_KERNEL_ERROR = 16500001,
-    ERR_FORM_EXTERNAL_KERNEL_MALLOC_ERROR = 16500002,
-    ERR_FORM_EXTERNAL_IPC_ERROR = 16500050,
-    ERR_FORM_EXTERNAL_SERVICE_CONNECTION_ERROR = 16500060,
-    ERR_FORM_EXTERNAL_GET_INFO_FAILED = 16500100,
-    ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR = 16501000,
-    ERR_FORM_EXTERNAL_FORM_ID_NOT_EXIST = 16501001,
-    ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND = 16501002,
-    ERR_FORM_EXTERNAL_OPERATION_FORM_NOT_SELF = 16501003,
-    ERR_FORM_EXTERNAL_ABILITY_NOT_INSTALLED = 16501004,
-    ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED = 16501005,
-    ERR_FORM_EXTERNAL_RENDER_DIED = 16501006,
-    ERR_FORM_EXTERNAL_FORM_NOT_TRUST = 16501007,
-    ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT = 16501008,
-    ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT = 16501009,
-    ERR_FORM_EXTERNAL_SET_OPERATION_FAILED = 16501010,
-    ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED = 16501011,
-    ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR = 16501012,
-};
-
 /**
  * @class FormErrors
  * FormErrors is used to access form error message.
@@ -62,7 +37,7 @@ public:
     /**
      * @brief Get the error message content.
      *
-     * @param errCode Error code.
+     * @param errCode Internal error code
      * @return Message content.
      */
     std::string GetErrorMessage(int errCode);
@@ -91,16 +66,6 @@ public:
      * @return External error message.
      */
     std::string GetErrorMsgByExternalErrorCode(int32_t externalErrorCode);
-
-private:
-    /**
-    * @brief Init error message map object.
-    *
-    */
-    void InitErrorMessageMap();
-
-private:
-    std::map<ErrCode, std::string> errorMessageMap_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

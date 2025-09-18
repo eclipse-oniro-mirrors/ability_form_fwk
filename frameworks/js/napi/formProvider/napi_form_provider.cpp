@@ -408,8 +408,7 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
             if (ret == ERR_OK) {
                 task.Resolve(env, CreateFormInfos(env, formInfos));
             } else {
-                auto retCode = QueryRetCode(ret);
-                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+                NapiFormUtil::RejectCurrentTask(env, task, ret);
             }
         };
 
@@ -451,14 +450,12 @@ napi_value JsFormProvider::OnSetFormNextRefreshTime(napi_env env, size_t argc, n
     NapiAsyncTask::CompleteCallback complete =
         [errCode, formId, time](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto retCode = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         int32_t ret = FormMgr::GetInstance().SetNextRefreshTime(formId, time);
         if (ret != ERR_OK) {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
             return;
         }
         task.Resolve(env, CreateJsValue(env, ret));
@@ -501,14 +498,12 @@ napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* a
     NapiAsyncTask::CompleteCallback complete =
         [errCode, formId, data = formProviderData](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto retCode = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         int32_t ret = FormMgr::GetInstance().UpdateForm(formId, *data);
         if (ret != ERR_OK) {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
             return;
         }
         task.Resolve(env, CreateJsValue(env, ret));

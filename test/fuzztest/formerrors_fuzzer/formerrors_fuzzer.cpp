@@ -37,7 +37,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     }
     FormErrors formErrors;
     int errorCode = fdp->ConsumeIntegral<int>();
-    formErrors.InitErrorMessageMap();
     int32_t internalErrorCode = fdp->ConsumeIntegral<int32_t>();
     formErrors.QueryExternalErrorCode(internalErrorCode);
     int32_t externalErrorCode = fdp->ConsumeIntegral<int32_t>();
