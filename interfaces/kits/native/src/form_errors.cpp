@@ -312,7 +312,6 @@ std::string FormErrors::QueryExternalErrorMessage(int32_t internalErrorCode, int
 {
     auto iter = FORM_ERROR_CODES.find(internalErrorCode);
     if (iter != FORM_ERROR_CODES.end() && !iter->second.detailMsg.empty()) {
-        HILOG_INFO("iter->second.detailMsg:%{public}s", iter->second.detailMsg.c_str());
         return iter->second.detailMsg;
     }
     return GetErrorMsgByExternalErrorCode(externalErrorCode);
