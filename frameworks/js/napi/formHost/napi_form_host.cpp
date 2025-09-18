@@ -163,7 +163,7 @@ void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
     if (asyncCallbackInfo->callback != nullptr) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(env, &scope);
-        if (scope == nullptr) {
+    if (scope == nullptr) {
             delete asyncCallbackInfo;
             asyncCallbackInfo = nullptr;
             delete work;
@@ -1162,14 +1162,12 @@ napi_value NapiFormHost::OnDisableFormsUpdate(napi_env env, size_t argc, napi_va
 
     auto complete = [formIds = iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto code = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         auto ret = FormMgr::GetInstance().LifecycleUpdate(formIds, FormHostClient::GetInstance(), false);
         if (ret != ERR_OK) {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
             return;
         }
         task.Resolve(env, CreateJsValue(env, ret));
@@ -1197,8 +1195,7 @@ napi_value NapiFormHost::OnIsSystemReady(napi_env env, size_t argc, napi_value* 
         if (ret == ERR_OK) {
             task.Resolve(env, CreateJsUndefined(env));
         } else {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
         }
     };
 
@@ -1221,8 +1218,7 @@ napi_value NapiFormHost::OnGetAllFormsInfo(napi_env env, size_t argc, napi_value
         std::vector<FormInfo> formInfos;
         auto ret = FormMgr::GetInstance().GetAllFormsInfo(formInfos);
         if (ret != ERR_OK) {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
             return;
         }
         task.Resolve(env, CreateFormInfos(env, formInfos));
@@ -1258,8 +1254,7 @@ napi_value NapiFormHost::OnGetFormsInfo(napi_env env, size_t argc, napi_value* a
         std::string moduleName(mName);
         std::vector<FormInfo> formInfos;
         if (errCode != ERR_OK) {
-            auto retCode = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         int ret = ERR_OK;
@@ -1270,8 +1265,7 @@ napi_value NapiFormHost::OnGetFormsInfo(napi_env env, size_t argc, napi_value* a
         }
 
         if (ret != ERR_OK) {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
             return;
         }
         task.Resolve(env, CreateFormInfos(env, formInfos));
@@ -1310,8 +1304,7 @@ napi_value NapiFormHost::OnDeleteForm(napi_env env, size_t argc, napi_value* arg
     }
     NapiAsyncTask::CompleteCallback complete = [formId, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto retCode = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         auto ret = FormMgr::GetInstance().DeleteForm(formId, FormHostClient::GetInstance());
@@ -1319,8 +1312,7 @@ napi_value NapiFormHost::OnDeleteForm(napi_env env, size_t argc, napi_value* arg
             auto result = QueryRetCode(ret);
             task.Resolve(env, CreateJsValue(env, result));
         } else {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
         }
     };
 
@@ -1373,8 +1365,7 @@ napi_value NapiFormHost::OnReleaseForm(napi_env env,
         (napi_env env, NapiAsyncTask &task, int32_t status) {
             auto ret = ERR_COMMON;
             if (errCode != ERR_OK) {
-                auto retCode = QueryRetCode(errCode);
-                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+                NapiFormUtil::RejectCurrentTask(env, task, errCode);
                 return ;
             }
             ret = FormMgr::GetInstance().ReleaseForm(formId, FormHostClient::GetInstance(), isReleaseCache);
@@ -1382,8 +1373,7 @@ napi_value NapiFormHost::OnReleaseForm(napi_env env,
                 auto result = QueryRetCode(ret);
                 task.Resolve(env, CreateJsValue(env, result));
             } else {
-                auto retCode = QueryRetCode(ret);
-                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+                NapiFormUtil::RejectCurrentTask(env, task, ret);
                 return;
             }
     };
@@ -1423,8 +1413,7 @@ napi_value NapiFormHost::OnRequestForm(napi_env env, size_t argc, napi_value* ar
     }
     NapiAsyncTask::CompleteCallback complete = [formId, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto retCode = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         Want want;
@@ -1433,8 +1422,7 @@ napi_value NapiFormHost::OnRequestForm(napi_env env, size_t argc, napi_value* ar
             auto result = QueryRetCode(ret);
             task.Resolve(env, CreateJsValue(env, result));
         } else {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
         }
     };
 
@@ -1471,8 +1459,7 @@ napi_value NapiFormHost::OnCastTempForm(napi_env env, size_t argc, napi_value* a
     }
     NapiAsyncTask::CompleteCallback complete = [formId, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto retCode = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         auto ret = FormMgr::GetInstance().CastTempForm(formId, FormHostClient::GetInstance());
@@ -1480,8 +1467,7 @@ napi_value NapiFormHost::OnCastTempForm(napi_env env, size_t argc, napi_value* a
             auto result = QueryRetCode(ret);
             task.Resolve(env, CreateJsValue(env, result));
         } else {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
         }
     };
 
@@ -1518,8 +1504,7 @@ napi_value NapiFormHost::OnEnableFormsUpdate(napi_env env, size_t argc, napi_val
     }
     auto complete = [iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto code = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         auto ret = FormMgr::GetInstance().LifecycleUpdate(iFormIds, FormHostClient::GetInstance(), true);
@@ -1527,8 +1512,7 @@ napi_value NapiFormHost::OnEnableFormsUpdate(napi_env env, size_t argc, napi_val
             auto result = QueryRetCode(ret);
             task.Resolve(env, CreateJsValue(env, result));
         } else {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
         }
     };
 
@@ -1649,8 +1633,7 @@ napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc
                 task.Resolve(env, CreateJsUndefined(env));
             } else {
                 HILOG_ERROR("task reject, result code is %{public}d", ret);
-                auto retCode = QueryRetCode(ret);
-                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+                NapiFormUtil::RejectCurrentTask(env, task, ret);
             }
         };
 
@@ -1710,9 +1693,7 @@ napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_va
     };
     auto complete = [data = onDeleteInvalidForms, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto retCode = QueryRetCode(errCode);
-            auto retMsg = QueryRetMsg(retCode);
-            task.Reject(env, CreateJsError(env, retCode, retMsg));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         auto retCode = QueryRetCode(data->result);
@@ -1765,8 +1746,7 @@ napi_value NapiFormHost::OnNotifyVisibleForms(napi_env env, size_t argc, napi_va
     }
     auto complete = [iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto code = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(iFormIds, FormHostClient::GetInstance(),
@@ -1837,8 +1817,7 @@ napi_value NapiFormHost::OnNotifyInVisibleForms(napi_env env, size_t argc, napi_
 
     auto complete = [formIds = formIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
-            auto code = QueryRetCode(errCode);
-            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
+            NapiFormUtil::RejectCurrentTask(env, task, errCode);
             return;
         }
         auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds,
@@ -1848,8 +1827,7 @@ napi_value NapiFormHost::OnNotifyInVisibleForms(napi_env env, size_t argc, napi_
             task.ResolveWithCustomize(
                 env, CreateJsError(env, resultCode, QueryRetMsg(resultCode)), CreateJsUndefined(env));
         } else {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
+            NapiFormUtil::RejectCurrentTask(env, task, ret);
         }
     };
 

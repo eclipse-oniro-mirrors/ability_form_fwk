@@ -784,6 +784,15 @@ long long NapiFormUtil::ConvertStringToLongLong(const std::string &strInfo, int 
     return static_cast<long long>(strtoll(strInfo.c_str(), nullptr, radix));
 }
 
+void NapiFormUtil::RejectCurrentTask(napi_env env, NapiAsyncTask &task, int32_t errCode)
+{
+    if (errCode == ERR_OK) {
+        return;
+    }
+    auto code = QueryRetCode(errCode);
+    task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
+}
+
 bool GetPropertyValueByPropertyName(napi_env env, napi_value value, const char *propertyName, double &result)
 {
     napi_value propertyValue;

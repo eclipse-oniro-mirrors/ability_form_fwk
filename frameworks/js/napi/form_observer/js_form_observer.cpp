@@ -200,7 +200,7 @@ private:
         HILOG_DEBUG("call");
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
-            NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return CreateJsUndefined(env);
         }
 
@@ -473,7 +473,7 @@ private:
         HILOG_DEBUG("call");
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The application not system-app, can't use system-api");
-            NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return CreateJsUndefined(env);
         }
 
