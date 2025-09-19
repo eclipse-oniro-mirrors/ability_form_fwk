@@ -69,43 +69,38 @@ constexpr const char *EVENT_KEY_OCCURRENCE_TIME = "OCCURRENCE_TIME";
 constexpr const char *EVENT_KEY_STATUS = "STATUS";
 constexpr const char *FORM_RENDER_SERVICE_STATUS_ALTER = "FORM_RENDER_SERVICE_STATUS_ALTER";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
-    std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::DELETE_FORM, "DELETE_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::CASTTEMP_FORM, "CASTTEMP_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::ACQUIREFORMSTATE_FORM, "ACQUIREFORMSTATE_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::MESSAGE_EVENT_FORM, "MESSAGE_EVENT_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::ROUTE_EVENT_FORM, "ROUTE_EVENT_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::BACKGROUND_EVENT_FORM, "BACKGROUND_EVENT_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::RELEASE_FORM, "RELEASE_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::DELETE_INVALID_FORM, "DELETE_INVALID_FORM"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::SET_NEXT_REFRESH_TIME_FORM, "SET_NEXT_REFRESH_TIME_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::FORM_RENDER_BLOCK, "FORM_RENDER_BLOCK"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::INIT_FMS_FAILED, "INIT_FMS_FAILED"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::CALLEN_DB_FAILED, "CALLEN_DB_FAILED"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM_FAILED, "ADD_FORM_FAILED"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::FIRST_ADD_FORM_DURATION, "FIRST_ADD_FORM_DURATION"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::FIRST_UPDATE_FORM_DURATION, "FIRST_UPDATE_FORM_DURATION"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::UPDATE_FORM_REFRESH_TIMES, "UPDATE_FORM_REFRESH_TIMES"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::PROXY_UPDATE_FORM, "PROXY_UPDATE_FORM"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::INVALID_PUBLISH_FORM_TO_HOST, "INVALID_PUBLISH_FORM_TO_HOST"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::UNBIND_FORM_APP, "UNBIND_FORM_APP"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::CONDITION_UPDATE_FORM, "CONDITION_UPDATE_FORM"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::LOAD_STAGE_FORM_CONFIG_INFO, "LOAD_STAGE_FORM_CONFIG_INFO"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::DELETE_FORM_FAILED, "DELETE_FORM_FAILED"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::UPDATE_FORM_FAILED, "UPDATE_FORM_FAILED"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::RECYCLE_RECOVER_FORM_FAILED, "RECYCLE_RECOVER_FORM_FAILED"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_PUBLIC_FORM, "REQUEST_PUBLIC_FORM"),
-    std::map<FormEventName, std::string>::value_type(
-        FormEventName::CONNECT_FORM_ABILITY_FAILED, "CONNECT_FORM_ABILITY_FAILED"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::FORM_NODE_ERROR, "FORM_NODE_ERROR"),
+    {FormEventName::ADD_FORM, "ADD_FORM"},
+    {FormEventName::REQUEST_FORM, "REQUEST_FORM"},
+    {FormEventName::DELETE_FORM, "DELETE_FORM"},
+    {FormEventName::CASTTEMP_FORM, "CASTTEMP_FORM"},
+    {FormEventName::ACQUIREFORMSTATE_FORM, "ACQUIREFORMSTATE_FORM"},
+    {FormEventName::MESSAGE_EVENT_FORM, "MESSAGE_EVENT_FORM"},
+    {FormEventName::ROUTE_EVENT_FORM, "ROUTE_EVENT_FORM"},
+    {FormEventName::BACKGROUND_EVENT_FORM, "BACKGROUND_EVENT_FORM"},
+    {FormEventName::RELEASE_FORM, "RELEASE_FORM"},
+    {FormEventName::DELETE_INVALID_FORM, "DELETE_INVALID_FORM"},
+    {FormEventName::SET_NEXT_REFRESH_TIME_FORM, "SET_NEXT_REFRESH_TIME_FORM"},
+    {FormEventName::FORM_RENDER_BLOCK, "FORM_RENDER_BLOCK"},
+    {FormEventName::INIT_FMS_FAILED, "INIT_FMS_FAILED"},
+    {FormEventName::CALLEN_DB_FAILED, "CALLEN_DB_FAILED"},
+    {FormEventName::ADD_FORM_FAILED, "ADD_FORM_FAILED"},
+    {FormEventName::FIRST_ADD_FORM_DURATION, "FIRST_ADD_FORM_DURATION"},
+    {FormEventName::FIRST_UPDATE_FORM_DURATION, "FIRST_UPDATE_FORM_DURATION"},
+    {FormEventName::UPDATE_FORM_REFRESH_TIMES, "UPDATE_FORM_REFRESH_TIMES"},
+    {FormEventName::PROXY_UPDATE_FORM, "PROXY_UPDATE_FORM"},
+    {FormEventName::INVALID_PUBLISH_FORM_TO_HOST, "INVALID_PUBLISH_FORM_TO_HOST"},
+    {FormEventName::UNBIND_FORM_APP, "UNBIND_FORM_APP"},
+    {FormEventName::CONDITION_UPDATE_FORM, "CONDITION_UPDATE_FORM"},
+    {FormEventName::LOAD_STAGE_FORM_CONFIG_INFO, "LOAD_STAGE_FORM_CONFIG_INFO"},
+    {FormEventName::DELETE_FORM_FAILED, "DELETE_FORM_FAILED"},
+    {FormEventName::UPDATE_FORM_FAILED, "UPDATE_FORM_FAILED"},
+    {FormEventName::RECYCLE_RECOVER_FORM_FAILED, "RECYCLE_RECOVER_FORM_FAILED"},
+    {FormEventName::REQUEST_PUBLIC_FORM, "REQUEST_PUBLIC_FORM"},
+    {FormEventName::CONNECT_FORM_ABILITY_FAILED, "CONNECT_FORM_ABILITY_FAILED"},
+    {FormEventName::FORM_NODE_ERROR, "FORM_NODE_ERROR"},
+    {FormEventName::RELOAD_FORM_FAILED, "RELOAD_FORM_FAILED"},
+    {FormEventName::FORM_STATUS_ERROR, "FORM_STATUS_ERROR"},
+    {FormEventName::FORM_EVENT_QUEUE_OVER_LIMIT, "FORM_EVENT_QUEUE_OVER_LIMIT"},
 };
 }
 
@@ -434,6 +429,9 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_
         case FormEventName::RECYCLE_RECOVER_FORM_FAILED:
         case FormEventName::CONNECT_FORM_ABILITY_FAILED:
         case FormEventName::FORM_NODE_ERROR:
+        case FormEventName::RELOAD_FORM_FAILED:
+        case FormEventName::FORM_STATUS_ERROR:
+        case FormEventName::FORM_EVENT_QUEUE_OVER_LIMIT:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER, FORM_ERROR,
                 HiSysEventType::FAULT,

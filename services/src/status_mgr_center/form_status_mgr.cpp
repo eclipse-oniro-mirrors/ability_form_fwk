@@ -20,6 +20,7 @@
 #include "status_mgr_center/form_event_retry_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
+#include "form_event_report.h"
 #include "fms_log_wrapper.h"
 #include "form_status_print.h"
 
@@ -88,6 +89,12 @@ bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEve
     FormStatusMachineInfo info;
     if (!FormStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
         HILOG_ERROR("get form status info failed, formId:%{public}" PRId64, formId);
+        FormEventReport::SendFormFailedEvent(FormEventName::FORM_STATUS_ERROR,
+            formId,
+            "",
+            "",
+            static_cast<int32_t>(status),
+            static_cast<int32_t>(event));
         return false;
     }
 

@@ -68,7 +68,7 @@ public:
     /**
      * @brief Pop form event from queue
      * @param eventInfo Form event task information
-     * @return Returns true if the queue is empty, false otherwise
+     * @return Returns true if pop success, false otherwise
      */
     bool PopFormEvent(FormEventTaskInfo &eventInfo);
 
@@ -85,6 +85,8 @@ public:
     const std::queue<FormEventTaskInfo> &GetEventQueue();
 
 private:
+    bool ReportQueueOverLimit(const int64_t formId);
+
     std::mutex eventQueueMutex_;
     std::queue<FormEventTaskInfo> eventQueue_;
     int64_t formId_;

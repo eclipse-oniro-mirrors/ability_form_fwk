@@ -113,6 +113,10 @@ void FormRenderMgrInner::CheckIfFormRecycled(FormRecord &formRecord, Want& want)
     if (FormStatus::GetInstance().GetFormStatus(formRecord.formId) == FormFsmStatus::RECYCLED) {
         formRecord.lowMemoryRecycleStatus = LowMemoryRecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
+        if (!formRecord.isDynamic) {
+            HILOG_DEBUG("form %{public}" PRId64 " is static form", formRecord.formId);
+            return;
+        }
         std::string statusData;
         if (FormInfoRdbStorageMgr::GetInstance().LoadStatusData(
             std::to_string(formRecord.formId), statusData) != ERR_OK) {
