@@ -229,6 +229,9 @@ int FormMgrProxy::UpdateForm(const int64_t formId, const FormProviderData &FormP
         option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
+        if (error == ERR_APPEXECFWK_PARCEL_ERROR) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
@@ -985,6 +988,9 @@ int FormMgrProxy::SendTransactCmd(IFormMgr::Message code, MessageParcel &data,
     int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
     if (result != ERR_OK) {
         HILOG_ERROR("error to SendRequest:%{public}d,cmd:%{public}d", result, code);
+        if (result == ERR_APPEXECFWK_PARCEL_ERROR) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return ERR_OK;

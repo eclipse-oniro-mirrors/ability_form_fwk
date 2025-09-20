@@ -107,6 +107,7 @@ const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {
     { ERR_APPEXECFWK_FORM_INVALID_PARAM,   "" },
     { ERR_APPEXECFWK_FORM_INVALID_FORM_ID, "The formId is invalid." },
+    { ERR_APPEXECFWK_PARCEL_ERROR, "Data serialization exception." },
 };
 }
 FormErrors::FormErrors()
