@@ -37,6 +37,7 @@
 #include "nlohmann/json.hpp"
 #include "xcollie/watchdog.h"
 #include "dfx_dump_catcher.h"
+#include "form_render_service_mgr.h"
 
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
 
@@ -197,6 +198,7 @@ bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
             ++iter;
         }
     }
+    FormRenderServiceMgr::GetInstance().SetCriticalTrueOnFormActivity();
     return hostsMapForFormId_.empty();
 }
 

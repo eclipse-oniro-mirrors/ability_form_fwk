@@ -189,9 +189,6 @@ int32_t FormRenderServiceMgr::ProcessStopRenderingForm(
     }
     HILOG_INFO("connectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 
-    std::lock_guard<std::mutex> lock(renderRecordMutex_);
-    SetCriticalFalseOnAllFormInvisible();
-
     return ERR_OK;
 }
 
@@ -232,7 +229,6 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const Want &want)
 {
     HILOG_INFO("formId:%{public}" PRId64 ",compId:%{public}s,uid:%{public}s", formId, compId.c_str(), uid.c_str());
-    SetCriticalTrueOnFormActivity();
     if (formId <= 0 || compId.empty() || uid.empty()) {
         HILOG_ERROR("param invalid");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -260,8 +256,6 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
 
     FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
 
-    SetCriticalFalseOnAllFormInvisible();
-
     return ERR_OK;
 }
 
@@ -279,8 +273,6 @@ int32_t FormRenderServiceMgr::CleanFormHost(const sptr<IRemoteObject> &hostToken
             ++iter;
         }
     }
-
-    SetCriticalFalseOnAllFormInvisible();
 
     return ERR_OK;
 }
@@ -344,8 +336,6 @@ int32_t FormRenderServiceMgr::OnUnlock()
         }
     }
 
-    SetCriticalFalseOnAllFormInvisible();
-
     return ERR_OK;
 }
 
@@ -374,9 +364,6 @@ int32_t FormRenderServiceMgr::SetVisibleChange(const int64_t formId, bool isVisi
             return SET_VISIBLE_CHANGE_FAILED;
         }
         auto ret = search->second->SetVisibleChange(formId, isVisible);
-        if (!isVisible) {
-            SetCriticalFalseOnAllFormInvisible();
-        }
         if (ret != ERR_OK) {
             HILOG_ERROR("SetVisibleChange %{public}" PRId64 " failed.", formId);
             return ret;
@@ -423,9 +410,6 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
         return;
     }
     OnConfigurationUpdatedInner();
-
-    std::lock_guard<std::mutex> lock(renderRecordMutex_);
-    SetCriticalFalseOnAllFormInvisible();
 }
 
 void FormRenderServiceMgr::OnConfigurationUpdatedInner()
@@ -486,9 +470,6 @@ void FormRenderServiceMgr::RunCachedConfigurationUpdated()
     if (hasCachedConfig_) {
         SetCriticalTrueOnFormActivity();
         OnConfigurationUpdatedInner();
-
-        std::lock_guard<std::mutex> lock(renderRecordMutex_);
-        SetCriticalFalseOnAllFormInvisible();
     }
 }
 
