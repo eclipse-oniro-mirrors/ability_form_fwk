@@ -24,7 +24,7 @@ int ConvertStringToInt(const std::string &strInfo)
     return static_cast<int>(strtoll(strInfo.c_str(), nullptr, BASE_REQUEST_CODE_NUM));
 }
 
-ani_object createInt(ani_env *env, ani_int value)
+ani_object createInt(ani_env *env, int32_t value)
 {
     ani_class cls;
     ani_status status = ANI_ERROR;

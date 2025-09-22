@@ -50,7 +50,7 @@ constexpr int64_t MICROSECONDS = 1000000;
 
 int ConvertStringToInt(const std::string &strInfo);
 
-ani_object createInt(ani_env *env, ani_int value);
+ani_object createInt(ani_env *env, int32_t value);
 
 bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value);
 
