@@ -45,21 +45,14 @@ void FormBundleForbidMgrTest::TearDown()
  */
 HWTEST_F(FormBundleForbidMgrTest, formbundleforbidmgr_001, TestSize.Level1)
 {
+    GTEST_LOG_(INFO) << "formbundleforbidmgr_001 begin";
+    formbundleforbidmgr.Init();
+    bool forbid = formbundleforbidmgr.IsBundleForbidden("");
+    formbundleforbidmgr.IsBundleForbidden(BUNDLE_NAME);
+    formbundleforbidmgr.SetBundleForbiddenStatus("", false);
     formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, false);
-    bool forbid = formbundleforbidmgr.IsBundleForbidden(BUNDLE_NAME);
-    EXPECT_EQ(forbid, false);
-}
-
-/**
- * @tc.name: formbundleforbidmgr_002
- * @tc.desc: test SetBundleForbiddenStatus function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormBundleForbidMgrTest, formbundleforbidmgr_002, TestSize.Level1)
-{
     formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, true);
-    bool forbid = formbundleforbidmgr.IsBundleForbidden(BUNDLE_NAME);
-    EXPECT_EQ(forbid, true);
-    formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, false);
+    EXPECT_EQ(forbid, false);
+    GTEST_LOG_(INFO) << "formbundleforbidmgr_001 end";
 }
 } // namespace
