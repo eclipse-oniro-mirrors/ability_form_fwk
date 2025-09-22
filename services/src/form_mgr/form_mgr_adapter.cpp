@@ -3929,7 +3929,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     int callingUid = IPCSkeleton::GetCallingUid();
     bool needHandleCachedClick =
         want.GetBoolParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
-    FormDataMgr::GetInstance().SetExpectRecycledStatus(validFormIds, false);
+    FormDataMgr::GetInstance().SetExpectRecycledStatus(formIds, false);
     HILOG_INFO("recover by click: %{public}d", needHandleCachedClick);
     for (int64_t formId : formIds) {
         if (formId <= 0) {
