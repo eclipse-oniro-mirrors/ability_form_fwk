@@ -101,7 +101,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RENDERING = {
         FormFsmStatus::RENDERING,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::RENDERING,
-        FormFsmProcessType::ADD_TASK_TO_QUEUE_DELETE,
+        FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH,
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
     {
@@ -215,7 +215,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA = {
         FormFsmStatus::RECYCLING_DATA,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::RECYCLING_DATA,
-        FormFsmProcessType::ADD_TASK_TO_QUEUE_DELETE,
+        FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH,
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
     {
@@ -267,7 +267,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING = {
         FormFsmStatus::RECYCLING,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::RECYCLING,
-        FormFsmProcessType::ADD_TASK_TO_QUEUE_DELETE,
+        FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH,
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
     {
@@ -319,7 +319,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECOVERING = {
         FormFsmStatus::RECOVERING,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::RECOVERING,
-        FormFsmProcessType::ADD_TASK_TO_QUEUE_DELETE,
+        FormFsmProcessType::ADD_TASK_TO_QUEUE_PUSH,
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
     {
