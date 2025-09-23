@@ -1020,6 +1020,7 @@ void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType,
     if (formVisibleType == static_cast<int32_t>(formInstance.formVisiblity)) {
         return;
     }
+    std::lock_guard<std::mutex> lock(formObserversMutex_);
     for (auto formObserver : formObservers_) {
         if (formObserver.first == formHostName + specialFlag + std::to_string(isVisibility) ||
             formObserver.first == formAllHostName + specialFlag + std::to_string(isVisibility)) {
@@ -1043,7 +1044,12 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
 {
     HILOG_INFO("start, formVisibleType:%{public}d", formVisibleType);
     FilterDataByVisibleType(formInstanceMaps, eventMaps, formVisibleType);
-    for (auto formObserver : formObservers_) {
+    std::map<std::string, std::vector<sptr<IRemoteObject>>> formObserversTemp;
+    {
+        std::lock_guard<std::mutex> lock(formObserversMutex_);
+        formObserversTemp = formObservers_;
+    }
+    for (auto const &formObserver : formObserversTemp) {
         NotifyWhetherFormsVisible(formObserver.first, formObserver.second, formInstanceMaps, formVisibleType);
     }
     for (auto iter = eventMaps.begin(); iter != eventMaps.end(); iter++) {
@@ -1070,7 +1076,7 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
 }
 
 void FormMgrAdapter::NotifyWhetherFormsVisible(const std::string &bundleName,
-    std::vector<sptr<IRemoteObject>> &remoteObjects,
+    const std::vector<sptr<IRemoteObject>> &remoteObjects,
     std::map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType)
 {
     HILOG_DEBUG("bundleName:%{public}s, remoteObjects:%{public}d", bundleName.c_str(), (int)remoteObjects.size());
