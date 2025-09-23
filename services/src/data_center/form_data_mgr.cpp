@@ -383,7 +383,7 @@ std::map<Constants::FormLocation, int> GetLocationMap()
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     std::map<Constants::FormLocation, int> locationMap;
-    for (const auto& dbInfo : formDBInfos) {
+    for (const auto &dbInfo : formDBInfos) {
         if (locationMap.count(dbInfo.formLocation) == 0) {
             locationMap[dbInfo.formLocation] = 1;
         } else {
