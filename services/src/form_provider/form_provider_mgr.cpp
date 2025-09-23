@@ -41,7 +41,7 @@
 #include "form_mgr/form_mgr_queue.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "common/util/form_task_common.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

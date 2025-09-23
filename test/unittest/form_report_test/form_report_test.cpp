@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 #include "common/util/form_report.h"
 #include "want.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 
 using namespace testing::ext;
 using namespace OHOS;

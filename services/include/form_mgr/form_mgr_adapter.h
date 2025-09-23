@@ -1256,8 +1256,6 @@ private:
 
     void CancelAddFormRequestTimeOutTask(const int64_t formId, const int result);
 
-    AddFormResultErrorCode GetFormResultErrCode(const int64_t formId);
-
     ErrCode CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates);
 
     void RemoveFormIdMapElement(const int64_t formId);

@@ -29,7 +29,7 @@
 #include "ipc_skeleton.h"
 #include "json_serializer.h"
 #include "permission_verification.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "common_event.h"
 #include "common_event_manager.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"

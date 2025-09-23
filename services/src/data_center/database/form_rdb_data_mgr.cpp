@@ -25,7 +25,7 @@
 #include "form_mgr_errors.h"
 #include "common/util/form_util.h"
 #include "common/util/scope_guard.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -78,7 +78,7 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnOpen(NativeRdb::RdbStore &rdbStor
 int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFile)
 {
     FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-        static_cast<int64_t>(CallDbFiledErrorType::DATABASE_EXIT_ABNORMAL));
+        static_cast<int64_t>(CallDbFailedErrorType::DATABASE_EXIT_ABNORMAL));
     return NativeRdb::E_OK;
 }
 
@@ -718,7 +718,7 @@ ErrCode FormRdbDataMgr::LoadRdbStore()
     if (errCode != NativeRdb::E_OK) {
         HILOG_ERROR("Form rdb store init fail, err code is %{public}" PRId32 "", errCode);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFiledErrorType::DATABASE_RESET_CONNECT_FAILED));
+            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_RESET_CONNECT_FAILED));
         rdbStore_ = nullptr;
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }

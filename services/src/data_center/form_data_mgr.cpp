@@ -38,7 +38,7 @@
 #include "js_form_state_observer_interface.h"
 #include "running_form_info.h"
 #include "data_center/form_record/form_record_report.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "common/util/form_task_common.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "status_mgr_center/form_status.h"
@@ -371,7 +371,7 @@ int FormDataMgr::CheckTempEnoughForm() const
     if (GetTempFormCount() >= maxTempSize) {
         HILOG_WARN("already exist %{public}d temp forms in system", maxTempSize);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
-            static_cast<int32_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT),
+            static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
             ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
     }
@@ -410,7 +410,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     if (formDbInfoSize >= maxFormsSize) {
         HILOG_WARN("exceeds max form number %{public}d", maxFormsSize);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
-            static_cast<int32_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT),
+            static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
             ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }

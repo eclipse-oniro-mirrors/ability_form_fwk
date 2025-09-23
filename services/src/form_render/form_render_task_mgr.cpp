@@ -20,7 +20,7 @@
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
 #include "form_render/form_render_queue.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_record/form_record.h"
 

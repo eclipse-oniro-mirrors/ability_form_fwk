@@ -14,7 +14,7 @@
  */
 
 #include "feature/memory_mgr/form_render_report.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "common/util/form_util.h"
 #include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
