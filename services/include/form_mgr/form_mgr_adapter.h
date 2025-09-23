@@ -1230,7 +1230,7 @@ private:
      * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
      */
     void NotifyWhetherFormsVisible(const std::string &bundleName,
-        std::vector<sptr<IRemoteObject>> &remoteObjects,
+        const std::vector<sptr<IRemoteObject>> &remoteObjects,
         std::map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType);
 
     /**
