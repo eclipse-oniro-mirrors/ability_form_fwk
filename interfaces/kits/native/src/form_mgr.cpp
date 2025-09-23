@@ -92,11 +92,13 @@ int FormMgr::AddForm(
     errCode = remoteProxy_->AddForm(formId, want, callerToken, formInfo);
     if (errCode != ERR_OK && errCode != ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS &&
         errCode != ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS) {
+        std::string eventBundleName = want.GetElement().GetBundleName();
+        std::string eventFormName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
+        HILOG_ERROR("add form failed, formId:%{public}ld, bundleName:%{public}s, formName:%{public}s",
+            formId, eventBundleName.c_str(), eventFormName.c_str());
         // The fault of card quantity exceeds the limit is not reported here
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
-            formInfo.formId,
-            formInfo.bundleName,
-            formInfo.formName,
+            formId, eventBundleName, eventFormName,
             static_cast<int32_t>(AddFormFailedErrorType::ADD_FORM_FAILED),
             errCode);
     }
