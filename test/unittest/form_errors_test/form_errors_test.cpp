@@ -47,7 +47,7 @@ HWTEST_F(FormErrorsTest, FormErrors_GetErrorMessage_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormErrors_GetErrorMessage_001 starts";
     FormErrors formErrors;
     std::string ret = formErrors.GetErrorMessage(ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
-    EXPECT_EQ(ret, "can't get form info by the formName.");
+    EXPECT_EQ(ret, "Failed to obtain the configuration information.");
     GTEST_LOG_(INFO) << "FormErrors_GetErrorMessage_001 ends";
 }
 
@@ -62,7 +62,7 @@ HWTEST_F(FormErrorsTest, FormErrors_GetErrorMessage_002, TestSize.Level1) {
     FormErrors formErrors;
     int errCode = -1;
     std::string ret = formErrors.GetErrorMessage(errCode);
-    EXPECT_EQ(ret, "some internal server error occurs.");
+    EXPECT_EQ(ret, "An internal functional error occurred.");
     GTEST_LOG_(INFO) << "FormErrors_GetErrorMessage_002 ends";
 }
 
@@ -107,7 +107,7 @@ HWTEST_F(FormErrorsTest, FormErrors_QueryExternalErrorMessage_001, TestSize.Leve
     GTEST_LOG_(INFO) << "FormErrors_QueryExternalErrorMessage_001 starts";
     FormErrors formErrors;
     std::string ret = formErrors.QueryExternalErrorMessage(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, ERR_OK);
-    EXPECT_EQ(ret, "success The formId is invalid.");
+    EXPECT_EQ(ret, "The formId is invalid.");
     GTEST_LOG_(INFO) << "FormErrors_QueryExternalErrorMessage_001 ends";
 }
 

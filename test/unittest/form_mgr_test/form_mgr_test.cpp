@@ -1112,7 +1112,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0053, TestSize.Level1) {
     int errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
     auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
 
-    EXPECT_EQ(result, "some internal server error occurs.");
+    EXPECT_EQ(result, "An internal functional error occurred.");
     GTEST_LOG_(INFO) << "FormMgrTest_0053 test ends";
 }
 
