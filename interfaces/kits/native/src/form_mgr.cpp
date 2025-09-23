@@ -94,7 +94,7 @@ int FormMgr::AddForm(
         errCode != ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS) {
         std::string eventBundleName = want.GetElement().GetBundleName();
         std::string eventFormName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-        HILOG_ERROR("add form failed, formId:%{public}ld, bundleName:%{public}s, formName:%{public}s",
+        HILOG_ERROR("add form failed, formId:%{public}lld, bundleName:%{public}s, formName:%{public}s",
             formId, eventBundleName.c_str(), eventFormName.c_str());
         // The fault of card quantity exceeds the limit is not reported here
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,

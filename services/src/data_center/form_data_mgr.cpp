@@ -387,7 +387,7 @@ std::map<Constants::FormLocation, int> GetLocationMap()
         if (locationMap.count(dbInfo.formLocation) == 0) {
             locationMap[dbInfo.formLocation] = 1;
         } else {
-            locationMap[dbInfo.formLocation] = locationMap[dbInfo.formLocation] + 1;
+            locationMap[dbInfo.formLocation] = locationMap[dbInfo.formLocation]++;
         }
     }
     return locationMap;
@@ -426,7 +426,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
         std::map<Constants::FormLocation, int> locationMap = GetLocationMap();
         Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
         int maxCount = 0;
-        for (auto &location : locationMap) {
+        for (const auto &location : locationMap) {
             HILOG_WARN("location:%{public}hhd-count:%{public}d", location.first, location.second);
             if (location.second > maxCount) {
                 maxCount = location.second;
