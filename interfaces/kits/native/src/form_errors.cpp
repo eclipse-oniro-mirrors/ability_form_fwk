@@ -283,7 +283,7 @@ std::string FormErrors::GetErrorMessage(int internalErrorCode)
     if (iter != FORM_ERROR_CODES.end() && !iter->second.detailMsg.empty()) {
         return iter->second.detailMsg;
     }
-    return FORM_ERROR_CODES.at(ERR_APPEXECFWK_FORM_COMMON_CODE).detailMsg;
+    return GetErrorMsgByExternalErrorCode(QueryExternalErrorCode(internalErrorCode));
 }
 
 /**
