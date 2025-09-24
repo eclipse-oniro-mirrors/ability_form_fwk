@@ -47,6 +47,12 @@ public:
     void GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos);
 
     /**
+     * @brief Get all location data from DbCache.
+     * @return all location data map
+     */
+    std::map<Constants::FormLocation, int> GetLocationMap();
+
+    /**
      * @brief Get all form data size from DbCache.
      * @return Returns form data size.
      */

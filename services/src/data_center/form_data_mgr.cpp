@@ -378,21 +378,6 @@ int FormDataMgr::CheckTempEnoughForm() const
     return ERR_OK;
 }
 
-std::map<Constants::FormLocation, int> GetLocationMap()
-{
-    std::vector<FormDBInfo> formDBInfos;
-    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
-    std::map<Constants::FormLocation, int> locationMap;
-    for (const auto &dbInfo : formDBInfos) {
-        if (locationMap.count(dbInfo.formLocation) == 0) {
-            locationMap[dbInfo.formLocation] = 1;
-        } else {
-            locationMap[dbInfo.formLocation] = locationMap[dbInfo.formLocation]++;
-        }
-    }
-    return locationMap;
-}
-
 /**
  * @brief Check form count is max.
  * @param callingUid The UID of the proxy.
@@ -423,17 +408,16 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     const auto formDbInfoSize = FormDbCache::GetInstance().GetAllFormInfoSize();
     HILOG_INFO("already use %{public}d forms by userId", formDbInfoSize);
     if (formDbInfoSize >= maxFormsSize) {
-        std::map<Constants::FormLocation, int> locationMap = GetLocationMap();
+        std::map<Constants::FormLocation, int> locationMap = FormDbCache::GetInstance().GetLocationMap();
         Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
         int maxCount = 0;
         for (const auto &location : locationMap) {
-            HILOG_WARN("location:%{public}hhd-count:%{public}d", location.first, location.second);
             if (location.second > maxCount) {
                 maxCount = location.second;
                 maxLocation = location.first;
             }
         }
-        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}hhd-maxCount:%{public}d",
+        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}hhd, maxCount:%{public}d",
             maxFormsSize, maxLocation, maxCount);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
             static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
