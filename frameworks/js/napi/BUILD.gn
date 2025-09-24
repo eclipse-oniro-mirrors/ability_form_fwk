@@ -982,6 +982,7 @@ ohos_shared_library("live_form_extension_module") {
     "ability_base:configuration",
     "ability_base:session_info",
     "ability_base:want",
+    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:abilitykit_native",
     "ability_runtime:appkit_native",
     "ability_runtime:extensionkit_native",
