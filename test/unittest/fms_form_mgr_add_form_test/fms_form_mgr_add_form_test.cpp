@@ -292,7 +292,8 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_002, TestSize.Level0)
     record1.SetFormName(PARAM_FORM_NAME);
     record1.SetSpecificationId(PARAM_FORM_DIMENSION_VALUE);
     record1.SetTemporaryFlag(false);
-    FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid, userId);
     retFormRec.updateAtHour = 1;
     retFormRec.updateAtMin = 1;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
@@ -382,6 +383,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
     record1.formUserUids.emplace_back(callingUid);
     record1.formTempFlag = false;
     record1.providerUserId = 100;
+    record1.userId = FormUtil::GetCallerUserId(DEFAULT_CALLING_UID);
     FormDBInfo formDBInfo(formId, record1);
     FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
     // Set form host record
@@ -566,7 +568,8 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_006, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _))
         .Times(testing::AnyNumber()).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     MockGetCallingUid(DEFAULT_CALLING_UID);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+        FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId);

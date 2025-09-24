@@ -1979,5 +1979,13 @@ void FormUtil::GetActiveUsers(std::vector<int32_t> &activeList)
         return;
     }
 }
+
+int32_t FormUtil::GetCallerUserId(const int callingUid)
+{
+    // get caller userId
+    int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->GetOsAccountLocalIdFromUid(callingUid, userId);
+    return userId;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -72,7 +72,6 @@
 #include "iservice_registry.h"
 #include "js_form_state_observer_interface.h"
 #include "nlohmann/json.hpp"
-#include "os_account_manager.h"
 #include "parameters.h"
 #include "system_ability_definition.h"
 #include "form_event_report.h"
@@ -305,7 +304,7 @@ FormRecord FormMgrAdapter::AllotThemeRecord(const Want &want, int64_t formId)
     formInfo.SetIsThemeForm(true);
 
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t currentUserId = GetCurrentUserId(callingUid);
+    int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
     return FormDataMgr::GetInstance().AllotFormRecord(formInfo, callingUid, currentUserId);
 }
 #endif
@@ -324,7 +323,7 @@ ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &wa
     } else {
         if (formId == 0) {
             // get current userId
-            int32_t currentUserId = GetCurrentUserId(callingUid);
+            int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
             checkCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, currentUserId);
         }
     }
@@ -1231,7 +1230,7 @@ int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
     }
 
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     int checkCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, userId);
     if (checkCode != 0) {
         HILOG_ERROR("%{public}" PRId64 " failed,because if too mush forms", matchedFormId);
@@ -1614,11 +1613,11 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
         HILOG_ERROR("the specified form id does not exist in caller. formId:%{public}s",
             std::to_string(formId).c_str());
-        return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    int32_t currentUserId = GetCurrentUserId(callingUid);
-    if (hasRecord && (record.providerUserId == currentUserId)) {
+    int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
+    if (hasRecord && (record.userId == currentUserId)) {
         if (!info.IsMatch(record)) {
             HILOG_ERROR("formId and item info not match:%{public}" PRId64 "", formId);
             return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
@@ -1629,8 +1628,13 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     // find in db but not in cache
     FormRecord dbRecord;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
-    if (getDbRet == ERR_OK && (dbRecord.providerUserId == currentUserId)) {
-        return AddNewFormRecord(info, formId, callerToken, wholeWantParams, formInfo);
+    if (getDbRet == ERR_OK) {
+        if (dbRecord.userId == currentUserId) {
+            return AddNewFormRecord(info, formId, callerToken, wholeWantParams, formInfo);
+        } else {
+            HILOG_ERROR("the form id does not belong to callerUser. formId:%{public}" PRId64, formId);
+            return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+        }
     }
 
     HILOG_INFO("no such formId:%{public}" PRId64, formId);
@@ -1747,7 +1751,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     }
 
     // get current userId
-    int32_t currentUserId = GetCurrentUserId(callingUid);
+    int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
     // set formRecord want;
@@ -1953,7 +1957,7 @@ ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundl
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    int32_t currentUserId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    int32_t currentUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, currentUserId, bundleInfo);
     if (errCode != ERR_OK) {
         HILOG_ERROR("get bundleInfo failed");
@@ -1990,7 +1994,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     }
 
     std::vector<FormInfo> formInfos {};
-    int32_t userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
@@ -2284,7 +2288,7 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
     AppExecFwk::ExtensionAbilityInfo formExtensionAbilityInfo;
 
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
 
     std::string action = Constants::FORM_PUBLISH_ACTION;
     if (!wantToHost.GetAction().empty()) {
@@ -2414,7 +2418,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     }
 
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetAction(Constants::FORM_PUBLISH_ACTION);
 
@@ -2466,7 +2470,7 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
 {
     Want wantToHost(want);
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     wantToHost.SetParam(Constants::PARAM_FORM_USER_ID, userId);
 
     int32_t pageRouterServiceCode = want.GetIntParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, -1);
@@ -2620,7 +2624,7 @@ ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want 
     if (isTemporary) {
         errCode = FormDataMgr::GetInstance().CheckTempEnoughForm();
     } else {
-        int32_t currentUserId = GetCurrentUserId(callingUid);
+        int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
         errCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, currentUserId);
     }
     if (errCode != ERR_OK) {
@@ -2654,7 +2658,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     }
 
     // get current userId
-    int32_t currentUserId = GetCurrentUserId(callingUid);
+    int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid, currentUserId);
     if (formProviderData != nullptr) {
@@ -2779,7 +2783,7 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         int callingUid = IPCSkeleton::GetCallingUid();
-        int32_t userId = GetCurrentUserId(callingUid);
+        int32_t userId = FormUtil::GetCallerUserId(callingUid);
         DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
             record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_CLICKED);
         DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
@@ -2862,7 +2866,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         int32_t callingUid = IPCSkeleton::GetCallingUid();
-        int32_t userId = GetCurrentUserId(callingUid);
+        int32_t userId = FormUtil::GetCallerUserId(callingUid);
         DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
             record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_CLICKED);
         DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
@@ -3083,14 +3087,6 @@ bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr>
     }
 
     return true;
-}
-
-int32_t FormMgrAdapter::GetCurrentUserId(const int callingUid)
-{
-    // get current userId
-    int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
-    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
-    return userId;
 }
 
 int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
@@ -3321,7 +3317,7 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
     }
 
     auto action = Constants::FORM_PUBLISH_ACTION;
-    auto userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    auto userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo)) {
@@ -3784,7 +3780,7 @@ int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
 
     AppExecFwk::ApplicationInfo callerAppInfo;
     auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
-    auto userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    auto userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     bool getCallerResult = IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName, flag, userId, callerAppInfo));
     if (!getCallerResult) {
         HILOG_ERROR("Get callerAppInfo failed");
@@ -4618,7 +4614,7 @@ ErrCode FormMgrAdapter::GetFormInfoByFormRecord(const FormRecord &record, FormIn
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::vector<FormInfo> formInfos {};
-    int32_t userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(record.bundleName, record.moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {

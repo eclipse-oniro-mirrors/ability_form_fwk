@@ -88,11 +88,14 @@ extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
 extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
 extern void MockGetRunningFormInfos(int32_t mockRet);
 extern void MockGenerateFormId(bool mockRet);
+extern void MockGetCallingUid(int32_t mockRet);
 void MockRequestPublishFormToHost(bool mockRet);
 void MockCheckBundlePermission(bool mockRet);
 void MockIsCaller(bool mockRet);
 
 namespace {
+constexpr int32_t DEFAULT_CALLING_UID = 20000001;
+
 class FmsFormMgrAdapterTest2 : public testing::Test {
 public:
     void SetUp();
@@ -562,6 +565,8 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0140, TestSize.Level0)
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsTemp(false);
+    MockGetFormRecordParamsUid(false);
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     EXPECT_EQ(
         ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0140 end";

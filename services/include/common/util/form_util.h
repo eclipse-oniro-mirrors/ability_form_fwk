@@ -175,6 +175,13 @@ public:
     static bool IsActiveUser(const int32_t userId);
 
     static void GetActiveUsers(std::vector<int32_t> &activeList);
+
+    /**
+     * @brief Get caller user ID.
+     * @param callingUid calling Uid.
+     * @return Returns user ID.
+     */
+    static int32_t GetCallerUserId(const int callingUid);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

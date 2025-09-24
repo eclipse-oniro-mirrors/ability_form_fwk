@@ -52,9 +52,12 @@ extern void MockGetFormRecord(bool mockRet);
 extern void MockGetFormRecordParams(bool mockRet);
 extern void MockGetFormRecordParamsUid(bool mockRet);
 extern void MockSceneAnimationCheck(OHOS::ErrCode mockRet);
+extern void MockGetCallingUid(int32_t mockRet);
 
 namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
+constexpr int32_t DEFAULT_CALLING_UID = 20000001;
+
 class FmsFormMgrAdapterTest3 : public testing::Test {
 public:
     FormItemInfo* formItemInfo_;
@@ -701,82 +704,92 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0278_0, TestSize.Level1)
  * @tc.desc: test AllotForm function.
  * @tc.type: FUNC
  */
- HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level1)
- {
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0275 start";
-     FormMgrAdapter formMgrAdapter;
-     int64_t formId = 0;
-     Want want;
-     // Set up Want parameters for share form
-     want.SetParam(Constants::KEY_DIRECT_CALL_INAPP, true);
-     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 0;
+    Want want;
+    // Set up Want parameters for share form
+    want.SetParam(Constants::KEY_DIRECT_CALL_INAPP, true);
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
 
-     // Set up FormItemInfo
-     formItemInfo_->SetProviderBundleName("providerBundle");
-     formItemInfo_->SetHostBundleName("hostBundle");
-     formItemInfo_->SetTransparencyEnabled(false);
+    // Set up FormItemInfo
+    formItemInfo_->SetProviderBundleName("providerBundle");
+    formItemInfo_->SetHostBundleName("hostBundle");
+    formItemInfo_->SetTransparencyEnabled(false);
 
-     // Call the method under test
-     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+    // Call the method under test
+    ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
 
-     // Verify the result
-     EXPECT_EQ(ret, 2293761);
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0275 end";
- }
+    // Verify the result
+    EXPECT_EQ(ret, 2293761);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 end";
+}
 
- /**
-  * @tc.name: FormMgrAdapter_0276
-  * @tc.desc: test AllotForm function.
-  * @tc.type: FUNC
-  */
- HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0276, TestSize.Level1)
- {
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0276 start";
-     FormMgrAdapter formMgrAdapter;
-     int64_t formId = 123;
-     Want want;
-     // Set up Want parameters for specific form
-     want.SetParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, true);
+/**
+ * @tc.name: FormMgrAdapter_0276
+ * @tc.desc: test AllotForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0276, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0276 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 123;
+    Want want;
+    // Set up Want parameters for specific form
+    want.SetParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, true);
 
-     // Set up FormItemInfo
-     formItemInfo_->SetProviderBundleName("providerBundle");
-     formItemInfo_->SetHostBundleName("hostBundle");
-     formItemInfo_->SetTransparencyEnabled(false);
+    // Set up FormItemInfo
+    formItemInfo_->SetProviderBundleName("providerBundle");
+    formItemInfo_->SetHostBundleName("hostBundle");
+    formItemInfo_->SetTransparencyEnabled(false);
 
-     // Call the method under test
-     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockGetFormRecordParamsUid(false);
+    MockGetCallingUid(DEFAULT_CALLING_UID);
 
-     // Verify the result
-     EXPECT_EQ(ret, 2293780);
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0276 end";
- }
+    // Call the method under test
+    ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
 
- /**
-  * @tc.name: FormMgrAdapter_0277
-  * @tc.desc: test AllotForm function.
-  * @tc.type: FUNC
-  */
- HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
- {
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0277 start";
-     FormMgrAdapter formMgrAdapter;
-     int64_t formId = 456;
-     Want want;
-     // Set up Want parameters for non-specific form
-     want.SetParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
+    // Verify the result
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0276 end";
+}
 
-     // Set up FormItemInfo
-     formItemInfo_->SetProviderBundleName("providerBundle");
-     formItemInfo_->SetHostBundleName("hostBundle");
-     formItemInfo_->SetTransparencyEnabled(false);
+/**
+ * @tc.name: FormMgrAdapter_0277
+ * @tc.desc: test AllotForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0277 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 456;
+    Want want;
+    // Set up Want parameters for non-specific form
+    want.SetParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
 
-     // Call the method under test
-     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+    // Set up FormItemInfo
+    formItemInfo_->SetProviderBundleName("providerBundle");
+    formItemInfo_->SetHostBundleName("hostBundle");
+    formItemInfo_->SetTransparencyEnabled(false);
 
-     // Verify the result
-     EXPECT_EQ(ret, 2293780);
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0277 end";
- }
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockGetFormRecordParamsUid(false);
+    MockGetCallingUid(DEFAULT_CALLING_UID);
+
+    // Call the method under test
+    ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+
+    // Verify the result
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0277 end";
+}
 
  /**
   * @tc.name: FormMgrAdapter_0278
