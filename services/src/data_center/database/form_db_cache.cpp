@@ -159,11 +159,10 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 
 /**
  * @brief Get all location data from DbCache.
- * @return all location data map
+ * @param locationMap all location data map
  */
-std::map<Constants::FormLocation, int> FormDbCache::GetLocationMap()
+void FormDbCache::GetLocationMap(std::map<Constants::FormLocation, int> &locationMap)
 {
-    std::map<Constants::FormLocation, int> locationMap;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (const auto& dbInfo : formDBInfos_) {
         if (locationMap.count(dbInfo.formLocation) == 0) {
@@ -172,7 +171,6 @@ std::map<Constants::FormLocation, int> FormDbCache::GetLocationMap()
             ++locationMap[dbInfo.formLocation];
         }
     }
-    return locationMap;
 }
 
 /**

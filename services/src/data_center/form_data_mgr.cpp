@@ -408,7 +408,8 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     const auto formDbInfoSize = FormDbCache::GetInstance().GetAllFormInfoSize();
     HILOG_INFO("already use %{public}d forms by userId", formDbInfoSize);
     if (formDbInfoSize >= maxFormsSize) {
-        std::map<Constants::FormLocation, int> locationMap = FormDbCache::GetInstance().GetLocationMap();
+        std::map<Constants::FormLocation, int> locationMap;
+        FormDbCache::GetInstance().GetLocationMap(locationMap);
         Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
         int maxCount = 0;
         for (const auto &location : locationMap) {

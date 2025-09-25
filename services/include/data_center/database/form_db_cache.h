@@ -48,9 +48,9 @@ public:
 
     /**
      * @brief Get all location data from DbCache.
-     * @return all location data map
+     * @param locationMap all location data map
      */
-    std::map<Constants::FormLocation, int> GetLocationMap();
+    void GetLocationMap(std::map<Constants::FormLocation, int> &locationMap);
 
     /**
      * @brief Get all form data size from DbCache.
