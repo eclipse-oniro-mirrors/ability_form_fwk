@@ -23,6 +23,7 @@
 #include "status_mgr_center/form_event_retry_mgr.h"
 #include "status_mgr_center/form_status.h"
 #undef private
+#include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_status_print.h"
 
@@ -291,5 +292,34 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_FormEventToString, TestSize.Level0
     EXPECT_EQ(event, "[RENDER_FORM]");
  
     GTEST_LOG_(INFO) << "FormStatusMgrTest_FormEventToString end";
+}
+
+/**
+ * @tc.name: FormStatusMgrTest_ReportStatusInfoError
+ * @tc.desc: Verify ReportStatusInfoError func
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_ReportStatusInfoError, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_ReportStatusInfoError start";
+
+    int64_t formId = 1;
+    FormFsmStatus status = FormFsmStatus::RENDERED;
+    FormFsmEvent event = FormFsmEvent::RENDER_FORM;
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+
+    bool ret = FormStatusMgr::GetInstance().ReportStatusInfoError(formId, status, event);
+    EXPECT_EQ(ret, false);
+
+    FormItemInfo formInfo;
+    formInfo.SetFormId(formId);
+    formInfo.SetProviderBundleName("bundleName");
+    formInfo.SetFormName("formName");
+    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formInfo, 100, 100);
+    EXPECT_EQ(formId, formRecord.formId);
+    ret = FormStatusMgr::GetInstance().ReportStatusInfoError(formId, status, event);
+    EXPECT_EQ(ret, true);
+
+    GTEST_LOG_(INFO) << "FormStatusMgrTest_ReportStatusInfoError end";
 }
 }  // namespace

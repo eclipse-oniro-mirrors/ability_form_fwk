@@ -168,6 +168,15 @@ private:
      */
     void DeleteFormEventQueue(const int64_t formId);
 
+    /**
+     * @brief When obtaining the status table information fails, report the current status and the received event.
+     * @param formId Form ID
+     * @param status Form state machine current status
+     * @param event Form state machine received event
+     * @return true if the report success, false otherwise
+     */
+    bool ReportStatusInfoError(const int64_t formId, const FormFsmStatus status, const FormFsmEvent event);
+
     // <formId, formEventQueue>
     std::shared_mutex formEventQueueMutex_;
     std::unordered_map<int64_t, std::shared_ptr<FormEventQueue>> formEventQueueMap_;
