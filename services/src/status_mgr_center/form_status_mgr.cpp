@@ -89,12 +89,7 @@ bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEve
     FormStatusMachineInfo info;
     if (!FormStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
         HILOG_ERROR("get form status info failed, formId:%{public}" PRId64, formId);
-        FormEventReport::SendFormFailedEvent(FormEventName::FORM_STATUS_ERROR,
-            formId,
-            "",
-            "",
-            static_cast<int32_t>(status),
-            static_cast<int32_t>(event));
+        (void)FormStatusMgr::GetInstance().ReportStatusInfoError(formId, status, event);
         return false;
     }
 
@@ -344,6 +339,23 @@ void FormStatusMgr::DeleteFormEventId(const int64_t formId)
         HILOG_INFO("formId:%{public}" PRId64 ". ", formId);
         formEventIdMap_.erase(iter);
     }
+}
+
+bool FormStatusMgr::ReportStatusInfoError(const int64_t formId, const FormFsmStatus status, const FormFsmEvent event)
+{
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("not exist form:%{public}" PRId64, formId);
+        return false;
+    }
+
+    FormEventReport::SendFormFailedEvent(FormEventName::FORM_STATUS_ERROR,
+        formId,
+        formRecord.bundleName,
+        formRecord.formName,
+        static_cast<int32_t>(status),
+        static_cast<int32_t>(event));
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
