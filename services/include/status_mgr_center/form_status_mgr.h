@@ -171,8 +171,8 @@ private:
     /**
      * @brief When obtaining the status table information fails, report the current status and the received event.
      * @param formId Form ID
-     * @param status FSM current status
-     * @param event FSM received event
+     * @param status Form state machine current status
+     * @param event Form state machine received event
      * @return True if the report success, false otherwise
      */
     bool ReportStatusInfoError(const int64_t formId, const FormFsmStatus status, const FormFsmEvent event);
