@@ -117,11 +117,6 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         HILOG_INFO("bundle update, formName:%{public}s, moduleName:%{public}s, isDistributedForm:%{public}d, "
             "isBundleDistributed:%{public}d, formId:%{public}" PRId64, formRecord.formName.c_str(),
             formRecord.moduleName.c_str(), formRecord.isDistributedForm, isBundleDistributed, formId);
-        if (bundleInfo.versionCode == formRecord.versionCode && formRecord.isDistributedForm == isBundleDistributed) {
-            HILOG_WARN("form: %{public}s, versionCode is same and no package format change. formId:%{public}" PRId64,
-                       formRecord.formName.c_str(), formId);
-            continue;
-        }
 
         if (ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo)) {
             updatedForms.emplace_back(formRecord);
