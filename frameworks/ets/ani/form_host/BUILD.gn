@@ -15,7 +15,7 @@ import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-ohos_shared_library("formProvider_ani") {
+ohos_shared_library("formHost_ani") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -28,7 +28,7 @@ ohos_shared_library("formProvider_ani") {
   ]
 
   sources = [
-    "src/ets_form_provider.cpp",
+    "src/ets_form_host.cpp",
     "${form_fwk_path}/frameworks/ets/ani/common/src/ani_helpers.cpp"
   ]
 
@@ -42,28 +42,31 @@ ohos_shared_library("formProvider_ani") {
     "ability_runtime:extensionkit_native",
     "ability_runtime:runtime",
     "ability_runtime:ani_common",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
+    "ipc:ipc_single",
+    "access_token:libtokenid_sdk"
   ]
 
   subsystem_name = "ability"
   part_name = "form_fwk"
 }
 
-generate_static_abc("formProvider") {
+generate_static_abc("formHost") {
   base_url = "./ets"
-  files = [ "./ets/@ohos.app.form.formProvider.ets" ]
+  files = [ "./ets/@ohos.app.form.formHost.ets" ]
 
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/formProvider.abc"
+  device_dst_file = "/system/framework/formHost.abc"
 }
 
-ohos_prebuilt_etc("form_provider_etc") {
-  source = "$target_out_dir/formProvider.abc"
-  deps = [ ":formProvider" ]
+ohos_prebuilt_etc("form_host_etc") {
+  source = "$target_out_dir/formHost.abc"
+  deps = [ ":formHost" ]
   module_install_dir = "framework"
   subsystem_name = "ability"
   part_name = "form_fwk"

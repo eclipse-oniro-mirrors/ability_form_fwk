@@ -10,32 +10,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import("//build/config/components/ets_frontend/ets2abc_config.gni")
-import("//build/ohos.gni")
+import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-ohos_shared_library("formProvider_ani") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
+# ohos_unittest is a template that will add gtest as deps.
+ohos_unittest("FormAniHelpersTest") {
+  module_out_path = "form_fwk/form_ani_helpers"
 
-  include_dirs = [
-    "${form_fwk_path}/interfaces/kits/native/include",
-    "../common/include"
-  ]
+  include_dirs = [ "${form_fwk_path}/frameworks/ets/ani/common/include" ]
 
   sources = [
-    "src/ets_form_provider.cpp",
+    "form_ani_helpers_test.cpp",
     "${form_fwk_path}/frameworks/ets/ani/common/src/ani_helpers.cpp"
   ]
 
-  deps = [ 
+  deps = [
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-   ]
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -43,28 +35,14 @@ ohos_shared_library("formProvider_ani") {
     "ability_runtime:runtime",
     "ability_runtime:ani_common",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
+    "googletest:gtest_main",
   ]
-
-  subsystem_name = "ability"
-  part_name = "form_fwk"
 }
 
-generate_static_abc("formProvider") {
-  base_url = "./ets"
-  files = [ "./ets/@ohos.app.form.formProvider.ets" ]
-
-  is_boot_abc = "True"
-  device_dst_file = "/system/framework/formProvider.abc"
-}
-
-ohos_prebuilt_etc("form_provider_etc") {
-  source = "$target_out_dir/formProvider.abc"
-  deps = [ ":formProvider" ]
-  module_install_dir = "framework"
-  subsystem_name = "ability"
-  part_name = "form_fwk"
+group("unittest") {
+  testonly = true
+  deps = [ ":FormAniHelpersTest" ]
 }
