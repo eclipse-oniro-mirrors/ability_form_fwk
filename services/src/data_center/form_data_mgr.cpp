@@ -408,7 +408,18 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     const auto formDbInfoSize = FormDbCache::GetInstance().GetAllFormInfoSize();
     HILOG_INFO("already use %{public}d forms by userId", formDbInfoSize);
     if (formDbInfoSize >= maxFormsSize) {
-        HILOG_WARN("exceeds max form number %{public}d", maxFormsSize);
+        std::map<Constants::FormLocation, int> locationMap;
+        FormDbCache::GetInstance().GetLocationMap(locationMap);
+        Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
+        int maxCount = 0;
+        for (const auto &location : locationMap) {
+            if (location.second > maxCount) {
+                maxCount = location.second;
+                maxLocation = location.first;
+            }
+        }
+        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}hhd, maxCount:%{public}d",
+            maxFormsSize, maxLocation, maxCount);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
             static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
             ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS);
