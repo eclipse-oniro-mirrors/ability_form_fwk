@@ -173,7 +173,7 @@ private:
      * @param formId Form ID
      * @param status Form state machine current status
      * @param event Form state machine received event
-     * @return True if the report success, false otherwise
+     * @return true if the report success, false otherwise
      */
     bool ReportStatusInfoError(const int64_t formId, const FormFsmStatus status, const FormFsmEvent event);
 
