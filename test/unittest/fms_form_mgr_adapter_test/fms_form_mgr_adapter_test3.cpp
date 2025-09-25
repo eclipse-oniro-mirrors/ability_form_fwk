@@ -1319,7 +1319,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SwitchLockForms, TestSize.Level1
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_SwitchLockForms start";
     FormMgrAdapter formMgrAdapter;
-    EXPECT_EQ(ERR_OK, formMgrAdapter.SwitchLockForms("bundleName", 0, false));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.SwitchLockForms("", 1, false));
     GTEST_LOG_(INFO) << "FormMgrAdapter_SwitchLockForms end";
 }
 
