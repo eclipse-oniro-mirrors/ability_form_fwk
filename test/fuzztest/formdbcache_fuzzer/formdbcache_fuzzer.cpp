@@ -135,7 +135,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     removedDBForms.emplace_back(formDBInfo);
     formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
     formDbCache.GetAllFormInfo(formDBInfos);
-    formDbCache.GetLocationMap();
+    std::map<Constants::FormLocation, int> locationMap;
+    formDbCache.GetLocationMap(locationMap);
     FormRecord record;
     formDbCache.GetDBRecord(formId, record);
     formDbCache.GetMatchCount(bundleName, moduleName);
