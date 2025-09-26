@@ -5108,7 +5108,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0284, TestSize.Level1)
 HWTEST_F(FormMgrTest, FormMgrTest_0285, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrTest_0285 begin";
-    std::string bundleName = "ohos.samples.FormApplicationTest";
+    std::string bundleName = "ohos.samples.FormApplication";
     ErrCode result = FormMgr::GetInstance().IsFormBundleDebugSignature(bundleName);
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0285 end";
