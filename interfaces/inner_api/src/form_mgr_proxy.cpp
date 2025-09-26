@@ -2572,12 +2572,12 @@ bool FormMgrProxy::IsFormBundleDebugSignature(const std::string &bundleName)
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
-        return true;
+        return false;
     }
 
     if (!data.WriteString(bundleName)) {
         HILOG_ERROR("write bundleName failed");
-        return true;
+        return false;
     }
 
     MessageParcel reply;
