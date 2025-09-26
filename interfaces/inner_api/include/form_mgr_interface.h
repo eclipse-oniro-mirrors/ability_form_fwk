@@ -727,6 +727,16 @@ public:
     {
         return false;
     }
+    
+    /**
+     * @brief Check form bundle signature is debug.
+     * @param bundleName The bundle name of form to be check.
+     * @return Returns true for form bundle signature is debug.
+     */
+    virtual bool IsFormBundleDebugSignature(const std::string &bundleName)
+    {
+        return false;
+    }
 
     /**
      * @brief Check form bundle is exempt.
@@ -1000,6 +1010,7 @@ public:
         FORM_MGR_NOTIFY_UPDATE_FORM_SIZE,
         FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS,
         FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS,
+        FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE,
     };
 };
 }  // namespace AppExecFwk

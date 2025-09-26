@@ -707,6 +707,13 @@ public:
     bool IsFormBundleProtected(const std::string &bundleName, int64_t formId) override;
 
     /**
+     * @brief Check form bundle signature is debug.
+     * @param bundleName The bundle name of form to be check.
+     * @return Returns true for form bundle signature is debug.
+     */
+    bool IsFormBundleDebugSignature(const std::string &bundleName) override;
+
+    /**
      * @brief Check form bundle is exempt.
      * @param formId The Id of the form to query.
      * @return Returns true for form bundle is exempt.

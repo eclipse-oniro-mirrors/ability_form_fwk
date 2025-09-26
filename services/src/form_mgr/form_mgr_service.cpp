@@ -97,6 +97,7 @@ const int32_t API_TIME_OUT = 5;
 const int32_t API_TIME_OUT_30S = 30;
 const int32_t CONDITION_NETWORK = 1;
 const long FORM_DISCON_NETWORK_CHECK_TIME = 600000; // ms
+const std::string APP_PROVISION_TYPE_DEBUG = "debug";
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::OVERHEATED);
@@ -1991,6 +1992,20 @@ bool FormMgrService::IsFormBundleProtected(const std::string &bundleName, int64_
     bool result = FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, formId);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
+}
+
+bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
+{
+    HILOG_DEBUG("call");
+    BundleInfo bundleInfo;
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO);
+    bool ret = FormBmsHelper::GetInstance().GetBundleInfoByFlags(bundleName, flags, userId, bundleInfo);
+    if (!ret) {
+        HILOG_ERROR("Get GetBundleInfoByFlags failed");
+        return false;
+    }
+    return bundleInfo.applicationInfo.appProvisionType == APP_PROVISION_TYPE_DEBUG;
 }
 
 bool FormMgrService::IsFormBundleExempt(int64_t formId)

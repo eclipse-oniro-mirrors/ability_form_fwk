@@ -600,6 +600,14 @@ private:
     ErrCode HandleIsFormProtected(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle form bundle signature is debug.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleIsFormDebugSignature(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle NotifyFormLocked message.
      * @param data input param.
      * @param reply output param.
