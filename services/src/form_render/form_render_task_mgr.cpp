@@ -55,19 +55,19 @@ void FormRenderTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
 
 void FormRenderTaskMgr::PostSetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
 
     auto task = [formId, isVisible, remoteObject]() {
         FormRenderTaskMgr::GetInstance().SetVisibleChange(formId, isVisible, remoteObject);
     };
     FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
-    HILOG_INFO("start task formId: %{public}" PRId64 " isVisible: %{public}d", formId, isVisible);
+    HILOG_INFO("start task formId:%{public}" PRId64 " isVisible:%{public}d", formId, isVisible);
 }
 
 void FormRenderTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin");
+    HILOG_DEBUG("begin");
 
     auto reloadForm = [forms = std::forward<decltype(formRecords)>(formRecords), want, remoteObject]() {
         FormRenderTaskMgr::GetInstance().ReloadForm(std::move(forms), want, remoteObject);
@@ -115,7 +115,7 @@ void FormRenderTaskMgr::OnUnlock(const sptr<IRemoteObject> &remoteObject)
 
 void FormRenderTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin");
+    HILOG_DEBUG("begin");
 
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
@@ -143,7 +143,7 @@ void FormRenderTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const s
 void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin");
+    HILOG_DEBUG("begin");
 
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {

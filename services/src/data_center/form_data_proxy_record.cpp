@@ -438,7 +438,7 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(
                     "formId:%{public}" PRId64, subscribe.c_str(), formId_);
             }
 
-            std::string uri = key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + bundleName_;
+            std::string uri = key + "?" + "user=" + userId + "&srcToken=" + token;
             HILOG_INFO("Convert data, uri:%{public}s, subscriberId:%{public}" PRId64, uri.c_str(), subscriberId);
             auto it = subscribeId2UrisMap.find(subscriberId);
             if (it == subscribeId2UrisMap.end()) {

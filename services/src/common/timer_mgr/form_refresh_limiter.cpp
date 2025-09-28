@@ -118,7 +118,7 @@ int FormRefreshLimiter::GetRefreshCount(const int64_t formId) const
  */
 void FormRefreshLimiter::Increase(const int64_t formId)
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
     std::lock_guard<std::mutex> lock(limiterMutex_);
     auto info = limiterMap_.find(formId);
     if (info != limiterMap_.end()) {

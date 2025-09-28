@@ -427,7 +427,7 @@ void FormRenderMgrInner::RemoveConnection(int64_t formId)
 
 ErrCode FormRenderMgrInner::checkConnectionsFormIds(std::vector<int64_t> formIds, std::vector<int64_t> &needConFormIds)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(resourceMutex_);
     for (const int64_t &formId : formIds) {
         if (renderFormConnections_.find(formId) == renderFormConnections_.end()) {

@@ -922,7 +922,7 @@ bool FormTimerMgr::DeleteDynamicItem(int64_t formId)
 */
 void FormTimerMgr::OnIntervalTimeOut()
 {
-    HILOG_INFO("start");
+    HILOG_DEBUG("start");
     std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
     std::vector<FormTimer> updateList;
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
