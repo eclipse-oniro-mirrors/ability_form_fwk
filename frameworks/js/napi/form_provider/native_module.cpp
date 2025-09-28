@@ -51,6 +51,8 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
         JsFormProvider::GetPublishedRunningFormInfos);
     BindNativeFunction(env, exports, "getPublishedRunningFormInfoById", moduleName,
         JsFormProvider::GetPublishedRunningFormInfoById);
+    BindNativeFunction(env, exports, "reloadForms", moduleName, JsFormProvider::ReloadForms);
+    BindNativeFunction(env, exports, "reloadAllForms", moduleName, JsFormProvider::ReloadAllForms);
     return exports;
 }
 

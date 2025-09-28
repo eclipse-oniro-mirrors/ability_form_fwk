@@ -836,6 +836,25 @@ public:
      * @return Return true if unregister success
      */
     bool UnregisterGetLiveFormStatusProxy() override;
+
+    /**
+    * @brief Reload specified forms of application.
+    * @param reloadNum The number of forms to be updated.
+    * @param moduleName The name of the application module to which this form belongs.
+    * @param abilityName The class name of the ability to which this form belongs.
+    * @param formName The name of this form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode ReloadForms(int32_t &reloadNum, const std::string &moduleName, const std::string &abilityName,
+        const std::string &formName) override;
+
+    /**
+     * @brief Reload all forms of application.
+     * @param reloadNum The number of forms to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ReloadAllForms(int32_t &reloadNum) override;
+
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.

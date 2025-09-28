@@ -2321,5 +2321,46 @@ bool FormMgr::UnregisterGetLiveFormStatusProxy()
     }
     return remoteProxy_->UnregisterGetLiveFormStatusProxy();
 }
+
+ErrCode FormMgr::ReloadForms(int32_t &reloadNum, const std::string &moduleName, const std::string &abilityName,
+    const std::string &formName)
+{
+    HILOG_DEBUG("call");
+    ErrCode resultCode = Connect();
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed, errCode %{public}d", resultCode);
+        return resultCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    resultCode = remoteProxy_->ReloadForms(reloadNum, moduleName, abilityName, formName);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail ReloadForms, errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
+ErrCode FormMgr::ReloadAllForms(int32_t &reloadNum)
+{
+    HILOG_DEBUG("call");
+    ErrCode resultCode = Connect();
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed, errCode %{public}d", resultCode);
+        return resultCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    resultCode = remoteProxy_->ReloadAllForms(reloadNum);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail ReloadAllForms, errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

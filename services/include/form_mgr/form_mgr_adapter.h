@@ -804,6 +804,15 @@ public:
      * @param formId The Id of the form.
      */
     void ClearReconnectNum(int64_t formId);
+
+    /**
+    * @brief Reload specified forms of application.
+    * @param reloadNum The number of forms to be updated.
+    * @param refreshForms The vector of forms to be updated.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms);
+
 private:
     /**
      * @brief Get form configure info.

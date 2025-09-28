@@ -40,6 +40,7 @@
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
 #include "status_mgr_center/form_status.h"
 
 using namespace OHOS::AppExecFwk;

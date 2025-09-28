@@ -325,6 +325,26 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS):
             return HandleUnregisterGetLiveFormStatusProxy(data, reply);
         default:
+            return OnRemoteRequestSixth(code, data, reply, option);
+    }
+}
+
+/**
+ * @brief the sixth part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELOAD_FORMS):
+            return HandleReloadForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELOAD_ALL_FORMS):
+            return HandleReloadAllForms(data, reply);
+        default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 }
@@ -2026,6 +2046,41 @@ ErrCode FormMgrStub::HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data,
     bool result = UnregisterGetLiveFormStatusProxy();
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleReloadForms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call");
+    int32_t reloadNum = 0;
+    std::string moduleName = data.ReadString();
+    std::string abilityName = data.ReadString();
+    std::string formName = data.ReadString();
+    ErrCode result = ReloadForms(reloadNum, moduleName, abilityName, formName);
+    if (!reply.WriteInt32(reloadNum)) {
+        HILOG_ERROR("Write reload number of forms failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleReloadAllForms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call");
+    int32_t reloadNum = 0;
+    ErrCode result = ReloadAllForms(reloadNum);
+    if (!reply.WriteInt32(reloadNum)) {
+        HILOG_ERROR("Write reload number of forms failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("Write request result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

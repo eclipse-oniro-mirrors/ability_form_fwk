@@ -195,6 +195,7 @@ ohos_shared_library("libfms") {
     "services/src/form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_timer_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_app_upgrade_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_provider_refresh_impl.cpp",
     "services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
     "services/src/form_refresh/strategy/refresh_check_mgr.cpp",
     "services/src/form_refresh/strategy/refresh_control_mgr.cpp",

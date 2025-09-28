@@ -833,6 +833,24 @@ public:
      */
     ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect);
 
+    /**
+    * @brief Reload specified forms of application.
+    * @param reloadNum The number of forms to be updated.
+    * @param moduleName The name of the application module to which this form belongs.
+    * @param abilityName The class name of the ability to which this form belongs.
+    * @param formName The name of this form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode ReloadForms(int32_t &reloadNum, const std::string &moduleName, const std::string &abilityName,
+        const std::string &formName);
+
+    /**
+     * @brief Reload all forms of application.
+     * @param reloadNum The number of forms to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ReloadAllForms(int32_t &reloadNum);
+
 private:
     /**
      * @brief Connect form manager service.

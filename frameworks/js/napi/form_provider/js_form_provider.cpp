@@ -29,6 +29,7 @@
 #include "running_form_info.h"
 #include "js_runtime_utils.h"
 #include "ipc_skeleton.h"
+#include "napi_base_context.h"
 #include "napi_common_util.h"
 #include "napi_common_want.h"
 #include "napi_form_util.h"
@@ -47,6 +48,7 @@ constexpr size_t ARGS_SIZE_ZERO = 0;
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr size_t ARGS_SIZE_THREE = 3;
+constexpr size_t ARGS_SIZE_FOUR = 4;
 const std::string IS_FORM_AGENT = "isFormAgent";
 enum class ActivationState : int32_t {
     Deactivated = 0,
@@ -111,6 +113,29 @@ static bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId)
 
     if (!ConvertStringToInt64(strFormId, formId)) {
         HILOG_ERROR("convert string formId to int64 failed");
+        return false;
+    }
+    return true;
+}
+
+bool CheckUIAbilityContext(napi_env env, napi_value jsContextValue)
+{
+    bool stageMode = false;
+    napi_status status = OHOS::AbilityRuntime::IsStageContext(env, jsContextValue, stageMode);
+    if (status != napi_ok || !stageMode) {
+        NapiFormUtil::ThrowParamError(env, "Parse param context failed, must be a context of stageMode.");
+        return false;
+    }
+
+    auto context = OHOS::AbilityRuntime::GetStageModeContext(env, jsContextValue);
+    if (context == nullptr) {
+        NapiFormUtil::ThrowParamError(env, "Parse param context failed, must not be nullptr.");
+        return false;
+    }
+    
+    auto abilityContext = AbilityRuntime::Context::ConvertTo<AbilityRuntime::AbilityContext>(context);
+    if (abilityContext == nullptr) {
+        NapiFormUtil::ThrowParamError(env, "The context is not ability context.");
         return false;
     }
     return true;
@@ -1138,6 +1163,94 @@ napi_value JsFormProvider::OnGetPublishedRunningFormInfoById(napi_env env, size_
     napi_value lastParam = (argc == ARGS_SIZE_TWO) ? argv[PARAM1] : nullptr;
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetPublishedRunningFormInfoById",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormProvider::ReloadForms(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnReloadForms);
+}
+
+napi_value JsFormProvider::OnReloadForms(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+    if (!CheckParamNum(env, argc, ARGS_SIZE_FOUR, ARGS_SIZE_FOUR)) {
+        return CreateJsUndefined(env);
+    }
+    if (!CheckUIAbilityContext(env, argv[PARAM0])) {
+        return CreateJsUndefined(env);
+    }
+    std::string moduleName;
+    if (!ConvertFromJsValue(env, argv[PARAM1], moduleName)) {
+        HILOG_ERROR("ConvertFromJsValue failed");
+        NapiFormUtil::ThrowParamTypeError(env, "moduleName", "string");
+        return CreateJsUndefined(env);
+    }
+    std::string abilityName;
+    if (!ConvertFromJsValue(env, argv[PARAM2], abilityName)) {
+        HILOG_ERROR("ConvertFromJsValue failed");
+        NapiFormUtil::ThrowParamTypeError(env, "abilityName", "string");
+        return CreateJsUndefined(env);
+    }
+    std::string formName;
+    if (!ConvertFromJsValue(env, argv[PARAM3], formName)) {
+        HILOG_ERROR("ConvertFromJsValue failed");
+        NapiFormUtil::ThrowParamTypeError(env, "formName", "string");
+        return CreateJsUndefined(env);
+    }
+
+    NapiAsyncTask::CompleteCallback complete =
+        [moduleName, abilityName, formName](napi_env env, NapiAsyncTask &task, int32_t status) {
+            int32_t reloadNum = 0;
+            auto ret = FormMgr::GetInstance().ReloadForms(reloadNum, moduleName, abilityName, formName);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+            napi_value jsReloadNum = nullptr;
+            napi_create_int32(env, reloadNum, &jsReloadNum);
+            task.ResolveWithNoError(env, jsReloadNum);
+        };
+ 
+    napi_value lastParam = nullptr;
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnReloadForms",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormProvider::ReloadAllForms(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnReloadAllForms);
+}
+
+napi_value JsFormProvider::OnReloadAllForms(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+    if (!CheckParamNum(env, argc, ARGS_SIZE_ONE, ARGS_SIZE_ONE)) {
+        return CreateJsUndefined(env);
+    }
+    if (!CheckUIAbilityContext(env, argv[PARAM0])) {
+        return CreateJsUndefined(env);
+    }
+
+    NapiAsyncTask::CompleteCallback complete =
+        [](napi_env env, NapiAsyncTask &task, int32_t status) {
+            int32_t reloadNum = 0;
+            auto ret = FormMgr::GetInstance().ReloadAllForms(reloadNum);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+            napi_value jsReloadNum = nullptr;
+            napi_create_int32(env, reloadNum, &jsReloadNum);
+            task.ResolveWithNoError(env, jsReloadNum);
+        };
+ 
+    napi_value lastParam = nullptr;
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnReloadAllForms",
         env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }

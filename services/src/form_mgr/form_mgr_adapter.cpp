@@ -4683,5 +4683,21 @@ void FormMgrAdapter::ClearReconnectNum(int64_t formId)
     std::lock_guard<std::mutex> lock(reconnectMutex_);
     formReconnectMap_.erase(formId);
 }
+
+ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms)
+{
+    HILOG_DEBUG("call");
+    int callingUid = IPCSkeleton::GetCallingUid();
+    RefreshData data;
+    data.callingUid = callingUid;
+    for (const FormRecord &formRecord : refreshForms) {
+        data.record = formRecord;
+        ErrCode requestRet = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_PROVIDER);
+        if (requestRet == ERR_OK) {
+            reloadNum++;
+        }
+    }
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

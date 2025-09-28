@@ -5111,4 +5111,74 @@ HWTEST_F(FormMgrTest, FormMgrTest_0285, TestSize.Level1)
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0285 end";
 }
+
+/**
+ * @tc.name: FormMgrTest_ReloadForms_001
+ * @tc.desc: Verify ReloadForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_ReloadForms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadForms_001 begin";
+    EXPECT_CALL(*mockProxy, ReloadForms(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    std::int32_t reloadNum = 0;
+    std::string moduleName = "A";
+    std::string abilityName = "B";
+    std::string formName = "C";
+    ErrCode result = FormMgr::GetInstance().ReloadForms(reloadNum, moduleName, abilityName, formName);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadForms_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_ReloadForms_002
+ * @tc.desc: Verify ReloadForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_ReloadForms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadForms_002 begin";
+    std::int32_t reloadNum = 0;
+    std::string moduleName = "A";
+    std::string abilityName = "B";
+    std::string formName = "C";
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    ErrCode result = FormMgr::GetInstance().ReloadForms(reloadNum, moduleName, abilityName, formName);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadForms_002 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_ReloadAllForms_001
+ * @tc.desc: Verify ReloadAllForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_ReloadAllForms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadAllForms_001 begin";
+    EXPECT_CALL(*mockProxy, ReloadAllForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    std::int32_t reloadNum = 0;
+    ErrCode result = FormMgr::GetInstance().ReloadAllForms(reloadNum);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadAllForms_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_ReloadAllForms_002
+ * @tc.desc: Verify ReloadAllForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_ReloadAllForms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadAllForms_002 begin";
+    std::int32_t reloadNum = 0;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    ErrCode result = FormMgr::GetInstance().ReloadAllForms(reloadNum);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_ReloadAllForms_002 end";
+}
 } // namespace

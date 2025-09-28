@@ -906,6 +906,30 @@ public:
         return false;
     }
 
+    /**
+    * @brief Reload specified forms of application.
+    * @param reloadNum The number of forms to be updated.
+    * @param moduleName The name of the application module to which this form belongs.
+    * @param abilityName The class name of the ability to which this form belongs.
+    * @param formName The name of this form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    virtual ErrCode ReloadForms(int32_t &reloadNum, const std::string &moduleName, const std::string &abilityName,
+        const std::string &formName)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Reload all forms of application.
+     * @param reloadNum The number of forms to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode ReloadAllForms(int32_t &reloadNum)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1011,6 +1035,8 @@ public:
         FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS,
         FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS,
         FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE,
+        FORM_MGR_RELOAD_FORMS,
+        FORM_MGR_RELOAD_ALL_FORMS,
     };
 };
 }  // namespace AppExecFwk

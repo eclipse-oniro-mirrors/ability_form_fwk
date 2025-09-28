@@ -28,6 +28,7 @@
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
 #include "form_refresh/refresh_impl/form_timer_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
@@ -399,5 +400,24 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormAppUpgradeRefreshImpl_015,
     MockAskForProviderData(ERR_OK);
     EXPECT_EQ(ERR_OK, FormAppUpgradeRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormAppUpgradeRefreshImpl_015 end";
+}
+
+HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormProviderRefreshImpl_016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormProviderRefreshImpl_016 start";
+
+    RefreshData data;
+    FormRecord formRecord;
+    data.record = formRecord;
+    MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsBaseValidPass(ERR_OK);
+    MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockAskForProviderData(ERR_OK);
+    EXPECT_EQ(ERR_OK, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormProviderRefreshImpl_016 end";
 }
 }
