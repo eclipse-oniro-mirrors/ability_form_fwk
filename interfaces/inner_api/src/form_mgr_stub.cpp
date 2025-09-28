@@ -218,6 +218,8 @@ int FormMgrStub::OnRemoteRequestThird(uint32_t code, MessageParcel &data, Messag
             return HandleRegisterClickCallbackEventObserver(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED):
             return HandleIsFormProtected(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE):
+            return HandleIsFormDebugSignature(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED):
             return HandleNotifyFormLocked(data, reply);
         default:
@@ -1793,6 +1795,18 @@ ErrCode FormMgrStub::HandleIsFormProtected(MessageParcel &data, MessageParcel &r
     std::string bundleName = data.ReadString();
     int64_t formId = data.ReadInt64();
     bool result = IsFormBundleProtected(bundleName, formId);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write action failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleIsFormDebugSignature(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    bool result = IsFormBundleDebugSignature(bundleName);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write action failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

@@ -1729,4 +1729,17 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterGetLiveFormStatusProxy_001
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetLiveFormStatusProxy_001 ends";
 }
+
+/**
+ * @tc.number: FormMgrProxyTest_IsFormBundleDebugSignature_001
+ * @tc.name: Verify IsFormBundleDebugSignature
+ * @tc.desc: text IsFormBundleDebugSignature function.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsFormBundleDebugSignature_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_IsFormBundleDebugSignature_001 starts";
+    std::string bundleName = "ohos.samples.FormApplicationTest";
+    auto result = formMgrProxy->IsFormBundleDebugSignature(bundleName);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_IsFormBundleDebugSignature_001 ends";
+}
 }

@@ -2006,6 +2006,22 @@ bool FormMgr::IsFormBundleProtected(const std::string &bundleName, int64_t formI
     return remoteProxy_->IsFormBundleProtected(bundleName, formId);
 }
 
+bool FormMgr::IsFormBundleDebugSignature(const std::string &bundleName)
+{
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return false;
+    }
+    return remoteProxy_->IsFormBundleDebugSignature(bundleName);
+}
+
 bool FormMgr::IsFormBundleExempt(int64_t formId)
 {
     ErrCode errCode = Connect();

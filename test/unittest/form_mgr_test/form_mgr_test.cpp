@@ -5097,4 +5097,18 @@ HWTEST_F(FormMgrTest, FormMgrTest_0284, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
     GTEST_LOG_(INFO) << "FormMgrTest_0284 end";
 }
+
+/**
+ * @tc.name: FormMgrTest_0285
+ * @tc.desc: Verify IsFormBundleDebugSignature
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0285, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0285 begin";
+    std::string bundleName = "ohos.samples.FormApplication";
+    ErrCode result = FormMgr::GetInstance().IsFormBundleDebugSignature(bundleName);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0285 end";
+}
 } // namespace

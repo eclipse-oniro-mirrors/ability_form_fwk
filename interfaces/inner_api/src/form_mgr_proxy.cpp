@@ -2573,6 +2573,30 @@ bool FormMgrProxy::IsFormBundleProtected(const std::string &bundleName, int64_t 
     return reply.ReadBool();
 }
 
+bool FormMgrProxy::IsFormBundleDebugSignature(const std::string &bundleName)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return false;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("write bundleName failed");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
 bool FormMgrProxy::IsFormBundleExempt(int64_t formId)
 {
     MessageParcel data;
