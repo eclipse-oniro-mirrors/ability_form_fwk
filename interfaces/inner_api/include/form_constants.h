@@ -249,6 +249,8 @@ namespace Constants {
     constexpr int32_t REFRESH_ATOMIC_FORM = 2;
     constexpr int32_t REFRESH_SYSTEMAPP_FORM = 3;
 
+    constexpr size_t MAX_FILE_NAME_SIZE = 64;
+
     enum class Dimension : int8_t {
         DIMENSION_MIN = 1,
         DIMENSION_1_2 = DIMENSION_MIN,

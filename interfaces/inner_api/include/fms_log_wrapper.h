@@ -64,7 +64,23 @@
 #endif
 
 #ifndef FMS_FILE_NAME
-#define FMS_FILE_NAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+static inline const char* GetUnderscoreInitials(const char* filename)
+{
+    const char* base = __builtin_strrchr(filename, '/') ? __builtin_strrchr(filename, '/') + 1 : filename;
+    static char result[OHOS::AppExecFwk::Constants::MAX_FILE_NAME_SIZE] = {0};
+    int pos = 0;
+    if (base[0] && base[0] != '_') {
+        result[pos++] = std::toupper(base[0]);
+    }
+    for (const char* p = base; *p && pos < OHOS::AppExecFwk::Constants::MAX_FILE_NAME_SIZE - 1; p++) {
+        if (*p == '_' && p[1] && p[1] != '_') {
+            result[pos++] = std::toupper(p[1]);
+        }
+    }
+    return pos ? result : "";
+}
+
+#define FMS_FILE_NAME GetUnderscoreInitials(__FILE__)
 #endif
 
 #ifndef FMS_FUNC_INFO
