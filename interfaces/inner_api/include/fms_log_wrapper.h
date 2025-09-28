@@ -22,6 +22,7 @@
 #include <functional>
 
 #include "hilog/log.h"
+#include "form_constants.h"
 
 #ifdef HILOG_FATAL
 #undef HILOG_FATAL
