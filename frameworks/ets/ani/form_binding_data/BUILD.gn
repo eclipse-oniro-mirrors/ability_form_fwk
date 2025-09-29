@@ -22,9 +22,14 @@ ohos_shared_library("formBindingData_ani") {
     debug = false
   }
 
-  include_dirs = []
-
-  sources = [ "src/sts_form_binding_data.cpp" ]
+  include_dirs = [
+    "../common/include"
+  ]
+ 
+  sources = [
+    "${form_fwk_path}/frameworks/ets/ani/common/src/ani_getfromcache.cpp",
+    "src/sts_form_binding_data.cpp",
+  ]
 
   deps = [ "${form_fwk_path}:form_manager" ]
 
