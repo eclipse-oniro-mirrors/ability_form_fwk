@@ -17,27 +17,28 @@
 #include <vector>
 
 #include "ani.h"
+#include "ani_getfromcache.h"
 #include "fms_log_wrapper.h"
-#include <ani_signature_builder.h>
+#include "form_constants.h"
 
-using namespace arkts::ani_signature;
-
+namespace OHOS {
+namespace AppExecFwk {
 static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_object paramObject)
 {
-    HILOG_INFO("CreateFormBindingData call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr ");
         return nullptr;
     }
     ani_status status = ANI_OK;
     ani_class formBindingDataCls;
-    if ((status = env->FindClass("@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner",
-        &formBindingDataCls)) != ANI_OK) {
+    if ((status = AniGetFromCache::GetInstance().AniFormGetCls(
+        env, Constants::ANI_FORMBINDINGDATAINNER, formBindingDataCls)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
     ani_method objectMethod;
-    if ((status = env->Class_FindMethod(formBindingDataCls, "<ctor>", ":", &objectMethod)) != ANI_OK) {
+    if ((status = AniGetFromCache::GetInstance().AniFormGetMtd(
+        env, formBindingDataCls, Constants::ANI_CONSTRUCTOR, ":", objectMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
@@ -53,13 +54,14 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
         return formBindingDataObj;
     }
     ani_class stringClass;
-    if ((status = env->FindClass("std.core.String", &stringClass)) != ANI_OK) {
+    if ((status = AniGetFromCache::GetInstance().AniFormGetCls(
+        env, Constants::ANI_STRING, stringClass)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
     ani_method setMethod;
-    if ((status = env->Class_FindMethod(formBindingDataCls, Builder::BuildSetterName("data").c_str(),
-        nullptr, &setMethod)) != ANI_OK) {
+    if ((status = AniGetFromCache::GetInstance().AniFormGetMtd(
+        env, formBindingDataCls, "<set>data", nullptr, setMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
@@ -67,9 +69,10 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
         HILOG_ERROR("Object_CallMethod_Void failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
-    HILOG_INFO("CreateFormBindingData end");
     return formBindingDataObj;
 }
+} // namespace AppExecFwk
+} // namespace OHOS
 
 extern "C" {
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
@@ -99,7 +102,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     std::array methods = {
-        ani_native_function { "createFormBindingData", nullptr, reinterpret_cast<void *>(CreateFormBindingData) },
+        ani_native_function {"createFormBindingData",
+            nullptr, reinterpret_cast<void *>(OHOS::AppExecFwk::CreateFormBindingData) },
     };
 
     if (env->Namespace_BindNativeFunctions(spc, methods.data(), methods.size()) != ANI_OK) {
