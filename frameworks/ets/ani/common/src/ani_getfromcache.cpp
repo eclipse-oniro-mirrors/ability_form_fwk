@@ -30,7 +30,8 @@ AniGetFromCache::~AniGetFromCache()
     HILOG_INFO("Destroy");
 }
 
-ani_status AniGetFromCache::AniFormGetCls(ani_env *env, const char *signature, ani_class &cls) {
+ani_status AniGetFromCache::AniFormGetCls(ani_env *env, const char *signature, ani_class &cls)
+{
     ani_status status = ANI_OK;
 
     std::lock_guard<std::mutex> lock(aniClsCacheMutex_);
@@ -42,7 +43,7 @@ ani_status AniGetFromCache::AniFormGetCls(ani_env *env, const char *signature, a
     status = env->FindClass(signature, &cls);
     if (status != ANI_OK) {
         HILOG_ERROR("AniFormGetCls FindClass failed status %{public}d ", static_cast<int>(status));
-        return ANI_ERROR;
+        return status;
     }
     ani_ref ref = nullptr;
     status = env->GlobalReference_Create(cls, &ref);
@@ -56,7 +57,8 @@ ani_status AniGetFromCache::AniFormGetCls(ani_env *env, const char *signature, a
 }
 
 ani_status AniGetFromCache::AniFormGetMtd(
-    ani_env *env, ani_class &cls, const char *name, const char *signature, ani_method &mtd) {
+    ani_env *env, ani_class &cls, const char *name, const char *signature, ani_method &mtd)
+{
     ani_status status = ANI_OK;
 
     std::lock_guard<std::mutex> lock(aniMtdCacheMutex_);
@@ -68,7 +70,7 @@ ani_status AniGetFromCache::AniFormGetMtd(
     status = env->Class_FindMethod(cls, name, signature, &mtd);
     if (status != ANI_OK) {
         HILOG_ERROR("AniFormGetMtd Class_FindMethod failed status %{public}d ", static_cast<int>(status));
-        return ANI_ERROR;
+        return status;
     }
     aniMtdCache_.emplace(cls, mtd);
     HILOG_INFO("AniFormGetMtd end");

@@ -32,13 +32,13 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     ani_status status = ANI_OK;
     ani_class formBindingDataCls;
     if ((status = AniGetFromCache::GetInstance().AniFormGetCls(
-        env, Constants::ANI_FORMBINDINGDATAINNER, formBindingDataCls)) != ANI_OK) {
+        env, AniConstants::ANI_FORMBINDINGDATAINNER, formBindingDataCls)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
     ani_method objectMethod;
     if ((status = AniGetFromCache::GetInstance().AniFormGetMtd(
-        env, formBindingDataCls, Constants::ANI_CONSTRUCTOR, ":", objectMethod)) != ANI_OK) {
+        env, formBindingDataCls, AniConstants::ANI_CONSTRUCTOR, ":", objectMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
@@ -55,7 +55,7 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     }
     ani_class stringClass;
     if ((status = AniGetFromCache::GetInstance().AniFormGetCls(
-        env, Constants::ANI_STRING, stringClass)) != ANI_OK) {
+        env, AniConstants::ANI_STRING, stringClass)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }

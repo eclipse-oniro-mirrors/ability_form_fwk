@@ -24,6 +24,15 @@ namespace AppExecFwk {
 namespace FormConstants {
     constexpr int32_t FOUNDATION_UID = 5523;
 }
+namespace AniConstants {
+    // ani signature
+    constexpr const char* ANI_FORMBINDINGDATAINNER =
+        "@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner";
+    // ani signature basic
+    constexpr const char* ANI_STRING = "std.core.String";
+    // ani signature method
+    constexpr const char* ANI_CONSTRUCTOR = "<ctor>";
+}
 namespace Constants {
     constexpr const char* PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS = "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS";
     constexpr const char* PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
@@ -124,14 +133,6 @@ namespace Constants {
     constexpr const char* FUN_INTERACTION = "1";
     constexpr const char* SCENE_ANIMATION = "2";
     constexpr const char* LIVE_FORM_BOTH = "3";
-
-    // ani signature
-    constexpr const char* ANI_FORMBINDINGDATAINNER =
-        "@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner";
-    // ani signature basic
-    constexpr const char* ANI_STRING = "std.core.String";
-    // ani signature method
-    constexpr const char* ANI_CONSTRUCTOR = "<ctor>";
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
