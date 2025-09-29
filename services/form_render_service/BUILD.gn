@@ -71,6 +71,7 @@ ohos_shared_library("formrender") {
     "src/form_module_checker.cpp",
     "src/form_render_event_report.cpp",
     "src/form_render_record.cpp",
+    "src/js_form_runtime.cpp",
     "src/form_render_serial_queue.cpp",
     "src/form_render_service_mgr.cpp",
     "src/status_mgr_center/form_render_status.cpp",
@@ -122,6 +123,9 @@ ohos_shared_library("formrender") {
     "ipc:ipc_napi",
     "napi:ace_napi",
     "samgr:samgr_proxy",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:rosen_text",
   ]
 
   subsystem_name = "ability"

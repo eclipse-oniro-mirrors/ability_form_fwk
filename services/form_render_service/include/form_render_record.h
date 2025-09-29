@@ -327,7 +327,7 @@ private:
     bool eventHandleNeedReset = false;
     std::shared_mutex eventHandlerReset_;
     std::recursive_mutex eventHandlerMutex_;
-    std::shared_ptr<AbilityRuntime::Runtime> runtime_;
+    std::shared_ptr<AbilityRuntime::JsRuntime> runtime_;
 
     // <formId, hostRemoteObj>
     std::mutex hostsMapMutex_;

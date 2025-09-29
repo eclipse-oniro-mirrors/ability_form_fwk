@@ -75,7 +75,8 @@
               "huks",
               "selinux_adapter",
               "openssl",
-              "window_manager"
+              "window_manager",
+              "graphic_2d"
 
           ],
           "third_party": [

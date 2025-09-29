@@ -555,10 +555,13 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 
     SetPkgContextInfoMap(formJsInfo, options);
 
-    runtime_ = AbilityRuntime::Runtime::Create(options);
+    runtime_ = std::make_shared<JsFormRuntime>();
     if (runtime_ == nullptr) {
         HILOG_ERROR("Create runtime Failed");
         return false;
+    }
+    if(!runtime_->Init(options)) {
+        HILOG_ERROR("Create runtime Failed");
     }
     hapPath_ = formJsInfo.jsFormCodePath;
     RegisterUncatchableErrorHandler();
