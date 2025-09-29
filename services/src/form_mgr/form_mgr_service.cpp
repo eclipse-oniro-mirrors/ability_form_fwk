@@ -2045,9 +2045,15 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float
 
 void FormMgrService::SetNetConnect()
 {
+    if (lastNetLostTime_ == 0) {
+        HILOG_DEBUG("no need update");
+        return;
+    }
+
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     if ((currentTime - lastNetLostTime_) >= FORM_DISCON_NETWORK_CHECK_TIME) {
         FormMgrAdapter::GetInstance().UpdateFormByCondition(CONDITION_NETWORK);
+        lastNetLostTime_ = 0;
     }
 }
 
