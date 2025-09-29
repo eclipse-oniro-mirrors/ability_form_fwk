@@ -885,7 +885,8 @@ private:
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
     void SetNetConnect();
-    void SetDisConnectTypeTime();
+    void SetDisConnectTypeTime(const int64_t time);
+    int64_t GetDisConnectTypeTime();
 
 private:
     static const int32_t ENABLE_FORM_UPDATE = 5;
@@ -900,6 +901,7 @@ private:
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
     uint32_t NetSceneCallbackId_ = 0;
     int32_t netConTime = 0;
+    mutable std::mutex lastNetLostTimeMutex_;
     int64_t lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
     std::set<int64_t> requestPublishFormWithSnapshotSet_;
     mutable std::mutex instanceMutex_;

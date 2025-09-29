@@ -865,7 +865,7 @@ int32_t NetConnCallbackObserver::NetConnectionPropertiesChange(sptr<NetHandle> &
 int32_t NetConnCallbackObserver::NetLost(sptr<NetHandle> &netHandle)
 {
     HILOG_INFO("OnNetLost");
-    this->fmservice_.SetDisConnectTypeTime();
+    this->fmservice_.SetDisConnectTypeTime(FormUtil::GetCurrentMillisecond());
     return ERR_OK;
 }
 
@@ -2045,21 +2045,29 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float
 
 void FormMgrService::SetNetConnect()
 {
-    if (lastNetLostTime_ == 0) {
+    int64_t lastNetLostTime = GetDisConnectTypeTime();
+    if (lastNetLostTime == 0) {
         HILOG_DEBUG("no need update");
         return;
     }
 
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
-    if ((currentTime - lastNetLostTime_) >= FORM_DISCON_NETWORK_CHECK_TIME) {
+    if ((currentTime - lastNetLostTime) >= FORM_DISCON_NETWORK_CHECK_TIME) {
         FormMgrAdapter::GetInstance().UpdateFormByCondition(CONDITION_NETWORK);
-        lastNetLostTime_ = 0;
+        SetDisConnectTypeTime(0);
     }
 }
 
-void FormMgrService::SetDisConnectTypeTime()
+void FormMgrService::SetDisConnectTypeTime(const int64_t time)
 {
-    lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
+    std::lock_guard<std::mutex> lock(lastNetLostTimeMutex_);
+    lastNetLostTime_ = time;
+}
+
+int64_t FormMgrService::GetDisConnectTypeTime()
+{
+    std::lock_guard<std::mutex> lock(lastNetLostTimeMutex_);
+    return lastNetLostTime_;
 }
 
 ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)
