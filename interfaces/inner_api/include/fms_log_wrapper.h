@@ -21,6 +21,8 @@
 #include <cinttypes>
 #include <functional>
 
+#include <list>
+
 #include "hilog/log.h"
 #include "form_constants.h"
 
@@ -70,7 +72,8 @@ struct Cache {
     std::list<std::string> lru;
 };
 
-static inline Cache& GetCache() {
+static inline Cache& GetCache()
+{
     static Cache cache;
     return cache;
 }
