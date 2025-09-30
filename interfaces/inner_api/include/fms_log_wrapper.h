@@ -185,7 +185,7 @@ static const std::unordered_map<std::string, std::string> fileNameMap_ = {
     if (pos == std::string::npos) {
         return fileBaseName;
     }
-    fileBaseName = fileName.substr(0, pos); 
+    fileBaseName = fileName.substr(0, pos);
     const auto iter = fileNameMap_.find(fileBaseName);
     if (iter != fileNameMap_.end()) {
         return iter->second;
