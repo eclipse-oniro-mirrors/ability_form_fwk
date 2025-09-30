@@ -20,7 +20,6 @@
 #ifdef CONFIG_HILOG
 #include <cinttypes>
 #include <functional>
-
 #include <string>
 
 #include "hilog/log.h"
