@@ -235,7 +235,7 @@ bool AniParseInt32(ani_env *env, const ani_ref &aniInt, int32_t &out)
     ani_int tmp;
     ani_status status;
     if ((status = env->Object_CallMethodByName_Int(
-        static_cast<ani_object>(aniInt), "unboxed", nullptr, &tmp)) != ANI_OK) {
+        static_cast<ani_object>(aniInt), "toInt", nullptr, &tmp)) != ANI_OK) {
         HILOG_ERROR("Object_CallMethodByName_Int failed! %{public}d", status);
         return false;
     }
