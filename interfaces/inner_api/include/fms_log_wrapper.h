@@ -20,6 +20,7 @@
 #ifdef CONFIG_HILOG
 #include <cinttypes>
 #include <functional>
+
 #include <string>
 
 #include "hilog/log.h"
@@ -226,7 +227,7 @@ static const std::unordered_map<std::string, std::string> fileNameMap_ = {
 #endif
 
 #ifndef FMS_FUNC_FMT
-#define FMS_FUNC_FMT "[%{public}s(%{public}s:%{public}d)]"
+#define FMS_FUNC_FMT "[%{public}s:%{public}d]"
 #endif
 
 #ifndef FMS_FUNC_FMT_BRIEF
@@ -234,11 +235,15 @@ static const std::unordered_map<std::string, std::string> fileNameMap_ = {
 #endif
 
 #ifndef FMS_FILE_NAME
-#define FMS_FILE_NAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define FMS_FILE_NAME ({ \
+    const char* start = __builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__; \
+    const char* dot = __builtin_strchr(start, '.'); \
+    dot ? __builtin_strndup(start, dot - start) : start; \
+})
 #endif
 
 #ifndef FMS_FUNC_INFO
-#define FMS_FUNC_INFO FMS_FILE_NAME, __FUNCTION__, __LINE__
+#define FMS_FUNC_INFO __FUNCTION__, __LINE__
 #endif
 
 #ifndef FMS_FUNC_INFO_BRIEF
@@ -250,11 +255,10 @@ static const std::unordered_map<std::string, std::string> fileNameMap_ = {
     FMS_FUNC_FMT_BRIEF fmt, FMS_FUNC_INFO_BRIEF, ##__VA_ARGS__);      \
 } while (0)
 
-#define FMS_PRINT_LOG(level, fmt, ...)                                                            \
-    do {                                                                                          \
-        std::string fileName = OHOS::AAFwk::ConvertFmsFileName(std::string(FMS_FILE_NAME));       \
-        ((void)HILOG_IMPL(LOG_CORE, level, FMS_LOG_DOMAIN,                                        \
-        FMS_LOG_TAG, FMS_FUNC_FMT fmt, fileName.c_str(), __FUNCTION__, __LINE__, ##__VA_ARGS__)); \
+#define FMS_PRINT_LOG(level, fmt, ...)                                   \
+    do {                                                                 \
+        ((void)HILOG_IMPL(LOG_CORE, level, FMS_LOG_DOMAIN,               \
+        FMS_FILE_NAME, FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__)); \
     } while (0)
 
 #define HILOG_DEBUG(fmt, ...) FMS_PRINT_LOG(LOG_DEBUG, fmt, ##__VA_ARGS__)
