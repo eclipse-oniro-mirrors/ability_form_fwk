@@ -24,6 +24,13 @@ namespace FormRender {
 class JsFormRuntime : public AbilityRuntime::JsRuntime {
 public:
     ~JsFormRuntime();
+
+   
+    InsertHapPath(std::string bundleName, std::string moduleName, std::string hapPath);
+    DestoryHapPath();
+private:
+    std::string bundleName_;
+    std::string moduleName_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

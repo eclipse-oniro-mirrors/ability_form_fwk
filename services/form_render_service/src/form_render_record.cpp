@@ -34,7 +34,6 @@
 #include "form_memory_guard.h"
 #include "form_module_checker.h"
 #include "form_render_event_report.h"
-#include "js_form_runtime.h"
 #include "nlohmann/json.hpp"
 #include "xcollie/watchdog.h"
 #include "dfx_dump_catcher.h"
@@ -565,6 +564,9 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Create runtime Failed");
     }
     hapPath_ = formJsInfo.jsFormCodePath;
+
+    runtime->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName,formJsInfo.jsFormCodePath);
+
     RegisterUncatchableErrorHandler();
     return true;
 }

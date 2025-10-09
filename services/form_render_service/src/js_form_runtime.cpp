@@ -22,6 +22,19 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 
+JsFormRuntime::InsertHapPath(std::string bundleName, std::string moduleName, std::string hapPath)
+{
+    bundleName_ = bundleName;
+    moduleName_ = moduleName;
+    Rosen::FontCollectionMgr::GetInstance().InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
+}
+
+JsFormRuntime::DestoryHapPath()
+{
+    // std::string bundle, std::string module
+    Rosen::FontCollectionMgr::GetInstance().DestoryHapPath(bundleName_, moduleName_);
+}
+
 JsFormRuntime::~JsFormRuntime()
 {
     auto env = GetNapiEnv();
@@ -30,7 +43,9 @@ JsFormRuntime::~JsFormRuntime()
         return;
     }
 
-    HILOG_WARN("call FontCollectionMgr instance DestroyLocalInstance.");
+    DestoryHapPath();
+
+    HILOG_WARN("DestroyLocalInstance.");
     auto envId = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(env));
     Rosen::FontCollectionMgr::GetInstance().DestroyLocalInstance(envId);
 }
