@@ -565,7 +565,10 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     }
     hapPath_ = formJsInfo.jsFormCodePath;
 
-    runtime->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName,formJsInfo.jsFormCodePath);
+    bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName,formJsInfo.jsFormCodePath);
+    if (!ret) {
+        HILOG_ERROR("InsertHapPath Failed");
+    }
 
     RegisterUncatchableErrorHandler();
     return true;

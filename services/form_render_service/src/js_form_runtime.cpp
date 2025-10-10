@@ -22,16 +22,15 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 
-JsFormRuntime::InsertHapPath(std::string bundleName, std::string moduleName, std::string hapPath)
+bool JsFormRuntime::InsertHapPath(std::string bundleName, std::string moduleName, std::string hapPath)
 {
     bundleName_ = bundleName;
     moduleName_ = moduleName;
-    Rosen::FontCollectionMgr::GetInstance().InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
+    return Rosen::FontCollectionMgr::GetInstance().InsertHapPath(bundleName, moduleName, hapPath);
 }
 
-JsFormRuntime::DestoryHapPath()
+void JsFormRuntime::DestoryHapPath()
 {
-    // std::string bundle, std::string module
     Rosen::FontCollectionMgr::GetInstance().DestoryHapPath(bundleName_, moduleName_);
 }
 
