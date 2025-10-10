@@ -37,6 +37,7 @@ ohos_unittest("FormAniHelpersTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "runtime_core:ani",
+    "runtime_core:ani_helpers",
     "runtime_core:libarkruntime",
     "googletest:gtest_main",
   ]
