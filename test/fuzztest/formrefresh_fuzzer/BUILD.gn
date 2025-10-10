@@ -51,6 +51,7 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_host_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_net_conn_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_next_time_refresh_impl.cpp",
+    "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_provider_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_timer_refresh_impl.cpp",
     "${form_fwk_path}/services/src/status_mgr_center/form_status.cpp",

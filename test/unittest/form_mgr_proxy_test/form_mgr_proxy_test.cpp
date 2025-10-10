@@ -690,7 +690,7 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0036, TestSize.Level1) {
  * @tc.require: #I59O23
  */
 HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0037, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_001 starts";
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0037 starts";
     // initialize input parameters.
     FormInfoFilter filter;
     filter.moduleName = "";
@@ -1741,5 +1741,36 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsFormBundleDebugSignature_001, Test
     auto result = formMgrProxy->IsFormBundleDebugSignature(bundleName);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_IsFormBundleDebugSignature_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_ReloadForms_001
+ * @tc.name: Verify ReloadForms
+ * @tc.desc: text ReloadForms function.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_ReloadForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadForms_001 starts";
+    int32_t reloadNum = 0;
+    std::string moduleName = "A";
+    std::string abilityName = "B";
+    std::string formName = "C";
+    int32_t result = formMgrProxy->ReloadForms(reloadNum, moduleName, abilityName, formName);
+    // expect result.
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_ReloadAllForms_001
+ * @tc.name: Verify ReloadAllForms
+ * @tc.desc: text ReloadAllForms function.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_ReloadAllForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadAllForms_001 starts";
+    int32_t reloadNum = 0;
+    int32_t result = formMgrProxy->ReloadAllForms(reloadNum);
+    // expect result.
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadForms_001 ends";
 }
 }

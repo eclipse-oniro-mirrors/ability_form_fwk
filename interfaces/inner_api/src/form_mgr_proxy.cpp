@@ -3019,5 +3019,52 @@ bool FormMgrProxy::UnregisterGetLiveFormStatusProxy()
     }
     return reply.ReadBool();
 }
+
+ErrCode FormMgrProxy::ReloadForms(int32_t &reloadNum, const std::string &moduleName, const std::string &abilityName,
+    const std::string &formName)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(moduleName)) {
+        HILOG_ERROR("Write moduleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(abilityName)) {
+        HILOG_ERROR("Write abilityName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(formName)) {
+        HILOG_ERROR("Write formName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(IFormMgr::Message::FORM_MGR_RELOAD_FORMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest failed: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    reloadNum = reply.ReadInt32();
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::ReloadAllForms(int32_t &reloadNum)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(IFormMgr::Message::FORM_MGR_RELOAD_ALL_FORMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest failed: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    reloadNum = reply.ReadInt32();
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

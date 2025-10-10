@@ -132,6 +132,9 @@ public:
     MOCK_METHOD0(UnregisterGetFormRectProxy, bool());
     MOCK_METHOD1(RegisterGetLiveFormStatusProxy, bool(const sptr<IRemoteObject> &observer));
     MOCK_METHOD0(UnregisterGetLiveFormStatusProxy, bool());
+    MOCK_METHOD4(ReloadForms, ErrCode(int32_t &reloadNum, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName));
+    MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
 };
 }
 }

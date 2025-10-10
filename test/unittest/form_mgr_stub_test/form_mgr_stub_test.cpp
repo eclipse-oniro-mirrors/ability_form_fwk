@@ -3382,4 +3382,46 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0139, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0139 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_HandleReloadForms_001
+ * @tc.name: Verify OnRemoteRequest and HandleReloadForms
+ * @tc.desc: test HandleReloadForms
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReloadForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadForms_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    EXPECT_CALL(*mockFormMgrService, ReloadForms(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    const std::string moduleName = "A";
+    const std::string abilityName = "B";
+    const std::string formName = "C";
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteString(moduleName);
+    data.WriteString(abilityName);
+    data.WriteString(formName);
+    auto result = mockFormMgrService->HandleReloadForms(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleReloadAllForms_001
+ * @tc.name: Verify OnRemoteRequest and HandleReloadAllForms
+ * @tc.desc: test HandleReloadAllForms
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReloadAllForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadAllForms_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    EXPECT_CALL(*mockFormMgrService, ReloadAllForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    MessageParcel data;
+    MessageParcel reply;
+    auto result = mockFormMgrService->HandleReloadAllForms(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadAllForms_001 ends";
+}
 }

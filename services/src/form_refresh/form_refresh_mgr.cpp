@@ -26,6 +26,7 @@
 #include "form_refresh/refresh_impl/form_force_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
 #include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -50,6 +51,7 @@ const static std::map<int32_t, IFormRefresh *> refreshMap = {
     { TYPE_FORCE, &FormForceRefreshImpl::GetInstance() },
     { TYPE_UNCONTROL, &FormRefreshAfterUncontrolImpl::GetInstance() },
     { TYPE_APP_UPGRADE, &FormAppUpgradeRefreshImpl::GetInstance() },
+    { TYPE_PROVIDER, &FormProviderRefreshImpl::GetInstance() },
 };
 
 int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)

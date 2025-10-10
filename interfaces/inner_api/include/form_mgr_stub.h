@@ -666,6 +666,16 @@ private:
     int OnRemoteRequestFifth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     /**
+     * @brief the sixth part of handle remote request.
+     * @param code ipc code.
+     * @param data input param.
+     * @param reply output param.
+     * @param option message option.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnRemoteRequestSixth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+    /**
      * @brief Handle update form size.
      * @param data input param.
      * @param reply output param.
@@ -775,6 +785,23 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle reload specified forms of application.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleReloadForms(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle reload all forms of application.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleReloadAllForms(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 
