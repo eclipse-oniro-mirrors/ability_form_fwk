@@ -1134,9 +1134,12 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_003, TestSize.Lev
     FormItemInfo formItemInfo;
     InitFormItemInfo(formId, formItemInfo);
     FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    record.expectRecycled = true;
     formDataMgr_.formRecords_.emplace(formId, record);
 
     formDataMgr_.HandleHostDied(token_);
+
+    EXPECT_FALSE(formDataMgr_.formRecords_[formId].expectRecycled);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleHostDied_003 end";
 }

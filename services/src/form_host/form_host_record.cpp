@@ -368,5 +368,12 @@ void FormHostRecord::OnLockForms(const std::vector<int64_t> &formIds, const bool
     }
     formHostCallback_->OnLockForms(formIds, lock, formHostClient_);
 }
+
+void FormHostRecord::GetForms(std::vector<int64_t> &formIds)
+{
+    for (const auto &iter : forms_) {
+        formIds.emplace_back(iter.first);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

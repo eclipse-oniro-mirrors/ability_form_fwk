@@ -905,12 +905,14 @@ void FormDataMgr::UpdateHostForms(const std::vector<int64_t> &updateFormIds)
 void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
 {
     std::vector<int64_t> recordTempForms;
+    std::vector<int64_t> hostFormIds;
     int remoteHostCallerUid = 0;
     {
         std::lock_guard<std::mutex> lock(formHostRecordMutex_);
         std::vector<FormHostRecord>::iterator itHostRecord;
         for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end();) {
             if (remoteHost == itHostRecord->GetFormHostClient()) {
+                itHostRecord->GetForms(hostFormIds);
                 HandleHostDiedForTempForms(*itHostRecord, recordTempForms);
                 HILOG_INFO("find died client,remove it");
                 itHostRecord->CleanResource();
@@ -922,23 +924,11 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
             }
         }
     }
-    {
-        std::lock_guard<std::mutex> lock(formRecordMutex_);
-        std::map<int64_t, FormRecord>::iterator itFormRecord;
-        for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
-            int64_t formId = itFormRecord->first;
-            // if temp form, remove it
-            if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
-                FormRecord formRecord = itFormRecord->second;
-                itFormRecord = formRecords_.erase(itFormRecord);
-                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
-                FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
-                FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
-            } else {
-                itFormRecord++;
-            }
-        }
-    }
+
+    // after host died, reset expectRecycled state
+    SetExpectRecycledStatus(hostFormIds, false);
+    DeleteRecordTempForms(recordTempForms);
+
     {
         std::lock_guard<std::mutex> lock(formStateRecordMutex_);
         std::map<std::string, FormHostRecord>::iterator itFormStateRecord;
@@ -3191,6 +3181,25 @@ bool FormDataMgr::IsExpectRecycled(int64_t formId)
         return false;
     }
     return info->second.expectRecycled;
+}
+
+void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempForms)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    std::map<int64_t, FormRecord>::iterator itFormRecord;
+    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
+        int64_t formId = itFormRecord->first;
+        // if temp form, remove it
+        if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
+            FormRecord formRecord = itFormRecord->second;
+            itFormRecord = formRecords_.erase(itFormRecord);
+            FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
+            FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+            FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
+        } else {
+            itFormRecord++;
+        }
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

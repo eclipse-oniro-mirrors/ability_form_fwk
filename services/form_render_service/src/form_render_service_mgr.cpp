@@ -58,6 +58,7 @@ FormRenderServiceMgr::FormRenderServiceMgr()
     serialQueue_ = std::make_unique<FormRenderSerialQueue>(FORM_RENDER_SERIAL_QUEUE);
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
     appliedConfig_ = std::make_shared<AppExecFwk::Configuration>();
+    mainHandler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
 }
 
 FormRenderServiceMgr::~FormRenderServiceMgr() = default;
@@ -832,8 +833,7 @@ void FormRenderServiceMgr::SetMainRuntimeCb(std::function<const std::unique_ptr<
 void FormRenderServiceMgr::MainThreadForceFullGC()
 {
     HILOG_INFO("call");
-    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
-    if (mainHandler == nullptr) {
+    if (mainHandler_ == nullptr) {
         HILOG_ERROR("null mainHandler");
         return;
     }
@@ -846,7 +846,7 @@ void FormRenderServiceMgr::MainThreadForceFullGC()
         }
         FormRenderServiceMgr::GetInstance().mainRuntimeCb_()->ForceFullGC(0);
     };
-    mainHandler->PostTask(task, "MainThreadForceFullGC");
+    mainHandler_->PostTask(task, "MainThreadForceFullGC");
 }
 }  // namespace FormRender
 }  // namespace AppExecFwk
