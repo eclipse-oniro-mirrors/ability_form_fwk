@@ -365,6 +365,8 @@ void FormStatusTaskMgr::RestoreFormRecycledStatus(const FormRecord &formRecord, 
     auto recycleForm = [formRecord, remoteObject]() {
         if (!FormDataMgr::GetInstance().IsExpectRecycled(formRecord.formId)) {
             HILOG_WARN("form not need recycle, formId: %{public}" PRId64, formRecord.formId);
+            const std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formRecord.formId);
+            FormStatusMgr::GetInstance().CancelFormEventTimeout(formRecord.formId, eventId);
             FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RECYCLE_DATA_FAIL);
             return;
         }

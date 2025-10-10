@@ -242,8 +242,6 @@ ErrCode FormInfoRdbStorageMgr::GetFormVersionCode(std::string &versionCode)
         Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY, versionCode);
     if (result != ERR_OK) {
         HILOG_ERROR("get form version code failed, code is %{public}d", result);
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_INFO("get form version code success. versionCode:%{public}s", versionCode.c_str());
@@ -271,8 +269,6 @@ ErrCode FormInfoRdbStorageMgr::GetMultiAppFormVersionCode(const std::string &bun
     ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, versionCode);
     if (result != ERR_OK) {
         HILOG_ERROR("get multi app form version code failed, code is %{public}d", result);
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_INFO("get multi app form version code success.");
