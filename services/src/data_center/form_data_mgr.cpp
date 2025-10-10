@@ -418,8 +418,8 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
                 maxLocation = location.first;
             }
         }
-        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}hhd, maxCount:%{public}d",
-            maxFormsSize, maxLocation, maxCount);
+        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}d, maxCount:%{public}d",
+            maxFormsSize, static_cast<int>(maxLocation), maxCount);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
             static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
             ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS);
