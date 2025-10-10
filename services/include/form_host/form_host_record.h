@@ -220,6 +220,12 @@ public:
      * @param lock True is lock form, false is unlock form.
      */
     void OnLockForms(const std::vector<int64_t> &formIds, const bool lock);
+
+    /**
+     * @brief get forms.
+     * @param formIds The output parameter store the formId list.
+     */
+    void GetForms(std::vector<int64_t> &formIds);
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;

@@ -1116,6 +1116,8 @@ private:
     ErrCode GetUnusedFormInstanceById(const int64_t formId, FormInstance &formInstance);
     void GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
     void GetUnusedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos);
+    void DeleteRecordTempForms(const std::vector<int64_t> &recordTempForms);
+
     mutable std::mutex formRecordMutex_;
     mutable std::mutex formHostRecordMutex_;
     mutable std::mutex formTempMutex_;

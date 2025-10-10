@@ -150,6 +150,7 @@ private:
     sptr<IFormSupply> formSupplyClient_;
     bool isVerified_ = false;
     bool hasCachedConfig_ = false;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> mainHandler_ = nullptr;
     std::function<const std::unique_ptr<Runtime> &()> mainRuntimeCb_ = nullptr;
 };
 }  // namespace FormRender
