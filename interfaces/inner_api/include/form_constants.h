@@ -130,6 +130,18 @@ namespace Constants {
     constexpr const char* SCENE_ANIMATION = "2";
     constexpr const char* LIVE_FORM_BOTH = "3";
 
+    // class names
+    constexpr const char* FORM_INFO_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormInfo";
+    constexpr const char* FORM_INFO_INNER_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.formInfoInner";
+    constexpr const char* RUNNING_FORM_INFO_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.RunningFormInfo";
+    constexpr const char* RUNNING_FORM_INFO_INNER_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.runningFormInfoInner";
+    constexpr const char* FORM_BINDING_DATA_CLASS_NAME =
+        "@ohos.app.form.formBindingData.formBindingData.FormBindingData";
+    constexpr const char* ASYNC_CALLBACK_WRAPPER_CLASS_NAME = "@ohos.app.form.formHost.AsyncCallbackWrapper";
+    constexpr const char* CALLBACK_WRAPPER_CLASS_NAME = "@ohos.app.form.formHost.CallbackWrapper";
+    constexpr const char* FORM_STATE_INFO_INNER_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormStateInfoInner";
+    constexpr const char* FORM_STATE_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormState";
+
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
     constexpr int32_t FORM_VISIBLE = 1;
