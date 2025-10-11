@@ -270,7 +270,7 @@ bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int3
 
     for (ani_size i = 0; i < size; ++i) {
         ani_ref elementRef;
-        status = env->Array_Get_Ref(array, i, &elementRef); 
+        status = env->Array_Get_Ref(array, i, &elementRef);
         if (status != ANI_OK) {
             HILOG_ERROR("Array_Get_Ref failed at index %{public}zu!", i);
             return false;
