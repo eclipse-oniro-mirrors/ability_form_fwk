@@ -555,12 +555,19 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 
     SetPkgContextInfoMap(formJsInfo, options);
 
-    runtime_ = AbilityRuntime::Runtime::Create(options);
+    runtime_ = std::make_shared<JsFormRuntime>();
     if (runtime_ == nullptr) {
         HILOG_ERROR("Create runtime Failed");
         return false;
     }
+    if (!runtime_->Init(options)) {
+        HILOG_ERROR("Init runtime Failed");
+    }
     hapPath_ = formJsInfo.jsFormCodePath;
+    bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
+    if (!ret) {
+        HILOG_ERROR("InsertHapPath Failed");
+    }
     RegisterUncatchableErrorHandler();
     return true;
 }
@@ -594,6 +601,10 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
                 formJsInfo.bundleName.c_str(), moduleName.c_str());
             (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).ReloadFormComponent();
         }
+    }
+    bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
+    if (!ret) {
+        HILOG_ERROR("InsertHapPath Failed");
     }
     return true;
 }

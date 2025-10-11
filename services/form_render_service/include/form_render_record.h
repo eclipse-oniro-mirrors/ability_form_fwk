@@ -27,7 +27,7 @@
 #include "form_mgr_errors.h"
 #include "form_supply_proxy.h"
 #include "form_renderer_group.h"
-#include "js_runtime.h"
+#include "js_form_runtime.h"
 #include "want.h"
 
 namespace OHOS {
@@ -327,7 +327,7 @@ private:
     bool eventHandleNeedReset = false;
     std::shared_mutex eventHandlerReset_;
     std::recursive_mutex eventHandlerMutex_;
-    std::shared_ptr<AbilityRuntime::Runtime> runtime_;
+    std::shared_ptr<JsFormRuntime> runtime_;
 
     // <formId, hostRemoteObj>
     std::mutex hostsMapMutex_;
