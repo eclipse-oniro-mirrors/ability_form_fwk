@@ -579,7 +579,7 @@ ani_object GetANIArray(ani_env *env, size_t array_size)
     }
 
     ani_object arrayObj;
-    status = env->Object_New(arrayCls, arrayCtor, &arrayObj, array_size)
+    status = env->Object_New(arrayCls, arrayCtor, &arrayObj, array_size);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New Array failed");
         return arrayObj;
@@ -610,7 +610,7 @@ ani_object NewRecordClass(ani_env *env)
         return nullptr;
     }
  
-    status = env->Object_New(recordCls, ctor, &recordObj)
+    status = env->Object_New(recordCls, ctor, &recordObj);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New status = %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
@@ -640,14 +640,14 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
     }
 
     ani_string ani_key {};
-    status = env->String_NewUTF8(key.c_str(), key.length(), &ani_key))
+    status = env->String_NewUTF8(key.c_str(), key.length(), &ani_key);
     if (status != ANI_OK) {
         HILOG_ERROR("String_NewUTF8 failed, status: %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return;
     }
 
-    status = env->Object_CallMethod_Void(recordObject, setFunc, ani_key, static_cast<ani_ref>(value))
+    status = env->Object_CallMethod_Void(recordObject, setFunc, ani_key, static_cast<ani_ref>(value));
     if (status != ANI_OK) {
         HILOG_ERROR("set key value failed, status: %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
@@ -791,7 +791,7 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
 ani_env *GetEnvFromVm(ani_vm *vm)
 {
     ani_env *env = nullptr;
-    ani_status = vm->GetEnv(ANI_VERSION_1, &env);
+    ani_status status = vm->GetEnv(ANI_VERSION_1, &env);
     if (status != ANI_OK) {
         HILOG_ERROR("Unsupported ANI_VERSION_1");
         return nullptr;
@@ -868,7 +868,7 @@ ani_object CreateBusinessError(ani_env *env, ani_int code, const std::string& ms
         HILOG_ERROR("FindClass failed %{public}d", status);
         return nullptr;
     }
-    status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)
+    status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
@@ -925,13 +925,13 @@ ani_object CreateBool(ani_env *env, ani_boolean value)
         return nullptr;
     }
     ani_method ctor;
-    ani_status status = env->Class_FindMethod(cls, "<ctor>", "z:", &ctor);
+    status = env->Class_FindMethod(cls, "<ctor>", "z:", &ctor);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod status : %{public}d", status);
         return nullptr;
     }
     ani_object object;
-    ani_status status = env->Object_New(cls, ctor, &object, value)
+    status = env->Object_New(cls, ctor, &object, value);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New status : %{public}d", status);
         return nullptr;

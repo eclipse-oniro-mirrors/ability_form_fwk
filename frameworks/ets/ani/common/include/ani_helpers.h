@@ -63,7 +63,7 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr);
 void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &formDataProxies,
     ani_ref proxiesArrayRef);
 
-int64_t FormIdAniStrtoInt64(ani_env *env, ani_string formId);
+int64_t FormIdAniStrtoInt64(ani_env *env, const ani_string &formId);
 
 ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue);
 
@@ -76,7 +76,7 @@ bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int3
 bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
     const std::vector<AppExecFwk::FormCustomizeData> &customizeData);
 
-ani_array_ref CreateAniArrayIntFromStdVector(ani_env *env, std::vector<int32_t> vec);
+ani_array_ref CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t> &vec);
 
 void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::RunningFormInfo &formInfo);
 
