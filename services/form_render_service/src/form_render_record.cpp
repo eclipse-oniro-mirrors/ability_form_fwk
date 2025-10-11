@@ -564,12 +564,10 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Init runtime Failed");
     }
     hapPath_ = formJsInfo.jsFormCodePath;
-
-    bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName,formJsInfo.jsFormCodePath);
+    bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
     }
-
     RegisterUncatchableErrorHandler();
     return true;
 }
@@ -603,6 +601,10 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
                 formJsInfo.bundleName.c_str(), moduleName.c_str());
             (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).ReloadFormComponent();
         }
+    }
+    bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
+    if (!ret) {
+        HILOG_ERROR("InsertHapPath Failed");
     }
     return true;
 }

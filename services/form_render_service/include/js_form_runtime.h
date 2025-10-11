@@ -18,6 +18,8 @@
 
 #include "js_runtime.h"
 
+#include <unordered_set>
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
@@ -28,7 +30,7 @@ public:
     void DestoryHapPath();
 private:
     std::string bundleName_;
-    std::string moduleName_;
+    std::unordered_set<std::string> moduleNameSet_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

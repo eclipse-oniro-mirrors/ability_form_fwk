@@ -25,13 +25,15 @@ namespace FormRender {
 bool JsFormRuntime::InsertHapPath(std::string bundleName, std::string moduleName, std::string hapPath)
 {
     bundleName_ = bundleName;
-    moduleName_ = moduleName;
+    moduleNameSet_.insert(moduleName);
     return Rosen::FontCollectionMgr::GetInstance().InsertHapPath(bundleName, moduleName, hapPath);
 }
 
 void JsFormRuntime::DestoryHapPath()
 {
-    Rosen::FontCollectionMgr::GetInstance().DestoryHapPath(bundleName_, moduleName_);
+    for (std::string moduleName : moduleNameSet_) {
+        Rosen::FontCollectionMgr::GetInstance().DestoryHapPath(bundleName_, moduleName);
+    }
 }
 
 JsFormRuntime::~JsFormRuntime()
