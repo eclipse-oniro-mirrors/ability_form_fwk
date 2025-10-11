@@ -22,7 +22,8 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 
-bool JsFormRuntime::InsertHapPath(std::string bundleName, std::string moduleName, std::string hapPath)
+bool JsFormRuntime::InsertHapPath(
+    const std::string bundleName, const std::string moduleName, const std::string hapPath)
 {
     bundleName_ = bundleName;
     moduleNameSet_.insert(moduleName);

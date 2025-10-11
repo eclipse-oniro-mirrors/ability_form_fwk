@@ -16,9 +16,9 @@
 #ifndef OHOS_FORM_FWK_JS_FORM_RUNTIME_H
 #define OHOS_FORM_FWK_JS_FORM_RUNTIME_H
 
-#include "js_runtime.h"
-
 #include <unordered_set>
+
+#include "js_runtime.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -26,7 +26,8 @@ namespace FormRender {
 class JsFormRuntime : public AbilityRuntime::JsRuntime {
 public:
     ~JsFormRuntime();
-    bool InsertHapPath(std::string bundleName, std::string moduleName, std::string hapPath);
+    bool InsertHapPath(
+        const std::string bundleName, const std::string moduleName, const std::string hapPath);
     void DestoryHapPath();
 private:
     std::string bundleName_;
