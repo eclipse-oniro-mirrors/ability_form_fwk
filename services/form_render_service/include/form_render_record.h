@@ -316,6 +316,7 @@ private:
     void ParseFormLocationMap(std::vector<std::string> &formName, std::vector<uint32_t> &formLocation);
     void RuntimeMemoryMonitor();
     void PostReAddRecycledForms(const FormJsInfo &formJsInfo, const Want &want);
+    void ReAddStaticRecycledForms(const int64_t formId);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
