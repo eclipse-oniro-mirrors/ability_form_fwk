@@ -123,7 +123,6 @@ ohos_shared_library("formrender") {
     "ipc:ipc_napi",
     "napi:ace_napi",
     "samgr:samgr_proxy",
-    "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "graphic_2d:rosen_text",
   ]

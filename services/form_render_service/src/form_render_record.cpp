@@ -561,7 +561,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         return false;
     }
     if (!runtime_->Init(options)) {
-        HILOG_ERROR("Create runtime Failed");
+        HILOG_ERROR("Init runtime Failed");
     }
     hapPath_ = formJsInfo.jsFormCodePath;
 
