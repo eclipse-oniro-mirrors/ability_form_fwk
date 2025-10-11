@@ -143,6 +143,10 @@ void FormProviderCaller::UpdateForm(const FormJsInfo &formJsInfo)
 void FormProviderCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
 {
     HILOG_DEBUG("call");
+    if (callerToken_ == nullptr) {
+        HILOG_ERROR("callerToken_ is null");
+        return;
+    }
     callerToken_->AddDeathRecipient(deathRecipient);
 }
 } // namespace AppExecFwk
