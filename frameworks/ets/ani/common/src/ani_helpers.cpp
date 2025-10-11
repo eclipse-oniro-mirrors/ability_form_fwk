@@ -28,22 +28,31 @@ int ConvertStringToInt(const std::string &strInfo)
 
 ani_object createInt(ani_env *env, int32_t value)
 {
-    ani_class cls;
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
+
+    ani_class cls = nullptr;
+    ani_method ctor = nullptr;
+    ani_object object = nullptr;
     ani_status status = ANI_ERROR;
-    if ((status = env->FindClass("std.core.Int", &cls)) != ANI_OK) {
-        HILOG_ERROR("FindClass status : %{public}d", status);
+
+    status = env->FindClass("std.core.Int", &cls);
+    if (status != ANI_OK) {
+        HILOG_ERROR("FindClass failed, status: %{public}d", status);
         return nullptr;
     }
 
-    ani_method ctor;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) != ANI_OK) {
-        HILOG_ERROR("Class_FindMethod status : %{public}d", status);
+    status = env->Class_FindMethod(cls, "<ctor>", "i:", &ctor);
+    if (status != ANI_OK) {
+        HILOG_ERROR("Class_FindMethod failed, status: %{public}d", status);
         return nullptr;
     }
 
-    ani_object object;
-    if ((status = env->Object_New(cls, ctor, &object, value)) != ANI_OK) {
-        HILOG_ERROR("Object_New status : %{public}d", status);
+    status = env->Object_New(cls, ctor, &object, value);
+    if (status != ANI_OK) {
+        HILOG_ERROR("Object_New failed, status: %{public}d", status);
         return nullptr;
     }
 
@@ -253,14 +262,16 @@ bool AniParseInt32(ani_env *env, const ani_ref &aniInt, int32_t &out)
 bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int32_t>& out)
 {
     ani_size size;
-    if (env->Array_GetLength(array, &size) != ANI_OK) {
+    ani_status status = env->Array_GetLength(array, &size);
+    if (status != ANI_OK) {
         HILOG_ERROR("Array_GetLength failed!");
         return false;
     }
 
     for (ani_size i = 0; i < size; ++i) {
         ani_ref elementRef;
-        if (env->Array_Get_Ref(array, i, &elementRef) != ANI_OK) {
+        status = env->Array_Get_Ref(array, i, &elementRef); 
+        if (status != ANI_OK) {
             HILOG_ERROR("Array_Get_Ref failed at index %{public}zu!", i);
             return false;
         }
@@ -281,10 +292,9 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
         return false;
     }
 
-    ani_status status = ANI_OK;
     ani_class recordCls = nullptr;
 
-    status = env->FindClass("escompat.Record", &recordCls);
+    ani_status status = env->FindClass("escompat.Record", &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass 'escompat.Record' failed, status: %{public}d", status);
         return false;
@@ -342,7 +352,8 @@ ani_array_ref CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int
 {
     ani_array_ref array = nullptr;
     ani_ref undefined_ref;
-    if (env->GetUndefined(&undefined_ref) != ANI_OK) {
+    ani_status status = env->GetUndefined(&undefined_ref);
+    if (status != ANI_OK) {
         HILOG_ERROR("GetUndefined failed");
         return array;
     }
@@ -444,19 +455,21 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
 ani_object CreateANIObject(ani_env *env, const char *className)
 {
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
+    ani_status status = env->FindClass(className, &cls);
+    if (status != ANI_OK) {
         HILOG_ERROR("FindClass failed");
         return nullptr;
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
+    status = env->Class_FindMethod(cls, "<ctor>", ":", &ctor);
+    if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed");
         return nullptr;
     }
 
     ani_object obj = nullptr;
-    ani_status status = env->Object_New(cls, ctor, &obj);
+    status = env->Object_New(cls, ctor, &obj);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New failed, error code: %{public}d", status);
         return nullptr;
@@ -492,26 +505,27 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
     }
 
     ani_size arrayLength = 0;
-    ani_status status = ANI_ERROR; //TODO
-    if ((status = env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength)) != ANI_OK) {
-        HILOG_ERROR("Array get length error");
+    ani_status status = env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength);
+    if (status != ANI_OK) {
+        HILOG_ERROR("Array_GetLength failed, status: %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return false;
     }
 
     for (size_t i = 0; i < static_cast<size_t>(arrayLength); i++) {
         ani_ref stringEntryRef;
-        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, ANI_GETTER_MARKER, "i:C{std.core.Object}",
-            &stringEntryRef, static_cast<ani_int>(i))) {
-            HILOG_ERROR("Object_CallMethodByName_Ref failed");
+        status = env->Object_CallMethodByName_Ref(arrayObj, ANI_GETTER_MARKER, "i:C{std.core.Object}",
+            &stringEntryRef, static_cast<ani_int>(i));
+        if (status != ANI_OK) {
+            HILOG_ERROR("Object_CallMethodByName_Ref failed, status: %{public}d", status);
             PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
             return false;
         }
 
         std::string stdFormID = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(stringEntryRef));
-        int64_t formIdNum;
+        int64_t formIdNum = 0;
         if (!ConvertStringToInt64(stdFormID, formIdNum)) {
-            HILOG_ERROR("ConvertStringToInt64 failed");
+            HILOG_ERROR("ConvertStringToInt64 failed for entry %zu", i);
             PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
             return false;
         }
@@ -521,6 +535,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
 
     return true;
 }
+
 
 ani_class GetANIClass(ani_env *env, const char *className)
 {
@@ -535,10 +550,9 @@ ani_class GetANIClass(ani_env *env, const char *className)
 
 ani_ref GetMemberRef(ani_env *env, ani_object object, const char *class_name, const std::string &member)
 {
-    ani_status status = ANI_OK;
     ani_class cls = GetANIClass(env, class_name);
     ani_method getter{};
-    status = env->Class_FindMethod(cls, ("<get>" + member).c_str(), nullptr, &getter);
+    ani_status status = env->Class_FindMethod(cls, ("<get>" + member).c_str(), nullptr, &getter);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed, error code: %{public}d", status);
         return nullptr;
@@ -558,13 +572,15 @@ ani_object GetANIArray(ani_env *env, size_t array_size)
 {
     ani_class arrayCls = GetANIClass(env, "escompat.Array");
     ani_method arrayCtor;
-    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor)) {
+    ani_status status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
+    if (status != ANI_OK) {
         HILOG_ERROR("FindMethod failed");
         return nullptr;
     }
 
     ani_object arrayObj;
-    if (ANI_OK != env->Object_New(arrayCls, arrayCtor, &arrayObj, array_size)) {
+    status = env->Object_New(arrayCls, arrayCtor, &arrayObj, array_size)
+    if (status != ANI_OK) {
         HILOG_ERROR("Object_New Array failed");
         return arrayObj;
     }
@@ -577,21 +593,25 @@ ani_object NewRecordClass(ani_env *env)
     CheckEnvOrThrow(env);
     
     ani_object recordObj = {};
-    ani_status status = ANI_ERROR;
     ani_class recordCls;
-    if (ANI_OK != (status = env->FindClass("escompat.Record", &recordCls))) {
+
+    ani_status status = env->FindClass("escompat.Record", &recordCls);
+    if (status != ANI_OK) {
         HILOG_ERROR("FindClass status = %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return nullptr;
     }
+
     ani_method ctor;
-    if (ANI_OK != (status = env->Class_FindMethod(recordCls, "<ctor>", nullptr, &ctor))) {
+    status = env->Class_FindMethod(recordCls, "<ctor>", nullptr, &ctor);
+    if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod status = %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return nullptr;
     }
  
-    if (ANI_OK != (status = env->Object_New(recordCls, ctor, &recordObj))) {
+    status = env->Object_New(recordCls, ctor, &recordObj)
+    if (status != ANI_OK) {
         HILOG_ERROR("Object_New status = %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return nullptr;
@@ -612,22 +632,23 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
     }
 
     ani_method setFunc {};
-    if (env->Class_FindMethod(recordCls, ANI_SETTER_MARKER, nullptr, &setFunc) != ANI_OK) {
+    status = env->Class_FindMethod(recordCls, ANI_SETTER_MARKER, nullptr, &setFunc);
+    if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod can not find: %{public}s", ANI_SETTER_MARKER);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return;
     }
 
-    ani_string ani_key{};
-
-    if ((status = env->String_NewUTF8(key.c_str(), key.length(), &ani_key)) != ANI_OK) {
+    ani_string ani_key {};
+    status = env->String_NewUTF8(key.c_str(), key.length(), &ani_key))
+    if (status != ANI_OK) {
         HILOG_ERROR("String_NewUTF8 failed, status: %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return;
     }
 
-    if (ANI_OK != (status = env->Object_CallMethod_Void(
-        recordObject, setFunc, ani_key, static_cast<ani_ref>(value)))) {
+    status = env->Object_CallMethod_Void(recordObject, setFunc, ani_key, static_cast<ani_ref>(value))
+    if (status != ANI_OK) {
         HILOG_ERROR("set key value failed, status: %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return;
@@ -704,7 +725,8 @@ bool InvokeCallback(ani_env *env, ani_object obj, ani_object arg)
     }
     
     ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method)) != ANI_OK || method == nullptr) {
+    status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method);
+    if (status != ANI_OK || method == nullptr) {
         HILOG_ERROR("Class_FindMethod status: %{public}d, or null method", status);
         return false;
     }
@@ -715,7 +737,8 @@ bool InvokeCallback(ani_env *env, ani_object obj, ani_object arg)
         arg = reinterpret_cast<ani_object>(undefinedRef);
     }
     
-    if ((status = env->Object_CallMethod_Void(obj, method, arg)) != ANI_OK) {
+    status = env->Object_CallMethod_Void(obj, method, arg);
+    if (status != ANI_OK) {
         HILOG_ERROR("Object_CallMethod_Void status: %{public}d", status);
         return false;
     }
@@ -732,13 +755,15 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
         return nullptr;
     }
     ani_enum formState;
-    if (env->FindEnum(FORM_STATE_CLASS_NAME, &formState) != ANI_OK) {
+    ani_status status = env->FindEnum(FORM_STATE_CLASS_NAME, &formState);
+    if (status != ANI_OK) {
         HILOG_INFO("Cannot find FormState enum");
         return nullptr;
     }
 
     ani_enum_item item;
-    if (env->Enum_GetEnumItemByIndex(formState, static_cast<ani_size>(((int)state) + 1), &item) != ANI_OK) {
+    status = env->Enum_GetEnumItemByIndex(formState, static_cast<ani_size>(((int)state) + 1), &item);
+    if (status != ANI_OK) {
         HILOG_INFO("Cannot get enum item");
         return nullptr;
     }
@@ -749,15 +774,15 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
         return nullptr;
     }
 
-    auto stat = env->Object_SetPropertyByName_Ref(returnObject, "want", static_cast<ani_ref>(wantAni));
-    if (stat != ANI_OK) {
-        HILOG_INFO("Cannot set want param %{public}d", stat);
+    status = env->Object_SetPropertyByName_Ref(returnObject, "want", static_cast<ani_ref>(wantAni));
+    if (status != ANI_OK) {
+        HILOG_INFO("Cannot set want param %{public}d", status);
         return nullptr;
     }
 
-    stat = env->Object_SetPropertyByName_Ref(returnObject, "formState", static_cast<ani_ref>(item));
-    if (stat != ANI_OK) {
-        HILOG_INFO("Cannot set formState param %{public}d", stat);
+    status = env->Object_SetPropertyByName_Ref(returnObject, "formState", static_cast<ani_ref>(item));
+    if (status != ANI_OK) {
+        HILOG_INFO("Cannot set formState param %{public}d", status);
         return nullptr;
     }
     return returnObject;
@@ -766,7 +791,8 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
 ani_env *GetEnvFromVm(ani_vm *vm)
 {
     ani_env *env = nullptr;
-    if (vm->GetEnv(ANI_VERSION_1, &env) != ANI_OK) {
+    ani_status = vm->GetEnv(ANI_VERSION_1, &env);
+    if (status != ANI_OK) {
         HILOG_ERROR("Unsupported ANI_VERSION_1");
         return nullptr;
     }
@@ -842,8 +868,8 @@ ani_object CreateBusinessError(ani_env *env, ani_int code, const std::string& ms
         HILOG_ERROR("FindClass failed %{public}d", status);
         return nullptr;
     }
-    ani_status status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
+    status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)
+    if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
@@ -852,7 +878,8 @@ ani_object CreateBusinessError(ani_env *env, ani_int code, const std::string& ms
         HILOG_ERROR("error nulll");
         return nullptr;
     }
-    if ((status = env->Object_New(cls, method, &obj, code, error)) != ANI_OK) {
+    status = env->Object_New(cls, method, &obj, code, error);
+    if (status != ANI_OK) {
         HILOG_ERROR("Object_New failed %{public}d", status);
         return nullptr;
     }
