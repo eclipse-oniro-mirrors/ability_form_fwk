@@ -72,6 +72,10 @@ bool FormHostCaller::IsSameToken(const sptr<IRemoteObject> &callerToken) const
 void FormHostCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
 {
     HILOG_DEBUG("call");
+    if (callerToken_ == nullptr) {
+        HILOG_ERROR("callerToken_ is null");
+        return;
+    }
     callerToken_->AddDeathRecipient(deathRecipient);
 }
 } // namespace AppExecFwk
