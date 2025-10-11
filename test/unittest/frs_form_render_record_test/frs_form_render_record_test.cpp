@@ -25,7 +25,7 @@
 #undef private
 #include "gmock/gmock.h"
 #include "fms_log_wrapper.h"
-#include "js_runtime.h"
+#include "js_form_runtime.h"
 #include "mock_form_provider_client.h"
 #include "want.h"
 #include <thread>
@@ -277,7 +277,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_008, TestSize.Level0)
     formJsInfo.uiSyntax = FormType::ETS;
     // set runtime_ is not nullptr
     formRenderRecordPtr_->eventRunner_ = EventRunner::Create("bundleName");
-    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->runtime_ = std::make_shared<JsFormRuntime>();
     // test CreateRuntime function
     EXPECT_EQ(true, formRenderRecordPtr_->CreateRuntime(formJsInfo));
     formRenderRecordPtr_->runtime_ = nullptr;
@@ -572,7 +572,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_024, TestSize.Level0)
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecordPtr_->GetFormRendererGroup(formJsInfo, context, runtime);
-    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->runtime_ = std::make_shared<JsFormRuntime>();
     EXPECT_EQ(ERR_OK, formRenderRecordPtr_->HandleReloadFormRecord(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_024 end";
 }
@@ -919,7 +919,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_043, TestSize.Level0)
     formRenderRecordPtr_->eventRunner_ = nullptr;
     formRenderRecordPtr_->HandleUpdateInJsThread(formJsInfo, want);
     EXPECT_EQ(false, formRenderRecordPtr_->BeforeHandleUpdateForm(formJsInfo));
-    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->runtime_ = std::make_shared<JsFormRuntime>();
     EXPECT_EQ(true, formRenderRecordPtr_->BeforeHandleUpdateForm(formJsInfo));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_043 end";
 }
@@ -1413,7 +1413,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_069, TestSize.Level1)
 
     ASSERT_NE(formRenderRecordPtr_, nullptr);
     FormJsInfo formJsInfo;
-    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->runtime_ = std::make_shared<JsFormRuntime>();
     ASSERT_NE(formRenderRecordPtr_->runtime_, nullptr);
     formRenderRecordPtr_->contextsMapForModuleName_.clear();
     bool result = formRenderRecordPtr_->UpdateRuntime(formJsInfo);
@@ -2066,7 +2066,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_106, TestSize.Level1)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_107, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_107 start";
-    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->runtime_ = std::make_shared<JsFormRuntime>();
     FormJsInfo info;
     info.formName = "123";
     info.moduleName = "456";
@@ -2527,7 +2527,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_133, TestSize.Level1)
     Want want;
     formRenderRecordPtr_->formRendererGroupMap_.clear();
     formRenderRecordPtr_->formRendererGroupMap_.emplace(456, nullptr);
-    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->runtime_ = std::make_shared<JsFormRuntime>();
     formRenderRecordPtr_->HandleReloadFormRecord(std::move(formJsInfos), want);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_133 end";
 }
@@ -2840,7 +2840,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_150, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_150 start";
     EXPECT_TRUE(formRenderRecordPtr_);
-    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->runtime_ = std::make_shared<JsFormRuntime>();
     formRenderRecordPtr_->RegisterUncatchableErrorHandler();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_150 end";
 }
