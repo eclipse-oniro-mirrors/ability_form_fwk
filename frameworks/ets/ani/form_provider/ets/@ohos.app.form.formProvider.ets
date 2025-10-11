@@ -81,7 +81,8 @@ export namespace formProvider {
   function setFormNextRefreshTime(formId: string, minute: int): Promise<void> {
     return new Promise<void>((resolve, reject): void => {
       if ((formId === "") || (minute < 0)) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>((err, data) => {
         if (err == null || err.code == ERR_OK) {
@@ -107,17 +108,21 @@ export namespace formProvider {
       setFormNextRefreshTimeInner(formId, minute, call);
     });
   }
+  
   export function setFormNextRefreshTimeReturnsPromise(formId: string, minute: int): Promise<void> {
     return setFormNextRefreshTime(formId, minute);
   }
+
   export function setFormNextRefreshTimeWithCallback(formId: string, minute: int, callback: AsyncCallback<void>): void {
     setFormNextRefreshTime(formId, minute, callback);
   }
+
   export function updateForm(formId: string, formBindingData: formBindingData.FormBindingData): Promise<void> {
     let dataObjStr: string = JSON.stringify(formBindingData.data);
     return new Promise<void>((resolve, reject): void => {
       if (formId === "") {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>((err, data) => {
         if (err == null || err.code == ERR_OK) {

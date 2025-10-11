@@ -222,6 +222,7 @@ export default namespace formInfo {
     public formDescription: string = '';
     public extraData?: Record<string, Object> = {};
   }
+  
   export class FormStateInfoInner implements FormStateInfo {
     formState: FormState;
     want: Want;

@@ -101,6 +101,7 @@ export namespace formHost {
       reject: (err: BusinessError) => void): void => {
       if (want === null || want === undefined) {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<formInfo.FormStateInfo>(
         (err: BusinessError | null, data: formInfo.FormStateInfo | undefined) => {
@@ -128,7 +129,8 @@ export namespace formHost {
   export function shareForm(formId: string, deviceId: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if ((formId === "") || (deviceId === "")) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>((err) => {
         if (err == null || err.code == ERR_OK) {
@@ -158,7 +160,8 @@ export namespace formHost {
     return new Promise<Record<string, Object>>((resolve: (data: Record<string, Object>) => void,
       reject: (err: BusinessError) => void): void => {
       if (formId === "") {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<Record<string, Object>>((err, data) => {
@@ -179,6 +182,7 @@ export namespace formHost {
       reject: (err: BusinessError) => void): void => {
       if (want === undefined) {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<formInfo.RunningFormInfo>(
         (err: BusinessError | null, data: formInfo.RunningFormInfo | undefined) => {
@@ -208,6 +212,7 @@ export namespace formHost {
     return new Promise<void>((resolve, reject): void => {
       if (formId === "") {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>(
         (err, data) => {
@@ -226,11 +231,11 @@ export namespace formHost {
   }
 
   export function deleteInvalidForms(formIds: Array<string>): Promise<int> {
-
     return new Promise<int>((resolve: (data: int) => void,
       reject: (err: BusinessError) => void): void => {
       if (formIds.length === 0) {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<int>(
         (err: BusinessError | null, data: int | undefined) => {
@@ -244,7 +249,6 @@ export namespace formHost {
         deleteInvalidFormsInner(formIds, call);
       });
     });
-
   }
 
   export function deleteInvalidForms(formIds: Array<string>, callback: AsyncCallback<int>): void {
@@ -275,6 +279,7 @@ export namespace formHost {
     return new Promise<void>((resolve, reject): void => {
       if (formIds.length === 0) {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>(
         (err, data) => {
@@ -307,6 +312,7 @@ export namespace formHost {
     return new Promise<void>((resolve, reject): void => {
       if (formIds.length === 0) {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>(
         (err, data) => {
@@ -388,7 +394,8 @@ export namespace formHost {
       (resolve: (data: Array<formInfo.FormInfo>) => void,
         reject: (err: BusinessError) => void): void => {
         if (bundleName === "") {
-          return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+          reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+          return;
         }
         let call = new AsyncCallbackWrapper<Array<formInfo.FormInfo>>(
           (err: BusinessError | null, data: Array<formInfo.FormInfo> | undefined) => {
@@ -411,7 +418,7 @@ export namespace formHost {
       return;
     }
 
-    let emptyString: string = ""
+    let emptyString: string = "";
     let call = new AsyncCallbackWrapper<Array<formInfo.FormInfo>>(callback);
 
     taskpool.execute((): void => {
@@ -457,7 +464,8 @@ export namespace formHost {
   export function notifyFormsEnableUpdate(formIds: Array<string>, isEnableUpdate: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let callbackWrap = new AsyncCallbackWrapper<void>((err) => {
@@ -488,7 +496,8 @@ export namespace formHost {
   export function notifyFormsVisible(formIds: Array<string>, isVisible: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let callbackWrap = new AsyncCallbackWrapper<void>((err) => {
@@ -520,7 +529,8 @@ export namespace formHost {
   export function notifyFormsPrivacyProtected(formIds: Array<string>, isProtected: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let callbackWrap = new AsyncCallbackWrapper<void>((err) => {
@@ -540,6 +550,7 @@ export namespace formHost {
     return new Promise<void>((resolve, reject): void => {
       if (formId === "") {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>(
         (err, data) => {
@@ -586,6 +597,7 @@ export namespace formHost {
     return new Promise<void>((resolve, reject): void => {
       if (formId === "") {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>(
         (err, data) => {
@@ -616,6 +628,7 @@ export namespace formHost {
     return new Promise<void>((resolve, reject): void => {
       if (formId === "") {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
       let call = new AsyncCallbackWrapper<void>(
         (err, data) => {
@@ -639,7 +652,8 @@ export namespace formHost {
   export function castToNormalForm(formId: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formId === "") {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {
@@ -671,7 +685,8 @@ export namespace formHost {
   export function notifyVisibleForms(formIds: Array<string>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {
@@ -703,7 +718,8 @@ export namespace formHost {
   export function notifyInvisibleForms(formIds: Array<string>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {
@@ -735,7 +751,8 @@ export namespace formHost {
   export function setFormsRecyclable(formIds: Array<string>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {
@@ -767,7 +784,8 @@ export namespace formHost {
   export function updateFormLockedState(formId: string, isLocked: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formId === "") {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let callbackWrap = new AsyncCallbackWrapper<void>((err) => {
@@ -786,7 +804,8 @@ export namespace formHost {
   export function recycleForms(formIds: Array<string>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {
@@ -806,7 +825,8 @@ export namespace formHost {
   export function recoverForms(formIds: Array<string>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {
@@ -840,7 +860,6 @@ export namespace formHost {
     taskpool.execute((): void => {
       registerFormObserverInner(callbackWrap);
     });
-
   }
 
   export function off(type: "formUninstall", callback?: Callback<string>): void {
@@ -857,7 +876,8 @@ export namespace formHost {
   export function setRouterProxy(formIds: Array<string>, proxy: Callback<Want>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {
@@ -892,7 +912,8 @@ export namespace formHost {
   export function clearRouterProxy(formIds: Array<string>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (formIds.length === 0) {
-        return reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
       }
 
       let call = new AsyncCallbackWrapper<void>(err => {

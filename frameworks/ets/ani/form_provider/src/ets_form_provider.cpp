@@ -29,7 +29,6 @@ using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AbilityRuntime::FormAniHelpers;
 using namespace OHOS::AppExecFwk::Constants;
-//using namespace OHOS::AppExecFwk::AniConstants;
 
 void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, ani_int minute, ani_object callback)
 {
@@ -103,7 +102,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
     ani_object formInfosArray = GetANIArray(env, formInfos.size());
 
     ani_size index = 0;
-    for (auto formInfo : formInfos) {
+    for (auto &formInfo : formInfos) {
         ani_object formInfoAni = CreateANIObject(env, FORM_INFO_INNER_CLASS_NAME);
         SetFormInfoFields(env, formInfoAni, formInfo);
         ani_status status = env->Object_CallMethodByName_Void(formInfosArray, ANI_SETTER_MARKER,
@@ -251,7 +250,7 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
 
     ani_object formInfosArray = GetANIArray(env, formInfos.size());
     ani_size index = 0;
-    for (auto formInfo : formInfos) {
+    for (auto &formInfo : formInfos) {
         ani_object runningFormInfoAni = CreateANIObject(env, RUNNING_FORM_INFO_INNER_CLASS_NAME);
         SetRunningFormInfoFields(env, runningFormInfoAni, formInfo);
         ani_status status = env->Object_CallMethodByName_Void(

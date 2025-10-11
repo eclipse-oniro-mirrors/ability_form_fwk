@@ -57,7 +57,7 @@ public:
         }
     }
 
-    void SetWant(const Want want)
+    void SetWant(const Want &want)
     {
         want_ = want;
     }
@@ -239,12 +239,12 @@ void AcquireFormData([[maybe_unused]] ani_env *env, ani_string formId, ani_objec
     ani_vm* vm;
     auto stat = env->GetVM(&vm);
     if (stat != ANI_OK || vm == nullptr) {
-        HILOG_INFO("cannot create vm");
+        HILOG_ERROR("cannot create vm");
     }
 
     ani_ref receiveDataForResultCallback = nullptr;
     if (env->GlobalReference_Create(callback, &receiveDataForResultCallback) != ANI_OK) {
-        HILOG_INFO("cannot create global reference");
+        HILOG_ERROR("cannot create global reference");
         return;
     }
 
@@ -267,7 +267,7 @@ void AcquireFormData([[maybe_unused]] ani_env *env, ani_string formId, ani_objec
 
     HILOG_DEBUG("End");
 #else
-        return;
+    return;
 #endif
 }
 
@@ -280,12 +280,12 @@ void InnerShareForm(ani_vm* vm, ani_ref callBackGlobRef, int32_t code)
 
     ani_object etsErrorCode = EtsErrorUtil::CreateError(env, AbilityErrorCode::ERROR_OK);
     if (code != 0) {
-        HILOG_INFO("code is not equalt to zero");
+        HILOG_ERROR("code is not equalt to zero");
         etsErrorCode = EtsErrorUtil::CreateError(env, static_cast<AbilityErrorCode>(code));
     }
 
     if (etsErrorCode == nullptr) {
-        HILOG_INFO("error code is not nullptr");
+        HILOG_ERROR("error code is nullptr");
     }
 
     if (callBackGlobRef == nullptr) {
@@ -334,6 +334,7 @@ void ShareForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string devi
     auto stat = env->GetVM(&vm);
     if (stat != ANI_OK || vm == nullptr) {
         HILOG_ERROR("Cannot get vm");
+        return;
     }
 
     EtsShareFormCallBackClient::ShareFormTask task = [=](int32_t code) {
@@ -430,6 +431,7 @@ void DeleteInvalidForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+        return;
     }
 
     int32_t num = 0;
@@ -519,6 +521,7 @@ void GetAllFormsInfo([[maybe_unused]] ani_env *env, ani_object callback)
     if (ret != ERR_OK) {
         HILOG_ERROR("Error when get allformInfos");
         InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        return;
     }
 
     auto result = CreateFormInfoAniArrayFromVec(env, allInfos);
