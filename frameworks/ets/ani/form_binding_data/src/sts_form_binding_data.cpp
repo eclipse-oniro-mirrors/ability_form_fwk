@@ -18,11 +18,15 @@
 
 #include "ani.h"
 #include "ani_getfromcache.h"
+#include <ani_signature_builder.h>
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
+using namespace arkts::ani_signature;
+
 static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_object paramObject)
 {
     if (env == nullptr) {
@@ -61,7 +65,7 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     }
     ani_method setMethod;
     if ((status = AniGetFromCache::GetInstance().AniFormGetMtd(
-        env, formBindingDataCls, "<set>data", nullptr, setMethod)) != ANI_OK) {
+        env, formBindingDataCls, Builder::BuildSetterName("data").c_str(), nullptr, setMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }

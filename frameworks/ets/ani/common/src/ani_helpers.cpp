@@ -14,10 +14,13 @@
  */
  
 #include "ani_helpers.h"
+#include <ani_signature_builder.h>
 
 namespace OHOS {
 namespace AbilityRuntime {
 namespace FormAniHelpers {
+
+using namespace arkts::ani_signature;
 
 int ConvertStringToInt(const std::string &strInfo)
 {
@@ -507,7 +510,7 @@ ani_ref GetMemberRef(ani_env *env, ani_object object, const char *class_name, co
     ani_status status = ANI_OK;
     ani_class cls = GetANIClass(env, class_name);
     ani_method getter{};
-    status = env->Class_FindMethod(cls, ("<get>" + member).c_str(), nullptr, &getter);
+    status = env->Class_FindMethod(cls, Builder::BuildGetterName(member).c_str(), nullptr, &getter);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed, error code: %{public}d", status);
         return nullptr;

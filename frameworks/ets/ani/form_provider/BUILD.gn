@@ -46,6 +46,7 @@ ohos_shared_library("formProvider_ani") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "runtime_core:ani",
+    "runtime_core:ani_helpers",
     "runtime_core:libarkruntime",
   ]
 
