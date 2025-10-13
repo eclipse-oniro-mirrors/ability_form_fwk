@@ -60,6 +60,8 @@ private:
         const bool isAppUpgrade = false);
     void ExecDisableCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
         const bool isAppUpgrade = false);
+    bool ShouldProcessForm(const FormRecord &formRecord, const ParamCtrl &item,
+        const bool isApply, const bool isAppUpgrade);
 
     std::vector<ParamCtrl> preUpdateDurationCtrl_;
     std::vector<ParamCtrl> preDisableCtrl_;
