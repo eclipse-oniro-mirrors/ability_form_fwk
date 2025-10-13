@@ -2246,5 +2246,35 @@ ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
     }
     return FormMgrAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
 }
+
+bool FormMgrService::IsFormDueDisable(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName, const int32_t dimension)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return false;
+    }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueDisable",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    bool result =
+        FormMgrAdapter::GetInstance().CheckFormDueDisable(bundleName, moduleName, abilityName, formName, dimension);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return result;
+}
+
+bool FormMgrService::IsFormDueRemove(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName, const int32_t dimension)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return false;
+    }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueRemove",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    bool result =
+        FormMgrAdapter::GetInstance().CheckFormDueRemove(bundleName, moduleName, abilityName, formName, dimension);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return result;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

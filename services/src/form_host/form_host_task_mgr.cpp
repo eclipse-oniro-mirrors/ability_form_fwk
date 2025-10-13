@@ -378,5 +378,53 @@ void FormHostTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
     FormDataMgr::GetInstance().HandleHostDied(remoteHost);
     FormSupplyCallback::GetInstance()->HandleHostDied(remoteHost);
 }
+
+void FormHostTaskMgr::PostDueDisableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisable,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("call");
+    auto func = [formIds, isDisable, remoteObject]() {
+        FormHostTaskMgr::GetInstance().DueDisableFormsTaskToHost(formIds, isDisable, remoteObject);
+    };
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, func);
+}
+
+void FormHostTaskMgr::DueDisableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisable,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("start");
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("get formHostProxy failed");
+        return;
+    }
+
+    remoteFormHost->OnDueDisableForm(formIds, isDisable);
+    HILOG_DEBUG("end");
+}
+
+void FormHostTaskMgr::PostDueRemoveFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isRemove,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("call");
+    auto func = [formIds, isRemove, remoteObject]() {
+        FormHostTaskMgr::GetInstance().DueRemoveFormsTaskToHost(formIds, isRemove, remoteObject);
+    };
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, func);
+}
+
+void FormHostTaskMgr::DueRemoveFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isRemove,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("start");
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("get formHostProxy failed");
+        return;
+    }
+ 
+    remoteFormHost->OnDueRemoveForm(formIds, isRemove);
+    HILOG_DEBUG("end");
+}
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -212,6 +212,20 @@ public:
      * @param lock True is lockform, false is unlockform.
      */
     void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) override;
+
+    /**
+     * @brief due disable form style
+     * @param formIds The Id list of the forms.
+     * @param lock True is due disable form, false is enable form.
+     */
+    void OnDueDisableForm(const std::vector<int64_t> &formIds, const bool isDisable) override;
+
+    /**
+     * @brief due remove form style
+     * @param formIds The Id list of the forms.
+     * @param lock True is due remove form, false is enable form.
+     */
+    void OnDueRemoveForm(const std::vector<int64_t> &formIds, const bool isRemove) override;
 private:
     static std::mutex instanceMutex_;
     static sptr<FormHostClient> instance_;

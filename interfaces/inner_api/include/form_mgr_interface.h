@@ -930,6 +930,36 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Check form is due disable control.
+     * @param bundleName form bundleName.
+     * @param moduleName form moduleName.
+     * @param abilityName form abilityName.
+     * @param formName form widget name.
+     * @param dimension form dimension value.
+     * @return Returns true for form is due disabled.
+     */
+    virtual bool IsFormDueDisable(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName, const int32_t dimension)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Check form is due remove control.
+     * @param bundleName form bundleName.
+     * @param moduleName form moduleName.
+     * @param abilityName form abilityName.
+     * @param formName form widget name.
+     * @param dimension form dimension value.
+     * @return Returns true for form is due removed.
+     */
+    virtual bool IsFormDueRemove(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName, const int32_t dimension)
+    {
+        return false;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1037,6 +1067,8 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE,
         FORM_MGR_RELOAD_FORMS,
         FORM_MGR_RELOAD_ALL_FORMS,
+        FORM_MGR_IS_FORM_DUE_DISABLE,
+        FORM_MGR_IS_FORM_DUE_REMOVE,
     };
 };
 }  // namespace AppExecFwk

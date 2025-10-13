@@ -375,5 +375,33 @@ void FormHostRecord::GetForms(std::vector<int64_t> &formIds)
         formIds.emplace_back(iter.first);
     }
 }
+
+void FormHostRecord::OnDueDisableForms(const std::vector<int64_t> &formIds, const bool isDisable)
+{
+    HILOG_DEBUG("start");
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("null formHostCallback_");
+        return;
+    }
+    formHostCallback_->OnDueDisableForms(formIds, isDisable, formHostClient_);
+}
+
+void FormHostRecord::OnDueRemoveForms(const std::vector<int64_t> &formIds, const bool isRemove)
+{
+    HILOG_DEBUG("start");
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("null formHostCallback_");
+        return;
+    }
+    formHostCallback_->OnDueRemoveForms(formIds, isRemove, formHostClient_);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

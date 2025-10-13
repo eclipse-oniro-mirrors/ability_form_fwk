@@ -3201,5 +3201,51 @@ void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempFo
         }
     }
 }
+
+bool FormDataMgr::GetFormRecord(const std::string &bundleName, const std::string &moduleName,
+    std::vector<FormRecord> &formRecords) const
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (bundleName == itFormRecord->second.bundleName && moduleName == itFormRecord->second.moduleName) {
+            formRecords.emplace_back(itFormRecord->second);
+        }
+    }
+    return formRecords.size() > 0;
+}
+
+void FormDataMgr::DueDisableForms(const std::vector<FormRecord> &&formRecords, const bool isDisable)
+{
+    HILOG_INFO("call, isDisable:%{public}d", isDisable);
+    std::lock_guard<std::mutex> lockMutex(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        std::vector<int64_t> matchedFormIds;
+        for (auto formRecord : formRecords) {
+            if (itHostRecord->Contains(formRecord.formId)) {
+                matchedFormIds.emplace_back(formRecord.formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnDueDisableForms(matchedFormIds, isDisable);
+        }
+    }
+}
+
+void FormDataMgr::DueRemoveForms(const std::vector<FormRecord> &&formRecords, const bool isRemove)
+{
+    HILOG_INFO("call, isRemove:%{public}d", isRemove);
+    std::lock_guard<std::mutex> lockMutex(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        std::vector<int64_t> matchedFormIds;
+        for (auto formRecord : formRecords) {
+            if (itHostRecord->Contains(formRecord.formId)) {
+                matchedFormIds.emplace_back(formRecord.formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnDueRemoveForms(matchedFormIds, isRemove);
+        }
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

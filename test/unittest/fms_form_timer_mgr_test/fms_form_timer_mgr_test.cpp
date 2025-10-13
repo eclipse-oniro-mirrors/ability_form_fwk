@@ -305,7 +305,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0015, Function | MediumTest | Lev
     timerCfg1.updateDuration = 0;
     bool isUpdateOk1 = FormTimerMgr::GetInstance().UpdateFormTimer(PARAM_FORM_ID_VALUE_1,
     UpdateType::TYPE_INTERVAL_CHANGE, timerCfg1);
-    EXPECT_EQ(isUpdateOk1, false);
+    EXPECT_EQ(isUpdateOk1, true);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0015 end";
 }
 /**
@@ -368,7 +368,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0018, Function | MediumTest | Lev
     timerCfg4.updateDuration = 0;
     bool isUpdateOk4 = FormTimerMgr::GetInstance().UpdateFormTimer(PARAM_FORM_ID_VALUE_4,
     UpdateType::TYPE_ATTIME_TO_INTERVAL,  timerCfg4);
-    EXPECT_EQ(isUpdateOk4, false);
+    EXPECT_EQ(isUpdateOk4, true);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0018 end";
 }
 

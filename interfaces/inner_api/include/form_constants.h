@@ -422,6 +422,8 @@ namespace Constants {
 
     constexpr int64_t DETECT_FORM_EXIT_DELAY_TASK = 30000; // task type base
     constexpr int64_t DETECT_FORM_EXIT_TIMEOUT_DELAY = 10 * 1000;
+
+    constexpr int32_t DUE_INVALID_UPDATE_DURATION = -1;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -112,6 +112,20 @@ public:
      */
     virtual void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) {}
 
+    /**
+     * @brief disable form style
+     * @param formIds The Id list of the forms.
+     * @param isDisable True is disable form, false is enable form.
+     */
+    virtual void OnDueDisableForm(const std::vector<int64_t> &formIds, const bool isDisable) {}
+
+    /**
+     * @brief remove form style
+     * @param formIds The Id list of the forms.
+     * @param isRemove True is remove form, false is enable form.
+     */
+    virtual void OnDueRemoveForm(const std::vector<int64_t> &formIds, const bool isRemove) {}
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -148,6 +162,12 @@ public:
 
         // ipc id for lock form style (3691)
         FORM_HOST_ON_LOCK_FORM,
+
+        // ipc id for due disable form (3692)
+        FORM_HOST_ON_DUE_DISABLE_FORM,
+
+        // ipc id for due remove form (3693)
+        FORM_HOST_ON_DUE_REMOVE_FORM,
     };
 };
 }  // namespace AppExecFwk

@@ -226,6 +226,20 @@ public:
      * @param formIds The output parameter store the formId list.
      */
     void GetForms(std::vector<int64_t> &formIds);
+
+    /**
+     * @brief due disable form or not.
+     * @param formIds The Id list of forms.
+     * @param isDisable True is due disable form, false is enable form.
+     */
+    void OnDueDisableForms(const std::vector<int64_t> &formIds, const bool isDisable);
+
+    /**
+     * @brief due remove form or not.
+     * @param formIds The Id list of forms.
+     * @param isRemove True is due remove form, false is enable form.
+     */
+    void OnDueRemoveForms(const std::vector<int64_t> &formIds, const bool isRemove);
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;

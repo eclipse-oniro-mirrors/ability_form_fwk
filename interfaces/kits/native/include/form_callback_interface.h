@@ -66,6 +66,18 @@ public:
      * @param enable True is lock form, false is unlock form.
      */
     virtual void ProcessLockForm(bool lock) {}
+
+    /**
+    * @brief due disable form.
+    * @param isDisable True is due disable form, false is due enable form.
+    */
+    virtual void ProcessDueDisableForm(bool isDisable) {}
+
+    /**
+    * @brief due remove form.
+    * @param isRemove True is due remove form, false is due remove form.
+    */
+    virtual void ProcessDueRemoveForm(bool isRemove) {}
 };
 
 class FormStateCallbackInterface {

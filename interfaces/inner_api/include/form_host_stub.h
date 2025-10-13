@@ -128,6 +128,22 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleOnLockForm(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle OnDueDisableForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnDueDisableForm(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle OnDueRemoveForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnDueRemoveForm(MessageParcel &data, MessageParcel &reply);
 private:
     DISALLOW_COPY_AND_MOVE(FormHostStub);
 };

@@ -104,6 +104,11 @@ public:
      */
     void DelRenderTask(int64_t formId);
 
+    /**
+     * @brief Cosume refresh when form exempt due control.
+     * @param disableFormRecords The due disable form list.
+     */
+    void CosumeRefreshByDueControl(const std::vector<FormRecord> &disableFormRecords);
 private:
     std::mutex overloadTaskMutex_;
     std::vector<FormTimer> overloadTask_;

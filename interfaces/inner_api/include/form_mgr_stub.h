@@ -802,6 +802,22 @@ private:
      */
     ErrCode HandleReloadAllForms(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle form due disable check msg.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleIsFormDueDisable(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle form due remove check msg.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleIsFormDueRemove(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

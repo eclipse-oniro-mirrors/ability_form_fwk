@@ -152,6 +152,7 @@ ohos_shared_library("libfms") {
     "services/src/feature/param_update/param_manager.cpp",
     "services/src/feature/param_update/param_reader.cpp",
     "services/src/feature/param_update/sign_tools.cpp",
+    "services/src/feature/param_update/param_control.cpp",
     "services/src/feature/route_proxy/form_router_proxy_mgr.cpp",
     "services/src/form_host/form_host_callback.cpp",
     "services/src/form_host/form_host_queue.cpp",

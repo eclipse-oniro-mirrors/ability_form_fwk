@@ -111,6 +111,20 @@ public:
      * @param lock True is lockform, false is unlockform.
      */
     void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) override;
+
+    /**
+     * @brief disable form style
+     * @param formIds The Id list of the forms.
+     * @param isDisable True is disable form, false is enable form.
+     */
+    void OnDueDisableForm(const std::vector<int64_t> &formIds, const bool isDisable) override;
+
+    /**
+     * @brief remove form style
+     * @param formIds The Id list of the forms.
+     * @param isRemove True is remove form, false is enable form.
+     */
+    void OnDueRemoveForm(const std::vector<int64_t> &formIds, const bool isRemove) override;
 private:
     template <typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

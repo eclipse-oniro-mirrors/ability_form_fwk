@@ -813,6 +813,29 @@ public:
     */
     ErrCode ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms);
 
+    /**
+     * @brief Check form is due disable control.
+     * @param bundleName form bundleName.
+     * @param moduleName form moduleName.
+     * @param abilityName form abilityName.
+     * @param formName form widget name.
+     * @param dimension form dimension value.
+     * @return Returns true for form is due disabled.
+     */
+    bool CheckFormDueDisable(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName, const int32_t dimension);
+
+    /**
+     * @brief Check form is due remove control.
+     * @param bundleName form bundleName.
+     * @param moduleName form moduleName.
+     * @param abilityName form abilityName.
+     * @param formName form widget name.
+     * @param dimension form dimension value.
+     * @return Returns true for form is due removed.
+     */
+    bool CheckFormDueRemove(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName, const int32_t dimension);
 private:
     /**
      * @brief Get form configure info.
@@ -1342,6 +1365,19 @@ private:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode CallerCheck(const int64_t formId, const int32_t callingUid);
+
+    /**
+     * @brief Make form due control status record.
+     * @param bundleName form bundleName.
+     * @param moduleName form moduleName.
+     * @param abilityName form abilityName.
+     * @param formName form widget name.
+     * @param dimension form dimension value.
+     * @param formRecord output formrecord.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode MakeDueControlFormRecord(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName, const int32_t dimension, FormRecord &formRecord);
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;

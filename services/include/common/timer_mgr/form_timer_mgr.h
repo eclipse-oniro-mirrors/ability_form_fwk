@@ -187,6 +187,12 @@ public:
      * @brief per 24h report disk use info.
      */
     void StartDiskUseInfoReportTimer();
+    /**
+     * @brief Delete interval timer task.
+     * @param formId The Id of the form.
+     * @return Returns true on success, false on failure.
+     */
+    bool DeleteIntervalTimer(int64_t formId);
 
 private:
     /**
@@ -250,12 +256,6 @@ private:
      * @return Returns true on success, false on failure.
      */
     bool AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &timerCfg);
-    /**
-     * @brief Delete interval timer task.
-     * @param formId The Id of the form.
-     * @return Returns true on success, false on failure.
-     */
-    bool DeleteIntervalTimer(int64_t formId);
     /**
      * @brief Delete update at timer.
      * @param formId The Id of the form.

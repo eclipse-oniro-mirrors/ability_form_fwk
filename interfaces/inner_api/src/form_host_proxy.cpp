@@ -404,5 +404,61 @@ void FormHostProxy::OnLockForm(const std::vector<int64_t> &formIds, const bool l
         HILOG_ERROR("SendRequest:%{public}d failed", error);
     }
 }
+
+void FormHostProxy::OnDueDisableForm(const std::vector<int64_t> &formIds, const bool isDisable)
+{
+    HILOG_INFO("start");
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return;
+    }
+
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("fail write formIds");
+        return;
+    }
+
+    if (!data.WriteBool(isDisable)) {
+        HILOG_ERROR("write isDisable failed");
+        return;
+    }
+
+    MessageParcel reply;
+    int error = SendTransactCmd(IFormHost::Message::FORM_HOST_ON_DUE_DISABLE_FORM, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+    }
+}
+
+void FormHostProxy::OnDueRemoveForm(const std::vector<int64_t> &formIds, const bool isRemove)
+{
+    HILOG_INFO("start");
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return;
+    }
+
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("fail write formIds");
+        return;
+    }
+
+    if (!data.WriteBool(isRemove)) {
+        HILOG_ERROR("write isRemove failed");
+        return;
+    }
+
+    MessageParcel reply;
+    int error = SendTransactCmd(IFormHost::Message::FORM_HOST_ON_DUE_REMOVE_FORM, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

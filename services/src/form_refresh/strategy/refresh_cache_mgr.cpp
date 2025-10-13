@@ -203,5 +203,18 @@ void RefreshCacheMgr::DelRenderTask(int64_t formId)
     }
 }
 
+void RefreshCacheMgr::CosumeRefreshByDueControl(const std::vector<FormRecord> &disableFormRecords)
+{
+    HILOG_INFO("call, formRecord size:%{public}zu", disableFormRecords.size());
+    for (const auto &formRecord : disableFormRecords) {
+        RefreshData data;
+        data.formId = formRecord.formId;
+        data.record = formRecord;
+        Want reqWant;
+        reqWant.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
+        data.want = reqWant;
+        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

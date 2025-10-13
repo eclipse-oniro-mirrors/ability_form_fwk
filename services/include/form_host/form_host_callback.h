@@ -102,6 +102,24 @@ public:
      * @param callerToken Caller ability token.
      */
     void OnLockForms(const std::vector<int64_t> &formIds, const bool lock, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief due disable form or not.
+     * @param formIds The Id list of forms.
+     * @param isDisable True is due disable form, false is enable form.
+     * @param callerToken Caller ability token.
+     */
+    void OnDueDisableForms(const std::vector<int64_t> &formIds, const bool isDisable,
+        const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief due remove form or not.
+     * @param formIds The Id list of forms.
+     * @param isRemove True is due remove form, false is enable form.
+     * @param callerToken Caller ability token.
+     */
+    void OnDueRemoveForms(const std::vector<int64_t> &formIds, const bool isRemove,
+        const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

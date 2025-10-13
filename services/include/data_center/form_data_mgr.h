@@ -986,6 +986,30 @@ public:
      * @return Returns true if the form should be recycled
      */
     bool IsExpectRecycled(int64_t formId);
+
+    /**
+     * @brief Get form record.
+     * @param bundleName Bundle name.
+     * @param moduleName module name.
+     * @param formRecords The form record list.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool GetFormRecord(const std::string &bundleName, const std::string &moduleName,
+        std::vector<FormRecord> &formRecords) const;
+
+    /**
+     * @brief due disable forms style.
+     * @param formRecords The Id list of the formRecord.
+     * @param isDisable True is due disable form, false is enable form.
+     */
+    void DueDisableForms(const std::vector<FormRecord> &&formRecords, const bool isDisable);
+
+    /**
+     * @brief due remove forms style.
+     * @param formRecords The Id list of the formRecord.
+     * @param isRemove True is due remove form, false is enable form.
+     */
+    void DueRemoveForms(const std::vector<FormRecord> &&formRecords, const bool isRemove);
 private:
     /**
      * @brief Create form record.

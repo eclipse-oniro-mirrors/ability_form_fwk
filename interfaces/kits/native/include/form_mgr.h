@@ -851,6 +851,29 @@ public:
      */
     ErrCode ReloadAllForms(int32_t &reloadNum);
 
+    /**
+     * @brief Check form is due disable control.
+     * @param bundleName form bundleName.
+     * @param moduleName form moduleName.
+     * @param abilityName form abilityName.
+     * @param formName form widget name.
+     * @param dimension form dimension value.
+     * @return Returns true for form is due disabled.
+     */
+    bool IsFormDueDisable(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName, const int32_t dimension);
+
+    /**
+     * @brief Check form is due remove control.
+     * @param bundleName form bundleName.
+     * @param moduleName form moduleName.
+     * @param abilityName form abilityName.
+     * @param formName form widget name.
+     * @param dimension form dimension value.
+     * @return Returns true for form is due removed.
+     */
+    bool IsFormDueRemove(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName, const int32_t dimension);
 private:
     /**
      * @brief Connect form manager service.

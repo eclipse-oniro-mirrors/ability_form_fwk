@@ -37,6 +37,7 @@
 #include "data_center/form_data_mgr.h"
 #include "form_refresh/form_refresh_mgr.h"
 #include "feature/memory_mgr/form_render_report.h"
+#include "feature/param_update/param_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -47,6 +48,7 @@ constexpr int REQUEST_DYNAMIC_CODE = 3;
 constexpr int SHIFT_BIT_LENGTH = 32;
 constexpr int NANO_TO_SECOND =  1000000000;
 constexpr char FMS_TIME_SPEED[] = "fms.time_speed";
+constexpr char FMS_DUE_PARAM[] = "fms.due_param";
 // Specified custom timer event publisher uid, publisher must be foundation
 constexpr int32_t FOUNDATION_UID = 5523;
 constexpr int64_t TIMER_UPDATE_INTERVAL = 5 * 60 * 1000;
@@ -226,10 +228,14 @@ bool FormTimerMgr::UpdateFormTimer(int64_t formId, const UpdateType &type, const
  */
 bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timerCfg)
 {
-    if (timerCfg.updateDuration < Constants::MIN_PERIOD || timerCfg.updateDuration > Constants::MAX_PERIOD
+    if (timerCfg.updateDuration < 0 || timerCfg.updateDuration > Constants::MAX_PERIOD
         || (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
         HILOG_ERROR("invalid param");
         return false;
+    }
+
+    if (timerCfg.updateDuration == 0) {
+        return FormTimerMgr::GetInstance().DeleteIntervalTimer(formId);
     }
 
     std::lock_guard<std::mutex> lock(intervalMutex_);
@@ -360,7 +366,7 @@ bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCf
  */
 bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &timerCfg)
 {
-    if (timerCfg.updateDuration < Constants::MIN_PERIOD || timerCfg.updateDuration > Constants::MAX_PERIOD
+    if (timerCfg.updateDuration < 0 || timerCfg.updateDuration > Constants::MAX_PERIOD
         || (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
         HILOG_ERROR("invalid time");
         return false;
@@ -388,6 +394,9 @@ bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &ti
     if (targetItem.refreshTask.formId == 0) {
         HILOG_ERROR("the updateAtTimer not exist");
         return false;
+    }
+    if (timerCfg.updateDuration == 0) {
+        return true;
     }
     targetItem.refreshTask.isUpdateAt = false;
     targetItem.refreshTask.period = timerCfg.updateDuration;
@@ -1457,6 +1466,7 @@ void FormTimerMgr::Init()
     systemEventMatchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED);
 #ifdef FORM_EVENT_FOR_TEST
     systemEventMatchingSkills.AddEvent(FMS_TIME_SPEED);
+    systemEventMatchingSkills.AddEvent(FMS_DUE_PARAM);
 #endif
     EventFwk::CommonEventSubscribeInfo systemTimerEventSubInfo(systemEventMatchingSkills);
     systemTimerEventSubInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
@@ -1502,7 +1512,9 @@ void FormTimerMgr::TimerReceiver::OnReceiveEvent(const EventFwk::CommonEventData
 
     HILOG_INFO("action:%{public}s", action.c_str());
 
-    if (action == FMS_TIME_SPEED) {
+    if (action == FMS_DUE_PARAM) {
+        ParamManager::GetInstance().InitParam();
+    } else if (action == FMS_TIME_SPEED) {
         // Time speed must between 1 and 1000.
         auto timeSpeed = std::clamp(eventData.GetCode(), Constants::MIN_TIME_SPEED, Constants::MAX_TIME_SPEED);
         FormTimerMgr::GetInstance().SetTimeSpeed(timeSpeed);

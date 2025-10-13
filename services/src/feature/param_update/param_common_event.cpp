@@ -25,6 +25,7 @@
 #include "feature/param_update/param_manager.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -118,6 +119,7 @@ void ParamCommonEvent::HandleParamUpdate(const AAFwk::Want &want) const
         HILOG_WARN("Ignore type: %{public}s", type.c_str());
         return;
     }
+    FormEventReport::SendFormFailedEvent(FormEventName::FORM_DUE_CONTROL, 0, "", "", 0, 0);
     ParamManager::GetInstance().InitParam();
 }
 }  // namespace AppExecFwk

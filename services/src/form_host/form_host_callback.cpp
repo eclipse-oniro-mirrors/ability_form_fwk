@@ -165,5 +165,37 @@ void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
     // post enableFormsTask to host
     FormHostTaskMgr::GetInstance().PostLockFormsTaskToHost(formIds, lock, callerToken);
 }
+
+void FormHostCallback::OnDueDisableForms(const std::vector<int64_t> &formIds,
+    const bool isDisable, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("size:%{public}zu, isDisable:%{public}d", formIds.size(), isDisable);
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("null callerToken");
+        return;
+    }
+    FormHostTaskMgr::GetInstance().PostDueDisableFormsTaskToHost(formIds, isDisable, callerToken);
+}
+
+void FormHostCallback::OnDueRemoveForms(const std::vector<int64_t> &formIds,
+    const bool isRemove, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("size:%{public}zu, isRemove:%{public}d", formIds.size(), isRemove);
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("null callerToken");
+        return;
+    }
+    FormHostTaskMgr::GetInstance().PostDueRemoveFormsTaskToHost(formIds, isRemove, callerToken);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

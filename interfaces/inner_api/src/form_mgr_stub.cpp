@@ -344,6 +344,10 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleReloadForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELOAD_ALL_FORMS):
             return HandleReloadAllForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_DUE_DISABLE):
+            return HandleIsFormDueDisable(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_DUE_REMOVE):
+            return HandleIsFormDueRemove(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -2081,6 +2085,38 @@ ErrCode FormMgrStub::HandleReloadAllForms(MessageParcel &data, MessageParcel &re
     }
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleIsFormDueDisable(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    std::string moduleName = data.ReadString();
+    std::string abilityName = data.ReadString();
+    std::string formName = data.ReadString();
+    int32_t dimension = data.ReadInt32();
+    bool result = IsFormDueDisable(bundleName, moduleName, abilityName, formName, dimension);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleIsFormDueRemove(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    std::string moduleName = data.ReadString();
+    std::string abilityName = data.ReadString();
+    std::string formName = data.ReadString();
+    int32_t dimension = data.ReadInt32();
+    bool result = IsFormDueRemove(bundleName, moduleName, abilityName, formName, dimension);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

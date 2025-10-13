@@ -3066,5 +3066,85 @@ ErrCode FormMgrProxy::ReloadAllForms(int32_t &reloadNum)
     reloadNum = reply.ReadInt32();
     return reply.ReadInt32();
 }
+
+bool FormMgrProxy::IsFormDueDisable(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName, const int32_t dimension)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return true;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("write bundleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(moduleName)) {
+        HILOG_ERROR("write moduleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(abilityName)) {
+        HILOG_ERROR("write abilityName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(formName)) {
+        HILOG_ERROR("write formName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(dimension)) {
+        HILOG_ERROR("write dimension failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_DUE_DISABLE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool FormMgrProxy::IsFormDueRemove(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName, const int32_t dimension)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return true;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("write bundleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(moduleName)) {
+        HILOG_ERROR("write moduleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(abilityName)) {
+        HILOG_ERROR("write abilityName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(formName)) {
+        HILOG_ERROR("write formName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(dimension)) {
+        HILOG_ERROR("write dimension failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_DUE_REMOVE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -34,6 +34,7 @@
 #include "form_provider/form_provider_mgr.h"
 #include "want.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
+#include "feature/param_update/param_control.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -147,7 +148,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
             FormTimerMgr::GetInstance().RemoveFormTimer(id);
         }
     }
-
+    ParamControl::GetInstance().ReloadDueControlByAppUpgrade(updatedForms);
     HandleFormReload(bundleName, userId, needReload, updatedForms);
 }
 
@@ -280,6 +281,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
 
     // normal or standalone package install finish, update version info
     if (!isBundleDistributed || bundleInfo.hapModuleInfos.size() > NORMAL_BUNDLE_MODULE_LENGTH) {
+        formRecord.lastVersionCode = formRecord.versionCode;
         formRecord.versionCode = bundleInfo.versionCode;
     }
 
