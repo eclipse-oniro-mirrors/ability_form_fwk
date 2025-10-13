@@ -68,7 +68,10 @@ HWTEST_F(FmsParamControlTest, fmsParamControl_002, TestSize.Level1)
 HWTEST_F(FmsParamControlTest, fmsParamControl_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsParamControlTest fmsParamControl_003 start";
-    std::string jsonStr = "{\"formUpdateDurationCtrl\":[{\"bundleName\":\"com.example.duedemo\",\"moduleName\":\"entry\",\"abilityName\":\"EntryFormAbility\",\"formName\":\"widget1\",\"dimension\":[2],\"appVersionStart\":0,\"appVersionEnd\":0,\"updateDuration\":0}]}";
+    std::string jsonStr = "{\"formUpdateDurationCtrl\":[{\"bundleName\":\"com.example.duedemo\","
+        "\"moduleName\":\"entry\",\"abilityName\":\"EntryFormAbility\","
+        "\"formName\":\"widget1\",\"dimension\":[2],\"appVersionStart\":0,"
+        "\"appVersionEnd\":0,\"updateDuration\":0}]}";
     paramControl.DealDueParam(jsonStr);
     FormRecord formRecord;
     formRecord.bundleName = "com.example.duedemo";
@@ -96,7 +99,10 @@ HWTEST_F(FmsParamControlTest, fmsParamControl_004, TestSize.Level1)
     EXPECT_FALSE(paramControl.IsFormDisable(formRecord));
     EXPECT_FALSE(paramControl.IsFormRemove(formRecord));
 
-    std::string jsonStr = "{\"formDisableCtrl\":[{\"bundleName\":\"com.example.duedemo\",\"moduleName\":\"entry\",\"abilityName\":\"EntryFormAbility\",\"formName\":\"widget2\",\"dimension\":[2],\"appVersionStart\":0,\"appVersionEnd\":0,\"policy\":\"remove\"}]}";
+    std::string jsonStr = "{\"formDisableCtrl\":[{\"bundleName\":\"com.example.duedemo\","
+        "\"moduleName\":\"entry\",\"abilityName\":\"EntryFormAbility\","
+        "\"formName\":\"widget2\",\"dimension\":[2],\"appVersionStart\":0,"
+        "\"appVersionEnd\":0,\"policy\":\"remove\"}]}";
     paramControl.DealDueParam(jsonStr);
     formRecord.bundleName = "com.example.duedemo";
     formRecord.moduleName = "entry";
@@ -107,7 +113,9 @@ HWTEST_F(FmsParamControlTest, fmsParamControl_004, TestSize.Level1)
     EXPECT_FALSE(paramControl.IsFormDisable(formRecord));
     EXPECT_TRUE(paramControl.IsFormRemove(formRecord));
 
-    jsonStr = "{\"formDisableCtrl\":[{\"bundleName\":\"com.example.duedemo\",\"moduleName\":\"entry\",\"abilityName\":\"EntryFormAbility\",\"formName\":\"widget2\",\"dimension\":[2],\"appVersionStart\":0,\"appVersionEnd\":0,\"policy\":\"disable\"}]}";
+    jsonStr = "{\"formDisableCtrl\":[{\"bundleName\":\"com.example.duedemo\",\"moduleName\":\"entry\","
+        "\"abilityName\":\"EntryFormAbility\",\"formName\":\"widget2\",\"dimension\":[2],"
+        "\"appVersionStart\":0,\"appVersionEnd\":0,\"policy\":\"disable\"}]}";
     paramControl.DealDueParam(jsonStr);
     EXPECT_FALSE(paramControl.IsFormRemove(formRecord));
     EXPECT_TRUE(paramControl.IsFormDisable(formRecord));
