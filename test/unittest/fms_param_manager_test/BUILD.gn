@@ -36,6 +36,7 @@ ohos_unittest("FmsParamManagerTest") {
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_timer_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_app_upgrade_refresh_impl.cpp",
+    "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_provider_refresh_impl.cpp",
     "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_check_mgr.cpp",
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_control_mgr.cpp",
