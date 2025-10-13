@@ -15,7 +15,7 @@ import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-ohos_shared_library("formBindingData_ani") {
+ohos_shared_library("form_agent_ani") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -24,17 +24,25 @@ ohos_shared_library("formBindingData_ani") {
 
   include_dirs = []
 
-  sources = [ "src/ets_form_binding_data.cpp" ]
+  sources = [ "src/ets_form_agent.cpp" ]
 
-  deps = [ "${form_fwk_path}:form_manager" ]
+  deps = [
+    "${form_fwk_ani_path}/utils:util_ani",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
+  ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_common",
     "ability_runtime:extensionkit_native",
     "ability_runtime:runtime",
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
   ]
@@ -43,17 +51,17 @@ ohos_shared_library("formBindingData_ani") {
   part_name = "form_fwk"
 }
 
-generate_static_abc("form_binding_data") {
+generate_static_abc("formagent") {
   base_url = "./ets"
-  files = [ "./ets/@ohos.app.form.formBindingData.ets" ]
+  files = [ "./ets/@ohos.app.form.formAgent.ets" ]
 
   is_boot_abc = "True"
-  device_dst_file = "/system/framework/form_binding_data.abc"
+  device_dst_file = "/system/framework/formagent.abc"
 }
 
-ohos_prebuilt_etc("form_binding_data_etc") {
-  source = "$target_out_dir/form_binding_data.abc"
-  deps = [ ":form_binding_data" ]
+ohos_prebuilt_etc("form_agent_etc") {
+  source = "$target_out_dir/formagent.abc"
+  deps = [ ":formagent" ]
   module_install_dir = "framework"
   subsystem_name = "ability"
   part_name = "form_fwk"

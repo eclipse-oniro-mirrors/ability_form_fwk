@@ -24,24 +24,25 @@ ohos_shared_library("formProvider_ani") {
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
-    "../common/include"
+    "../common/include",
   ]
 
   sources = [
+    "${form_fwk_path}/frameworks/ets/ani/common/src/ani_helpers.cpp",
     "src/ets_form_provider.cpp",
-    "${form_fwk_path}/frameworks/ets/ani/common/src/ani_helpers.cpp"
   ]
 
-  deps = [ 
+  deps = [
+    "${form_fwk_ani_path}/utils:util_ani",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-   ]
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_common",
     "ability_runtime:extensionkit_native",
     "ability_runtime:runtime",
-    "ability_runtime:ani_common",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",

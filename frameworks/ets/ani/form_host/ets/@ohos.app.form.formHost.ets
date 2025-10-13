@@ -29,8 +29,8 @@ export class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
-export class CallbackWrapper<T> {
-  private myFun_: Callback<T> = (data: T) => { }
+class CallbackWrapper<T> {
+  private myFun_: Callback<T> = (data: T) => {}
 
   constructor(myFun: Callback<T>) {
     this.myFun_ = myFun;
@@ -41,7 +41,7 @@ export class CallbackWrapper<T> {
   }
 }
 
-export namespace formHost {
+export default namespace formHost {
 
   loadLibrary("formHost_ani.z");
 
@@ -78,6 +78,12 @@ export namespace formHost {
   native function unRegisterFormObserverInner(callback?: CallbackWrapper<string>): void;
   native function setRouterProxyInner(formIds: Array<string>, proxy: CallbackWrapper<Want>, callback: AsyncCallbackWrapper<void>): void;
   native function clearRouterProxyInner(formIds: Array<string>, callback: AsyncCallbackWrapper<void>): void;
+  export native function nativeOnFormOverflow(callback: CallbackWrapper<formInfo.OverflowRequest>): void;
+  export native function nativeOffFormOverflow(callback?: CallbackWrapper<formInfo.OverflowRequest>): void;
+  export native function nativeOnChangeSceneAnimationState(callback: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
+  export native function nativeOffChangeSceneAnimationState(callback?: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
+  export native function nativeOnGetFormRect(callback: GetFormRectInfoCallbackWrapper): void;
+  export native function nativeOffGetFormRect(callback?: GetFormRectInfoCallbackWrapper): void;
 
   const ERR_OK = 0;
   const INVALID_PARAM_ERROR_CODE = 401;
@@ -936,5 +942,76 @@ export namespace formHost {
 
     let call = new AsyncCallbackWrapper<void>(callback);
     taskpool.execute((): void => { clearRouterProxyInner(formIds, call); });
+  }
+
+  function onFormOverflow(callback: Callback<formInfo.OverflowRequest>): void {
+    let myCall = new CallbackWrapper<formInfo.OverflowRequest>(callback);
+    formHost.nativeOnFormOverflow(myCall);
+  }
+
+  function onChangeSceneAnimationState(callback: Callback<formInfo.ChangeSceneAnimationStateRequest>): void {
+    let myCall = new CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>(callback);
+    formHost.nativeOnChangeSceneAnimationState(myCall);
+  }
+
+  function offFormOverflow(callback?: Callback<formInfo.OverflowRequest>): void {
+    let myCall: CallbackWrapper<formInfo.OverflowRequest> | undefined = undefined;
+    if (callback) {
+      myCall = new CallbackWrapper<formInfo.OverflowRequest>(callback);
+    }
+    formHost.nativeOffFormOverflow(myCall);
+  }
+
+  function offChangeSceneAnimationState(callback?: Callback<formInfo.ChangeSceneAnimationStateRequest>): void {
+    let myCall: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest> | undefined = undefined;
+    if (callback) {
+      myCall = new CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>(callback);
+    }
+    formHost.nativeOffChangeSceneAnimationState(myCall);
+  }
+
+  function onGetFormRect(callback: formInfo.GetFormRectInfoCallback): void {
+    let myCall = new GetFormRectInfoCallbackWrapper(callback);
+    formHost.nativeOnGetFormRect(myCall);
+  }
+
+  function offGetFormRect(callback?: formInfo.GetFormRectInfoCallback): void {
+    let myCall: GetFormRectInfoCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new GetFormRectInfoCallbackWrapper(callback);
+    }
+    formHost.nativeOffGetFormRect(myCall);
+  }
+
+  class GetFormRectInfoCallbackWrapper {
+    private liveFormInterfaceParam: long;
+
+    native nativePromiseCallback(realRect: formInfo.Rect): void;
+
+    private checkPromise(obj: Any): boolean {
+      if (obj instanceof Promise) {
+        return true;
+      }
+      return false;
+    }
+
+    private callPromise(p: Promise<formInfo.Rect>): void {
+      let rectObj: formInfo.Rect = await p;
+      this.nativePromiseCallback(rectObj);
+    }
+
+    private formRectCallback: formInfo.GetFormRectInfoCallback = (formId: string): Promise<formInfo.Rect> => {
+      return new Promise<formInfo.Rect>((resolve: (rect: formInfo.Rect) => void,
+        reject: (rect: formInfo.Rect) => void): void => {
+      });
+    }
+
+    constructor(myFun: formInfo.GetFormRectInfoCallback) {
+      this.formRectCallback = myFun;
+    }
+
+    invoke(formId: string): Promise<formInfo.Rect> {
+      return this.formRectCallback(formId);
+    }
   }
 }
