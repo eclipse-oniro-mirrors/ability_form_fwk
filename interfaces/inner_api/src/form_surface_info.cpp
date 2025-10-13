@@ -25,8 +25,7 @@ bool FormSurfaceInfo::ReadFromParcel(Parcel &parcel)
     width = parcel.ReadFloat();
     height = parcel.ReadFloat();
     borderWidth = parcel.ReadFloat();
-    layoutWidth = parcel.ReadFloat();
-    layoutHeight = parcel.ReadFloat();
+    formViewScale = parcel.ReadFloat();
     return true;
 }
 
@@ -44,12 +43,8 @@ bool FormSurfaceInfo::Marshalling(Parcel &parcel) const
         HILOG_ERROR("Write borderWidth failed");
         return false;
     }
-    if (!parcel.WriteFloat(layoutWidth)) {
-        HILOG_ERROR("Write layoutWidth failed");
-        return false;
-    }
-    if (!parcel.WriteFloat(layoutHeight)) {
-        HILOG_ERROR("Write layoutHeight failed");
+    if (!parcel.WriteFloat(formViewScale)) {
+        HILOG_ERROR("Write formViewScale failed");
         return false;
     }
     return true;
