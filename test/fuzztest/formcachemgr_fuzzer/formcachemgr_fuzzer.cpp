@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
@@ -33,24 +34,21 @@ namespace OHOS {
 constexpr size_t U32_AT_SIZE = 4;
 constexpr int64_t EVENT_MSG = 1;
 constexpr int64_t EVENT_ID = 2;
-uint32_t GetU32Data(const char* ptr)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
+    if (fdp == nullptr) {
+        return true;
+    }
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
+    std::string datas = fdp->ConsumeRandomLengthString();
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
+    FormCacheMgr::GetInstance().GetData(formId, datas, imageDataMap);
 
     FormProviderData formProviderData;
     formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
+    FormCacheMgr::GetInstance().AddData(formId, formProviderData);
 
-    formCacheMgr.DeleteData(formId);
+    FormCacheMgr::GetInstance().DeleteData(formId);
     FormEventHandler formEventHandler(nullptr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
     formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
@@ -58,168 +56,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
     formEventHandler.RegisterEventTimeoutObserver(observer);
     formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
-}
-
-bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
-    formCacheMgr.DeleteData(formId);
-    FormEventHandler formEventHandler(nullptr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
-    formEventHandler.GetEventId();
-    std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.RegisterEventTimeoutObserver(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
-}
-
-bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
-    formCacheMgr.DeleteData(formId);
-    FormEventHandler formEventHandler(nullptr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
-    formEventHandler.GetEventId();
-    std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.RegisterEventTimeoutObserver(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
-}
-
-bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
-    formCacheMgr.DeleteData(formId);
-    FormEventHandler formEventHandler(nullptr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
-    formEventHandler.GetEventId();
-    std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.RegisterEventTimeoutObserver(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
-}
-
-bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
-    formCacheMgr.DeleteData(formId);
-    FormEventHandler formEventHandler(nullptr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
-    formEventHandler.GetEventId();
-    std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.RegisterEventTimeoutObserver(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
-}
-
-bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
-    formCacheMgr.DeleteData(formId);
-    FormEventHandler formEventHandler(nullptr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
-    formEventHandler.GetEventId();
-    std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.RegisterEventTimeoutObserver(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
-}
-
-bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
-    formCacheMgr.DeleteData(formId);
-    FormEventHandler formEventHandler(nullptr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
-    formEventHandler.GetEventId();
-    std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.RegisterEventTimeoutObserver(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
-}
-
-bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
-{
-    FormCacheMgr formCacheMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
-    formCacheMgr.DeleteData(formId);
-    FormEventHandler formEventHandler(nullptr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
-    formEventHandler.GetEventId();
-    std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.RegisterEventTimeoutObserver(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
+    return FormCacheMgr::GetInstance().NeedAcquireProviderData(formId);
 }
 }
 
@@ -246,10 +83,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         ch = nullptr;
         return 0;
     }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     free(ch);
     ch = nullptr;
     return 0;
 }
-
