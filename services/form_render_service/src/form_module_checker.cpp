@@ -105,7 +105,11 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "window.getLastWindow.*",
     "process.pid",
     "process.tid",
-    "graphics.text.FontCollection.*",
+    "graphics.text.FontCollection.getLocalInstance",
+    "graphics.text.FontCollection.loadFontSync",
+    "graphics.text.FontCollection.unloadFontSync",
+    "graphics.text.FontCollection.loadFont",
+    "graphics.text.FontCollection.unloadFont",
 };
 } // namespace
 
