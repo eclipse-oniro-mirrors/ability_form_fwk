@@ -1842,6 +1842,30 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
         group->UpdateFormSizeOfFormRequests(width, height, borderWidth);
     } else {
         HILOG_WARN("formRendererGroup not find, formId:%{public}" PRId64, formId);
+        ReAddStaticRecycledForms(formId);
+    }
+}
+
+void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId)
+{
+    if (!CheckEventHandler(true, true)) {
+        HILOG_ERROR("null eventHandler");
+        return;
+    }
+ 
+    std::unordered_map<std::string, Ace::FormRequest> formRequests;
+    if (!GetFormRequestByFormId(formId, formRequests)) {
+        HILOG_ERROR("get form request failed, formId:%{public}" PRId64, formId);
+        return;
+    }
+ 
+    for (auto &formRequest : formRequests) {
+        if (formRequest.second.isDynamic || !formRequest.second.hasRelease) {
+            continue;
+        }
+ 
+        formRequest.second.want.SetParam(OHOS::AppExecFwk::Constants::FORM_IS_STATIC_FORM_UPDATE_SIZE, true);
+        PostReAddRecycledForms(formRequest.second.formJsInfo, formRequest.second.want);
     }
 }
 
