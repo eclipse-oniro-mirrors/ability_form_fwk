@@ -2429,9 +2429,13 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_126, TestSize.Level1)
     FormJsInfo formJsInfo3;
     std::vector<FormJsInfo> formJsInfos = {formJsInfo1, formJsInfo2, formJsInfo3};
     std::string bundleName = "<bundleName>";
+ 
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    EXPECT_EQ(formRenderRecordPtr_->ReAddRecycledForms(formJsInfos), ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL);
+ 
     auto eventRunner = EventRunner::Create(bundleName);
     formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
-    formRenderRecordPtr_->ReAddRecycledForms(formJsInfos);
+    EXPECT_EQ(formRenderRecordPtr_->ReAddRecycledForms(formJsInfos), ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_126 end";
 }
 
