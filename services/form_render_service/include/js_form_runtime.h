@@ -27,8 +27,8 @@ class JsFormRuntime : public AbilityRuntime::JsRuntime {
 public:
     ~JsFormRuntime();
     bool InsertHapPath(
-        const std::string bundleName, const std::string moduleName, const std::string hapPath);
-    void DestoryHapPath();
+        const std::string& bundleName, const std::string& moduleName, const std::string& hapPath);
+    void DestroyHapPath();
 private:
     std::string bundleName_;
     std::unordered_set<std::string> moduleNameSet_;

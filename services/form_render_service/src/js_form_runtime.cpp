@@ -23,17 +23,17 @@ namespace AppExecFwk {
 namespace FormRender {
 
 bool JsFormRuntime::InsertHapPath(
-    const std::string bundleName, const std::string moduleName, const std::string hapPath)
+    const std::string& bundleName, const std::string& moduleName, const std::string& hapPath)
 {
     bundleName_ = bundleName;
     moduleNameSet_.insert(moduleName);
     return Rosen::FontCollectionMgr::GetInstance().InsertHapPath(bundleName, moduleName, hapPath);
 }
 
-void JsFormRuntime::DestoryHapPath()
+void JsFormRuntime::DestroyHapPath()
 {
     for (std::string moduleName : moduleNameSet_) {
-        Rosen::FontCollectionMgr::GetInstance().DestoryHapPath(bundleName_, moduleName);
+        Rosen::FontCollectionMgr::GetInstance().DestroyHapPath(bundleName_, moduleName);
     }
 }
 
@@ -45,7 +45,7 @@ JsFormRuntime::~JsFormRuntime()
         return;
     }
 
-    DestoryHapPath();
+    DestroyHapPath();
 
     HILOG_WARN("DestroyLocalInstance.");
     auto envId = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(env));
