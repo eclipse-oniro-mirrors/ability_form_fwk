@@ -272,37 +272,8 @@ void ParamControl::ExecUpdateDurationCtrl(const bool isApply, const std::vector<
             continue;
         }
 
-        for (FormRecord &formRecord : formRecords) {
-            if (!formRecord.isEnableUpdate || formRecord.updateDuration == 0) {
-                // interval refresh not configured
-                continue;
-            }
-
-            if (isApply && !IsFormInfoMatch(formRecord, item)) {
-                continue;
-            }
-
-            if (!isApply && !IsFormInfoMatch(formRecord, item, false)) {
-                continue;
-            }
-
-            if (!isAppUpgrade &&
-                IsSameUpdateDuration(formRecord, item, (isApply ? preUpdateDurationCtrl_ : nextUpdateDurationCtrl_))) {
-                continue;
-            }
-
-            if (isAppUpgrade && IsFormInfoMatch(formRecord, item)) {
-                continue;
-            }
-
-            if (isApply && item.updateDuration == 0) {
-                HILOG_INFO("disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
-                FormTimerMgr::GetInstance().DeleteIntervalTimer(formRecord.formId);
-                continue;
-            }
-
-            if (isApply && formRecord.updateDuration >= (item.updateDuration * Constants::TIME_CONVERSION)) {
-                // interval period need not change
+        for (const auto &formRecord : formRecords) {
+            if (!ShouldProcessForm(formRecord, item, isApply, isAppUpgrade)) {
                 continue;
             }
 
@@ -335,7 +306,7 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
             continue;
         }
 
-        for (FormRecord &formRecord : formRecords) {
+        for (const auto &formRecord : formRecords) {
             if (isApply && !IsFormInfoMatch(formRecord, item)) {
                 continue;
             }
@@ -369,6 +340,45 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
     }
     FormDataMgr::GetInstance().DueDisableForms(std::move(disableFormRecords), isApply);
     FormDataMgr::GetInstance().DueRemoveForms(std::move(removeFormRecords), isApply);
+}
+
+bool ParamControl::ShouldProcessForm(const FormRecord &formRecord, const ParamCtrl &item,
+    const bool isApply, const bool isAppUpgrade)
+{
+    if (!formRecord.isEnableUpdate || formRecord.updateDuration == 0) {
+        // interval refresh not configured
+        return false;
+    }
+
+    if (isApply && !IsFormInfoMatch(formRecord, item)) {
+        return false;
+    }
+
+    if (!isApply && !IsFormInfoMatch(formRecord, item, false)) {
+        return false;
+    }
+
+    if (!isAppUpgrade &&
+        IsSameUpdateDuration(formRecord, item, (isApply ? preUpdateDurationCtrl_ : nextUpdateDurationCtrl_))) {
+        return false;
+    }
+
+    if (isAppUpgrade && IsFormInfoMatch(formRecord, item)) {
+        return false;
+    }
+
+    if (isApply && item.updateDuration == 0) {
+        HILOG_INFO("disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
+        FormTimerMgr::GetInstance().DeleteIntervalTimer(formRecord.formId);
+        return false;
+    }
+
+    if (isApply && formRecord.updateDuration >= (item.updateDuration * Constants::TIME_CONVERSION)) {
+        // interval period need not change
+        return false;
+    }
+
+    return true;
 }
 
 void from_json(const nlohmann::json &jsonObject, ParamCtrl &paramCtrl)
