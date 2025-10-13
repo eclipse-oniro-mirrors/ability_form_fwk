@@ -110,6 +110,7 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "graphics.text.FontCollection.unloadFontSync",
     "graphics.text.FontCollection.loadFont",
     "graphics.text.FontCollection.unloadFont",
+    "graphics.text.FontCollection.clearCaches",
 };
 } // namespace
 
