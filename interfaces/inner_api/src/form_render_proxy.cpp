@@ -331,7 +331,7 @@ int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &w
 {
     MessageParcel data;
     MessageOption option(MessageOption::TF_SYNC);
-    HILOG_INFO("begin");
+    HILOG_DEBUG("begin");
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

@@ -982,7 +982,7 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
 
     std::string bundleName = hapTokenInfo.bundleName;
     int32_t userId = hapTokenInfo.userID;
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d", bundleName.c_str(), userId,
+    HILOG_DEBUG("bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d", bundleName.c_str(), userId,
         hapTokenInfo.instIndex);
 
     if (hapTokenInfo.instIndex != 0) {
@@ -2995,8 +2995,8 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         return false;
     }
 
-    HILOG_INFO("formId:%{public}" PRId64 ", needRefresh:%{public}d, formVisibleType:%{public}d,"
-        "isTimerRefresh:%{public}d, wantCacheMapSize:%{public}d, isHostRefresh:%{public}d", matchedFormId,
+    HILOG_INFO("formId:%{public}" PRId64 ",needRefresh:%{public}d,formVisibleType:%{public}d,"
+        "isTimerRefresh:%{public}d,wantCacheMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
         (int)formRecord.wantCacheMap.size(), formRecord.isHostRefresh);
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
