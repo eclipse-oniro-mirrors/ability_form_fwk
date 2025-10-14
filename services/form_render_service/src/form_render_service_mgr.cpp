@@ -26,6 +26,7 @@
 #include "js_runtime.h"
 #include "service_extension.h"
 #include "form_memmgr_client.h"
+#include "rosen_text/font_collection.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
@@ -255,6 +256,7 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
         search->second->Release();
         // after form recycled, call gc to release the abc file cache.
         MainThreadForceFullGC();
+        OHOS::Rosen::FontCollection::Create()->ClearCaches();
     }
 
     FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
