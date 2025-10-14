@@ -522,12 +522,12 @@ void FormHostClient::OnDueControlForm(
         std::lock_guard<std::mutex> lockMutex(callbackMutex_);
         auto iter = formCallbackMap_.find(formId);
         if (iter == formCallbackMap_.end()) {
-            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+            HILOG_ERROR("not find formId:%{public}" PRId64, formId);
             continue;
         }
         for (const auto& callback : iter->second) {
             if (!callback) {
-                HILOG_ERROR("null callback");
+                HILOG_ERROR("null callback formId:%{public}" PRId64, formId);
                 continue;
             }
             callback->ProcessDueControlForm(isDisablePolicy, isControl);

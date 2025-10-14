@@ -3221,7 +3221,7 @@ void FormDataMgr::DueControlForms(
     std::lock_guard<std::mutex> lockMutex(formHostRecordMutex_);
     for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         std::vector<int64_t> matchedFormIds;
-        for (auto formRecord : formRecords) {
+        for (const auto &formRecord : formRecords) {
             if (itHostRecord->Contains(formRecord.formId)) {
                 matchedFormIds.emplace_back(formRecord.formId);
             }

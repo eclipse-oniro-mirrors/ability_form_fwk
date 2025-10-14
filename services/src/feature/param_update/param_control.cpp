@@ -200,28 +200,23 @@ bool ParamControl::IsParamValid(ParamCtrl &paramCtrl, bool isDisableCtrl)
 bool ParamControl::IsFormInfoMatch(const FormRecord &formRecord, const ParamCtrl &paramCtrl, const bool isNewVersion)
 {
     if (formRecord.bundleName != paramCtrl.bundleName) {
-        HILOG_ERROR("bundleName not match");
         return false;
     }
 
     if (formRecord.moduleName != paramCtrl.moduleName) {
-        HILOG_ERROR("moduleName not match");
         return false;
     }
 
     if (!paramCtrl.abilityName.empty() && formRecord.abilityName != paramCtrl.abilityName) {
-        HILOG_ERROR("abilityName not match");
         return false;
     }
 
     if (!paramCtrl.formName.empty() && formRecord.formName != paramCtrl.formName) {
-        HILOG_ERROR("formName not match");
         return false;
     }
 
     auto it = std::find(paramCtrl.dimensions.begin(), paramCtrl.dimensions.end(), formRecord.specification);
     if (!paramCtrl.dimensions.empty() && it == paramCtrl.dimensions.end()) {
-        HILOG_ERROR("dimensions not match");
         return false;
     }
 
@@ -307,11 +302,7 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
         }
 
         for (const auto &formRecord : formRecords) {
-            if (isApply && !IsFormInfoMatch(formRecord, item)) {
-                continue;
-            }
-
-            if (!isApply && !IsFormInfoMatch(formRecord, item, false)) {
+            if (!IsFormInfoMatch(formRecord, item, isApply)) {
                 continue;
             }
 
@@ -350,11 +341,7 @@ bool ParamControl::ShouldProcessForm(const FormRecord &formRecord, const ParamCt
         return false;
     }
 
-    if (isApply && !IsFormInfoMatch(formRecord, item)) {
-        return false;
-    }
-
-    if (!isApply && !IsFormInfoMatch(formRecord, item, false)) {
+    if (!IsFormInfoMatch(formRecord, item, isApply)) {
         return false;
     }
 

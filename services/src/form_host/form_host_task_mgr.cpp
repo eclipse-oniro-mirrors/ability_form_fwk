@@ -382,8 +382,7 @@ void FormHostTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
 void FormHostTaskMgr::PostDueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
     const bool isControl, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
-
+    HILOG_INFO("call");
     auto func = [formIds, isDisablePolicy, isControl, remoteObject]() {
         FormHostTaskMgr::GetInstance().DueControlFormsTaskToHost(formIds, isDisablePolicy, isControl, remoteObject);
     };
@@ -393,8 +392,7 @@ void FormHostTaskMgr::PostDueControlFormsTaskToHost(const std::vector<int64_t> &
 void FormHostTaskMgr::DueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
     const bool isControl, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
-
+    HILOG_INFO("call");
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
         HILOG_ERROR("get formHostProxy failed");
@@ -402,7 +400,6 @@ void FormHostTaskMgr::DueControlFormsTaskToHost(const std::vector<int64_t> &form
     }
 
     remoteFormHost->OnDueControlForm(formIds, isDisablePolicy, isControl);
-    HILOG_DEBUG("end");
 }
 } // namespace AppExecFwk
 } // namespace OHOS
