@@ -106,6 +106,10 @@ public:
 
     sptr<IFormSupply> GetFormSupplyClient();
 
+    void SetCriticalFalseOnAllFormInvisible();
+    
+    void SetCriticalTrueOnFormActivity();
+
 private:
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);
@@ -119,9 +123,6 @@ private:
         const FormJsInfo &formJsInfo, const Want &want, const std::string &uid, const std::string &statusData);
     int32_t RecycleFormByUid(const std::string &uid, std::string &statusData, const int64_t formId);
     int32_t DeleteRenderRecordByUid(const std::string &uid, const std::shared_ptr<FormRenderRecord> &search);
-
-    void SetCriticalFalseOnAllFormInvisible();
-    void SetCriticalTrueOnFormActivity();
 
     std::shared_ptr<OHOS::AppExecFwk::Configuration> GetNeedApplyConfig();
     void CacheAppliedConfig();

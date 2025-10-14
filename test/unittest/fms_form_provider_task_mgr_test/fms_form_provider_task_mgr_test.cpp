@@ -438,4 +438,19 @@ HWTEST_F(FormProviderTaskMgrTest, FormProviderTaskMgr_0023, TestSize.Level0)
     formTaskMgr.NotifyFormLocationUpdate(formId, want, remoteObject);
     GTEST_LOG_(INFO) << "FormProviderTaskMgr_0023 end";
 }
+
+/**
+ * @tc.name: FormProviderTaskMgr_0024
+ * @tc.desc: test DelayedFormExitDetect function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderTaskMgrTest, FormProviderTaskMgr_0024, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderTaskMgr_0024 start";
+    std::shared_ptr<FormProviderTaskMgr> formTaskMgr = std::make_shared<FormProviderTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
+    int32_t connectId = 1;
+    formTaskMgr->DelayedFormExitDetect(connectId);
+    GTEST_LOG_(INFO) << "FormProviderTaskMgr_0024 end";
+}
 }

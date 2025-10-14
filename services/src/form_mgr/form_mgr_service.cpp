@@ -25,6 +25,8 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "fms_log_wrapper.h"
+#include "form_event_report.h"
+#include "form_mgr_errors.h"
 #include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
@@ -34,11 +36,9 @@
 #include "data_center/form_data_proxy_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #include "common/event/form_event_handler.h"
-#include "common/event/form_event_report.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_instance.h"
-#include "form_mgr_errors.h"
 #include "common/util/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
@@ -923,7 +923,7 @@ ErrCode FormMgrService::Init()
      * so it can't affect the TDD test program */
     if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
         FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(InitFmsFiledErrorType::PUBLISH_SER_FAILED));
+            static_cast<int64_t>(InitFmsFailedErrorType::PUBLISH_SER_FAILED));
         HILOG_ERROR("FormMgrService::Init Publish failed");
         return ERR_INVALID_OPERATION;
     }
@@ -2030,9 +2030,15 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float
 
 void FormMgrService::SetNetConnect()
 {
+    if (lastNetLostTime_ == 0) {
+        HILOG_DEBUG("no need update");
+        return;
+    }
+
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     if ((currentTime - lastNetLostTime_) >= FORM_DISCON_NETWORK_CHECK_TIME) {
         FormMgrAdapter::GetInstance().UpdateFormByCondition(CONDITION_NETWORK);
+        lastNetLostTime_ = 0;
     }
 }
 

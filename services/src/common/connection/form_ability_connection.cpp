@@ -23,7 +23,7 @@
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "form_info.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_provider/form_supply_callback.h"

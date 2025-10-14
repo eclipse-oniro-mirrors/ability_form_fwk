@@ -15,7 +15,7 @@
 
 #include "data_center/form_record/form_record_report.h"
 #include "fms_log_wrapper.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "data_center/form_basic_info_mgr.h"
 
 namespace OHOS {

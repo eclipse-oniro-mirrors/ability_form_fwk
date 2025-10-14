@@ -32,7 +32,7 @@
 #include "time_service_client.h"
 #include "time_common.h"
 #include "want.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "data_center/form_record/form_record_report.h"
 #include "data_center/form_data_mgr.h"
 #include "form_refresh/form_refresh_mgr.h"
@@ -232,7 +232,7 @@ bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timer
         return false;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     auto intervalTask = intervalTimerTasks_.find(formId);
     if (intervalTask != intervalTimerTasks_.end()) {
         intervalTask->second.period = timerCfg.updateDuration / timeSpeed_;
@@ -318,7 +318,7 @@ bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCf
         return false;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     FormTimer timerTask;
     auto intervalTask = intervalTimerTasks_.find(formId);
     if (intervalTask != intervalTimerTasks_.end()) {
@@ -444,7 +444,7 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
     bool isExist = false;
 
     {
-        std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
+        std::lock_guard<std::mutex> lock(dynamicMutex_);
         for (auto &refreshItem : dynamicRefreshTasks_) {
             if ((refreshItem.formId == formId) && (refreshItem.userId == userId)) {
                 refreshItem.settedTime = refreshTime;
@@ -479,7 +479,7 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
 void FormTimerMgr::SetEnableFlag(int64_t formId, bool flag)
 {
     // try interval list
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     auto iter = intervalTimerTasks_.find(formId);
     if (iter != intervalTimerTasks_.end()) {
         iter->second.isEnable = flag;
@@ -553,7 +553,7 @@ bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
 {
     HILOG_INFO("call");
     {
-        std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+        std::lock_guard<std::mutex> lock(intervalMutex_);
         EnsureInitIntervalTimer();
         if (intervalTimerTasks_.find(task.formId) != intervalTimerTasks_.end()) {
             HILOG_WARN("already exist formTimer, formId:%{public}" PRId64 " task", task.formId);
@@ -687,7 +687,7 @@ bool FormTimerMgr::OnDynamicTimeTrigger(int64_t updateTime)
     HILOG_INFO("updateTime:%{public}" PRId64, updateTime);
     std::vector<FormTimer> updateList;
     {
-        std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
+        std::lock_guard<std::mutex> lock(dynamicMutex_);
         auto timeInSec = GetBootTimeMs();
         int64_t markedTime = timeInSec + Constants::ABS_REFRESH_MS;
         std::list<DynamicRefreshItem>::iterator itItem;
@@ -756,7 +756,7 @@ bool FormTimerMgr::GetRemindTasks(std::vector<FormTimer> &remindTasks)
  */
 void FormTimerMgr::SetIntervalEnableFlag(int64_t formId, bool flag)
 {
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     // try interval list
     auto refreshTask = intervalTimerTasks_.find(formId);
     if (refreshTask != intervalTimerTasks_.end()) {
@@ -773,7 +773,7 @@ void FormTimerMgr::SetIntervalEnableFlag(int64_t formId, bool flag)
 bool FormTimerMgr::GetIntervalTimer(int64_t formId, FormTimer &formTimer)
 {
     HILOG_INFO("start");
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     auto intervalTask = intervalTimerTasks_.find(formId);
     if (intervalTask == intervalTimerTasks_.end()) {
         HILOG_INFO("interval timer not find");
@@ -815,7 +815,7 @@ bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicIte
 {
     HILOG_INFO("start");
     {
-        std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
+        std::lock_guard<std::mutex> lock(dynamicMutex_);
         std::list<DynamicRefreshItem>::iterator itItem;
         for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
             if (itItem->formId == formId) {
@@ -850,7 +850,7 @@ bool FormTimerMgr::DeleteIntervalTimer(int64_t formId)
     HILOG_INFO("start");
     bool isExist = false;
 
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     auto intervalTask = intervalTimerTasks_.find(formId);
     if (intervalTask != intervalTimerTasks_.end()) {
         intervalTimerTasks_.erase(intervalTask);
@@ -896,7 +896,7 @@ bool FormTimerMgr::DeleteDynamicItem(int64_t formId)
 {
     HILOG_INFO("start");
     {
-        std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
+        std::lock_guard<std::mutex> lock(dynamicMutex_);
         std::list<DynamicRefreshItem>::iterator itItem;
         for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
             if (itItem->formId == formId) {
@@ -923,7 +923,7 @@ bool FormTimerMgr::DeleteDynamicItem(int64_t formId)
 void FormTimerMgr::OnIntervalTimeOut()
 {
     HILOG_DEBUG("start");
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     std::vector<FormTimer> updateList;
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     for (auto &intervalPair : intervalTimerTasks_) {
@@ -1135,7 +1135,7 @@ std::shared_ptr<WantAgent> FormTimerMgr::GetLimiterWantAgent()
 bool FormTimerMgr::UpdateDynamicAlarm()
 {
     HILOG_INFO("start");
-    std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
+    std::lock_guard<std::mutex> lock(dynamicMutex_);
     if (dynamicRefreshTasks_.empty()) {
         ClearDynamicResource();
         dynamicWakeUpTime_ = INT64_MAX;
@@ -1376,7 +1376,7 @@ void FormTimerMgr::StartDiskUseInfoReportTimer()
 void FormTimerMgr::ClearIntervalTimer()
 {
     HILOG_INFO("start");
-    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
+    std::lock_guard<std::mutex> lock(intervalMutex_);
     InnerClearIntervalTimer();
     InnerClearIntervalReportTimer();
     HILOG_INFO("end");
@@ -1557,7 +1557,7 @@ bool FormTimerMgr::IsActiveUser(int32_t userId)
 
 bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
 {
-    std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
+    std::lock_guard<std::mutex> lock(dynamicMutex_);
     auto itItem = std::find_if(dynamicRefreshTasks_.begin(), dynamicRefreshTasks_.end(),
         [formId](const auto &it) { return it.formId == formId; });
     if (itItem == dynamicRefreshTasks_.end()) {

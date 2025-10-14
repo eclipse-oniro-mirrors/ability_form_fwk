@@ -257,6 +257,12 @@ private:
      */
     void NotifySizeChanged(const int64_t formId, const int32_t newDimension, const Rect &newRect,
         const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Delay detection of whether the form process exits normally.
+     * @param connectId The ability connection id generated when save.
+     */
+    void DelayedFormExitDetect(int32_t connectId);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

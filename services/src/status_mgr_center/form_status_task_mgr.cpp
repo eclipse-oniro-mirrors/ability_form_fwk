@@ -17,7 +17,7 @@
 #include "form_render_interface.h"
 #include "fms_log_wrapper.h"
 #include "common/util/form_util.h"
-#include "common/event/form_event_report.h"
+#include "form_event_report.h"
 #include "status_mgr_center/form_status_queue.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "status_mgr_center/form_status.h"
@@ -332,7 +332,7 @@ void FormStatusTaskMgr::RenderForm(
             formRecord.formId, HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
     }
     if (error != ERR_OK) {
-        HILOG_ERROR("StopRenderingForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
+        HILOG_ERROR("RenderForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
         RemoveConnection(connectId);
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formRecord.formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RENDER_FORM_FAIL);
