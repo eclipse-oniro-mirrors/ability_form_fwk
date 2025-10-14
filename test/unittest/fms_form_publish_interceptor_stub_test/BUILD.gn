@@ -51,6 +51,7 @@ ohos_unittest("FmsFormPublishInterceptorStubTest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "data_share:datashare_provider",
+    "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",

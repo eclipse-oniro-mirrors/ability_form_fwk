@@ -35,7 +35,6 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AbilityRuntime::FormAniHelpers;
 using namespace OHOS::AppExecFwk::Constants;
 namespace {
-constexpr const char* SIGNATURE_STRING_INT_VOID = "Lstd/core/String;I:V";
 constexpr const char* FORM_RECT_INNER = "L@ohos/app/form/formInfo/formInfo/RectInner;";
 constexpr const char* PROVIDER_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "L@ohos/app/form/formProvider/AsyncCallbackWrapper;";
 constexpr const char* PROVIDER_RECT_LEFT = "left";
@@ -717,9 +716,6 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function{"getPublishedFormInfoByIdInner",
             "C{std.core.String}C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(GetPublishedFormInfoById)},
-        ani_native_function{
-            "setFormNextRefreshTime_inner", SIGNATURE_STRING_INT_VOID,
-            reinterpret_cast<void *>(SetFormNextRefreshTime)},
         ani_native_function{
             "nativeGetFormRect", nullptr, reinterpret_cast<void *>(GetFormRect)},
         ani_native_function{

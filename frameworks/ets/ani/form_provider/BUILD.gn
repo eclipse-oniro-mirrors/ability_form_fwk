@@ -45,6 +45,7 @@ ohos_shared_library("formProvider_ani") {
     "ability_runtime:runtime",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
