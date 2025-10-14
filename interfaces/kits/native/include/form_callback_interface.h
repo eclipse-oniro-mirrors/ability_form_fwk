@@ -68,16 +68,11 @@ public:
     virtual void ProcessLockForm(bool lock) {}
 
     /**
-    * @brief due disable form.
-    * @param isDisable True is due disable form, false is due enable form.
+    * @brief due control form.
+    * @param isDisablePolicy True is disable form, false is remove form.
+    * @param isControl True is control form, false is not control form.
     */
-    virtual void ProcessDueDisableForm(bool isDisable) {}
-
-    /**
-    * @brief due remove form.
-    * @param isRemove True is due remove form, false is due remove form.
-    */
-    virtual void ProcessDueRemoveForm(bool isRemove) {}
+    virtual void ProcessDueControlForm(bool isDisablePolicy, bool isControl) {}
 };
 
 class FormStateCallbackInterface {

@@ -510,7 +510,8 @@ void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool 
     }
 }
 
-void FormHostClient::OnDueDisableForm(const std::vector<int64_t> &formIds, const bool isDisable)
+void FormHostClient::OnDueControlForm(
+    const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl)
 {
     HILOG_INFO("call, size:%{public}zu", formIds.size());
     for (auto &formId : formIds) {
@@ -529,31 +530,7 @@ void FormHostClient::OnDueDisableForm(const std::vector<int64_t> &formIds, const
                 HILOG_ERROR("null callback");
                 continue;
             }
-            callback->ProcessDueDisableForm(isDisable);
-        }
-    }
-}
-
-void FormHostClient::OnDueRemoveForm(const std::vector<int64_t> &formIds, const bool isRemove)
-{
-    HILOG_INFO("call, size:%{public}zu", formIds.size());
-    for (auto &formId : formIds) {
-        if (formId < 0) {
-            HILOG_ERROR("the passed form id can't be negative");
-            continue;
-        }
-        std::lock_guard<std::mutex> lockMutex(callbackMutex_);
-        auto iter = formCallbackMap_.find(formId);
-        if (iter == formCallbackMap_.end()) {
-            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
-            continue;
-        }
-        for (const auto& callback : iter->second) {
-            if (!callback) {
-                HILOG_ERROR("null callback");
-                continue;
-            }
-            callback->ProcessDueRemoveForm(isRemove);
+            callback->ProcessDueControlForm(isDisablePolicy, isControl);
         }
     }
 }

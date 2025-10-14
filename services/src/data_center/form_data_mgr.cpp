@@ -3214,9 +3214,10 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, const std::string
     return formRecords.size() > 0;
 }
 
-void FormDataMgr::DueDisableForms(const std::vector<FormRecord> &&formRecords, const bool isDisable)
+void FormDataMgr::DueControlForms(
+    const std::vector<FormRecord> &&formRecords, const bool isDisablePolicy, const bool isControl)
 {
-    HILOG_INFO("call, isDisable:%{public}d", isDisable);
+    HILOG_INFO("call, isDisablePolicy:%{public}d, isControl:%{public}d", isDisablePolicy, isControl);
     std::lock_guard<std::mutex> lockMutex(formHostRecordMutex_);
     for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         std::vector<int64_t> matchedFormIds;
@@ -3226,24 +3227,7 @@ void FormDataMgr::DueDisableForms(const std::vector<FormRecord> &&formRecords, c
             }
         }
         if (!matchedFormIds.empty()) {
-            itHostRecord->OnDueDisableForms(matchedFormIds, isDisable);
-        }
-    }
-}
-
-void FormDataMgr::DueRemoveForms(const std::vector<FormRecord> &&formRecords, const bool isRemove)
-{
-    HILOG_INFO("call, isRemove:%{public}d", isRemove);
-    std::lock_guard<std::mutex> lockMutex(formHostRecordMutex_);
-    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
-        std::vector<int64_t> matchedFormIds;
-        for (auto formRecord : formRecords) {
-            if (itHostRecord->Contains(formRecord.formId)) {
-                matchedFormIds.emplace_back(formRecord.formId);
-            }
-        }
-        if (!matchedFormIds.empty()) {
-            itHostRecord->OnDueRemoveForms(matchedFormIds, isRemove);
+            itHostRecord->OnDueControlForms(matchedFormIds, isDisablePolicy, isControl);
         }
     }
 }

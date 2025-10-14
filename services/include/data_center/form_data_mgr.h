@@ -998,18 +998,12 @@ public:
         std::vector<FormRecord> &formRecords) const;
 
     /**
-     * @brief due disable forms style.
+     * @brief due control forms style.
      * @param formRecords The Id list of the formRecord.
-     * @param isDisable True is due disable form, false is enable form.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
      */
-    void DueDisableForms(const std::vector<FormRecord> &&formRecords, const bool isDisable);
-
-    /**
-     * @brief due remove forms style.
-     * @param formRecords The Id list of the formRecord.
-     * @param isRemove True is due remove form, false is enable form.
-     */
-    void DueRemoveForms(const std::vector<FormRecord> &&formRecords, const bool isRemove);
+    void DueControlForms(const std::vector<FormRecord> &&formRecords, const bool isDisablePolicy, const bool isControl);
 private:
     /**
      * @brief Create form record.

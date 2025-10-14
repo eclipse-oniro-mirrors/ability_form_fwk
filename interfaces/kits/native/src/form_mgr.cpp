@@ -2363,8 +2363,8 @@ ErrCode FormMgr::ReloadAllForms(int32_t &reloadNum)
     return resultCode;
 }
 
-bool FormMgr::IsFormDueDisable(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension)
+bool FormMgr::IsFormDueControl(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName, const int32_t dimension, const bool isDisablePolicy)
 {
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
@@ -2377,24 +2377,7 @@ bool FormMgr::IsFormDueDisable(const std::string &bundleName, const std::string 
         HILOG_ERROR("null remoteProxy_");
         return false;
     }
-    return remoteProxy_->IsFormDueDisable(bundleName, moduleName, abilityName, formName, dimension);
-}
-
-bool FormMgr::IsFormDueRemove(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension)
-{
-    ErrCode errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
-    }
-
-    std::shared_lock<std::shared_mutex> lock(connectMutex_);
-    if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("null remoteProxy_");
-        return false;
-    }
-    return remoteProxy_->IsFormDueRemove(bundleName, moduleName, abilityName, formName, dimension);
+    return remoteProxy_->IsFormDueControl(bundleName, moduleName, abilityName, formName, dimension, isDisablePolicy);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

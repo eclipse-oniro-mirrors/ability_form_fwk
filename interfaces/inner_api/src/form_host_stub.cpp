@@ -71,10 +71,8 @@ int FormHostStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
             return HandleOnErrorForms(data, reply);
         case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_LOCK_FORM):
             return HandleOnLockForm(data, reply);
-        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_DUE_DISABLE_FORM):
-            return HandleOnDueDisableForm(data, reply);
-        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_DUE_REMOVE_FORM):
-            return HandleOnDueRemoveForm(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_DUE_CONTROL_FORM):
+            return HandleOnDueControlForm(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -249,7 +247,7 @@ int32_t FormHostStub::HandleOnErrorForms(MessageParcel &data, MessageParcel &rep
     return ERR_OK;
 }
 
-int32_t FormHostStub::HandleOnDueDisableForm(MessageParcel &data, MessageParcel &reply)
+int32_t FormHostStub::HandleOnDueControlForm(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("start");
     std::vector<int64_t> formIds;
@@ -258,23 +256,9 @@ int32_t FormHostStub::HandleOnDueDisableForm(MessageParcel &data, MessageParcel 
         HILOG_ERROR("fail ReadInt64Vector<formIds>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool isDisable = data.ReadBool();
-    OnDueDisableForm(formIds, isDisable);
-    reply.WriteInt32(ERR_OK);
-    return ERR_OK;
-}
-
-int32_t FormHostStub::HandleOnDueRemoveForm(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("start");
-    std::vector<int64_t> formIds;
-    bool ret = data.ReadInt64Vector(&formIds);
-    if (!ret) {
-        HILOG_ERROR("fail ReadInt64Vector<formIds>");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    bool isRemove = data.ReadBool();
-    OnDueRemoveForm(formIds, isRemove);
+    bool isDisablePolicy = data.ReadBool();
+    bool isControl = data.ReadBool();
+    OnDueControlForm(formIds, isDisablePolicy, isControl);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }

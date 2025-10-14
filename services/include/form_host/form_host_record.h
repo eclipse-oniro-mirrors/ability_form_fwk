@@ -230,16 +230,10 @@ public:
     /**
      * @brief due disable form or not.
      * @param formIds The Id list of forms.
-     * @param isDisable True is due disable form, false is enable form.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
      */
-    void OnDueDisableForms(const std::vector<int64_t> &formIds, const bool isDisable);
-
-    /**
-     * @brief due remove form or not.
-     * @param formIds The Id list of forms.
-     * @param isRemove True is due remove form, false is enable form.
-     */
-    void OnDueRemoveForms(const std::vector<int64_t> &formIds, const bool isRemove);
+    void OnDueControlForms(const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl);
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;

@@ -108,22 +108,14 @@ public:
     void PostHostDiedTask(const sptr<IRemoteObject> &remoteHost);
 
     /**
-     * @brief Post due disable form task.
+     * @brief Post due control form task.
      * @param formIds formIds The Id list of the forms.
-     * @param isDisable True or false.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
      * @param remoteObject Form host proxy object.
      */
-    void PostDueDisableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisable,
-        const sptr<IRemoteObject> &remoteObject);
-
-    /**
-     * @brief Post due remove form task.
-     * @param formIds formIds The Id list of the forms.
-     * @param isRemove True or false.
-     * @param remoteObject Form host proxy object.
-     */
-    void PostDueRemoveFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isRemove,
-        const sptr<IRemoteObject> &remoteObject);
+    void PostDueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
+        const bool isControl, const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Post form data to form host when acquire form..
@@ -205,22 +197,14 @@ private:
     void HostDied(const sptr<IRemoteObject> &remoteHost);
 
     /**
-     * @brief Exec due disable form task.
+     * @brief Exec due control form task.
      * @param formIds formIds The Id list of the forms.
-     * @param isDisable True or false.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
      * @param remoteObject Form host proxy object.
      */
-    void DueDisableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisable,
-        const sptr<IRemoteObject> &remoteObject);
-
-    /**
-     * @brief Exec due remove form task.
-     * @param formIds formIds The Id list of the forms.
-     * @param isRemove True or false.
-     * @param remoteObject Form host proxy object.
-     */
-    void DueRemoveFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isRemove,
-        const sptr<IRemoteObject> &remoteObject);
+    void DueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
+        const bool isControl, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

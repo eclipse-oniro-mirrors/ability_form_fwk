@@ -182,8 +182,8 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     // Check due remove
     int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
-    if (formId == 0 && CheckFormDueRemove(formItemInfo.GetProviderBundleName(), formItemInfo.GetModuleName(),
-        formItemInfo.GetAbilityName(), formItemInfo.GetFormName(), dimensionId)) {
+    if (formId == 0 && CheckFormDueControl(formItemInfo.GetProviderBundleName(), formItemInfo.GetModuleName(),
+        formItemInfo.GetAbilityName(), formItemInfo.GetFormName(), dimensionId, false)) {
         HILOG_ERROR("Add new form fail,%{public}s is due removed. formId: %{public}" PRId64 " code: %{public}d",
             formItemInfo.GetProviderBundleName().c_str(), formId, ERR_APPEXECFWK_FORM_DUE_REMOVE);
         return ERR_APPEXECFWK_FORM_DUE_REMOVE;
@@ -4714,26 +4714,16 @@ ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRe
     return ERR_OK;
 }
 
-bool FormMgrAdapter::CheckFormDueDisable(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension)
+bool FormMgrAdapter::CheckFormDueControl(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName, const int32_t dimension, const bool isDisablePolicy)
 {
     HILOG_DEBUG("call");
     FormRecord formRecord;
     if (MakeDueControlFormRecord(bundleName, moduleName, abilityName, formName, dimension, formRecord) != ERR_OK) {
         return false;
     }
-    return ParamControl::GetInstance().IsFormDisable(formRecord);
-}
-
-bool FormMgrAdapter::CheckFormDueRemove(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension)
-{
-    HILOG_DEBUG("call");
-    FormRecord formRecord;
-    if (MakeDueControlFormRecord(bundleName, moduleName, abilityName, formName, dimension, formRecord) != ERR_OK) {
-        return false;
-    }
-    return ParamControl::GetInstance().IsFormRemove(formRecord);
+    return isDisablePolicy ?
+        ParamControl::GetInstance().IsFormDisable(formRecord) : ParamControl::GetInstance().IsFormRemove(formRecord);
 }
 
 ErrCode FormMgrAdapter::MakeDueControlFormRecord(const std::string &bundleName, const std::string &moduleName,

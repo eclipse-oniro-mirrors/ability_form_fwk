@@ -104,21 +104,13 @@ public:
     void OnLockForms(const std::vector<int64_t> &formIds, const bool lock, const sptr<IRemoteObject> &callerToken);
 
     /**
-     * @brief due disable form or not.
+     * @brief due control form or not.
      * @param formIds The Id list of forms.
-     * @param isDisable True is due disable form, false is enable form.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
      * @param callerToken Caller ability token.
      */
-    void OnDueDisableForms(const std::vector<int64_t> &formIds, const bool isDisable,
-        const sptr<IRemoteObject> &callerToken);
-
-    /**
-     * @brief due remove form or not.
-     * @param formIds The Id list of forms.
-     * @param isRemove True is due remove form, false is enable form.
-     * @param callerToken Caller ability token.
-     */
-    void OnDueRemoveForms(const std::vector<int64_t> &formIds, const bool isRemove,
+    void OnDueControlForms(const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl,
         const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk

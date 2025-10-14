@@ -338,8 +338,8 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
     if (!isApply) {
         RefreshCacheMgr::GetInstance().CosumeRefreshByDueControl(disableFormRecords);
     }
-    FormDataMgr::GetInstance().DueDisableForms(std::move(disableFormRecords), isApply);
-    FormDataMgr::GetInstance().DueRemoveForms(std::move(removeFormRecords), isApply);
+    FormDataMgr::GetInstance().DueControlForms(std::move(disableFormRecords), true, isApply);
+    FormDataMgr::GetInstance().DueControlForms(std::move(removeFormRecords), false, isApply);
 }
 
 bool ParamControl::ShouldProcessForm(const FormRecord &formRecord, const ParamCtrl &item,

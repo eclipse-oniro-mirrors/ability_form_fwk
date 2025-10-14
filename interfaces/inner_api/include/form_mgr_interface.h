@@ -931,31 +931,18 @@ public:
     }
 
     /**
-     * @brief Check form is due disable control.
+     * @brief Check form is due control.
      * @param bundleName form bundleName.
      * @param moduleName form moduleName.
      * @param abilityName form abilityName.
      * @param formName form widget name.
      * @param dimension form dimension value.
+     * @param isDisablePolicy True is disable form, false is remove form.
      * @return Returns true for form is due disabled.
      */
-    virtual bool IsFormDueDisable(const std::string &bundleName, const std::string &moduleName,
-        const std::string &abilityName, const std::string &formName, const int32_t dimension)
-    {
-        return false;
-    }
-
-    /**
-     * @brief Check form is due remove control.
-     * @param bundleName form bundleName.
-     * @param moduleName form moduleName.
-     * @param abilityName form abilityName.
-     * @param formName form widget name.
-     * @param dimension form dimension value.
-     * @return Returns true for form is due removed.
-     */
-    virtual bool IsFormDueRemove(const std::string &bundleName, const std::string &moduleName,
-        const std::string &abilityName, const std::string &formName, const int32_t dimension)
+    virtual bool IsFormDueControl(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName,
+        const int32_t dimension, const bool isDisablePolicy)
     {
         return false;
     }
@@ -1067,8 +1054,7 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE,
         FORM_MGR_RELOAD_FORMS,
         FORM_MGR_RELOAD_ALL_FORMS,
-        FORM_MGR_IS_FORM_DUE_DISABLE,
-        FORM_MGR_IS_FORM_DUE_REMOVE,
+        FORM_MGR_IS_FORM_DUE_CONTROL,
     };
 };
 }  // namespace AppExecFwk

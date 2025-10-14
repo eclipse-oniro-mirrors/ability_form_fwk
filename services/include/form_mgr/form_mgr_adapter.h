@@ -814,28 +814,18 @@ public:
     ErrCode ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms);
 
     /**
-     * @brief Check form is due disable control.
+     * @brief Check form is due control.
      * @param bundleName form bundleName.
      * @param moduleName form moduleName.
      * @param abilityName form abilityName.
      * @param formName form widget name.
      * @param dimension form dimension value.
-     * @return Returns true for form is due disabled.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @return Returns true for form is due controled.
      */
-    bool CheckFormDueDisable(const std::string &bundleName, const std::string &moduleName,
-        const std::string &abilityName, const std::string &formName, const int32_t dimension);
-
-    /**
-     * @brief Check form is due remove control.
-     * @param bundleName form bundleName.
-     * @param moduleName form moduleName.
-     * @param abilityName form abilityName.
-     * @param formName form widget name.
-     * @param dimension form dimension value.
-     * @return Returns true for form is due removed.
-     */
-    bool CheckFormDueRemove(const std::string &bundleName, const std::string &moduleName,
-        const std::string &abilityName, const std::string &formName, const int32_t dimension);
+    bool CheckFormDueControl(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const std::string &formName,
+        const int32_t dimension, const bool isDisablePolicy);
 private:
     /**
      * @brief Get form configure info.

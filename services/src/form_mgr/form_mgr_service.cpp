@@ -2247,32 +2247,18 @@ ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
     return FormMgrAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
 }
 
-bool FormMgrService::IsFormDueDisable(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension)
+bool FormMgrService::IsFormDueControl(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName, const int32_t dimension, const bool isDisablePolicy)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("need system authority");
         return false;
     }
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueDisable",
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueControl",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    bool result =
-        FormMgrAdapter::GetInstance().CheckFormDueDisable(bundleName, moduleName, abilityName, formName, dimension);
-    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    return result;
-}
-
-bool FormMgrService::IsFormDueRemove(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension)
-{
-    HILOG_INFO("call");
-    if (!CheckCallerIsSystemApp()) {
-        return false;
-    }
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueRemove",
-        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    bool result =
-        FormMgrAdapter::GetInstance().CheckFormDueRemove(bundleName, moduleName, abilityName, formName, dimension);
+    bool result = FormMgrAdapter::GetInstance().CheckFormDueControl(
+        bundleName, moduleName, abilityName, formName, dimension, isDisablePolicy);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
 }

@@ -376,7 +376,8 @@ void FormHostRecord::GetForms(std::vector<int64_t> &formIds)
     }
 }
 
-void FormHostRecord::OnDueDisableForms(const std::vector<int64_t> &formIds, const bool isDisable)
+void FormHostRecord::OnDueControlForms(
+    const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl)
 {
     HILOG_DEBUG("start");
     if (formIds.empty()) {
@@ -387,21 +388,7 @@ void FormHostRecord::OnDueDisableForms(const std::vector<int64_t> &formIds, cons
         HILOG_ERROR("null formHostCallback_");
         return;
     }
-    formHostCallback_->OnDueDisableForms(formIds, isDisable, formHostClient_);
-}
-
-void FormHostRecord::OnDueRemoveForms(const std::vector<int64_t> &formIds, const bool isRemove)
-{
-    HILOG_DEBUG("start");
-    if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
-        return;
-    }
-    if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
-        return;
-    }
-    formHostCallback_->OnDueRemoveForms(formIds, isRemove, formHostClient_);
+    formHostCallback_->OnDueControlForms(formIds, isDisablePolicy, isControl, formHostClient_);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
