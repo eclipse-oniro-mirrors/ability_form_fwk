@@ -32,6 +32,8 @@ namespace AniConstants {
     constexpr const char* ANI_STRING = "std.core.String";
     // ani signature method
     constexpr const char* ANI_CONSTRUCTOR = "<ctor>";
+    constexpr const char* ANI_NOPARAM = ":";
+    constexpr const char* ANI_NULLPOINTER = "";
 }
 namespace Constants {
     constexpr const char* PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS = "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS";

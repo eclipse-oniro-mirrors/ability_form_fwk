@@ -57,22 +57,23 @@ ani_status AniGetFromCache::AniFormGetCls(ani_env *env, const char *signature, a
 }
 
 ani_status AniGetFromCache::AniFormGetMtd(
-    ani_env *env, ani_class &cls, const char *name, const char *signature, ani_method &mtd)
+    ani_env *env, ani_class &cls, GetMedParam &sig, ani_method &mtd)
 {
     ani_status status = ANI_OK;
 
     std::lock_guard<std::mutex> lock(aniMtdCacheMutex_);
-    auto iter = aniMtdCache_.find(cls);
+    std::string mtdTag = sig.cls + sig.name;
+    auto iter = aniMtdCache_.find(mtdTag);
     if (iter != aniMtdCache_.end()) {
         mtd = reinterpret_cast<ani_method>(iter->second);
         return status;
     }
-    status = env->Class_FindMethod(cls, name, signature, &mtd);
+    status = env->Class_FindMethod(cls, sig.name.c_str(), sig.mtd == "" ? nullptr : sig.mtd.c_str(), &mtd);
     if (status != ANI_OK) {
         HILOG_ERROR("AniFormGetMtd Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return status;
     }
-    aniMtdCache_.emplace(cls, mtd);
+    aniMtdCache_.emplace(mtdTag, mtd);
     HILOG_INFO("AniFormGetMtd end");
     return status;
 }

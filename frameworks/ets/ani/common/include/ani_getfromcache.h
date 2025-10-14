@@ -26,13 +26,18 @@ class AniGetFromCache final : public DelayedRefSingleton<AniGetFromCache>  {
 public:
     DISALLOW_COPY_AND_MOVE(AniGetFromCache);
 
+    typedef struct GetMedParam {
+        std::string cls;
+        std::string name;
+        std::string mtd;
+    } Signature;
     ani_status AniFormGetCls(ani_env *env, const char *signature, ani_class &cls);
-    ani_status AniFormGetMtd(ani_env *env, ani_class &cls, const char *name, const char *signature, ani_method &mtd);
+    ani_status AniFormGetMtd(ani_env *env, ani_class &cls, GetMedParam &sig, ani_method &mtd);
 private:
     std::mutex aniClsCacheMutex_;
     std::unordered_map<std::string, ani_ref> aniClsCache_;
     std::mutex aniMtdCacheMutex_;
-    std::unordered_map<ani_ref, ani_method> aniMtdCache_;
+    std::unordered_map<std::string, ani_method> aniMtdCache_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
