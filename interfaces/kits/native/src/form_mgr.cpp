@@ -2363,8 +2363,7 @@ ErrCode FormMgr::ReloadAllForms(int32_t &reloadNum)
     return resultCode;
 }
 
-bool FormMgr::IsFormDueControl(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension, const bool isDisablePolicy)
+bool FormMgr::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
 {
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
@@ -2377,7 +2376,7 @@ bool FormMgr::IsFormDueControl(const std::string &bundleName, const std::string 
         HILOG_ERROR("null remoteProxy_");
         return false;
     }
-    return remoteProxy_->IsFormDueControl(bundleName, moduleName, abilityName, formName, dimension, isDisablePolicy);
+    return remoteProxy_->IsFormDueControl(formMajorInfo, isDisablePolicy);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

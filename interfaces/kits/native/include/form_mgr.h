@@ -36,6 +36,7 @@
 #include "running_form_info.h"
 #include "iremote_object.h"
 #include "want.h"
+#include "form_major_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -853,16 +854,11 @@ public:
 
     /**
      * @brief Check form is due control.
-     * @param bundleName form bundleName.
-     * @param moduleName form moduleName.
-     * @param abilityName form abilityName.
-     * @param formName form widget name.
-     * @param dimension form dimension value.
+     * @param formMajorInfo form major info.
      * @param isDisablePolicy True is disable form, false is remove form.
-     * @return Returns true for form is due disabled.
+     * @return Returns true for form is due controlled.
      */
-    bool IsFormDueControl(const std::string &bundleName, const std::string &moduleName, const std::string &abilityName,
-        const std::string &formName, const int32_t dimension, const bool isDisablePolicy);
+    bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 private:
     /**
      * @brief Connect form manager service.

@@ -39,6 +39,7 @@
 #include "theme_manager_client.h"
 #endif
 #include "configuration.h"
+#include "form_major_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1357,17 +1358,12 @@ private:
     ErrCode CallerCheck(const int64_t formId, const int32_t callingUid);
 
     /**
-     * @brief Make form due control status record.
-     * @param bundleName form bundleName.
-     * @param moduleName form moduleName.
-     * @param abilityName form abilityName.
-     * @param formName form widget name.
-     * @param dimension form dimension value.
-     * @param formRecord output formrecord.
-     * @return Return ERR_OK on success, others on failure
+     * @brief Check form is due control.
+     * @param formMajorInfo form major info.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @return Returns true for form is due controlled.
      */
-    ErrCode MakeDueControlFormRecord(const std::string &bundleName, const std::string &moduleName,
-        const std::string &abilityName, const std::string &formName, const int32_t dimension, FormRecord &formRecord);
+    bool CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;

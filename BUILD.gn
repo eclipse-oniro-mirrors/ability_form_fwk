@@ -491,6 +491,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/running_form_info.cpp",
     "interfaces/inner_api/src/form_event_report.cpp",
     "interfaces/inner_api/src/form_file_util.cpp",
+    "interfaces/inner_api/src/form_major_info.cpp",
   ]
 
   configs = [ ":formmgr_log_config" ]

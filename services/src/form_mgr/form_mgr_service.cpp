@@ -2247,8 +2247,7 @@ ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
     return FormMgrAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
 }
 
-bool FormMgrService::IsFormDueControl(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension, const bool isDisablePolicy)
+bool FormMgrService::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
 {
     HILOG_DEBUG("call");
     if (!CheckCallerIsSystemApp()) {
@@ -2257,8 +2256,7 @@ bool FormMgrService::IsFormDueControl(const std::string &bundleName, const std::
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueControl",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    bool result = FormMgrAdapter::GetInstance().CheckFormDueControl(
-        bundleName, moduleName, abilityName, formName, dimension, isDisablePolicy);
+    bool result = FormMgrAdapter::GetInstance().CheckFormDueControl(formMajorInfo, isDisablePolicy);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
 }

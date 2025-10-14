@@ -30,6 +30,7 @@
 #include "iremote_broker.h"
 #include "running_form_info.h"
 #include "form_lock_info.h"
+#include "form_major_info.h"
 
 #include "want.h"
 
@@ -932,17 +933,11 @@ public:
 
     /**
      * @brief Check form is due control.
-     * @param bundleName form bundleName.
-     * @param moduleName form moduleName.
-     * @param abilityName form abilityName.
-     * @param formName form widget name.
-     * @param dimension form dimension value.
+     * @param formMajorInfo form major info.
      * @param isDisablePolicy True is disable form, false is remove form.
      * @return Returns true for form is due disabled.
      */
-    virtual bool IsFormDueControl(const std::string &bundleName, const std::string &moduleName,
-        const std::string &abilityName, const std::string &formName,
-        const int32_t dimension, const bool isDisablePolicy)
+    virtual bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
     {
         return false;
     }

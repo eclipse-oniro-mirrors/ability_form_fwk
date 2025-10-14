@@ -3067,33 +3067,16 @@ ErrCode FormMgrProxy::ReloadAllForms(int32_t &reloadNum)
     return reply.ReadInt32();
 }
 
-bool FormMgrProxy::IsFormDueControl(const std::string &bundleName, const std::string &moduleName,
-    const std::string &abilityName, const std::string &formName, const int32_t dimension, const bool isDisablePolicy)
+bool FormMgrProxy::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return false;
     }
-    if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("write bundleName failed");
-        return false;
-    }
-    if (!data.WriteString(moduleName)) {
-        HILOG_ERROR("write moduleName failed");
-        return false;
-    }
-    if (!data.WriteString(abilityName)) {
-        HILOG_ERROR("write abilityName failed");
-        return false;
-    }
-    if (!data.WriteString(formName)) {
-        HILOG_ERROR("write formName failed");
-        return false;
-    }
-    if (!data.WriteInt32(dimension)) {
-        HILOG_ERROR("write dimension failed");
-        return false;
+    if (!data.WriteParcelable(&formMajorInfo)) {
+        HILOG_ERROR("Write formMajorInfo failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteBool(isDisablePolicy)) {
         HILOG_ERROR("write isDisablePolicy failed");

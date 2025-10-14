@@ -2091,13 +2091,13 @@ ErrCode FormMgrStub::HandleReloadAllForms(MessageParcel &data, MessageParcel &re
 ErrCode FormMgrStub::HandleIsFormDueControl(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    std::string bundleName = data.ReadString();
-    std::string moduleName = data.ReadString();
-    std::string abilityName = data.ReadString();
-    std::string formName = data.ReadString();
-    int32_t dimension = data.ReadInt32();
+    std::unique_ptr<FormMajorInfo> formMajorInfo(data.ReadParcelable<FormMajorInfo>());
+    if (formMajorInfo == nullptr) {
+        HILOG_ERROR("Read formMajorInfo failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     bool isDisablePolicy = data.ReadBool();
-    bool result = IsFormDueControl(bundleName, moduleName, abilityName, formName, dimension, isDisablePolicy);
+    bool result = IsFormDueControl(*formMajorInfo, isDisablePolicy);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
