@@ -188,15 +188,15 @@ ohos_shared_library("libfms") {
     "services/src/form_refresh/check_mgr/system_app_checker.cpp",
     "services/src/form_refresh/check_mgr/untrust_app_checker.cpp",
     "services/src/form_refresh/form_refresh_mgr.cpp",
+    "services/src/form_refresh/refresh_impl/form_app_upgrade_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_data_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_force_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_host_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_net_conn_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_next_time_refresh_impl.cpp",
+    "services/src/form_refresh/refresh_impl/form_provider_refresh_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.cpp",
     "services/src/form_refresh/refresh_impl/form_timer_refresh_impl.cpp",
-    "services/src/form_refresh/refresh_impl/form_app_upgrade_refresh_impl.cpp",
-    "services/src/form_refresh/refresh_impl/form_provider_refresh_impl.cpp",
     "services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
     "services/src/form_refresh/strategy/refresh_check_mgr.cpp",
     "services/src/form_refresh/strategy/refresh_control_mgr.cpp",
@@ -341,9 +341,9 @@ ohos_shared_library("fmskit_native") {
   ]
   public_configs = [ ":fmskit_public_config" ]
   sources = [
+    "interfaces/inner_api/src/form_event_hiappevent.cpp",
     "interfaces/kits/native/src/form_caller_mgr.cpp",
     "interfaces/kits/native/src/form_errors.cpp",
-    "interfaces/inner_api/src/form_event_hiappevent.cpp",
     "interfaces/kits/native/src/form_host_caller.cpp",
     "interfaces/kits/native/src/form_host_client.cpp",
     "interfaces/kits/native/src/form_mgr.cpp",
@@ -363,10 +363,10 @@ ohos_shared_library("fmskit_native") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
-    "hisysevent:libhisysevent",
   ]
 
   public_external_deps = [
@@ -462,6 +462,8 @@ ohos_shared_library("form_manager") {
   sources = [
     "interfaces/inner_api/src/form_ashmem.cpp",
     "interfaces/inner_api/src/form_ecological_rule_param.cpp",
+    "interfaces/inner_api/src/form_event_report.cpp",
+    "interfaces/inner_api/src/form_file_util.cpp",
     "interfaces/inner_api/src/form_host_proxy.cpp",
     "interfaces/inner_api/src/form_host_stub.cpp",
     "interfaces/inner_api/src/form_info_filter.cpp",
@@ -489,8 +491,6 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
     "interfaces/inner_api/src/provider_connect_stub.cpp",
     "interfaces/inner_api/src/running_form_info.cpp",
-    "interfaces/inner_api/src/form_event_report.cpp",
-    "interfaces/inner_api/src/form_file_util.cpp",
     "interfaces/inner_api/src/form_major_info.cpp",
   ]
 
@@ -516,13 +516,13 @@ ohos_shared_library("form_manager") {
     "eventhandler:libeventhandler",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",
     "napi:ace_napi",
     "os_account:os_account_innerkits",
     "samgr:samgr_proxy",
-    "hisysevent:libhisysevent",
   ]
 
   subsystem_name = "ability"
@@ -571,14 +571,20 @@ group("form_ani_packages") {
   deps = []
   if (ability_runtime_graphics) {
     deps += [
+      "${form_fwk_ani_path}/form_agent:form_agent_ani",
+      "${form_fwk_ani_path}/form_agent:form_agent_etc",
       "${form_fwk_ani_path}/form_binding_data:formBindingData_ani",
       "${form_fwk_ani_path}/form_binding_data:form_binding_data_etc",
       "${form_fwk_ani_path}/form_error:form_error_etc",
-      "${form_fwk_ani_path}/form_info:form_info_etc",
-      "${form_fwk_ani_path}/form_provider:formProvider_ani",
-      "${form_fwk_ani_path}/form_provider:form_provider_etc",
       "${form_fwk_ani_path}/form_host:formHost_ani",
       "${form_fwk_ani_path}/form_host:form_host_etc",
+      "${form_fwk_ani_path}/form_info:form_info_etc",
+      "${form_fwk_ani_path}/form_observer:form_observer_abc_etc",
+      "${form_fwk_ani_path}/form_observer:formobserver_ani",
+      "${form_fwk_ani_path}/form_provider:formProvider_ani",
+      "${form_fwk_ani_path}/form_provider:form_provider_etc",
+      "${form_fwk_ani_path}/form_util:formutil_ani",
+      "${form_fwk_ani_path}/utils:util_ani",
     ]
   }
 }

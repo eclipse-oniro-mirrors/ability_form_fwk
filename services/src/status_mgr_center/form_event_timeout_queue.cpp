@@ -34,7 +34,7 @@ FormEventTimeoutQueue::~FormEventTimeoutQueue()
 
 bool FormEventTimeoutQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return false;
@@ -46,7 +46,7 @@ bool FormEventTimeoutQueue::ScheduleTask(uint64_t ms, std::function<void()> func
 void FormEventTimeoutQueue::ScheduleDelayTask(
     const std::pair<int64_t, std::string> &eventMsg, uint32_t ms, std::function<void()> func)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return;
@@ -57,7 +57,7 @@ void FormEventTimeoutQueue::ScheduleDelayTask(
 
 void FormEventTimeoutQueue::CancelDelayTask(const std::pair<int64_t, std::string> &eventMsg)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return;

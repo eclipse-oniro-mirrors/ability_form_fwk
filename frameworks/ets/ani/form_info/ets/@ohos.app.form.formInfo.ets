@@ -163,6 +163,21 @@ export default namespace formInfo {
     readonly extraData?: Record<string, Object>;
   }
 
+  class RunningFormInfoInner implements RunningFormInfo {
+    formId: string;
+    bundleName: string;
+    hostBundleName: string;
+    formLocation: FormLocation;
+    visibilityType: VisibilityType;
+    moduleName: string;
+    abilityName: string;
+    formName: string;
+    dimension: int;
+    formUsageState: FormUsageState;
+    formDescription: string;
+    extraData?: Record<string, Object>;
+  }
+
   enum FormUsageState {
     USED = 0,
     UNUSED = 1
@@ -227,4 +242,78 @@ export default namespace formInfo {
     formState: FormState;
     want: Want;
   }
+
+  interface FunInteractionParams {
+    abilityName?: string;
+    targetBundleName: string;
+    subBundleName: string;
+    keepStateDuration?: int;
+  }
+
+  class FunInteractionParamsInner implements FunInteractionParams {
+    abilityName?: string;
+    targetBundleName: string;
+    subBundleName: string;
+    keepStateDuration?: int;
+  }
+
+  interface OverflowRequest {
+    formId: string;
+    isOverflow: boolean;
+    overflowInfo?: OverflowInfo;
+  }
+
+  class OverflowRequestInner implements OverflowRequest {
+    formId: string;
+    isOverflow: boolean;
+    overflowInfo?: OverflowInfo;
+  }
+
+  interface Rect {
+    left: double;
+    top: double;
+    width: double;
+    height: double;
+  }
+
+  class RectInner implements Rect {
+    left: double;
+    top: double;
+    width: double;
+    height: double;
+  }
+
+  interface OverflowInfo {
+    area: Rect;
+    duration: int;
+    useDefaultAnimation?: boolean;
+  }
+  
+  class OverflowInfoInner implements OverflowInfo {
+    area: Rect;
+    duration: int;
+    useDefaultAnimation?: boolean;
+  }
+
+  interface ChangeSceneAnimationStateRequest {
+    formId: string;
+    state: int;
+  }
+
+  class ChangeSceneAnimationStateRequestInner implements ChangeSceneAnimationStateRequest {
+    formId: string;
+    state: int;
+  }
+
+  interface SceneAnimationParams {
+    abilityName: string;
+    disabledDesktopBehaviors?: string;
+  }
+
+  class SceneAnimationParamsInner implements SceneAnimationParams {
+    abilityName: string;
+    disabledDesktopBehaviors?: string;
+  }
+
+  type GetFormRectInfoCallback = (formId: string) => Promise<Rect>;
 }

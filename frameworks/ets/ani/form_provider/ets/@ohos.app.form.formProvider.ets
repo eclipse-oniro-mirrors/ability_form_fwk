@@ -18,7 +18,7 @@ import formBindingData from '@ohos.app.form.formBindingData';
 import formInfo from '@ohos.app.form.formInfo';
 import Want from '@ohos.app.ability.Want';
 
-export class AsyncCallbackWrapper<T, E = void> {
+class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => { }
 
   constructor(myFun: AsyncCallback<T, E>) {
@@ -43,6 +43,14 @@ export namespace formProvider {
   native function isRequestPublishFormSupportedInner(callback: AsyncCallbackWrapper<boolean>): void;
   native function getPublishedFormInfosInner(callback: AsyncCallbackWrapper<Array<formInfo.RunningFormInfo>>): void;
   native function getPublishedFormInfoByIdInner(formId: string, callback: AsyncCallbackWrapper<formInfo.RunningFormInfo>): void;
+  export native function nativeGetFormRect(formId: string, callback: AsyncCallbackWrapper<formInfo.Rect>): void;
+  export native function nativeCancelOverflow(formId: string, callback: AsyncCallbackWrapper<void>): void;
+  export native function nativeRequestOverflow(formId: string, overflowInfo: formInfo.OverflowInfo, callback: AsyncCallbackWrapper<void>): void;
+  export native function nativeDeactivateSceneAnimation(formId: string, callback: AsyncCallbackWrapper<void>): void;
+  export native function nativeActivateSceneAnimation(formId: string, callback: AsyncCallbackWrapper<void>): void;
+  export native function nativeOpenFormManagerCrossBundle(want: Want): void;
+  export native function checkFormIDParam(formId: string): void;
+  export native function checkOverflowInfoParam(overflowInfo: formInfo.OverflowInfo): void;
 
   const ERR_OK = 0;
   const INVALID_PARAM_ERROR_CODE = 401;
@@ -336,5 +344,100 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
         isRequestPublishFormSupportedInner(call);
       });
     });
+  }
+
+  export function getFormRect(formId: string): Promise<formInfo.Rect> {
+    checkFormIDParam(formId);
+    let getRectFormPromise: Promise<formInfo.Rect> =
+      new Promise<formInfo.Rect>((resolve: (data: formInfo.Rect) => void, reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<formInfo.Rect>((err: BusinessError | null, data: formInfo.Rect | undefined) => {
+          if (err == null || err.code == 0) {
+            resolve(data as formInfo.Rect);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          formProvider.nativeGetFormRect(formId, myCall);
+        });
+      });
+    return getRectFormPromise;
+  }
+
+  export function cancelOverflow(formId: string): Promise<void> {
+    checkFormIDParam(formId);
+    let requestFormPromise: Promise<void> =
+      new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
+          if (err == null || err.code == 0) {
+            resolve(undefined);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          formProvider.nativeCancelOverflow(formId, myCall);
+        });
+      });
+    return requestFormPromise;
+  }
+
+  export function requestOverflow(formId: string, overflowInfo: formInfo.OverflowInfo): Promise<void> {
+    checkFormIDParam(formId);
+    checkOverflowInfoParam(overflowInfo);
+    let requestFormPromise: Promise<void> =
+      new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
+          if (err == null || err.code == 0) {
+            resolve(undefined);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          formProvider.nativeRequestOverflow(formId, overflowInfo, myCall);
+        });
+      });
+    return requestFormPromise;
+  }
+
+  export function deactivateSceneAnimation(formId: string): Promise<void> {
+    checkFormIDParam(formId);
+    let deactivateFormPromise: Promise<void> =
+      new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
+          if (err == null || err.code == 0) {
+            resolve(undefined);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          formProvider.nativeDeactivateSceneAnimation(formId, myCall);
+        });
+      });
+    return deactivateFormPromise;
+  }
+
+  export function activateSceneAnimation(formId: string): Promise<void> {
+    checkFormIDParam(formId);
+    let activateFormPromise: Promise<void> =
+      new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
+          if (err == null || err.code == 0) {
+            resolve(undefined);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          formProvider.nativeActivateSceneAnimation(formId, myCall);
+        });
+      });
+    return activateFormPromise;
+  }
+
+  export function openFormManagerCrossBundle(want: Want): void {
+    formProvider.nativeOpenFormManagerCrossBundle(want);
   }
 }
