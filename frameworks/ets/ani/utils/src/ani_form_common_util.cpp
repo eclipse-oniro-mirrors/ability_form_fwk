@@ -42,7 +42,7 @@ constexpr const char *CLASSNAME_BOOL = "std.core.Boolean";
 constexpr const char *CLASSNAME_INT = "std.core.Int";
 constexpr const char *CLASSNAME_RECORD = "std.core.Record";
 constexpr const char *CLASSNAME_ARRAY = "std.core.Array";
-constexpr const char *CLASSNAME_ERROR = "escompat.Error";
+constexpr const char *CLASSNAME_ERROR = "std.core.Error";
 constexpr const char *CLASSNAME_RUNNING_FORM_INFO = "@ohos.app.form.formInfo.formInfo.RunningFormInfoInner";
 constexpr const char *FORM_INFO_INNER_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.formInfoInner";
 constexpr const char *ENUMNAME_VISIBILITYTYPE = "@ohos.app.form.formInfo.formInfo.VisibilityType";
@@ -374,7 +374,7 @@ ani_object WrapBusinessError(ani_env *env, const std::string &msg)
         return nullptr;
     }
 
-    status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method);
+    status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{std.core.ErrorOptions}:", &method);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed, status: %{public}d", status);
         return nullptr;
@@ -403,7 +403,7 @@ ani_object CreateBusinessError(ani_env *env, ani_int code, const std::string& ms
         HILOG_ERROR("FindClass failed %{public}d", status);
         return nullptr;
     }
-    status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method);
+    status = env->Class_FindMethod(cls, "<ctor>", "iC{std.core.Error}:", &method);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
