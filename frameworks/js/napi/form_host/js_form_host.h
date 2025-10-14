@@ -43,28 +43,6 @@ private:
     napi_env env_;
 };
 
-/* formId：the Id of form.
- * overflowInfo: overflow information, including overflow area and overflow duration.
- * isOverflow: whether overflow, true means request overflow, false means cancel overflow.
- * state：activation state, 1 means activate, 0 means deactivate.
- * condition：condition variable for thread synchronization
- * mutex：mutex locks for shared resources.
- * isReady：used to indicate whether the asynchronous operation is completed or not.
- * result：the result of the operation.
- */
-typedef struct LiveFormInterfaceParam {
-    std::string formId;
-    AppExecFwk::OverflowInfo overflowInfo;
-    bool isOverflow = true;
-    int32_t state;
-    std::condition_variable condition;
-    std::mutex mutex;
-    bool isReady = false;
-    bool result = false;
-    AppExecFwk::Rect formRect;
-    std::unordered_map<std::string, std::string> liveFormStatusMap;
-} LiveFormInterfaceParam;
-
 class JsFormRouterProxyMgr : public AppExecFwk::FormHostDelegateStub {
 public:
     JsFormRouterProxyMgr() = default;
