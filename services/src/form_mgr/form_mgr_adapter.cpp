@@ -3953,7 +3953,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             continue;
         }
         // Recovery is performed only when the form has been recycled or is recycling, or when there is a
-        // recycling task in the queue.
+        // recycling task in the queue, or click in recycled form.
         if (!(FormStatus::GetInstance().IsFormProcessRecycle(formId) || record.isExistRecycleTask) &&
             !needHandleCachedClick) {
             HILOG_WARN("form %{public}" PRId64 " not RECYCLED", formId);
