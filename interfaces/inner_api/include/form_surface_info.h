@@ -25,8 +25,7 @@ struct FormSurfaceInfo : public Parcelable {
     float width = 0.0f;
     float height = 0.0f;
     float borderWidth = 0.0f;
-    float layoutWidth = 0.0f;
-    float layoutHeight = 0.0f;
+    float formViewScale = 1.0f;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

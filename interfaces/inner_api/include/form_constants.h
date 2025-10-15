@@ -50,6 +50,7 @@ namespace Constants {
     constexpr const char* PARAM_FORM_HEIGHT_KEY = "ohos.extra.param.key.form_height";
     constexpr const char* PARAM_LAYOUT_WIDTH_KEY = "ohos.extra.param.key.layout_width";
     constexpr const char* PARAM_LAYOUT_HEIGHT_KEY = "ohos.extra.param.key.layout_height";
+    constexpr const char* PARAM_FORM_VIEW_SCALE = "ohos.extra.param.key.form_view_scale";
     constexpr const char* PARAM_JSON_WANT_KEY = "ohos.extra.param.key.json_want";
     constexpr const char* PARAM_LIVE_FORM_ID_KEY = "ohos.extra.param.key.live_form_id";
     constexpr int32_t ONE_HOST_MAX_FORM_SIZE = 256;
