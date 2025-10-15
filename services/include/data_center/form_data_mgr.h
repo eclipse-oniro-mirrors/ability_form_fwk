@@ -981,6 +981,13 @@ public:
     void SetExpectRecycledStatus(const std::vector<int64_t> &formIds, bool isExpectRecycled);
 
     /**
+     * @brief set expect recycled status
+     * @param formId formId.
+     * @param isExpectRecycled isExpectRecycled
+     */
+    void SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled);
+
+    /**
      * @brief get expect recycled status
      * @param formId form id.
      * @return Returns true if the form should be recycled
