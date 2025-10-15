@@ -30,6 +30,7 @@
 #include "iremote_broker.h"
 #include "running_form_info.h"
 #include "form_lock_info.h"
+#include "form_major_info.h"
 
 #include "want.h"
 
@@ -930,6 +931,17 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Check form is due control.
+     * @param formMajorInfo form major info.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @return Returns true for form is due disabled.
+     */
+    virtual bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+    {
+        return false;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1037,6 +1049,7 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE,
         FORM_MGR_RELOAD_FORMS,
         FORM_MGR_RELOAD_ALL_FORMS,
+        FORM_MGR_IS_FORM_DUE_CONTROL,
     };
 };
 }  // namespace AppExecFwk

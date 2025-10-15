@@ -2246,5 +2246,19 @@ ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
     }
     return FormMgrAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
 }
+
+bool FormMgrService::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("need system authority");
+        return false;
+    }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueControl",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    bool result = FormMgrAdapter::GetInstance().CheckFormDueControl(formMajorInfo, isDisablePolicy);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return result;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

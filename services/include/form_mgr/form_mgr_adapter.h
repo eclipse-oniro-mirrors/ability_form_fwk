@@ -39,6 +39,7 @@
 #include "theme_manager_client.h"
 #endif
 #include "configuration.h"
+#include "form_major_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -813,6 +814,13 @@ public:
     */
     ErrCode ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms);
 
+    /**
+     * @brief Check form is due control.
+     * @param formMajorInfo form major info.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @return Returns true for form is due controlled.
+     */
+    bool CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 private:
     /**
      * @brief Get form configure info.
@@ -1342,6 +1350,7 @@ private:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode CallerCheck(const int64_t formId, const int32_t callingUid);
+
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;

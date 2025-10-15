@@ -30,6 +30,7 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "${form_fwk_path}/services/src/form_refresh/refresh_impl",
     "${form_fwk_path}/services/include/common/util",
     "${form_fwk_path}/services/include/form_refresh/strategy",
+    "${form_fwk_path}/services/include/feature/param_update",
   ]
   cflags = [
     "-g",
@@ -65,6 +66,7 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
     "${form_fwk_path}/services/src/form_refresh/form_refresh_mgr.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_app_upgrade_refresh_impl.cpp",
+    "${form_fwk_path}/services/src/feature/param_update/param_control.cpp",
     "formrefresh_fuzzer.cpp",
   ]
 

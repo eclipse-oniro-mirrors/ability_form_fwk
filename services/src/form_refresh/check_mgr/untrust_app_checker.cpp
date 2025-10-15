@@ -15,6 +15,7 @@
 
 #include "form_refresh/check_mgr/untrust_app_checker.h"
 #include "common/util/form_trust_mgr.h"
+#include "feature/param_update/param_control.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -27,6 +28,16 @@ int UntrustAppChecker::CheckValid(const CheckValidFactor &factor)
     if (!FormTrustMgr::GetInstance().IsTrust(factor.record.bundleName)) {
         HILOG_ERROR("is untrust app, formId:%{public}" PRId64, factor.record.formId);
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+
+    if (ParamControl::GetInstance().IsFormDisable(factor.record)) {
+        HILOG_ERROR("form is disable refresh by due, %{public}" PRId64, factor.record.formId);
+        return ERR_APPEXECFWK_FORM_DUE_DISABLE;
+    }
+
+    if (ParamControl::GetInstance().IsFormRemove(factor.record)) {
+        HILOG_ERROR("form is remove state by due, %{public}" PRId64, factor.record.formId);
+        return ERR_APPEXECFWK_FORM_DUE_REMOVE;
     }
     return ERR_OK;
 }

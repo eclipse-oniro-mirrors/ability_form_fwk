@@ -42,6 +42,7 @@
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
 #include "status_mgr_center/form_status.h"
+#include "feature/param_update/param_control.h"
 
 using namespace OHOS::AppExecFwk;
 

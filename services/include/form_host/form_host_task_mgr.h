@@ -107,6 +107,15 @@ public:
      */
     void PostHostDiedTask(const sptr<IRemoteObject> &remoteHost);
 
+    /**
+     * @brief Post due control form task.
+     * @param formIds formIds The Id list of the forms.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
+     * @param remoteObject Form host proxy object.
+     */
+    void PostDueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
+        const bool isControl, const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Post form data to form host when acquire form..
@@ -186,6 +195,16 @@ private:
      * @param remoteHost Form host proxy object.
      */
     void HostDied(const sptr<IRemoteObject> &remoteHost);
+
+    /**
+     * @brief Exec due control form task.
+     * @param formIds formIds The Id list of the forms.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
+     * @param remoteObject Form host proxy object.
+     */
+    void DueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
+        const bool isControl, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

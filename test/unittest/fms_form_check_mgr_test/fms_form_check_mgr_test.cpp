@@ -43,6 +43,7 @@
 #include "form_refresh/strategy/refresh_check_mgr.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
 #include "form_refresh/strategy/refresh_exec_mgr.h"
+#include "feature/param_update/param_control.h"
 
 using namespace testing::ext;
 using namespace OHOS;

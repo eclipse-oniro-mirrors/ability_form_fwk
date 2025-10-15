@@ -19,6 +19,7 @@
 #include <fstream>
 #include "form_constants.h"
 #include "feature/param_update/param_reader.h"
+#include "feature/param_update/param_control.h"
 #include "common/util/string_utils.h"
 #include "data_center/database/form_rdb_data_mgr.h"
 #include "fms_log_wrapper.h"
@@ -77,6 +78,7 @@ void ParamManager::InitParam()
     if (currentVersionNum < pathVersionNum) {
         ReloadParam(pathVersion, path);
     }
+    ParamControl::GetInstance().DealDueParam(g_paramStr);
 }
 
 const std::string &ParamManager::GetParamStr()

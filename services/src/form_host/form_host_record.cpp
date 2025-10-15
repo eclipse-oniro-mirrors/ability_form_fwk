@@ -375,5 +375,20 @@ void FormHostRecord::GetForms(std::vector<int64_t> &formIds)
         formIds.emplace_back(iter.first);
     }
 }
+
+void FormHostRecord::OnDueControlForms(
+    const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl)
+{
+    HILOG_DEBUG("start");
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("null formHostCallback_");
+        return;
+    }
+    formHostCallback_->OnDueControlForms(formIds, isDisablePolicy, isControl, formHostClient_);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

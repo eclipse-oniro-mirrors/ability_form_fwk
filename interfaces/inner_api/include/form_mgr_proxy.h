@@ -797,6 +797,13 @@ public:
      */
     ErrCode ReloadAllForms(int32_t &reloadNum) override;
 
+    /**
+     * @brief Check form is due control.
+     * @param formMajorInfo form major info.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @return Returns true for form is due disabled.
+     */
+    bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

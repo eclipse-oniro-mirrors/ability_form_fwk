@@ -3066,5 +3066,32 @@ ErrCode FormMgrProxy::ReloadAllForms(int32_t &reloadNum)
     reloadNum = reply.ReadInt32();
     return reply.ReadInt32();
 }
+
+bool FormMgrProxy::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return false;
+    }
+    if (!data.WriteParcelable(&formMajorInfo)) {
+        HILOG_ERROR("Write formMajorInfo failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isDisablePolicy)) {
+        HILOG_ERROR("write isDisablePolicy failed");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_DUE_CONTROL, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

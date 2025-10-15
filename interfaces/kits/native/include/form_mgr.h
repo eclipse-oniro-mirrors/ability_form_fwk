@@ -36,6 +36,7 @@
 #include "running_form_info.h"
 #include "iremote_object.h"
 #include "want.h"
+#include "form_major_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -851,6 +852,13 @@ public:
      */
     ErrCode ReloadAllForms(int32_t &reloadNum);
 
+    /**
+     * @brief Check form is due control.
+     * @param formMajorInfo form major info.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @return Returns true for form is due controlled.
+     */
+    bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 private:
     /**
      * @brief Connect form manager service.

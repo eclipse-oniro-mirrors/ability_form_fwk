@@ -212,6 +212,15 @@ public:
      * @param lock True is lockform, false is unlockform.
      */
     void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) override;
+
+    /**
+     * @brief due control form style
+     * @param formIds The Id list of the forms.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @param isControl True is control form, false is not control form.
+     */
+    void OnDueControlForm(
+        const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl) override;
 private:
     static std::mutex instanceMutex_;
     static sptr<FormHostClient> instance_;

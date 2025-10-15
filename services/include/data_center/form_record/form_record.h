@@ -100,6 +100,7 @@ public:
     std::string uiModule = ""; // widget module name
     // user expect form recycled status
     bool expectRecycled = false;
+    uint32_t lastVersionCode = 0;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -855,6 +855,13 @@ public:
      */
     ErrCode ReloadAllForms(int32_t &reloadNum) override;
 
+    /**
+     * @brief Check form is due control.
+     * @param formMajorInfo form major info.
+     * @param isDisablePolicy True is disable form, false is remove form.
+     * @return Returns true for form is due controlled.
+     */
+    bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy) override;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.

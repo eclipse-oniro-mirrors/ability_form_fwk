@@ -2362,5 +2362,21 @@ ErrCode FormMgr::ReloadAllForms(int32_t &reloadNum)
     }
     return resultCode;
 }
+
+bool FormMgr::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+{
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return false;
+    }
+    return remoteProxy_->IsFormDueControl(formMajorInfo, isDisablePolicy);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

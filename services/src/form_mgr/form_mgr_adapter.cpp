@@ -90,6 +90,7 @@
 #include "form_refresh/strategy/refresh_control_mgr.h"
 #include "status_mgr_center/form_status.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
+#include "feature/param_update/param_control.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -178,6 +179,19 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("AddForm fail,%{public}s is unTrust. formId: %{public}" PRId64 " code: %{public}d",
             formItemInfo.GetProviderBundleName().c_str(), formId, ERR_APPEXECFWK_FORM_NOT_TRUST);
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+    // Check due remove
+    int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
+    FormMajorInfo formMajorInfo;
+    formMajorInfo.bundleName = formItemInfo.GetProviderBundleName();
+    formMajorInfo.moduleName = formItemInfo.GetModuleName();
+    formMajorInfo.abilityName = formItemInfo.GetAbilityName();
+    formMajorInfo.formName = formItemInfo.GetFormName();
+    formMajorInfo.dimension = dimensionId;
+    if (formId == 0 && CheckFormDueControl(formMajorInfo, false)) {
+        HILOG_ERROR("Add new form fail,%{public}s is due removed. formId: %{public}" PRId64 " code: %{public}d",
+            formItemInfo.GetProviderBundleName().c_str(), formId, ERR_APPEXECFWK_FORM_DUE_REMOVE);
+        return ERR_APPEXECFWK_FORM_DUE_REMOVE;
     }
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
@@ -1786,6 +1800,13 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
             HILOG_WARN("Get updateDuration failed, uses local configuration");
         }
+        int32_t duration = ParamControl::GetInstance().GetDueUpdateDuration(formRecord);
+        if (duration == 0) {
+            HILOG_WARN("Due disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
+            return ERR_OK;
+        }
+        int64_t dueDuration = duration * Constants::TIME_CONVERSION;
+        updateDuration = std::max(updateDuration, dueDuration * Constants::TIME_CONVERSION);
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
         HILOG_WARN("add interval timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
@@ -1920,7 +1941,6 @@ ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundl
     HILOG_DEBUG("GetBundleInfo start");
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
-    std::string deviceId = want.GetElement().GetDeviceID();
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     if (bundleName.empty() || abilityName.empty() || moduleName.empty()) {
         HILOG_ERROR("invalid bundleName or abilityName or moduleName");
@@ -4698,6 +4718,31 @@ ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRe
         }
     }
     return ERR_OK;
+}
+
+bool FormMgrAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+{
+    HILOG_DEBUG("call");
+    Want want;
+    want.SetElementName(formMajorInfo.bundleName, formMajorInfo.abilityName);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formMajorInfo.moduleName);
+
+    BundleInfo bundleInfo;
+    std::string packageName;
+    if (GetBundleInfo(want, bundleInfo, packageName) != ERR_OK) {
+        HILOG_ERROR("Get bundle info failed");
+        return false;
+    }
+
+    FormRecord formRecord;
+    formRecord.bundleName = formMajorInfo.bundleName;
+    formRecord.moduleName = formMajorInfo.moduleName;
+    formRecord.abilityName = formMajorInfo.abilityName;
+    formRecord.formName = formMajorInfo.formName;
+    formRecord.specification = formMajorInfo.dimension;
+    formRecord.versionCode = bundleInfo.versionCode;
+    return isDisablePolicy ?
+        ParamControl::GetInstance().IsFormDisable(formRecord) : ParamControl::GetInstance().IsFormRemove(formRecord);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

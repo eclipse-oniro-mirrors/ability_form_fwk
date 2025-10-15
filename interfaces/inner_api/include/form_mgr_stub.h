@@ -802,6 +802,13 @@ private:
      */
     ErrCode HandleReloadAllForms(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle form due control check msg.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleIsFormDueControl(MessageParcel &data, MessageParcel &reply);
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

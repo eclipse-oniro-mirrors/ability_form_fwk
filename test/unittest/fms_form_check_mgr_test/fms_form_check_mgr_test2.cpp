@@ -24,6 +24,7 @@
 #include "form_refresh/form_refresh_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "common/util/form_trust_mgr.h"
+#include "feature/param_update/param_control.h"
 
 using namespace testing::ext;
 using namespace OHOS;
