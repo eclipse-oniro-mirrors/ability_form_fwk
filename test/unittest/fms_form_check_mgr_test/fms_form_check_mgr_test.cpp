@@ -215,6 +215,10 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormHostRefreshImpl_009, TestS
 
     data.record.isVisible = true;
     MockIsScreenOff(false);
+    MockIsNeedToFresh(false);
+    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsNeedToFresh(true);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
@@ -248,6 +252,10 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormNetConnRefreshImpl_010, Te
 
     data.record.isVisible = true;
     MockIsScreenOff(false);
+    MockIsNeedToFresh(false);
+    EXPECT_EQ(ERR_OK, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsNeedToFresh(true);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormNetConnRefreshImpl::GetInstance().RefreshFormRequest(data));
 
@@ -307,6 +315,10 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormRefreshAfterUncontrolImpl_
 
     data.record.isVisible = true;
     MockIsScreenOff(false);
+    MockIsNeedToFresh(false);
+    EXPECT_EQ(ERR_OK, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsNeedToFresh(true);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(data));
 
@@ -413,6 +425,18 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormProviderRefreshImpl_016, T
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
+    MockIsHealthyControl(true);
+    EXPECT_EQ(ERR_OK, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsHealthyControl(false);
+    MockIsScreenOff(true);
+    EXPECT_EQ(ERR_OK, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsScreenOff(false);
+    MockIsNeedToFresh(false);
+    EXPECT_EQ(ERR_OK, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsNeedToFresh(true);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
 

@@ -2216,10 +2216,7 @@ ErrCode FormMgrService::ReloadForms(int32_t &reloadNum, const std::string &modul
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     std::vector<FormRecord> callerBundleForms;
-    bool hasFormRecord = FormDataMgr::GetInstance().GetFormRecord(callerBundleName, callerBundleForms);
-    if (!hasFormRecord) {
-        return ERR_OK;
-    }
+    FormDataMgr::GetInstance().GetFormRecord(callerBundleName, callerBundleForms);
     std::vector<FormRecord> refreshForms;
     std::copy_if(callerBundleForms.begin(), callerBundleForms.end(), std::back_inserter(refreshForms),
         [&moduleName, &abilityName, &formName] (const FormRecord &formRecord) {
@@ -2240,10 +2237,7 @@ ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     std::vector<FormRecord> refreshForms;
-    bool hasFormRecord = FormDataMgr::GetInstance().GetFormRecord(callerBundleName, refreshForms);
-    if (!hasFormRecord) {
-        return ERR_OK;
-    }
+    FormDataMgr::GetInstance().GetFormRecord(callerBundleName, refreshForms);
     return FormMgrAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
 }
 }  // namespace AppExecFwk

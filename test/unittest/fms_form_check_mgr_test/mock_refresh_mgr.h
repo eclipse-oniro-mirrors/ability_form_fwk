@@ -29,5 +29,6 @@ void MockIsSystemOverload(bool mockBool);
 void MockIsFormInvisible(bool mockBool);
 void MockIsScreenOff(bool mockBool);
 void MockIsHealthyControl(bool mockBool);
+void MockIsNeedToFresh(bool mockBool);
 }
 #endif // OHOS_MOCK_REFRESH_MGR_H
