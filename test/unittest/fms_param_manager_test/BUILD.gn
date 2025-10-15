@@ -84,6 +84,7 @@ ohos_unittest("FmsParamManagerTest") {
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "hisysevent:libhisysevent",
+    "libxml2:libxml2",
   ]
 }
 
