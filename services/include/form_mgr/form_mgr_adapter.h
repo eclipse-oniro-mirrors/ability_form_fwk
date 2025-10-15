@@ -816,17 +816,11 @@ public:
 
     /**
      * @brief Check form is due control.
-     * @param bundleName form bundleName.
-     * @param moduleName form moduleName.
-     * @param abilityName form abilityName.
-     * @param formName form widget name.
-     * @param dimension form dimension value.
+     * @param formMajorInfo form major info.
      * @param isDisablePolicy True is disable form, false is remove form.
-     * @return Returns true for form is due controled.
+     * @return Returns true for form is due controlled.
      */
-    bool CheckFormDueControl(const std::string &bundleName, const std::string &moduleName,
-        const std::string &abilityName, const std::string &formName,
-        const int32_t dimension, const bool isDisablePolicy);
+    bool CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 private:
     /**
      * @brief Get form configure info.
@@ -1357,13 +1351,6 @@ private:
      */
     ErrCode CallerCheck(const int64_t formId, const int32_t callingUid);
 
-    /**
-     * @brief Check form is due control.
-     * @param formMajorInfo form major info.
-     * @param isDisablePolicy True is disable form, false is remove form.
-     * @return Returns true for form is due controlled.
-     */
-    bool CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
