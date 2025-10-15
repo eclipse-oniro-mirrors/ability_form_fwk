@@ -71,9 +71,10 @@ void RefreshCacheMgr::AddFlagByHealthyControl(const int64_t formId, bool isAskFo
 
 void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterator &record, const int32_t userId)
 {
+    HILOG_INFO("formId:%{public}" PRId64  ",isRefresh: %{public}d ,isUpdate: %{public}d", record->formId,
+        record->isRefreshDuringDisableForm, record->isUpdateDuringDisableForm);
     if (record->isRefreshDuringDisableForm) {
-        HILOG_INFO("ask for data, formId:%{public}" PRId64, record->formId);
-        record->isRefreshDuringDisableForm = false;
+        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(record->formId, false);
         Want want;
         want.SetElementName(record->bundleName, record->abilityName);
         want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
@@ -89,8 +90,7 @@ void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterato
         data.want = want;
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
     } else if (record->isUpdateDuringDisableForm) {
-        HILOG_INFO("update provider data, formId:%{public}" PRId64, record->formId);
-        record->isUpdateDuringDisableForm = false;
+        FormDataMgr::GetInstance().SetUpdateDuringDisableForm(record->formId, false);
         FormProviderData data = record->formProviderInfo.GetFormData();
         RefreshExecMgr::UpdateByProviderData(record->formId, data, true);
     }
