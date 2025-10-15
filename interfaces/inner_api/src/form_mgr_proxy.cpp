@@ -3056,6 +3056,10 @@ ErrCode FormMgrProxy::ReloadAllForms(int32_t &reloadNum)
 {
     HILOG_DEBUG("call");
     MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     MessageParcel reply;
     MessageOption option;
     ErrCode error = SendTransactCmd(IFormMgr::Message::FORM_MGR_RELOAD_ALL_FORMS, data, reply, option);
