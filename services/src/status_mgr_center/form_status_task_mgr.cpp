@@ -242,7 +242,7 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
 void FormStatusTaskMgr::ReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin formId: %{public}" PRId64, formId);
+    HILOG_DEBUG("begin formId: %{public}" PRId64, formId);
 
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {

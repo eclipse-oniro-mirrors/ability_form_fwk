@@ -197,7 +197,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
         FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
     }
 
-    HILOG_INFO("enableForm:%{public}d, protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
+    HILOG_DEBUG("enableForm:%{public}d, protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
     if (!formRecord.enableForm) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formRecord.formId, true);
@@ -428,7 +428,7 @@ void FormRenderMgrInner::RemoveConnection(int64_t formId)
 
 ErrCode FormRenderMgrInner::checkConnectionsFormIds(std::vector<int64_t> formIds, std::vector<int64_t> &needConFormIds)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(resourceMutex_);
     for (const int64_t &formId : formIds) {
         if (renderFormConnections_.find(formId) == renderFormConnections_.end()) {

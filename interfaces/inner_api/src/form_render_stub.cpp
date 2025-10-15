@@ -258,7 +258,7 @@ int32_t FormRenderStub::HandleRecycleForm(MessageParcel &data, MessageParcel &re
 
 int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("begin");
+    HILOG_DEBUG("begin");
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
         HILOG_ERROR("read FormJsInfo error");

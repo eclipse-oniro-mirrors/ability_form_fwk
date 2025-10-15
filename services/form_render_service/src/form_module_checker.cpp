@@ -117,7 +117,7 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
         }
     }
 
-    HILOG_ERROR("api not allowed, apiPath: '%{public}s'", apiPath.c_str());
+    HILOG_DEBUG("api not allowed, apiPath: '%{public}s'", apiPath.c_str());
     return false;
 }
 
@@ -170,7 +170,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         }
         return true;
     }
-    HILOG_ERROR("module can't load in form,moduleName= %{public}s", moduleName);
+    HILOG_DEBUG("module can't load in form,moduleName= %{public}s", moduleName);
     return false;
 }
 

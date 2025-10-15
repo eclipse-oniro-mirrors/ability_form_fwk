@@ -52,7 +52,7 @@ void FormEventRetryMgr::SetLastFormEvent(const int64_t formId, const FormEventTa
     }
 
     iter->second = formEventInfo;
-    HILOG_INFO("set lastFormEvent, formId:%{public}" PRId64 ".", formId);
+    HILOG_DEBUG("set lastFormEvent, formId:%{public}" PRId64 ".", formId);
 }
 
 void FormEventRetryMgr::DeleteLastFormEvent(const int64_t formId)

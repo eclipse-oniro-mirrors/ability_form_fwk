@@ -34,7 +34,7 @@ FormMgrQueue::~FormMgrQueue()
  
 bool FormMgrQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return false;
@@ -46,7 +46,7 @@ bool FormMgrQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
 void FormMgrQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg,
     uint32_t ms, std::function<void()> func)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return;
@@ -57,7 +57,7 @@ void FormMgrQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg
 
 void FormMgrQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return;
