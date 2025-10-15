@@ -1800,11 +1800,12 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
             HILOG_WARN("Get updateDuration failed, uses local configuration");
         }
-        int32_t dueDuration = ParamControl::GetInstance().GetDueUpdateDuration(formRecord);
-        if (dueDuration == 0) {
+        int32_t duration = ParamControl::GetInstance().GetDueUpdateDuration(formRecord);
+        if (duration == 0) {
             HILOG_WARN("Due disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
             return ERR_OK;
         }
+        int64_t dueDuration = duration * Constants::TIME_CONVERSION;
         updateDuration = std::max(updateDuration, dueDuration * Constants::TIME_CONVERSION);
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
