@@ -144,7 +144,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap = {};
     std::map<int64_t, bool> foundFormsMap = {};
     OHOS::GenerateMapData(fdp, matchedFormIds, noHostDBFormsMap, foundFormsMap);
-    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostDBFormsMap, foundFormsMap);
     formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostDBFormsMap, foundFormsMap);
     formDbCache.GetMultiAppFormVersionCode(bundleName);
     formDbCache.UpdateMultiAppFormVersionCode(bundleName, versionCode);
