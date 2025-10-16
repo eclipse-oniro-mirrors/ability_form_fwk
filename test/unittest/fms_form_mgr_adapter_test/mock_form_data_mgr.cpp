@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "mock_form_data_mgr.h"
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #define private public
@@ -52,6 +54,8 @@ namespace {
     bool g_mockGetFormHostRecord = false;
     bool g_mockGetRunningFormInfosByFormIdRet = true;
     bool g_mockGetRunningFormInfosRet = true;
+    bool g_mockIsDynamic = false;
+    bool g_mockIsExistRecycleTask = false;
     OHOS::AAFwk::Want g_mockGetRequestPublishFormInfoWant = {};
     constexpr int32_t UPDATE_DURATION  = 2;
 }
@@ -206,6 +210,16 @@ void MockGetRunningFormInfos(int32_t mockRet)
     g_mockGetRunningFormInfosRet = mockRet;
 }
 
+void MockFormRecordIsDynamic(bool mockRet)
+{
+    g_mockIsDynamic = mockRet;
+}
+
+void MockIsExistRecycleTask(bool mockRet)
+{
+    g_mockIsExistRecycleTask = mockRet;
+}
+
 namespace OHOS {
 namespace AppExecFwk {
 FormDataMgr::FormDataMgr()
@@ -261,7 +275,8 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         formRecord.formVisibleNotify = true;
         formRecord.uid = 0;
         formRecord.updateDuration = UPDATE_DURATION * Constants::TIME_CONVERSION;
-        formRecord.isDynamic = false;
+        formRecord.isDynamic = g_mockIsDynamic;
+        formRecord.isExistRecycleTask = g_mockIsExistRecycleTask;
     }
     return g_mockGetFormRecordRet;
 }

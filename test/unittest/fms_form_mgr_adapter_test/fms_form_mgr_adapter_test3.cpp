@@ -35,8 +35,10 @@
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
+#include "mock_form_data_mgr.h"
 #include "mock_form_provider_client.h"
 #include "mock_form_mgr_adapter_test.h"
+#include "mock_want.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -670,9 +672,45 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
 
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
+    MockFormRecordIsDynamic(false);
     ret = formMgrAdapter.RecoverForms(formIds, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0274 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RecoverForms
+ * @tc.desc: test RecoverForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RecoverForms, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RecoverForms start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<int64_t> formIds = {1};
+    Want want = {};
+
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockFormRecordIsDynamic(true);
+
+    MockGetBoolParam(false);
+    MockIsExistRecycleTask(true);
+    EXPECT_EQ(formMgrAdapter.RecoverForms(formIds, want), ERR_OK);
+
+    MockGetBoolParam(false);
+    MockIsExistRecycleTask(false);
+    EXPECT_EQ(formMgrAdapter.RecoverForms(formIds, want), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    MockGetBoolParam(true);
+    MockIsExistRecycleTask(true);
+    EXPECT_EQ(formMgrAdapter.RecoverForms(formIds, want), ERR_OK);
+
+    MockGetBoolParam(true);
+    MockIsExistRecycleTask(false);
+    EXPECT_EQ(formMgrAdapter.RecoverForms(formIds, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RecoverForms end";
 }
 
  /**
