@@ -148,7 +148,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostDBFormsMap, foundFormsMap);
     formDbCache.GetMultiAppFormVersionCode(bundleName);
     formDbCache.UpdateMultiAppFormVersionCode(bundleName, versionCode);
-    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
     return true;
 }
 }
