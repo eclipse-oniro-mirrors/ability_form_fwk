@@ -49,6 +49,7 @@ ohos_unittest("FmsFormUtilPermissionVerifyTest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
     "hilog:libhilog",

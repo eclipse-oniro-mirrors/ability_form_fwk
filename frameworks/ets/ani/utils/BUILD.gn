@@ -53,6 +53,7 @@ ohos_shared_library("util_ani") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "hilog:libhilog",
+    "eventhandler:libeventhandler",
     "runtime_core:ani",
   ]
 

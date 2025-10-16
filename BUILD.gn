@@ -49,6 +49,7 @@ ohos_source_set("form_host_delegate_proxy") {
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
@@ -71,6 +72,7 @@ ohos_source_set("form_host_delegate_stub") {
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]

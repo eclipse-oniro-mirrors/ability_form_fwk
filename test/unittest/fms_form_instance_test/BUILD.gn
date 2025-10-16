@@ -42,6 +42,7 @@ ohos_unittest("FmsFormInstanceTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "form_fwk:form_manager",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_core",
     "googletest:gmock_main",
