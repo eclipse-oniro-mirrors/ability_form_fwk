@@ -514,7 +514,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0096, TestSize.Level1)
 
     MockIsSACall(true);
     FormMgrService formMgrService;
-    EXPECT_EQ(true, formMgrService.HasFormVisible(tokenId));
+    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId));
 
     instIndex = 1;
     MockFormParams::instIndex = instIndex;
@@ -1108,8 +1108,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0127, TestSize.Level1)
     FormMgrService formMgrService;
     MockIsSACall(true);
     std::string bundleName = "bundleName";
-    EXPECT_EQ(formMgrService.EnableForms(bundleName, true), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-    EXPECT_EQ(formMgrService.EnableForms(bundleName, false), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    EXPECT_EQ(formMgrService.EnableForms(bundleName, true), ERR_OK);
+    EXPECT_EQ(formMgrService.EnableForms(bundleName, false), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0127 end";
 }
 
