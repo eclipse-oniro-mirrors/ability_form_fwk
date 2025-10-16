@@ -41,7 +41,6 @@ ohos_unittest("FmsFormCheckMgrTest") {
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_timer_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_app_upgrade_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
-    "${form_fwk_path}/services/src/form_refresh/strategy/refresh_control_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_check_mgr_test/fms_form_check_mgr_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_check_mgr_test/mock_refresh_check_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_check_mgr_test/mock_refresh_exec_mgr.cpp",

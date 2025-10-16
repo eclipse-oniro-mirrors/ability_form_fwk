@@ -1400,4 +1400,37 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0184, TestSize.Level1)
     EXPECT_EQ(formMgrService.GetFormRect(formId, rect), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0184 end";
 }
+
+/**
+ * @tc.name: FormMgrService_ReloadForms_0001
+ * @tc.desc: Verify ReloadForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ReloadForms_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_ReloadForms_0001 start";
+    FormMgrService formMgrService;
+    int32_t reloadNum = 0;
+    std::string moduleName = "testModule";
+    std::string abilityName = "testAbility";
+    std::string formName = "testForm";
+    ErrCode ret = formMgrService.ReloadForms(reloadNum, moduleName, abilityName, formName);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_ReloadForms_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrService_ReloadAllForms_0001
+ * @tc.desc: Verify ReloadForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ReloadAllForms_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_ReloadAllForms_0001 start";
+    FormMgrService formMgrService;
+    int32_t reloadNum = 0;
+    ErrCode ret = formMgrService.ReloadAllForms(reloadNum);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_ReloadAllForms_0001 end";
+}
 }

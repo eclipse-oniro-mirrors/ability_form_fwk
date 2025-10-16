@@ -23,6 +23,7 @@ namespace {
     bool g_mockIsFormInvisible = false;
     bool g_mockIsScreenOff = false;
     bool g_mockIsHealthyControl = false;
+    bool g_mockIsNeedToFresh = true;
 }
 
 namespace OHOS {
@@ -45,29 +46,42 @@ void MockIsHealthyControl(bool mockBool)
 {
     g_mockIsHealthyControl = mockBool;
 }
+
+void MockIsNeedToFresh(bool mockBool)
+{
+    g_mockIsNeedToFresh = mockBool;
+}
 }
 
 namespace OHOS {
 namespace AppExecFwk {
 
-inline bool RefreshControlMgr::IsSystemOverload()
+RefreshControlMgr::RefreshControlMgr() {}
+RefreshControlMgr::~RefreshControlMgr() {}
+
+bool RefreshControlMgr::IsSystemOverload()
 {
     return g_mockIsSystemOverload;
 }
 
-inline bool RefreshControlMgr::IsFormInvisible(const FormRecord &record)
+bool RefreshControlMgr::IsFormInvisible(const FormRecord &record)
 {
     return g_mockIsFormInvisible;
 }
 
-inline bool RefreshControlMgr::IsScreenOff(const FormRecord &record)
+bool RefreshControlMgr::IsScreenOff(const FormRecord &record)
 {
     return g_mockIsScreenOff;
 }
 
-inline bool RefreshControlMgr::IsHealthyControl(const FormRecord &record)
+bool RefreshControlMgr::IsHealthyControl(const FormRecord &record)
 {
     return g_mockIsHealthyControl;
+}
+
+bool RefreshControlMgr::IsNeedToFresh(FormRecord &record, bool isVisibleToFresh)
+{
+    return g_mockIsNeedToFresh;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

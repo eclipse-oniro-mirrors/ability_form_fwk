@@ -1750,6 +1750,9 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsFormBundleDebugSignature_001, Test
  */
 HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_ReloadForms_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadForms_001 starts";
+    EXPECT_CALL(*mockFormMgrService, ReloadForms(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
     int32_t reloadNum = 0;
     std::string moduleName = "A";
     std::string abilityName = "B";
@@ -1767,10 +1770,13 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_ReloadForms_001, TestSize.Level1) {
  */
 HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_ReloadAllForms_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadAllForms_001 starts";
+    EXPECT_CALL(*mockFormMgrService, ReloadAllForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
     int32_t reloadNum = 0;
     int32_t result = formMgrProxy->ReloadAllForms(reloadNum);
     // expect result.
     EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadForms_001 ends";
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_ReloadAllForms_001 ends";
 }
 }
