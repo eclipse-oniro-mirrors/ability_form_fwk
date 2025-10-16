@@ -19,19 +19,15 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 namespace {
-const std::string BUNDLE_NAME = "com.example.test";
 
 class FormBundleForbidMgrTest : public testing::Test {
 public:
     void SetUp() override;
     void TearDown() override;
-    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
 };
 
 void FormBundleForbidMgrTest::SetUp()
 {
-    OHOS::AppExecFwk::ElementName element;
-    element.SetBundleName(BUNDLE_NAME);
 }
 
 void FormBundleForbidMgrTest::TearDown()
@@ -43,16 +39,11 @@ void FormBundleForbidMgrTest::TearDown()
  * @tc.desc: test IsBundleForbidden function.
  * @tc.type: FUNC
  */
-HWTEST_F(FormBundleForbidMgrTest, formbundleforbidmgr_001, TestSize.Level1)
+HWTEST_F(FormBundleForbidMgrTest, formbundleforbidmgr_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "formbundleforbidmgr_001 begin";
-    formbundleforbidmgr.Init();
-    bool forbid = formbundleforbidmgr.IsBundleForbidden("");
-    formbundleforbidmgr.IsBundleForbidden(BUNDLE_NAME);
-    formbundleforbidmgr.SetBundleForbiddenStatus("", false);
-    formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, false);
-    formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, true);
-    EXPECT_EQ(forbid, false);
+    FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus("", true);
+    EXPECT_EQ(FormBundleForbidMgr::GetInstance().IsBundleForbidden(""), false);
     GTEST_LOG_(INFO) << "formbundleforbidmgr_001 end";
 }
 } // namespace
