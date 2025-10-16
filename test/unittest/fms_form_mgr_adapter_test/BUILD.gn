@@ -114,6 +114,7 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_render_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_timer_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_want.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_ipc_skeleton.cpp",
   ]
 
   include_dirs = [

@@ -1154,12 +1154,7 @@ private:
      */
     bool CreateHandleEventMap(const int64_t matchedFormId, const FormRecord &formRecord,
         std::map<std::string, std::vector<int64_t>> &eventMaps);
-    /**
-     * @brief Get current user ID.
-     * @param callingUid calling Uid.
-     * @return Returns user ID.
-     */
-    int32_t GetCurrentUserId(const int callingUid);
+
     /**
      * @brief AcquireFormState want check.
      * @param bundleName The bundle name of the form.

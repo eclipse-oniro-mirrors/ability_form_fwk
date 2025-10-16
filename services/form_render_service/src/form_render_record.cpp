@@ -54,7 +54,6 @@ constexpr size_t RUNTIME_MEMORY_LIMIT = 16 * 1024 * 1024;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr size_t THREAD_NAME_LEN = 15;
-constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
 constexpr char FORM_RENDERER_PROCESS_ON_ADD_SURFACE[] = "ohos.extra.param.key.process_on_add_surface";
 constexpr char RENDERING_BLOCK_MONITOR_PREFIX[] = "RenderingBlockMonitorTask_";
 constexpr char MEMORY_MONITOR_PREFIX[] = "MemoryMonitorTask_";
@@ -940,7 +939,7 @@ bool FormRenderRecord::CheckEventHandler(bool createThead, bool needMonitored)
 
 void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
-    auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
+    auto compId = want.GetStringParam(Constants::FORM_COMP_ID);
     HILOG_INFO("AddFormRequest formId: %{public}s, compId: %{public}s, formJsInfo.formData.size: %{public}zu.",
         std::to_string(formJsInfo.formId).c_str(),
         compId.c_str(),
