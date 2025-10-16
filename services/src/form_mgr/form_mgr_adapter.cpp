@@ -901,6 +901,8 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
     FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
         RefreshCacheMgr::GetInstance().ConsumeRenderTask(formId);
+        // reset expectRecycled, after form visible
+        FormDataMgr::GetInstance().SetExpectRecycledStatus(formId, false);
     }
 }
 
@@ -3952,10 +3954,10 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     HILOG_DEBUG("call");
     FormRecord record;
     std::vector<int64_t> validFormIds;
+    std::vector<int64_t> matchedFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
     bool needHandleCachedClick =
         want.GetBoolParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
-    FormDataMgr::GetInstance().SetExpectRecycledStatus(formIds, false);
     HILOG_INFO("recover by click: %{public}d", needHandleCachedClick);
     for (int64_t formId : formIds) {
         if (formId <= 0) {
@@ -3964,6 +3966,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         }
 
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        matchedFormIds.emplace_back(matchedFormId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
             HILOG_WARN("form %{public}" PRId64 " not exist", formId);
             continue;
@@ -3989,7 +3992,9 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         validFormIds.emplace_back(matchedFormId);
         HILOG_INFO("formId:%{public}" PRId64 " non-recyclable", formId);
     }
-
+    if (!matchedFormIds.empty()) {
+        FormDataMgr::GetInstance().SetExpectRecycledStatus(matchedFormIds, false);
+    }
     if (validFormIds.empty()) {
         HILOG_WARN("empty validFormIds");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

@@ -5097,4 +5097,40 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_002, TestSize.Lev
     EXPECT_FALSE(formIsVisible);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormVisible_002 end";
 }
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetExpectRecycledStatus_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetExpectRecycledStatus_001 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    FormRecord formRecord;
+    formRecord.formId = FORM_ID_ZERO;
+    formDataMgr->formRecords_.emplace(FORM_ID_ZERO, formRecord);
+    formDataMgr->SetExpectRecycledStatus(FORM_ID_ZERO, true);
+    EXPECT_TRUE(formDataMgr->IsExpectRecycled(FORM_ID_ZERO));
+
+    formDataMgr->SetExpectRecycledStatus(100, true);
+    EXPECT_FALSE(formDataMgr->IsExpectRecycled(100));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetExpectRecycledStatus_001 end";
+}
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetExpectRecycledStatus_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetExpectRecycledStatus_002 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    FormRecord formRecord0;
+    formRecord0.formId = FORM_ID_ZERO;
+    formDataMgr->formRecords_.emplace(FORM_ID_ZERO, formRecord0);
+    FormRecord formRecord1;
+    formRecord1.formId = FORM_ID_ONE;
+    formDataMgr->formRecords_.emplace(FORM_ID_ONE, formRecord1);
+
+    formDataMgr->SetExpectRecycledStatus({FORM_ID_ZERO, FORM_ID_ONE}, true);
+    EXPECT_TRUE(formDataMgr->IsExpectRecycled(FORM_ID_ZERO));
+    EXPECT_TRUE(formDataMgr->IsExpectRecycled(FORM_ID_ONE));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetExpectRecycledStatus_002 end";
+}
 }

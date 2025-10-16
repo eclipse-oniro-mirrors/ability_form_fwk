@@ -3173,6 +3173,15 @@ void FormDataMgr::SetExpectRecycledStatus(const std::vector<int64_t> &formIds, b
     }
 }
 
+void FormDataMgr::SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        info->second.expectRecycled = isExpectRecycled;
+    }
+}
+
 bool FormDataMgr::IsExpectRecycled(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
