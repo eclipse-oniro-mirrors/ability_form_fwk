@@ -108,9 +108,8 @@ bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, int64_t f
         return false;
     }
 
-    if (formId != 0) {
-        bool protectStatus = false;
-        FormDataMgr::GetInstance().GetFormProtect(formId, protectStatus);
+    bool protectStatus = false;
+    if (formId != 0 && FormDataMgr::GetInstance().GetFormProtect(formId, protectStatus) == ERR_OK) {
         return protectStatus;
     }
 
