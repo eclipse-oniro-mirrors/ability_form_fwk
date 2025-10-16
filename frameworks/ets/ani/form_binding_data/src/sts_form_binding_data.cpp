@@ -26,6 +26,7 @@ namespace OHOS {
 namespace AppExecFwk {
 
 using namespace arkts::ani_signature;
+using namespace AniConstants;
 
 static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_object paramObject)
 {
@@ -40,9 +41,10 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
+    AniGetFromCache::Signature sig = { ANI_FORMBINDINGDATAINNER, ANI_CONSTRUCTOR, ANI_NOPARAM };
     ani_method objectMethod;
     if ((status = AniGetFromCache::GetInstance().AniFormGetMtd(
-        env, formBindingDataCls, AniConstants::ANI_CONSTRUCTOR, ":", objectMethod)) != ANI_OK) {
+        env, formBindingDataCls, sig, objectMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
@@ -64,8 +66,9 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
         return nullptr;
     }
     ani_method setMethod;
+    sig = { ANI_FORMBINDINGDATAINNER, Builder::BuildSetterName("data"), ANI_NULLPOINTER };
     if ((status = AniGetFromCache::GetInstance().AniFormGetMtd(
-        env, formBindingDataCls, Builder::BuildSetterName("data").c_str(), nullptr, setMethod)) != ANI_OK) {
+        env, formBindingDataCls, sig, setMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
         return nullptr;
     }
