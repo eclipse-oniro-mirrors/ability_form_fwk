@@ -1089,6 +1089,10 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_056, TestSize.Level1)
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     MockGetFormRecord(false);
     EXPECT_EQ(false, FormEventUtil::HandleAdditionalInfoChanged(bundleName));
+
+    MockGetFormRecord(true);
+    MockSetFormTempFlag(true);
+    EXPECT_EQ(true, FormEventUtil::HandleAdditionalInfoChanged(bundleName));
     GTEST_LOG_(INFO) << "FormEventUtil_056 end";
 }
 

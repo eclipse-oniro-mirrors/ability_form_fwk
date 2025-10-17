@@ -34,7 +34,8 @@ class FormEventUtil {
 public:
     static void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId, bool &needReload);
     static void HandleUpdateFormCloud(const std::string &bundleName);
-    static void HandleProviderUpdated(const std::string &bundleName, const int userId, const bool needReload = true);
+    static void HandleProviderUpdated(const std::string &bundleName, const int userId, const bool needReload = true,
+        const bool needCheckVersion = true);
     static void HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId);
     static void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
     static void HandleBundleDataCleared(const std::string &bundleName, int32_t userId);
