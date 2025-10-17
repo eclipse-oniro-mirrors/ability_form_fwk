@@ -1126,7 +1126,7 @@ void FormRenderRecord::Release()
     std::shared_ptr<EventHandler> eventHandler = eventHandler_;
     std::shared_ptr<EventRunner> eventRunner = eventRunner_;
     {
-        std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
         if (eventHandler_ == nullptr) {
             HILOG_INFO("null eventHandler");
             return;

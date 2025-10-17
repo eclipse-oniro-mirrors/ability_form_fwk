@@ -329,7 +329,7 @@ private:
     std::shared_ptr<EventHandler> eventHandler_;
     bool eventHandleNeedReset = false;
     std::shared_mutex eventHandlerReset_;
-    std::recursive_mutex eventHandlerMutex_;
+    std::mutex eventHandlerMutex_;
     std::shared_ptr<JsFormRuntime> runtime_;
 
     // <formId, hostRemoteObj>
