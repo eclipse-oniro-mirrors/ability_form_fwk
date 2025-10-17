@@ -106,8 +106,6 @@ public:
 
     sptr<IFormSupply> GetFormSupplyClient();
 
-    void SetCriticalFalseOnAllFormInvisible();
-
     void SetCriticalTrueOnFormActivity();
 
     void SetMainRuntimeCb(std::function<const std::unique_ptr<Runtime> &()> &&cb);
@@ -115,6 +113,7 @@ public:
     void MainThreadForceFullGC();
 
 private:
+    void SetCriticalFalseOnAllFormInvisible();
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);
     void OnConfigurationUpdatedInner();

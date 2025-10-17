@@ -914,6 +914,7 @@ private:
     void SetDisConnectTypeTime();
 
 private:
+    std::mutex snapshotSetMutex_;
     static const int32_t ENABLE_FORM_UPDATE = 5;
     const static std::map<std::string, DumpKey> dumpKeyMap_;
     std::string onStartBeginTime_;
