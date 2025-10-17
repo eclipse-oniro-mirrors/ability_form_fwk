@@ -543,7 +543,6 @@ int32_t FormRenderServiceMgr::ProcessRecycleForm(const int64_t formId, const Wan
     FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
     FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
 
-    std::lock_guard<std::mutex> lock(renderRecordMutex_);
     SetCriticalFalseOnAllFormInvisible();
 
     return ERR_OK;
