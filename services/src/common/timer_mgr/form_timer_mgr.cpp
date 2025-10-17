@@ -1579,63 +1579,20 @@ bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
 
 bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
 {
-    struct tm tmAtTime = {0};
-    auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    struct tm* ptm = localtime_r(&tt, &tmAtTime);
-    if (ptm == nullptr) {
-        HILOG_ERROR("localtime error");
-        return false;
-    }
-
-    long nowAtTime = tmAtTime.tm_hour * Constants::MIN_PER_HOUR + tmAtTime.tm_min;
-    int64_t currentTime = FormUtil::GetCurrentMillisecond();
+    long nextTime = -1;
     UpdateAtItem foundItem;
-    bool found = FindNextAtTimerItem(nowAtTime, foundItem);
-    if (!found) {
-        {
-            std::lock_guard<std::mutex> lock(updateAtMutex_);
-            if (!updateAtTimerTasks_.empty()) {
-                HILOG_WARN("updateAtTimerTasks_ not empty");
-                return true;
-            }
-        }
-        {
-            std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
-            ClearUpdateAtTimerResource();
-        }
-        atTimerWakeUpTime_ = LONG_MAX;
-        HILOG_INFO("no update at task in system now");
-        return true;
+    bool ret = GetNextUpdateTime(-1, foundItem, nextTime, timerTask);
+    if (nextTime == -1) {
+        return ret;
     }
 
-    tmAtTime.tm_sec = 0;
-    tmAtTime.tm_hour = foundItem.refreshTask.hour;
-    tmAtTime.tm_min = foundItem.refreshTask.min;
-    int64_t selectTime = FormUtil::GetMillisecondFromTm(tmAtTime);
-    int64_t diffTime = selectTime - currentTime;
-    // Create updateAt timer that triggers within 10 seconds, request a refresh proactively.
-    if (std::abs(diffTime) <= TIMER_UPDATEAT_CREATE_BEHIND_TRIGGER && timerTask.formId > 0) {
-        HILOG_WARN("the timer was created late, actively request a refresh. formId:%{public}" PRId64, timerTask.formId);
-        timerTask.refreshType = RefreshType::TYPE_UPDATETIMES;
-        ExecTimerTask(timerTask);
-    }
-    if (diffTime < 0) {
-        selectTime += Constants::MS_PER_DAY;
-    }
-    HILOG_INFO("selectTime:%{public}" PRId64 ", currentTime:%{public}" PRId64, selectTime, currentTime);
-
-    int64_t timeInSec = GetBootTimeMs();
-    HILOG_INFO("timeInSec:%{public}" PRId64 ".", timeInSec);
-    int64_t nextTime = timeInSec + (selectTime - currentTime);
-    HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
     if (nextTime == atTimerWakeUpTime_) {
-        HILOG_WARN("end, wakeUpTime not change, no need update alarm");
-        return true;
+        HILOG_WARN("wakeUpTime not change, find next update alarm");
+        (void)GetNextUpdateTime(foundItem.updateAtTime, foundItem, nextTime, timerTask);
     }
 
     auto timerOption = std::make_shared<FormTimerOption>();
-    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
-      | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
+    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME)) | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
     HILOG_DEBUG("timerOption type is %{public}d", flag);
     timerOption->SetType(flag);
     timerOption->SetRepeat(false);
@@ -1656,6 +1613,8 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
         }
         currentUpdateAtWantAgent_ = wantAgent;
         updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        HILOG_INFO("updateAtTimerId:%{public}" PRId64 ",formId:%{public}" PRId64, updateAtTimerId_,
+            foundItem.refreshTask.formId);
         bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
             static_cast<uint64_t>(nextTime));
         if (!bRet) {
@@ -1665,6 +1624,41 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
     }
 
     HILOG_INFO("end");
+    return true;
+}
+
+bool FormTimerMgr::GetNextUpdateTime(long nowAtTime, UpdateAtItem &foundItem, long &nextTime, FormTimer &timerTask)
+{
+    struct tm tmAtTime = { 0 };
+    auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    struct tm* ptm = localtime_r(&tt, &tmAtTime);
+    if (ptm == nullptr) {
+        HILOG_ERROR("localtime error");
+        return false;
+    }
+
+    if (nowAtTime == -1) {
+        nowAtTime = tmAtTime.tm_hour * Constants::MIN_PER_HOUR + tmAtTime.tm_min;
+    }
+
+    bool found = FindNextAtTimerItem(nowAtTime, foundItem);
+    if (!found) {
+        {
+            std::lock_guard<std::mutex> lock(updateAtMutex_);
+            if (!updateAtTimerTasks_.empty()) {
+                HILOG_WARN("updateAtTimerTasks_ not empty");
+                return true;
+            }
+        }
+        {
+            std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
+            ClearUpdateAtTimerResource();
+        }
+        atTimerWakeUpTime_ = LONG_MAX;
+        HILOG_INFO("no update at task in system now");
+        return true;
+    }
+    HILOG_ERROR("end");
     return true;
 }
 }  // namespace AppExecFwk
