@@ -604,7 +604,6 @@ int32_t FormRenderServiceMgr::ProcessRecoverForm(const FormJsInfo &formJsInfo, c
 void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
 {
     // Ensure that there are no issues with adding form and unlocking drawing concurrency
-    // 调用处已加锁 无重入风险
     if (isVerified_) {
         renderWant.SetParam(Constants::FORM_RENDER_STATE, true);
     } else if (renderWant.GetBoolParam(Constants::FORM_RENDER_STATE, false)) {

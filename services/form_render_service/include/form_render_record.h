@@ -280,7 +280,7 @@ private:
 
     sptr<IFormSupply> GetFormSupplyClient();
 
-    std::shared_ptr<EventHandler> GetEventHandler();
+    std::shared_ptr<EventHandler> GetEventHandler(bool createThead = false, bool needMonitored = false);
 
     int32_t AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
 
