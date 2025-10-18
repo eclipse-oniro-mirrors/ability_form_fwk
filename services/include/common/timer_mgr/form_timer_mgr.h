@@ -384,6 +384,7 @@ private:
     void InnerClearIntervalReportTimer();
     bool IsDynamicTimerExpired(int64_t formId);
     bool UpdateAtTimerAlarmDetail(FormTimer &timerTask);
+    bool GetNextUpdateTime(long nowAtTime, UpdateAtItem &foundItem, long &nextTime, FormTimer &timerTask);
 
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
