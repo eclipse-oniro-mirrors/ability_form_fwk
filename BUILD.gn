@@ -132,6 +132,8 @@ ohos_shared_library("libfms") {
     "services/src/data_center/form_data_mgr.cpp",
     "services/src/data_center/form_data_proxy_mgr.cpp",
     "services/src/data_center/form_data_proxy_record.cpp",
+    "services/src/data_center/form_info/bundle_form_info.cpp",
+    "services/src/data_center/form_info/form_info_helper.cpp",
     "services/src/data_center/form_info/form_info_mgr.cpp",
     "services/src/data_center/form_info/form_info_rdb_storage_mgr.cpp",
     "services/src/data_center/form_info/form_info_storage.cpp",

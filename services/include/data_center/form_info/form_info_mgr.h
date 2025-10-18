@@ -21,82 +21,15 @@
 #include <unordered_map>
 
 #include "appexecfwk_errors.h"
+#include "bundle_form_info.h"
 #include "bundle_info.h"
-#include "data_center/database/form_db_info.h"
 #include "form_info.h"
 #include "form_info_filter.h"
-#include "data_center/form_info/form_info_storage.h"
 #include "data_center/form_record/form_record.h"
 #include "resource_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-class FormInfoHelper {
-public:
-    static ErrCode LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
-        int32_t userId);
-
-private:
-    static ErrCode LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos);
-
-    static ErrCode LoadStageFormConfigInfo(
-        const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
-
-    static std::shared_ptr<Global::Resource::ResourceManager> GetResourceManager(const BundleInfo &bundleInfo);
-
-    static ErrCode GetFormInfoDescription(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager,
-        FormInfo &formInfo);
-
-    static ErrCode GetFormInfoDisplayName(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager,
-        FormInfo &formInfo);
-
-    static bool LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared);
-};
-
-class BundleFormInfo {
-public:
-    explicit BundleFormInfo(const std::string &bundleName);
-
-    ErrCode InitFromJson(const std::string &formInfoStoragesJson);
-
-    ErrCode UpdateStaticFormInfos(int32_t userId);
-
-    ErrCode Remove(int32_t userId);
-
-    ErrCode AddDynamicFormInfo(const FormInfo &formInfo, int32_t userId);
-
-    ErrCode RemoveDynamicFormInfo(const std::string &moduleName, const std::string &formName, int32_t userId);
-
-    ErrCode RemoveAllDynamicFormsInfo(int32_t userId);
-
-    bool Empty() const;
-
-    ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
-
-    uint32_t GetVersionCode(int32_t userId = Constants::INVALID_USER_ID);
-
-    ErrCode GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
-        int32_t userId = Constants::INVALID_USER_ID);
-
-    ErrCode GetFormsInfoByFilter(
-        const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
-
-private:
-    ErrCode UpdateFormInfoStorageLocked();
-
-    void HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
-        std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos);
-
-    void GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInfos,
-        const std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames);
-
-    void ClearDistributedFormInfos(int32_t userId);
-
-    std::string bundleName_ {};
-    mutable std::shared_timed_mutex formInfosMutex_ {};
-    std::vector<AAFwk::FormInfoStorage> formInfoStorages_ {};
-};
-
 class FormInfoMgr final : public DelayedRefSingleton<FormInfoMgr> {
 DECLARE_DELAYED_REF_SINGLETON(FormInfoMgr)
 
