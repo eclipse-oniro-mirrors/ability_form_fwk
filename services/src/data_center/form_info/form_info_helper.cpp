@@ -39,7 +39,6 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
     auto entryIt = std::find_if(hapModuleInfoBegin, hapModuleInfoEnd, [](const auto &hapInfo) {
         return (hapInfo.moduleType == ModuleType::ENTRY) && (!hapInfo.formWidgetModule.empty());
     });
-
     if (entryIt == hapModuleInfoEnd) {
         return false;
     }
