@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,7 @@ namespace {
 const std::uint32_t ERR_VERSION_CODE = 0;
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
 }
+
 BundleFormInfo::BundleFormInfo(const std::string &bundleName) : bundleName_(bundleName)
 {
 }
