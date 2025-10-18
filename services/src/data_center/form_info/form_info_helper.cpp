@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -125,31 +125,39 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
             continue;
         }
         for (const auto &profileInfo: profileInfos) {
-            std::vector<ExtensionFormInfo> extensionFormInfos;
-            int32_t privacyLevel = 0;
-            ErrCode errCode = ExtensionFormProfile::TransformTo(profileInfo, extensionFormInfos, privacyLevel);
-            if (errCode != ERR_OK) {
-                HILOG_WARN("fail transform profile to extension form info");
-                continue;
-            }
-            for (const auto &extensionFormInfo: extensionFormInfos) {
-                FormInfo formInfo(extensionInfo, extensionFormInfo);
-                if (!bundleInfo.applicationInfo.isSystemApp) {
-                    formInfo.transparencyEnabled = false;
-                }
-                if (hasDistributedForm) {
-                    formInfo.package = extensionInfo.bundleName + sharedModule.moduleName;
-                }
-                formInfo.versionCode = bundleInfo.versionCode;
-                formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
-                formInfo.privacyLevel = privacyLevel;
-                PrintLoadStageFormConfigInfo(formInfo, hasDistributedForm);
-                SendLoadStageFormConfigEvent(formInfo);
-                formInfos.emplace_back(formInfo);
-            }
+            DistributedFormInfo distributedFormInfo { hasDistributedForm, sharedModule.moduleName };
+            LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, distributedFormInfo);
         }
     }
     return ERR_OK;
+}
+
+void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
+    const ExtensionAbilityInfo &extensionInfo, const std::string &profileInfo,
+    const DistributedFormInfo &distributedFormInfo)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos;
+    int32_t privacyLevel = 0;
+    ErrCode errCode = ExtensionFormProfile::TransformTo(profileInfo, extensionFormInfos, privacyLevel);
+    if (errCode != ERR_OK) {
+        HILOG_WARN("fail transform profile to extension form info");
+        return;
+    }
+    for (const auto &extensionFormInfo: extensionFormInfos) {
+        FormInfo formInfo(extensionInfo, extensionFormInfo);
+        if (!bundleInfo.applicationInfo.isSystemApp) {
+            formInfo.transparencyEnabled = false;
+        }
+        if (distributedFormInfo.isDistributedForm) {
+            formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
+        }
+        formInfo.versionCode = bundleInfo.versionCode;
+        formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
+        formInfo.privacyLevel = privacyLevel;
+        PrintLoadStageFormConfigInfo(formInfo, distributedFormInfo.isDistributedForm);
+        SendLoadStageFormConfigEvent(formInfo);
+        formInfos.emplace_back(formInfo);
+    }
 }
 
 void FormInfoHelper::PrintLoadStageFormConfigInfo(const FormInfo &formInfo, bool hasDistributedForm)

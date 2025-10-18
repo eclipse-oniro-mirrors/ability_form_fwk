@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,11 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+struct DistributedFormInfo {
+    bool isDistributedForm = false;
+    std::string moduleName = "";
+};
+
 class FormInfoHelper {
 public:
     static ErrCode LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
@@ -47,6 +52,10 @@ private:
         FormInfo &formInfo);
 
     static bool LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared);
+
+    static void LoadFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
+        const ExtensionAbilityInfo &extensionInfo, const std::string &profileInfo,
+        const DistributedFormInfo &distributedFormInfo);
 
     static void PrintLoadStageFormConfigInfo(const FormInfo &formInfo, bool hasDistributedForm);
 

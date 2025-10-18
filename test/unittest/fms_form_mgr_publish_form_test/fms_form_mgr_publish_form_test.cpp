@@ -29,6 +29,7 @@
 #include "form_mgr.h"
 #include "form_info.h"
 #include "data_center/form_info/form_info_mgr.h"
+#include "data_center/form_info/bundle_form_info.h"
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_service.h"

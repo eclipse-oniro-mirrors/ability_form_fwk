@@ -23,6 +23,7 @@
 #define private public
 #define protected public
 #include "data_center/form_info/form_info_mgr.h"
+#include "data_center/form_info/form_info_helper.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/timer_mgr/form_refresh_limiter.h"
 #undef private
