@@ -1192,8 +1192,14 @@ void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupply
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
             auto task = [thisWeakPtr, formJsInfo = formRequest.second.formJsInfo, want = formRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
-                if (renderRecord) {
-                    renderRecord->HandleUpdateInJsThread(formJsInfo, want);
+                if (!renderRecord) {
+                    HILOG_WARN("null renderRecord, formId:%{public}" PRId64, formJsInfo.formId);
+                    return;
+                }
+                int32_t ret = renderRecord->HandleUpdateInJsThread(formJsInfo, want);
+                if (ret == ERR_OK) {
+                    const auto compId = want.GetStringParam(Constants::FORM_COMP_ID);
+                    renderRecord->UpdateFormRequestReleaseState(formJsInfo.formId, compId, false);
                 }
             };
             eventHandler_->PostTask(task, "ReAddAllRecycledForms");
