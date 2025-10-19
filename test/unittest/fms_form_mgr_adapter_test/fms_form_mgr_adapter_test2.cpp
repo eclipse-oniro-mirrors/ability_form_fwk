@@ -37,6 +37,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
 #include "mock_form_provider_client.h"
+#include "mock_ipc_skeleton.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -88,7 +89,6 @@ extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
 extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
 extern void MockGetRunningFormInfos(int32_t mockRet);
 extern void MockGenerateFormId(bool mockRet);
-extern void MockGetCallingUid(int32_t mockRet);
 void MockRequestPublishFormToHost(bool mockRet);
 void MockCheckBundlePermission(bool mockRet);
 void MockIsCaller(bool mockRet);
@@ -566,9 +566,15 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0140, TestSize.Level0)
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsTemp(false);
     MockGetFormRecordParamsUid(false);
-    MockGetCallingUid(DEFAULT_CALLING_UID);
+
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+
     EXPECT_EQ(
         ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
+
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0140 end";
 }
 

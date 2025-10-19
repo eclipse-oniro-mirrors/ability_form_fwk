@@ -1633,10 +1633,9 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     if (getDbRet == ERR_OK) {
         if (dbRecord.userId == currentUserId) {
             return AddNewFormRecord(info, formId, callerToken, wholeWantParams, formInfo);
-        } else {
-            HILOG_ERROR("the form id does not belong to callerUser. formId:%{public}" PRId64, formId);
-            return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
         }
+        HILOG_ERROR("the form id does not belong to callerUser. formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
     HILOG_INFO("no such formId:%{public}" PRId64, formId);
