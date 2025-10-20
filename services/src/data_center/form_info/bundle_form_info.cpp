@@ -306,11 +306,11 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
     if (formDBInfos.empty() || formInfos.empty()) {
         return;
     }
-    for (auto formDBInfo : formDBInfos) {
+    for (const auto &formDBInfo : formDBInfos) {
         if (formDBNames.count(formDBInfo.formName) > 0) {
             continue;
         }
-        for (auto formInfo : formInfos) {
+        for (const auto &formInfo : formInfos) {
             if (formInfo.name == formDBInfo.formName) {
                 formDBNames.insert(formDBInfo.formName);
                 break;
