@@ -901,6 +901,13 @@ napi_value JsFormProvider::OnActivateSceneAnimation(napi_env env, size_t argc, n
 
     NapiAsyncTask::CompleteCallback complete =
         [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
+            auto selfToken = IPCSkeleton::GetSelfTokenID();
+            if (!Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken)) {
+                HILOG_ERROR("The application not system-app,can't use system-api");
+                task.Reject(env,
+                    NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
+                return;
+            }
             ErrCode ret = FormMgr::GetInstance().ChangeSceneAnimationState(formId,
                 static_cast<int32_t>(ActivationState::Activated));
             if (ret != ERR_OK) {
@@ -939,6 +946,13 @@ napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc,
 
     NapiAsyncTask::CompleteCallback complete =
         [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
+            auto selfToken = IPCSkeleton::GetSelfTokenID();
+            if (!Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken)) {
+                HILOG_ERROR("The application not system-app,can't use system-api");
+                task.Reject(env,
+                    NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
+                return;
+            }
             ErrCode ret = FormMgr::GetInstance().ChangeSceneAnimationState(formId,
                 static_cast<int32_t>(ActivationState::Deactivated));
             if (ret != ERR_OK) {
