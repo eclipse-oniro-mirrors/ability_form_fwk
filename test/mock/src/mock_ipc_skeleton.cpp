@@ -13,24 +13,27 @@
  * limitations under the License.
  */
 
+#include "mock_ipc_skeleton.h"
 #include <gtest/gtest.h>
 
-#include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
-
-namespace {
-    int32_t g_GetCallingUid = 20000000;
-}
-
-void MockGetCallingUid(int32_t mockRet)
-{
-    g_GetCallingUid = mockRet;
-}
+#include "fms_log_wrapper.h"
 
 namespace OHOS {
+namespace {
+constexpr int32_t DEFAULT_CALLING_UID = 20000000;
+}  // namespace
+
+namespace AppExecFwk {
+MockIPCSkeleton *MockIPCSkeleton::obj = nullptr;
+}  // namespace AppExecFwk
+
 pid_t IPCSkeleton::GetCallingUid()
 {
-    GTEST_LOG_(INFO) << "GetCallingUid called " << g_GetCallingUid;
-    return g_GetCallingUid;
+    GTEST_LOG_(INFO) << "GetCallingUid called ";
+    if (AppExecFwk::MockIPCSkeleton::obj) {
+        return AppExecFwk::MockIPCSkeleton::obj->GetCallingUid();
+    }
+    return DEFAULT_CALLING_UID;
 }
-} // namespace OHOS
+}  // namespace OHOS

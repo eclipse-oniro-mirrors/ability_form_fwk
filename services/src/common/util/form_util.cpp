@@ -1984,7 +1984,7 @@ int32_t FormUtil::GetCallerUserId(const int callingUid)
 {
     // get caller userId
     int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
-    DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->GetOsAccountLocalIdFromUid(callingUid, userId);
+    (void)DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->GetOsAccountLocalIdFromUid(callingUid, userId);
     return userId;
 }
 } // namespace AppExecFwk

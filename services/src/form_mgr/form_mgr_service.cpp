@@ -230,7 +230,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
         API_TIME_OUT_30S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ret = FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    auto callingUid = IPCSkeleton::GetCallingUid();
+    const auto callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     int64_t newFormId = formId;
     if (newFormId == 0) {

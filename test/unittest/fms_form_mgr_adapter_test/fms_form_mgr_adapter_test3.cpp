@@ -39,6 +39,7 @@
 #include "mock_form_provider_client.h"
 #include "mock_form_mgr_adapter_test.h"
 #include "mock_want.h"
+#include "mock_ipc_skeleton.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -54,7 +55,6 @@ extern void MockGetFormRecord(bool mockRet);
 extern void MockGetFormRecordParams(bool mockRet);
 extern void MockGetFormRecordParamsUid(bool mockRet);
 extern void MockSceneAnimationCheck(OHOS::ErrCode mockRet);
-extern void MockGetCallingUid(int32_t mockRet);
 
 namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
@@ -787,13 +787,16 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0276, TestSize.Level1)
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsUid(false);
-    MockGetCallingUid(DEFAULT_CALLING_UID);
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
 
     // Call the method under test
     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
-
     // Verify the result
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0276 end";
 }
 
@@ -819,13 +822,16 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsUid(false);
-    MockGetCallingUid(DEFAULT_CALLING_UID);
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
 
     // Call the method under test
     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
-
     // Verify the result
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0277 end";
 }
 

@@ -102,6 +102,7 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
 
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/mock/src/mock_ipc_skeleton.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test2.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test3.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
@@ -115,7 +116,6 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_render_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_timer_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_want.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_ipc_skeleton.cpp",
   ]
 
   include_dirs = [
