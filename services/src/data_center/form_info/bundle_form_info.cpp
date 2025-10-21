@@ -44,9 +44,7 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
     }
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     auto formInfoStorages = jsonObject.get<std::vector<AAFwk::FormInfoStorage>>();
-    for (const auto &item : formInfoStorages) {
-        formInfoStorages_.push_back(item);
-    }
+    formInfoStorages_.insert(formInfoStorages_.end(), formInfoStorages.begin(), formInfoStorages.end());
     return ERR_OK;
 }
 
@@ -272,10 +270,7 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
     if (formDBNames.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
         if (inFormInfos.size() > Constants::FORM_INFO_MAX_NUM) {
-            unsigned int needPopNum = inFormInfos.size() - Constants::FORM_INFO_MAX_NUM;
-            for (unsigned int i = 0; i < needPopNum; i++) {
-                inFormInfos.pop_back();
-            }
+            inFormInfos.resize(inFormInfos.size() - Constants::FORM_INFO_MAX_NUM);
         }
         outFormInfos = inFormInfos;
         return;
@@ -286,7 +281,7 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
         addFormNum = Constants::FORM_INFO_MAX_NUM - static_cast<int32_t>(formDBNames.size());
         formNum = Constants::FORM_INFO_MAX_NUM;
     }
-    for (auto formInfo : inFormInfos) {
+    for (const auto &formInfo : inFormInfos) {
         bool isUsed = formDBNames.find(formInfo.name) != formDBNames.end();
         if (isUsed) {
             outFormInfos.push_back(formInfo);
