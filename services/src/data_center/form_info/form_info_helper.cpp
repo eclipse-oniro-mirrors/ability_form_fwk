@@ -233,7 +233,7 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceMa
 ErrCode FormInfoHelper::GetFormInfoDisplayName(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager,
     FormInfo &formInfo)
 {
-    if (formInfo.displayNameId != 0 && !resourceManager) {
+    if (formInfo.displayNameId != 0 && resourceManager != nullptr) {
         std::string displayName;
         auto state = resourceManager->GetStringById(static_cast<uint32_t>(formInfo.displayNameId), displayName);
         if (state != OHOS::Global::Resource::RState::SUCCESS) {
@@ -248,7 +248,7 @@ ErrCode FormInfoHelper::GetFormInfoDisplayName(std::shared_ptr<Global::Resource:
 ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager,
     FormInfo &formInfo)
 {
-    if (formInfo.descriptionId != 0 && !resourceManager) {
+    if (formInfo.descriptionId != 0 && resourceManager != nullptr) {
         std::string description;
         auto state = resourceManager->GetStringById(static_cast<uint32_t>(formInfo.descriptionId), description);
         if (state != OHOS::Global::Resource::RState::SUCCESS) {
