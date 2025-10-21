@@ -52,11 +52,14 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     HILOG_INFO("action:%{public}s, userId:%{public}d", action.c_str(), userId);
 
     wptr<FormBundleEventCallback> weakThis = this;
-    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED ||
-        action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
-        // install or update
-        HILOG_WARN("bundleName:%{public}s changed", bundleName.c_str());
-        HandleBundleChange(bundleName, userId);
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED) {
+        // install
+        HILOG_WARN("package added, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+        HandleBundleChange(bundleName, userId, true);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
+        // update
+        HILOG_WARN("package changed, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+        HandleBundleChange(bundleName, userId, false);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         int appIndex = want.GetIntParam("appIndex", 0);
@@ -87,7 +90,8 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     }
 }
 
-void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName, int32_t userId)
+void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName, int32_t userId,
+    const bool needCheckVersion)
 {
     std::vector<int32_t> activeList;
     FormUtil::GetActiveUsers(activeList);
@@ -99,9 +103,9 @@ void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName, 
     for (const int32_t userId : activeList) {
         bool needReload = true;
         FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId, needReload);
-        std::function<void()> taskFunc = [bundleName, userId, needReload]() {
+        std::function<void()> taskFunc = [bundleName, userId, needReload, needCheckVersion]() {
             FormEventUtil::HandleUpdateFormCloud(bundleName);
-            FormEventUtil::HandleProviderUpdated(bundleName, userId, needReload);
+            FormEventUtil::HandleProviderUpdated(bundleName, userId, needReload, needCheckVersion);
         };
         FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     }
