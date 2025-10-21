@@ -640,7 +640,7 @@ public:
      * @param enable True for enable form, false for disable form.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t EnableForms(const std::string bundleName, const bool enable);
+    int32_t EnableForms(const std::string bundleName, const int32_t userId, const bool enable);
 
     /**
      * @brief this interface is invoked when the application lock status changes.

@@ -691,7 +691,7 @@ public:
      * @param enable True for enable form, false for disable form.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t EnableForms(const std::string bundleName, const bool enable)
+    virtual int32_t EnableForms(const std::string bundleName, const int32_t userId, const bool enable)
     {
         return 0;
     }

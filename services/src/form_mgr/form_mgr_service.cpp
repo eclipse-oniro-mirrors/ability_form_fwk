@@ -1928,14 +1928,14 @@ void FormMgrService::OnSystemloadLevel(int32_t level)
 }
 #endif // RES_SCHEDULE_ENABLE
 
-int32_t FormMgrService::EnableForms(const std::string bundleName, const bool enable)
+int32_t FormMgrService::EnableForms(const std::string bundleName, const int32_t userId, const bool enable)
 {
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("disable forms permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().EnableForms(bundleName, enable);
+    return FormMgrAdapter::GetInstance().EnableForms(bundleName, userId, enable);
 }
 
 bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)

@@ -2457,7 +2457,7 @@ int32_t FormMgrProxy::BatchRefreshForms(const int32_t formRefreshType)
     return reply.ReadInt32();
 }
 
-int32_t FormMgrProxy::EnableForms(const std::string bundleName, const bool enable)
+int32_t FormMgrProxy::EnableForms(const std::string bundleName, const int32_t userId, const bool enable)
 {
     HILOG_DEBUG("EnableForms start.%{public}s", bundleName.c_str());
     MessageParcel data;
@@ -2470,7 +2470,10 @@ int32_t FormMgrProxy::EnableForms(const std::string bundleName, const bool enabl
         HILOG_ERROR("write bundleName failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-
+    if (!data.WriteInt32(userId)) {
+        HILOG_ERROR("write userId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (!data.WriteBool(enable)) {
         HILOG_ERROR("fail write enable");
         return ERR_APPEXECFWK_PARCEL_ERROR;

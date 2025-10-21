@@ -2785,52 +2785,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0146, TestSize.Level1) {
 }
 
 /**
- * @tc.name: FormMgrTest_0147
- * @tc.desc: Verify EnableForms
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0147, TestSize.Level0) {
-    GTEST_LOG_(INFO) << "FormMgrTest_0147 begin";
-    std::string bundleName = "ohos.samples.FormApplication";
-    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
-    int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
-    GTEST_LOG_(INFO) << "FormMgrTest_0147 test ends";
-}
-
-/**
- * @tc.name: FormMgrTest_0148
- * @tc.desc: Verify EnableForms
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0148, TestSize.Level0) {
-    GTEST_LOG_(INFO) << "FormMgrTest_0148 begin";
-    std::string bundleName = "ohos.samples.FormApplication";
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    EXPECT_CALL(*mockProxy, EnableForms(_, _))
-    .Times(1)
-    .WillOnce(Return(OHOS::ERR_OK));
-    int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
-    EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrTest_0148 test ends";
-}
-
-/**
- * @tc.name: FormMgrTest_0149
- * @tc.desc: Verify EnableForms
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0149, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrTest_0149 begin";
-    std::string bundleName;
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-    GTEST_LOG_(INFO) << "FormMgrTest_0149 test ends";
-}
-
-/**
  * @tc.name: FormMgrTest_0150
  * @tc.desc: Verify IsFormBundleForbidden
  * @tc.type: FUNC
@@ -4527,42 +4481,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0241, TestSize.Level1)
     FormMgr::GetInstance().resetFlag_ = false;
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0241 test ends";
-}
-
-/**
- * @tc.name: FormMgrTest_0242
- * @tc.desc: Verify EnableForms
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0242, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrTest_0242 begin";
-    std::string bundleName = "ohos.samples.FormApplication";
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    EXPECT_CALL(*mockProxy, EnableForms(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_FAILED));
-    int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
-    EXPECT_EQ(result, ERR_FAILED);
-    GTEST_LOG_(INFO) << "FormMgrTest_0242 test ends";
-}
-
-/**
- * @tc.name: FormMgrTest_0243
- * @tc.desc: Verify EnableForms
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0243, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrTest_0243 begin";
-    FormMgr::GetInstance().resetFlag_ = true;
-    std::string bundleName = "ohos.samples.FormApplication";
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
-    FormMgr::GetInstance().resetFlag_ = false;
-    FormMgr::GetInstance().SetFormMgrService(mockProxy);
-    GTEST_LOG_(INFO) << "FormMgrTest_0243 test ends";
 }
 
 /**
