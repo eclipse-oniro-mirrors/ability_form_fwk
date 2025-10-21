@@ -4713,6 +4713,7 @@ ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRe
     data.callingUid = callingUid;
     for (const FormRecord &formRecord : refreshForms) {
         data.record = formRecord;
+        data.formId = formRecord.formId;
         ErrCode requestRet = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_PROVIDER);
         if (requestRet == ERR_OK) {
             reloadNum++;

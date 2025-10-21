@@ -44,8 +44,6 @@ public:
 
     static napi_value DisconnectAbility(napi_env env, napi_callback_info info);
 
-    static napi_value StartAbilityByCall(napi_env env, napi_callback_info info);
-
 private:
     napi_value OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info);
 
@@ -54,8 +52,6 @@ private:
     napi_value OnConnectAbility(napi_env env, NapiCallbackInfo &info);
 
     napi_value OnDisconnectAbility(napi_env env, NapiCallbackInfo &info);
-
-    napi_value OnStartAbilityByCall(napi_env env, NapiCallbackInfo &info);
 
     bool CheckConnectionParam(napi_env env, napi_value value,
         sptr<JSUIExtensionConnection> &connection, AAFwk::Want &want);

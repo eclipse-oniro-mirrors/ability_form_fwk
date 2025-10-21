@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-let Caller = requireNapi('application.Caller');
 let ExtensionContext = requireNapi('application.ExtensionContext');
 let hilog = requireNapi('hilog');
 
@@ -43,22 +42,5 @@ export class LiveFormExtensionContext extends ExtensionContext {
   disconnectServiceExtensionAbility(connection) {
     hilog.sLogI(domainID, TAG, `disconnectServiceExtensionAbility: ${connection}`);
     return this.__context_impl__.disconnectServiceExtensionAbility(connection);
-  }
-
-  startAbilityByCall(want) {
-    hilog.sLogI(domainID, TAG, `startAbilityByCall: ${JSON.stringify(want)}`);
-    return new Promise(async (resolve, reject) => {
-      let callee = null;
-      try {
-        callee = await this.__context_impl__.startAbilityByCall(want);
-      } catch (error) {
-        hilog.sLogI(domainID, TAG, 'LiveFormExtensionContext::startAbilityByCall Obtain remoteObject failed');
-        reject(error);
-        return;
-      }
-
-      resolve(new Caller(callee));
-      hilog.sLogI(domainID, TAG, 'LiveFormExtensionContext::startAbilityByCall success');
-    });
   }
 }

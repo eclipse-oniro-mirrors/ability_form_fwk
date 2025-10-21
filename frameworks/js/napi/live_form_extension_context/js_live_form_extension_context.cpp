@@ -14,7 +14,6 @@
  */
 
 #include "js_live_form_extension_context.h"
-#include "js_caller_complex.h"
 #include "js_extension_context.h"
 #include "js_error_utils.h"
 #include "js_runtime.h"
@@ -37,7 +36,6 @@ constexpr int32_t INDEX_ZERO = 0;
 constexpr int32_t INDEX_ONE = 1;
 constexpr size_t ARGC_ONE = 1;
 constexpr size_t ARGC_TWO = 2;
-constexpr int32_t CALLER_TIME_OUT = 10; // 10s
 constexpr int32_t ERR_FAILED = -1;
 
 std::map<UIExtensionConnectionKey, sptr<JSUIExtensionConnection>, key_compare> g_connects;
@@ -74,103 +72,6 @@ void RemoveConnection(int64_t connectId)
         HILOG_DEBUG("ability not exist");
     }
 }
-
-class StartAbilityByCallParameters {
-public:
-    int err = ERR_OK;
-    sptr<IRemoteObject> remoteCallee = nullptr;
-    std::shared_ptr<CallerCallBack> callerCallBack = nullptr;
-    std::mutex mutexlock;
-    std::condition_variable condition;
-};
-
-void GenerateCallerCallBack(std::shared_ptr<StartAbilityByCallParameters> calls,
-    std::shared_ptr<CallerCallBack> callerCallBack)
-{
-    if (calls == nullptr) {
-        HILOG_ERROR("null calls");
-        return;
-    }
-    if (callerCallBack == nullptr) {
-        HILOG_ERROR("null callerCallBack");
-        return;
-    }
-    auto callBackDone = [calldata = calls] (const sptr<IRemoteObject> &obj) {
-        HILOG_DEBUG("callBackDone called start");
-        std::unique_lock<std::mutex> lock(calldata->mutexlock);
-        calldata->remoteCallee = obj;
-        calldata->condition.notify_all();
-    };
-
-    auto releaseListen = [](const std::string &str) {
-        HILOG_DEBUG("releaseListen is called %{public}s", str.c_str());
-    };
-
-    callerCallBack->SetCallBack(callBackDone);
-    callerCallBack->SetOnRelease(releaseListen);
-}
-
-void StartAbilityByCallExecuteDone(std::shared_ptr<StartAbilityByCallParameters> calldata)
-{
-    if (calldata == nullptr) {
-        HILOG_ERROR("null calldata");
-        return;
-    }
-    std::unique_lock<std::mutex> lock(calldata->mutexlock);
-    if (calldata->remoteCallee != nullptr) {
-        HILOG_ERROR("not null callExecute callee");
-        return;
-    }
-
-    if (calldata->condition.wait_for(lock, std::chrono::seconds(CALLER_TIME_OUT)) == std::cv_status::timeout) {
-        HILOG_DEBUG("callExecute waiting callee timeout");
-        calldata->err = ERR_FAILED;
-    }
-    HILOG_DEBUG("end");
-}
-
-void StartAbilityByCallComplete(napi_env env, NapiAsyncTask &task,
-    std::weak_ptr<LiveFormExtensionContext> liveFormExtensionContext,
-    std::shared_ptr<StartAbilityByCallParameters> calldata, std::shared_ptr<CallerCallBack> callerCallBack)
-{
-    HILOG_DEBUG("call");
-    if (calldata == nullptr) {
-        HILOG_ERROR("null calldata");
-        return;
-    }
-    if (calldata->err != ERR_OK) {
-        HILOG_ERROR("calldata err: %{public}d", calldata->err);
-        task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
-                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
-        auto context = liveFormExtensionContext.lock();
-        if (context == nullptr || callerCallBack == nullptr) {
-            HILOG_ERROR("null context or callBack");
-            return;
-        }
-        context->ClearFailedCallConnection(callerCallBack);
-        return;
-    }
-    auto context = liveFormExtensionContext.lock();
-    if (context == nullptr || callerCallBack == nullptr || calldata->remoteCallee == nullptr) {
-        HILOG_ERROR("null callComplete params error %{public}s",
-            context == nullptr ? "context" : (calldata->remoteCallee == nullptr ? "remoteCallee" : "callerCallBack"));
-        task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
-                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
-        HILOG_DEBUG("callComplete end");
-        return;
-    }
-    auto releaseCallAbilityFunc = [liveFormExtensionContext] (
-        const std::shared_ptr<CallerCallBack> &callback) -> ErrCode {
-        auto contextForRelease = liveFormExtensionContext.lock();
-        if (contextForRelease == nullptr) {
-            HILOG_ERROR("null releaseCallAbilityFunction");
-            return ERR_FAILED;
-        }
-        return contextForRelease->ReleaseCall(callback);
-    };
-    task.Resolve(env, CreateJsCallerComplex(env, releaseCallAbilityFunc, calldata->remoteCallee, callerCallBack));
-    HILOG_DEBUG("end");
-}
 } // namespace
 
 void JsLiveFormExtensionContext::Finalizer(napi_env env, void *data, void *hint)
@@ -200,7 +101,6 @@ napi_value JsLiveFormExtensionContext::CreateJsLiveFormExtensionContext(
     BindNativeFunction(env, objValue, "startAbilityByLiveForm", moduleName, StartAbilityByLiveForm);
     BindNativeFunction(env, objValue, "connectServiceExtensionAbility", moduleName, ConnectAbility);
     BindNativeFunction(env, objValue, "disconnectServiceExtensionAbility", moduleName, DisconnectAbility);
-    BindNativeFunction(env, objValue, "startAbilityByCall", moduleName, StartAbilityByCall);
 
     return objValue;
 }
@@ -227,12 +127,6 @@ napi_value JsLiveFormExtensionContext::DisconnectAbility(napi_env env, napi_call
 {
     HILOG_DEBUG("called");
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnDisconnectAbility);
-}
-
-napi_value JsLiveFormExtensionContext::StartAbilityByCall(napi_env env, napi_callback_info info)
-{
-    HILOG_DEBUG("called");
-    GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnStartAbilityByCall);
 }
 
 napi_value JsLiveFormExtensionContext::OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info)
@@ -335,7 +229,7 @@ napi_value JsLiveFormExtensionContext::OnConnectAbility(napi_env env, NapiCallba
     // Check params count
     if (info.argc != ARGC_TWO) {
         HILOG_ERROR("invalid argc");
-        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED);
+        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED, "invalid argument count");
         return CreateJsUndefined(env);
     }
     // Unwrap want and connection
@@ -343,7 +237,7 @@ napi_value JsLiveFormExtensionContext::OnConnectAbility(napi_env env, NapiCallba
     sptr<JSUIExtensionConnection> connection(new JSUIExtensionConnection(env));
     if (!AppExecFwk::UnwrapWant(env, info.argv[INDEX_ZERO], want) ||
         !CheckConnectionParam(env, info.argv[INDEX_ONE], connection, want)) {
-        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED);
+        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED, "invalid parameter");
         return CreateJsUndefined(env);
     }
     int64_t connectId = connection->GetConnectionId();
@@ -381,12 +275,12 @@ napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCal
     }
     if (info.argc != ARGC_ONE) {
         HILOG_ERROR("invalid argc");
-        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED);
+        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED, "invalid argument count");
         return CreateJsUndefined(env);
     }
     int64_t connectId = -1;
     if (!AppExecFwk::UnwrapInt64FromJS2(env, info.argv[INDEX_ZERO], connectId)) {
-        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED);
+        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED, "invalid parameter");
         return CreateJsUndefined(env);
     }
     AAFwk::Want want;
@@ -405,7 +299,7 @@ napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCal
             if (connection == nullptr) {
                 HILOG_ERROR("null connection");
                 task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
-                    FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
+                    "null connection"));
                 return;
             }
             auto innerErrorCode = context->DisconnectAbility(want, connection);
@@ -420,66 +314,6 @@ napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCal
     NapiAsyncTask::Schedule("JSLiveFormExtensionContext::OnDisconnectAbility",
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
-}
-
-napi_value JsLiveFormExtensionContext::OnStartAbilityByCall(napi_env env, NapiCallbackInfo &info)
-{
-    HILOG_INFO("called");
-    if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("not system app");
-        ThrowError(env, AbilityErrorCode::ERROR_CODE_NOT_SYSTEM_APP);
-        return CreateJsUndefined(env);
-    }
-    // 1. Check params
-    if (info.argc != ARGC_ONE) {
-        HILOG_ERROR("invalid argc");
-        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED);
-        return CreateJsUndefined(env);
-    }
-    AAFwk::Want want;
-    if (!AppExecFwk::UnwrapWant(env, info.argv[INDEX_ZERO], want)) {
-        ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED);
-        return CreateJsUndefined(env);
-    }
-
-    // 2. create CallBack function
-    std::shared_ptr<StartAbilityByCallParameters> calls = std::make_shared<StartAbilityByCallParameters>();
-    auto callExecute = [calldata = calls] () { StartAbilityByCallExecuteDone(calldata); };
-    auto callerCallBack = std::make_shared<CallerCallBack>();
-    GenerateCallerCallBack(calls, callerCallBack);
-    auto callComplete = [weak = context_, calldata = calls, callerCallBack] (
-        napi_env env, NapiAsyncTask &task, int32_t status) {
-        StartAbilityByCallComplete(env, task, weak, calldata, callerCallBack);
-    };
-
-    // 3. StartAbilityByCall
-    napi_value retsult = nullptr;
-    auto context = context_.lock();
-    if (context == nullptr) {
-        HILOG_ERROR("null context");
-        ThrowError(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
-        return CreateJsUndefined(env);
-    }
-
-    auto ret = context->StartAbilityByCall(want, callerCallBack);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("startAbility failed %{public}d", static_cast<int32_t>(ret));
-        ThrowError(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
-        return CreateJsUndefined(env);
-    }
-
-    if (calls->remoteCallee == nullptr) {
-        HILOG_ERROR("null remoteCallee");
-        NapiAsyncTask::ScheduleHighQos("JsLiveFormExtensionContext::OnStartAbilityByCall", env,
-            CreateAsyncTaskWithLastParam(env, nullptr, std::move(callExecute), std::move(callComplete), &retsult));
-    } else {
-        HILOG_DEBUG("promise return result execute");
-        NapiAsyncTask::ScheduleHighQos("JsLiveFormExtensionContext::OnStartAbilityByCall", env,
-            CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(callComplete), &retsult));
-    }
-
-    HILOG_DEBUG("end");
-    return retsult;
 }
 
 bool JsLiveFormExtensionContext::CheckConnectionParam(napi_env env, napi_value value,
@@ -501,7 +335,6 @@ bool JsLiveFormExtensionContext::CheckConnectionParam(napi_env env, napi_value v
     } else {
         g_serialNumber = 0;
     }
-    HILOG_DEBUG("not find connection");
     return true;
 }
 
