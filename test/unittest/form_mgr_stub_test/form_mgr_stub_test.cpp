@@ -3141,9 +3141,11 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleEnableForms_001, TestSize.Level1
     MessageParcel data;
     MessageParcel reply;
     const std::string bundleName = "bundleName";
+    const int32_t userId = 100;
     data.WriteString(bundleName);
+    data.WriteInt32(userId);
     data.WriteBool(true);
-    EXPECT_CALL(*mockFormMgrService, EnableForms(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, EnableForms(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleEnableForms(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleEnableForms_001 ends";
 }

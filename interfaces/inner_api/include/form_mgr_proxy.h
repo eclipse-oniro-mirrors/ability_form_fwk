@@ -627,7 +627,7 @@ public:
      * @param enable True for enable form, false for disable form.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t EnableForms(const std::string bundleName, const bool enable) override;
+    int32_t EnableForms(const std::string bundleName, const int32_t userId, const bool enable) override;
 
     /**
      * @brief Check form bundle is controlled.

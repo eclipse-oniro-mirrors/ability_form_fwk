@@ -1108,8 +1108,9 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0127, TestSize.Level1)
     FormMgrService formMgrService;
     MockIsSACall(true);
     std::string bundleName = "bundleName";
-    EXPECT_EQ(formMgrService.EnableForms(bundleName, true), ERR_OK);
-    EXPECT_EQ(formMgrService.EnableForms(bundleName, false), ERR_OK);
+    int32_t userId = 100;
+    EXPECT_EQ(formMgrService.EnableForms(bundleName, userId, true), ERR_OK);
+    EXPECT_EQ(formMgrService.EnableForms(bundleName, userId, false), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0127 end";
 }
 
