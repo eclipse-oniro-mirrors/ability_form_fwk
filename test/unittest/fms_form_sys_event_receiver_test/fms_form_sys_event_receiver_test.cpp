@@ -26,6 +26,7 @@
 #include "data_center/database/form_db_cache.h"
 #include "form_host_interface.h"
 #include "data_center/form_info/form_info_mgr.h"
+#include "data_center/form_info/bundle_form_info.h"
 #include "data_center/form_info/form_info_storage.h"
 #include "form_mgr.h"
 #include "common/event/system_event/form_sys_event_receiver.h"

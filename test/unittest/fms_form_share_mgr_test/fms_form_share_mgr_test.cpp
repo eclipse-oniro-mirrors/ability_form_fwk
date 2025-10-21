@@ -32,6 +32,8 @@
 #include "common/event/form_event_handler.h"
 #include "form_info.h"
 #include "data_center/form_info/form_info_mgr.h"
+#include "data_center/form_info/bundle_form_info.h"
+#include "data_center/form_info/form_info_helper.h"
 #include "form_mgr.h"
 #include "common/util/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"

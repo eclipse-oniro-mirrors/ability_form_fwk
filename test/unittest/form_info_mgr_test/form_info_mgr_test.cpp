@@ -19,6 +19,8 @@
 #define private public
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_info/form_info_mgr.h"
+#include "data_center/form_info/form_info_helper.h"
+#include "data_center/form_info/bundle_form_info.h"
 #include "mock_bundle_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
