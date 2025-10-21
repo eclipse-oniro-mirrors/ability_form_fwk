@@ -35,6 +35,7 @@ group("fuzztest") {
     "formdbcacheannex_fuzzer:fuzztest",
     "formecologicalruleparam_fuzzer:fuzztest",
     "formerrors_fuzzer:fuzztest",
+    "formeventreport_fuzzer:fuzztest",
     "formfreeinstalloperator_fuzzer:fuzztest",
     "formhostcaller_fuzzer:fuzztest",
     "formhostclient_fuzzer:fuzztest",
