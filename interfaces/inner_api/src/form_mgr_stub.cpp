@@ -1744,8 +1744,9 @@ int32_t FormMgrStub::HandleEnableForms(MessageParcel &data, MessageParcel &reply
         HILOG_ERROR("fail ReadString<bundleName>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    int32_t userId = data.ReadInt32();
     bool enable = data.ReadBool();
-    int32_t result = EnableForms(bundleName, enable);
+    int32_t result = EnableForms(bundleName, userId, enable);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

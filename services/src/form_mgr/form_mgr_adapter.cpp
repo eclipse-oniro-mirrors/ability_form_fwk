@@ -4096,7 +4096,7 @@ void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 }
 #endif // RES_SCHEDULE_ENABLE
 
-int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool enable)
+int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const int32_t userId, const bool enable)
 {
     FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, !enable);
     std::vector<FormRecord> formInfos;
@@ -4104,7 +4104,6 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    int32_t userId = FormUtil::GetCurrentAccountId();
     HILOG_INFO("userId:%{public}d, bundleName:%{public}s, infosSize:%{public}zu, enable:%{public}d",
         userId, bundleName.c_str(), formInfos.size(), enable);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
@@ -4113,7 +4112,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         if (enable) {
             FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(iter->formId);
         }
-        if (iter->enableForm == enable) {
+        if (iter->enableForm == enable || iter->providerUserId != userId) {
             iter = formInfos.erase(iter);
             continue;
         }

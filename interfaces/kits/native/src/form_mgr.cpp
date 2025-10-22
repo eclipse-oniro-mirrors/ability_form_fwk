@@ -1946,34 +1946,6 @@ int32_t FormMgr::BatchRefreshForms(const int32_t formRefreshType)
     return remoteProxy_->BatchRefreshForms(formRefreshType);
 }
 
-int32_t FormMgr::EnableForms(const std::string bundleName, const bool enable)
-{
-    if (bundleName.empty()) {
-        HILOG_ERROR("empty bundleName");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("form is in recover status, can't do action on form");
-        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
-    }
-
-    ErrCode errCode = Connect();
-    if (errCode != ERR_OK) {
-        return errCode;
-    }
-
-    std::shared_lock<std::shared_mutex> lock(connectMutex_);
-    if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    ErrCode resultCode = remoteProxy_->EnableForms(bundleName, enable);
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("fail EnableForms,errCode %{public}d", resultCode);
-    }
-    return resultCode;
-}
-
 bool FormMgr::IsFormBundleForbidden(const std::string &bundleName)
 {
     ErrCode errCode = Connect();

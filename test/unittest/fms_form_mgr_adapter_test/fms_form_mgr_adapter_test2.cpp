@@ -2426,8 +2426,9 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_235, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_235 start";
     FormMgrAdapter formMgrAdapter;
     std::string bundleName = "com.ohos.launcher";
-    EXPECT_EQ(formMgrAdapter.EnableForms(bundleName, true), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-    EXPECT_EQ(formMgrAdapter.EnableForms(bundleName, false), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    int32_t userId = 100;
+    EXPECT_EQ(formMgrAdapter.EnableForms(bundleName, userId, true), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    EXPECT_EQ(formMgrAdapter.EnableForms(bundleName, userId, false), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 }
 
 /**
