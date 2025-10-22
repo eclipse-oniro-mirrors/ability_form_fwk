@@ -32,7 +32,8 @@ const std::vector<FormEventName> EVENT_NAME_LIST = {FormEventName::ADD_FORM, For
     FormEventName::RELOAD_FORM_FAILED, FormEventName::FORM_NODE_ERROR, FormEventName::FORM_STATUS_ERROR,
     FormEventName::FORM_EVENT_QUEUE_OVER_LIMIT};
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     FuzzedDataProvider provider(data, size);
     FormEventName eventName = EVENT_NAME_LIST[provider.ConsumeIntegralInRange<size_t>(0, EVENT_NAME_LIST.size() - 1)];
     FormEventInfo eventInfo;
@@ -61,9 +62,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     FormEventReport::SendFormRefreshCountEvent(eventName, HiSysEventType::STATISTIC, newEventInfo);
     FormEventReport::SendLoadStageFormConfigInfoEvent(eventName, HiSysEventType::BEHAVIOR, newEventInfo);
     FormEventReport::SendDiskUseEvent();
-    std::string callerBundleName = provider.ConsumeRandomLengthString();
     std::string formName = provider.ConsumeRandomLengthString();
-    FormEventReport::SendRequestPublicFormEvent(callerBundleName, formName, RequestFormType::OPEN_FORM_MANAGER);
     int64_t formId = provider.ConsumeIntegral<int64_t>();
     std::string bundleName = provider.ConsumeRandomLengthString();
     int32_t errorCode = provider.ConsumeIntegral<int32_t>();
