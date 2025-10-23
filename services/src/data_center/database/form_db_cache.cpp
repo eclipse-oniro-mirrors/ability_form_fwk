@@ -24,6 +24,7 @@
 #include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
 #include "common/util/form_util.h"
+#include "feature/theme_form/theme_form_client.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -455,7 +456,7 @@ void FormDbCache::DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap)
         }
     }
     if (!removeList.empty()) {
-        ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
+        ThemeFormClient::GetInstance().DeleteForms(removeList);
     }
 }
 #endif

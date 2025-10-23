@@ -90,6 +90,7 @@
 #include "status_mgr_center/form_status.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "feature/param_update/param_control.h"
+#include "feature/theme_form/theme_form_client.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -240,9 +241,8 @@ int FormMgrAdapter::CreateForm(const Want &want, RunningFormInfo &runningFormInf
         }
 
         // call theme manager service to add
-        ThemeManager::ThemeFormInfo themeFormInfo;
-        FillThemeFormInfo(want, themeFormInfo, formId);
-        ret = ThemeManager::ThemeManagerClient::GetInstance().AddForm(themeFormInfo);
+        FormNotifyInfo info = {formId, want};
+        ret = ThemeFormClient::GetInstance().AddForm(info);
         if (ret != ERR_OK) {
             HILOG_ERROR("ThemeManager AddForm failed");
             return ret;
@@ -276,19 +276,6 @@ int FormMgrAdapter::AddThemeDBRecord(const Want &want, int64_t formId)
         HILOG_ERROR("UpdateDBRecord failed");
     }
     return ret;
-}
-
-void FormMgrAdapter::FillThemeFormInfo(const Want &want, ThemeManager::ThemeFormInfo &themeFormInfo, int64_t formId)
-{
-    themeFormInfo.formId = formId;
-    themeFormInfo.themeFormDimension =
-        static_cast<ThemeManager::ThemeFormDimension>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
-    themeFormInfo.themeFormLocation =
-        static_cast<ThemeManager::ThemeFormLocation>(want.GetIntParam(Constants::FORM_LOCATION_KEY, 0));
-    themeFormInfo.themeFormId = want.GetStringParam(Constants::PARAM_THEME_THEME_FORM_ID);
-    themeFormInfo.themeId = want.GetStringParam(Constants::PARAM_THEME_THEME_ID);
-    HILOG_INFO("get theme form info, themeFormId:%{public}s, themeId:%{public}s",
-        themeFormInfo.themeFormId.c_str(), themeFormInfo.themeId.c_str());
 }
 
 FormRecord FormMgrAdapter::AllotThemeRecord(const Want &want, int64_t formId)
@@ -540,7 +527,7 @@ int FormMgrAdapter::DeleteThemeForm(const int64_t formId)
     HILOG_INFO("call");
     std::vector<int64_t> removeList;
     removeList.emplace_back(formId);
-    int ret = ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
+    int ret = ThemeFormClient::GetInstance().DeleteForms(removeList);
     if (ret != ERR_OK) {
         HILOG_ERROR("call ThemeManager to delete failed");
         return ret;
