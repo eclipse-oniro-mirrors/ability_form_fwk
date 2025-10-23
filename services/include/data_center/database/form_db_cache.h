@@ -24,9 +24,6 @@
 #include "common/util/form_id_key.h"
 #include "data_center/form_record/form_record.h"
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"
-#ifdef THEME_MGR_ENABLE
-#include "theme_manager_client.h"
-#endif
 
 namespace OHOS {
 namespace AppExecFwk {

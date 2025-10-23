@@ -35,9 +35,6 @@
 #include "iremote_object.h"
 #include "running_form_info.h"
 #include "want.h"
-#ifdef THEME_MGR_ENABLE
-#include "theme_manager_client.h"
-#endif
 #include "configuration.h"
 #include "form_major_info.h"
 
@@ -1356,14 +1353,6 @@ private:
     std::map<int64_t, int32_t> formReconnectMap_;
     std::mutex reconnectMutex_;
 #ifdef THEME_MGR_ENABLE
-    /**
-     * @brief Fill ThemeFormInfo with want and formId
-     * @param formId Indicates the id of form.
-     * @param themeFormInfo Info of theme form defined by ThemeManager.
-     * @param want The want of form.
-     */
-    void FillThemeFormInfo(const Want &want, ThemeManager::ThemeFormInfo &themeFormInfo, int64_t formId);
-
     /**
      * @brief Call ThemeManager to delete form and clear record in database.
      * @param formId Indicates the id of form.

@@ -65,7 +65,6 @@
               "memmgr",
               "init",
               "resource_schedule_service",
-              "theme_mgr",
               "jsoncpp",
               "libxml2",
               "config_policy",
