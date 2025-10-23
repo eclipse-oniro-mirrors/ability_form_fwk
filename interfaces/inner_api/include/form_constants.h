@@ -204,6 +204,7 @@ namespace Constants {
     constexpr const char* FORM_STATUS_DATA = "form_status_data";
     constexpr const char* FORM_IS_DYNAMIC = "form_is_dynamic";
     constexpr const char* FORM_IS_RECOVER_FORM = "form_is_recover_form";
+    constexpr const char* FORM_IS_STATIC_FORM_UPDATE_SIZE = "form_is_static_form_update_size";
     constexpr const char* FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT = "form_is_recover_form_to_handle_click_event";
     constexpr const char* FORM_STATUS_EVENT = "form_status_event";
     constexpr const char* FORM_STATUS_EVENT_ID = "form_status_event_id";
