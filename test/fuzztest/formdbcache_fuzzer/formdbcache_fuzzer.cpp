@@ -119,7 +119,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.Start();
     FormDBInfo formDBInfo;
     formDbCache.SaveFormInfo(formDBInfo);
-    formDbCache.SaveFormInfoNolock(formDBInfo);
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
     formDbCache.DeleteFormInfo(formId);
     int32_t hostUid = fdp->ConsumeIntegral<int32_t>();
