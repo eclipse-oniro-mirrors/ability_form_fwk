@@ -528,7 +528,7 @@ ani_ref GetMemberRef(ani_env *env, ani_object object, const char *class_name, co
 
 ani_object GetANIArray(ani_env *env, size_t array_size)
 {
-    ani_class arrayCls = GetANIClass(env, "escompat.Array");
+    ani_class arrayCls = GetANIClass(env, "std.core.Array");
     ani_method arrayCtor;
     if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor)) {
         HILOG_ERROR("FindMethod failed");
