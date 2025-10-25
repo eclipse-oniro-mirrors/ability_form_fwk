@@ -35,8 +35,12 @@ constexpr int32_t TIME_OUT = 3;
 constexpr int32_t MAX_TIMES = 10;
 constexpr int32_t DELAY_TIME = 300000;
 constexpr int32_t THEME_MANAGER_SERVICE_ID = 0x00010136;
-constexpr ErrCode NO_ERROR = OHOS::ThemeManager::NO_ERROR;
 constexpr ErrCode ERR_FAILED = -1;
+static const std::unordered_set<int32_t> errorCodeList = {
+    NO_ERROR, NO_PERMISSION, NOT_SYSTEM_APP, IPC_FAILED, THEME_NULLPTR, FILE_EXCEPTION,
+    PACKAGE_OVERSIZED, IS_ACTIVATING, PACKAGE_FORMAT_ERROR, SA_UNLOADING, DATABASE_ERROR,
+    INVALID_VALUE, INTERNAL_ERROR, DELETE_FAILED
+};
 
 ThemeFormClient::ThemeFormClient()
 {
@@ -67,7 +71,7 @@ int32_t ThemeFormClient::AddForm(const FormNotifyInfo& info)
         HILOG_WARN("AddForm : UnloadSelf saManager is fail, code:%{public}d, times:%{public}d", result, i);
         usleep(DELAY_TIME);
     }
-    
+
     HILOG_WARN("AddForm : code:%{public}d", result);
     return result;
 }
@@ -79,7 +83,7 @@ int32_t ThemeFormClient::DeleteForms(const vector<int64_t> &formIds)
         HILOG_ERROR("GetProxy failed!");
         return THEME_NULLPTR;
     }
-    
+
     int32_t result = 0;
     for (int i = 0; i <= MAX_TIMES; i++) {
         result = ConvertIntToErrorCode(proxy->DeleteForm(formIds));
@@ -100,7 +104,7 @@ void ThemeFormClient::CreateThemeFormParcel(const FormNotifyInfo& info, ThemeMan
     themeFormInfo.formId = info.formId;
     auto& want = info.want;
     themeFormInfo.themeFormDimension =
-        static_cast<ThemeManager::ThemeFormDimension>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
+        static_cast<ThemeFormDimension>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
     themeFormInfo.themeFormLocation =
         static_cast<ThemeFormLocation>(want.GetIntParam(Constants::FORM_LOCATION_KEY, 0));
     themeFormInfo.themeFormId = want.GetStringParam(Constants::PARAM_THEME_THEME_FORM_ID);
@@ -110,16 +114,11 @@ void ThemeFormClient::CreateThemeFormParcel(const FormNotifyInfo& info, ThemeMan
         themeFormInfo.themeFormId.c_str(), themeFormInfo.themeId.c_str());
 }
 
-ThemeManager::ErrorCode ThemeFormClient::ConvertIntToErrorCode(int32_t errorCode)
+ErrorCode ThemeFormClient::ConvertIntToErrorCode(int32_t errorCode)
 {
-    ThemeManager::ErrorCode themeErrorCode = E_UNKNOWN;
-    std::unordered_set<int32_t> set = {
-        NO_ERROR, NO_PERMISSION, NOT_SYSTEM_APP, IPC_FAILED, THEME_NULLPTR, FILE_EXCEPTION,
-        PACKAGE_OVERSIZED, IS_ACTIVATING, PACKAGE_FORMAT_ERROR, SA_UNLOADING, DATABASE_ERROR,
-        INVALID_VALUE, INTERNAL_ERROR, DELETE_FAILED
-    };
-    auto it = set.find(errorCode);
-    if (it != set.end()) {
+    ErrorCode themeErrorCode = E_UNKNOWN;
+    auto it = errorCodeList.find(errorCode);
+    if (it != errorCodeList.end()) {
         themeErrorCode = static_cast<ErrorCode>(errorCode);
     }
     return themeErrorCode;
@@ -128,14 +127,21 @@ ThemeManager::ErrorCode ThemeFormClient::ConvertIntToErrorCode(int32_t errorCode
 void ThemeFormClient::OnRemoteSaDied(const wptr<IRemoteObject> &object)
 {
     std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
-    this->themeSvcProxy_ = nullptr;
+    if (themeSvcProxy_ != nullptr && deathRecipient_ != nullptr) {
+        auto remoteObj = themeSvcProxy_->AsObject();
+        if (remoteObj != nullptr) {
+            remoteObj->RemoveDeathRecipient(deathRecipient_);
+        }
+        deathRecipient_ = nullptr;
+    }
+    themeSvcProxy_ = nullptr;
 }
 
 sptr<IThemeManagerService> ThemeFormClient::GetProxy()
 {
     std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
-    if (this->themeSvcProxy_) {
-        return this->themeSvcProxy_;
+    if (themeSvcProxy_) {
+        return themeSvcProxy_;
     }
 
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -161,10 +167,10 @@ sptr<IThemeManagerService> ThemeFormClient::GetProxy()
             HILOG_INFO("iface_cast failed!");
             proxy = new ThemeFormServiceProxy(object);
         }
-        this->themeSvcProxy_ = proxy;
+        themeSvcProxy_ = proxy;
     }
 
-    return this->themeSvcProxy_;
+    return themeSvcProxy_;
 }
 
 void ThemeFormDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)

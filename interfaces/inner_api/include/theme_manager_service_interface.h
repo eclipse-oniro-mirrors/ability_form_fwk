@@ -22,7 +22,7 @@
 #include <string_ex.h>
 #include "theme_manager_service_param.h"
 
-namespace OHOS::ThemeManager {
+namespace OHOS::AppExecFwk {
 using std::vector;
 class IThemeManagerService : public IRemoteBroker {
 public:
@@ -40,6 +40,6 @@ enum class IThemeManagerServiceIpcCode {
     COMMAND_DELETE_FORM,
 };
 
-} // namespace OHOS::ThemeManager
+} // namespace OHOS::AppExecFwk
 #endif // THEME_MGR_ENABLE
 #endif // OHOS_FORM_FWK_THEME_MANAGER_SERVICE_INTERFACE_H
