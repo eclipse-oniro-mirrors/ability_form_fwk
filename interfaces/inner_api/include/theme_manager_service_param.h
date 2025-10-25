@@ -91,7 +91,7 @@ public:
 
     virtual bool Marshalling(Parcel &parcel) const override;
     static ThemeManagerThemeFormInfoByParcel *Unmarshalling(Parcel &parcel);
-    AppExecFwk::ThemeFormInfo themeFormInfo_;
+    ThemeFormInfo themeFormInfo_;
 };
 
 } // namespace OHOS::AppExecFwk
