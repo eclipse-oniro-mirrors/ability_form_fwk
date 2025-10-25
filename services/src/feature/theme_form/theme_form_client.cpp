@@ -48,6 +48,15 @@ ThemeFormClient::ThemeFormClient()
 
 ThemeFormClient::~ThemeFormClient()
 {
+    std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
+    if (themeSvcProxy_ != nullptr && deathRecipient_ != nullptr) {
+        auto remoteObj = themeSvcProxy_->AsObject();
+        if (remoteObj != nullptr) {
+            remoteObj->RemoveDeathRecipient(deathRecipient_);
+        }
+        deathRecipient_ = nullptr;
+    }
+    themeSvcProxy_ = nullptr;
 }
 
 int32_t ThemeFormClient::AddForm(const FormNotifyInfo& info)
