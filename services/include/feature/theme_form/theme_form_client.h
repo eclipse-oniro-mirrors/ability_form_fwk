@@ -28,7 +28,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-using namespace OHOS::ThemeManager;
 
 struct FormNotifyInfo {
     int64_t formId;
@@ -62,12 +61,13 @@ public:
     int32_t DeleteForms(const vector<int64_t> &formIds);
 
 private:
-    std::mutex themeSvcProxyMutex_;
     sptr<IThemeManagerService> GetProxy();
 
     void CreateThemeFormParcel(const FormNotifyInfo& info, ThemeManagerThemeFormInfoByParcel& parcel);
-    ThemeManager::ErrorCode ConvertIntToErrorCode(int32_t errorCode);
+    ErrorCode ConvertIntToErrorCode(int32_t errorCode);
+    void CleanResource();
 
+    std::mutex themeSvcProxyMutex_;
     sptr<IThemeManagerService> themeSvcProxy_ {nullptr};
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
 };

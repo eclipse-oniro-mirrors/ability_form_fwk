@@ -17,20 +17,34 @@
 #include "theme_manager_service_param.h"
 #include "fms_log_wrapper.h"
 
-namespace OHOS::ThemeManager {
+namespace OHOS::AppExecFwk {
 ThemeManagerThemeFormInfoByParcel::ThemeManagerThemeFormInfoByParcel()
 {
 }
 
 bool ThemeManagerThemeFormInfoByParcel::Marshalling(Parcel &parcel) const
 {
-    bool status = true;
-    status &= parcel.WriteString(themeFormInfo_.themeFormId);
-    status &= parcel.WriteInt64(themeFormInfo_.formId);
-    status &= parcel.WriteString(themeFormInfo_.themeId);
-    status &= parcel.WriteInt32(static_cast<int32_t>(themeFormInfo_.themeFormDimension));
-    status &= parcel.WriteInt32(static_cast<int32_t>(themeFormInfo_.themeFormLocation));
-    return status;
+    if (!parcel.WriteString(themeFormInfo_.themeFormId)) {
+        HILOG_ERROR("write themeFormId failed");
+        return false;
+    }
+    if (!parcel.WriteInt64(themeFormInfo_.formId)) {
+        HILOG_ERROR("write formId failed");
+        return false;
+    }
+    if (!parcel.WriteString(themeFormInfo_.themeId)) {
+        HILOG_ERROR("write themeId failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(themeFormInfo_.themeFormDimension))) {
+        HILOG_ERROR("write themeFormDimension failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(themeFormInfo_.themeFormLocation))) {
+        HILOG_ERROR("write themeFormLocation failed");
+        return false;
+    }
+    return true;
 }
 
 ThemeManagerThemeFormInfoByParcel *ThemeManagerThemeFormInfoByParcel::Unmarshalling(Parcel &parcel)
@@ -50,5 +64,5 @@ ThemeManagerThemeFormInfoByParcel *ThemeManagerThemeFormInfoByParcel::Unmarshall
     return obj;
 }
 
-} // namespace OHOS::ThemeManager
+} // namespace OHOS::AppExecFwk
 #endif // THEME_MGR_ENABLE

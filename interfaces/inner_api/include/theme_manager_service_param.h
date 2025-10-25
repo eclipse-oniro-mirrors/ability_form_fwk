@@ -22,7 +22,7 @@
 #include "parcel.h"
 #include "want_params.h"
 
-namespace OHOS::ThemeManager {
+namespace OHOS::AppExecFwk {
 
 enum ThemeFormDimension {
     DIMENSION_1_1 = 0,
@@ -91,9 +91,9 @@ public:
 
     virtual bool Marshalling(Parcel &parcel) const override;
     static ThemeManagerThemeFormInfoByParcel *Unmarshalling(Parcel &parcel);
-    ThemeManager::ThemeFormInfo themeFormInfo_;
+    ThemeFormInfo themeFormInfo_;
 };
 
-} // namespace OHOS::ThemeManager
+} // namespace OHOS::AppExecFwk
 #endif // THEME_MGR_ENABLE
 #endif // OHOS_FORM_FWK_THEME_MANAGER_SERVICE_PARAM_H
