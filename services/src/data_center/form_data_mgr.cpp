@@ -2194,7 +2194,7 @@ bool FormDataMgr::GetPackageForm(const FormRecord &record, const BundlePackInfo 
     HILOG_INFO("moduleName is %{public}s", record.moduleName.c_str());
     std::vector<PackageModule> modules = bundlePackInfo.summary.modules;
     for (const auto &cfg : modules) {
-        HILOG_INFO("try module %{public}s", cfg.distro.moduleName.c_str());
+        HILOG_DEBUG("try module %{public}s", cfg.distro.moduleName.c_str());
         if (record.moduleName != cfg.distro.moduleName) {
             continue;
         }
@@ -2210,6 +2210,7 @@ bool FormDataMgr::GetPackageForm(const FormRecord &record, const BundlePackInfo 
         HILOG_WARN("no ability in module:%{public}s", record.moduleName.c_str());
         return false;
     }
+    HILOG_WARN("no module");
     return false;
 }
 
@@ -2230,7 +2231,7 @@ bool FormDataMgr::GetAbilityFormInfo(const FormRecord &record, const std::vector
             }
         }
     }
-    HILOG_INFO("no matched abilityFormInfo, module:%{public}s", record.moduleName.c_str());
+    HILOG_WARN("no matched abilityFormInfo, ability:%{public}s", record.abilityName.c_str());
     return false;
 }
 
@@ -2238,7 +2239,7 @@ bool FormDataMgr::IsSameForm(const FormRecord &record, const AbilityFormInfo &ab
 {
     auto dimensionIter = Constants::DIMENSION_MAP.find(static_cast<Constants::Dimension>(record.specification));
     if (dimensionIter == Constants::DIMENSION_MAP.end()) {
-        HILOG_ERROR("valid specification:%{public}d", record.specification);
+        HILOG_ERROR("invalid specification:%{public}d", record.specification);
         return false;
     }
     auto dimension = dimensionIter->second;
@@ -2248,7 +2249,7 @@ bool FormDataMgr::IsSameForm(const FormRecord &record, const AbilityFormInfo &ab
         return true;
     }
 
-    HILOG_INFO("no same form, record:%{public}s, dimension:%{public}s, abilityFormInfo:%{public}s",
+    HILOG_ERROR("no same form, formName:%{public}s, dimension:%{public}s, abilityFormName:%{public}s",
         record.formName.c_str(), dimension.c_str(), abilityFormInfo.name.c_str());
 
     return false;
