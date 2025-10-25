@@ -65,6 +65,7 @@ private:
 
     void CreateThemeFormParcel(const FormNotifyInfo& info, ThemeManagerThemeFormInfoByParcel& parcel);
     ErrorCode ConvertIntToErrorCode(int32_t errorCode);
+    void CleanResource();
 
     std::mutex themeSvcProxyMutex_;
     sptr<IThemeManagerService> themeSvcProxy_ {nullptr};

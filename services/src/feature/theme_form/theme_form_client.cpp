@@ -48,6 +48,11 @@ ThemeFormClient::ThemeFormClient()
 
 ThemeFormClient::~ThemeFormClient()
 {
+    CleanResource();
+}
+
+void ThemeFormClient::CleanResource()
+{
     std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
     if (themeSvcProxy_ != nullptr && deathRecipient_ != nullptr) {
         auto remoteObj = themeSvcProxy_->AsObject();
@@ -135,15 +140,7 @@ ErrorCode ThemeFormClient::ConvertIntToErrorCode(int32_t errorCode)
 
 void ThemeFormClient::OnRemoteSaDied(const wptr<IRemoteObject> &object)
 {
-    std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
-    if (themeSvcProxy_ != nullptr && deathRecipient_ != nullptr) {
-        auto remoteObj = themeSvcProxy_->AsObject();
-        if (remoteObj != nullptr) {
-            remoteObj->RemoveDeathRecipient(deathRecipient_);
-        }
-        deathRecipient_ = nullptr;
-    }
-    themeSvcProxy_ = nullptr;
+    CleanResource();
 }
 
 sptr<IThemeManagerService> ThemeFormClient::GetProxy()

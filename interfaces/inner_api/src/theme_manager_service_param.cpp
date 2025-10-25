@@ -25,18 +25,23 @@ ThemeManagerThemeFormInfoByParcel::ThemeManagerThemeFormInfoByParcel()
 bool ThemeManagerThemeFormInfoByParcel::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(themeFormInfo_.themeFormId)) {
+        HILOG_ERROR("write themeFormId failed");
         return false;
     }
     if (!parcel.WriteInt64(themeFormInfo_.formId)) {
+        HILOG_ERROR("write formId failed");
         return false;
     }
     if (!parcel.WriteString(themeFormInfo_.themeId)) {
+        HILOG_ERROR("write themeId failed");
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(themeFormInfo_.themeFormDimension))) {
+        HILOG_ERROR("write themeFormDimension failed");
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(themeFormInfo_.themeFormLocation))) {
+        HILOG_ERROR("write themeFormLocation failed");
         return false;
     }
     return true;
