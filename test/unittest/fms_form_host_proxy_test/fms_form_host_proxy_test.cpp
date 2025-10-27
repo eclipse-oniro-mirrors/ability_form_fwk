@@ -459,4 +459,30 @@ HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_003, Function | MediumTest | Le
     proxy->OnLockForm(formIds, true);
     proxy->OnLockForm(formIds, false);
 }
+
+/*
+ * @tc.name: FormHostProxyTest_004
+ * @tc.desc: test OnDueControlForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_004, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormHostProxyTest, FormHostProxyTest_004, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    std::vector<int64_t> formIds{0};
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    EXPECT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormHostProxy> proxy = std::make_shared<FormHostProxy>(iremoteObject);
+    EXPECT_NE(nullptr, proxy);
+    proxy->OnDueControlForm(formIds, true, true);
+    proxy->OnDueControlForm(formIds, true, false);
+    proxy->OnDueControlForm(formIds, false, true);
+    proxy->OnDueControlForm(formIds, false, false);
+    MockWriteInterfaceToken(true);
+    proxy->OnDueControlForm(formIds, true, true);
+    proxy->OnDueControlForm(formIds, true, false);
+    proxy->OnDueControlForm(formIds, false, true);
+    proxy->OnDueControlForm(formIds, false, false);
+}
 }
