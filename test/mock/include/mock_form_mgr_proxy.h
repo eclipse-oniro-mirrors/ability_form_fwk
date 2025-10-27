@@ -123,6 +123,7 @@ public:
     MOCK_METHOD4(ReloadForms, ErrCode(int32_t &reloadNum, const std::string &moduleName,
         const std::string &abilityName, const std::string &formName));
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
+    MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
 };
 }
 }

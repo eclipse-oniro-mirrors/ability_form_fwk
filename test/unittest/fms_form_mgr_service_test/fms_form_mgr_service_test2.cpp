@@ -1434,4 +1434,19 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ReloadAllForms_0001, TestSize.Le
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_ReloadAllForms_0001 end";
 }
+
+/**
+ * @tc.name: FormMgrService_IsFormDueControl_0001
+ * @tc.desc: Verify IsFormDueControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_IsFormDueControl_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_IsFormDueControl_0001 start";
+    FormMgrService formMgrService;
+    FormMajorInfo formMajorInfo;
+    bool ret = formMgrService.IsFormDueControl(formMajorInfo, true);
+    EXPECT_FALSE(ret);
+    GTEST_LOG_(INFO) << "FormMgrService_IsFormDueControl_0001 end";
+}
 }

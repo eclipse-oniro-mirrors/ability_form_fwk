@@ -5136,4 +5136,21 @@ HWTEST_F(FormMgrTest, FormMgrTest_ReloadAllForms_003, TestSize.Level1)
     EXPECT_EQ(result, ERR_FAILED);
     GTEST_LOG_(INFO) << "FormMgrTest_ReloadAllForms_003 end";
 }
+
+/**
+ * @tc.name: FormMgrTest_IsFormDueControl_001
+ * @tc.desc: Verify IsFormDueControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_IsFormDueControl_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_IsFormDueControl_001 begin";
+    EXPECT_CALL(*mockProxy, IsFormDueControl(_, _))
+        .Times(1)
+        .WillOnce(Return(false));
+    FormMajorInfo formMajorInfo;
+    bool result = FormMgr::GetInstance().IsFormDueControl(formMajorInfo, true);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FormMgrTest_IsFormDueControl_001 end";
+}
 } // namespace
