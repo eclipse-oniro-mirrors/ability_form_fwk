@@ -1071,6 +1071,15 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
         FormRenderMgr::GetInstance().checkConnectionsFormIds(formIds, userId, needConFormIds);
     }
 
+    for (std::vector<int64_t>::iterator itFormId = needConFormIds.begin(); itFormId != needConFormIds.end();) {
+        if (!FormDataMgr::GetInstance().ExistFormRecord(*itFormId)) {
+            HILOG_WARN("not exist such form:%{public}" PRId64, *itFormId);
+            itFormId = needConFormIds.erase(itFormId);
+        } else {
+            itFormId++;
+        }
+    }
+
     if (!needConFormIds.empty()) {
         HILOG_ERROR("reAddConnections, size: %{public}zu", needConFormIds.size());
         FormRenderMgr::GetInstance().reAddConnections(needConFormIds, userId, callerToken);
