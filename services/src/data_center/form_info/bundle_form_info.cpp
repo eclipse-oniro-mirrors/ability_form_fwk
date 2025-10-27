@@ -264,13 +264,13 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos)
 {
-    HILOG_INFO("formInfo num: %{public}zu"",formDBInfo num: %{public}zu",
+    HILOG_INFO("formInfo num: %{public}zu,formDBInfo num: %{public}zu",
         inFormInfos.size(), formDBInfos.size());
     std::set<std::string> formDBNames;
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
     if (formDBNames.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
         if (inFormInfos.size() > Constants::FORM_INFO_MAX_NUM) {
-            inFormInfos.resize(inFormInfos.size() - Constants::FORM_INFO_MAX_NUM);
+            inFormInfos.resize(Constants::FORM_INFO_MAX_NUM);
         }
         outFormInfos = inFormInfos;
         return;
