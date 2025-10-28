@@ -397,7 +397,7 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
         processorId);
 #endif
     if (ret != ERR_OK) {
-        HILOG_ERROR("fail to StartAbilityByFms");
+        HILOG_ERROR("fail to StartAbilityByFms, error code: %{public}d", ret);
         if (ret == ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED ||
             ret == ERR_APPEXECFWK_FORM_GET_INFO_FAILED || ret == ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
             NapiFormUtil::ThrowByInternalErrorCode(env, ret);
