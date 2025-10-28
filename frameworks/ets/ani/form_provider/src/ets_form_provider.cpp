@@ -104,7 +104,7 @@ ani_object GetFormsInfo([[maybe_unused]] ani_env *env, const ani_object filter)
         CheckIfRefValidOrThrow(env, formInfoAni);
         SetFormInfoFields(env, formInfoAni, formInfo);
         ani_status status = env->Object_CallMethodByName_Void(formInfosArray, ANI_SETTER_MARKER,
-            "iC{std.core.Object}:", index, formInfoAni);
+            "iY:", index, formInfoAni);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void failed, error code: %{public}d", static_cast<int>(status));
             PrepareExceptionAndThrow(env, static_cast<int>(AppExecFwk::ERR_FORM_EXTERNAL_PARAM_INVALID));
