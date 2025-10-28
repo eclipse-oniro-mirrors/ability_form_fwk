@@ -382,33 +382,31 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
     want.SetParam(key, value);
     HILOG_DEBUG("JsFormProvider OnOpenFormManager want:%{public}s", want.ToString().c_str());
 
-    NapiAsyncTask::CompleteCallback complete =
-            [want](napi_env env, NapiAsyncTask &task, int32_t status) {
 #ifdef NO_RUNTIME_EMULATOR
-                int64_t processorId = FormEventHiAppEvent::AddProcessor();
-                HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
-                time_t beginTime = time(nullptr);
+    int64_t processorId = FormEventHiAppEvent::AddProcessor();
+    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
+    time_t beginTime = time(nullptr);
 #endif
-                auto ret = FormMgr::GetInstance().StartAbilityByFms(want);
+    auto ret = FormMgr::GetInstance().StartAbilityByFms(want);
 #ifdef NO_RUNTIME_EMULATOR
-                PublishFormData publishFormData = {want.GetBundle(), want.GetElement().GetAbilityName(),
-                    want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
-                    want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
-                    want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
-                FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManager", publishFormData,
-                    processorId);
+    PublishFormData publishFormData = {want.GetBundle(), want.GetElement().GetAbilityName(),
+        want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
+        want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
+        want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
+    FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManager", publishFormData,
+        processorId);
 #endif
-                if (ret != ERR_OK) {
-                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
-                    return;
-                }
-                task.ResolveWithNoError(env, CreateJsUndefined(env));
-            };
-
-    napi_value result = nullptr;
-    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnOpenFormManager",
-        env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
-    return result;
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail to StartAbilityByFms, error code: %{public}d", static_cast<int>(ret));
+        if (ret == ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED ||
+            ret == ERR_APPEXECFWK_FORM_GET_INFO_FAILED || ret == ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
+            NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+        } else {
+            NapiFormUtil::Throw(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,
+                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        }
+    }
+    return CreateJsUndefined(env);
 }
 
 napi_value JsFormProvider::OpenFormManagerCrossBundle(napi_env env, napi_callback_info info)
