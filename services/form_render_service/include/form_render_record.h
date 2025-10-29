@@ -317,6 +317,8 @@ private:
     void RuntimeMemoryMonitor();
     void PostReAddRecycledForms(const FormJsInfo &formJsInfo, const Want &want);
     void ReAddStaticRecycledForms(const int64_t formId);
+    void HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
+        const sptr<IFormSupply> &formSupplyClient, int32_t renderType);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;

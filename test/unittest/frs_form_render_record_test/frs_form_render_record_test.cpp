@@ -2429,10 +2429,10 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_126, TestSize.Level1)
     FormJsInfo formJsInfo3;
     std::vector<FormJsInfo> formJsInfos = {formJsInfo1, formJsInfo2, formJsInfo3};
     std::string bundleName = "<bundleName>";
- 
+
     formRenderRecordPtr_->eventHandler_ = nullptr;
     EXPECT_EQ(formRenderRecordPtr_->ReAddRecycledForms(formJsInfos), ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL);
- 
+
     auto eventRunner = EventRunner::Create(bundleName);
     formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
     EXPECT_EQ(formRenderRecordPtr_->ReAddRecycledForms(formJsInfos), ERR_OK);
@@ -2928,4 +2928,24 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_156, TestSize.Level1)
     formRenderRecordPtr_->RecordFormVisibility(formId, true);
     EXPECT_TRUE(formRenderRecordPtr_->IsFormVisible(formId));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_156 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_157
+ * @tc.desc: Verify RecordFormVisibility
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_157, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_157 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->visibilityMap_.clear();
+    int64_t formId = 100;
+    formRenderRecordPtr_->RecordFormVisibility(formId, true);
+    EXPECT_EQ(formRenderRecordPtr_->visibilityMap_.size(), 1);
+    EXPECT_TRUE(formRenderRecordPtr_->visibilityMap_[formId]);
+
+    formRenderRecordPtr_->RecordFormVisibility(formId, false);
+    EXPECT_EQ(formRenderRecordPtr_->visibilityMap_.size(), 0);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_157 end";
 }
