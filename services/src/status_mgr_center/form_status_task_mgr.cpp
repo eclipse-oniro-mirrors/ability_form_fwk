@@ -32,7 +32,7 @@ namespace AppExecFwk {
 namespace {
 constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 3000;
 constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
-constexpr int64_t RELEASE_RENDER_DELAY_TIME = 20;
+constexpr int64_t RELEASE_RENDER_DELAY_TIME = 40;
 constexpr int64_t RELEASE_RENDER_DELAY_MSG = 2;
 }
 FormStatusTaskMgr::FormStatusTaskMgr()
