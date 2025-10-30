@@ -46,7 +46,8 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "intl",
     "systemDateTime",
     "batteryInfo",
-    "commonEventManager"
+    "commonEventManager",
+    "graphics.uiEffect"
 };
 const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "i18n",
