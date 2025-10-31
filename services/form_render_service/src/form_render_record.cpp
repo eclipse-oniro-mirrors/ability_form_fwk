@@ -940,9 +940,9 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
     return true;
 }
 
-bool FormRenderRecord::CheckEventHandler(bool createThead, bool needMonitored)
+bool FormRenderRecord::CheckEventHandler(bool createThread, bool needMonitored)
 {
-    GetEventHandler(createThead, needMonitored);
+    GetEventHandler(createThread, needMonitored);
     return eventHandler_ != nullptr;
 }
 
@@ -1355,9 +1355,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
     Release();
     UpdateAllFormRequest(formJsInfos, true);
     SetEventHandlerNeedResetFlag(false);
-    {
-        GetEventHandler(true,true);
-    }
+    GetEventHandler(true,true);
     return ReAddRecycledForms(formJsInfos) == ERR_OK;
 }
 
@@ -1944,10 +1942,10 @@ sptr<IFormSupply> FormRenderRecord::GetFormSupplyClient()
     return formSupplyClient_;
 }
 
-std::shared_ptr<EventHandler> FormRenderRecord::GetEventHandler(bool createThead, bool needMonitored)
+std::shared_ptr<EventHandler> FormRenderRecord::GetEventHandler(bool createThread, bool needMonitored)
 {
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (eventHandler_ == nullptr && createThead) {
+    if (eventHandler_ == nullptr && createThread) {
         CreateEventHandler(bundleName_, needMonitored);
     }
     return eventHandler_;
@@ -2151,7 +2149,8 @@ void FormRenderRecord::ParseFormLocationMap(std::vector<std::string> &formName, 
 
 void FormRenderRecord::RuntimeMemoryMonitor()
 {
-    if (runtime_ == nullptr || eventHandler_ == nullptr) {
+    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
+    if (runtime_ == nullptr || eventHandler == nullptr) {
         return;
     }
 
@@ -2172,9 +2171,7 @@ void FormRenderRecord::RuntimeMemoryMonitor()
         objSize = nativeEnginePtr->GetHeapObjectSize();
         limitSize = nativeEnginePtr->GetHeapLimitSize();
     };
-    auto eventHandler = GetEventHandler();
-    if (eventHandler != nullptr)
-        eventHandler->PostSyncTask(task, "RuntimeMemoryMonitorTask");
+    eventHandler->PostSyncTask(task, "RuntimeMemoryMonitorTask");
 
     uint64_t processMemory = GetPss();
     HILOG_INFO("processMemory: %{public}" PRIu64 ", bundleName: %{public}s, totalSize: %{public}zu, "
