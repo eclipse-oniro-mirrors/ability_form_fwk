@@ -95,7 +95,6 @@ void MockIsCaller(bool mockRet);
 
 namespace {
 constexpr int32_t DEFAULT_CALLING_UID = 20000001;
-constexpr int32_t SYSTEM_UID = 1000;
 
 class FmsFormMgrAdapterTest2 : public testing::Test {
 public:
@@ -845,7 +844,9 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0152, TestSize.Level0)
     formInfo.abilityName = "abilityName1";
     formInfo.moduleName = "moduleName1";
     FormItemInfo itemInfo = {};
-    EXPECT_EQ(ERR_OK, formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfo, itemInfo));
+    Want want = {};
+    MockGetCallerBundleName(false);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfo, itemInfo, want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0152 end";
 }
 
@@ -2656,25 +2657,5 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_245, TestSize.Level0)
     int64_t formId1 = 1;
     formMgrAdapter.RemoveFormIdMapElement(formId1);
     GTEST_LOG_(INFO) << "FormMgrAdapter_245 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_SetHostBundleName_001
- * @tc.desc: test SetHostBundleName function and the return value is ERR_OK.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_SetHostBundleName_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_SetHostBundleName_001 start";
-    FormMgrAdapter formMgrAdapter;
-    FormItemInfo itemInfo = {};
-    Want want = {};
-    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillOnce(Return(SYSTEM_UID));
-    EXPECT_EQ(ERR_OK, formMgrAdapter.SetHostBundleName(want, itemInfo));
-    MockGetCallerBundleName(true);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.SetHostBundleName(want, itemInfo));
-    MockGetCallerBundleName(false);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.SetHostBundleName(want, itemInfo));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_SetHostBundleName_001 end";
 }
 }

@@ -62,7 +62,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formMgrAdapter.GetFormItemInfo(want, bundleInfo, formInfos, info);
     int dimensionId = static_cast<int>(GetU32Data(data));
     formMgrAdapter.IsDimensionValid(formInfos, dimensionId);
-    formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfos, info);
+    formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfos, info, want);
     Want wants;
     formMgrAdapter.CheckPublishForm(wants);
     formMgrAdapter.QueryPublishFormToHost(wants);
