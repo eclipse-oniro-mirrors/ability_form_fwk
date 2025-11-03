@@ -167,15 +167,6 @@ void FormEventUtil::HandleFormReload(
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    // trigger formExtesnionAbility onAddForm callback
-    for (const auto& record : updatedForms) {
-        auto itr = record.wantCacheMap.find(record.formId);
-        if (itr == record.wantCacheMap.end()) {
-            continue;
-        }
-        FormMgrAdapter::GetInstance().ReAcquireProviderFormInfoAsync(record, itr->second);
-    }
-
     FormMgrAdapter::GetInstance().DelayRefreshForms(updatedForms, want);
     if (needReload) {
         FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
