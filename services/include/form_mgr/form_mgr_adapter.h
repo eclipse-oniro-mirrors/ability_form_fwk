@@ -794,7 +794,7 @@ public:
      * @param wantParams WantParams of the request.
      * @return Returns ERR_OK on success, others on failure.
      */
-    void ReAcquireProviderFormInfoAsync(const FormRecord &record, const Want &want);
+    ErrCode ReAcquireProviderFormInfoAsync(const FormRecord &record, const Want &want);
 
     /**
      * @brief Reacquire form info from form provider.
@@ -873,7 +873,7 @@ private:
 
     /**
      * @brief Set hostBundleName of formItemInfo.
-     * @param want The want of the request.
+     * @param want The want of the request..
      * @param itemInfo Form item info.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -929,7 +929,7 @@ private:
 
     /**
      * @brief Acquire form data from form provider.
-     * @param formId The Id of the form.
+     * @param formId The Id of the form..
      * @param info Form configure info.
      * @param wantParams WantParams of the request.
      * @return Returns ERR_OK on success, others on failure.

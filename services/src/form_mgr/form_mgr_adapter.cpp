@@ -4686,20 +4686,19 @@ int32_t FormMgrAdapter::GetCallingUserId()
     return callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
 }
 
-void FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormRecord &formRecord, const Want &want)
+ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormRecord &formRecord, const Want &want)
 {
     // get bundleInfo
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("get IBundleMgr failed");
-        return;
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     BundleInfo bundleInfo;
-    ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(want.GetElement().GetBundleName(),
-        formRecord.userId, bundleInfo);
+    ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(want.GetElement().GetBundleName(), formRecord.userId, bundleInfo);
     if (errCode != ERR_OK) {
         HILOG_ERROR("get bundleInfo failed");
-        return;
+        return errCode;
     }
 
     // get formInfo
@@ -4707,7 +4706,7 @@ void FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormRecord &formRecord
     errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
     if (errCode != ERR_OK) {
         HILOG_ERROR("get formInfo failed");
-        return;
+        return errCode;
     }
 
     // get formItemInfo
@@ -4717,7 +4716,7 @@ void FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormRecord &formRecord
     if (errCode != ERR_OK) {
         HILOG_ERROR("get form config info failed. formId: %{public}" PRId64 " code: %{public}d",
             formRecord.formId, errCode);
-        return;
+        return errCode;
     }
 
     const auto& wantParams = want.GetParams();
@@ -4725,6 +4724,8 @@ void FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormRecord &formRecord
         ReAcquireProviderFormInfoAsync(formItemInfo, wantParams);
     };
     FormMgrQueue::GetInstance().ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, task);
+
+    return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams)
