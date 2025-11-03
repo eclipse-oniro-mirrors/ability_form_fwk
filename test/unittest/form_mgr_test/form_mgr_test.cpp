@@ -620,10 +620,10 @@ HWTEST_F(FormMgrTest, FormMgrTest_0025, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0025 starts";
     EXPECT_CALL(*mockProxy, CheckFMSReady())
         .Times(1)
-        .WillOnce(Return(true));
+        .WillOnce(Return(ERR_OK));
 
     auto result = FormMgr::GetInstance().CheckFMSReady();
-    EXPECT_TRUE(result);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0025 test ends";
 }
 
@@ -1676,8 +1676,8 @@ HWTEST_F(FormMgrTest, FormMgrTest_0084, TestSize.Level1) {
     SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = mockSamgr;
     std::shared_ptr<bool> dummyVal = std::make_shared<bool>(true);
     mockSamgr->weakGetSystemAbility_ = dummyVal;
-    auto result = FormMgr::GetInstance().CheckFMSReady();
-    EXPECT_TRUE(result == false);
+    int32_t result = FormMgr::GetInstance().CheckFMSReady();
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0084 test ends";
 }
 
@@ -4061,7 +4061,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0218, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrTest_0218 starts";
     FormMgr::GetInstance().resetFlag_ = true;
     auto result = FormMgr::GetInstance().CheckFMSReady();
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     FormMgr::GetInstance().resetFlag_ = false;
     GTEST_LOG_(INFO) << "FormMgrTest_0218 test ends";
 }

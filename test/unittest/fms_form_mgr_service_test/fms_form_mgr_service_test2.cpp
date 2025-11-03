@@ -1200,22 +1200,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0133, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0134
- * @tc.name: test CheckFMSReady function.
- * @tc.desc: userId == Constants::ANY_USERID.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0134, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0134 start";
-    FormMgrService formMgrService;
-    formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    constexpr int32_t userId = Constants::ANY_USERID;
-
-    EXPECT_FALSE(formMgrService.CheckFMSReady());
-    GTEST_LOG_(INFO) << "FormMgrService_0134 end";
-}
-
-/**
  * @tc.number: FormMgrService_0135
  * @tc.name: test IsSystemAppForm function.
  * @tc.desc: !formRecords.empty()

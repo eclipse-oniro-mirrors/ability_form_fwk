@@ -434,9 +434,9 @@ public:
 
     /**
     * @brief Check form manager service ready.
-    * @return Return true if form manager service Ready; return false otherwise.
+    * @return Returns ERR_OK if form manager service Ready, other values otherwise.
     */
-    virtual bool CheckFMSReady() = 0;
+    virtual int32_t CheckFMSReady() = 0;
 
     /**
      * @brief Check whether the form is system app.

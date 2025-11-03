@@ -91,11 +91,19 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0001 start";
     FormMgrService formMgrService;
+    formMgrService.state_ = ServiceRunningState::STATE_NOT_START;
+    EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_APPEXECFWK_FORM_COMMON_CODE);
+ 
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    constexpr int32_t userId = 0;
-    MockGetCurrentAccountIdRet(userId);
+    MockGetCurrentAccountIdRet(Constants::ANY_USERID);
+    EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_APPEXECFWK_FORM_COMMON_CODE);
+ 
+    MockGetCurrentAccountIdRet(0);
+    FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = false;
+    EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_APPEXECFWK_FORM_COMMON_CODE);
+ 
     FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = true;
-    EXPECT_TRUE(formMgrService.CheckFMSReady());
+    EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0001 end";
 }
 

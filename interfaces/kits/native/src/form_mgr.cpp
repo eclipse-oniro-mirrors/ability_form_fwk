@@ -1379,21 +1379,21 @@ int32_t FormMgr::AcquireFormData(int64_t formId, int64_t requestCode, const sptr
     return remoteProxy_->AcquireFormData(formId, requestCode, callerToken, formData);
 }
 
-bool FormMgr::CheckFMSReady()
+int32_t FormMgr::CheckFMSReady()
 {
     HILOG_DEBUG("call");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        return false;
+        return errCode;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    bool resultCode = remoteProxy_->CheckFMSReady();
-    if (resultCode == false) {
-        HILOG_ERROR("CheckFMSReady failed");
+    int32_t resultCode = remoteProxy_->CheckFMSReady();
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("resultCode:%{public}d", resultCode);
     }
     return resultCode;
 }

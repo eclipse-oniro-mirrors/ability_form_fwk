@@ -383,9 +383,9 @@ public:
 
     /**
     * @brief Check form manager service ready.
-    * @return Return true if form manager service Ready; return false otherwise.
+    * @return Returns ERR_OK if form manager service Ready, other values otherwise.
     */
-    bool CheckFMSReady() override;
+    int32_t CheckFMSReady() override;
 
     /**
      * @brief Check whether the form is system app.

@@ -325,35 +325,6 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_011, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrService_0001
- * @tc.desc: test CheckFMSReady function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormHostRecordTest, FormMgrService_0001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0001 start";
-    FormMgrService formMgrService;
-    formMgrService.state_ = ServiceRunningState::STATE_NOT_START;
-    EXPECT_EQ(false, formMgrService.CheckFMSReady());
-    GTEST_LOG_(INFO) << "FormMgrService_0001 end";
-}
-
-/**
- * @tc.name: FormMgrService_0003
- * @tc.desc: test CheckFMSReady function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormHostRecordTest, FormMgrService_0003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0003 start";
-    FormMgrService formMgrService;
-    formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = true;
-    EXPECT_EQ(true, formMgrService.CheckFMSReady());
-    GTEST_LOG_(INFO) << "FormMgrService_0003 end";
-}
-
-/**
  * @tc.name: FormMgrService_0004
  * @tc.desc: test LifecycleUpdate function.
  * @tc.type: FUNC

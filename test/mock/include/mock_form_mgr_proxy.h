@@ -54,7 +54,7 @@ public:
     MOCK_METHOD2(DumpFormInfoByBundleName, int(const std::string &bundleName, std::string &formInfos));
     MOCK_METHOD3(AcquireFormState, int(const Want &want, const sptr<IRemoteObject> &callerToken,
         FormStateInfo &stateInfo));
-    MOCK_METHOD0(CheckFMSReady, bool());
+    MOCK_METHOD0(CheckFMSReady, int32_t());
     MOCK_METHOD3(NotifyWhetherVisibleForms, int(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType));
     MOCK_METHOD2(CastTempForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken));

@@ -71,7 +71,7 @@ public:
     MOCK_METHOD2(StartAbility, int32_t(const Want &want, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD4(ShareForm, int32_t(int64_t, const std::string&, const sptr<IRemoteObject>&, int64_t));
     MOCK_METHOD1(RecvFormShareInfoFromRemote, int32_t(const FormShareInfo&));
-    MOCK_METHOD0(CheckFMSReady, bool());
+    MOCK_METHOD0(CheckFMSReady, int32_t());
     MOCK_METHOD2(StopRenderingForm, int32_t(const int64_t formId, const std::string &compId));
     MOCK_METHOD2(SetBackgroundFunction, int32_t(const std::string funcName, const std::string params));
     MOCK_METHOD4(AcquireFormData, int32_t(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,

@@ -955,7 +955,7 @@ private:
         auto complete = [](napi_env env, NapiAsyncTask &task, int32_t status) {
             // Use original logic.
             // Use the error code to return whether the function executed successfully.
-            auto ret = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
+            auto ret = FormMgr::GetInstance().CheckFMSReady();
             if (ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {

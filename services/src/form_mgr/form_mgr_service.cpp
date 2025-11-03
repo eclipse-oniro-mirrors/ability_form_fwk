@@ -172,25 +172,28 @@ FormMgrService::~FormMgrService()
 
 /**
 * @brief Check form manager service ready.
-* @return Return true if form manager service Ready; return false otherwise.
+* @return Returns ERR_OK if form manager service Ready, other values otherwise.
 */
-
-bool FormMgrService::CheckFMSReady()
+int32_t FormMgrService::CheckFMSReady()
 {
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
     if (state_ != ServiceRunningState::STATE_RUNNING) {
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (userId == Constants::ANY_USERID) {
         HILOG_ERROR("empty account");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_CheckFMSReady",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     bool result = FormInfoMgr::GetInstance().HasReloadedFormInfos();
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    return result;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
@@ -1406,7 +1409,7 @@ int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
-    if (!CheckFMSReady()) {
+    if (CheckFMSReady() != ERR_OK) {
         HILOG_ERROR("fms not ready");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
