@@ -2131,15 +2131,21 @@ void FormMgrService::PostConnectNetWork()
     FormMgrQueue::GetInstance().ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
     HILOG_DEBUG("end");
 }
-bool FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().RegisterOverflowProxy(callerToken);
 }
 
-bool FormMgrService::UnregisterOverflowProxy()
+ErrCode FormMgrService::UnregisterOverflowProxy()
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().UnregisterOverflowProxy();
 }
 
@@ -2150,15 +2156,21 @@ ErrCode FormMgrService::RequestOverflow(const int64_t formId, const OverflowInfo
     return FormMgrAdapter::GetInstance().RequestOverflow(formId, callingUid, overflowInfo, isOverflow);
 }
 
-bool FormMgrService::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().RegisterChangeSceneAnimationStateProxy(callerToken);
 }
 
-bool FormMgrService::UnregisterChangeSceneAnimationStateProxy()
+ErrCode FormMgrService::UnregisterChangeSceneAnimationStateProxy()
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().UnregisterChangeSceneAnimationStateProxy();
 }
 
@@ -2169,15 +2181,21 @@ ErrCode FormMgrService::ChangeSceneAnimationState(const int64_t formId, int32_t 
     return FormMgrAdapter::GetInstance().ChangeSceneAnimationState(formId, callingUid, state);
 }
 
-bool FormMgrService::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }    
     return FormMgrAdapter::GetInstance().RegisterGetFormRectProxy(callerToken);
 }
 
-bool FormMgrService::UnregisterGetFormRectProxy()
+ErrCode FormMgrService::UnregisterGetFormRectProxy()
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }    
     return FormMgrAdapter::GetInstance().UnregisterGetFormRectProxy();
 }
 
@@ -2199,15 +2217,21 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const int32_t newDi
     return FormMgrAdapter::GetInstance().UpdateFormSize(formId, newDimension, newRect);
 }
 
-bool FormMgrService::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }    
     return FormMgrAdapter::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);
 }
 
-bool FormMgrService::UnregisterGetLiveFormStatusProxy()
+ErrCode FormMgrService::UnregisterGetLiveFormStatusProxy()
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }    
     return FormMgrAdapter::GetInstance().UnregisterGetLiveFormStatusProxy();
 }
 

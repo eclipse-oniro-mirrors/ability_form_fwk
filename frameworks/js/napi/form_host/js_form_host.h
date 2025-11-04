@@ -57,21 +57,21 @@ public:
 
     ErrCode RouterEvent(const int64_t formId, const OHOS::AAFwk::Want &want);
     
-    bool RegisterOverflowListener(napi_env env, napi_ref callback);
+    ErrCode RegisterOverflowListener(napi_env env, napi_ref callback);
 
-    bool UnregisterOverflowListener();
+    ErrCode UnregisterOverflowListener();
     
-    bool RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callback);
+    ErrCode RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callback);
 
-    bool UnregisterChangeSceneAnimationStateListener();
+    ErrCode UnregisterChangeSceneAnimationStateListener();
 
-    bool RegisterGetFormRectListener(napi_env env, napi_ref callback);
+    ErrCode RegisterGetFormRectListener(napi_env env, napi_ref callback);
 
-    bool UnregisterGetFormRectListener();
+    ErrCode UnregisterGetFormRectListener();
 
-    bool RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
+    ErrCode RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
 
-    bool UnregisterGetLiveFormStatusListener();
+    ErrCode UnregisterGetLiveFormStatusListener();
 private:
     static std::mutex mutex_;
     static sptr<JsFormRouterProxyMgr> instance_;
@@ -102,6 +102,11 @@ private:
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
+
+    mutable std::mutex registerOverflowProxyMutex_;
+    mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
+    mutable std::mutex registerGetFormRectProxyMutex_;
+    mutable std::mutex registerGetLiveFormStatusProxyMutex_;
 };
 
 class PromiseCallbackInfo {

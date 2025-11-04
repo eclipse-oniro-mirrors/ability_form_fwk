@@ -1896,8 +1896,8 @@ ErrCode FormMgrStub::HandleRegisterOverflowProxy(MessageParcel &data, MessagePar
 {
     HILOG_INFO("Handle save overflow proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
-    bool result = RegisterOverflowProxy(callerToken);
-    if (!reply.WriteBool(result)) {
+    ErrCode result = RegisterOverflowProxy(callerToken);
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -1907,8 +1907,8 @@ ErrCode FormMgrStub::HandleRegisterOverflowProxy(MessageParcel &data, MessagePar
 ErrCode FormMgrStub::HandleUnregisterOverflowProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
-    bool result = UnregisterOverflowProxy();
-    if (!reply.WriteBool(result)) {
+    ErrCode result = UnregisterOverflowProxy();
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write proxy failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -1939,8 +1939,8 @@ ErrCode FormMgrStub::HandleRegisterChangeSceneAnimationStateProxy(MessageParcel 
 {
     HILOG_INFO("call");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
-    bool result = RegisterChangeSceneAnimationStateProxy(callerToken);
-    if (!reply.WriteBool(result)) {
+    ErrCode result = RegisterChangeSceneAnimationStateProxy(callerToken);
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -1950,8 +1950,8 @@ ErrCode FormMgrStub::HandleRegisterChangeSceneAnimationStateProxy(MessageParcel 
 ErrCode FormMgrStub::HandleUnregisterChangeSceneAnimationStateProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
-    bool result = UnregisterChangeSceneAnimationStateProxy();
-    if (!reply.WriteBool(result)) {
+    ErrCode result = UnregisterChangeSceneAnimationStateProxy();
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -1975,8 +1975,8 @@ ErrCode FormMgrStub::HandleRegisterGetFormRectProxy(MessageParcel &data, Message
 {
     HILOG_DEBUG("handle save query proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
-    bool result = RegisterGetFormRectProxy(callerToken);
-    if (!reply.WriteBool(result)) {
+    ErrCode result = RegisterGetFormRectProxy(callerToken);
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write proxy failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -1986,8 +1986,8 @@ ErrCode FormMgrStub::HandleRegisterGetFormRectProxy(MessageParcel &data, Message
 ErrCode FormMgrStub::HandleUnregisterGetFormRectProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
-    bool result = UnregisterGetFormRectProxy();
-    if (!reply.WriteBool(result)) {
+    ErrCode result = UnregisterGetFormRectProxy();
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -2035,8 +2035,8 @@ ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, M
 {
     HILOG_DEBUG("handle save query proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
-    bool result = RegisterGetLiveFormStatusProxy(callerToken);
-    if (!reply.WriteBool(result)) {
+    ErrCode result = RegisterGetLiveFormStatusProxy(callerToken);
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write proxy failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -2046,8 +2046,8 @@ ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, M
 ErrCode FormMgrStub::HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
-    bool result = UnregisterGetLiveFormStatusProxy();
-    if (!reply.WriteBool(result)) {
+    ErrCode result = UnregisterGetLiveFormStatusProxy();
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
