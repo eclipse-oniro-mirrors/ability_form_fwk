@@ -339,9 +339,9 @@ public:
     {
         return ERR_OK;
     }
-    bool CheckFMSReady() override
+    int32_t CheckFMSReady() override
     {
-        return false;
+        return ERR_OK;
     }
     ErrCode RegisterFormAddObserverByBundle(const std::string bundleName,
         const sptr<IRemoteObject> &callerToken) override

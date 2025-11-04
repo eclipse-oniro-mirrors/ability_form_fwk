@@ -1682,14 +1682,14 @@ int32_t FormMgrProxy::RecvFormShareInfoFromRemote(const FormShareInfo &info)
     return reply.ReadInt32();
 }
 
-bool FormMgrProxy::CheckFMSReady()
+int32_t FormMgrProxy::CheckFMSReady()
 {
     HILOG_DEBUG("start");
     MessageParcel data;
     // write in token to help identify which stub to be called
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
-        return false;
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     // send request
     MessageParcel reply;
@@ -1698,10 +1698,10 @@ bool FormMgrProxy::CheckFMSReady()
         IFormMgr::Message::FORM_MGR_CHECK_FMS_READY, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return false;
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     // retrieve and return result;
-    return reply.ReadBool();
+    return reply.ReadInt32();
 }
 
 bool FormMgrProxy::IsSystemAppForm(const std::string &bundleName)

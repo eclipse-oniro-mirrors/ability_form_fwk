@@ -2307,7 +2307,7 @@ HWTEST_F(FmsFormMgrProxyTest, CheckFMSReady_0100, Function | MediumTest | Level1
     ASSERT_NE(nullptr, proxy);
 
     int32_t result = proxy->CheckFMSReady();
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
 
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, CheckFMSReady_0100, end";
 }

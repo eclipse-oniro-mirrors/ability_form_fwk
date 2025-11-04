@@ -1252,8 +1252,8 @@ int32_t FormMgrStub::HandleStartAbilityByCrossBundle(MessageParcel &data, Messag
 int32_t FormMgrStub::HandleCheckFMSReady(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    bool result = CheckFMSReady();
-    if (!reply.WriteBool(result)) {
+    int32_t result = CheckFMSReady();
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write action failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

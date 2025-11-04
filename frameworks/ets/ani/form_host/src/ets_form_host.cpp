@@ -1268,7 +1268,7 @@ void IsSystemReady([[maybe_unused]] ani_env *env, ani_object callback)
         return;
     }
 
-    auto ret = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
+    auto ret = FormMgr::GetInstance().CheckFMSReady();
     if (ret != ERR_OK) {
         HILOG_ERROR("CheckFMSReady not ready");
         InvokeAsyncWithBusinessError(env, callback, ret, nullptr);

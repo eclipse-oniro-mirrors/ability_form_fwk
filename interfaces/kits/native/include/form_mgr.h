@@ -501,10 +501,9 @@ public:
 
     /**
      * @brief Check form manager service ready.
-     *
-     * @return Return true if form manager service ready; returns false otherwise.
+     * @return Returns ERR_OK if form manager service Ready, other values otherwise.
      */
-    bool CheckFMSReady();
+    int32_t CheckFMSReady();
 
     /**
      * @brief Check whether the form is system app.
