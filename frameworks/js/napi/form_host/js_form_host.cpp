@@ -1924,12 +1924,8 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
-        result = JsFormRouterProxyMgr::GetInstance()->RegisterOverflowListener(env, callbackRef);
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterOverflowListener(env, callbackRef);
+        return CreateJsValue(env, ret);
     }
     
     napi_value OffRegisterOverflowListener(napi_env env)
@@ -1940,12 +1936,8 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
-        result = JsFormRouterProxyMgr::GetInstance()->UnregisterOverflowListener();
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterOverflowListener();
+        return CreateJsValue(env, ret);
     }
 
     napi_value OnRegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
@@ -1957,13 +1949,9 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
-        result = JsFormRouterProxyMgr::GetInstance()->RegisterChangeSceneAnimationStateListener(
+        bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterChangeSceneAnimationStateListener(
             env, callbackRef);
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        return CreateJsValue(env, ret);
     }
 
     napi_value OffRegisterChangeSceneAnimationStateListener(napi_env env)
@@ -1974,12 +1962,8 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);;
         }
-        result = JsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
+        return CreateJsValue(env, ret);
     }
 
     napi_value OnRegisterGetFormRectListener(napi_env env, napi_ref callbackRef)
@@ -1991,13 +1975,9 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
-        result = JsFormRouterProxyMgr::GetInstance()->RegisterGetFormRectListener(
+        bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterGetFormRectListener(
             env, callbackRef);
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        return CreateJsValue(env, ret);
     }
 
     napi_value OffRegisterGetFormRectListener(napi_env env)
@@ -2008,12 +1988,8 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
-        result = JsFormRouterProxyMgr::GetInstance()->UnregisterGetFormRectListener();
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterGetFormRectListener();
+        return CreateJsValue(env, ret);
     }
 
     napi_value OnUpdateFormSize(napi_env env, size_t argc, napi_value* argv)
@@ -2112,13 +2088,9 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
-        result = JsFormRouterProxyMgr::GetInstance()->RegisterGetLiveFormStatusListener(
+        bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterGetLiveFormStatusListener(
             env, callbackRef);
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        return CreateJsValue(env, ret);
     }
  
     napi_value OffRegisterGetLiveFormStatusListener(napi_env env)
@@ -2129,12 +2101,8 @@ private:
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
-        result = JsFormRouterProxyMgr::GetInstance()->UnregisterGetLiveFormStatusListener();
-        if (result != ERR_OK) {
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
+        bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterGetLiveFormStatusListener();
+        return CreateJsValue(env, ret);
     }
 };
 
@@ -2284,14 +2252,14 @@ void JsFormRouterProxyMgr::RemoveFormRouterProxyCallback(const std::vector<int64
     }
 }
 
-ErrCode JsFormRouterProxyMgr::RegisterOverflowListener(napi_env env, napi_ref callbackRef)
+bool JsFormRouterProxyMgr::RegisterOverflowListener(napi_env env, napi_ref callbackRef)
 {
     std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
     HILOG_INFO("call");
 
     if (callbackRef == nullptr) {
         HILOG_ERROR("Invalid callback reference");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
 
     if (overflowRegisterCallback_ != nullptr) {
@@ -2308,20 +2276,20 @@ ErrCode JsFormRouterProxyMgr::RegisterOverflowListener(napi_env env, napi_ref ca
     napi_typeof(env, callback, &valueType);
     if (valueType != napi_function) {
         HILOG_ERROR("Callback is not a function");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
 
     HILOG_INFO("Listener registered successfully");
-    return ERR_OK;
+    return true;
 }
 
-ErrCode JsFormRouterProxyMgr::UnregisterOverflowListener()
+bool JsFormRouterProxyMgr::UnregisterOverflowListener()
 {
     std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
     HILOG_INFO("call");
     overflowRegisterCallback_ = nullptr;
     overflowEnv_ = nullptr;
-    return ERR_OK;
+    return true;
 }
 
 ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo,
@@ -2417,14 +2385,14 @@ void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::Over
     napi_close_handle_scope(env, scope);
 }
 
-ErrCode JsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
+bool JsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
 {
     std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
     HILOG_INFO("call");
 
     if (callbackRef == nullptr) {
         HILOG_ERROR("Invalid callback reference");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
 
     if (changeSceneAnimationStateRigisterCallback_ != nullptr) {
@@ -2441,20 +2409,20 @@ ErrCode JsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(napi_env
     napi_typeof(env, callback, &valueType);
     if (valueType != napi_function) {
         HILOG_ERROR("Callback is not a function");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
 
     HILOG_INFO("Listener registered successfully");
-    return ERR_OK;
+    return true;
 }
 
-ErrCode JsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
+bool JsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
 {
     std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
     HILOG_INFO("call");
     changeSceneAnimationStateRigisterCallback_ = nullptr;
     changeSceneAnimationStateEnv_ = nullptr;
-    return ERR_OK;
+    return true;
 }
 
 ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, int32_t state)
@@ -2519,13 +2487,13 @@ void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(std::shared_ptr<LiveFo
     napi_close_handle_scope(changeSceneAnimationStateEnv_, scope);
 }
 
-ErrCode JsFormRouterProxyMgr::RegisterGetFormRectListener(napi_env env, napi_ref callbackRef)
+bool JsFormRouterProxyMgr::RegisterGetFormRectListener(napi_env env, napi_ref callbackRef)
 {
     std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
     HILOG_INFO("call");
     if (callbackRef == nullptr) {
         HILOG_ERROR("Invalid callback reference");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
 
     if (getFormRectCallbackRef_ != nullptr) {
@@ -2542,20 +2510,20 @@ ErrCode JsFormRouterProxyMgr::RegisterGetFormRectListener(napi_env env, napi_ref
     napi_typeof(env, callback, &valueType);
     if (valueType != napi_function) {
         HILOG_ERROR("Callback is not a function");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
 
     HILOG_INFO("Listener registered successfully");
-    return ERR_OK;
+    return true;
 }
 
-ErrCode JsFormRouterProxyMgr::UnregisterGetFormRectListener()
+bool JsFormRouterProxyMgr::UnregisterGetFormRectListener()
 {
     std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
     HILOG_INFO("call");
     getFormRectCallbackRef_ = nullptr;
     getFormRectEnv_ = nullptr;
-    return ERR_OK;
+    return true;
 }
  
 ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect &rect)
@@ -2742,13 +2710,13 @@ bool JsFormRouterProxyMgr::ConvertFunctionResult(napi_env env, napi_value funcRe
     return true;
 }
 
-ErrCode JsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(napi_env env, napi_ref callbackRef)
+bool JsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(napi_env env, napi_ref callbackRef)
 {
     std::lock_guard<std::mutex> lock(registerGetLiveFormStatusProxyMutex_);
     HILOG_INFO("call");
     if (callbackRef == nullptr) {
         HILOG_ERROR("Invalid callback reference");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
  
     if (getLiveFormStatusCallbackRef_ != nullptr) {
@@ -2765,20 +2733,20 @@ ErrCode JsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(napi_env env, na
     napi_typeof(env, callback, &valueType);
     if (valueType != napi_function) {
         HILOG_ERROR("Callback is not a function");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return false;
     }
  
     HILOG_INFO("Listener registered successfully");
-    return ERR_OK;
+    return true;
 }
  
-ErrCode JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
+bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 {
     std::lock_guard<std::mutex> lock(registerGetLiveFormStatusProxyMutex_);
     HILOG_INFO("call");
     getLiveFormStatusCallbackRef_ = nullptr;
     getLiveFormStatusEnv_ = nullptr;
-    return ERR_OK;
+    return true;
 }
 
 ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)

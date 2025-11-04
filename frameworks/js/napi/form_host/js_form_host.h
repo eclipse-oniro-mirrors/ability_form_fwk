@@ -57,21 +57,21 @@ public:
 
     ErrCode RouterEvent(const int64_t formId, const OHOS::AAFwk::Want &want);
     
-    ErrCode RegisterOverflowListener(napi_env env, napi_ref callback);
+    bool RegisterOverflowListener(napi_env env, napi_ref callback);
 
-    ErrCode UnregisterOverflowListener();
+    bool UnregisterOverflowListener();
     
-    ErrCode RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callback);
+    bool RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callback);
 
-    ErrCode UnregisterChangeSceneAnimationStateListener();
+    bool UnregisterChangeSceneAnimationStateListener();
 
-    ErrCode RegisterGetFormRectListener(napi_env env, napi_ref callback);
+    bool RegisterGetFormRectListener(napi_env env, napi_ref callback);
 
-    ErrCode UnregisterGetFormRectListener();
+    bool UnregisterGetFormRectListener();
 
-    ErrCode RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
+    bool RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
 
-    ErrCode UnregisterGetLiveFormStatusListener();
+    bool UnregisterGetLiveFormStatusListener();
 private:
     static std::mutex mutex_;
     static sptr<JsFormRouterProxyMgr> instance_;
