@@ -1611,7 +1611,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
         HILOG_ERROR("the specified form id does not exist in caller. formId:%{public}s",
             std::to_string(formId).c_str());
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
