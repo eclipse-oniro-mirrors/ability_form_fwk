@@ -742,57 +742,58 @@ public:
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage);
 
     /**
-     * @brief Register overflow proxy in fms
-     * @param callerToken The form host proxy
-     * @return Return ERR_OK on success, others on failure.
+     * @brief Register overflow proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken);
     
     /**
-     * @brief Unregister overflow proxy in fms
-     * @return Return ERR_OK on success, others on failure.
+     * @brief Unregister overflow proxy in fms.
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UnregisterOverflowProxy();
+
     /**
-     * @brief Request overflow with specific range
-     * @param formId The id of the form to request overflow
-     * @param overflowInfo The overflowInfo to explict overflow area and duration
-     * @param isOverflow True for request overflow, false for cancel overflow, default value is true
-     * @return Return ERR_OK on success, others on failure
+     * @brief Request overflow with specific range.
+     * @param formId The id of the form to request overflow.
+     * @param overflowInfo The overflowInfo to explict overflow area and duration.
+     * @param isOverflow True for request overflow, false for cancel overflow, default value is true.
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow = true);
 
     /**
      * @brief Register change sceneAnimation state proxy in fms.
      * @param callerToken The form host proxy.
-     * @return Returns ERR_OK on success, others on failure
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Unregister change sceneAnimation state proxy in fms.
-     * @return Returns ERR_OK on success, others on failure
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UnregisterChangeSceneAnimationStateProxy();
 
     /**
      * @brief Change SceneAnimation State.
      * @param formId The formId.
-     * @param state 1 for activate SceneAnimation, 0 for deactivate SceneAnimation
-     * @return Return ERR_OK on success, others on failure
+     * @param state 1 for activate SceneAnimation, 0 for deactivate SceneAnimation.
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
     
    /**
      * @brief Register getFormRect proxy in fms.
      * @param callerToken The form host proxy.
-     * @return Returns ERR_OK on success, others on failure
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken);
 
     /**
-     * @brief Unregister get form rect proxy in fms
-     * @return Return ERR_OK on success, others on failure
+     * @brief Unregister get form rect proxy in fms.
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UnregisterGetFormRectProxy();
  
@@ -813,7 +814,7 @@ public:
  
     /**
      * @brief Unregister get live form status proxy in fms
-     * @return Return ERR_OK on success, others on failure.
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UnregisterGetLiveFormStatusProxy();
     

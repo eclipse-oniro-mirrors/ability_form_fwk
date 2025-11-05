@@ -4345,7 +4345,7 @@ ErrCode FormMgrAdapter::RegisterOverflowProxy(const sptr<IRemoteObject> &callerT
     HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("callerToken is null");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     overflowCallerToken_ = callerToken;
     return ERR_OK;
@@ -4362,6 +4362,7 @@ ErrCode FormMgrAdapter::UnregisterOverflowProxy()
 ErrCode FormMgrAdapter::RequestOverflow(const int64_t formId, const int32_t callingUid,
     const OverflowInfo &overflowInfo, bool isOverflow)
 {
+    std::lock_guard<std::mutex> lock(overflowCallerTokenMutex_);
     HILOG_INFO("call");
     ErrCode checkResult = SceneAnimationCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
@@ -4383,7 +4384,7 @@ ErrCode FormMgrAdapter::RegisterChangeSceneAnimationStateProxy(const sptr<IRemot
     HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("callerToken is null");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     sceneanimationCallerToken_ = callerToken;
     return ERR_OK;
@@ -4399,6 +4400,7 @@ ErrCode FormMgrAdapter::UnregisterChangeSceneAnimationStateProxy()
 
 ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const int32_t callingUid, int32_t state)
 {
+    std::lock_guard<std::mutex> lock(sceneanimationCallerTokenMutex_);
     HILOG_INFO("call");
     ErrCode checkResult = SceneAnimationCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
@@ -4420,7 +4422,7 @@ ErrCode FormMgrAdapter::RegisterGetFormRectProxy(const sptr<IRemoteObject> &call
     HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("callerToken is null");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     getFormRectCallerToken_ = callerToken;
     return ERR_OK;
@@ -4436,6 +4438,7 @@ ErrCode FormMgrAdapter::UnregisterGetFormRectProxy()
 
 ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)
 {
+    std::lock_guard<std::mutex> lock(getFormRectCallerTokenMutex_);
     HILOG_INFO("call");
     ErrCode checkResult = CallerCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
@@ -4458,7 +4461,7 @@ ErrCode FormMgrAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject>
     HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("callerToken is null");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     getLiveFormStatusCallerToken_ = callerToken;
     return ERR_OK;
@@ -4474,6 +4477,7 @@ ErrCode FormMgrAdapter::UnregisterGetLiveFormStatusProxy()
 
 ErrCode FormMgrAdapter::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
+    std::lock_guard<std::mutex> lock(getLiveFormStatusCallerTokenMutex_);
     HILOG_INFO("call");
     if (!getLiveFormStatusCallerToken_) {
         HILOG_ERROR("Fail, getLiveFormStatusCallerToken_ is nullptr!");
