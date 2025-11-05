@@ -47,6 +47,7 @@ public:
     bool IsFormDisable(const FormRecord &formRecord);
     bool IsFormRemove(const FormRecord &formRecord);
     void ReloadDueControlByAppUpgrade(const std::vector<FormRecord> &formRecords);
+    bool IsDueDisableCtrlEmpty();
 private:
     void ParamTransfer();
     void ParseJsonToObj(const nlohmann::json &jsonObject);
