@@ -1399,4 +1399,19 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0306, TestSize.Level0)
         formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0306 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0307
+ * @tc.desc: test CheckFormDueControl function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0307, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0307 start";
+    FormMgrAdapter formMgrAdapter;
+    FormMajorInfo formMajorInfo;
+    formMajorInfo.bundleName = "test";
+    EXPECT_FALSE(formMgrAdapter.CheckFormDueControl(formMajorInfo, true));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0307 end";
+}
 }
