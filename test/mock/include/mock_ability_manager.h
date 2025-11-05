@@ -177,7 +177,8 @@ public:
         return;
     }
 
-    int KillProcess(const std::string &bundleName, const bool clreaPageStack = true, int32_t appIndex = 0) override
+    int KillProcess(const std::string &bundleName, const bool clreaPageStack = true, int32_t appIndex = 0,
+        const std::string &reason = "KillProcess") override
     {
         return 0;
     }
@@ -541,7 +542,8 @@ public:
         return;
     }
 
-    int KillProcess(const std::string &bundleName, const bool clreaPageStack = true, int32_t appIndex = 0) override
+    int KillProcess(const std::string &bundleName, const bool clreaPageStack = true, int32_t appIndex = 0,
+        const std::string &reason = "KillProcess") override
     {
         return 0;
     }
