@@ -944,6 +944,17 @@ public:
         return false;
     }
 
+    /**
+     * @brief Send non-transparent ratio.
+     * @param formId The Id of the form to update.
+     * @param ratio Percentage value of non-transparent areas on the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1052,6 +1063,7 @@ public:
         FORM_MGR_RELOAD_FORMS,
         FORM_MGR_RELOAD_ALL_FORMS,
         FORM_MGR_IS_FORM_DUE_CONTROL,
+        FORM_MGR_SEND_NON_TRANSPARENT_RATIO,
     };
 };
 }  // namespace AppExecFwk

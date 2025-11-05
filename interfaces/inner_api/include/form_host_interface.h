@@ -121,6 +121,12 @@ public:
     virtual void OnDueControlForm(
         const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl) {}
 
+    /**
+     * @brief check if the form is abnormal
+     * @param formIds The Id list of the forms.
+     */
+    virtual void OnCheckForm(const std::vector<int64_t> &formIds) {}
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -160,6 +166,9 @@ public:
 
         // ipc id for due control form (3692)
         FORM_HOST_ON_DUE_CONTROL_FORM,
+
+        // ipc id for checking form (3693)
+        FORM_HOST_ON_CHECK_FORM,
     };
 };
 }  // namespace AppExecFwk

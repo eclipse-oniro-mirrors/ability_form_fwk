@@ -2972,6 +2972,23 @@ void FormDataMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const
     }
 }
 
+void FormDataMgr::CheckForms(const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("start");
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        std::vector<int64_t> matchedFormIds;
+        for (auto formId : formIds) {
+            if (itHostRecord->Contains(formId)) {
+                matchedFormIds.emplace_back(formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnCheckForms(matchedFormIds);
+        }
+    }
+}
+
 void FormDataMgr::GetFormIdsByUserId(int32_t userId, std::vector<int64_t> &formIds)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);

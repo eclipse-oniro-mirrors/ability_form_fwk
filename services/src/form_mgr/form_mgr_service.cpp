@@ -66,6 +66,7 @@
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
+#include "feature/form_check/form_abnormal_reporter.h"
 #include "feature/param_update/param_common_event.h"
 #include "feature/param_update/param_manager.h"
 #include "string_wrapper.h"
@@ -2290,6 +2291,18 @@ bool FormMgrService::IsFormDueControl(const FormMajorInfo &formMajorInfo, const 
     bool result = FormMgrAdapter::GetInstance().CheckFormDueControl(formMajorInfo, isDisablePolicy);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
+}
+
+ErrCode FormMgrService::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
+{
+    HILOG_DEBUG("call");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("send non-transparency ratio permission denied");
+        return ret;
+    }
+    FormAbnormalReporter::GetInstance().AddRecord(formId, ratio);
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

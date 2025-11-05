@@ -94,6 +94,7 @@ public:
     MOCK_METHOD2(OnError, void(const int32_t errorCode, const std::string &errorMsg));
     MOCK_METHOD1(ProcessEnableForm, void(bool enable));
     MOCK_METHOD2(ProcessDueControlForm, void(bool isDisablePolicy, bool isControl));
+    MOCK_METHOD0(ProcessCheckForm, void());
 };
 
 class ShareFormCallBackMock : public ShareFormCallBack {

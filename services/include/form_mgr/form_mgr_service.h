@@ -864,6 +864,15 @@ public:
      * @return Returns true for form is due controlled.
      */
     bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy) override;
+
+    /**
+     * @brief Send non-transparent ratio.
+     * @param formId The Id of the form to update.
+     * @param ratio Percentage value of non-transparent areas on the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio) override;
+
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.

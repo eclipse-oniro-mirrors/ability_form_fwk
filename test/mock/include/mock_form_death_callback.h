@@ -105,6 +105,14 @@ public:
     {
         HILOG_INFO("%{public}s called.", __func__);
     }
+
+    /**
+     * @brief check if form is abnormal.
+     */
+    void ProcessCheckForm() override
+    {
+        HILOG_INFO("%{public}s called.", __func__);
+    }
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

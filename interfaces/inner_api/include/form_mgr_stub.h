@@ -809,6 +809,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleIsFormDueControl(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle sending non-transparent ratio.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleSendNonTransparencyRatio(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

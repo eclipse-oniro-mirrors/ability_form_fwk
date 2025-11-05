@@ -120,6 +120,13 @@ public:
      */
     void OnDueControlForm(
         const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl) override;
+
+    /**
+     * @brief check if the form is abnormal
+     * @param formIds The Id list of the forms.
+     */
+    void OnCheckForm(const std::vector<int64_t> &formIds) override;
+
 private:
     template <typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

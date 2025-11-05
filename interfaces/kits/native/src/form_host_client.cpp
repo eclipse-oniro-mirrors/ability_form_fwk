@@ -534,5 +534,29 @@ void FormHostClient::OnDueControlForm(
         }
     }
 }
+
+void FormHostClient::OnCheckForm(const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("call, size:%{public}zu", formIds.size());
+    for (int64_t formId : formIds) {
+        if (formId < 0) {
+            HILOG_ERROR("the form id can't be negative");
+            continue;
+        }
+        std::lock_guard<std::mutex> lockMutex(callbackMutex_);
+        auto iter = formCallbackMap_.find(formId);
+        if (iter == formCallbackMap_.end()) {
+            HILOG_ERROR("not find callback formId:%{public}" PRId64, formId);
+            continue;
+        }
+        for (const auto &callback : iter->second) {
+            if (!callback) {
+                HILOG_ERROR("null callback formId:%{public}" PRId64, formId);
+                continue;
+            }
+            callback->ProcessCheckForm();
+        }
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

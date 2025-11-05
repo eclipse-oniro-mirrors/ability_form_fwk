@@ -346,6 +346,8 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleReloadAllForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_DUE_CONTROL):
             return HandleIsFormDueControl(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SEND_NON_TRANSPARENT_RATIO):
+            return HandleSendNonTransparencyRatio(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -2105,6 +2107,19 @@ ErrCode FormMgrStub::HandleIsFormDueControl(MessageParcel &data, MessageParcel &
     bool result = IsFormDueControl(*formMajorInfo, isDisablePolicy);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleSendNonTransparencyRatio(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int64_t formId = data.ReadInt64();
+    int32_t ratio = data.ReadInt32();
+    ErrCode result = SendNonTransparencyRatio(formId, ratio);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("Write request result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

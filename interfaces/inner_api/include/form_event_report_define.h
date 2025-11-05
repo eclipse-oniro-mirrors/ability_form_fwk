@@ -128,6 +128,17 @@ struct NewFormEventInfo {
     bool distributedForm = false;
 };
 
+struct FormAbnormalReportParams {
+    std::vector<std::string> bundleNames;
+    std::vector<std::string> moduleNames;
+    std::vector<std::string> abilityNames;
+    std::vector<std::string> formNames;
+    std::vector<int32_t> formDimensions;
+    std::vector<int32_t> formLocations;
+    std::vector<std::string> appVersions;
+    std::vector<int32_t> nonTransparencyRateList;
+};
+
 enum class FormEventName {
     // form behavior event
     ADD_FORM,

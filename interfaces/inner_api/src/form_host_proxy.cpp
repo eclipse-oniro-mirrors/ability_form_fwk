@@ -438,5 +438,28 @@ void FormHostProxy::OnDueControlForm(
         HILOG_ERROR("SendRequest:%{public}d failed", error);
     }
 }
+
+void FormHostProxy::OnCheckForm(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("start");
+    MessageParcel data;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return;
+    }
+
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("fail write formIds");
+        return;
+    }
+
+    MessageOption option(MessageOption::TF_ASYNC);
+    MessageParcel reply;
+    int error = SendTransactCmd(IFormHost::Message::FORM_HOST_ON_CHECK_FORM, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

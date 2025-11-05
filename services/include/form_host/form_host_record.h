@@ -222,6 +222,12 @@ public:
     void OnLockForms(const std::vector<int64_t> &formIds, const bool lock);
 
     /**
+     * @brief Check if form is abnormal.
+     * @param formIds The Id list of forms.
+     */
+    void OnCheckForms(const std::vector<int64_t> &formIds);
+
+    /**
      * @brief get forms.
      * @param formIds The output parameter store the formId list.
      */
