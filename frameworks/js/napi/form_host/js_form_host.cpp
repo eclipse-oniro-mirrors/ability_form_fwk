@@ -2287,7 +2287,10 @@ bool JsFormRouterProxyMgr::UnregisterOverflowListener()
 {
     std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
     HILOG_INFO("call");
-    overflowRegisterCallback_ = nullptr;
+    if (overflowRegisterCallback_ != nullptr) {
+        napi_delete_reference(overflowEnv_, overflowRegisterCallback_);
+        overflowRegisterCallback_ = nullptr;
+    }
     overflowEnv_ = nullptr;
     return true;
 }
@@ -2421,6 +2424,10 @@ bool JsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
     std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
     HILOG_INFO("call");
     changeSceneAnimationStateRigisterCallback_ = nullptr;
+    if (changeSceneAnimationStateRigisterCallback_ != nullptr) {
+        napi_delete_reference(changeSceneAnimationStateEnv_, changeSceneAnimationStateRigisterCallback_);
+        changeSceneAnimationStateRigisterCallback_ = nullptr;
+    }
     changeSceneAnimationStateEnv_ = nullptr;
     return true;
 }
@@ -2521,7 +2528,10 @@ bool JsFormRouterProxyMgr::UnregisterGetFormRectListener()
 {
     std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
     HILOG_INFO("call");
-    getFormRectCallbackRef_ = nullptr;
+    if (getFormRectCallbackRef_ != nullptr) {
+        napi_delete_reference(getFormRectEnv_, getFormRectCallbackRef_);
+        getFormRectCallbackRef_ = nullptr;
+    }
     getFormRectEnv_ = nullptr;
     return true;
 }
@@ -2744,7 +2754,10 @@ bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 {
     std::lock_guard<std::mutex> lock(registerGetLiveFormStatusProxyMutex_);
     HILOG_INFO("call");
-    getLiveFormStatusCallbackRef_ = nullptr;
+    if (getLiveFormStatusCallbackRef_ != nullptr) {
+        napi_delete_reference(getLiveFormStatusEnv_, getLiveFormStatusCallbackRef_);
+        getLiveFormStatusCallbackRef_ = nullptr;
+    }
     getLiveFormStatusEnv_ = nullptr;
     return true;
 }
