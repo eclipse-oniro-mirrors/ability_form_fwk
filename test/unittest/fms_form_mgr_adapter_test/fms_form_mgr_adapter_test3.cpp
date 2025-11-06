@@ -1265,7 +1265,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0300, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     sptr<IRemoteObject> observer = nullptr;
     auto ret = formMgrAdapter.RegisterGetFormRectProxy(observer);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0300 end";
 }
 
@@ -1279,7 +1279,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0301, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0301 start";
     FormMgrAdapter formMgrAdapter;
     auto ret = formMgrAdapter.UnregisterGetFormRectProxy();
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0301 end";
 }
 
@@ -1313,7 +1313,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0303, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     sptr<IRemoteObject> observer = nullptr;
     auto ret = formMgrAdapter.RegisterGetLiveFormStatusProxy(observer);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0303 end";
 }
 
@@ -1327,7 +1327,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0304, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0304 start";
     FormMgrAdapter formMgrAdapter;
     auto ret = formMgrAdapter.UnregisterGetLiveFormStatusProxy();
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0304 end";
 }
 
