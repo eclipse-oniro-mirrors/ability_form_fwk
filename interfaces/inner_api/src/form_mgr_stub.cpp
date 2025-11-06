@@ -1616,9 +1616,7 @@ bool FormMgrStub::ReadFormDataProxies(MessageParcel &data, std::vector<FormDataP
         if (key.empty() || subscribeId.empty()) {
             continue;
         }
-        FormDataProxy formDataProxy("", "");
-        formDataProxy.key = key;
-        formDataProxy.subscribeId = subscribeId;
+        FormDataProxy formDataProxy(key, subscribeId);
         formDataProxies.push_back(formDataProxy);
     }
     return true;
