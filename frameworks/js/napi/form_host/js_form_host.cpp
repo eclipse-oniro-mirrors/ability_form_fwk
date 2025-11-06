@@ -1960,7 +1960,7 @@ private:
         ErrCode result = FormMgr::GetInstance().UnregisterChangeSceneAnimationStateProxy();
         if (result != ERR_OK) {
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);;
+            return CreateJsUndefined(env);
         }
         bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
         return CreateJsValue(env, ret);
