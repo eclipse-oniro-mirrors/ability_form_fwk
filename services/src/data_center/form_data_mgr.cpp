@@ -3248,7 +3248,7 @@ void FormDataMgr::InitTransparencyFormCapbilityKey()
     transparencyFormCapbilityKey_ = OHOS::system::GetParameter(TRANSPARENT_FORM_CAPABILITY_PARAM_NAME, "");
 }
 
-const std::string FormDataMgr::GetTransparencyFormCapbilityKey()
+const std::string& FormDataMgr::GetTransparencyFormCapbilityKey()
 {
     return transparencyFormCapbilityKey_;
 }

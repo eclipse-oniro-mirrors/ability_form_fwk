@@ -1016,7 +1016,7 @@ public:
      * @brief Get transparencyFormCapbilityKey value.
      * @return Returns transparencyFormCapbilityKey value.
      */
-    const std::string GetTransparencyFormCapbilityKey();
+    const std::string& GetTransparencyFormCapbilityKey();
 
 private:
     /**

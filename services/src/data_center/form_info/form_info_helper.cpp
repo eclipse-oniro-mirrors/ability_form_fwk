@@ -273,7 +273,7 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
         return false;
     }
     const std::string transparencyFormCapbilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapbilityKey();
-    if (transparencyFormCapbilityKey == "") {
+    if (transparencyFormCapbilityKey.empty()) {
         HILOG_ERROR("get transparencyFormCapbilityKey failed");
         return false;
     }
