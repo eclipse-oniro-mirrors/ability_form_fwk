@@ -252,8 +252,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.L
 HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetBundleTransparencyEnabled_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 start";
-    bool agcTransparencyEnabled = GetBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID);
-    EXPECT_FALSE(AGCTransparencyEnabled);
+    bool isAGCTransparencyEnabled = GetBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID);
+    EXPECT_FALSE(isAGCTransparencyEnabled);
     GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 end";
 }
 

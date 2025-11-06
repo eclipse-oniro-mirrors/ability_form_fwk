@@ -143,14 +143,14 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         HILOG_WARN("fail transform profile to extension form info");
         return;
     }
-    bool agcTransparencyEnabled;
+    bool isAGCTransparencyEnabled = false;
     if (!bundleInfo.applicationInfo.isSystemApp) {
-        agcTransparencyEnabled = GetBundleTransparencyEnabled(bundleInfo.name, userId);
+        isAGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleInfo.name, userId);
     }
     for (const auto &extensionFormInfo: extensionFormInfos) {
         FormInfo formInfo(extensionInfo, extensionFormInfo);
         if (!bundleInfo.applicationInfo.isSystemApp && formInfo.transparencyEnabled) {
-            formInfo.transparencyEnabled = agcTransparencyEnabled;
+            formInfo.transparencyEnabled = isAGCTransparencyEnabled;
         }
         if (distributedFormInfo.isDistributedForm) {
             formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
@@ -269,6 +269,7 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
+        HILOG_ERROR("get IBundleMgr failed");
         return false;
     }
     AppProvisionInfo appProvisionInfo;
@@ -278,8 +279,6 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
         HILOG_ERROR("get AppProvisionInfo failed");
         return false;
     } else {
-        HILOG_INFO("get AppProvisionInfo appServiceCapabilities %{public}s",
-            appProvisionInfo.appServiceCapabilities.c_str());
         nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities,
             nullptr, false);
         if (jsonObject.is_discarded()) {
@@ -290,11 +289,7 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
             HILOG_ERROR("appServiceCapabilities is not object");
             return false;
         }
-        if (jsonObject.contains(TRANSPARENT_FORM_KEY)) {
-            return true;
-        } else {
-            return false;
-        }
+        return jsonObject.contains(TRANSPARENT_FORM_KEY);
     }
 }
 }  // namespace AppExecFwk
