@@ -143,14 +143,14 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         HILOG_WARN("fail transform profile to extension form info");
         return;
     }
-    bool AGCTransparencyEnabled;
+    bool agcTransparencyEnabled;
     if (!bundleInfo.applicationInfo.isSystemApp) {
-        AGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleInfo.name, userId);
+        agcTransparencyEnabled = GetBundleTransparencyEnabled(bundleInfo.name, userId);
     }
     for (const auto &extensionFormInfo: extensionFormInfos) {
         FormInfo formInfo(extensionInfo, extensionFormInfo);
         if (!bundleInfo.applicationInfo.isSystemApp && formInfo.transparencyEnabled) {
-            formInfo.transparencyEnabled = AGCTransparencyEnabled;
+            formInfo.transparencyEnabled = agcTransparencyEnabled;
         }
         if (distributedFormInfo.isDistributedForm) {
             formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
