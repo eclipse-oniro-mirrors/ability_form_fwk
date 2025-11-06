@@ -2423,7 +2423,6 @@ bool JsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
 {
     std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
     HILOG_INFO("call");
-    changeSceneAnimationStateRigisterCallback_ = nullptr;
     if (changeSceneAnimationStateRigisterCallback_ != nullptr) {
         napi_delete_reference(changeSceneAnimationStateEnv_, changeSceneAnimationStateRigisterCallback_);
         changeSceneAnimationStateRigisterCallback_ = nullptr;
