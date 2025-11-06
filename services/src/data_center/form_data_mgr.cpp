@@ -65,6 +65,7 @@ FormDataMgr::FormDataMgr()
 {
     HILOG_INFO("create");
     InitLowMemoryStatus();
+    InitTransparencyFormCapbilityKey();
 }
 FormDataMgr::~FormDataMgr()
 {

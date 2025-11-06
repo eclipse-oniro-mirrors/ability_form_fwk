@@ -31,7 +31,6 @@ namespace AppExecFwk {
 namespace {
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
 const std::string FORM_METADATA_NAME = "ohos.extension.form";
-constexpr char TRANSPARENT_FORM_KEY[] = "com.huawei.service.desktop.transparentForm";
 }
 
 bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)
