@@ -4728,6 +4728,11 @@ ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRe
 bool FormMgrAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
 {
     HILOG_DEBUG("call");
+    if (ParamControl::GetInstance().IsDueDisableCtrlEmpty()) {
+        // due disable ctrl param empty, just return
+        return false;
+    }
+
     Want want;
     want.SetElementName(formMajorInfo.bundleName, formMajorInfo.abilityName);
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formMajorInfo.moduleName);

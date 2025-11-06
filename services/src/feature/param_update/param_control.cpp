@@ -130,8 +130,13 @@ void ParamControl::ReloadDueControlByAppUpgrade(const std::vector<FormRecord> &f
     ExecDisableCtrl(false, nextDisableCtrl_, true);
 
     // Apply new formrecord
-    ExecUpdateDurationCtrl(true, nextUpdateDurationCtrl_);
-    ExecDisableCtrl(true, nextDisableCtrl_);
+    ExecUpdateDurationCtrl(true, nextUpdateDurationCtrl_, true);
+    ExecDisableCtrl(true, nextDisableCtrl_, true);
+}
+
+bool ParamControl::IsDueDisableCtrlEmpty()
+{
+    return nextDisableCtrl_.empty();
 }
 
 void ParamControl::ParamTransfer()
@@ -302,11 +307,11 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
         }
 
         for (const auto &formRecord : formRecords) {
-            if (!IsFormInfoMatch(formRecord, item, isApply)) {
+            if (!IsFormInfoMatch(formRecord, item, isAppUpgrade ? isApply : true)) {
                 continue;
             }
 
-            if (isAppUpgrade && IsFormInfoMatch(formRecord, item)) {
+            if (isAppUpgrade && IsFormInfoMatch(formRecord, item, !isApply)) {
                 continue;
             }
 
@@ -341,16 +346,16 @@ bool ParamControl::ShouldProcessForm(const FormRecord &formRecord, const ParamCt
         return false;
     }
 
-    if (!IsFormInfoMatch(formRecord, item, isApply)) {
+    if (!IsFormInfoMatch(formRecord, item, isAppUpgrade ? isApply : true)) {
+        return false;
+    }
+
+    if (isAppUpgrade && IsFormInfoMatch(formRecord, item, !isApply)) {
         return false;
     }
 
     if (!isAppUpgrade &&
         IsSameUpdateDuration(formRecord, item, (isApply ? preUpdateDurationCtrl_ : nextUpdateDurationCtrl_))) {
-        return false;
-    }
-
-    if (isAppUpgrade && IsFormInfoMatch(formRecord, item)) {
         return false;
     }
 
