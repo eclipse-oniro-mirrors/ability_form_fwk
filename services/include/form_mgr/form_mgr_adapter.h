@@ -1345,6 +1345,7 @@ private:
 
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
+    std::mutex formPublishInterceptorMutex_;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
     std::map<int64_t, AddFormResultErrorCode> formIdMap_;
     std::unique_ptr<FormSerialQueue> serialQueue_ = nullptr;
@@ -1408,12 +1409,16 @@ private:
 
     void PostEnterpriseAppInstallFailedRetryTask(const FormRecord &record, const Want &want);
 
+    bool IsForegroundApp();
+
+    void SetFormPublishInterceptor(const sptr<IFormPublishInterceptor> &formPublishInterceptor);
+
+    sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
+
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 
     std::map<int, std::vector<int64_t>> conditionUpdateFormMap;
-
-    bool IsForegroundApp();
 
     sptr<IRemoteObject> overflowCallerToken_;
 
