@@ -2385,11 +2385,12 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (formPublishInterceptor_ == nullptr) {
+    sptr<IFormPublishInterceptor> interceptor = GetFormPublishInterceptor();
+    if (interceptor == nullptr) {
         return AcquireAddFormResult(formId);
     }
 
-    int ret = formPublishInterceptor_->ProcessPublishForm(wantToHost);
+    int ret = interceptor->ProcessPublishForm(wantToHost);
     if (ret == ERR_OK) {
         HILOG_DEBUG("success to ProcessPublishForm");
         return AcquireAddFormResult(formId);
@@ -3303,7 +3304,7 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
         return false;
     }
 
-    if (formPublishInterceptor_ != nullptr) {
+    if (GetFormPublishInterceptor() != nullptr) {
         HILOG_DEBUG("query publish form has publish interceptor, return true");
         return true;
     }
@@ -3616,7 +3617,7 @@ int32_t FormMgrAdapter::RegisterPublishFormInterceptor(const sptr<IRemoteObject>
         HILOG_ERROR("RegisterPublishFormInterceptor failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    formPublishInterceptor_ = interceptor;
+    SetFormPublishInterceptor(interceptor);
     return ERR_OK;
 }
 
@@ -3632,9 +3633,9 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
         HILOG_ERROR("UnregisterPublishFormInterceptor failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (formPublishInterceptor_ == interceptor) {
+    if (GetFormPublishInterceptor() == interceptor) {
         HILOG_DEBUG("UnregisterPublishFormInterceptor success");
-        formPublishInterceptor_ = nullptr;
+        SetFormPublishInterceptor(nullptr);
         return ERR_OK;
     }
     HILOG_ERROR("the param not equal to the current interceptor");
@@ -4747,6 +4748,18 @@ bool FormMgrAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, con
     formRecord.versionCode = bundleInfo.versionCode;
     return isDisablePolicy ?
         ParamControl::GetInstance().IsFormDisable(formRecord) : ParamControl::GetInstance().IsFormRemove(formRecord);
+}
+
+void FormMgrAdapter::SetFormPublishInterceptor(const sptr<IFormPublishInterceptor> &interceptor)
+{
+    std::lock_guard<std::mutex> lock(formPublishInterceptorMutex_);
+    formPublishInterceptor_ = interceptor;
+}
+
+sptr<IFormPublishInterceptor> FormMgrAdapter::GetFormPublishInterceptor()
+{
+    std::lock_guard<std::mutex> lock(formPublishInterceptorMutex_);
+    return formPublishInterceptor_;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
