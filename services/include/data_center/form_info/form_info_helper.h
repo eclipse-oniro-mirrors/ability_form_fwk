@@ -63,6 +63,8 @@ private:
         const std::string &bundleInfoName, bool hasDistributedForm);
 
     static void SendLoadStageFormConfigEvent(const FormInfo& formInfo);
+
+    static bool GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

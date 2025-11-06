@@ -245,6 +245,18 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.L
 }
 
 /**
+ * @tc.name: FormInfoHelper_GetBundleTransparencyEnabled_0100
+ * @tc.number: GetBundleTransparencyEnabled
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetBundleTransparencyEnabled_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 start";
+    bool AGCTransparencyEnabled = GetBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID);
+    EXPECT_FALSE(AGCTransparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 end";
+}
+
+/**
  * @tc.name: BundleFormInfo_InitFromJson_0100
  * @tc.number: InitFromJson
  * @tc.desc: call InitFromJson with bad profile

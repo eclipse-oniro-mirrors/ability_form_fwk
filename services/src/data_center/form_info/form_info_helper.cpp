@@ -30,6 +30,7 @@ namespace AppExecFwk {
 namespace {
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
 const std::string FORM_METADATA_NAME = "ohos.extension.form";
+constexpr char TRANSPARENT_FORM_KEY[] = "com.huawei.service.desktop.transparentForm";
 }
 
 bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)
@@ -142,10 +143,14 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         HILOG_WARN("fail transform profile to extension form info");
         return;
     }
+    bool AGCTransparencyEnabled;
+    if (!bundleInfo.applicationInfo.isSystemApp) {
+        AGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleInfo.name, userId);
+    }
     for (const auto &extensionFormInfo: extensionFormInfos) {
         FormInfo formInfo(extensionInfo, extensionFormInfo);
-        if (!bundleInfo.applicationInfo.isSystemApp) {
-            formInfo.transparencyEnabled = false;
+        if (!bundleInfo.applicationInfo.isSystemApp && formInfo.transparencyEnabled) {
+            formInfo.transparencyEnabled = AGCTransparencyEnabled;
         }
         if (distributedFormInfo.isDistributedForm) {
             formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
@@ -258,6 +263,39 @@ ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource:
         formInfo.description = description;
     }
     return ERR_OK;
+}
+
+bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId)
+{
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        return false;
+    }
+    AppProvisionInfo appProvisionInfo;
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId,
+        appProvisionInfo));
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get AppProvisionInfo failed");
+        return false;
+    } else {
+        HILOG_INFO("get AppProvisionInfo appServiceCapabilities %{public}s",
+            appProvisionInfo.appServiceCapabilities.c_str());
+        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities,
+            nullptr, false);
+        if (jsonObject.is_discarded()) {
+            HILOG_ERROR("fail parse appServiceCapabilities");
+            return false;
+        }
+        if (!jsonObject.is_object()) {
+            HILOG_ERROR("appServiceCapabilities is not object");
+            return false;
+        }
+        if (jsonObject.contains(TRANSPARENT_FORM_KEY)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
