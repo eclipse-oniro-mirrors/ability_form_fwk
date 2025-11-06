@@ -30,13 +30,13 @@ FormRenderTaskMgr::FormRenderTaskMgr() {}
 
 FormRenderTaskMgr::~FormRenderTaskMgr() {}
 
-void FormRenderTaskMgr::PostUpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+void FormRenderTaskMgr::PostUpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
     const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("start");
 
-    auto updateFormSize = [formId, width, height, borderWidth, uid, remoteObject]() {
-        FormRenderTaskMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    auto updateFormSize = [formId, formSurfaceInfo, uid, remoteObject]() {
+        FormRenderTaskMgr::GetInstance().UpdateFormSize(formId, formSurfaceInfo, uid, remoteObject);
     };
     FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, updateFormSize);
     HILOG_DEBUG("end");
@@ -76,7 +76,7 @@ void FormRenderTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecor
     HILOG_INFO("end");
 }
 
-void FormRenderTaskMgr::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+void FormRenderTaskMgr::UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
     const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("start");
@@ -87,7 +87,7 @@ void FormRenderTaskMgr::UpdateFormSize(const int64_t &formId, float width, float
         return;
     }
 
-    int32_t error = remoteFormRender->UpdateFormSize(formId, width, height, borderWidth, uid);
+    int32_t error = remoteFormRender->UpdateFormSize(formId, formSurfaceInfo, uid);
     if (error != ERR_OK) {
         HILOG_ERROR("fail Update FormSize");
         return;

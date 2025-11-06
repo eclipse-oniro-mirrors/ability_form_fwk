@@ -22,6 +22,7 @@
 #include "ipc_types.h"
 #include "iremote_broker.h"
 #include "want.h"
+#include "form_surface_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -74,7 +75,7 @@ public:
 
     virtual int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) { return ERR_OK; }
 
-    virtual int32_t UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    virtual int32_t UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
         const std::string &uid) { return ERR_OK; }
 
     virtual void RunCachedConfigurationUpdated() {}

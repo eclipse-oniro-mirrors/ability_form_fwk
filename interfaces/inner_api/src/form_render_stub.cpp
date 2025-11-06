@@ -281,13 +281,15 @@ int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &re
 int32_t FormRenderStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel &reply)
 {
     int64_t formId = data.ReadInt64();
-    float width = data.ReadFloat();
-    float height = data.ReadFloat();
-    float borderWidth = data.ReadFloat();
+    std::unique_ptr<FormSurfaceInfo> formSurfaceInfo(data.ReadParcelable<FormSurfaceInfo>());
+    if (!formSurfaceInfo) {
+        HILOG_ERROR("Read formSurfaceInfo failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::string uid = data.ReadString();
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_UpdateFormSize",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    int32_t result = UpdateFormSize(formId, width, height, borderWidth, uid);
+    int32_t result = UpdateFormSize(formId, *formSurfaceInfo, uid);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;

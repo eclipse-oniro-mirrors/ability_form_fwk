@@ -2774,10 +2774,12 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_146, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_146 start";
     int64_t formId = 123;
-    float width = 1;
-    float height = 1;
-    float borderWidth = 1;
-    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, width, height, borderWidth);
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 1;
+    formSurfaceInfo.height = 1;
+    formSurfaceInfo.borderWidth = 1;
+    formSurfaceInfo.formViewScale = 1;
+    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, formSurfaceInfo);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_146 end";
 }
 
@@ -2798,10 +2800,12 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_147, TestSize.Level1)
     std::unordered_map<std::string, Ace::FormRequest> map;
     map.emplace("123", request);
     formRenderRecordPtr_->formRequests_.emplace(formId, map);
-    float width = 1;
-    float height = 1;
-    float borderWidth = 1;
-    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, width, height, borderWidth);
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 1;
+    formSurfaceInfo.height = 1;
+    formSurfaceInfo.borderWidth = 1;
+    formSurfaceInfo.formViewScale = 1;
+    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, formSurfaceInfo);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_147 end";
 }
 

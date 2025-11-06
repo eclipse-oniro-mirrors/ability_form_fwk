@@ -42,6 +42,7 @@
 #include "status_mgr_center/form_status.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "feature/memory_mgr/form_render_report.h"
+#include "form_surface_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -758,7 +759,8 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
     return ERR_OK;
 }
 
-ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    float formViewScale)
 {
     HILOG_DEBUG("call");
     RecoverFRSOnFormActivity();
@@ -774,8 +776,13 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
         HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = width;
+    formSurfaceInfo.height = height;
+    formSurfaceInfo.borderWidth = borderWidth;
+    formSurfaceInfo.formViewScale = formViewScale;
     std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
-    FormRenderTaskMgr::GetInstance().PostUpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    FormRenderTaskMgr::GetInstance().PostUpdateFormSize(formId, formSurfaceInfo, uid, remoteObject);
     return ERR_OK;
 }
 

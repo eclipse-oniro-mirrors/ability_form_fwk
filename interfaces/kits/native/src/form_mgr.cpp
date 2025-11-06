@@ -2010,7 +2010,8 @@ bool FormMgr::IsFormBundleExempt(int64_t formId)
     return remoteProxy_->IsFormBundleExempt(formId);
 }
 
-ErrCode FormMgr::UpdateFormSize(const int64_t formId, float width, float height, float borderWidth)
+ErrCode FormMgr::UpdateFormSize(const int64_t formId, float width, float height, float borderWidth,
+    float formViewScale)
 {
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
@@ -2021,7 +2022,7 @@ ErrCode FormMgr::UpdateFormSize(const int64_t formId, float width, float height,
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    ErrCode resultCode = remoteProxy_->UpdateFormSize(formId, width, height, borderWidth);
+    ErrCode resultCode = remoteProxy_->UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail UpdateFormSize,errCode %{public}d", resultCode);
     }

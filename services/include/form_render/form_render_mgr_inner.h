@@ -85,7 +85,8 @@ public:
 
     ErrCode RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams);
 
-	ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth);
+    ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+        float formViewScale);
 
     void SetUserId(int32_t userId);
 

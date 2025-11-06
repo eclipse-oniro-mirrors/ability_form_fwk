@@ -4525,7 +4525,8 @@ HWTEST_F(FormMgrTest, FormMgrTest_0246, TestSize.Level1)
     float width = 100;
     float height = 50;
     float borderWidth = 10;
-    bool result = FormMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth);
+    float formViewScale = 1.0;
+    bool result = FormMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0246 test ends";
 }

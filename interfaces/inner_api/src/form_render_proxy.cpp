@@ -383,7 +383,7 @@ void FormRenderProxy::RunCachedConfigurationUpdated()
     }
 }
 
-int32_t FormRenderProxy::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+int32_t FormRenderProxy::UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
     const std::string &uid)
 {
     MessageParcel data;
@@ -396,16 +396,8 @@ int32_t FormRenderProxy::UpdateFormSize(const int64_t &formId, float width, floa
         HILOG_ERROR("write formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteFloat(width)) {
-        HILOG_ERROR("fail write width");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteFloat(height)) {
-        HILOG_ERROR("fail write height");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteFloat(borderWidth)) {
-        HILOG_ERROR("fail write borderWidth");
+    if (!data.WriteParcelable(&formSurfaceInfo)) {
+        HILOG_ERROR("write formSurfaceInfo fail");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteString(uid)) {

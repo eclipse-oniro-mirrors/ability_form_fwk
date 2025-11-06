@@ -727,10 +727,11 @@ public:
      * @param width The width value to be updated.
      * @param height The height value to be updated.
      * @param borderWidth The borderWidth value to be updated.
+     * @param formViewScale the formViewScale value to be updated.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t UpdateFormSize(const int64_t formId, float width, float height, float borderWidth);
-
+    int32_t UpdateFormSize(const int64_t formId, float width, float height, float borderWidth,
+        float formViewScale);
     /**
      * @brief Open the form edit ability.
      * @param abilityName The form edit ability name.

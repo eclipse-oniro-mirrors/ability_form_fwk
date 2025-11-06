@@ -71,7 +71,7 @@ public:
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) override;
 
-    int32_t UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    int32_t UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
         const std::string &uid) override;
 
     void RunCachedConfigurationUpdated() override;

@@ -116,7 +116,8 @@ public:
 
     ErrCode RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams);
 
-    void UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth);
+    void UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+        float formViewScale);
 
     void DisconnectAllRenderConnections(int32_t userId);
 

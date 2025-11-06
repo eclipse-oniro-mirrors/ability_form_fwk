@@ -2041,7 +2041,8 @@ int32_t FormMgrService::NotifyFormLocked(const int64_t &formId, bool isLocked)
     return FormMgrAdapter::GetInstance().NotifyFormLocked(formId, isLocked);
 }
 
-ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    float formViewScale)
 {
     HILOG_DEBUG("call");
     ErrCode ret = CheckFormPermission();
@@ -2049,7 +2050,7 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float
         HILOG_ERROR("update formSize permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().UpdateFormSize(formId, width, height, borderWidth);
+    return FormMgrAdapter::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
 }
 
 void FormMgrService::SetNetConnect()

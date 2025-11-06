@@ -621,7 +621,7 @@ void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
 }
 
 int32_t FormRenderServiceMgr::UpdateFormSize(
-    const int64_t formId, float width, float height, float borderWidth, const std::string &uid)
+    const int64_t formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid)
 {
     SetCriticalTrueOnFormActivity();
 
@@ -631,7 +631,7 @@ int32_t FormRenderServiceMgr::UpdateFormSize(
             HILOG_ERROR("UpdateFormSize null renderRecord of %{public}" PRId64, formId);
             return UPDATE_FORM_SIZE_FAILED;
         }
-        search->second->UpdateFormSizeOfGroups(formId, width, height, borderWidth);
+        search->second->UpdateFormSizeOfGroups(formId, formSurfaceInfo);
         return ERR_OK;
     }
     HILOG_ERROR("can't find render record of %{public}" PRId64, formId);

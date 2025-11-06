@@ -20,6 +20,7 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include "form_constants.h"
 #include "form_supply_stub.h"
+#include "form_surface_info.h"
 
 #define private public
 #define protected public
@@ -185,10 +186,10 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::string str3 = fdp->ConsumeRandomLengthString();
     int32_t num1 = fdp->ConsumeIntegral<int32_t>();
     int64_t num2 = fdp->ConsumeIntegral<int64_t>();
-    float num3 = fdp->ConsumeIntegralInRange(0, 1000);
     bool isTrue = fdp->ConsumeBool();
     FormJsInfo formJsInfo;
     formJsInfo.formId = num2;
+    FormSurfaceInfo formSurfaceInfo;
     sptr<IRemoteObject> callerToken;
     callerToken = new (std::nothrow) FormSupplyStubFuzzTest();
     Want want;
@@ -213,7 +214,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().SetVisibleChange(num2, isTrue, want);
     FormRenderServiceMgr::GetInstance().RecycleForm(num2, want);
     FormRenderServiceMgr::GetInstance().RecoverForm(formJsInfo, want);
-    FormRenderServiceMgr::GetInstance().UpdateFormSize(num2, num3, num3, num3, str1);
+    FormRenderServiceMgr::GetInstance().UpdateFormSize(num2, formSurfaceInfo, str1);
     sptr<IFormSupply> formSupplyClient;
     FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
     FormRenderServiceMgr::GetInstance().ConfirmUnlockState(want);

@@ -88,7 +88,7 @@ public:
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) override;
 
     int32_t UpdateFormSize(
-        const int64_t &formId, float width, float height, float borderWidth, const std::string &uid) override;
+        const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid) override;
 
 protected:
     int32_t CheckPermission() override;

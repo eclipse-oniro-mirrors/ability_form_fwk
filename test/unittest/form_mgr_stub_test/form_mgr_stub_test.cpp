@@ -2990,7 +2990,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0124, TestSize.Level1) {
     data.WriteFloat(height);
     const float borderWidth = 1.1;
     data.WriteFloat(borderWidth);
-    EXPECT_CALL(*mockFormMgrService, UpdateFormSize(_, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
+    const float formViewScale = 1.1;
+    data.WriteFloat(formViewScale);
+    EXPECT_CALL(*mockFormMgrService, UpdateFormSize(_, _, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0124 ends";
 }
