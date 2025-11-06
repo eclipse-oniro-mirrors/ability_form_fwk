@@ -70,7 +70,7 @@ ani_object CreateFormInfos(ani_env* env, const std::vector<OHOS::AppExecFwk::For
             HILOG_ERROR("null aniInfo");
             break;
         }
-        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index, aniInfo);
+        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index, aniInfo);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void failed status: %{public}d", status);
             break;
