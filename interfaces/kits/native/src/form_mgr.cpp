@@ -2072,34 +2072,34 @@ ErrCode FormMgr::OpenFormEditAbility(const std::string &abilityName, const int64
     return resultCode;
 }
 
-bool FormMgr::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgr::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("Call");
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("Connect form mgr service failed, errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->RegisterOverflowProxy(callerToken);
 }
 
-bool FormMgr::UnregisterOverflowProxy()
+ErrCode FormMgr::UnregisterOverflowProxy()
 {
     HILOG_INFO("call");
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UnregisterOverflowProxy();
 }
@@ -2132,34 +2132,34 @@ ErrCode FormMgr::RequestOverflow(const int64_t formId, const OverflowInfo &overf
     return result;
 }
 
-bool FormMgr::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgr::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->RegisterChangeSceneAnimationStateProxy(callerToken);
 }
 
-bool FormMgr::UnregisterChangeSceneAnimationStateProxy()
+ErrCode FormMgr::UnregisterChangeSceneAnimationStateProxy()
 {
     HILOG_INFO("call");
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UnregisterChangeSceneAnimationStateProxy();
 }
@@ -2189,33 +2189,33 @@ ErrCode FormMgr::ChangeSceneAnimationState(const int64_t formId, int32_t state)
     return result;
 }
 
-bool FormMgr::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgr::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->RegisterGetFormRectProxy(callerToken);
 }
 
-bool FormMgr::UnregisterGetFormRectProxy()
+ErrCode FormMgr::UnregisterGetFormRectProxy()
 {
     HILOG_INFO("call");
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UnregisterGetFormRectProxy();
 }
@@ -2263,33 +2263,33 @@ ErrCode FormMgr::UpdateFormSize(const int64_t formId, const int32_t newDimension
     return resultCode;
 }
 
-bool FormMgr::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgr::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->RegisterGetLiveFormStatusProxy(callerToken);
 }
  
-bool FormMgr::UnregisterGetLiveFormStatusProxy()
+ErrCode FormMgr::UnregisterGetLiveFormStatusProxy()
 {
     HILOG_INFO("call");
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UnregisterGetLiveFormStatusProxy();
 }

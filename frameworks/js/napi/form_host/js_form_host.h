@@ -102,6 +102,11 @@ private:
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
+
+    mutable std::mutex registerOverflowProxyMutex_;
+    mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
+    mutable std::mutex registerGetFormRectProxyMutex_;
+    mutable std::mutex registerGetLiveFormStatusProxyMutex_;
 };
 
 class PromiseCallbackInfo {

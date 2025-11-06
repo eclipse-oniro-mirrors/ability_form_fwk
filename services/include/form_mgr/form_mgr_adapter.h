@@ -686,15 +686,15 @@ public:
     /**
      * @brief Register overflow proxy
      * @param callerToken The form host proxy
-     * @return Return true for overflow proxy register success, false otherwise
+     * @return Return ERR_OK on success, others on failure.
      */
-    bool RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken);
+    ErrCode RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Unregister overflow proxy
-     * @return Return true for overflow proxy unregister success, false otherwise
+     * @return Return ERR_OK on success, others on failure.
      */
-    bool UnregisterOverflowProxy();
+    ErrCode UnregisterOverflowProxy();
 
     /**
      * @brief Request overflow with specific range
@@ -710,15 +710,15 @@ public:
     /**
      * @brief Register change sceneAnimation state proxy
      * @param callerToken The form host proxy.
-     * @return Returns true for change sceneAnimation state proxy register success, false otherwise
+     * @return Returns ERR_OK on success, others on failure.
      */
-    bool RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken);
+    ErrCode RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Unregister change sceneAnimation state proxy
-     * @return Return true for change sceneAnimation state proxy unregister success, false otherwise
+     * @return Return ERR_OK on success, others on failure.
      */
-    bool UnregisterChangeSceneAnimationStateProxy();
+    ErrCode UnregisterChangeSceneAnimationStateProxy();
 
     /**
      * @brief Change SceneAnimation State.
@@ -734,13 +734,13 @@ public:
      * @param callerToken The form host proxy.
      * @return Returns ERR_OK for setting success.
      */
-    bool RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken);
+    ErrCode RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Unregister get form rect proxy in fms
-     * @return Return true if unregister success
+     * @return Return ERR_OK on success, others on failure.
      */
-    bool UnregisterGetFormRectProxy();
+    ErrCode UnregisterGetFormRectProxy();
 
     /**
      * @brief Get the form rect.
@@ -756,13 +756,13 @@ public:
      * @param callerToken The form host proxy.
      * @return Returns ERR_OK for setting success.
      */
-    bool RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
+    ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Unregister get live form status proxy in fms
-     * @return Return true if unregister success
+     * @return Return ERR_OK on success, others on failure.
      */
-    bool UnregisterGetLiveFormStatusProxy();
+    ErrCode UnregisterGetLiveFormStatusProxy();
 
     /**
      * @brief Get live form status.
@@ -1422,6 +1422,14 @@ private:
     sptr<IRemoteObject> getFormRectCallerToken_;
 
     sptr<IRemoteObject> getLiveFormStatusCallerToken_;
+
+    mutable std::mutex overflowCallerTokenMutex_;
+
+    mutable std::mutex sceneanimationCallerTokenMutex_;
+
+    mutable std::mutex getFormRectCallerTokenMutex_;
+
+    mutable std::mutex getLiveFormStatusCallerTokenMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
