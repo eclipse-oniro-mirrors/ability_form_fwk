@@ -3241,5 +3241,15 @@ void FormDataMgr::DueControlForms(
         }
     }
 }
+
+void FormDataMgr::InitTransparencyFormCapbilityKey()
+{
+    transparencyFormCapbilityKey_ = OHOS::system::GetParameter(TRANSPARENT_FORM_CAPABILITY_PARAM_NAME, "");
+}
+
+const std::string FormDataMgr::GetTransparencyFormCapbilityKey()
+{
+    return transparencyFormCapbilityKey_;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

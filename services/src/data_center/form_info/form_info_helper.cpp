@@ -24,6 +24,7 @@
 #include "form_mgr_errors.h"
 #include "hitrace_meter.h"
 #include "in_process_call_wrapper.h"
+#include "data_center/form_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -272,6 +273,11 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
         HILOG_ERROR("get IBundleMgr failed");
         return false;
     }
+    const std::string transparencyFormCapbilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapbilityKey();
+    if (transparencyFormCapbilityKey == "") {
+        HILOG_ERROR("get transparencyFormCapbilityKey failed");
+        return false;
+    }
     AppProvisionInfo appProvisionInfo;
     ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId,
         appProvisionInfo));
@@ -289,7 +295,7 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
             HILOG_ERROR("appServiceCapabilities is not object");
             return false;
         }
-        return jsonObject.contains(TRANSPARENT_FORM_KEY);
+        return jsonObject.contains(transparencyFormCapbilityKey);
     }
 }
 }  // namespace AppExecFwk
