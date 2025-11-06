@@ -1384,7 +1384,7 @@ int32_t FormMgr::CheckFMSReady()
     HILOG_DEBUG("call");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        return errCode;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
