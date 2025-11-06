@@ -2186,7 +2186,7 @@ ErrCode FormMgrService::RegisterGetFormRectProxy(const sptr<IRemoteObject> &call
     HILOG_INFO("call");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }    
+    }
     return FormMgrAdapter::GetInstance().RegisterGetFormRectProxy(callerToken);
 }
 
@@ -2195,7 +2195,7 @@ ErrCode FormMgrService::UnregisterGetFormRectProxy()
     HILOG_INFO("call");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }    
+    }
     return FormMgrAdapter::GetInstance().UnregisterGetFormRectProxy();
 }
 
@@ -2222,7 +2222,7 @@ ErrCode FormMgrService::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject>
     HILOG_INFO("call");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }    
+    }
     return FormMgrAdapter::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);
 }
 
@@ -2231,7 +2231,7 @@ ErrCode FormMgrService::UnregisterGetLiveFormStatusProxy()
     HILOG_INFO("call");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }    
+    }
     return FormMgrAdapter::GetInstance().UnregisterGetLiveFormStatusProxy();
 }
 
