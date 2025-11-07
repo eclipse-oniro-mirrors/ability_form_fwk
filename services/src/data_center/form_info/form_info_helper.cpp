@@ -267,7 +267,7 @@ void FormInfoHelper::UpdateBundleTransparencyEnabled(const std::string &bundleNa
     std::vector<FormInfo> &formInfos)
 {
     bool isAGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleName, userId);
-    for(auto &formInfo: formInfos) {
+    for (auto &formInfo: formInfos) {
         // Only when configured as true will the AGC audit results be set.
         if (formInfo.transparencyEnabled) {
             formInfo.transparencyEnabled = isAGCTransparencyEnabled;
