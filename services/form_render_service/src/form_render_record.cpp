@@ -847,7 +847,7 @@ int32_t FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const W
             continue;
         }
         if (compMaxId == formRequest.compId) {
-            AddRenderer(formJsInfo, formRequest.want);
+            AddRenderer(formRequest.formJsInfo, formRequest.want);
             UpdateFormRequestReleaseState(formJsInfo.formId, formRequest.compId, false);
         }
     }
