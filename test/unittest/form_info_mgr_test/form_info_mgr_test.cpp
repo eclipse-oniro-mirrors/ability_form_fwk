@@ -269,7 +269,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateBundleTransparencyEnabled_0100, T
     FormInfo formInfo = GetTestFormInfo();
     formInfo.transparencyEnabled = true;
     formInfos.emplace_back(formInfo);
-    UpdateBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, userId, &formInfos)
+    UpdateBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID, &formInfos);
     EXPECT_FALSE(formInfos[0].transparencyEnabled);
     GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 end";
 }
