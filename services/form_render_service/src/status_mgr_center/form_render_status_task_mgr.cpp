@@ -40,6 +40,7 @@ void FormRenderStatusTaskMgr::OnRenderFormDone(const int64_t formId, const FormF
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RENDER_FORM_FAIL);
         return;
     }
 
@@ -61,6 +62,7 @@ void FormRenderStatusTaskMgr::OnRecycleForm(const int64_t formId, const FormFsmE
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_DATA_FAIL);
         return;
     }
 
@@ -85,6 +87,7 @@ void FormRenderStatusTaskMgr::OnRecoverFormDone(const int64_t formId, const Form
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECOVER_FORM_FAIL);
         return;
     }
 
@@ -106,6 +109,7 @@ void FormRenderStatusTaskMgr::OnDeleteFormDone(const int64_t formId, const FormF
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::DELETE_FORM_FAIL);
         return;
     }
 
@@ -127,6 +131,7 @@ void FormRenderStatusTaskMgr::OnRecycleFormDone(const int64_t formId, const Form
 {
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
+        FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM_FAIL);
         return;
     }
 

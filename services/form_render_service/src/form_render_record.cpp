@@ -456,6 +456,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
                 HILOG_ERROR("null renderRecord, formId:%{public}" PRId64, formJsInfo.formId);
+                std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+                FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
+                    FormFsmEvent::RENDER_FORM_FAIL, eventId, formSupplyClient);
                 return;
             }
             renderRecord->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType);
@@ -1664,6 +1667,8 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord");
+            FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formJsInfo.formId,
+                FormFsmEvent::RECOVER_FORM_FAIL, eventId, formSupplyClient);
             return;
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
