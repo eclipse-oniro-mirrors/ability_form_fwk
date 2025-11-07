@@ -49,6 +49,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr char MEMMORY_WATERMARK[] = "resourceschedule.memmgr.min.memmory.watermark";
+constexpr char TRANSPARENT_FORM_CAPABILITY_PARAM_NAME[] = "const.form.transparentForm.capability";
 
 static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
 {

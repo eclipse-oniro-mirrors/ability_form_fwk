@@ -129,6 +129,11 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
             LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, distributedFormInfo);
         }
     }
+
+    if (!bundleInfo.applicationInfo.isSystemApp) {
+        UpdateBundleTransparencyEnabled(bundleInfo.name, userId, formInfos);
+    }
+
     return ERR_OK;
 }
 
@@ -143,15 +148,8 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         HILOG_WARN("fail transform profile to extension form info");
         return;
     }
-    bool isAGCTransparencyEnabled = false;
-    if (!bundleInfo.applicationInfo.isSystemApp) {
-        isAGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleInfo.name, userId);
-    }
     for (const auto &extensionFormInfo: extensionFormInfos) {
         FormInfo formInfo(extensionInfo, extensionFormInfo);
-        if (!bundleInfo.applicationInfo.isSystemApp && formInfo.transparencyEnabled) {
-            formInfo.transparencyEnabled = isAGCTransparencyEnabled;
-        }
         if (distributedFormInfo.isDistributedForm) {
             formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
         }
@@ -263,6 +261,18 @@ ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource:
         formInfo.description = description;
     }
     return ERR_OK;
+}
+
+void FormInfoHelper::UpdateBundleTransparencyEnabled(const std::string &bundleName, int32_t userId,
+    std::vector<FormInfo> &formInfos)
+{
+    bool isAGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleName, userId);
+    for(auto &formInfo: formInfos) {
+        // Only when configured as true will the AGC audit results be set.
+        if (formInfo.transparencyEnabled) {
+            formInfo.transparencyEnabled = isAGCTransparencyEnabled;
+        }
+    }
 }
 
 bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId)

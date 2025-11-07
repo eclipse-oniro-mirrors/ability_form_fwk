@@ -258,6 +258,23 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetBundleTransparencyEnabled_0100, Test
 }
 
 /**
+ * @tc.name: FormInfoHelper_UpdateBundleTransparencyEnabled_0100
+ * @tc.number: UpdateBundleTransparencyEnabled
+ * @tc.desc: call UpdateBundleTransparencyEnabled success
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateBundleTransparencyEnabled_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+    UpdateBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, userId, &formInfos)
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 end";
+}
+
+/**
  * @tc.name: BundleFormInfo_InitFromJson_0100
  * @tc.number: InitFromJson
  * @tc.desc: call InitFromJson with bad profile
