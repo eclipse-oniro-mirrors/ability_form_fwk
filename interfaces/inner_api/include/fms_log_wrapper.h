@@ -64,11 +64,7 @@
 #endif
 
 #ifndef FMS_FILE_NAME
-#define FMS_FILE_NAME ({                                                                                    \
-    const char* start = __builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__; \
-    const char* dot = __builtin_strchr(start, '.');                                                         \
-    dot ? __builtin_strndup(start, dot - start) : start;                                                    \
-})
+#define FMS_FILE_NAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
 #ifndef FMS_FUNC_INFO
