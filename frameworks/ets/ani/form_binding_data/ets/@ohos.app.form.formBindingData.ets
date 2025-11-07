@@ -17,12 +17,12 @@ export namespace formBindingData {
 
   loadLibrary("formBindingData_ani.z");
 
-  interface ProxyData {
+  export interface ProxyData {
     key: string;
     subscriberId?: string;
   }
 
-  interface FormBindingData {
+  export interface FormBindingData {
     data: Object;
     proxies?: Array<ProxyData>;
   }

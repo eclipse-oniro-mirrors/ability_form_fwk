@@ -16,7 +16,7 @@
 import Want from '@ohos.app.ability.Want';
 
 export default namespace formInfo {
-  interface FormInfo {
+  export interface FormInfo {
     bundleName: string;
     moduleName: string;
     abilityName: string;
@@ -61,7 +61,7 @@ export default namespace formInfo {
     MODE_LIGHT = 1
   }
 
-  interface FormStateInfo {
+  export interface FormStateInfo {
     formState: FormState;
     want: Want;
   }
@@ -93,7 +93,7 @@ export default namespace formInfo {
     FORM_PERMISSION_GRANTED_KEY = 'ohos.extra.param.key.permission_granted',
   }
 
-  interface FormInfoFilter {
+  export interface FormInfoFilter {
     bundleName?: string;
     moduleName?: string;
     supportedDimensions?: Array<int>;
@@ -128,7 +128,7 @@ export default namespace formInfo {
     FORM_SHARE = 2
   }
 
-  interface PublishFormResult {
+  export interface PublishFormResult {
     code: PublishFormErrorCode;
     message: string;
   }
@@ -140,7 +140,7 @@ export default namespace formInfo {
     INTERNAL_ERROR = 3
   }
 
-  interface FormProviderFilter {
+  export interface FormProviderFilter {
     bundleName: string;
     formName?: string;
     moduleName?: string;
@@ -148,7 +148,7 @@ export default namespace formInfo {
     isUnusedIncluded?: boolean;
   }
 
-  interface RunningFormInfo {
+  export interface RunningFormInfo {
     readonly formId: string;
     readonly bundleName: string;
     readonly hostBundleName: string;
