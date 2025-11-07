@@ -106,9 +106,10 @@ public:
             return;
         }
 
-        bool result = AppExecFwk::FormMgr::GetInstance().RegisterOverflowProxy(EtsFormRouterProxyMgr::GetInstance());
-        if (!result) {
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterOverflowProxy(EtsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
             HILOG_ERROR("RegisterOverflowProxy failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
         }
         ani_vm *aniVM = nullptr;
@@ -127,9 +128,10 @@ public:
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
         }
-        bool result = AppExecFwk::FormMgr::GetInstance().UnregisterOverflowProxy();
-        if (!result) {
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterOverflowProxy();
+        if (result != ERR_OK) {
             HILOG_ERROR("UnregisterOverflowProxy failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterOverflowListener();
@@ -144,10 +146,11 @@ public:
             return;
         }
 
-        bool result = AppExecFwk::FormMgr::GetInstance().RegisterChangeSceneAnimationStateProxy(
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterChangeSceneAnimationStateProxy(
             EtsFormRouterProxyMgr::GetInstance());
-        if (!result) {
+        if (result != ERR_OK) {
             HILOG_ERROR("RegisterOverflowProxy failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
         }
         ani_vm *aniVM = nullptr;
@@ -166,9 +169,10 @@ public:
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
         }
-        bool result = AppExecFwk::FormMgr::GetInstance().UnregisterChangeSceneAnimationStateProxy();
-        if (!result) {
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterChangeSceneAnimationStateProxy();
+        if (result != ERR_OK) {
             HILOG_ERROR("UnregisterOverflowProxy failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
@@ -183,10 +187,11 @@ public:
             return;
         }
 
-        bool result = AppExecFwk::FormMgr::GetInstance().RegisterGetFormRectProxy(
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterGetFormRectProxy(
             EtsFormRouterProxyMgr::GetInstance());
-        if (!result) {
+        if (result != ERR_OK) {
             HILOG_ERROR("RegisterGetFormRectListener failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
         }
         ani_vm *aniVM = nullptr;
@@ -205,9 +210,10 @@ public:
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
         }
-        bool result = AppExecFwk::FormMgr::GetInstance().UnregisterGetFormRectProxy();
-        if (!result) {
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterGetFormRectProxy();
+        if (result != ERR_OK) {
             HILOG_ERROR("UnRegisterGetFormRectListener failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
@@ -580,6 +586,7 @@ ani_object EtsFormRouterProxyMgr::CreateFormOverflowInfo(ani_env* env, AppExecFw
 
 void EtsFormRouterProxyMgr::RegisterOverflowListener(ani_vm* ani_vm, ani_object callback)
 {
+    std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
     HILOG_INFO("RegisterOverflowListener Call");
     if (ani_vm == nullptr) {
         HILOG_ERROR("ani_vm is null");
@@ -611,6 +618,7 @@ void EtsFormRouterProxyMgr::RegisterOverflowListener(ani_vm* ani_vm, ani_object 
 
 void EtsFormRouterProxyMgr::UnregisterOverflowListener()
 {
+    std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
     HILOG_INFO("UnregisterOverflowListener Call");
     ani_vm_ = nullptr;
     ani_env* env = GetAniEnv();
@@ -630,6 +638,7 @@ void EtsFormRouterProxyMgr::UnregisterOverflowListener()
 
 void EtsFormRouterProxyMgr::RegisterGetFormRectListener(ani_vm* ani_vm, ani_object callback)
 {
+    std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
     HILOG_INFO("RegisterGetFormRectListener Call");
     if (ani_vm == nullptr) {
         HILOG_ERROR("ani_vm is null");
@@ -661,6 +670,7 @@ void EtsFormRouterProxyMgr::RegisterGetFormRectListener(ani_vm* ani_vm, ani_obje
 
 void EtsFormRouterProxyMgr::UnregisterGetFormRectListener()
 {
+    std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
     HILOG_INFO("UnregisterGetFormRectListener Call");
     ani_vm_ = nullptr;
     ani_env* env = GetAniEnv();
@@ -680,6 +690,7 @@ void EtsFormRouterProxyMgr::UnregisterGetFormRectListener()
 
 void EtsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(ani_vm* ani_vm, ani_object callback)
 {
+    std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
     HILOG_INFO("RegisterChangeSceneAnimationStateListener Call");
     if (ani_vm == nullptr) {
         HILOG_ERROR("ani_vm is null");
@@ -711,6 +722,7 @@ void EtsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(ani_vm* an
 
 void EtsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
 {
+    std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
     HILOG_INFO("UnregisterChangeSceneAnimationStateListener Call");
     ani_env* env = GetAniEnv();
     if (env == nullptr) {
