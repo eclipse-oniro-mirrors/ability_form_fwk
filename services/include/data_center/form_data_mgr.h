@@ -1011,6 +1011,13 @@ public:
      * @param isControl True is control form, false is not control form.
      */
     void DueControlForms(const std::vector<FormRecord> &&formRecords, const bool isDisablePolicy, const bool isControl);
+
+    /**
+     * @brief Get transparencyFormCapbilityKey value.
+     * @return Returns transparencyFormCapbilityKey value.
+     */
+    const std::string& GetTransparencyFormCapbilityKey();
+
 private:
     /**
      * @brief Create form record.
@@ -1135,6 +1142,11 @@ private:
      */
     void InitLowMemoryStatus();
 
+    /**
+     * @brief Init transparencyFormCapbilityKey.
+     */
+    void InitTransparencyFormCapbilityKey();
+
 private:
     void GetUnusedFormInstancesByFilter(
         const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances);
@@ -1166,6 +1178,7 @@ private:
     std::unordered_map<std::string, int> formCloudUpdateDurationMap_;
     std::unordered_map<int64_t, bool> formVisibleMap_;
     std::atomic_bool isLowMemory_ = false;
+    std::string transparencyFormCapbilityKey_ = "";
 };
 } // namespace AppExecFwk
 } // namespace OHOS

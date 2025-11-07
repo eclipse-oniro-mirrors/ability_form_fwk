@@ -24,6 +24,7 @@
 #include "form_mgr_errors.h"
 #include "hitrace_meter.h"
 #include "in_process_call_wrapper.h"
+#include "data_center/form_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -128,6 +129,11 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
             LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, distributedFormInfo);
         }
     }
+
+    if (!bundleInfo.applicationInfo.isSystemApp) {
+        UpdateBundleTransparencyEnabled(bundleInfo.name, userId, formInfos);
+    }
+
     return ERR_OK;
 }
 
@@ -144,9 +150,6 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
     }
     for (const auto &extensionFormInfo: extensionFormInfos) {
         FormInfo formInfo(extensionInfo, extensionFormInfo);
-        if (!bundleInfo.applicationInfo.isSystemApp) {
-            formInfo.transparencyEnabled = false;
-        }
         if (distributedFormInfo.isDistributedForm) {
             formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
         }
@@ -258,6 +261,51 @@ ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource:
         formInfo.description = description;
     }
     return ERR_OK;
+}
+
+void FormInfoHelper::UpdateBundleTransparencyEnabled(const std::string &bundleName, int32_t userId,
+    std::vector<FormInfo> &formInfos)
+{
+    bool isAGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleName, userId);
+    for (auto &formInfo: formInfos) {
+        // Only when configured as true will the AGC audit results be set.
+        if (formInfo.transparencyEnabled) {
+            formInfo.transparencyEnabled = isAGCTransparencyEnabled;
+        }
+    }
+}
+
+bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId)
+{
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("get IBundleMgr failed");
+        return false;
+    }
+    const std::string &transparencyFormCapbilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapbilityKey();
+    if (transparencyFormCapbilityKey.empty()) {
+        HILOG_ERROR("get transparencyFormCapbilityKey is empty");
+        return false;
+    }
+    AppProvisionInfo appProvisionInfo;
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId,
+        appProvisionInfo));
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get AppProvisionInfo failed");
+        return false;
+    } else {
+        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities,
+            nullptr, false);
+        if (jsonObject.is_discarded()) {
+            HILOG_ERROR("fail parse appServiceCapabilities");
+            return false;
+        }
+        if (!jsonObject.is_object()) {
+            HILOG_ERROR("appServiceCapabilities is not object");
+            return false;
+        }
+        return jsonObject.contains(transparencyFormCapbilityKey);
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

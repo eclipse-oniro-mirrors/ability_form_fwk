@@ -245,6 +245,36 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.L
 }
 
 /**
+ * @tc.name: FormInfoHelper_GetBundleTransparencyEnabled_0100
+ * @tc.number: GetBundleTransparencyEnabled
+ * @tc.desc: call GetBundleTransparencyEnabled success
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetBundleTransparencyEnabled_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 start";
+    bool isAGCTransparencyEnabled = formInfoHelper_->GetBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID);
+    EXPECT_FALSE(isAGCTransparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateBundleTransparencyEnabled_0100
+ * @tc.number: UpdateBundleTransparencyEnabled
+ * @tc.desc: call UpdateBundleTransparencyEnabled success
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateBundleTransparencyEnabled_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+    formInfoHelper_->UpdateBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID, formInfos);
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 end";
+}
+
+/**
  * @tc.name: BundleFormInfo_InitFromJson_0100
  * @tc.number: InitFromJson
  * @tc.desc: call InitFromJson with bad profile
