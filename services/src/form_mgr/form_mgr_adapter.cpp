@@ -851,7 +851,16 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
 int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    Want addFormWant(want);
+    bool isNeedAddForm = want.GetBoolParam(Constants::IS_NEED_ADDFORM_ON_REQUEST, false);
+    HILOG_INFO("formId:%{public}" PRId64 ", isNeedAddForm:%{public}d", formId, isNeedAddForm);
+    addFormWant.RemoveParam(Constants::IS_NEED_ADDFORM_ON_REQUEST);
+    Want updateFormWant(addFormWant);
+    updateFormWant.RemoveParam(Constants::PARAM_FORM_WIDTH_KEY);
+    updateFormWant.RemoveParam(Constants::PARAM_FORM_HEIGHT_KEY);
+    updateFormWant.RemoveParam(Constants::PARAM_FORM_DIMENSION_KEY);
+    updateFormWant.RemoveParam(Constants::PARAM_FORM_BORDER_WIDTH_KEY);
+
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("invalid formId or callerToken");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -869,7 +878,19 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     data.formId = matchedFormId;
     data.record = record;
     data.callerToken = callerToken;
-    data.want = want;
+    data.want = updateFormWant;
+    if (isNeedAddForm) {
+        ErrCode errCode = AcquireProviderFormInfoByFormRecord(record, addFormWant.GetParams());
+        auto delayRefreshForm = [data]() mutable {
+            FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
+        };
+        FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, delayRefreshForm);
+        if (errCode != ERR_OK) {
+            HILOG_ERROR("AcquireProviderFormInfoByFormRecord failed, formId:%{public}" PRId64, formId);
+        }
+        return errCode;
+    }
+
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
 
@@ -2025,7 +2046,13 @@ ErrCode FormMgrAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInf
         return ERR_APPEXECFWK_FORM_NO_SUCH_DIMENSION;
     }
 
-    ErrCode ret = CreateFormItemInfo(bundleInfo, formInfo, formItemInfo, want);
+    ErrCode ret = SetHostBundleName(want, formItemInfo);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("SetHostBundleName failed");
+        return ret;
+    }
+
+    ret = CreateFormItemInfo(bundleInfo, formInfo, formItemInfo);
     if (ret != ERR_OK) {
         HILOG_ERROR("CreateFormItemInfo failed");
         return ret;
@@ -2053,17 +2080,8 @@ bool FormMgrAdapter::IsDimensionValid(const FormInfo &formInfo, int dimensionId)
     return false;
 }
 
-ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
-    const FormInfo &formInfo, FormItemInfo &itemInfo, const AAFwk::Want &want)
+ErrCode FormMgrAdapter::SetHostBundleName(const AAFwk::Want &want, FormItemInfo &itemInfo)
 {
-    itemInfo.SetProviderBundleName(bundleInfo.name);
-    itemInfo.SetVersionCode(bundleInfo.versionCode);
-    itemInfo.SetVersionName(bundleInfo.versionName);
-    itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
-    itemInfo.SetSystemAppFlag(bundleInfo.applicationInfo.isSystemApp);
-    itemInfo.SetProviderUid(bundleInfo.applicationInfo.uid);
-    itemInfo.SetDescription(formInfo.description);
-
     std::string hostBundleName;
     bool isSaUid = IPCSkeleton::GetCallingUid() == SYSTEM_UID;
     ErrCode ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -2079,6 +2097,19 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
         return ret;
     }
     itemInfo.SetHostBundleName(hostBundleName);
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo, const FormInfo &formInfo,
+    FormItemInfo &itemInfo)
+{
+    itemInfo.SetProviderBundleName(bundleInfo.name);
+    itemInfo.SetVersionCode(bundleInfo.versionCode);
+    itemInfo.SetVersionName(bundleInfo.versionName);
+    itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
+    itemInfo.SetSystemAppFlag(bundleInfo.applicationInfo.isSystemApp);
+    itemInfo.SetProviderUid(bundleInfo.applicationInfo.uid);
+    itemInfo.SetDescription(formInfo.description);
     itemInfo.SetAbilityName(formInfo.abilityName);
     itemInfo.SetModuleName(formInfo.moduleName); // formInfo.moduleName: bundleMgr do not set
     itemInfo.SetFormName(formInfo.name);
@@ -4700,6 +4731,55 @@ ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info,
         }
     }
     return AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
+}
+
+ErrCode FormMgrAdapter::AcquireProviderFormInfoByFormRecord(const FormRecord &formRecord, const WantParams &wantParams)
+{
+    Want addFormWant;
+    addFormWant.SetParams(wantParams);
+    // get bundleInfo
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("get IBundleMgr failed");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+    BundleInfo bundleInfo;
+    ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(formRecord.bundleName,
+        formRecord.userId, bundleInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get bundleInfo failed");
+        return errCode;
+    }
+
+    // get formInfo
+    FormInfo formInfo;
+    errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get formInfo failed");
+        return errCode;
+    }
+
+    // get formItemInfo
+    FormItemInfo formItemInfo;
+    formItemInfo.SetFormId(formRecord.formId);
+    formItemInfo.SetSpecificationId(addFormWant.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY,
+        formInfo.defaultDimension));
+    errCode = CreateFormItemInfo(bundleInfo, formInfo, formItemInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get form config info failed. formId: %{public}" PRId64 " code: %{public}d",
+            formRecord.formId, errCode);
+        return errCode;
+    }
+
+    // set parameters
+    addFormWant.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, formRecord.isDynamic);
+    addFormWant.SetParam(Constants::PARAM_MODULE_NAME_KEY, formRecord.moduleName);
+    addFormWant.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, formRecord.formTempFlag);
+    addFormWant.SetParam(Constants::PARAM_FORM_OBSCURED_KEY, formRecord.protectForm || !formRecord.enableForm);
+    addFormWant.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int>(formRecord.renderingMode));
+    addFormWant.SetParam(Constants::PARAM_FONT_FOLLOW_SYSTEM_KEY, formInfo.fontScaleFollowSystem);
+    addFormWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, formInfo.enableBlurBackground);
+    return AcquireProviderFormInfoAsync(formRecord.formId, formItemInfo, addFormWant.GetParams());
 }
 
 void FormMgrAdapter::ClearReconnectNum(int64_t formId)
