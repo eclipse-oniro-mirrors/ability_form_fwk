@@ -438,7 +438,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     RecordFormLocation(formJsInfo.formId, location);
     {
         // Some resources need to be initialized in a JS thread
-        if (!CheckEventHandler(true, formJsInfo.isDynamic)) {
+        if (GetEventHandler(true, formJsInfo.isDynamic) == nullptr) {
             HILOG_ERROR("null eventHandler_ ");
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
@@ -940,12 +940,6 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
     return true;
 }
 
-bool FormRenderRecord::CheckEventHandler(bool createThread, bool needMonitored)
-{
-    GetEventHandler(createThread, needMonitored);
-    return eventHandler_ != nullptr;
-}
-
 void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto compId = want.GetStringParam(Constants::FORM_COMP_ID);
@@ -1180,7 +1174,7 @@ void FormRenderRecord::RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds,
 void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient)
 {
     HILOG_INFO("ReAdd all recycled forms start");
-    if (!CheckEventHandler(false, true)) {
+    if (GetEventHandler(false, true) == nullptr) {
         HILOG_ERROR("CheckEventHandler failed");
         return;
     }
@@ -1249,7 +1243,7 @@ void FormRenderRecord::PostReAddRecycledForms(const FormJsInfo &formJsInfo, cons
 int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos)
 {
     HILOG_INFO("ReAdd recycled forms start");
-    if (!CheckEventHandler(false, true)) {
+    if (GetEventHandler(false, true) == nullptr) {
         HILOG_ERROR("CheckEventHandler failed");
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
@@ -1307,7 +1301,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
     HILOG_INFO("Reload form record");
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        if (!CheckEventHandler(true, true)) {
+        if (GetEventHandler(true, true) == nullptr) {
             HILOG_ERROR("null eventHandler");
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
@@ -1355,7 +1349,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
     Release();
     UpdateAllFormRequest(formJsInfos, true);
     SetEventHandlerNeedResetFlag(false);
-    GetEventHandler(true,true);
+    GetEventHandler(true, true);
     return ReAddRecycledForms(formJsInfos) == ERR_OK;
 }
 
@@ -1526,7 +1520,7 @@ void FormRenderRecord::UpdateConfiguration(
 
     SetConfiguration(config);
     if (eventHandler_ == nullptr) {
-        if (!CheckEventHandler(true, true)) {
+        if (GetEventHandler(true, true) == nullptr) {
             HILOG_ERROR("null eventHandler");
             return;
         }
@@ -1604,7 +1598,7 @@ int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &status
 {
     HILOG_INFO("RecycleForm begin, formId:%{public}s", std::to_string(formId).c_str());
     int32_t result = ERR_APPEXECFWK_FORM_COMMON_CODE;
-    if (!CheckEventHandler(true, true)) {
+    if (GetEventHandler(true, true) == nullptr) {
         HILOG_ERROR("null eventHandler_");
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
@@ -1649,7 +1643,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
 {
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId:%{public}s", std::to_string(formId).c_str());
-    if (!CheckEventHandler(true, true)) {
+    if (GetEventHandler(true, true) == nullptr) {
         HILOG_ERROR("null eventHandler_");
         return RENDER_FORM_FAILED;
     }
@@ -1880,7 +1874,7 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
 
 void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId)
 {
-    if (!CheckEventHandler(true, true)) {
+    if (GetEventHandler(true, true) == nullptr) {
         HILOG_ERROR("null eventHandler");
         return;
     }

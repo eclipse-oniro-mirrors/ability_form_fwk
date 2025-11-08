@@ -226,8 +226,6 @@ private:
 
     void HandleReleaseInJsThread();
 
-    bool CheckEventHandler(bool createThread = true, bool needMonitored = false);
-
     void AddFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
     void AddFormRequest(int64_t formId, Ace::FormRequest &formRequest);
