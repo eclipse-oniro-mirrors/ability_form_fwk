@@ -1162,6 +1162,7 @@ bool FormTimerMgr::UpdateDynamicAlarm()
      | ((unsigned int)(timerOption->TIMER_TYPE_EXACT)));
     timerOption->SetRepeat(false);
     timerOption->SetInterval(0);
+    timerOption->SetName("fms_next_refresh_timer");
     std::shared_ptr<WantAgent> wantAgent = GetDynamicWantAgent(dynamicWakeUpTime_, firstTask->userId);
     if (!wantAgent) {
         HILOG_ERROR("create wantAgent failed");
@@ -1295,6 +1296,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
     timerOption->SetRepeat(true);
     int64_t interval = TIMER_UPDATE_INTERVAL / timeSpeed_;
     timerOption->SetInterval(interval);
+    timerOption->SetName("fms_cyclical_refresh_timer");
     auto timeCallback = []() { FormTimerMgr::GetInstance().OnIntervalTimeOut(); };
     timerOption->SetCallbackInfo(timeCallback);
 
@@ -1609,6 +1611,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
     timerOption->SetType(flag);
     timerOption->SetRepeat(false);
     timerOption->SetInterval(0);
+    timerOption->SetName("fms_fixed_refresh_timer");
     int32_t userId = foundItem.refreshTask.userId;
     std::shared_ptr<WantAgent> wantAgent = GetUpdateAtWantAgent(foundItem.updateAtTime, userId);
     if (wantAgent == nullptr) {
