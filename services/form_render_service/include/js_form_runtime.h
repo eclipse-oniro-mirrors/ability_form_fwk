@@ -26,6 +26,7 @@ namespace FormRender {
 class JsFormRuntime : public AbilityRuntime::JsRuntime {
 public:
     ~JsFormRuntime();
+    void SetLocalFontCollectionMaxSize();
     bool InsertHapPath(
         const std::string& bundleName, const std::string& moduleName, const std::string& hapPath);
     void DestroyHapPath();

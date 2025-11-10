@@ -574,6 +574,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Init runtime Failed");
     }
     hapPath_ = formJsInfo.jsFormCodePath;
+    runtime_->SetLocalFontCollectionMaxSize();
     bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
