@@ -400,7 +400,7 @@ private:
     uint64_t intervalTimerId_ = 0L;
     uint64_t updateAtTimerId_ = 0L;
     uint64_t dynamicAlarmTimerId_ = 0L;
-    uint64_t limiterTimerId_ = 0L;
+    std::atomic<uint64_t> limiterTimerId_ = 0L;
     uint64_t limiterTimerReportId_ = 0L;
     uint64_t reportDiskUseTimerId_ = 0L;
 

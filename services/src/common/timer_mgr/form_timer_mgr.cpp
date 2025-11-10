@@ -1041,12 +1041,12 @@ void FormTimerMgr::ClearUpdateAtTimerResource()
 bool FormTimerMgr::UpdateLimiterAlarm()
 {
     HILOG_INFO("start");
-    if (limiterTimerId_ != 0L) {
+    if (limiterTimerId_.load() != 0L) {
         HILOG_INFO("stop limiter timer start");
-        int32_t retCode = MiscServices::TimeServiceClient::GetInstance()->StopTimerV9(limiterTimerId_);
+        int32_t retCode = MiscServices::TimeServiceClient::GetInstance()->StopTimerV9(limiterTimerId_.load());
         if (retCode == MiscServices::E_TIME_DEAL_FAILED) {
             HILOG_WARN("reset limiter timer");
-            limiterTimerId_ = 0L;
+            limiterTimerId_.store(0L);
         }
         HILOG_INFO("stop limiter timer end");
     }
@@ -1067,7 +1067,7 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     if (!CreateLimiterTimer()) {
         return false;
     }
-    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerId_,
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerId_.load(),
         static_cast<uint64_t>(limiterWakeUpTime));
     if (!bRet) {
         HILOG_ERROR("init limiter timer task error");
@@ -1082,11 +1082,11 @@ bool FormTimerMgr::UpdateLimiterAlarm()
 void FormTimerMgr::ClearLimiterTimerResource()
 {
     HILOG_INFO("start");
-    if (limiterTimerId_ != 0L) {
+    if (limiterTimerId_.load() != 0L) {
         HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_.load());
         HILOG_INFO("clear limiter timer end");
-        limiterTimerId_ = 0L;
+        limiterTimerId_.store(0L);
     }
 
     if (currentLimiterWantAgent_ != nullptr) {
@@ -1109,9 +1109,9 @@ bool FormTimerMgr::CreateLimiterTimer()
         return false;
     }
     timerOption->SetWantAgent(wantAgent);
-    if (limiterTimerId_ == 0L) {
-        limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
-        HILOG_INFO("new timerId:%{public}" PRId64 ".", limiterTimerId_);
+    if (limiterTimerId_.load() == 0L) {
+        limiterTimerId_.store(MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption));
+        HILOG_INFO("new timerId:%{public}" PRId64 ".", limiterTimerId_.load());
         currentLimiterWantAgent_ = wantAgent;
     }
     HILOG_INFO("end");
@@ -1488,7 +1488,7 @@ void FormTimerMgr::Init()
     intervalTimerId_ = 0L;
     updateAtTimerId_ = 0L;
     dynamicAlarmTimerId_ = 0L;
-    limiterTimerId_ = 0L;
+    limiterTimerId_.store(0L);
     limiterTimerReportId_ = 0L;
     reportDiskUseTimerId_ = 0L;
     FormPeriodReport();

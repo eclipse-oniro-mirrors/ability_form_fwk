@@ -110,7 +110,7 @@ sptr<BundleMgrService> FmsFormMgrUpdateFormTest::mockBundleMgrService = nullptr;
  */
 HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_001 start";
+    GTEST_LOG_(INFO) << "UpdateForm_001 start";
 
     // param editor
     int64_t formId {100L};
@@ -141,16 +141,16 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
 
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = FORM_PROVIDER_BUNDLE_NAME;
-        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        GTEST_LOG_(INFO) << "UpdateForm_001 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
     // test exec
     MockGetCallingUid(callingUid);
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
 
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_001 end";
+    GTEST_LOG_(INFO) << "UpdateForm_001 end";
 }
 
 /*
@@ -163,7 +163,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
  */
 HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_003 start";
+    GTEST_LOG_(INFO) << "UpdateForm_003 start";
 
     // param editor
     int64_t formId {300L};
@@ -183,9 +183,9 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
 
     // test exec
-    EXPECT_EQ(ERR_OK, FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
 
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_003 end";
+    GTEST_LOG_(INFO) << "UpdateForm_003 end";
 }
 
 /*
@@ -198,7 +198,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
  */
 HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_004, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_004 start";
+    GTEST_LOG_(INFO) << "UpdateForm_004 start";
 
     // param editor
     int64_t formId {400L};
@@ -220,13 +220,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_004, TestSize.Level0)
 
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = FORM_PROVIDER_BUNDLE_NAME;
-        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        GTEST_LOG_(INFO) << "UpdateForm_004 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
     // test exec
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_004 end";
+    GTEST_LOG_(INFO) << "UpdateForm_004 end";
 }
 
 /*
@@ -239,7 +239,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_004, TestSize.Level0)
  */
 HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_005, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_005 start";
+    GTEST_LOG_(INFO) << "UpdateForm_005 start";
 
     // param editor
     int64_t formId {500L};
@@ -261,13 +261,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_005, TestSize.Level0)
 
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = FORM_PROVIDER_BUNDLE_NAME;
-        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        GTEST_LOG_(INFO) << "UpdateForm_005 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
     // test exec
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_005 end";
+    GTEST_LOG_(INFO) << "UpdateForm_005 end";
 }
 
 /*
@@ -280,7 +280,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_005, TestSize.Level0)
  */
 HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_006, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_006 start";
+    GTEST_LOG_(INFO) << "UpdateForm_006 start";
 
     // param editor
     int64_t formId {600L};
@@ -302,13 +302,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_006, TestSize.Level0)
 
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = FORM_PROVIDER_BUNDLE_NAME;
-        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        GTEST_LOG_(INFO) << "UpdateForm_006 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
     // test exec
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_006 end";
+    GTEST_LOG_(INFO) << "UpdateForm_006 end";
 }
 
 /*
@@ -321,7 +321,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_006, TestSize.Level0)
  */
 HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_007 start";
+    GTEST_LOG_(INFO) << "UpdateForm_007 start";
 
     // param editor
     int64_t formId {700L};
@@ -361,16 +361,16 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
 
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = FORM_PROVIDER_BUNDLE_NAME;
-        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        GTEST_LOG_(INFO) << "UpdateForm_007 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
     // test exec
     MockGetCallingUid(callingUid);
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
 
-    GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_007 end";
+    GTEST_LOG_(INFO) << "UpdateForm_007 end";
 }
 
 /**
@@ -380,7 +380,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
  * @tc.require: issueI5KIZC
  */
 HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "UpdateForm_008 starts";
+    GTEST_LOG_(INFO) << "UpdateForm_008 start";
     // param editor
     int64_t formId {100L};
     int32_t callingUid {20000001};
@@ -405,15 +405,15 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
 
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = FORM_PROVIDER_BUNDLE_NAME;
-        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        GTEST_LOG_(INFO) << "UpdateForm_008 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
     // test exec
     MockGetCallingUid(callingUid);
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
 
-    GTEST_LOG_(INFO) << "UpdateForm_008 test ends";
+    GTEST_LOG_(INFO) << "UpdateForm_008 test end";
 }
 }
