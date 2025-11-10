@@ -839,6 +839,20 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
         ret = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
     } else {
         // update Form
+        std::string bundleName;
+        ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("get bundleName failed");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+        if (bundleName != formRecord.bundleName) {
+            HILOG_ERROR("not match caller bundleName:%{public}s", bundleName.c_str());
+            return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+        }
+        if (callingUid != formRecord.uid) {
+            HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d", formRecord.uid, callingUid);
+            return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+        }
         ret = FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
     }
 

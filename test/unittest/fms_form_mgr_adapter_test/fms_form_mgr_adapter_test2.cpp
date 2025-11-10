@@ -526,7 +526,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0138, TestSize.Level0)
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsUid(false);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0138 end";
 }
 
