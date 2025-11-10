@@ -531,7 +531,7 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function {
             "requestForm_inner", "C{std.core.String}:", reinterpret_cast<void *>(RequestForm)},
         ani_native_function {
-            "requestFormWithParams_inner", "C{std.core.String}C{escompat.Record}:",
+            "requestFormWithParams_inner", "C{std.core.String}C{std.core.Record}:",
             reinterpret_cast<void *>(RequestFormWithParams)},
         ani_native_function {
             "castToNormalForm_inner", "C{std.core.String}:", reinterpret_cast<void *>(CastToNormalForm)},

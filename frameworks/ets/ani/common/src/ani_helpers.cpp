@@ -275,7 +275,7 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
 {
     ani_status status = ANI_OK;
     ani_class recordCls;
-    status = env->FindClass("escompat.Record", &recordCls);
+    status = env->FindClass("std.core.Record", &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("Find record class failed status: %{public}d", status);
         return false;
@@ -294,7 +294,7 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
 
     ani_method setFunc {};
     if (env->Class_FindMethod(recordCls, ANI_SETTER_MARKER, nullptr, &setFunc) != ANI_OK) {
-        HILOG_ERROR("Get set method failed Lescompat/Record;");
+        HILOG_ERROR("Get set method failed Lstd.core.Record;");
         return false;
     }
 
@@ -547,7 +547,7 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
 {
     HILOG_DEBUG("Call");
     ani_class recordCls;
-    ani_status status = env->FindClass("escompat.Record", &recordCls);
+    ani_status status = env->FindClass("std.core.Record", &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass failed status: %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(AppExecFwk::ERR_FORM_EXTERNAL_PARAM_INVALID));
