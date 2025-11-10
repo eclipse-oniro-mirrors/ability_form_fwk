@@ -21,6 +21,14 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
+namespace {
+    constexpr size_t LOCALFONTCOLLECTION_MEMORY_LIMIT = 20 * 1024 * 1024;
+}
+
+void JsFormRuntime::SetLocalFontCollectionMaxSize()
+{
+    Rosen::FontCollectionMgr::GetInstance().SetLocalFontCollectionMaxSize(LOCALFONTCOLLECTION_MEMORY_LIMIT);
+}
 
 bool JsFormRuntime::InsertHapPath(
     const std::string& bundleName, const std::string& moduleName, const std::string& hapPath)
