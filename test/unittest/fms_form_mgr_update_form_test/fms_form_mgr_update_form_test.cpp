@@ -183,7 +183,8 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
 
     // test exec
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+        FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
 
     GTEST_LOG_(INFO) << "UpdateForm_003 end";
 }
