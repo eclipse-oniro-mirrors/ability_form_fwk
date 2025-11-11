@@ -69,6 +69,9 @@ private:
         LiveFormInterfaceParam *params);
     static void GetFormRectPromiseCallback(ani_env *env, ani_object aniObj, ani_object obj);
     static bool ConvertFunctionResult(ani_env* env, ani_object retObj, Rect &item);
+    mutable std::mutex registerOverflowProxyMutex_;
+    mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
+    mutable std::mutex registerGetFormRectProxyMutex_;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS
