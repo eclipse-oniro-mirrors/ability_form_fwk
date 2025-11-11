@@ -1305,6 +1305,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
     float width = 1;
     float height = 1;
     float borderWidth = 1;
+    float formViewScale = 1;
     FormLockInfo formLockInfo;
     formLockInfo.bundleName = "bundleName";
     formLockInfo.userId = 1;
@@ -1316,14 +1317,14 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
     formMgrService.IsFormBundleProtected(bundleName, formId);
     formMgrService.IsFormBundleExempt(formId);
     formMgrService.NotifyFormLocked(formId, true);
-    formMgrService.UpdateFormSize(formId, width, height, borderWidth);
+    formMgrService.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     MockIsSACall(true);
     formMgrService.LockForms(formLockInfos, LockChangeType::SWITCH_CHANGE);
     formMgrService.LockForms(formLockInfos, LockChangeType::PROTECT_CHANGE);
     formMgrService.IsFormBundleProtected(bundleName, formId);
     formMgrService.IsFormBundleExempt(formId);
     formMgrService.NotifyFormLocked(formId, true);
-    formMgrService.UpdateFormSize(formId, width, height, borderWidth);
+    formMgrService.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     GTEST_LOG_(INFO) << "FormMgrService_0180 end";
 }
 

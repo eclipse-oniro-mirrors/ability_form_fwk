@@ -1843,8 +1843,12 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
     return true;
 }
 
-void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth)
+void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo)
 {
+    float width = formSurfaceInfo.width;
+    float height = formSurfaceInfo.height;
+    float borderWidth = formSurfaceInfo.borderWidth;
+    float formViewScale = formSurfaceInfo.formViewScale;
     {
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
         auto iter = formRequests_.find(formId);
@@ -1858,7 +1862,8 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
         }
 
         HILOG_INFO("formRequests length: %{public}zu formId: %{public}" PRId64 " width: %{public}f height: %{public}f"
-            " borderWidth: %{public}f", iter->second.size(), formId, width, height, borderWidth);
+            " borderWidth: %{public}f, formViewScale: %{public}f", iter->second.size(), formId, width, height,
+            borderWidth, formViewScale);
         for (auto& formRequestIter : iter->second) {
             formRequestIter.second.want.SetParam(
                 OHOS::AppExecFwk::Constants::PARAM_FORM_WIDTH_KEY, static_cast<double>(width));
@@ -1866,6 +1871,8 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
                 OHOS::AppExecFwk::Constants::PARAM_FORM_HEIGHT_KEY, static_cast<double>(height));
             formRequestIter.second.want.SetParam(
                 OHOS::AppExecFwk::Constants::PARAM_FORM_BORDER_WIDTH_KEY, static_cast<float>(borderWidth));
+            formRequestIter.second.want.SetParam(
+                OHOS::AppExecFwk::Constants::PARAM_FORM_VIEW_SCALE, formViewScale);
         }
     }
 
@@ -1873,7 +1880,7 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width
     auto search = formRendererGroupMap_.find(formId);
     if (search != formRendererGroupMap_.end()) {
         auto group = search->second;
-        group->UpdateFormSizeOfFormRequests(width, height, borderWidth);
+        group->UpdateFormSizeOfFormRequests(width, height, borderWidth, formViewScale);
     } else {
         HILOG_WARN("formRendererGroup not find, formId:%{public}" PRId64, formId);
         ReAddStaticRecycledForms(formId);

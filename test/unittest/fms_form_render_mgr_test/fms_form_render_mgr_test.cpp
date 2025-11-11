@@ -1184,8 +1184,8 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_059, TestSize.Level0)
     float width = 1.1;
     float height = 1.1;
     float borderWidth = 1.1;
-
-    formRenderMgr.UpdateFormSize(formId, width, height, borderWidth);
+    float formViewScale = 1.1;
+    formRenderMgr.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_059 end";
 }
 

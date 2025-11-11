@@ -240,11 +240,13 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0013, TestSize.Level1) {
     EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
         .WillOnce(Return(ERR_OK));
     int64_t formId = 1;
-    float width = 1.1;
-    float height = 1.1;
-    float borderWidth = 1.1;
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 1.1;
+    formSurfaceInfo.height = 1.1;
+    formSurfaceInfo.borderWidth = 1.1;
+    formSurfaceInfo.formViewScale = 1.1;
     std::string uid = "uid";
-    int result = formRenderProxy_->UpdateFormSize(formId, width, height, borderWidth, uid);
+    int result = formRenderProxy_->UpdateFormSize(formId, formSurfaceInfo, uid);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0013 test ends";
 }

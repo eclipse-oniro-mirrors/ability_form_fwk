@@ -58,12 +58,14 @@ HWTEST_F(FormRenderTaskMgrTest, FormRenderTaskMgr_0001, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRenderTaskMgr_0001 start";
     std::shared_ptr<FormRenderTaskMgr> formTaskMgr = std::make_shared<FormRenderTaskMgr>();
     int64_t formId = 123;
-    float width = 1;
-    float height = 1;
-    float borderWidth = 1;
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 1;
+    formSurfaceInfo.height = 1;
+    formSurfaceInfo.borderWidth = 1;
+    formSurfaceInfo.formViewScale = 1;
     std::string uid = "123";
     sptr<IRemoteObject> remoteObject;
-    formTaskMgr->PostUpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    formTaskMgr->PostUpdateFormSize(formId, formSurfaceInfo, uid, remoteObject);
     GTEST_LOG_(INFO) << "FormRenderTaskMgr_0001 end";
 }
 
@@ -124,12 +126,14 @@ HWTEST_F(FormRenderTaskMgrTest, FormRenderTaskMgr_0005, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRenderTaskMgr_0005 start";
     std::shared_ptr<FormRenderTaskMgr> formTaskMgr = std::make_shared<FormRenderTaskMgr>();
     int64_t formId = 123;
-    float width = 1;
-    float height = 1;
-    float borderWidth = 1;
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 1;
+    formSurfaceInfo.height = 1;
+    formSurfaceInfo.borderWidth = 1;
+    formSurfaceInfo.formViewScale = 1;
     std::string uid = "123";
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr->UpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    formTaskMgr->UpdateFormSize(formId, formSurfaceInfo, uid, remoteObject);
     GTEST_LOG_(INFO) << "FormRenderTaskMgr_0005 end";
 }
 
@@ -193,12 +197,14 @@ HWTEST_F(FormRenderTaskMgrTest, FormRenderTaskMgr_0009, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRenderTaskMgr_0009 start";
     std::shared_ptr<FormRenderTaskMgr> formTaskMgr = std::make_shared<FormRenderTaskMgr>();
     int64_t formId = 123;
-    float width = 1;
-    float height = 1;
-    float borderWidth = 1;
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 1;
+    formSurfaceInfo.height = 1;
+    formSurfaceInfo.borderWidth = 1;
+    formSurfaceInfo.formViewScale = 1;
     std::string uid = "123";
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
-    formTaskMgr->UpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    formTaskMgr->UpdateFormSize(formId, formSurfaceInfo, uid, remoteObject);
     GTEST_LOG_(INFO) << "FormRenderTaskMgr_0009 end";
 }
 

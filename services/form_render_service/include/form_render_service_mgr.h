@@ -100,7 +100,7 @@ public:
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want);
 
-    int32_t UpdateFormSize(const int64_t formId, float width, float height, float borderWidth, const std::string &uid);
+    int32_t UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid);
 
     void SetFormSupplyClient(const sptr<IFormSupply> &formSupplyClient);
 

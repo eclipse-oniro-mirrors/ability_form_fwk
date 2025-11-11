@@ -29,6 +29,7 @@
 #include "form_renderer_group.h"
 #include "js_form_runtime.h"
 #include "want.h"
+#include "form_surface_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -149,7 +150,7 @@ public:
 
     size_t FormCount();
 
-    void UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth);
+    void UpdateFormSizeOfGroups(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo);
     bool IsFormVisible(int64_t formId);
     bool IsAllFormsInvisible();
 private:

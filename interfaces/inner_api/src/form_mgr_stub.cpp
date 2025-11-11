@@ -1873,7 +1873,8 @@ ErrCode FormMgrStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel &re
     float width = data.ReadFloat();
     float height = data.ReadFloat();
     float borderWidth = data.ReadFloat();
-    ErrCode result = UpdateFormSize(formId, width, height, borderWidth);
+    float formViewScale = data.ReadFloat();
+    ErrCode result = UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

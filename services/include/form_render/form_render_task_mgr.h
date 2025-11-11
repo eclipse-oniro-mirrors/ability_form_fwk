@@ -20,6 +20,7 @@
 #include "iremote_object.h"
 #include "want.h"
 #include "data_center/form_record/form_record.h"
+#include "form_surface_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -28,7 +29,7 @@ class FormRenderTaskMgr final : public DelayedRefSingleton<FormRenderTaskMgr> {
     DECLARE_DELAYED_REF_SINGLETON(FormRenderTaskMgr)
 
 public:
-    void PostUpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    void PostUpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
         const std::string &uid, const sptr<IRemoteObject> &remoteObject);
 
     void PostOnUnlock(const sptr<IRemoteObject> &remoteObject);
@@ -39,7 +40,7 @@ public:
         const sptr<IRemoteObject> &remoteObject);
 
 private:
-    void UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth, const std::string &uid,
+    void UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid,
         const sptr<IRemoteObject> &remoteObject);
 
     void OnUnlock(const sptr<IRemoteObject> &remoteObject);

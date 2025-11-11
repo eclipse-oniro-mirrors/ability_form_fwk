@@ -4252,9 +4252,10 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+ErrCode FormMgrAdapter::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    float formViewScale)
 {
-    FormRenderMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth);
+    FormRenderMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     return ERR_OK;
 }
 

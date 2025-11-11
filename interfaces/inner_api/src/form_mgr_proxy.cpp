@@ -2660,7 +2660,8 @@ int32_t FormMgrProxy::NotifyFormLocked(const int64_t &formId, bool isLocked)
     return result;
 }
 
-ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    float formViewScale)
 {
     HILOG_DEBUG("start");
     MessageParcel data;
@@ -2682,6 +2683,10 @@ ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float h
     }
     if (!data.WriteFloat(borderWidth)) {
         HILOG_ERROR("fail write borderWidth");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteFloat(formViewScale)) {
+        HILOG_ERROR("fail write formViewScale");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageParcel reply;

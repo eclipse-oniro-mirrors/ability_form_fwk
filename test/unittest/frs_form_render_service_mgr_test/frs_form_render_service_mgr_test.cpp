@@ -1199,22 +1199,24 @@ HWTEST_F(FormRenderServiceMgrTest, UpdateFormSize_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "UpdateFormSize_001 start";
     int64_t formId{1};
-    float width{100};
-    float height{100};
-    float borderWidth{100};
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 100.0;
+    formSurfaceInfo.height = 100.0;
+    formSurfaceInfo.borderWidth = 100.0;
+    formSurfaceInfo.formViewScale = 1.0;
     std::string uid{"uid"};
     FormRenderServiceMgr formRenderServiceMgr;
-    int32_t ret = formRenderServiceMgr.UpdateFormSize(formId, width, height, borderWidth, uid);
+    int32_t ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uid);
     EXPECT_EQ(ret, UPDATE_FORM_SIZE_FAILED);
 
     formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
-    ret = formRenderServiceMgr.UpdateFormSize(formId, width, height, borderWidth, uid);
+    ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uid);
     EXPECT_EQ(ret, UPDATE_FORM_SIZE_FAILED);
 
     std::string uidNew{"uidNew"};
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uidNew);
     formRenderServiceMgr.renderRecordMap_.emplace(uidNew, formRenderRecord);
-    ret = formRenderServiceMgr.UpdateFormSize(formId, width, height, borderWidth, uidNew);
+    ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uidNew);
     EXPECT_EQ(ret, ERR_OK);
 
     GTEST_LOG_(INFO) << "UpdateFormSize_001 end";
