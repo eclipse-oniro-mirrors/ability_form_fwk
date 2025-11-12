@@ -688,7 +688,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_030, TestSize.Level0)
 
     Want want;
     formRenderRecordPtr_->eventHandler_ = nullptr;
-    formRenderRecordPtr_->CheckEventHandler(true, true);
+    formRenderRecordPtr_->GetEventHandler(true, true);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_030 end";
 }
 
@@ -705,7 +705,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_031, TestSize.Level0)
     std::string bundleName = "<bundleName>";
     auto eventRunner = EventRunner::Create(bundleName);
     formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
-    formRenderRecordPtr_->CheckEventHandler(true, true);
+    formRenderRecordPtr_->GetEventHandler(true, true);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_031 end";
 }
 
@@ -1178,7 +1178,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_057, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_057 start";
     EXPECT_TRUE(formRenderRecordPtr_);
 
-    formRenderRecordPtr_->CheckEventHandler(true, false);
+    formRenderRecordPtr_->GetEventHandler(true, false);
     formRenderRecordPtr_->threadState_ = std::make_unique<ThreadState>(2);
     EXPECT_EQ(TaskState::RUNNING, formRenderRecordPtr_->RunTask());
     GTEST_LOG_(INFO) << "FormRenderRecordTest_057 end";
@@ -1194,7 +1194,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_058, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_058 start";
     EXPECT_TRUE(formRenderRecordPtr_);
 
-    formRenderRecordPtr_->CheckEventHandler(true, false);
+    formRenderRecordPtr_->GetEventHandler(true, false);
     formRenderRecordPtr_->threadState_ = std::make_unique<ThreadState>(1);
     formRenderRecordPtr_->threadIsAlive_ = false;
 

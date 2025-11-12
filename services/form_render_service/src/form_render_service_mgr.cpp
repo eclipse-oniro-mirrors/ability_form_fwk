@@ -543,7 +543,6 @@ int32_t FormRenderServiceMgr::ProcessRecycleForm(const int64_t formId, const Wan
     FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
     FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
 
-    std::lock_guard<std::mutex> lock(renderRecordMutex_);
     SetCriticalFalseOnAllFormInvisible();
 
     return ERR_OK;
@@ -608,7 +607,7 @@ void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
         renderWant.SetParam(Constants::FORM_RENDER_STATE, true);
     } else if (renderWant.GetBoolParam(Constants::FORM_RENDER_STATE, false)) {
         HILOG_WARN("Maybe unlock event is missed or delayed, all form record begin to render");
-        isVerified_ = true;
+        isVerified_ = true; // The calling site has been locked
         for (const auto &iter : renderRecordMap_) {
             if (iter.second) {
                 iter.second->OnUnlock();
@@ -677,6 +676,7 @@ int32_t FormRenderServiceMgr::UpdateRenderRecordByUid(const std::string &uid, Wa
             HILOG_ERROR("null record");
             return RENDER_FORM_FAILED;
         }
+        std::lock_guard<std::mutex> lock(configMutex_);
         record->SetConfiguration(configuration_);
         result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
         if (renderRecordMap_.empty()) {
@@ -767,6 +767,7 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
  */
 void FormRenderServiceMgr::SetCriticalFalseOnAllFormInvisible()
 {
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
     HILOG_DEBUG("critical:%{public}d", FormMemmgrClient::GetInstance().IsCritical());
     if (!FormMemmgrClient::GetInstance().IsCritical()) {
         return;

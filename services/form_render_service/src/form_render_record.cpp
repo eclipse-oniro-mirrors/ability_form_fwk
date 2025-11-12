@@ -231,7 +231,6 @@ void FormRenderRecord::HandleDeleteRendererGroup(int64_t formId)
 
 bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool needMonitored)
 {
-    std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
     if (eventHandler_) {
         HILOG_DEBUG("EventHandle is exist,no need to create a new one");
         return true;
@@ -264,7 +263,9 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
             HILOG_INFO("Get thread %{public}d and psid %{public}d", renderRecord->jsThreadId_,
                 renderRecord->processId_);
         };
-        eventHandler_->PostHighPriorityTask(task, "GotJSThreadId");
+        auto eventHandler = GetEventHandler();
+        if (eventHandler != nullptr)
+            eventHandler->PostHighPriorityTask(task, "GotJSThreadId");
 
         hasMonitor_.store(true);
         AddWatchDogThreadMonitor();
@@ -437,7 +438,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     RecordFormLocation(formJsInfo.formId, location);
     {
         // Some resources need to be initialized in a JS thread
-        if (!CheckEventHandler(true, formJsInfo.isDynamic)) {
+        if (GetEventHandler(true, formJsInfo.isDynamic) == nullptr) {
             HILOG_ERROR("null eventHandler_ ");
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
@@ -943,15 +944,6 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
     return true;
 }
 
-bool FormRenderRecord::CheckEventHandler(bool createThead, bool needMonitored)
-{
-    if (eventHandler_ == nullptr && createThead) {
-        CreateEventHandler(bundleName_, needMonitored);
-    }
-
-    return eventHandler_ != nullptr;
-}
-
 void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto compId = want.GetStringParam(Constants::FORM_COMP_ID);
@@ -1132,7 +1124,7 @@ void FormRenderRecord::Release()
     std::shared_ptr<EventHandler> eventHandler = eventHandler_;
     std::shared_ptr<EventRunner> eventRunner = eventRunner_;
     {
-        std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
         if (eventHandler_ == nullptr) {
             HILOG_INFO("null eventHandler");
             return;
@@ -1186,7 +1178,7 @@ void FormRenderRecord::RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds,
 void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient)
 {
     HILOG_INFO("ReAdd all recycled forms start");
-    if (!CheckEventHandler(false, true)) {
+    if (GetEventHandler(false, true) == nullptr) {
         HILOG_ERROR("CheckEventHandler failed");
         return;
     }
@@ -1247,13 +1239,15 @@ void FormRenderRecord::PostReAddRecycledForms(const FormJsInfo &formJsInfo, cons
         HILOG_ERROR("null eventHandler_");
         return;
     }
-    eventHandler_->PostTask(task, "ReAddRecycledForms");
+    auto eventHandler = GetEventHandler();
+    if (eventHandler != nullptr)
+        eventHandler->PostTask(task, "ReAddRecycledForms");
 }
 
 int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos)
 {
     HILOG_INFO("ReAdd recycled forms start");
-    if (!CheckEventHandler(false, true)) {
+    if (GetEventHandler(false, true) == nullptr) {
         HILOG_ERROR("CheckEventHandler failed");
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
@@ -1311,7 +1305,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
     HILOG_INFO("Reload form record");
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        if (!CheckEventHandler(true, true)) {
+        if (GetEventHandler(true, true) == nullptr) {
             HILOG_ERROR("null eventHandler");
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
@@ -1359,10 +1353,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
     Release();
     UpdateAllFormRequest(formJsInfos, true);
     SetEventHandlerNeedResetFlag(false);
-    {
-        std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
-        CreateEventHandler(bundleName_, true);
-    }
+    GetEventHandler(true, true);
     return ReAddRecycledForms(formJsInfos) == ERR_OK;
 }
 
@@ -1532,9 +1523,8 @@ void FormRenderRecord::UpdateConfiguration(
     }
 
     SetConfiguration(config);
-    std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
     if (eventHandler_ == nullptr) {
-        if (!CheckEventHandler(true, true)) {
+        if (GetEventHandler(true, true) == nullptr) {
             HILOG_ERROR("null eventHandler");
             return;
         }
@@ -1553,7 +1543,9 @@ void FormRenderRecord::UpdateConfiguration(
         renderRecord->HandleUpdateConfiguration(config);
     };
 
-    eventHandler_->PostTask(task, "UpdateConfiguration");
+    auto eventHandler = GetEventHandler();
+    if (eventHandler != nullptr)
+        eventHandler->PostTask(task, "UpdateConfiguration");
     ReAddAllRecycledForms(formSupplyClient);
 }
 
@@ -1590,7 +1582,9 @@ void FormRenderRecord::FormRenderGC()
         HILOG_ERROR("null eventHandler_");
         return;
     }
-    eventHandler_->PostSyncTask(task, "HandleFormRenderGC");
+    auto eventHandler = GetEventHandler();
+    if (eventHandler != nullptr)
+        eventHandler->PostSyncTask(task, "HandleFormRenderGC");
 }
 
 void FormRenderRecord::HandleFormRenderGC()
@@ -1608,7 +1602,7 @@ int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &status
 {
     HILOG_INFO("RecycleForm begin, formId:%{public}s", std::to_string(formId).c_str());
     int32_t result = ERR_APPEXECFWK_FORM_COMMON_CODE;
-    if (!CheckEventHandler(true, true)) {
+    if (GetEventHandler(true, true) == nullptr) {
         HILOG_ERROR("null eventHandler_");
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
@@ -1622,7 +1616,9 @@ int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &status
 
         result = renderRecord->HandleRecycleForm(formId, statusData);
     };
-    eventHandler_->PostSyncTask(task, "RecycleForm");
+    auto eventHandler = GetEventHandler();
+    if (eventHandler != nullptr)
+        eventHandler->PostSyncTask(task, "RecycleForm");
     return result;
 }
 
@@ -1651,7 +1647,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
 {
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId:%{public}s", std::to_string(formId).c_str());
-    if (!CheckEventHandler(true, true)) {
+    if (GetEventHandler(true, true) == nullptr) {
         HILOG_ERROR("null eventHandler_");
         return RENDER_FORM_FAILED;
     }
@@ -1838,7 +1834,9 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
         formRendererGroup->SetVisibleChange(isVisible);
     };
     // the formrenderer_ must be initialized using a sync task
-    eventHandler_->PostSyncTask(task, "RecoverRenderer");
+    auto eventHandler = GetEventHandler();
+    if (eventHandler != nullptr)
+        eventHandler->PostSyncTask(task, "RecoverRenderer");
     HILOG_INFO("recover renderer, formId:%{public}" PRId64, currentRequest.formJsInfo.formId);
     return true;
 }
@@ -1889,7 +1887,7 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, const FormS
 
 void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId)
 {
-    if (!CheckEventHandler(true, true)) {
+    if (GetEventHandler(true, true) == nullptr) {
         HILOG_ERROR("null eventHandler");
         return;
     }
@@ -1951,9 +1949,12 @@ sptr<IFormSupply> FormRenderRecord::GetFormSupplyClient()
     return formSupplyClient_;
 }
 
-std::shared_ptr<EventHandler> FormRenderRecord::GetEventHandler()
+std::shared_ptr<EventHandler> FormRenderRecord::GetEventHandler(bool createThread, bool needMonitored)
 {
-    std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
+    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+    if (eventHandler_ == nullptr && createThread) {
+        CreateEventHandler(bundleName_, needMonitored);
+    }
     return eventHandler_;
 }
 
@@ -2155,7 +2156,8 @@ void FormRenderRecord::ParseFormLocationMap(std::vector<std::string> &formName, 
 
 void FormRenderRecord::RuntimeMemoryMonitor()
 {
-    if (runtime_ == nullptr || eventHandler_ == nullptr) {
+    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
+    if (runtime_ == nullptr || eventHandler == nullptr) {
         return;
     }
 
@@ -2176,7 +2178,7 @@ void FormRenderRecord::RuntimeMemoryMonitor()
         objSize = nativeEnginePtr->GetHeapObjectSize();
         limitSize = nativeEnginePtr->GetHeapLimitSize();
     };
-    eventHandler_->PostSyncTask(task, "RuntimeMemoryMonitorTask");
+    eventHandler->PostSyncTask(task, "RuntimeMemoryMonitorTask");
 
     uint64_t processMemory = GetPss();
     HILOG_INFO("processMemory: %{public}" PRIu64 ", bundleName: %{public}s, totalSize: %{public}zu, "

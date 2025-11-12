@@ -227,8 +227,6 @@ private:
 
     void HandleReleaseInJsThread();
 
-    bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
-
     void AddFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
     void AddFormRequest(int64_t formId, Ace::FormRequest &formRequest);
@@ -281,7 +279,7 @@ private:
 
     sptr<IFormSupply> GetFormSupplyClient();
 
-    std::shared_ptr<EventHandler> GetEventHandler();
+    std::shared_ptr<EventHandler> GetEventHandler(bool createThread = false, bool needMonitored = false);
 
     int32_t AddHostByFormId(int64_t formId, const sptr<IRemoteObject> hostRemoteObj);
 
@@ -330,7 +328,7 @@ private:
     std::shared_ptr<EventHandler> eventHandler_;
     bool eventHandleNeedReset = false;
     std::shared_mutex eventHandlerReset_;
-    std::recursive_mutex eventHandlerMutex_;
+    std::mutex eventHandlerMutex_;
     std::shared_ptr<JsFormRuntime> runtime_;
 
     // <formId, hostRemoteObj>

@@ -1878,6 +1878,7 @@ int32_t FormMgrService::RecoverForms(const std::vector<int64_t> &formIds, const 
 
 ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
 {
+    std::lock_guard<std::mutex> lock(snapshotSetMutex_);
     HILOG_DEBUG("call");
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
@@ -1914,12 +1915,14 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     auto ret = FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
         formId, {}, false);
     if (ret == ERR_OK) {
+        std::lock_guard<std::mutex> lock(snapshotSetMutex_);
         requestPublishFormWithSnapshotSet_.insert(formId);
         auto taskId = std::make_pair((int64_t)TaskType::UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
             static_cast<int64_t>(callingUid));
         FormMgrQueue::GetInstance().ScheduleDelayTask(
             taskId, IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME,
             [this, taskId, formId]() {
+                std::lock_guard<std::mutex> lock(snapshotSetMutex_);
                 requestPublishFormWithSnapshotSet_.erase(formId);
                 FormMgrQueue::GetInstance().CancelDelayTask(taskId);
             });
