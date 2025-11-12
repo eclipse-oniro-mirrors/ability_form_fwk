@@ -900,9 +900,9 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
 
     FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
-        RefreshCacheMgr::GetInstance().ConsumeRenderTask(formId);
         // reset expectRecycled, after form visible
         FormDataMgr::GetInstance().SetExpectRecycledStatus(formId, false);
+        RefreshCacheMgr::GetInstance().ConsumeRenderTask(formId);
     }
 }
 
