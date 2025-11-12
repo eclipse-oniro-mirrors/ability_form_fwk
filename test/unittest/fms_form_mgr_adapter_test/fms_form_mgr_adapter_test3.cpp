@@ -761,7 +761,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level1)
     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
 
     // Verify the result
-    EXPECT_EQ(ret, 2293761);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0275 end";
 }
 
@@ -789,8 +789,12 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0276, TestSize.Level1)
     MockGetFormRecordParamsUid(false);
     MockIPCSkeleton::obj = new MockIPCSkeleton();
     EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+
     // Call the method under test
-    formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+    ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+    // Verify the result
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
     delete MockIPCSkeleton::obj;
     MockIPCSkeleton::obj = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0276 end";
@@ -820,8 +824,12 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
     MockGetFormRecordParamsUid(false);
     MockIPCSkeleton::obj = new MockIPCSkeleton();
     EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+
     // Call the method under test
-    formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+    ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+    // Verify the result
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
     delete MockIPCSkeleton::obj;
     MockIPCSkeleton::obj = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0277 end";
