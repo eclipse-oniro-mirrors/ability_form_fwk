@@ -3,7 +3,7 @@
 frameworks/js/napi/BUILD.gn  @mirotong @jeremiah1106 @yanwei10 required_reviewers=3
 
 [AAFWK ABILITY]
-frameworks/ @aafwk_ability
+frameworks/ @afwk_helper
 interfaces/ @aafwk_ability
 services/ @aafwk_ability
 test/ @aafwk_ability
