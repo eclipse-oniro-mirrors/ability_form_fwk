@@ -4,6 +4,6 @@ frameworks/js/napi/BUILD.gn  @mirotong @jeremiah1106 @yanwei10 required_reviewer
 
 [AAFWK ABILITY]
 frameworks/ @afwk_helper
-interfaces/ @aafwk_ability
-services/ @aafwk_ability
-test/ @aafwk_ability
+interfaces/ @afwk_helper
+services/ @afwk_helper
+test/ @afwk_helper
