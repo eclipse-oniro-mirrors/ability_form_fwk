@@ -17,6 +17,7 @@ import { BusinessError, AsyncCallback } from '@ohos.base';
 import formBindingData from '@ohos.app.form.formBindingData';
 import formInfo from '@ohos.app.form.formInfo';
 import Want from '@ohos.app.ability.Want';
+import UIAbilityContext from 'application.UIAbilityContext';
 
 class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => { }
@@ -43,14 +44,16 @@ export namespace formProvider {
   native function isRequestPublishFormSupportedInner(callback: AsyncCallbackWrapper<boolean>): void;
   native function getPublishedFormInfosInner(callback: AsyncCallbackWrapper<Array<formInfo.RunningFormInfo>>): void;
   native function getPublishedFormInfoByIdInner(formId: string, callback: AsyncCallbackWrapper<formInfo.RunningFormInfo>): void;
-  export native function nativeGetFormRect(formId: string, callback: AsyncCallbackWrapper<formInfo.Rect>): void;
-  export native function nativeCancelOverflow(formId: string, callback: AsyncCallbackWrapper<void>): void;
-  export native function nativeRequestOverflow(formId: string, overflowInfo: formInfo.OverflowInfo, callback: AsyncCallbackWrapper<void>): void;
-  export native function nativeDeactivateSceneAnimation(formId: string, callback: AsyncCallbackWrapper<void>): void;
-  export native function nativeActivateSceneAnimation(formId: string, callback: AsyncCallbackWrapper<void>): void;
-  export native function nativeOpenFormManagerCrossBundle(want: Want): void;
-  export native function checkFormIDParam(formId: string): void;
-  export native function checkOverflowInfoParam(overflowInfo: formInfo.OverflowInfo): void;
+  native function nativeGetFormRect(formId: string, callback: AsyncCallbackWrapper<formInfo.Rect>): void;
+  native function nativeCancelOverflow(formId: string, callback: AsyncCallbackWrapper<void>): void;
+  native function nativeRequestOverflow(formId: string, overflowInfo: formInfo.OverflowInfo, callback: AsyncCallbackWrapper<void>): void;
+  native function nativeDeactivateSceneAnimation(formId: string, callback: AsyncCallbackWrapper<void>): void;
+  native function nativeActivateSceneAnimation(formId: string, callback: AsyncCallbackWrapper<void>): void;
+  native function nativeOpenFormManagerCrossBundle(want: Want): void;
+  native function checkFormIDParam(formId: string): void;
+  native function checkOverflowInfoParam(overflowInfo: formInfo.OverflowInfo): void;
+  native function nativeReloadForms(context: UIAbilityContext, moduleName: string, abilityName: string, formName: string, callback: AsyncCallbackWrapper<int>): void;
+  native function nativeReloadAllForms(context: UIAbilityContext, callback: AsyncCallbackWrapper<int>): void;
 
   const ERR_OK = 0;
   const INVALID_PARAM_ERROR_CODE = 401;
@@ -358,7 +361,7 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
           }
         });
         taskpool.execute((): void => {
-          formProvider.nativeGetFormRect(formId, myCall);
+          nativeGetFormRect(formId, myCall);
         });
       });
     return getRectFormPromise;
@@ -376,7 +379,7 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
           }
         });
         taskpool.execute((): void => {
-          formProvider.nativeCancelOverflow(formId, myCall);
+          nativeCancelOverflow(formId, myCall);
         });
       });
     return requestFormPromise;
@@ -395,7 +398,7 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
           }
         });
         taskpool.execute((): void => {
-          formProvider.nativeRequestOverflow(formId, overflowInfo, myCall);
+          nativeRequestOverflow(formId, overflowInfo, myCall);
         });
       });
     return requestFormPromise;
@@ -413,7 +416,7 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
           }
         });
         taskpool.execute((): void => {
-          formProvider.nativeDeactivateSceneAnimation(formId, myCall);
+          nativeDeactivateSceneAnimation(formId, myCall);
         });
       });
     return deactivateFormPromise;
@@ -431,13 +434,48 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
           }
         });
         taskpool.execute((): void => {
-          formProvider.nativeActivateSceneAnimation(formId, myCall);
+          nativeActivateSceneAnimation(formId, myCall);
         });
       });
     return activateFormPromise;
   }
 
   export function openFormManagerCrossBundle(want: Want): void {
-    formProvider.nativeOpenFormManagerCrossBundle(want);
+    nativeOpenFormManagerCrossBundle(want);
+  }
+
+  export function reloadForms(context: UIAbilityContext, moduleName: string, abilityName: string,
+    formName: string): Promise<int> {
+    let reloadFormsPromise: Promise<int> =
+      new Promise<int>((resolve: (data: int) => void, reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<int>((err: BusinessError | null, data: int | undefined) => {
+          if (err == null || err.code == ERR_OK) {
+            resolve(data as int);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          nativeReloadForms(context, moduleName, abilityName, formName, myCall);
+        });
+      });
+    return reloadFormsPromise;
+  }
+
+  export function reloadAllForms(context: UIAbilityContext): Promise<int> {
+    let reloadAllFormsPromise: Promise<int> =
+      new Promise<int>((resolve: (data: int) => void, reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<int>((err: BusinessError | null, data: int | undefined) => {
+          if (err == null || err.code == ERR_OK) {
+            resolve(data as int);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          nativeReloadAllForms(context, myCall);
+        });
+      });
+    return reloadAllFormsPromise;
   }
 }

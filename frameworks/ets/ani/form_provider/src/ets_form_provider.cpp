@@ -19,6 +19,7 @@
 #include <regex>
 
 #include "ani.h"
+#include "ani_base_context.h"
 #include "ani_common_want.h"
 #include "js_runtime_utils.h"
 #include "ani_helpers.h"
@@ -53,6 +54,23 @@ enum class ActivationState : int32_t {
     DEACTIVATED = 0,
     ACTIVATED = 1
 };
+
+bool CheckUIAbilityContext(ani_env *env, ani_object etsContext)
+{
+    auto context = OHOS::AbilityRuntime::GetStageModeContext(env, etsContext);
+    if (context == nullptr) {
+        HILOG_ERROR("Null context");
+        EtsFormErrorUtil::ThrowParamError(env, "Parse param context failed, must not be nullptr");
+        return false;
+    }
+    auto uiAbilityContext = OHOS::AbilityRuntime::Context::ConvertTo<OHOS::AbilityRuntime::AbilityContext>(context);
+    if (uiAbilityContext == nullptr) {
+        HILOG_ERROR("Null UIAbilityContext");
+        EtsFormErrorUtil::ThrowParamError(env, "Parse param context failed, must be UIAbilityContext");
+        return false;
+    }
+    return true;
+}
 }
 
 int ConvertStringToInt(const std::string &strInfo)
@@ -688,6 +706,57 @@ void GetPublishedFormInfoById(ani_env* env, ani_string formId, ani_object callba
     HILOG_DEBUG("End");
 }
 
+
+void ReloadForms(ani_env* env, ani_object etsContext, ani_string moduleName, ani_string abilityName,
+    ani_string formName, ani_object callback)
+{
+    HILOG_DEBUG("Call");
+    CheckEnvOrThrow(env);
+
+    if (!CheckUIAbilityContext(env, etsContext)) {
+        return;
+    }
+
+    std::string moduleNameStr = ANIUtils_ANIStringToStdString(env, moduleName);
+    std::string abilityNameStr = ANIUtils_ANIStringToStdString(env, abilityName);
+    std::string formNameStr = ANIUtils_ANIStringToStdString(env, formName);
+    int32_t reloadNum = 0;
+    auto ret = FormMgr::GetInstance().ReloadForms(reloadNum, moduleNameStr, abilityNameStr, formNameStr);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("ReloadForms failed, error code: %{public}d", static_cast<int>(ret));
+        InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        return;
+    }
+
+    ani_object etsReloadNum = createInt(env, reloadNum);
+    InvokeAsyncWithBusinessError(env, callback, ret, etsReloadNum);
+
+    HILOG_DEBUG("End");
+}
+
+void ReloadAllForms(ani_env* env, ani_object etsContext, ani_object callback)
+{
+    HILOG_DEBUG("Call");
+    CheckEnvOrThrow(env);
+
+    if (!CheckUIAbilityContext(env, etsContext)) {
+        return;
+    }
+
+    int32_t reloadNum = 0;
+    auto ret = FormMgr::GetInstance().ReloadAllForms(reloadNum);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("ReloadAllForms failed, error code: %{public}d", static_cast<int>(ret));
+        InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        return;
+    }
+
+    ani_object etsReloadNum = createInt(env, reloadNum);
+    InvokeAsyncWithBusinessError(env, callback, ret, etsReloadNum);
+
+    HILOG_DEBUG("End");
+}
+
 std::vector<ani_native_function> GetBindMethods()
 {
     std::vector methods = {
@@ -732,6 +801,10 @@ std::vector<ani_native_function> GetBindMethods()
             "checkFormIDParam", nullptr, reinterpret_cast<void *>(CheckFormIDParam)},
         ani_native_function{
             "checkOverflowInfoParam", nullptr, reinterpret_cast<void *>(CheckOverflowInfoParam)},
+        ani_native_function{
+            "nativeReloadForms", nullptr, reinterpret_cast<void *>(ReloadForms)},
+        ani_native_function{
+            "nativeReloadAllForms", nullptr, reinterpret_cast<void *>(ReloadAllForms)},
     };
     return methods;
 }
