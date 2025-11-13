@@ -54,7 +54,7 @@ export namespace formProvider {
     }
     taskpool.execute(() => setFormNextRefreshTime_inner(formId, minute)).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -80,25 +80,25 @@ export namespace formProvider {
     let dataObjStr: string = JSON.stringify(formBindingData.data);
     taskpool.execute(() => updateForm_inner(formId, dataObjStr, formBindingData.proxies)).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
 
   export function getFormsInfo(filter: formInfo.FormInfoFilter, callback: AsyncCallback<Array<formInfo.FormInfo>>): void {
-    taskpool.execute(() => getFormsInfo_inner(filter)).then((e: NullishType) => {
+    taskpool.execute(() => getFormsInfo_inner(filter)).then((e: Any) => {
       let infoArr: Array<formInfo.FormInfo> = e as Array<formInfo.FormInfo>;
       callback(null, infoArr);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
 
   export function getFormsInfo(callback: AsyncCallback<Array<formInfo.FormInfo>>): void {
-    taskpool.execute(() => getFormsInfo_inner()).then((e: NullishType) => {
+    taskpool.execute(() => getFormsInfo_inner()).then((e: Any) => {
       let infoArr: Array<formInfo.FormInfo> = e as Array<formInfo.FormInfo>;
       callback(null, infoArr);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -131,7 +131,7 @@ export namespace formProvider {
   export function isRequestPublishFormSupported(callback: AsyncCallback<boolean>): void {
     taskpool.execute(() => {
       return isRequestPublishFormSupported_inner();
-    }).then((e: NullishType) => {
+    }).then((e: Any) => {
       callback(new BusinessError, e as boolean);
     });
   }

@@ -59,7 +59,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return deleteForm_inner(formId); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -95,7 +95,7 @@ export namespace formHost {
     taskpool.execute(() : int => { return deleteInvalidForms_inner(formIds); }).then((value : Any) => {
       let deletedFormCount : int = value as int
       callback(null, deletedFormCount);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -108,7 +108,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return setFormUpdate_inner(formIds, false); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -132,7 +132,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return setFormUpdate_inner(formIds, true); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -157,9 +157,9 @@ export namespace formHost {
 
   export function getAllFormsInfo(callback: AsyncCallback<Array<formInfo.FormInfo>>): void {
     taskpool.execute(() : Array<formInfo.FormInfo> => {
-      return getAllFormsInfo_inner(); }).then((result: Array<formInfo.FormInfo> | NullishType) => {
+      return getAllFormsInfo_inner(); }).then((result: Array<formInfo.FormInfo> | Any) => {
       callback(null, result as Array<formInfo.FormInfo>);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -184,7 +184,7 @@ export namespace formHost {
       return getFormsInfo_inner(bundleName, moduleName); }).then((value : Any) => {
       let formInfos : Array<formInfo.FormInfo> = value as Array<formInfo.FormInfo>;
       callback(null, formInfos);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -215,7 +215,7 @@ export namespace formHost {
       return getFormsInfo_inner(bundleName, emptyString); }).then((value: Any) => {
       let formInfos: Array<formInfo.FormInfo> = value as Array<formInfo.FormInfo>;
       callback(null, formInfos);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -230,7 +230,7 @@ export namespace formHost {
   export function isSystemReady(callback: AsyncCallback<void>): void {
     taskpool.execute(() : void => { return isSystemReady_inner(); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -245,7 +245,7 @@ export namespace formHost {
         notifyFormsEnableUpdate_inner(formIds, isEnableUpdate);
       }).then(() => {
         callback(null, undefined);
-      }).catch((e: NullishType) => {
+      }).catch((e: Any) => {
         callback(e as BusinessError, undefined);
     });
   }
@@ -271,7 +271,7 @@ export namespace formHost {
         notifyFormsVisible_inner(formIds, isVisible);
       }).then(() => {
         callback(null, undefined);
-      }).catch((e: NullishType) => {
+      }).catch((e: Any) => {
         callback(e as BusinessError, undefined);
     });
   }
@@ -310,7 +310,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return releaseForm_inner(formId, isReleaseCache); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -323,7 +323,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return releaseForm_inner(formId, true); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -347,7 +347,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return requestForm_inner(formId); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -387,7 +387,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return castToNormalForm_inner(formId); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -411,7 +411,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return notifyVisibleForms_inner(formIds); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -435,7 +435,7 @@ export namespace formHost {
 
     taskpool.execute(() : void => { return notifyInvisibleForms_inner(formIds); }).then(() => {
       callback(null, undefined);
-    }).catch((e: NullishType) => {
+    }).catch((e: Any) => {
       callback(e as BusinessError, undefined);
     });
   }
@@ -459,7 +459,7 @@ export namespace formHost {
 
 		taskpool.execute(() => setFormsRecyclable_inner(formIds)).then(() => {
 			callback(null, undefined);
-		}).catch((e: NullishType) => {
+		}).catch((e: Any) => {
 			callback(e as BusinessError, undefined);
 		});
 	}
@@ -494,7 +494,7 @@ export namespace formHost {
 
 		taskpool.execute(() => recoverForms_inner(formIds)).then(() => {
 			callback(null, undefined);
-		}).catch((e: NullishType) => {
+		}).catch((e: Any) => {
 			callback(e as BusinessError, undefined);
 		});
 	}
