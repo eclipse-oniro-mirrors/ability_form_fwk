@@ -295,7 +295,7 @@ ani_env* EtsFormRouterProxyMgr::GetAniEnv()
 
 ErrCode EtsFormRouterProxyMgr::RouterEvent(int64_t formId, const OHOS::AAFwk::Want &want)
 {
-    HILOG_INFO("RouterEvent called with formId: %{public}lld", formId);
+    HILOG_INFO("RouterEvent called with formId: %{public}ld", formId);
     return ERR_OK;
 }
 
@@ -342,7 +342,7 @@ void EtsFormRouterProxyMgr::ChangeSceneAnimationStateInner(std::shared_ptr<LiveF
 
 ErrCode EtsFormRouterProxyMgr::GetFormRect(int64_t formId, AppExecFwk::Rect &rect)
 {
-    HILOG_INFO("GetFormRect called with formId: %{public}lld", formId);
+    HILOG_INFO("GetFormRect called with formId: %{public}ld", formId);
     LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
         .formId = std::to_string(formId)
     };
