@@ -872,7 +872,6 @@ private:
      */
     bool IsDimensionValid(const FormInfo &formInfo, int dimensionId) const;
 
-    
     /**
      * @brief Set hostBundleName of formItemInfo.
      * @param want The want of the request.
