@@ -797,7 +797,6 @@ public:
      */
     ErrCode ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams);
 
-    
     /**
      * @brief Reacquire form info from form provider by form record.
      * @param record The record of the form.
