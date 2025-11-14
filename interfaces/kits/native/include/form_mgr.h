@@ -42,8 +42,6 @@ namespace OHOS {
 namespace AppExecFwk {
 using OHOS::AAFwk::Want;
 
-static volatile int recoverStatus_ = Constants::NOT_IN_RECOVERY;
-
 /**
  * @class FormMgr
  * FormMgr is used to access form manager services.
@@ -747,7 +745,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken);
-    
+
     /**
      * @brief Unregister overflow proxy in fms.
      * @return Returns ERR_OK on success, others on failure.
@@ -783,7 +781,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
-    
+
    /**
      * @brief Register getFormRect proxy in fms.
      * @param callerToken The form host proxy.
@@ -796,7 +794,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UnregisterGetFormRectProxy();
- 
+
     /**
      * @brief Get the form rect.
      * @param formId The formId.
@@ -811,13 +809,13 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
- 
+
     /**
      * @brief Unregister get live form status proxy in fms
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UnregisterGetLiveFormStatusProxy();
-    
+
     /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
@@ -872,6 +870,12 @@ private:
     void ResetProxy(const wptr<IRemoteObject> &remote);
 
     /**
+     * @brief Check the validity of the remote proxy.
+     * @return Returns true if the remote proxy is valid.
+     */
+    bool IsRemoteProxyValid();
+
+    /**
      * @class FormMgrDeathRecipient
      * FormMgrDeathRecipient notices IRemoteBroker died.
      */
@@ -899,6 +903,8 @@ private:
     // True: need to get a new fms remote object,
     // False: no need to get a new fms remote object.
     volatile bool resetFlag_ = false;
+
+    static std::atomic<int> recoverStatus_;
 
     std::vector<std::shared_ptr<FormCallbackInterface>> formDeathCallbacks_;
 };
