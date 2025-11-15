@@ -21,6 +21,7 @@
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
 #include "json_serializer.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace AAFwk {
@@ -47,11 +48,30 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     }
 
     for (const auto &item : this->formInfos) {
-        if (IsFunInterFormInfoFiltered(item)) {
+        if (IsFunInterFormInfoFiltered(item) || IsEquipmentLevelFiltered(item)) {
             continue;
         }
         formInfos.push_back(item);
     }
+}
+
+static bool FindMatchDeviceType(const std::vector<std::string> &supportDeviceType, const char *targetDeviceType)
+{
+    if (targetDeviceType == nullptr) {
+        HILOG_ERROR("targetDeviceType is nullptr");
+        return false;
+    }
+    std::string targetDeviceTypeStr = targetDeviceType;
+    auto it = std::find(supportDeviceType.begin(), supportDeviceType.end(), targetDeviceTypeStr);
+    return it != supportDeviceType.end();
+}
+
+static bool FindMatchPerformanceClass(const std::vector<int32_t> &supportDevicePerformanceClasses,
+    int32_t targetPerformanceClasses)
+{
+    auto it = std::find(supportDevicePerformanceClasses.begin(), supportDevicePerformanceClasses.end(),
+        targetPerformanceClasses);
+    return it != supportDevicePerformanceClasses.end();
 }
 
 static bool find_match_dimensions(const std::vector<int32_t> &targetDimensions,
@@ -106,7 +126,7 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
         if (!filter.supportShapes.empty() && !find_match_shapes(filter.supportShapes, item.supportShapes)) {
             continue;
         }
-        if (IsFunInterFormInfoFiltered(item)) {
+        if (IsFunInterFormInfoFiltered(item) || IsEquipmentLevelFiltered(item)) {
             continue;
         }
         if (filter.supportDimensions.empty()) {
@@ -131,13 +151,27 @@ void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &mo
         return;
     }
     for (const auto &item : this->formInfos) {
-        if (IsFunInterFormInfoFiltered(item)) {
+        if (IsFunInterFormInfoFiltered(item) || IsEquipmentLevelFiltered(item)) {
             continue;
         }
         if (item.moduleName == moduleName) {
             formInfos.push_back(item);
         }
     }
+}
+
+bool FormInfoStorage::IsEquipmentLevelFiltered(const AppExecFwk::FormInfo &formInfo) const
+{
+    if ((formInfo.supportDeviceTypes.empty() ||
+        FindMatchDeviceType(formInfo.supportDeviceTypes, GetDeviceType())) &&
+        (formInfo.supportDevicePerformanceClasses.empty() ||
+        FindMatchPerformanceClass(formInfo.supportDevicePerformanceClasses, GetPerformanceClass()))) {
+        return false;
+    }
+
+    HILOG_ERROR("fms not support form of bundleName: %{public}s, formName: %{public}s",
+        formInfo.bundleName.c_str(), formInfo.name.c_str());
+    return true;
 }
 
 bool FormInfoStorage::IsFunInterFormInfoFiltered(const AppExecFwk::FormInfo &formInfo) const

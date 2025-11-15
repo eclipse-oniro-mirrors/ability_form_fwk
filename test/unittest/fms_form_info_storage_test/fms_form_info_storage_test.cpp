@@ -446,5 +446,33 @@ HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_022, TestSize.Level1)
     from_json(jsonObject, formInfoStorage);
     GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_022 end";
 }
+
+/*
+* @tc.name: FmsFormInfoStorageTest_023
+* @tc.desc: Test function IsCutForm
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_023, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_023 start";
+    AppExecFwk::FormInfo formInfo;
+    EXPECT_FALSE(formInfoStorage_->FormInfoStorage::IsCutForm(formInfo));
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_023 end";
+}
+
+/*
+* @tc.name: FmsFormInfoStorageTest_024
+* @tc.desc: Test function IsCutForm
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_024, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_024 start";
+    AppExecFwk::FormInfo formInfo;
+    formInfo.supportDeviceTypes = {"123", "456"};
+    formInfo.supportDevicePerformanceClasses = {1, 2}
+    EXPECT_TRUE(formInfoStorage_->FormInfoStorage::IsCutForm(formInfo));
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_024 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
