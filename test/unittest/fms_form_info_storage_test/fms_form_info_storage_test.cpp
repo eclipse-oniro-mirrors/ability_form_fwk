@@ -449,20 +449,20 @@ HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_022, TestSize.Level1)
 
 /*
 * @tc.name: FmsFormInfoStorageTest_023
-* @tc.desc: Test function IsCutForm
+* @tc.desc: Test function IsEquipmentLevelFiltered
 * @tc.type: FUNC
 */
 HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_023 start";
     AppExecFwk::FormInfo formInfo;
-    EXPECT_FALSE(formInfoStorage_->FormInfoStorage::IsCutForm(formInfo));
+    EXPECT_FALSE(formInfoStorage_->FormInfoStorage::IsEquipmentLevelFiltered(formInfo));
     GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_023 end";
 }
 
 /*
 * @tc.name: FmsFormInfoStorageTest_024
-* @tc.desc: Test function IsCutForm
+* @tc.desc: Test function IsEquipmentLevelFiltered
 * @tc.type: FUNC
 */
 HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_024, TestSize.Level1)
@@ -471,7 +471,7 @@ HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_024, TestSize.Level1)
     AppExecFwk::FormInfo formInfo;
     formInfo.supportDeviceTypes = {"123", "456"};
     formInfo.supportDevicePerformanceClasses = {1, 2}
-    EXPECT_TRUE(formInfoStorage_->FormInfoStorage::IsCutForm(formInfo));
+    EXPECT_TRUE(formInfoStorage_->FormInfoStorage::IsEquipmentLevelFiltered(formInfo));
     GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_024 end";
 }
 }  // namespace AppExecFwk
