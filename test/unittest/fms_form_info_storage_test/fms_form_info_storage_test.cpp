@@ -470,7 +470,7 @@ HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_024, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_024 start";
     AppExecFwk::FormInfo formInfo;
     formInfo.supportDeviceTypes = {"123", "456"};
-    formInfo.supportDevicePerformanceClasses = {1, 2}
+    formInfo.supportDevicePerformanceClasses = {1, 2};
     EXPECT_TRUE(formInfoStorage_->FormInfoStorage::IsEquipmentLevelFiltered(formInfo));
     GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_024 end";
 }
