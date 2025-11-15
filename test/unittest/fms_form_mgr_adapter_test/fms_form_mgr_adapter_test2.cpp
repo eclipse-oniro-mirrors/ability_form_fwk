@@ -124,7 +124,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0121, TestSize.Level0)
     MockGetMatchedHostClient(true);
     MockGetMatchedHostClientParams(true);
     MockGetMatchedHostClientParamsMatchedId(formId);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.RequestForm(formId, callerToken, want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.RequestForm(formId, callerToken, want));
     MockGetMatchedHostClientParamsMatchedId(0);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0121 end";
 }
@@ -844,9 +844,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0152, TestSize.Level0)
     formInfo.abilityName = "abilityName1";
     formInfo.moduleName = "moduleName1";
     FormItemInfo itemInfo = {};
-    Want want = {};
-    MockGetCallerBundleName(false);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfo, itemInfo, want));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfo, itemInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0152 end";
 }
 

@@ -800,6 +800,14 @@ public:
     ErrCode ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams);
 
     /**
+     * @brief Reacquire form info from form provider by form record.
+     * @param record The record of the form.
+     * @param wantParams WantParams of the request.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode AcquireProviderFormInfoByFormRecord(const FormRecord &record, const WantParams &wantParams);
+
+    /**
      * @brief Clear reconnect num.
      * @param formId The Id of the form.
      */
@@ -866,15 +874,21 @@ private:
     bool IsDimensionValid(const FormInfo &formInfo, int dimensionId) const;
 
     /**
+     * @brief Set hostBundleName of formItemInfo.
+     * @param want The want of the request.
+     * @param itemInfo Form item info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode SetHostBundleName(const AAFwk::Want &want, FormItemInfo &itemInfo);
+
+    /**
      * @brief Create form configure info.
      * @param bundleInfo Bundle info.
      * @param formInfo Form info.
      * @param itemInfo Form configure info.
-     * @param want The want of the request.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo,
-        const AAFwk::Want &want);
+    ErrCode CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo);
 
     /**
      * @brief Set form item info params.

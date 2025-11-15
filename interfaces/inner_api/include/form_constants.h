@@ -413,6 +413,8 @@ namespace Constants {
     constexpr const int32_t FORM_VERSION_CODE = 100001;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
+    // Is form need the addition process on request form
+    constexpr const char* IS_NEED_ADDFORM_ON_REQUEST = "isNeedAddForm";
 
     const std::string FORM_MGR_CONFIG_DIR = "/data/service/el1/public/update/param_service/install/system/etc/FormMgrConfig/";
 
