@@ -2887,12 +2887,14 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
 
 void FormMgrAdapter::CheckAndSetFreeInstallFlag(const FormRecord &record, Want &want)
 {
-    if (record.isSystemApp && (want.GetFlags() & Want::FLAG_INSTALL_ON_DEMAND)) {
+    unsigned int flag = want.GetFlags() & Want::FLAG_INSTALL_ON_DEMAND;
+    if (!flag) {
+        return;
+    }
+    if (record.isSystemApp) {
         HILOG_INFO("System app want has FLAG_INSTALL_ON_DEMAND");
         want.SetParam(PARAM_FREE_INSTALL_CALLING_UID, record.uid);
-    }
-
-    if (!record.isSystemApp && (want.GetFlags() & Want::FLAG_INSTALL_ON_DEMAND)) {
+    } else {
         HILOG_WARN("Only system app can set FLAG_INSTALL_ON_DEMAND");
         want.RemoveFlags(Want::FLAG_INSTALL_ON_DEMAND);
     }
