@@ -1482,6 +1482,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0074, TestSize.Level1) {
     std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
     ASSERT_NE(nullptr, formMgr);
     formMgr->ResetProxy(nullptr);
+    EXPECT_TRUE(FormMgr::GetInstance().remoteProxy_ == nullptr);
     formMgr->SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0074 test ends";
 }
@@ -1497,6 +1498,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0075, TestSize.Level1) {
     sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
     FormMgr::GetInstance().ResetProxy(remote);
     EXPECT_TRUE(FormMgr::GetInstance().GetRecoverStatus() == Constants::IN_RECOVERING);
+    EXPECT_TRUE(FormMgr::GetInstance().remoteProxy_ == nullptr);
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0075 test ends";
 }
@@ -4703,7 +4705,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0256, TestSize.Level1) {
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0256 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0257
  * @tc.desc: Verify requestOverflow
@@ -4718,7 +4720,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0257, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
     GTEST_LOG_(INFO) << "FormMgrTest_0257 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0258
  * @tc.desc: Verify requestOverflow
@@ -4734,7 +4736,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0258, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrTest_0258 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0259
  * @tc.desc: Verify requestOverflow
@@ -4756,7 +4758,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0259, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrTest_0259 end";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0260
  * @tc.desc: Verify ChangeSceneAnimationState
@@ -4777,7 +4779,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0260, TestSize.Level1) {
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0260 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0261
  * @tc.desc: Verify ChangeSceneAnimationState
@@ -4791,7 +4793,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0261, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
     GTEST_LOG_(INFO) << "FormMgrTest_0261 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0262
  * @tc.desc: Verify ChangeSceneAnimationState
@@ -4843,7 +4845,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0272, TestSize.Level1) {
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0272 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0273
  * @tc.desc: Verify getFormRect
@@ -4873,7 +4875,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0275, TestSize.Level1) {
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0275 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0276
  * @tc.desc: Verify RegisterGetFormRectProxy
@@ -4889,7 +4891,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0276, TestSize.Level1) {
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0276 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0277
  * @tc.desc: Verify UnregisterGetFormRectProxy
@@ -4905,7 +4907,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0277, TestSize.Level1)
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0277 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0278
  * @tc.desc: Verify UnregisterGetFormRectProxy
@@ -4937,7 +4939,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0279, TestSize.Level1) {
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0279 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0280
  * @tc.desc: Verify RegisterGetLiveFormStatusProxy
@@ -4953,7 +4955,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0280, TestSize.Level1) {
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0280 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0281
  * @tc.desc: Verify UnregisterGetLiveFormStatusProxy
@@ -4969,7 +4971,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0281, TestSize.Level1)
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0281 test ends";
 }
- 
+
 /**
  * @tc.name: FormMgrTest_0282
  * @tc.desc: Verify UnregisterGetLiveFormStatusProxy
