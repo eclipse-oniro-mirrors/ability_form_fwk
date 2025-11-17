@@ -24,6 +24,14 @@ namespace {
 constexpr const char* ETS_FUNINTERACTIONPARAMS_NAME = "L@ohos/app/form/formInfo/formInfo/FunInteractionParamsInner;";
 constexpr const char* ETS_FORMINFO_NAME = "L@ohos/app/form/formInfo/formInfo/FormInfoInner;";
 constexpr const char* ETS_SCENEANIMATIONPARAMS_NAME = "L@ohos/app/form/formInfo/formInfo/SceneAnimationParamsInner;";
+constexpr const char* DELEGATOR_RECORD_KEY = "keys";
+constexpr const char* DELEGATOR_RECORD_NEXT = "next";
+constexpr const char* DELEGATOR_RECORD_DONE = "done";
+constexpr const char* DELEGATOR_RECORD_VALUE = "value";
+constexpr const char* DELEGATOR_RECORD_CLASS_NAME = "escompat.Record";
+constexpr const char* DELEGATOR_RECORD_GET = "$_get";
+constexpr const char* DELEGATOR_RECORD_GET_NAME =
+    "X{C{std.core.BaseEnum}C{std.core.Numeric}C{std.core.String}}:C{std.core.Object}";
 }
 
 ani_object CreateFunInteractionParamsDatas(ani_env* env,
@@ -127,6 +135,87 @@ bool UnwrapFormRect(ani_env *env, ani_object rectobject, AppExecFwk::Rect &rect)
     rect.width = width;
     rect.height = height;
     return true;
+}
+
+bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<std::string, std::string> &mockList)
+{
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
+    ani_ref iter = nullptr;
+    ani_status status = ANI_ERROR;
+    status = env->Object_CallMethodByName_Ref(aniMockList, DELEGATOR_RECORD_KEY, nullptr, &iter);
+    if (ANI_OK != status) {
+        HILOG_ERROR("Failed to get keys iterator status: %{public}d", status);
+        return false;
+    }
+    ani_ref next = nullptr;
+    ani_boolean done = false;
+    while (ANI_OK == env->Object_CallMethodByName_Ref(
+        static_cast<ani_object>(iter), DELEGATOR_RECORD_NEXT, nullptr, &next)) {
+        status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), DELEGATOR_RECORD_DONE, &done);
+        if (ANI_OK != status) {
+            HILOG_ERROR("Failed to check iterator done status: %{public}d", status);
+            return false;
+        }
+        if (done) {
+            HILOG_DEBUG("[forEachMapEntry] done break");
+            return true;
+        }
+        ani_ref aniKey = nullptr;
+        ani_ref aniValue = nullptr;
+        if (!ParseRecordStringInner(env, next, aniMockList, aniKey, aniValue)) {
+            HILOG_ERROR("ParseRecordStringInner failed");
+            return false;
+        }
+        SetRecordStringToMap(env, static_cast<ani_string>(aniKey), static_cast<ani_string>(aniValue), mockList);
+    }
+    return true;
+}
+
+bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, ani_ref &aniKey, ani_ref &aniValue)
+{
+    ani_status status = ANI_ERROR;
+    status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), DELEGATOR_RECORD_VALUE, &aniKey);
+    if (ANI_OK != status) {
+        HILOG_ERROR("Failed to get value status: %{public}d", status);
+        return false;
+    }
+    ani_class recordCls = nullptr;
+    status = env->FindClass(DELEGATOR_RECORD_CLASS_NAME, &recordCls);
+    if (status != ANI_OK) {
+        HILOG_ERROR("FindClass failed status: %{public}d", status);
+        return false;
+    }
+    ani_method recordGetMethod = nullptr;
+    status = env->Class_FindMethod(recordCls, DELEGATOR_RECORD_GET, DELEGATOR_RECORD_GET_NAME, &recordGetMethod);
+    if (status != ANI_OK) {
+        HILOG_ERROR("Class_FindMethod failed status: %{public}d", status);
+        return false;
+    }
+    status = env->Object_CallMethod_Ref(aniMockList, recordGetMethod, &aniValue, static_cast<ani_string>(aniKey));
+    if (status != ANI_OK) {
+        HILOG_ERROR("Object_CallMethod_Void failed status: %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+void SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
+    std::unordered_map<std::string, std::string> &uMap)
+{
+    std::string mapKey = "";
+    if (!GetStdString(env, aniKey, mapKey)) {
+        HILOG_ERROR("GetStdString failed");
+        return;
+    }
+    std::string mapValue = "";
+    if (!GetStdString(env, aniValue, mapValue)) {
+        HILOG_ERROR("GetStdString failed");
+        return;
+    }
+    uMap.emplace(mapKey, mapValue);
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

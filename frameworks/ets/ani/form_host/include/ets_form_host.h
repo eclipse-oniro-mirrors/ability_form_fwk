@@ -44,6 +44,10 @@ public:
 
     void UnregisterGetFormRectListener();
 
+    void RegisterGetLiveFormStatusListener(ani_vm *ani_vm, ani_object callback);
+
+    void UnregisterGetLiveFormStatusListener();
+
     ErrCode RouterEvent(const int64_t formId, const OHOS::AAFwk::Want &want);
 private:
     static std::mutex mutex_;
@@ -53,6 +57,7 @@ private:
     ani_vm* ani_vm_ = nullptr;
     ani_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
     ani_ref getFormRectCallbackRef_ = nullptr;
+    ani_ref getLiveFormStatusCallbackRef_ = nullptr;
     DISALLOW_COPY_AND_MOVE(EtsFormRouterProxyMgr);
 
     ErrCode RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow = true);
@@ -63,6 +68,7 @@ private:
     ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect);
     void GetFormRectInner(LiveFormInterfaceParam *dataParam);
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
+    void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     ani_env* GetAniEnv();
     bool bindNativeMethod(ani_env* env, ani_class cls, LiveFormInterfaceParam *dataParam);
     void CallPromise(ani_env* env, ani_class cls, ani_object callbackObj, ani_object retObj,

@@ -84,6 +84,8 @@ export default namespace formHost {
   export native function nativeOffChangeSceneAnimationState(callback?: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
   export native function nativeOnGetFormRect(callback: GetFormRectInfoCallbackWrapper): void;
   export native function nativeOffGetFormRect(callback?: GetFormRectInfoCallbackWrapper): void;
+  export native function nativeOnGetLiveFormStatus(callback: GetLiveFormStatusCallbackWrapper): void;
+  export native function nativeOffGetLiveFormStatus(callback?: GetLiveFormStatusCallbackWrapper): void;
 
   const ERR_OK = 0;
   const INVALID_PARAM_ERROR_CODE = 401;
@@ -983,6 +985,19 @@ export default namespace formHost {
     formHost.nativeOffGetFormRect(myCall);
   }
 
+  function on(type: 'getLiveFormStatus', callback: formInfo.GetLiveFormStatusCallback): void {
+    let myCall = new GetLiveFormStatusCallbackWrapper(callback);
+    formHost.nativeOnGetLiveFormStatus(myCall);
+  }
+
+  function off(type: 'getLiveFormStatus', callback?: formInfo.GetLiveFormStatusCallback): void {
+    let myCall: GetLiveFormStatusCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new GetLiveFormStatusCallbackWrapper(callback);
+    }
+    formHost.nativeOffGetLiveFormStatus(myCall);
+  }
+
   class GetFormRectInfoCallbackWrapper {
     private liveFormInterfaceParam: long;
 
@@ -1012,6 +1027,18 @@ export default namespace formHost {
 
     invoke(formId: string): Promise<formInfo.Rect> {
       return this.formRectCallback(formId);
+    }
+  }
+
+  class GetLiveFormStatusCallbackWrapper {
+    private liveFormStatusCallback: formInfo.GetLiveFormStatusCallback = (): Record<string, string> => { }
+
+    constructor(callback: formInfo.GetLiveFormStatusCallback) {
+      this.liveFormStatusCallback = callback;
+    }
+
+    invoke(): Record<string, string> {
+      return this.liveFormStatusCallback();
     }
   }
 }
