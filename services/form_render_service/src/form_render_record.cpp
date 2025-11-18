@@ -51,6 +51,7 @@ constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr size_t THREAD_BLOCK_TIMEOUT = 10 * 1000;
 constexpr int32_t MEMORY_MONITOR_INTERVAL = Constants::MS_PER_DAY * 3;
 constexpr size_t RUNTIME_MEMORY_LIMIT = 16 * 1024 * 1024;
+constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr size_t THREAD_NAME_LEN = 15;
@@ -923,7 +924,7 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
             return false;
         }
         if (!search->second) {
-            HILOG_ERROR("FormRendererGroup was founded but null");
+            HILOG_ERROR("FormRendererGroup was found but null");
             return false;
         }
         if (!compId.empty()) {
@@ -1436,6 +1437,47 @@ int32_t FormRenderRecord::HandleOnUnlock()
     return ERR_OK;
 }
 
+int32_t FormRenderRecord::SetRenderGroupEnableFlag(const int64_t formId, bool isEnable)
+{
+    HILOG_INFO("SetRenderGroupEnableFlag, formId:%{public}" PRId64, formId);
+    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("null eventHandler formId:%{public}" PRId64, formId);
+        return SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED;
+    }
+    auto task = [thisWeakPtr = weak_from_this(), formId, isEnable]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("null renderRecord formId:%{public}" PRId64, formId);
+            return;
+        }
+
+        renderRecord->HandleSetRenderGroupEnableFlag(formId, isEnable);
+    };
+
+    eventHandler->PostTask(task, "SetRenderGroupEnableFlag");
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::HandleSetRenderGroupEnableFlag(const int64_t &formId, bool isEnable)
+{
+    HILOG_INFO("HandleSetRenderGroupEnableFlag begin,formId:%{public}" PRId64, formId);
+    MarkThreadAlive();
+
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto search = formRendererGroupMap_.find(formId);
+    if (search == formRendererGroupMap_.end()) {
+        HILOG_ERROR("invalid FormRendererGroup formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
+    }
+    if (!search->second) {
+        HILOG_ERROR("FormRendererGroup was found but null");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
+    }
+    search->second->SetRenderGroupEnableFlag(isEnable);
+    return ERR_OK;
+}
+
 int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible)
 {
     HILOG_INFO("SetVisibleChange, formId:%{public}s", std::to_string(formId).c_str());
@@ -1471,7 +1513,7 @@ int32_t FormRenderRecord::HandleSetVisibleChange(const int64_t &formId, bool isV
         return SET_VISIBLE_CHANGE_FAILED;
     }
     if (!search->second) {
-        HILOG_ERROR("FormRendererGroup was founded but null");
+        HILOG_ERROR("FormRendererGroup was found but null");
         return SET_VISIBLE_CHANGE_FAILED;
     }
     search->second->SetVisibleChange(isVisible);
@@ -1634,7 +1676,7 @@ int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     if (!search->second) {
-        HILOG_ERROR("FormRendererGroup was founded but null");
+        HILOG_ERROR("FormRendererGroup was found but null");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
 

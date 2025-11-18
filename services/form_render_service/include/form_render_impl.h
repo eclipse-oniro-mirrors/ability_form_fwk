@@ -81,6 +81,8 @@ public:
 
     int32_t OnUnlock() override;
 
+    int32_t SetRenderGroupEnableFlag(const int64_t formId, bool isEnable, const Want &want) override;
+
     int32_t SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want) override;
 
     int32_t RecycleForm(const int64_t &formId, const Want &want) override;

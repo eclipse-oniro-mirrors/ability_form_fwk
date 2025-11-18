@@ -34,6 +34,8 @@ public:
 
     void PostOnUnlock(const sptr<IRemoteObject> &remoteObject);
 
+    void PostSetRenderGroupEnableFlag(int64_t formId, bool isEnable, const sptr<IRemoteObject> &remoteObject);
+
     void PostSetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject);
 
     void PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
@@ -44,6 +46,8 @@ private:
         const sptr<IRemoteObject> &remoteObject);
 
     void OnUnlock(const sptr<IRemoteObject> &remoteObject);
+
+    void SetRenderGroupEnableFlag(int64_t formId, bool isEnable, const sptr<IRemoteObject> &remoteObject);
 
     void SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject);
 

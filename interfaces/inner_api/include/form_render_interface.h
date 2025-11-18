@@ -69,6 +69,8 @@ public:
 
     virtual int32_t OnUnlock() { return ERR_OK; }
 
+    virtual int32_t SetRenderGroupEnableFlag(const int64_t formId, bool isEnable, const Want &want) { return ERR_OK; }
+
     virtual int32_t SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want) { return ERR_OK; }
 
     virtual int32_t RecycleForm(const int64_t &formId, const Want &want) { return ERR_OK; }
@@ -101,6 +103,7 @@ public:
         FORM_RUN_CACHED_CONFIG = 3109,
         FORM_SET_VISIBLE_CHANGE = 3110,
         FORM_UPDATE_FORM_SIZE = 3111,
+        FORM_SET_RENDER_GROUP_ENABLE_FLAG = 3112,
     };
 };
 } // namespace AppExecFwk

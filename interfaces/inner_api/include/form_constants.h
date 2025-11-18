@@ -41,6 +41,7 @@ namespace Constants {
     constexpr const char* PARAM_FORM_NAME_KEY = "ohos.extra.param.key.form_name";
     constexpr const char* PARAM_FORM_DIMENSION_KEY = "ohos.extra.param.key.form_dimension";
     constexpr const char* PARAM_FORM_RENDERINGMODE_KEY = "ohos.extra.param.key.form_rendering_mode";
+    constexpr const char* PARAM_FORM_DISABLE_UIFIRST_KEY = "ohos.extra.param.key.disable_uifirst";
     constexpr const char* PARAM_FORM_OBSCURED_KEY = "ohos.extra.param.key.form_obscured_mode";
     constexpr const char* PARAM_MESSAGE_KEY = "ohos.extra.param.key.message";
     constexpr const char* PARAM_FORM_TEMPORARY_KEY = "ohos.extra.param.key.form_temporary";

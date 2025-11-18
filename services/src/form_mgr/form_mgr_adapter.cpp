@@ -904,8 +904,19 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         }
         return errCode;
     }
+    UpdateFormRenderParam(data.formId, want);
 
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
+}
+
+void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const Want &want)
+{
+    bool hasparam = want.GetParams().HasParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY);
+    if (hasparam) {
+        // isEnable can be true only while PARAM_FORM_DISABLE_UIFIRST_KEY was false.
+        bool isEnable = !want.GetBoolParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY, false);
+        FormRenderMgr::GetInstance().SetRenderGroupEnableFlag(formId, isEnable);
+    }
 }
 
 void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)

@@ -52,6 +52,8 @@ public:
 
     void NotifyScreenOn();
 
+    void SetRenderGroupEnableFlag(int64_t formId, bool isEnable);
+
     void SetVisibleChange(int64_t formId, bool isVisible);
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord,

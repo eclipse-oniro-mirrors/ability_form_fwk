@@ -81,6 +81,8 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return HandleSetVisibleChange(data, reply);
         case static_cast<uint32_t>(IFormRender::Message::FORM_UPDATE_FORM_SIZE):
             return HandleUpdateFormSize(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_SET_RENDER_GROUP_ENABLE_FLAG):
+            return HandleSetRenderGroupEnableFlag(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -198,6 +200,23 @@ int32_t FormRenderStub::HandleOnUnlock(MessageParcel &data, MessageParcel &reply
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_OnUnlock",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = OnUnlock();
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormRenderStub::HandleSetRenderGroupEnableFlag(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    bool isEnable = data.ReadBool();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("error to ReadParcelable<Want>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_SetRenderGroupEnableFlag",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    int32_t result = SetRenderGroupEnableFlag(formId, isEnable, *want);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;

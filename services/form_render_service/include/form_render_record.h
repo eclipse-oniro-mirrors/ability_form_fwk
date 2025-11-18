@@ -112,6 +112,10 @@ public:
 
     int32_t OnUnlock();
 
+    int32_t SetRenderGroupEnableFlag(const int64_t formId, bool isEnable);
+
+    int32_t HandleSetRenderGroupEnableFlag(const int64_t &formId, bool isEnable);
+
     int32_t SetVisibleChange(const int64_t &formId, bool isVisible);
 
     int32_t HandleSetVisibleChange(const int64_t &formId, bool isVisible);

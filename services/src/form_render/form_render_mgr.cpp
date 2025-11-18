@@ -417,6 +417,20 @@ void FormRenderMgr::OnUnlock(int32_t userId)
     ExecAcquireProviderTask(userId);
 }
 
+void FormRenderMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable)
+{
+    HILOG_INFO("call.");
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->PostSetRenderGroupEnableFlagTask(formId, isEnable);
+    }
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->PostSetRenderGroupEnableFlagTask(formId, isEnable);
+    }
+}
+
 void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible)
 {
     HILOG_INFO("call.");
