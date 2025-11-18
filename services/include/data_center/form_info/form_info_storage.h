@@ -38,6 +38,7 @@ struct FormInfoStorage {
 private:
     bool IsGameCard(const AppExecFwk::FormInfo &formInfo) const;
     bool IsFunInterFormInfoFiltered(const AppExecFwk::FormInfo &formInfo) const;
+    bool IsEquipmentLevelFiltered(const AppExecFwk::FormInfo &formInfo) const;
 };
 
 void to_json(nlohmann::json &jsonObject, const FormInfoStorage &formInfoStorage);
