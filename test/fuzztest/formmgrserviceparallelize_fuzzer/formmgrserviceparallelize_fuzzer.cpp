@@ -51,6 +51,11 @@ extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
     if (SetSelfTokenID(TOKEN_ID | (1uLL << OHOS::OFFSET)) < 0) {
         return -1;
     }
+
+    if (p_formMgrService == nullptr) {
+        return -1;
+    }
+
     OHOS::p_formMgrService->OnStart();
     return 0;
 }
