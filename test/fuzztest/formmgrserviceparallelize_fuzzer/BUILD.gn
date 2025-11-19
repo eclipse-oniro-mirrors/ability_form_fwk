@@ -55,6 +55,8 @@ ohos_fuzztest("FormMgrServiceParallelizeFuzzTest") {
     "ffrt:libffrt",
     "ipc:ipc_core",
     "memmgr:memmgrclient",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

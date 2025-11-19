@@ -46,7 +46,8 @@ sptr<IRemoteObject> GetMockRemoteObject()
 }
 }
 
-extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv) {
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
     if (SetSelfTokenID(TOKEN_ID | (1uLL << OHOS::OFFSET)) < 0) {
         return -1;
     }
@@ -54,15 +55,16 @@ extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv) {
     return 0;
 }
 
-extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider) {
+extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider)
+{
     if (p_formMgrService == nullptr) {
         return 0;
     }
 
-    static const int IPC_CODES[] = {
+    static const int ipcCodes[] = {
         IpcCode::ADD_FORM, IpcCode::DELETE_FORM
     };
-    int code = provider.PickValueInArray(IPC_CODES);
+    int code = provider.PickValueInArray(ipcCodes);
 
     switch (code) {
         case IpcCode::ADD_FORM: {
@@ -86,7 +88,8 @@ extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider) {
     return 0;
 }
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     FuzzedDataProvider fdp(data, size);
     FuzzIFormMgrService(fdp);
     return 0;
