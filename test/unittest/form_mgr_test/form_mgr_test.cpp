@@ -1482,7 +1482,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0074, TestSize.Level1) {
     std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
     ASSERT_NE(nullptr, formMgr);
     formMgr->ResetProxy(nullptr);
-    EXPECT_TRUE(FormMgr::GetInstance().remoteProxy_ == nullptr);
+    EXPECT_TRUE(formMgr->remoteProxy_ == nullptr);
     formMgr->SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0074 test ends";
 }

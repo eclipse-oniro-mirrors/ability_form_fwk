@@ -76,6 +76,11 @@ public:
         std::u16string descriptor = std::u16string();
         return descriptor;
     }
+
+    bool IsObjectDead() const override
+    {
+        return false;
+    }
 };
 } // namespace Notification
 } // namespace OHOS
