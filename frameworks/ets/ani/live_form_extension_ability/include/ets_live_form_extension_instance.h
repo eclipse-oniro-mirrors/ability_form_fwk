@@ -13,33 +13,16 @@
  * limitations under the License.
  */
 
+#ifndef OHOS_FORM_FWK_ETS_LIVE_FORM_EXTENSION_INSTANCE_H
+#define OHOS_FORM_FWK_ETS_LIVE_FORM_EXTENSION_INSTANCE_H
+
 #include "live_form_extension.h"
-#include "runtime.h"
-#include "fms_log_wrapper.h"
-#include "js_live_form_extension.h"
-#include "ets_live_form_extension_instance.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
-LiveFormExtension::LiveFormExtension()
-{
-    HILOG_INFO("called");
-}
+class Runtime;
 
-LiveFormExtension *LiveFormExtension::Create(const std::unique_ptr<Runtime> &runtime)
-{
-    if (!runtime) {
-        HILOG_WARN("null runtime");
-        return new LiveFormExtension();
-    }
-    switch (runtime->GetLanguage()) {
-        case Runtime::Language::JS:
-            return JsLiveFormExtension::Create(runtime);
-        case Runtime::Language::ETS:
-            return CreateETSLiveFormExtension(runtime);
-        default:
-            return new LiveFormExtension();
-    }
-}
+LiveFormExtension *CreateETSLiveFormExtension(const std::unique_ptr<Runtime> &runtime);
 } // namespace AbilityRuntime
 } // namespace OHOS
+#endif // OHOS_FORM_FWK_ETS_LIVE_FORM_EXTENSION_INSTANCE_H

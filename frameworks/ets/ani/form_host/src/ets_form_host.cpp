@@ -27,6 +27,7 @@
 #include "ani_form_error_util.h"
 #include "ani_form_util.h"
 #include "ani_helpers.h"
+#include "ani_task.h"
 #include "form_callback_interface.h"
 #include "event_handler.h"
 #include "fms_log_wrapper.h"
@@ -62,6 +63,8 @@ constexpr const char* ETS_RECT_NAME = "L@ohos/app/form/formInfo/formInfo/RectInn
 constexpr const char* ETS_OVERFLOWINFO_NAME = "L@ohos/app/form/formInfo/formInfo/OverflowInfoInner;";
 constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "L@ohos/app/form/formHost/CallbackWrapper;";
 constexpr const char* ETS_FORM_RECT_INFO_CALLBACK = "L@ohos/app/form/formHost/formHost/GetFormRectInfoCallbackWrapper;";
+constexpr const char* ETS_LIVE_FORM_STATUS_CALLBACK =
+    "L@ohos/app/form/formHost/formHost/GetLiveFormStatusCallbackWrapper;";
 constexpr const char *CHECK_PROMISE_SIGNATURE = "C{std.core.Object}:z";
 constexpr const char *CALL_PROMISE_SIGNATURE = "C{std.core.Promise}:";
 constexpr const char *FORM_HOST_FORMINFO_FORMID = "formId";
@@ -79,6 +82,8 @@ constexpr const char* FORM_HOST_RECT_HEIGHT = "height";
 constexpr const char* FORM_HOST_OVERFLOWINFO_AREA = "area";
 constexpr const char* FORM_HOST_OVERFLOWINFO_DURATION = "duration";
 constexpr const char* FORM_HOST_OVERFLOWINFO_USEDEFAULTANIMATION = "useDefaultAnimation";
+
+constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
 
 void CallBackReturn(const Rect &item, LiveFormInterfaceParam* liveFormInterfaceParam, bool ret)
 {
@@ -219,6 +224,44 @@ public:
         EtsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
     }
 
+    static void OnRegisterGetLiveFormStatusListener(ani_env* env, ani_object callback)
+    {
+        HILOG_INFO("OnRegisterGetLiveFormStatusListener Call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("The app not system-app,can't use system-api");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return;
+        }
+
+        auto result = AppExecFwk::FormMgr::GetInstance().RegisterGetLiveFormStatusProxy(
+            EtsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
+            HILOG_ERROR("RegisterGetLiveFormStatusProxy failed, retcode:%{public}d", result);
+            return;
+        }
+        ani_vm *aniVM = nullptr;
+        if (env->GetVM(&aniVM) != ANI_OK) {
+            HILOG_ERROR("get aniVM failed");
+            return;
+        }
+        EtsFormRouterProxyMgr::GetInstance()->RegisterGetLiveFormStatusListener(aniVM, callback);
+    }
+
+    static void OffRegisterGetLiveFormStatusListener(ani_env* env, ani_object callback)
+    {
+        HILOG_INFO("OffRegisterGetLiveFormStatusListener Call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("The app not system-app,can't use system-api");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return;
+        }
+        auto result = AppExecFwk::FormMgr::GetInstance().UnregisterGetLiveFormStatusProxy();
+        if (result != ERR_OK) {
+            HILOG_ERROR("UnregisterGetLiveFormStatusProxy failed, retcode:%{public}d", result);
+            return;
+        }
+        EtsFormRouterProxyMgr::GetInstance()->UnregisterGetLiveFormStatusListener();
+    }
 private:
     static bool CheckCallerIsSystemApp()
     {
@@ -263,6 +306,14 @@ void EtsFormHostInit(ani_env* env)
         ani_native_function {
             "nativeOffGetFormRect", nullptr,
             reinterpret_cast<void *>(EtsFormHost::OffRegisterGetFormRectListener)
+        },
+        ani_native_function {
+            "nativeOnGetLiveFormStatus", nullptr,
+            reinterpret_cast<void *>(EtsFormHost::OnRegisterGetLiveFormStatusListener)
+        },
+        ani_native_function {
+            "nativeOffGetLiveFormStatus", nullptr,
+            reinterpret_cast<void *>(EtsFormHost::OffRegisterGetLiveFormStatusListener)
         },
     };
     status = env->Namespace_BindNativeFunctions(ns, methods.data(), methods.size());
@@ -506,7 +557,57 @@ void EtsFormRouterProxyMgr::GetFormRectPromiseCallback(ani_env *env, ani_object 
 ErrCode EtsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("GetLiveFormStatus Call");
-    return ERR_OK;
+    std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
+    auto task = [dataParam] () {
+        EtsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
+        HILOG_INFO("getLiveFormStatus start notify.");
+        std::unique_lock<std::mutex> lock(dataParam->mutex);
+        dataParam->isReady = true;
+        dataParam->condition.notify_all();
+    };
+    if (AniTask::AniSendEvent(task) != ANI_OK) {
+        HILOG_ERROR("Failed to aniSendEvent");
+    }
+    std::unique_lock<std::mutex> lock(dataParam->mutex);
+    dataParam->condition.wait_for(
+        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
+    bool result = dataParam->result;
+    liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
+    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+}
+
+void EtsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam)
+{
+    HILOG_INFO("call");
+    if (dataParam == nullptr) {
+        HILOG_ERROR("null dataParam");
+        return;
+    }
+    dataParam->result = false;
+    ani_env *env = GetAniEnv();
+    if (env == nullptr) {
+        HILOG_ERROR("null env");
+        return;
+    }
+    ani_class cls = nullptr;
+    ani_status status = ANI_ERROR;
+    if ((status = env->FindClass(ETS_LIVE_FORM_STATUS_CALLBACK, &cls)) != ANI_OK) {
+        HILOG_ERROR("findClass failed");
+        return;
+    }
+    ani_object callbackObj = reinterpret_cast<ani_object>(getLiveFormStatusCallbackRef_);
+    ani_ref callResult = nullptr;
+    if ((status = env->Object_CallMethodByName_Ref(callbackObj, FORM_HOST_INVOKE, nullptr, &callResult)) != ANI_OK ||
+        callResult == nullptr) {
+        HILOG_ERROR("callMethod failed");
+        return;
+    }
+
+    HILOG_INFO("parse result");
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    bool ret = ParseRecordString(env, reinterpret_cast<ani_object>(callResult), liveFormStatusMap);
+    dataParam->result = ret;
+    dataParam->liveFormStatusMap = liveFormStatusMap;
 }
 
 ErrCode EtsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo,
@@ -738,6 +839,56 @@ void EtsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
         changeSceneAnimationStateRigisterCallback_ = nullptr;
     }
     ani_vm_ = nullptr;
+}
+
+void EtsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(ani_vm* ani_vm, ani_object callback)
+{
+    HILOG_INFO("RegisterGetLiveFormStatusListener Call");
+    if (ani_vm == nullptr) {
+        HILOG_ERROR("ani_vm is null");
+        return;
+    }
+    ani_env* env = nullptr;
+    ani_status status = ANI_ERROR;
+    if ((status = ani_vm->GetEnv(ANI_VERSION_1, &env)) != ANI_OK) {
+        HILOG_ERROR("GetEnv failed status: %{public}d", status);
+        return;
+    }
+    if (callback == nullptr) {
+        HILOG_ERROR("Invalid callback reference");
+        return;
+    }
+    if (getLiveFormStatusCallbackRef_ != nullptr) {
+        if ((status = env->GlobalReference_Delete(getLiveFormStatusCallbackRef_)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+            return;
+        }
+        getLiveFormStatusCallbackRef_ = nullptr;
+    }
+    if ((status = env->GlobalReference_Create(callback, &getLiveFormStatusCallbackRef_)) != ANI_OK) {
+        HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+        return;
+    }
+    ani_vm_ = ani_vm;
+}
+
+void EtsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
+{
+    HILOG_INFO("UnregisterGetLiveFormStatusListener Call");
+    ani_vm_ = nullptr;
+    ani_env* env = GetAniEnv();
+    if (env == nullptr) {
+        HILOG_ERROR("env is null");
+        return;
+    }
+    ani_status status = ANI_ERROR;
+    if (getLiveFormStatusCallbackRef_ != nullptr) {
+        if ((status = env->GlobalReference_Delete(getLiveFormStatusCallbackRef_)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+            return;
+        }
+        getLiveFormStatusCallbackRef_ = nullptr;
+    }
 }
 
 class EtsFormStateCallbackClient
