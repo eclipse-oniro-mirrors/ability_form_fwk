@@ -1809,6 +1809,9 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
         }
     }
 
+    if (!formRecord.isSystemApp && formRecord.transparencyEnabled) {
+        FormTimerMgr::GetInstance().StartFormCheckTimer();
+    }
     // start update timer
     if (info.GetProviderBundleName() != info.GetHostBundleName()) {
         return AddFormTimer(formRecord);

@@ -401,5 +401,26 @@ void FormHostTaskMgr::DueControlFormsTaskToHost(const std::vector<int64_t> &form
 
     remoteFormHost->OnDueControlForm(formIds, isDisablePolicy, isControl);
 }
+
+void FormHostTaskMgr::PostCheckFormsTaskToHost(
+    const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("post check forms task");
+    auto func = [formIds, remoteObject]() {
+        FormHostTaskMgr::GetInstance().CheckFormsTaskToHost(formIds, remoteObject);
+    };
+    FormHostQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, func);
+}
+
+void FormHostTaskMgr::CheckFormsTaskToHost(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("get formHostProxy failed");
+        return;
+    }
+    remoteFormHost->OnCheckForm(formIds);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

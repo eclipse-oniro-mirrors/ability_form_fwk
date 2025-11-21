@@ -872,6 +872,12 @@ public:
     void EnableForms(const std::vector<FormRecord> &&formRecords, const bool enable);
 
     /**
+     * @brief Check if form is abnormal.
+     * @param formIds The list of formId.
+     */
+    void CheckForms(const std::vector<int64_t> &formIds);
+
+    /**
      * @brief Get all formIds by userId.
      * @param userId User ID.
      * @param formIds The list of formId.

@@ -73,6 +73,8 @@ int FormHostStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
             return HandleOnLockForm(data, reply);
         case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_DUE_CONTROL_FORM):
             return HandleOnDueControlForm(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_CHECK_FORM):
+            return HandleOnCheckForm(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -260,6 +262,19 @@ int32_t FormHostStub::HandleOnDueControlForm(MessageParcel &data, MessageParcel 
     bool isControl = data.ReadBool();
     OnDueControlForm(formIds, isDisablePolicy, isControl);
     reply.WriteInt32(ERR_OK);
+    return ERR_OK;
+}
+
+int32_t FormHostStub::HandleOnCheckForm(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("start");
+    std::vector<int64_t> formIds;
+    bool ret = data.ReadInt64Vector(&formIds);
+    if (!ret) {
+        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    OnCheckForm(formIds);
     return ERR_OK;
 }
 }  // namespace AppExecFwk

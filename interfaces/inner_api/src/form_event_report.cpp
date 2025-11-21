@@ -38,6 +38,9 @@ constexpr const char *EVENT_KEY_BIND_DURATION = "BIND_DURATION";
 constexpr const char *EVENT_KEY_GET_DURATION = "GET_DURATION";
 constexpr const char *EVENT_KEY_FORM_NAME = "FORM_NAME";
 constexpr const char *EVENT_KEY_FORM_DIMENSION = "FORM_DIMENSION";
+constexpr const char *EVENT_KEY_FORM_LOCATION = "FORM_LOCATION";
+constexpr const char *EVENT_KEY_NONTRANSPARENCY_RATE = "NONTRANSPARENCY_RATE";
+constexpr const char *EVENT_KEY_APP_VERSION = "APP_VERSION";
 constexpr const char *EVENT_KEY_ACQUIRE_DURATION = "ACQUIRE_DURATION";
 constexpr const char *EVENT_KEY_DURATION = "DURATION";
 constexpr const char *EVENT_KEY_DURATION_TYPE = "DURATION_TYPE";
@@ -68,6 +71,7 @@ constexpr const char *EVENT_KEY_IS_LOW_MEMORY = "IS_LOW_MEMORY";
 constexpr const char *EVENT_KEY_OCCURRENCE_TIME = "OCCURRENCE_TIME";
 constexpr const char *EVENT_KEY_STATUS = "STATUS";
 constexpr const char *FORM_RENDER_SERVICE_STATUS_ALTER = "FORM_RENDER_SERVICE_STATUS_ALTER";
+constexpr const char *ABNORMAL_FORM = "ABNORMAL_FORM";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     {FormEventName::ADD_FORM, "ADD_FORM"},
     {FormEventName::REQUEST_FORM, "REQUEST_FORM"},
@@ -473,6 +477,23 @@ void FormEventReport::SendFRSStatusEvent(
         EVENT_KEY_FORM_COUNT, formCountList,
         EVENT_KEY_IS_LOW_MEMORY, isLowMemoryList,
         EVENT_KEY_STATUS, statusList);
+}
+
+void FormEventReport::SendFormAbnormalEvent(const FormAbnormalReportParams &params)
+{
+    HILOG_DEBUG("call");
+    HiSysEventWrite(
+        HiSysEvent::Domain::FORM_MANAGER,
+        ABNORMAL_FORM,
+        HiSysEventType::STATISTIC,
+        EVENT_KEY_BUNDLE_NAME, params.bundleNames,
+        EVENT_KEY_MODULE_NAME, params.moduleNames,
+        EVENT_KEY_ABILITY_NAME, params.abilityNames,
+        EVENT_KEY_FORM_NAME, params.formNames,
+        EVENT_KEY_FORM_DIMENSION, params.formDimensions,
+        EVENT_KEY_FORM_LOCATION, params.formLocations,
+        EVENT_KEY_APP_VERSION, params.appVersions,
+        EVENT_KEY_NONTRANSPARENCY_RATE, params.nonTransparencyRateList);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

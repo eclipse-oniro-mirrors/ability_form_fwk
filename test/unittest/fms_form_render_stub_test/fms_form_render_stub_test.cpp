@@ -452,6 +452,11 @@ public:
         return ERR_OK;
     }
 
+    ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio) override
+    {
+        return ERR_OK;
+    }
+
     const int number_ = 1;
 };
 

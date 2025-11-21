@@ -31,6 +31,7 @@ ohos_unittest("FmsFormStatusTaskMgrTest") {
     "${form_fwk_path}/services/src/status_mgr_center/form_event_timeout_queue.cpp",
     "${form_fwk_path}/services/src/status_mgr_center/form_event_retry_mgr.cpp",
     "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
+    "${form_fwk_path}/services/src/feature/form_check/form_abnormal_reporter.cpp",
     "${form_fwk_path}/services/src/form_mgr/form_mgr_queue.cpp",
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
   ]

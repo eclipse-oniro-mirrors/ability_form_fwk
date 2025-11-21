@@ -3105,5 +3105,32 @@ bool FormMgrProxy::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bo
     }
     return reply.ReadBool();
 }
+
+ErrCode FormMgrProxy::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("Write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(ratio)) {
+        HILOG_ERROR("write ratio failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_SEND_NON_TRANSPARENT_RATIO, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

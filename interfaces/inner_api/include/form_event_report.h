@@ -58,6 +58,8 @@ public:
         const std::vector<uint8_t> &statusList,
         const std::vector<int32_t> &formCountList,
         const std::vector<int64_t> &occurrenceTimeList);
+    static void SendFormAbnormalEvent(const FormAbnormalReportParams &params);
+
 private:
     static std::string ConvertEventName(const FormEventName &eventName);
 };

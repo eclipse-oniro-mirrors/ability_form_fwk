@@ -264,6 +264,11 @@ public:
     {
         return 0;
     }
+
+    ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio) override
+    {
+        return ERR_OK;
+    }
 };
 
 void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)

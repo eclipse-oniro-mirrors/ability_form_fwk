@@ -116,6 +116,14 @@ public:
      */
     void PostDueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
         const bool isControl, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Post check form task.
+     * @param formIds formIds The Id list of the forms.
+     * @param remoteObject Form host proxy object.
+     */
+    void PostCheckFormsTaskToHost(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject);
+
 private:
     /**
      * @brief Post form data to form host when acquire form..
@@ -205,6 +213,13 @@ private:
      */
     void DueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
         const bool isControl, const sptr<IRemoteObject> &remoteObject);
+    
+    /**
+     * @brief Exec check form task.
+     * @param formIds formIds The Id list of the forms.
+     * @param remoteObject Form host proxy object.
+     */
+    void CheckFormsTaskToHost(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

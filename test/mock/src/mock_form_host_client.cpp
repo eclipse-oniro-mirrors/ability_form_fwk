@@ -95,5 +95,8 @@ void MockFormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const
     HILOG_DEBUG("MockFormHostClient OnEnableForm");
     PostVoid();
 }
+
+void MockFormHostClient::OnCheckForm(const std::vector<int64_t> &formIds)
+{}
 }  // namespace AppExecFwk
 }  // namespace OHOS

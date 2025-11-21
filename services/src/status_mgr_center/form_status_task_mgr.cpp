@@ -26,6 +26,7 @@
 #include "form_provider/form_supply_callback.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_cache_mgr.h"
+#include "feature/form_check/form_abnormal_reporter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -336,11 +337,14 @@ void FormStatusTaskMgr::RenderForm(
         FormRecordReport::GetInstance().IncreaseUpdateTimes(
             formRecord.formId, HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
     }
+    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     if (error != ERR_OK) {
         HILOG_ERROR("StopRenderingForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
         RemoveConnection(connectId);
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formRecord.formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RENDER_FORM_FAIL);
+    } else if (renderType == Constants::UPDATE_RENDERING_FORM) {
+        FormAbnormalReporter::GetInstance().MarkUpdateRender(formRecord.formId);
     }
 
     HILOG_DEBUG("end");
