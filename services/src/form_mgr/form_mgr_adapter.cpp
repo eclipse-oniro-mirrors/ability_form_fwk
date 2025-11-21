@@ -114,6 +114,7 @@ const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.supp
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
+const std::string PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 constexpr int32_t RECONNECT_NUMS = 2;
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
@@ -2881,6 +2882,8 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
+    CheckAndSetFreeInstallFlag(record, want);
+
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
         int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityOnlyUIAbility(
@@ -2911,6 +2914,21 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 #endif
     return ERR_OK;
+}
+
+void FormMgrAdapter::CheckAndSetFreeInstallFlag(const FormRecord &record, Want &want)
+{
+    unsigned int flag = want.GetFlags() & Want::FLAG_INSTALL_ON_DEMAND;
+    if (!flag) {
+        return;
+    }
+    if (record.isSystemApp) {
+        HILOG_INFO("System app want has FLAG_INSTALL_ON_DEMAND");
+        want.SetParam(PARAM_FREE_INSTALL_CALLING_UID, record.uid);
+    } else {
+        HILOG_WARN("Only system app can set FLAG_INSTALL_ON_DEMAND");
+        want.RemoveFlags(Want::FLAG_INSTALL_ON_DEMAND);
+    }
 }
 
 int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)

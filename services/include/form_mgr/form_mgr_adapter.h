@@ -302,6 +302,13 @@ public:
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Check record isSystemApp And Set FreeInstallFlag
+     * @param record form record.
+     * @param want the want of the ability to modify.
+     */
+    void CheckAndSetFreeInstallFlag(const FormRecord &record, Want &want);
+
+    /**
      * @brief Process background router event.
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
