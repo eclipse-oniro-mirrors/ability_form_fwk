@@ -142,6 +142,11 @@ namespace Constants {
     constexpr const char* CALLBACK_WRAPPER_CLASS_NAME = "@ohos.app.form.formHost.CallbackWrapper";
     constexpr const char* FORM_STATE_INFO_INNER_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormStateInfoInner";
     constexpr const char* FORM_STATE_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormState";
+    constexpr const char* FUNINTERACTION_PARAMS_INNER_CLASS_NAME =
+        "@ohos.app.form.formInfo.formInfo.FunInteractionParamsInner";
+    constexpr const char* SCENE_ANIMATION_PARAMS_INNER_CLASS_NAME =
+        "@ohos.app.form.formInfo.formInfo.SceneAnimationParamsInner";
+
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.

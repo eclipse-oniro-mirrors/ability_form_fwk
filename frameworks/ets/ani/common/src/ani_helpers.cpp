@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "ani_helpers.h"
 #include "form_mgr_errors.h"
 
@@ -178,14 +178,12 @@ int64_t FormIdAniStrtoInt64(ani_env *env, const ani_string &formId)
     std::string stdFormId = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(formId));
     if (stdFormId.empty()) {
         HILOG_ERROR("formId ANIUtils_ANIStringToStdString failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return INVALID_FORMID;
     }
 
     int64_t formIdNum = INVALID_FORMID;
     if (!ConvertStringToInt64(stdFormId, formIdNum)) {
         HILOG_ERROR("formId ConvertStringToInt64 failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return INVALID_FORMID;
     }
 
@@ -413,6 +411,7 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
     env->Object_SetPropertyByName_Boolean(formInfoAni, "isDynamic", formInfo.isDynamic);
     env->Object_SetPropertyByName_Boolean(formInfoAni, "transparencyEnabled", formInfo.transparencyEnabled);
     env->Object_SetPropertyByName_Boolean(formInfoAni, "enableBlurBackground", formInfo.enableBlurBackground);
+    env->Object_SetPropertyByName_Boolean(formInfoAni, "resizable", formInfo.resizable);
     // Set enum properties
     env->Object_SetPropertyByName_Int(formInfoAni, "renderingMode", static_cast<int>(formInfo.renderingMode));
     env->Object_SetPropertyByName_Int(formInfoAni, "type", static_cast<int>(formInfo.type));
@@ -432,6 +431,8 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
     SetStringProperty(env, formInfoAni, "jsComponentName", formInfo.jsComponentName);
     SetStringProperty(env, formInfoAni, "formConfigAbility", formInfo.formConfigAbility);
     SetStringProperty(env, formInfoAni, "scheduledUpdateTime", formInfo.scheduledUpdateTime);
+    SetStringProperty(env, formInfoAni, "groupId", formInfo.groupId);
+
     // Set array properties
     ani_array supportDimensionAni = CreateAniArrayIntFromStdVector(env, formInfo.supportDimensions);
     if (supportDimensionAni != nullptr) {
@@ -450,6 +451,39 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
     if (CreateFormCustomizeDataRecord(env, record, formInfo.customizeDatas)) {
         env->Object_SetPropertyByName_Ref(formInfoAni, "customizeData", record);
     }
+
+    SetFormInfoFunInteractionParams(env, formInfoAni, formInfo.funInteractionParams);
+    SetFormInfoSceneAnimationParams(env, formInfoAni, formInfo.sceneAnimationParams);
+}
+
+void SetFormInfoFunInteractionParams(ani_env *env, ani_object formInfoAni,
+    const AppExecFwk::FormFunInteractionParams &funInteractionParams)
+{
+    ani_object funInteractionParamsAni = CreateANIObject(env, FUNINTERACTION_PARAMS_INNER_CLASS_NAME);
+    if (funInteractionParamsAni == nullptr) {
+        HILOG_ERROR("Cannot create funInteractionParams object");
+        return;
+    }
+    SetStringProperty(env, funInteractionParamsAni, "abilityName", funInteractionParams.abilityName);
+    SetStringProperty(env, funInteractionParamsAni, "targetBundleName", funInteractionParams.targetBundleName);
+    SetStringProperty(env, funInteractionParamsAni, "subBundleName", funInteractionParams.subBundleName);
+    env->Object_SetPropertyByName_Int(funInteractionParamsAni, "keepStateDuration",
+        funInteractionParams.keepStateDuration);
+    env->Object_SetPropertyByName_Ref(formInfoAni, "funInteractionParams", funInteractionParamsAni);
+}
+
+void SetFormInfoSceneAnimationParams(ani_env *env, ani_object formInfoAni,
+    const AppExecFwk::FormSceneAnimationParams &formSceneAnimationParams)
+{
+    ani_object sceneAnimationParamsAni = CreateANIObject(env, SCENE_ANIMATION_PARAMS_INNER_CLASS_NAME);
+    if (sceneAnimationParamsAni == nullptr) {
+        HILOG_ERROR("Cannot create sceneAnimationParams object");
+        return;
+    }
+    SetStringProperty(env, sceneAnimationParamsAni, "abilityName", formSceneAnimationParams.abilityName);
+    SetStringProperty(env, sceneAnimationParamsAni, "disabledDesktopBehaviors",
+        formSceneAnimationParams.disabledDesktopBehaviors);
+    env->Object_SetPropertyByName_Ref(formInfoAni, "sceneAnimationParams", sceneAnimationParamsAni);
 }
 
 ani_object CreateANIObject(ani_env *env, const char *className)
@@ -591,7 +625,7 @@ ani_object NewRecordClass(ani_env *env)
 {
     HILOG_INFO("Call");
     CheckEnvOrThrow(env);
-    
+
     ani_object recordObj = {};
     ani_class recordCls;
 
@@ -609,7 +643,7 @@ ani_object NewRecordClass(ani_env *env)
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return nullptr;
     }
- 
+
     status = env->Object_New(recordCls, ctor, &recordObj);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New status = %{public}d", status);
@@ -716,27 +750,27 @@ bool InvokeCallback(ani_env *env, ani_object obj, ani_object arg)
         HILOG_ERROR("null env");
         return false;
     }
-    
+
     ani_class clsCall = nullptr;
     ani_status status = env->FindClass(CALLBACK_WRAPPER_CLASS_NAME, &clsCall);
     if (status != ANI_OK || clsCall == nullptr) {
         HILOG_ERROR("FindClass status: %{public}d, or null clsCall", status);
         return false;
     }
-    
+
     ani_method method = nullptr;
     status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method);
     if (status != ANI_OK || method == nullptr) {
         HILOG_ERROR("Class_FindMethod status: %{public}d, or null method", status);
         return false;
     }
-    
+
     if (arg == nullptr) {
         ani_ref undefinedRef = nullptr;
         env->GetUndefined(&undefinedRef);
         arg = reinterpret_cast<ani_object>(undefinedRef);
     }
-    
+
     status = env->Object_CallMethod_Void(obj, method, arg);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_CallMethod_Void status: %{public}d", status);
@@ -938,6 +972,13 @@ ani_object CreateBool(ani_env *env, ani_boolean value)
     }
 
     return object;
+}
+
+bool VectorHasNegativeValue(const std::vector<int>& vector)
+{
+    return std::any_of(vector.begin(), vector.end(), [](int v) {
+        return v < 0;
+    });
 }
 
 }  // namespace FormAniHelpers

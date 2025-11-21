@@ -192,6 +192,10 @@ export function getPublishedFormInfos(): Promise<Array<formInfo.FormInfo>> {
 
 export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormInfo> {
   return new Promise<formInfo.FormInfo>((resolve, reject: (err: BusinessError) => void): void => {
+    if (formId === "") {
+      reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+      return;
+    }
     let call = new AsyncCallbackWrapper<formInfo.RunningFormInfo>((err, data) => {
       if (err && err.code !== ERR_OK) {
         reject(err);
@@ -231,6 +235,10 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
 
   export function getPublishedRunningFormInfoById(formId: string): Promise<formInfo.RunningFormInfo> {
     return new Promise<formInfo.RunningFormInfo>((resolve, reject): void => {
+      if (formId === "") {
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
+      }
       let call = new AsyncCallbackWrapper<formInfo.RunningFormInfo>((err, data) => {
         if (err == null || err.code == ERR_OK) {
           resolve(data as formInfo.RunningFormInfo);
@@ -246,7 +254,7 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
 
   export function getFormsInfo(filter: formInfo.FormInfoFilter,
     callback: AsyncCallback<Array<formInfo.FormInfo>>): void {
-    if (filter === null || filter === undefined) {
+    if (filter === null || filter === undefined || filter.moduleName === undefined) {
       callback(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)), undefined);
       return;
     }
@@ -265,6 +273,10 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
 
   export function getFormsInfo(filter?: formInfo.FormInfoFilter): Promise<Array<formInfo.FormInfo>> {
     return new Promise<Array<formInfo.FormInfo>>((resolve, reject): void => {
+      if(filter !== undefined && filter?.moduleName === undefined) {
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, INVALID_PARAM_MESSAGE_ETS));
+        return;
+      }
       let call = new AsyncCallbackWrapper<Array<formInfo.FormInfo>>((err, data) => {
         if (err == null || err.code == ERR_OK) {
           resolve(data as Array<formInfo.FormInfo>);
