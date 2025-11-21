@@ -29,8 +29,8 @@ export class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
-class CallbackWrapper<T> {
-  private myFun_: Callback<T> = (data: T) => {}
+export class CallbackWrapper<T> {
+  private myFun_: Callback<T> = (data: T) => { }
 
   constructor(myFun: Callback<T>) {
     this.myFun_ = myFun;
@@ -39,9 +39,15 @@ class CallbackWrapper<T> {
   invoke(data: T): void {
     this.myFun_(data);
   }
+
+  isEqual(callback: Callback<T>): boolean {
+    return (this.myFun_ === callback);
+  }
 }
 
 export default namespace formHost {
+
+  let callbackArray: CallbackWrapper<string>[] = [];
 
   loadLibrary("formHost_ani.z");
 
@@ -863,22 +869,20 @@ export default namespace formHost {
     });
   }
 
-  export function on(type: 'formUninstall', callback: Callback<string>): void {
-    let callbackWrap = new CallbackWrapper<string>(callback);
-    taskpool.execute((): void => {
-      registerFormObserverInner(callbackWrap);
-    });
+  export function onFormUninstall(callback: Callback<string>): void {
+    if(!hasCallback(callback)){
+      let callbackWrap = createCallbackWrapper(callback);
+        registerFormObserverInner(callbackWrap);
+    }
   }
 
-  export function off(type: "formUninstall", callback?: Callback<string>): void {
-    taskpool.execute((): void => {
+  export function offFormUninstall(callback?: Callback<string>): void {
       if (callback) {
-        let callbackWrap = new CallbackWrapper<string>(callback);
+        let callbackWrap = createCallbackWrapper(callback);
         unRegisterFormObserverInner(callbackWrap);
       } else {
         unRegisterFormObserverInner();
       }
-    });
   }
 
   export function setRouterProxy(formIds: Array<string>, proxy: Callback<Want>): Promise<void> {
@@ -913,7 +917,6 @@ export default namespace formHost {
     let callbackWrapper = new CallbackWrapper<Want>(proxy);
     taskpool.execute((): void => {
       setRouterProxyInner(formIds, callbackWrapper, call);
-      callback(null, undefined);
     });
   }
 
@@ -944,6 +947,26 @@ export default namespace formHost {
 
     let call = new AsyncCallbackWrapper<void>(callback);
     taskpool.execute((): void => { clearRouterProxyInner(formIds, call); });
+  }
+
+  function hasCallback(callback: Callback<string>): boolean {
+    for (let num of callbackArray) {
+      if (num.isEqual(callback)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function createCallbackWrapper(callback: Callback<string>): CallbackWrapper<string> {
+    for (let element of callbackArray) {
+      if(element.isEqual(callback)){
+        return element;
+      }
+    }
+    let calbackWrapper: CallbackWrapper<string> = new CallbackWrapper<string>(callback);
+    callbackArray.push(calbackWrapper)
+    return calbackWrapper;
   }
 
   function onFormOverflow(callback: Callback<formInfo.OverflowRequest>): void {

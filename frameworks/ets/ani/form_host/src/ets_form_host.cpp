@@ -21,17 +21,10 @@
 #include <memory>
 #include <regex>
 #include <utility>
-#include "ani.h"
-#include "ani_common_want.h"
-#include "ani_form_common_util.h"
-#include "ani_form_error_util.h"
-#include "ani_form_util.h"
 #include "ani_helpers.h"
 #include "ani_task.h"
 #include "form_callback_interface.h"
 #include "event_handler.h"
-#include "fms_log_wrapper.h"
-#include "form_mgr.h"
 #include "form_host_client.h"
 #include "form_host_delegate_stub.h"
 #include "form_info.h"
@@ -51,7 +44,6 @@ namespace AbilityRuntime {
 using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
-using namespace OHOS::AbilityRuntime::FormAniHelpers;
 using namespace OHOS::AppExecFwk::Constants;
 namespace {
 constexpr ani_size REFERENCES_MAX_NUMBER = 16;
@@ -350,9 +342,63 @@ ani_env* EtsFormRouterProxyMgr::GetAniEnv()
     return env;
 }
 
+void EtsFormRouterProxyMgr::AddFormRouterProxyCallback(ani_env* env, ani_object callback,
+    const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("call");
+#ifndef WATCH_API_DISABLE
+    ani_ref setRouterProxyCallback = nullptr;
+    auto globalrefStatus = env->GlobalReference_Create(callback, &setRouterProxyCallback);
+    if (globalrefStatus != ANI_OK) {
+        HILOG_ERROR("Failed to create global reference: %{public}d", globalrefStatus);
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE));
+        return;
+    }
+
+    ani_vm *vm;
+    auto getVmStatus = env->GetVM(&vm);
+    if (getVmStatus != ANI_OK) {
+        HILOG_ERROR("Failed to get VM: %{public}d", getVmStatus);
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE));
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
+    auto callbackClient = std::make_shared<FormRouterProxyCallbackClient>(vm, setRouterProxyCallback);
+    for (const auto &formId : formIds) {
+        auto iter = formRouterProxyCallbackMap_.find(formId);
+        if (iter != formRouterProxyCallbackMap_.end()) {
+            iter->second = callbackClient;
+            continue;
+        }
+        formRouterProxyCallbackMap_.emplace(formId, callbackClient);
+    }
+    HILOG_INFO("End");
+#endif
+}
+
+void EtsFormRouterProxyMgr::RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
+    for (const auto &formId : formIds) {
+        auto iter = formRouterProxyCallbackMap_.find(formId);
+        if (iter != formRouterProxyCallbackMap_.end()) {
+            formRouterProxyCallbackMap_.erase(formId);
+        }
+    }
+}
+
 ErrCode EtsFormRouterProxyMgr::RouterEvent(int64_t formId, const OHOS::AAFwk::Want &want)
 {
-    HILOG_INFO("RouterEvent called with formId: %{public}lld", formId);
+    HILOG_INFO("Call");
+    std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
+    auto callbackClient = formRouterProxyCallbackMap_.find(formId);
+    if (callbackClient != formRouterProxyCallbackMap_.end()) {
+        if (callbackClient->second != nullptr) {
+            callbackClient->second->ProcessFormRouterProxy(want);
+        }
+    }
     return ERR_OK;
 }
 
@@ -399,7 +445,6 @@ void EtsFormRouterProxyMgr::ChangeSceneAnimationStateInner(std::shared_ptr<LiveF
 
 ErrCode EtsFormRouterProxyMgr::GetFormRect(int64_t formId, AppExecFwk::Rect &rect)
 {
-    HILOG_INFO("GetFormRect called with formId: %{public}lld", formId);
     LiveFormInterfaceParam* dataParam = new (std::nothrow) LiveFormInterfaceParam {
         .formId = std::to_string(formId)
     };
@@ -979,14 +1024,16 @@ bool CheckCallerIsSystemApp()
 
 bool InnerAcquireFormState(ani_env *env, ani_ref callbackRef, int32_t state, Want want)
 {
+    auto callbackObject = static_cast<ani_object>(callbackRef);
     ani_object formStateInfoObject = CreateFormStateInfo(env, state, want);
     if (formStateInfoObject == nullptr) {
         HILOG_ERROR("Cannot create formState object with params");
+        InvokeAsyncWithBusinessError(env, callbackObject,
+            static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return false;
     }
 
     ani_object errorEts = EtsErrorUtil::CreateError(env, AbilityErrorCode::ERROR_OK);
-    auto callbackObject = static_cast<ani_object>(callbackRef);
     auto res = InvokeAsyncCallback(env, callbackObject, errorEts, formStateInfoObject);
     if (!res) {
         HILOG_ERROR("Cannot call callback");
@@ -999,50 +1046,70 @@ void AcquireFormState([[maybe_unused]] ani_env *env, ani_object wantObject, ani_
 {
     HILOG_DEBUG("Call");
     CheckEnvOrThrow(env);
+    CheckIfRefValidOrThrow(env, aniCallback);
+    ani_ref acquireFormStateCallback = nullptr;
+    if (env->GlobalReference_Create(aniCallback, &acquireFormStateCallback) != ANI_OK) {
+        InvokeAsyncWithBusinessError(env, aniCallback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
+
     Want want;
     bool result = UnwrapWant(env, wantObject, want);
     if (!result) {
         HILOG_ERROR("Fail want parse");
-        PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INVALID_PARAM));
+        InvokeAsyncWithBusinessError(env, aniCallback, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
+
     ani_vm *vm;
-    auto state = env->GetVM(&vm);
-    if (state != ANI_OK || vm == nullptr) {
-        HILOG_ERROR("Failed to get vm");
-        PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
+    auto stat = env->GetVM(&vm);
+    if (stat != ANI_OK || vm == nullptr) {
+        HILOG_ERROR("Cannot get vm");
+        InvokeAsyncWithBusinessError(env, aniCallback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
     }
-    ani_ref acquireFormStateCallback = nullptr;
-    state = env->GlobalReference_Create(aniCallback, &acquireFormStateCallback);
-    if (state != ANI_OK) {
-        HILOG_ERROR("Failed to create global reference");
-        PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
-        return;
-    }
+
     EtsFormStateCallbackClient::AcquireFormStateTask task(
         [vm, acquireFormStateCallback](int32_t state, Want want) -> void {
             ani_env *env = GetEnvFromVm(vm);
-            if (env == nullptr) {
-                HILOG_ERROR("Env is null");
+            CheckEnvOrThrow(env);
+            if (acquireFormStateCallback == nullptr) {
+                HILOG_ERROR("callback is nullptr");
+                PrepareExceptionAndThrow(env,
+                    static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
                 return;
             }
+
             bool result = InnerAcquireFormState(env, acquireFormStateCallback, state, want);
             if (!result) {
                 HILOG_ERROR("Cannot call callback");
-                PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
+                PrepareExceptionAndThrow(env,
+                    static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
+                return;
             }
-            DeleteGlobalReference(env, acquireFormStateCallback);
+
+            ani_status status = ANI_OK;
+            if ((status = env->GlobalReference_Delete(acquireFormStateCallback)) != ANI_OK) {
+                HILOG_ERROR("GlobalReference_Delete failed status:%{public}d", status);
+                PrepareExceptionAndThrow(env,
+                    static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
+                return;
+            }
         });
     auto callback = std::make_shared<EtsFormStateCallbackClient>(std::move(task));
     FormHostClient::GetInstance()->AddFormState(callback, want);
     FormStateInfo stateInfo;
     auto resultFromFormMgr = FormMgr::GetInstance().AcquireFormState(want, FormHostClient::GetInstance(), stateInfo);
+    callback->SetWant(stateInfo.want);
     if (resultFromFormMgr != ERR_OK) {
         HILOG_ERROR("Cannot get state info from system");
-        PrepareExceptionAndThrow(env, static_cast<int>(resultFromFormMgr));
+        FormHostClient::GetInstance()->RemoveFormState(want);
+        InvokeAsyncWithBusinessError(env, aniCallback, static_cast<int>(resultFromFormMgr), nullptr);
+        return;
     }
-    callback->SetWant(stateInfo.want);
+
     HILOG_DEBUG("End");
 }
 
@@ -1054,13 +1121,22 @@ void InnerAcquireFormData(ani_vm* vm, ani_ref callBackGlobRef, AAFwk::WantParams
     CheckEnvOrThrow(env);
     if (callBackGlobRef == nullptr) {
         HILOG_ERROR("callback is nullptr");
+        PrepareExceptionAndThrow(env,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
+    }
+
+    ani_object etsErrorCode = EtsErrorUtil::CreateError(env, AbilityErrorCode::ERROR_OK);
+    if (etsErrorCode == nullptr) {
+        HILOG_ERROR("error code is nullptr");
     }
 
     ani_object callbackObj = static_cast<ani_object>(callBackGlobRef);
     ani_fn_object callbackFunc = reinterpret_cast<ani_fn_object>(callbackObj);
     if (callbackFunc == nullptr) {
         HILOG_ERROR("callbackFunc is nullptr");
+        PrepareExceptionAndThrow(env,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
 
@@ -1069,13 +1145,12 @@ void InnerAcquireFormData(ani_vm* vm, ani_ref callBackGlobRef, AAFwk::WantParams
     ani_object formDataObject = static_cast<ani_object>(formDataWrapped);
     std::string keyFormData = "formData";
     SetRecordKeyValue(env, recordObj, keyFormData, formDataObject);
-    ani_object etsError = EtsErrorUtil::CreateError(env, AbilityErrorCode::ERROR_OK);
-    InvokeAsyncCallback(env, callbackFunc, etsError, formDataObject);
+    InvokeAsyncCallback(env, callbackFunc, etsErrorCode, formDataObject);
     ani_status status = ANI_OK;
     if ((status = env->GlobalReference_Delete(callBackGlobRef)) != ANI_OK) {
         HILOG_ERROR("GlobalReference_Delete failed status:%{public}d", status);
-        EtsErrorUtil::ThrowErrorByNativeErr(env,
-            static_cast<int32_t>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
+        PrepareExceptionAndThrow(env,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
     callBackGlobRef = nullptr;
@@ -1087,34 +1162,50 @@ void AcquireFormData([[maybe_unused]] ani_env *env, ani_string formId, ani_objec
 #ifndef WATCH_API_DISABLE
     HILOG_DEBUG("Call");
     CheckEnvOrThrow(env);
+    CheckIfRefValidOrThrow(env, callback);
+    ani_ref receiveDataForResultCallback_ = nullptr;
+    if (env->GlobalReference_Create(callback, &receiveDataForResultCallback_) != ANI_OK) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
+   
+    if (IsRefUndefined(env, formId)) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+    
     int64_t requestCode = SystemTimeMillis();
     ani_vm* vm;
     auto stat = env->GetVM(&vm);
     if (stat != ANI_OK || vm == nullptr) {
-        HILOG_ERROR("cannot create vm");
-    }
-
-    ani_ref receiveDataForResultCallback = nullptr;
-    if (env->GlobalReference_Create(callback, &receiveDataForResultCallback) != ANI_OK) {
-        HILOG_ERROR("cannot create global reference");
+        HILOG_ERROR("Cannot get vm");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
     }
 
-    EtsFormDataCallbackClient::AcquireFormDataTask task = [vm, receiveDataForResultCallback](AAFwk::WantParams data) {
-        InnerAcquireFormData(vm, receiveDataForResultCallback, data);
+    EtsFormDataCallbackClient::AcquireFormDataTask task = [vm, receiveDataForResultCallback_](AAFwk::WantParams data) {
+        InnerAcquireFormData(vm, receiveDataForResultCallback_, data);
     };
 
     auto acquireFormCallback = std::make_shared<EtsFormDataCallbackClient>(std::move(task));
     FormHostClient::GetInstance()->AddAcqiureFormDataCallback(acquireFormCallback, requestCode);
-
     AAFwk::WantParams formData;
     ErrCode ret = FormMgr::GetInstance().AcquireFormData(formIdNum, requestCode, FormHostClient::GetInstance(),
         formData);
     if (ret != ERR_OK) {
         HILOG_ERROR("Fail error code: %{public}d", ret);
         FormHostClient::GetInstance()->RemoveAcquireDataCallback(requestCode);
-        PrepareExceptionAndThrow(env, ret);
+        InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
         return;
     }
 
@@ -1130,19 +1221,10 @@ void InnerShareForm(ani_vm* vm, ani_ref callBackGlobRef, int32_t code)
     ani_env *env = nullptr;
     env = GetEnvFromVm(vm);
     CheckEnvOrThrow(env);
-
-    ani_object etsErrorCode = EtsErrorUtil::CreateError(env, AbilityErrorCode::ERROR_OK);
-    if (code != 0) {
-        HILOG_ERROR("code is not equalt to zero");
-        etsErrorCode = EtsErrorUtil::CreateError(env, static_cast<AbilityErrorCode>(code));
-    }
-
-    if (etsErrorCode == nullptr) {
-        HILOG_ERROR("error code is nullptr");
-    }
-
     if (callBackGlobRef == nullptr) {
         HILOG_ERROR("callback is nullptr");
+        PrepareExceptionAndThrow(env,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
 
@@ -1150,16 +1232,20 @@ void InnerShareForm(ani_vm* vm, ani_ref callBackGlobRef, int32_t code)
     ani_fn_object callbackFunc = reinterpret_cast<ani_fn_object>(callbackObj);
     if (callbackFunc == nullptr) {
         HILOG_ERROR("callbackFunc is nullptr");
+        PrepareExceptionAndThrow(env,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
-    InvokeAsyncCallback(env, callbackFunc, etsErrorCode, nullptr);
+
+    InvokeAsyncWithBusinessError(env, callbackFunc, code, nullptr);
     ani_status status = ANI_OK;
     if ((status = env->GlobalReference_Delete(callBackGlobRef)) != ANI_OK) {
         HILOG_ERROR("GlobalReference_Delete failed status:%{public}d", status);
-        EtsErrorUtil::ThrowErrorByNativeErr(env,
-            static_cast<int32_t>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
+        PrepareExceptionAndThrow(env,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
+   
     callBackGlobRef = nullptr;
     HILOG_DEBUG("End");
 }
@@ -1168,18 +1254,36 @@ void ShareForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string devi
 {
     HILOG_DEBUG("Call");
     CheckEnvOrThrow(env);
-    CheckIfRefValidOrThrow(env, formId);
-    CheckIfRefValidOrThrow(env, deviceId);
-    int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
-    std::string stdDeviceId = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(deviceId));
-    if (stdDeviceId.empty()) {
-        HILOG_ERROR("deviceId ANIUtils_ANIStringToStdString failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+    CheckIfRefValidOrThrow(env, callback);
+    ani_ref receiveDataForResultCallback_ = nullptr;
+    if (env->GlobalReference_Create(callback, &receiveDataForResultCallback_) != ANI_OK) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
+   
+    if (IsRefUndefined(env, formId)) {
+        InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
-    ani_ref receiveDataForResultCallback_ = nullptr;
-    if (env->GlobalReference_Create(callback, &receiveDataForResultCallback_) != ANI_OK) {
+    if (IsRefUndefined(env, deviceId)) {
+        InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+
+    int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+    
+    std::string stdDeviceId = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(deviceId));
+    if (stdDeviceId.empty()) {
+        HILOG_ERROR("deviceId ANIUtils_ANIStringToStdString failed");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1187,6 +1291,8 @@ void ShareForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string devi
     auto stat = env->GetVM(&vm);
     if (stat != ANI_OK || vm == nullptr) {
         HILOG_ERROR("Cannot get vm");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
     }
 
@@ -1201,7 +1307,8 @@ void ShareForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string devi
     if (ret != ERR_OK) {
         HILOG_ERROR("ShareForm failed, error code: %{public}d: ", ret);
         FormHostClient::GetInstance()->RemoveShareFormCallback(requestCode);
-        PrepareExceptionAndThrow(env, ret);
+        InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        return;
     }
 
     HILOG_DEBUG("End");
@@ -1216,7 +1323,7 @@ void AddForm([[maybe_unused]] ani_env *env, ani_object wantObject, ani_object ca
     if (!result) {
         HILOG_ERROR("want parsing error");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1253,11 +1360,17 @@ void DeleteForm([[maybe_unused]] ani_env *env, ani_string formId, ani_object cal
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+
     auto ret = FormMgr::GetInstance().DeleteForm(formIdNum, FormHostClient::GetInstance());
     if (ret != ERR_OK) {
         HILOG_ERROR("DeleteForm failed, error code: %{public}d", static_cast<int>(ret));
@@ -1275,7 +1388,7 @@ void DeleteInvalidForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1283,7 +1396,7 @@ void DeleteInvalidForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1330,6 +1443,12 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
 
     if (!isUndefined) {
         AniParseIntArray(env, supportDimensionAni, filter.supportDimensions);
+        if (VectorHasNegativeValue(filter.supportDimensions)) {
+            HILOG_ERROR("Dimensions value should not be negative.");
+            InvokeAsyncWithBusinessError(env, callback,
+                static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+            return;
+        }
     }
 
     ani_array_ref supportedShapes;
@@ -1344,6 +1463,12 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
 
     if (!isUndefined) {
         AniParseIntArray(env, supportedShapes, filter.supportShapes);
+        if (VectorHasNegativeValue(filter.supportShapes)) {
+            HILOG_ERROR("Shapes value should not be negative.");
+            InvokeAsyncWithBusinessError(env, callback,
+                static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+            return;
+        }
     }
 
     std::vector<FormInfo> formInfos;
@@ -1427,7 +1552,7 @@ void IsSystemReady([[maybe_unused]] ani_env *env, ani_object callback)
     if (!CheckCallerIsSystemApp()) {
         HILOG_ERROR("caller is not system-app");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_NOT_SYSTEM_APP), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS), nullptr);
         return;
     }
 
@@ -1449,7 +1574,7 @@ void NotifyFormsEnableUpdate([[maybe_unused]] ani_env *env, ani_object arrayObj,
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1457,7 +1582,7 @@ void NotifyFormsEnableUpdate([[maybe_unused]] ani_env *env, ani_object arrayObj,
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1478,7 +1603,7 @@ void NotifyFormsVisible([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1486,7 +1611,7 @@ void NotifyFormsVisible([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1507,7 +1632,7 @@ void SetEnableFormUpdate([[maybe_unused]] ani_env *env, ani_object arrayObj, ani
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1515,7 +1640,7 @@ void SetEnableFormUpdate([[maybe_unused]] ani_env *env, ani_object arrayObj, ani
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1523,6 +1648,7 @@ void SetEnableFormUpdate([[maybe_unused]] ani_env *env, ani_object arrayObj, ani
     if (ret != ERR_OK) {
         HILOG_ERROR("LifecycleUpdate failed, error code: %{public}d", ret);
         InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        return;
     }
 
     InvokeAsyncWithBusinessError(env, callback, ERR_OK, nullptr);
@@ -1535,10 +1661,17 @@ void ReleaseForm([[maybe_unused]] ani_env *env, ani_string formId, ani_boolean i
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+
     auto ret = FormMgr::GetInstance().ReleaseForm(formIdNum, FormHostClient::GetInstance(), isReleaseCache);
     if (ret != ERR_OK) {
         HILOG_ERROR("releaseform failed, error code: %{public}d", ret);
@@ -1556,11 +1689,18 @@ void RequestForm([[maybe_unused]] ani_env *env, ani_string formId, ani_object ca
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     Want want;
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+
     auto ret = FormMgr::GetInstance().RequestForm(formIdNum, FormHostClient::GetInstance(), want);
     if (ret != ERR_OK) {
         HILOG_ERROR("requestform failed error code: %{public}d", ret);
@@ -1579,12 +1719,18 @@ void RequestFormWithParams([[maybe_unused]] ani_env *env, ani_string formId, ani
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
     Want want;
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+
     AAFwk::WantParams wantParams;
     if (UnwrapWantParams(env, wantParamsObject, wantParams)) {
         want.SetParams(wantParams);
@@ -1607,10 +1753,17 @@ void CastToNormalForm([[maybe_unused]] ani_env *env, ani_string formId, ani_obje
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+
     auto ret = FormMgr::GetInstance().CastTempForm(formIdNum, FormHostClient::GetInstance());
     if (ret != ERR_OK) {
         HILOG_ERROR("castToNormal form failed error code: %{public}d", ret);
@@ -1628,14 +1781,15 @@ void NotifyVisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1657,14 +1811,15 @@ void NotifyInvisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, an
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1687,14 +1842,15 @@ void NotifyFormsPrivacyProtected([[maybe_unused]] ani_env *env, ani_object array
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1713,13 +1869,21 @@ void UpdateFormLocation(ani_env *env, ani_string formId, ani_object formLocation
 {
     HILOG_DEBUG("Call");
     CheckEnvOrThrow(env);
-    CheckIfRefValidOrThrow(env, formLocation);
+    if (IsRefUndefined(env, formLocation)) {
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
+        return;
+    }
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID));
+        return;
+    }
+
     ani_int formLocationValue = 0;
     ani_status formLocationValueStatus = GetEnumValueInt(env, formLocation, formLocationValue);
     if (formLocationValueStatus != ANI_OK) {
         HILOG_ERROR("enum value could not received %{public}d", formLocationValueStatus);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
@@ -1739,10 +1903,17 @@ void UpdateFormLockedState([[maybe_unused]] ani_env *env, ani_string formId, ani
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+
     auto ret = FormMgr::GetInstance().NotifyFormLocked(formIdNum, isLocked);
     if (ret != ERR_OK) {
         HILOG_ERROR("UpdateFormLockedState failed, error code: %{public}d", ret);
@@ -1760,14 +1931,15 @@ void SetFormsRecyclable([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1786,22 +1958,31 @@ void SetPublishFormResult(ani_env *env, ani_string formId, ani_object publishFor
 {
     HILOG_DEBUG("Call");
     CheckEnvOrThrow(env);
-    CheckIfRefValidOrThrow(env, publishFormResultObj);
+    if (IsRefUndefined(env, publishFormResultObj)) {
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
+        return;
+    }
+
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
+    if (formIdNum == INVALID_FORMID) {
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID));
+        return;
+    }
+
     ani_ref messageRef;
     ani_status messageStatus = env->Object_GetPropertyByName_Ref(publishFormResultObj, "message", &messageRef);
-    if (messageStatus != ANI_OK) {
+    if (messageStatus != ANI_OK || IsRefUndefined(env, static_cast<ani_object>(messageRef))) {
         HILOG_ERROR("message field could not received %{public}d", messageStatus);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
     std::string messageInfo = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(messageRef));
     ani_ref codeEnumObj;
     ani_status codeEnumObjStatus = env->Object_GetPropertyByName_Ref(publishFormResultObj, "code", &codeEnumObj);
-    if (codeEnumObjStatus != ANI_OK) {
+    if (codeEnumObjStatus != ANI_OK || IsRefUndefined(env, static_cast<ani_object>(codeEnumObj))) {
         HILOG_ERROR("code field could not received %{public}d", codeEnumObjStatus);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
@@ -1809,7 +1990,7 @@ void SetPublishFormResult(ani_env *env, ani_string formId, ani_object publishFor
     ani_status errorCodeValueStatus = GetEnumValueInt(env, static_cast<ani_object>(codeEnumObj), errorCodeValue);
     if (errorCodeValueStatus != ANI_OK) {
         HILOG_ERROR("enum value could not received %{public}d", errorCodeValueStatus);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
@@ -1822,7 +2003,6 @@ void SetPublishFormResult(ani_env *env, ani_string formId, ani_object publishFor
         PrepareExceptionAndThrow(env, ret);
         return;
     }
-
     HILOG_DEBUG("End");
 }
 
@@ -1832,14 +2012,15 @@ void RecycleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_object
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
                 InvokeAsyncWithBusinessError(env, callback,
-                    static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+                    static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1861,14 +2042,15 @@ void RecoverForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_object
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -1987,7 +2169,7 @@ void AddFormUninstallCallback(ani_env* env, ani_object callback)
     auto globalrefStatus = env->GlobalReference_Create(callback, &uninstallCallback);
     if (globalrefStatus != ANI_OK) {
         HILOG_ERROR("Failed to create global reference: %{public}d", globalrefStatus);
-        PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
 
@@ -1995,7 +2177,7 @@ void AddFormUninstallCallback(ani_env* env, ani_object callback)
     auto getVmStatus = env->GetVM(&vm);
     if (getVmStatus != ANI_OK) {
         HILOG_ERROR("Failed to get VM: %{public}d", getVmStatus);
-        PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
 
@@ -2022,9 +2204,9 @@ void RemoveFormUninstallCallback(ani_env* env, ani_object callback)
 void RegisterFormObserver(ani_env* env, ani_object callback)
 {
     HILOG_DEBUG("Call");
-   
     if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("the application not system-app, can't use system-api");
+        HILOG_ERROR("caller is not system-app");
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
         return;
     }
    
@@ -2036,6 +2218,11 @@ void RegisterFormObserver(ani_env* env, ani_object callback)
 void UnRegisterFormObserver(ani_env* env, ani_object callback)
 {
     HILOG_DEBUG("Call");
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("caller is not system-app");
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
+        return;
+    }
    
     ani_boolean isUndefined = true;
     env->Reference_IsUndefined(callback, &isUndefined);
@@ -2050,182 +2237,26 @@ void UnRegisterFormObserver(ani_env* env, ani_object callback)
     HILOG_DEBUG("End");
 }
 
-
-class FormRouterProxyCallbackClient : public std::enable_shared_from_this<FormRouterProxyCallbackClient> {
-public:
-    FormRouterProxyCallbackClient(ani_vm* vm, ani_ref callback): m_vm(vm), m_callback(callback)
-    {
-        m_handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
-    }
-
-    ~FormRouterProxyCallbackClient()
-    {
-        ani_env *env = GetEnvFromVm(m_vm);
-        if (env == nullptr) {
-            HILOG_ERROR("Env is null");
-            return;
-        }
-        env->Reference_Delete(m_callback);
-    }
-
-    void ProcessFormRouterProxy(const Want &want)
-    {
-        HILOG_INFO("Call");
-        if (m_handler == nullptr) {
-            HILOG_ERROR("null Handler");
-            return;
-        }
-
-        m_handler->PostSyncTask([thisWeakPtr = weak_from_this(), want]() {
-            auto sharedThis = thisWeakPtr.lock();
-            if (sharedThis == nullptr) {
-                HILOG_ERROR("null SharedThis");
-                return;
-            }
-
-            ani_env *env = GetEnvFromVm(sharedThis->m_vm);
-            if (env == nullptr) {
-                HILOG_ERROR("Env is null");
-                return;
-            }
-
-            ani_object aniWant = AppExecFwk::WrapWant(env, want);
-            auto res = InvokeCallback(env, static_cast<ani_object>(sharedThis->m_callback), aniWant);
-            if (!res) {
-                HILOG_ERROR("Cannot call callback");
-                return;
-            }
-        });
-    }
-
-private:
-    std::shared_ptr<AppExecFwk::EventHandler> m_handler = nullptr;
-    ani_vm* m_vm;
-    ani_ref m_callback = nullptr;
-};
-
-class AniFormRouterProxyMgr : public AppExecFwk::FormHostDelegateStub {
-public:
-    AniFormRouterProxyMgr() = default;
-
-    virtual ~AniFormRouterProxyMgr() = default;
-
-    static AniFormRouterProxyMgr* GetInstance()
-    {
-        static AniFormRouterProxyMgr instance;
-        return &instance;
-    }
-
-    void AddFormRouterProxyCallback(ani_env* env, ani_object callback,
-    const std::vector<int64_t> &formIds)
-    {
-        HILOG_INFO("call");
-    #ifndef WATCH_API_DISABLE
-        ani_ref setRouterProxyCallback = nullptr;
-        auto globalrefStatus = env->GlobalReference_Create(callback, &setRouterProxyCallback);
-        if (globalrefStatus != ANI_OK) {
-            HILOG_ERROR("Failed to create global reference: %{public}d", globalrefStatus);
-            PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
-            return;
-        }
-
-        ani_vm *vm;
-        auto getVmStatus = env->GetVM(&vm);
-        if (getVmStatus != ANI_OK) {
-            HILOG_ERROR("Failed to get VM: %{public}d", getVmStatus);
-            PrepareExceptionAndThrow(env, static_cast<int>(AbilityRuntime::AbilityErrorCode::ERROR_CODE_INNER));
-            return;
-        }
-
-        std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
-        auto callbackClient = std::make_shared<FormRouterProxyCallbackClient>(vm, setRouterProxyCallback);
-        for (const auto &formId : formIds) {
-            auto iter = formRouterProxyCallbackMap_.find(formId);
-            if (iter != formRouterProxyCallbackMap_.end()) {
-                iter->second = callbackClient;
-                continue;
-            }
-            formRouterProxyCallbackMap_.emplace(formId, callbackClient);
-        }
-        HILOG_INFO("End");
-    #endif
-    }
-
-    void RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds)
-    {
-        HILOG_INFO("call");
-        std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
-        for (const auto &formId : formIds) {
-            auto iter = formRouterProxyCallbackMap_.find(formId);
-            if (iter != formRouterProxyCallbackMap_.end()) {
-                formRouterProxyCallbackMap_.erase(formId);
-            }
-        }
-    }
-   
-    ErrCode RouterEvent(const int64_t formId, const OHOS::AAFwk::Want &want)
-    {
-        HILOG_INFO("Call");
-        std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
-        auto callbackClient = formRouterProxyCallbackMap_.find(formId);
-        if (callbackClient != formRouterProxyCallbackMap_.end()) {
-            if (callbackClient->second != nullptr) {
-                callbackClient->second->ProcessFormRouterProxy(want);
-            }
-        }
-        return ERR_OK;
-    }
-
-    ErrCode RequestOverflow(const int64_t formId,
-        const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow)
-    {
-        // not implemented.
-        return ERR_OK;
-    }
-
-    ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state)
-    {
-        // not implemented.
-        return ERR_OK;
-    }
-
-    ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect)
-    {
-        // not implemented.
-        return ERR_OK;
-    }
-
-    ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
-    {
-        // not implemented.
-        return ERR_OK;
-    }
-
-private:
-    mutable std::mutex FormRouterProxyCallbackMutex_;
-    std::map<int64_t, std::shared_ptr<FormRouterProxyCallbackClient>> formRouterProxyCallbackMap_;
-    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
-};
-
 void SetRouterProxy(ani_env *env, ani_object arrayObj, ani_object callback, ani_object asyncCallback)
 {
     HILOG_DEBUG("Call");
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, asyncCallback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, asyncCallback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
-    AniFormRouterProxyMgr::GetInstance()->AddFormRouterProxyCallback(env, callback, formIds);
-    auto ret = FormMgr::GetInstance().RegisterFormRouterProxy(formIds, AniFormRouterProxyMgr::GetInstance());
+    EtsFormRouterProxyMgr::GetInstance()->AddFormRouterProxyCallback(env, callback, formIds);
+    auto ret = FormMgr::GetInstance().RegisterFormRouterProxy(formIds, EtsFormRouterProxyMgr::GetInstance());
     if (ret != ERR_OK) {
         HILOG_ERROR("RegisterFormRouterProxy failed, error code: %{public}d", static_cast<int>(ret));
         InvokeAsyncWithBusinessError(env, asyncCallback, static_cast<int32_t>(ret), nullptr);
@@ -2242,18 +2273,19 @@ void ClearRouterProxy(ani_env *env, ani_object arrayObj, ani_object callback)
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
     }
 
     std::vector<int64_t> formIds;
     if (!ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
-    AniFormRouterProxyMgr::GetInstance()->RemoveFormRouterProxyCallback(formIds);
+    EtsFormRouterProxyMgr::GetInstance()->RemoveFormRouterProxyCallback(formIds);
     auto ret = FormMgr::GetInstance().UnregisterFormRouterProxy(formIds);
     if (ret != ERR_OK) {
         HILOG_ERROR("ClearRouterProxy failed, error code: %{public}d", ret);
