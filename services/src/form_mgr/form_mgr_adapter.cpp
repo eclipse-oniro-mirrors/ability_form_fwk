@@ -2557,6 +2557,9 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
         HILOG_INFO("StartAbility wantToHost:%{public}s", wantToHost.ToString().c_str());
         return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
     }
+    if (want.GetStringParam(Constants::PARMA_REQUEST_METHOD) == Constants::OPEN_FORM_MANAGE_VIEW) {
+        FormEventReport::SendRequestPublicFormEvent(dstBundleName, "", RequestFormType::OPEN_FORM_MANAGER);
+    }
     return errCode;
 }
 

@@ -408,7 +408,7 @@ void FormEventReport::SendDiskUseEvent()
 }
 
 void FormEventReport::SendRequestPublicFormEvent(const std::string &callerBundleName, const std::string &formName,
-    bool withSnapshot)
+    RequestFormType funcType)
 {
     HiSysEventWrite(
         HiSysEvent::Domain::FORM_MANAGER,
@@ -416,7 +416,7 @@ void FormEventReport::SendRequestPublicFormEvent(const std::string &callerBundle
         HiSysEventType::STATISTIC,
         EVENT_KEY_BUNDLE_NAME, callerBundleName,
         EVENT_KEY_FORM_NAME, formName,
-        EVENT_KEY_WITH_SNAPSHOT, withSnapshot);
+        EVENT_KEY_WITH_SNAPSHOT, static_cast<int8_t>(funcType));
 }
 
 void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_t formId, const std::string &bundleName,
