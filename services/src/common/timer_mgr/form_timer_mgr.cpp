@@ -1683,7 +1683,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
     }
     HILOG_INFO("selectTime:%{public}" PRId64 ", currentTime:%{public}" PRId64, selectTime, currentTime);
 
-    int64_t timeInSec = GetBootTimeMs();
+    int64_t timeInSec = FormTimerUtil::GetBootTimeMs();
     HILOG_INFO("timeInSec:%{public}" PRId64 ".", timeInSec);
     int64_t nextTime = timeInSec + (selectTime - currentTime);
     HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
