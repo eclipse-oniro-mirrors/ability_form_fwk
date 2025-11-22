@@ -592,19 +592,35 @@ void FormDataProxyRecord::RetryFailureSubscribes()
         HILOG_ERROR("null dataShareHelper");
         return;
     }
-    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
-    for (auto& result : rdbSubscribeResultMap_) {
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>> copyRdbSubscribeResultMap;
+    {
+        std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+        copyRdbSubscribeResultMap = rdbSubscribeResultMap_;
+    }
+    for (auto& result : copyRdbSubscribeResultMap) {
         for (auto& records : result.second) {
             auto& record = records.second;
             RetryFailureRdbSubscribes(record);
         }
     }
-    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
-    for (auto& result : publishSubscribeResultMap_) {
+    {
+        std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+        rdbSubscribeResultMap_ = copyRdbSubscribeResultMap;
+    }
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>> copyPublishSubscribeResultMap;
+    {
+        std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+        copyPublishSubscribeResultMap = publishSubscribeResultMap_;
+    }
+    for (auto& result : copyPublishSubscribeResultMap) {
         for (auto& records : result.second) {
             auto& record = records.second;
             RetryFailurePublishedSubscribes(record);
         }
+    }
+    {
+        std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+        publishSubscribeResultMap_ = copyPublishSubscribeResultMap;
     }
 }
 
