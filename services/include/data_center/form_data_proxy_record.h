@@ -114,6 +114,8 @@ private:
     AAFwk::Want wantCache_;
     SubscribeMap rdbSubscribeMap_;
     SubscribeMap publishSubscribeMap_;
+    std::mutex rdbSubscribeResultMapMutex_;
+    std::mutex publishSubscribeResultMapMutex_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> rdbSubscribeResultMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> publishSubscribeResultMap_;
     std::map<std::string, std::vector<FormDataProxy>> formDataPermissionProxyMap_;
