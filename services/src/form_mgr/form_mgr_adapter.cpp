@@ -894,7 +894,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     data.record = record;
     data.callerToken = callerToken;
     data.want = updateFormWant;
-    if (isNeedAddForm) {
+    if (isNeedAddForm && (record.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(formId))) {
         ErrCode errCode = AcquireProviderFormInfoByFormRecord(record, addFormWant.GetParams());
         auto delayRefreshForm = [data]() mutable {
             FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
