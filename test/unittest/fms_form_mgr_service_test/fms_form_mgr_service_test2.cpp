@@ -1434,4 +1434,25 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_IsFormDueControl_0001, TestSize.
     EXPECT_FALSE(ret);
     GTEST_LOG_(INFO) << "FormMgrService_IsFormDueControl_0001 end";
 }
+
+/**
+ * @tc.name: FormMgrService_SendNonTransparencyRatio_0001
+ * @tc.desc: Verify SendNonTransparencyRatio
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_SendNonTransparencyRatio_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_SendNonTransparencyRatio_0001 start";
+    FormMgrService formMgrService;
+    int64_t formId = 10;
+    int32_t ratio = 0;
+    MockIsSACall(true);
+    auto ret = formMgrService.SendNonTransparencyRatio(formId, ratio);
+    EXPECT_EQ(ret, ERR_OK);
+
+    MockIsSACall(false);
+    ret = formMgrService.SendNonTransparencyRatio(formId, ratio);
+    EXPECT_NE(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_SendNonTransparencyRatio_0001 end";
+}
 }

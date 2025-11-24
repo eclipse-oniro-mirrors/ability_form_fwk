@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,27 +10,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+ 
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
-
+ 
 module_output_path = "form_fwk/form_fwk/form_mgr_service"
-
-ohos_unittest("FmsFormHostCallbackTest") {
+ 
+ohos_unittest("FmsFormAbnormalReporterTest") {
   module_out_path = module_output_path
-
+ 
   sources = [
-    "fms_form_host_callback_test.cpp",
-    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
-    "${form_fwk_path}/test/mock/src/mock_form_host_task_mgr.cpp",
-    "${form_fwk_path}/services/src/form_host/form_host_callback.cpp",
+    "fms_form_abnormal_reporter_test.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_event_report.cpp",
+    "${form_fwk_path}/services/src/feature/form_check/form_abnormal_reporter.cpp",
   ]
-
+ 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
-
-  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
+ 
+  configs = [
+    "${form_fwk_path}/test:formmgr_test_config",
+  ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -40,34 +42,24 @@ ohos_unittest("FmsFormHostCallbackTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
   ]
-
+ 
   external_deps = [
-    "ability_base:base",
-    "ability_base:want",
-    "ability_runtime:ability_manager",
-    "ability_runtime:app_manager",
-    "access_token:libaccesstoken_sdk",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "eventhandler:libeventhandler",
-    "ffrt:libffrt",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-    "kv_store:distributeddata_inner",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
+    "googletest:gtest_main",
     "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "c_utils:utils",
+    "ipc:ipc_core",
+    "libxml2:libxml2",
   ]
-
+ 
   if (form_runtime_power) {
     defines = [ "SUPPORT_POWER" ]
     external_deps += [ "power_manager:powermgr_client" ]
   }
 }
-
+ 
 group("unittest") {
   testonly = true
-  deps = [ ":FmsFormHostCallbackTest" ]
+  deps = [ ":FmsFormAbnormalReporterTest" ]
 }

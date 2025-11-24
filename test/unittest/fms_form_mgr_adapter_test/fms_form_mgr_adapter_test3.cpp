@@ -35,10 +35,10 @@
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
-#include "mock_form_data_mgr.h"
 #include "mock_form_provider_client.h"
-#include "mock_form_mgr_adapter_test.h"
-#include "mock_want.h"
+#include "inner/mock_form_data_mgr.h"
+#include "inner/mock_form_mgr_adapter.h"
+#include "inner/mock_want.h"
 #include "mock_ipc_skeleton.h"
 
 using namespace testing::ext;

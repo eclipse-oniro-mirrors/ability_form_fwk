@@ -13,12 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MOCK_FORM_MGR_ADAPTER_TEST_H
-#define OHOS_MOCK_FORM_MGR_ADAPTER_TEST_H
-
+#include "mock_form_event_report.h"
 #include <gtest/gtest.h>
-#include "form_mgr_errors.h"
 
-void MockCallerCheck(OHOS::ErrCode mockRet);
+#include "fms_log_wrapper.h"
+#include "form_event_report.h"
 
-#endif // OHOS_MOCK_FORM_MGR_ADAPTER_TEST_H
+namespace OHOS {
+namespace AppExecFwk {
+std::shared_ptr<MockFormEventReport> MockFormEventReport::obj = nullptr;
+
+void FormEventReport::SendFormAbnormalEvent(const FormAbnormalReportParams &params)
+{
+    GTEST_LOG_(INFO) << "SendFormAbnormalEvent called";
+    if (AppExecFwk::MockFormEventReport::obj) {
+        return AppExecFwk::MockFormEventReport::obj->SendFormAbnormalEvent(params);
+    }
+}
+}  // namespace AppExecFwk
+}  // namespace OHOS

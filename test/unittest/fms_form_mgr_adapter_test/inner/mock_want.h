@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef MOCK_WANT_H
-#define MOCK_WANT_H
+#ifndef INNER_MOCK_WANT_H
+#define INNER_MOCK_WANT_H
 
 void MockGetBoolParam(bool mockRet);
 
-#endif // MOCK_WANT_H
+#endif // INNER_MOCK_WANT_H

@@ -125,6 +125,7 @@ public:
         const std::string &abilityName, const std::string &formName));
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
     MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
+    MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
 
     sptr<IRemoteObject> AsObject()
     {
