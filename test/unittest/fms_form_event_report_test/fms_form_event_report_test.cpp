@@ -371,7 +371,7 @@ HWTEST_F(FormFormEventReportTest, SendRequestPublicFormEvent_0100, TestSize.Leve
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "REQUEST_PUBLIC_FORM");
     std::string bundleName = "testBundleName";
     std::string formName = "testFormName";
-    FormEventReport::SendRequestPublicFormEvent(bundleName, formName, true);
+    FormEventReport::SendRequestPublicFormEvent(bundleName, formName, RequestFormType::REQUEST_PUBLISH_FORM);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

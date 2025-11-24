@@ -169,7 +169,7 @@ REQUEST_PUBLIC_FORM:
   __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: Publish form within the app}
   BUNDLE_NAME: {type: STRING, desc: bundle name}
   FORM_NAME: {type: STRING, desc: form name}
-  WITH_SNAPSHOT: {type: BOOL, desc: with snapshot}
+  FUNC_TYPE: {type: INT8, desc: Enum of function type}
 
 FORM_MEMORY_LEAK:
   __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form memory leak}

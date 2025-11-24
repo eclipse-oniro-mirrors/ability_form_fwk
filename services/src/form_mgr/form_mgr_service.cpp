@@ -462,7 +462,7 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::string bundleName;
     FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    FormEventReport::SendRequestPublicFormEvent(bundleName, formName);
+    FormEventReport::SendRequestPublicFormEvent(bundleName, formName, RequestFormType::REQUEST_PUBLISH_FORM);
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
 
@@ -1911,7 +1911,8 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     std::string bundleName;
     FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    FormEventReport::SendRequestPublicFormEvent(bundleName, formName, true);
+    FormEventReport::SendRequestPublicFormEvent(bundleName, formName,
+        RequestFormType::REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     auto ret = FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
         formId, {}, false);
