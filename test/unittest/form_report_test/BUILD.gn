@@ -49,6 +49,7 @@ ohos_unittest("FormReportTest") {
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "googletest:gmock_main",
+    "libxml2:libxml2",
   ]
 }
 

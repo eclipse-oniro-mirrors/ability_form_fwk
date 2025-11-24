@@ -46,6 +46,7 @@ ohos_unittest("FormRecordReporttTest") {
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "libxml2:libxml2",
   ]
 }
 

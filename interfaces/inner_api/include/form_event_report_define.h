@@ -30,7 +30,7 @@ struct FormEventInfo {
     int32_t formAppPid = -1;
     int64_t timeStamp = 0;
     int64_t formDimension = 0;
-    bool distributedForm = false;
+    bool isDistributedForm = false;
 };
 
 enum class CallDbFailedErrorType : int32_t {
@@ -125,7 +125,7 @@ struct NewFormEventInfo {
     int32_t conditionType;
     int32_t renderingMode;
     std::string bundleAndFormName;
-    bool distributedForm = false;
+    bool isDistributedForm = false;
 };
 
 struct FormAbnormalReportParams {
