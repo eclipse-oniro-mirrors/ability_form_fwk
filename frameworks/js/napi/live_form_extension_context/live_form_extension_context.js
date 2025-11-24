@@ -17,6 +17,7 @@ let hilog = requireNapi('hilog');
 
 const domainID = 0xD001301;
 const TAG = 'FormManagerService';
+const PARAM_JSON_WANT_KEY = 'ohos.extra.param.key.json_want';
 
 export class LiveFormExtensionContext extends ExtensionContext {
   formId = '';
@@ -30,7 +31,10 @@ export class LiveFormExtensionContext extends ExtensionContext {
   }
 
   startAbilityByLiveForm(want) {
-    hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${JSON.stringify(want)}`);
+    let json_want = JSON.stringify(want);
+    hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${json_want}`);
+    want.parameters = {};
+    want.parameters[PARAM_JSON_WANT_KEY] = json_want;
     return this.__context_impl__.startAbilityByLiveForm(want, this.formId);
   }
 
