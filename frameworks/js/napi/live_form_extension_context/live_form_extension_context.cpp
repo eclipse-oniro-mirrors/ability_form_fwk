@@ -49,10 +49,11 @@ bool LiveFormExtensionContext::SetWindowBackgroundColor()
 ErrCode LiveFormExtensionContext::StartAbilityByFms(const AAFwk::Want &want, const std::string &formId)
 {
     HILOG_INFO("StartAbilityByFms want: %{public}s", want.ToString().c_str());
-    AAFwk::Want wantToHost(want);
-    wantToHost.SetParam(Constants::PARAM_JSON_WANT_KEY, want.ToString());
-    wantToHost.SetModuleName("");
+    AAFwk::Want wantToHost;
     wantToHost.SetAction(Constants::FORM_PAGE_ACTION);
+    ElementName elementName = want.GetElement();
+    wantToHost.SetElementName(elementName.GetBundleName(), elementName.GetAbilityName());
+    wantToHost.SetParam(Constants::PARAM_JSON_WANT_KEY, want.GetStringParam(Constants::PARAM_JSON_WANT_KEY));
     wantToHost.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM);
     wantToHost.SetParam(Constants::PARMA_REQUEST_METHOD, REQUEST_METHOD);
     wantToHost.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, formId);
