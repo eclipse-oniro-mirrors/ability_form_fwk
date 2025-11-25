@@ -272,6 +272,9 @@ void FormMgrService::ReportAddFormEvent(const int64_t formId, const Want &want)
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
+    eventInfo.formDimension = static_cast<int64_t>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
+    int32_t userId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    eventInfo.isDistributedForm = FormDistributedMgr::GetInstance().IsBundleDistributed(eventInfo.bundleName, userId);
     int ret = FormBmsHelper::GetInstance().GetCallerBundleName(eventInfo.hostBundleName);
     if (ret != ERR_OK || eventInfo.hostBundleName.empty()) {
         HILOG_ERROR("cannot get host bundle name by uid");
@@ -291,11 +294,11 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
 
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("delete form permission denied");
-        FormRecord record;
-        FormDataMgr::GetInstance().GetFormRecord(formId, record);
         FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED,
             formId,
             record.bundleName,
@@ -311,6 +314,10 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     if (formHostRecords.size() != 0) {
         eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
     }
+    eventInfo.bundleName = record.bundleName;
+    eventInfo.moduleName = record.moduleName;
+    eventInfo.formDimension = record.specification;
+    eventInfo.isDistributedForm = record.isDistributedForm;
     FormEventReport::SendSecondFormEvent(FormEventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_DeleteForm",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);

@@ -495,10 +495,13 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         formProviderData.SetImageDataMap(imageDataMap);
     }
     FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
+    FormRecord formRecord;
+    (void)FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord);
     auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     NewFormEventInfo eventInfo;
     eventInfo.formId = formId_;
     eventInfo.bundleName = bundleName_;
+    eventInfo.isDistributedForm = formRecord.isDistributedForm;
     FormEventReport::SendFourthFormEvent(FormEventName::PROXY_UPDATE_FORM,
         HiSysEventType::STATISTIC, eventInfo, wantCache_);
     if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {

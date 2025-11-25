@@ -207,6 +207,8 @@ HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0400, TestSize.Level0)
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "DELETE_FORM");
     HiSysEventType type = HiSysEventType::BEHAVIOR;
     FormEventInfo eventInfo;
+    eventInfo.bundleName = "testBundleName";
+    eventInfo.isDistributedForm = true;
     FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
 }
 
