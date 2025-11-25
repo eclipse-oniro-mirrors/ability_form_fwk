@@ -31,10 +31,10 @@ export class LiveFormExtensionContext extends ExtensionContext {
   }
 
   startAbilityByLiveForm(want) {
-    let json_want = JSON.stringify(want);
-    hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${json_want}`);
+    let jsonWant = JSON.stringify(want);
+    hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${jsonWant}`);
     want.parameters = {};
-    want.parameters[PARAM_JSON_WANT_KEY] = json_want;
+    want.parameters[PARAM_JSON_WANT_KEY] = jsonWant;
     return this.__context_impl__.startAbilityByLiveForm(want, this.formId);
   }
 
