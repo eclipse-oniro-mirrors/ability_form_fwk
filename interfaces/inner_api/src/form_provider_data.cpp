@@ -149,13 +149,20 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         return;
     }
 
-    int32_t size = lseek(fd, 0L, SEEK_END);
-    if (size <= 0) {
+    off_t offSize = lseek(fd, 0L, SEEK_END);
+    if (offSize <= 0) {
         HILOG_ERROR("Get file size failed, errno is %{public}d", errno);
+        close(fd);
         return;
     }
+    if (offSize > INT32_MAX) {
+        HILOG_ERROR("File size exceeds int32_t limit");
+        return;
+    }
+    int32_t size = static_cast<int32_t>(offSize);
     HILOG_BRIEF("File size is %{public}d", size);
     if (lseek(fd, 0L, SEEK_SET) == -1) {
+        close(fd);
         return;
     }
     if (size > MAX_IMAGE_BYTE_SIZE) {
@@ -167,10 +174,21 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         HILOG_ERROR("malloc memory failed, errno is %{public}d", errno);
         return;
     }
-    if (read(fd, bytes, size) < 0) {
-        delete[] bytes;
-        HILOG_ERROR("errno %{public}d", errno);
-        return;
+    size_t totalRead = 0;
+    while (totalRead < size) {
+        ssize_t bytesRead = read(fd, bytes + totalRead, size - totalRead);
+        if (bytesRead == -1) {
+            delete[] bytes;
+            close(fd);
+            HILOG_ERROR("Read error: errno is %{public}d", errno);
+            return;
+        } else if (bytesRead == 0) {
+            HILOG_ERROR("Unexpected end of file");
+            delete[] bytes;
+            close(fd);
+            return;
+        }
+        totalRead += bytesRead;
     }
     std::shared_ptr<char> data(bytes, DeleteBytes());
     AddImageData(picName, data, size);
