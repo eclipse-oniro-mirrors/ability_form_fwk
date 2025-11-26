@@ -669,7 +669,7 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
             formInfosArray, ANI_SETTER_MARKER, PROVIDER_SET_SIGNATURE, index, runningFormInfoAni);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void failed, error code: %{public}d", static_cast<int>(status));
-            InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM),
+            InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE),
                 nullptr);
             break;
         }

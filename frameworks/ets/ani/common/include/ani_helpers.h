@@ -125,7 +125,7 @@ void DeleteGlobalReference(ani_env *env, ani_ref globalReference);
 
 ani_object CreateBool(ani_env *env, ani_boolean value);
 
-bool VectorHasNegativeValue(const std::vector<int>& vector);
+bool VectorHasNegativeValue(const std::vector<int>& vec);
 }  // namespace FormAniHelpers
 }  // namespace AbilityRuntime
 }  // namespace OHOS

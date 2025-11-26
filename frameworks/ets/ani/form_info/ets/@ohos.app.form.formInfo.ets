@@ -225,8 +225,8 @@ export default namespace formInfo {
     public previewImages?: Array<int> = {};
     public enableBlurBackground?: boolean = false;
     public renderingMode?: RenderingMode = RenderingMode.AUTO_COLOR;
-    public funInteractionParams?: FunInteractionParams = {};
-    public sceneAnimationParams?: SceneAnimationParams = {};
+    public funInteractionParams?: FunInteractionParams = { targetBundleName: "", subBundleName: "" };
+    public sceneAnimationParams?: SceneAnimationParams = { abilityName: "" };
     public resizable?: boolean = false;
     public groupId?: string = '';
   }

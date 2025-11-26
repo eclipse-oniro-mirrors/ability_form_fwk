@@ -98,6 +98,7 @@ export default namespace formHost {
   const INVALID_PARAM_MESSAGE_ETS = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
     + " 2.Incorrect parameter types;"
     + " 3.Parameter verification failed.";
+  const INVALID_CALLBACK_INDEX = -1;
 
   export function acquireFormState(want: Want, callback: AsyncCallback<formInfo.FormStateInfo>): void {
     if (want === undefined || want === null) {
@@ -870,7 +871,7 @@ export default namespace formHost {
   }
 
   export function onFormUninstall(callback: Callback<string>): void {
-    if(!hasCallback(callback)){
+    if (findCallbackIndex(callback) == INVALID_CALLBACK_INDEX) {
       let callbackWrap = createCallbackWrapper(callback);
         registerFormObserverInner(callbackWrap);
     }
@@ -949,24 +950,24 @@ export default namespace formHost {
     taskpool.execute((): void => { clearRouterProxyInner(formIds, call); });
   }
 
-  function hasCallback(callback: Callback<string>): boolean {
-    for (let num of callbackArray) {
-      if (num.isEqual(callback)) {
-        return true;
+  function findCallbackIndex(callback: Callback<string>) : int {
+    let findIndex = INVALID_CALLBACK_INDEX;
+    callbackArray.forEach((element, index) => {
+      if (element.isEqual(callback)) {
+        findIndex = index;
       }
-    }
-    return false;
+    });
+    return findIndex;
   }
 
   function createCallbackWrapper(callback: Callback<string>): CallbackWrapper<string> {
-    for (let element of callbackArray) {
-      if(element.isEqual(callback)){
-        return element;
-      }
+    let findIndex = findCallbackIndex(callback);
+    if (findIndex != INVALID_CALLBACK_INDEX) {
+      return callbackArray[findIndex];
     }
-    let calbackWrapper: CallbackWrapper<string> = new CallbackWrapper<string>(callback);
-    callbackArray.push(calbackWrapper)
-    return calbackWrapper;
+    let callbackWrapper: CallbackWrapper<string> = new CallbackWrapper<string>(callback);
+    callbackArray.push(callbackWrapper)
+    return callbackWrapper;
   }
 
   function onFormOverflow(callback: Callback<formInfo.OverflowRequest>): void {

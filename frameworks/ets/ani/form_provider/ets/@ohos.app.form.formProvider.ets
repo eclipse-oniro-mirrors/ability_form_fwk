@@ -273,7 +273,7 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
 
   export function getFormsInfo(filter?: formInfo.FormInfoFilter): Promise<Array<formInfo.FormInfo>> {
     return new Promise<Array<formInfo.FormInfo>>((resolve, reject): void => {
-      if(filter !== undefined && filter?.moduleName === undefined) {
+      if(filter !== null && filter !== undefined && filter?.moduleName === undefined) {
         reject(new BusinessError(INVALID_PARAM_ERROR_CODE, INVALID_PARAM_MESSAGE_ETS));
         return;
       }

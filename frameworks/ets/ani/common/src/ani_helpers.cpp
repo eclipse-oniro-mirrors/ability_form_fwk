@@ -974,9 +974,9 @@ ani_object CreateBool(ani_env *env, ani_boolean value)
     return object;
 }
 
-bool VectorHasNegativeValue(const std::vector<int>& vector)
+bool VectorHasNegativeValue(const std::vector<int>& vec)
 {
-    return std::any_of(vector.begin(), vector.end(), [](int v) {
+    return std::any_of(vec.begin(), vec.end(), [](int v) {
         return v < 0;
     });
 }
