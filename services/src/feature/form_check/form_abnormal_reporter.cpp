@@ -82,7 +82,7 @@ void FormAbnormalReporter::CheckForms()
         formIds.emplace_back(formId);
     }
 
-    HILOG_INFO("total:%{public}" PRIu32 " checkSize:%{public}d" PRIu32, formIdSet.size(), formIds.size());
+    HILOG_INFO("total:%{public}zu checkSize:%{public}zu", formIdSet.size(), formIds.size());
     if (formIds.empty()) {
         return;
     }
@@ -115,7 +115,7 @@ void FormAbnormalReporter::ReportAbnormalForms()
         }
     }
     total += count;
-    HILOG_INFO("map size:%{public}" PRIu32 " total:%{public}d remained:%{public}d", map.size(), total, count);
+    HILOG_INFO("map size:%{public}zu total:%{public}d remained:%{public}d", map.size(), total, count);
     if (count > 0) {
         FormEventReport::SendFormAbnormalEvent(params);
     }
