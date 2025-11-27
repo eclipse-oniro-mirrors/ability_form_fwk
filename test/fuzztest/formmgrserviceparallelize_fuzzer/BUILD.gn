@@ -19,7 +19,7 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("FormMgrServiceParallelizeFuzzTest") {
-  module_out_path = form_fuzz_test_path
+  module_out_path = "${form_fuzz_test_path}/concurrent"
 
   fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmgrserviceparallelize_fuzzer"
 
