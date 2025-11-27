@@ -1751,11 +1751,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_076, TestSize.Le
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_032 start";
     FormRecord formRecord;
-    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
+    std::vector<std::string> subscribedKeys;
     int64_t formId = 1;
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const std::vector<FormDataProxy> formDataProxies;
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
     formDataProxyRecord.RegisterPermissionListener(formDataProxies);
     formDataProxyRecord.UnRegisterPermissionListener();
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_032 end";
@@ -1774,6 +1775,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_077, TestSize.Le
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const std::vector<FormDataProxy> formDataProxies;
+    std::vector<std::string> subscribedKeys;
     ErrCode ret = formDataProxyRecord.SubscribeFormData(formDataProxies);
     EXPECT_EQ(ret, ERR_OK);
     int32_t permStateChangeType = 1;
@@ -1824,8 +1826,9 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_079, TestSize.Le
     FormRecord formRecord;
     int64_t formId = 1;
     uint32_t tokenId = 1;
-    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    std::vector<std::string> subscribedKeys;
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
     const DataShare::PublishedDataItem data;
     sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
     formAshmem = nullptr;
@@ -1851,6 +1854,9 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_080, TestSize.Le
     int64_t formId = 1;
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    std::vector<std::string> subscribedKeys;
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
+    
     formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
     const DataShare::PublishedDataItem data;
     formRecord.uiSyntax = FormType::JS;
@@ -1876,6 +1882,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_081, TestSize.Le
     FormRecord formRecord;
     int64_t formId = 1;
     uint32_t tokenId = 1;
+    std::vector<std::string> subscribedKeys;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const DataShare::PublishedDataItem data;
     auto node = std::get<DataShare::AshmemNode>(data.value_);
@@ -1901,9 +1908,10 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_082, TestSize.Le
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_028 start";
     FormRecord formRecord;
     int64_t formId = 1;
-    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
+    std::vector<std::string> subscribedKeys;
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
     formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, true);
     formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
     FormDataProxyRecord::SubscribeMap publishSubscribeMap;
