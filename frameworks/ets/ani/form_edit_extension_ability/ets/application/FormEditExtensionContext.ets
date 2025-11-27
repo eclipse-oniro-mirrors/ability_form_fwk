@@ -37,7 +37,7 @@ export default class FormEditExtensionContext extends UIExtensionContext {
   startSecondPage(want: Want): Promise<AbilityResult> {
     let p: Promise<AbilityResult> =
       new Promise<AbilityResult>((resolve: (data: AbilityResult) => void, reject: (err: BusinessError) => void): void => {
-        let myCall:AsyncCallbackWrapper<AbilityResult> = new AsyncCallbackWrapper<AbilityResult>(
+        let myCall: AsyncCallbackWrapper<AbilityResult> = new AsyncCallbackWrapper<AbilityResult>(
           (err: BusinessError | null, data: AbilityResult | undefined) => {
           if (err == null || err.code == 0) {
             resolve(data as AbilityResult);

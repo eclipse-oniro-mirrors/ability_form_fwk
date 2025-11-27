@@ -14,7 +14,7 @@
  */
 
 #include "ets_form_edit_extension_impl.h"
-#include "hilog_tag_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "ets_form_edit_extension_context.h"
 #include "ets_ui_extension_content_session.h"
 #include "ani_common_want.h"
@@ -28,42 +28,42 @@ EtsFormEditExtensionImpl::EtsFormEditExtensionImpl(const std::unique_ptr<Runtime
 
 void EtsFormEditExtensionImpl::BindContext()
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "BindContext");
+    HILOG_INFO("BindContext");
     if (etsObj_ == nullptr) {
         return;
     }
     auto env = etsRuntime_.GetAniEnv();
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null env");
+        HILOG_ERROR("null env");
         return;
     }
     if (context_ == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null context_");
+        HILOG_ERROR("null context_");
         return;
     }
     ani_object contextObj = EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(env, context_);
     if (contextObj == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null contextObj");
+        HILOG_ERROR("null contextObj");
         return;
     }
     ani_field contextField;
     auto status = env->Class_FindField(etsObj_->aniCls, "context", &contextField);
     if (status != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Class_GetField context failed");
+        HILOG_ERROR("Class_GetField context failed");
         return;
     }
     ani_ref contextRef = nullptr;
     if (env->GlobalReference_Create(contextObj, &contextRef) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "GlobalReference_Create contextObj failed");
+        HILOG_ERROR("GlobalReference_Create contextObj failed");
         return;
     }
     if (env->Object_SetField_Ref(etsObj_->aniObj, contextField, contextRef) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Object_SetField_Ref contextObj failed");
+        HILOG_ERROR("Object_SetField_Ref contextObj failed");
         env->GlobalReference_Delete(contextRef);
         return;
     }
 
-    TAG_LOGI(AAFwkTag::UI_EXT, "BindContext end");
+    HILOG_INFO("BindContext end");
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

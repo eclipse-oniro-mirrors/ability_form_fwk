@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <dlfcn.h>
 
-#include "hilog_tag_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "hitrace_meter.h"
 #include "string_wrapper.h"
 
@@ -38,12 +38,12 @@ FormEditExtension *CreateETSFormEditExtension(const std::unique_ptr<Runtime> &ru
     }
     auto handle = dlopen(ETS_ANI_LIBNAME, RTLD_LAZY);
     if (handle == nullptr) {
-        TAG_LOGE(AAFwkTag::FORM_EDIT_EXT, "dlopen failed %{public}s, %{public}s", ETS_ANI_LIBNAME, dlerror());
+        HILOG_ERROR("dlopen failed %{public}s, %{public}s", ETS_ANI_LIBNAME, dlerror());
         return nullptr;
     }
     auto symbol = dlsym(handle, ETS_ANI_CREATE_FUNC);
     if (symbol == nullptr) {
-        TAG_LOGE(AAFwkTag::FORM_EDIT_EXT, "dlsym failed %{public}s, %{public}s", ETS_ANI_CREATE_FUNC, dlerror());
+        HILOG_ERROR("dlsym failed %{public}s, %{public}s", ETS_ANI_CREATE_FUNC, dlerror());
         dlclose(handle);
         return nullptr;
     }

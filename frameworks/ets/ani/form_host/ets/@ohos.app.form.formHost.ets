@@ -1009,12 +1009,12 @@ export default namespace formHost {
     formHost.nativeOffGetFormRect(myCall);
   }
 
-  function on(type: 'getLiveFormStatus', callback: formInfo.GetLiveFormStatusCallback): void {
+  function onGetLiveFormStatus(callback: formInfo.GetLiveFormStatusCallback): void {
     let myCall = new GetLiveFormStatusCallbackWrapper(callback);
     formHost.nativeOnGetLiveFormStatus(myCall);
   }
 
-  function off(type: 'getLiveFormStatus', callback?: formInfo.GetLiveFormStatusCallback): void {
+  function offGetLiveFormStatus(callback?: formInfo.GetLiveFormStatusCallback): void {
     let myCall: GetLiveFormStatusCallbackWrapper | undefined = undefined;
     if (callback) {
       myCall = new GetLiveFormStatusCallbackWrapper(callback);

@@ -16,7 +16,7 @@
 #include "ani_form_error_util.h"
 #include "ani_form_common_util.h"
 #include "ets_form_edit_extension_context.h"
-#include "hilog_tag_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "ets_ui_extension_context.h"
 #include "ets_runtime.h"
 #include "ani_common_ability_result.h"
@@ -42,7 +42,7 @@ using namespace OHOS::AppExecFwk;
 EtsFormEditExtensionContext* EtsFormEditExtensionContext::GetEtsFormEditExtensionContext(ani_env *env, ani_object obj)
 {
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null env");
+        HILOG_ERROR("null env");
         return nullptr;
     }
 
@@ -50,12 +50,12 @@ EtsFormEditExtensionContext* EtsFormEditExtensionContext::GetEtsFormEditExtensio
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
     if ((status = env->Object_GetFieldByName_Long(obj, "nativeExtensionContext", &etsContextLong)) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
     etsContext = reinterpret_cast<EtsFormEditExtensionContext *>(etsContextLong);
     if (etsContext == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "etsContext null");
+        HILOG_ERROR("etsContext null");
         return nullptr;
     }
     return etsContext;
@@ -64,14 +64,14 @@ EtsFormEditExtensionContext* EtsFormEditExtensionContext::GetEtsFormEditExtensio
 ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
     ani_env *env, std::shared_ptr<FormEditExtensionContext> context)
 {
-    TAG_LOGD(AAFwkTag::UI_EXT, "called");
+    HILOG_DEBUG("called");
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null env");
+        HILOG_ERROR("null env");
         return nullptr;
     }
 
     if (context == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null context");
+        HILOG_ERROR("null context");
         return nullptr;
     }
 
@@ -80,17 +80,17 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
     ani_method method = nullptr;
     ani_object contextObj = nullptr;
     if ((status = env->FindClass(FORM_EDIT_EXTENSION_CONTEXT, &cls)) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
     if ((status = env->Class_FindMethod(cls, "<ctor>", "J:V", &method)) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
     std::unique_ptr<EtsFormEditExtensionContext> etsContext = std::make_unique<EtsFormEditExtensionContext>(context);
     if ((status = env->Object_New(cls, method, &contextObj, reinterpret_cast<ani_long>(etsContext.release()))) !=
         ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
 
@@ -99,23 +99,23 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
             reinterpret_cast<void *>(EtsFormEditExtensionContext::StartSecondPage) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
 
     auto workContext = new (std::nothrow)
         std::weak_ptr<AbilityRuntime::UIExtensionContext>(context);
     if (workContext == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null workContext");
+        HILOG_ERROR("null workContext");
         return nullptr;
     }
     if (!ContextUtil::SetNativeContextLong(env, contextObj, (ani_long)workContext)) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "SetNativeContextLong failed");
+        HILOG_ERROR("SetNativeContextLong failed");
         delete workContext;
         return nullptr;
     }
     if (!EtsFormEditExtensionContext::BindNativePtrCleaner(env)) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         delete workContext;
         return nullptr;
     }
@@ -123,12 +123,12 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
     OHOS::AbilityRuntime::CreateEtsExtensionContext(env, cls, contextObj, context, context->GetAbilityInfo());
     ani_ref *contextGlobalRef = new (std::nothrow) ani_ref;
     if (contextGlobalRef == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "new contextGlobalRef failed");
+        HILOG_ERROR("new contextGlobalRef failed");
         delete workContext;
         return nullptr;
     }
     if ((status = env->GlobalReference_Create(contextObj, contextGlobalRef)) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "GlobalReference_Create failed status: %{public}d", status);
+        HILOG_ERROR("GlobalReference_Create failed status: %{public}d", status);
         delete contextGlobalRef;
         delete workContext;
         return nullptr;
@@ -140,13 +140,13 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
 bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
 {
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "nullptr env");
+        HILOG_ERROR("nullptr env");
         return false;
     }
     ani_class cleanerCls;
     ani_status status = env->FindClass(UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME, &cleanerCls);
     if (ANI_OK != status) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Not found Cleaner. status:%{public}d.", status);
+        HILOG_ERROR("Not found Cleaner. status:%{public}d.", status);
         return false;
     }
     std::array methods = {
@@ -154,7 +154,7 @@ bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
     };
     if ((status = env->Class_BindNativeMethods(cleanerCls, methods.data(), methods.size())) != ANI_OK
         && status != ANI_ALREADY_BINDED) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         return false;
     }
     return true;
@@ -163,7 +163,7 @@ bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
 void EtsFormEditExtensionContext::Clean(ani_env *env, ani_object object)
 {
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "nullptr env");
+        HILOG_ERROR("nullptr env");
         return;
     }
 
@@ -181,15 +181,15 @@ void EtsFormEditExtensionContext::Clean(ani_env *env, ani_object object)
 void EtsFormEditExtensionContext::StartSecondPage(ani_env *env, ani_object aniObj,
     ani_object aniWant, ani_object callback)
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "called");
+    HILOG_INFO("called");
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null env");
+        HILOG_ERROR("null env");
         return;
     }
 
     auto etsContext = GetEtsFormEditExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null etsContext");
+        HILOG_ERROR("null etsContext");
         return;
     }
     etsContext->OnStartSecondPage(env, aniWant, callback);
@@ -198,14 +198,14 @@ void EtsFormEditExtensionContext::StartSecondPage(ani_env *env, ani_object aniOb
 
 void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object aniWant, ani_object callback)
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "called");
+    HILOG_INFO("called");
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null env");
+        HILOG_ERROR("null env");
         return;
     }
 
     if (context_.lock() == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Context is released");
+        HILOG_ERROR("Context is released");
         EtsErrorUtil::ThrowError(env,
             static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
         return ;
@@ -215,7 +215,7 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
 
     auto contextPtr = context_.lock();
     if (!contextPtr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Context is released");
+        HILOG_ERROR("Context is released");
         AsyncCallback(env, callback,
             EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
             nullptr);
@@ -225,7 +225,7 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
     int resultCode = 0;
     ani_object abilityResult = AppExecFwk::WrapAbilityResult(env, resultCode, want);
     if (abilityResult == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Wrap abilityResult failed");
+        HILOG_ERROR("Wrap abilityResult failed");
         AsyncCallback(env, callback,
             EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
             nullptr);
@@ -239,18 +239,18 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
 bool EtsFormEditExtensionContext::AsyncCallback(ani_env *env, ani_object call, ani_object error, ani_object result)
 {
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null env");
+        HILOG_ERROR("null env");
         return false;
     }
     ani_class clsCall = nullptr;
     ani_status status = env->FindClass(AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, &clsCall);
     if (status!= ANI_OK || clsCall == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "FindClass status: %{public}d, or null clsCall", status);
+        HILOG_ERROR("FindClass status: %{public}d, or null clsCall", status);
         return false;
     }
     ani_method method = nullptr;
     if ((status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method)) != ANI_OK || method == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Class_FindMethod status: %{public}d, or null method", status);
+        HILOG_ERROR("Class_FindMethod status: %{public}d, or null method", status);
         return false;
     }
     if (error == nullptr) {
@@ -264,7 +264,7 @@ bool EtsFormEditExtensionContext::AsyncCallback(ani_env *env, ani_object call, a
         result = reinterpret_cast<ani_object>(undefinedRef);
     }
     if ((status = env->Object_CallMethod_Void(call, method, error, result)) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Object_CallMethod_Void status: %{public}d", status);
+        HILOG_ERROR("Object_CallMethod_Void status: %{public}d", status);
         return false;
     }
     return true;

@@ -14,7 +14,7 @@
  */
 
 #include "ets_form_edit_extension.h"
-#include "hilog_tag_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "hitrace_meter.h"
 #include "ets_ui_extension_base.h"
 #include "ets_form_edit_extension_context.h"
@@ -43,9 +43,9 @@ void EtsFormEditExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRe
     std::shared_ptr<AppExecFwk::AbilityHandler> &handler,
     const sptr<IRemoteObject> &token)
 {
-    TAG_LOGD(AAFwkTag::UI_EXT, "Begin init form edit extension");
+    HILOG_DEBUG("Begin init form edit extension");
     if (impl_ == nullptr) {
-        TAG_LOGE(AAFwkTag::FORM_EDIT_EXT, "null impl_");
+        HILOG_ERROR("null impl_");
         return;
     }
 
@@ -53,7 +53,7 @@ void EtsFormEditExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRe
     context->SetToken(token);
     auto appContext = Context::GetApplicationContext();
     if (appContext == nullptr) {
-        TAG_LOGE(AAFwkTag::FORM_EDIT_EXT, "null appContext");
+        HILOG_ERROR("null appContext");
         return;
     }
     context->SetApplicationInfo(appContext->GetApplicationInfo());
@@ -61,12 +61,12 @@ void EtsFormEditExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRe
     context->SetParentContext(appContext);
 
     if (record == nullptr) {
-        TAG_LOGE(AAFwkTag::FORM_EDIT_EXT, "null record");
+        HILOG_ERROR("null record");
         return;
     }
     auto abilityInfo = record->GetAbilityInfo();
     if (abilityInfo == nullptr) {
-        TAG_LOGE(AAFwkTag::FORM_EDIT_EXT, "null abilityInfo");
+        HILOG_ERROR("null abilityInfo");
         return;
     }
     context->SetAbilityInfo(abilityInfo);

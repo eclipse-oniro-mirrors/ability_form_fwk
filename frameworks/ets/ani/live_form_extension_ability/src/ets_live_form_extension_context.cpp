@@ -95,7 +95,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
             reinterpret_cast<void *>(EtsLiveFormExtensionContext::StartAbilityByLiveForm) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "status: %{public}d", status);
+        HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
 
@@ -176,15 +176,15 @@ void EtsLiveFormExtensionContext::Clean(ani_env *env, ani_object object)
 void EtsLiveFormExtensionContext::StartAbilityByLiveForm(ani_env *env, ani_object aniObj,
     ani_object aniWant, ani_string aniFormId, ani_object callback)
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "called");
+    HILOG_INFO("called");
     if (env == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null env");
+        HILOG_ERROR("null env");
         return;
     }
 
     auto etsContext = GetEtsLiveFormExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "null etsContext");
+        HILOG_ERROR("null etsContext");
         return;
     }
     etsContext->OnStartAbilityByLiveForm(env, aniWant, aniFormId, callback);
@@ -194,7 +194,7 @@ void EtsLiveFormExtensionContext::StartAbilityByLiveForm(ani_env *env, ani_objec
 void EtsLiveFormExtensionContext::OnStartAbilityByLiveForm(ani_env *env, ani_object aniWant,
     ani_string aniFormId, ani_object callback)
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "called");
+    HILOG_INFO("called");
     if (env == nullptr) {
         HILOG_ERROR("null env");
         return;
