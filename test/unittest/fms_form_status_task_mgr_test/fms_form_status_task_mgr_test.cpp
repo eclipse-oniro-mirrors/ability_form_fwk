@@ -243,6 +243,9 @@ HWTEST_F(FormStatusTaskMgrTest, FormStatusTaskMgr_0012, TestSize.Level1)
     record.isVisible = true;
     formTaskMgr->RenderForm(record, want, remoteObject);
 
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
+    formTaskMgr->RenderForm(record, want, remoteObject);
+
     GTEST_LOG_(INFO) << "FormStatusTaskMgr_0012 end";
 }
 

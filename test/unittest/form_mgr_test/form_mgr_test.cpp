@@ -5156,4 +5156,21 @@ HWTEST_F(FormMgrTest, FormMgrTest_IsFormDueControl_001, TestSize.Level1)
     EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FormMgrTest_IsFormDueControl_001 end";
 }
+
+/**
+ * @tc.name: FormMgrTest_SendNonTransparencyRatio_001
+ * @tc.desc: Verify SendNonTransparencyRatio
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_SendNonTransparencyRatio_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_SendNonTransparencyRatio_001 begin";
+    EXPECT_CALL(*mockProxy, SendNonTransparencyRatio(_, _))
+        .WillOnce(Return(ERR_OK));
+    int64_t formId = 10;
+    int32_t ratio = 0;
+    auto result = FormMgr::GetInstance().SendNonTransparencyRatio(formId, ratio);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_SendNonTransparencyRatio_001 end";
+}
 } // namespace

@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef MOCK_FORM_DATA_MGR_H
-#define MOCK_FORM_DATA_MGR_H
+#ifndef INNER_MOCK_FORM_DATA_MGR_H
+#define INNER_MOCK_FORM_DATA_MGR_H
 
 void MockFormRecordIsDynamic(bool mockRet);
 
 void MockIsExistRecycleTask(bool mockRet);
 
-#endif // MOCK_FORM_DATA_MGR_H
+#endif // INNER_MOCK_FORM_DATA_MGR_H
