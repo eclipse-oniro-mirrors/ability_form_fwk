@@ -157,6 +157,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
     if (offSize > INT32_MAX) {
         HILOG_ERROR("File size exceeds int32_t limit");
+        close(fd);
         return;
     }
     int32_t size = static_cast<int32_t>(offSize);
@@ -167,6 +168,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
     if (size > MAX_IMAGE_BYTE_SIZE) {
         HILOG_ERROR("File is too large");
+        close(fd);
         return;
     }
     char* bytes = new (std::nothrow) char[size];
