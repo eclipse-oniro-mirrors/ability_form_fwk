@@ -246,6 +246,14 @@ private:
     bool UpdateIntervalValue(int64_t formId, const FormTimerCfg &timerCfg);
     /**
      * @brief Update update at timer task value.
+     * @param changedItem UpdateAtItem.
+     * @param formId The Id of the form.
+     * @param timerCfg task value.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateTimerValue(UpdateAtItem &changedItem, int64_t formId, const FormTimerCfg &timerCfg);
+    /**
+     * @brief Update update at timer task value.
      * @param formId The Id of the form.
      * @param timerCfg task value.
      * @return Returns true on success, false on failure.

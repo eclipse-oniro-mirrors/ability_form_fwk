@@ -257,6 +257,59 @@ bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timer
 }
 /**
  * @brief Update update at timer task value.
+ * @param changedItem UpdateAtItem.
+ * @param formId The Id of the form.
+ * @param timerCfg task value.
+ * @return Returns true on success, false on failure.
+ */
+bool FormTimerMgr::UpdateTimerValue(UpdateAtItem &changedItem, int64_t formId, const FormTimerCfg &timerCfg)
+{
+    std::lock_guard<std::mutex> lock(updateAtMutex_);
+    std::list<UpdateAtItem>::iterator itItem;
+
+    for (itItem = updateAtTimerTasks_.begin(); itItem != updateAtTimerTasks_.end();) {
+        if (itItem->refreshTask.formId == formId) {
+            changedItem = *itItem;
+            itItem = updateAtTimerTasks_.erase(itItem);
+        } else {
+            itItem++;
+        }
+    }
+
+    if (changedItem.refreshTask.formId == 0) {
+        HILOG_ERROR("the updateAtTimer not exist");
+        return false;
+    }
+
+    std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
+    if (updateAtTimes.size() > 0) {
+        bool ret = ERR_OK;
+        for (const auto &time: updateAtTimes) {
+            if (time.size() < TIME_MIN_SIZE) {
+                HILOG_ERROR("Insufficient length");
+                return false;
+            }
+            HILOG_INFO("time[0] : %{public}d ,time[1] : %{public}d ", (int)time[0], (int)time[1]);
+            UpdateAtItem changedItem_ = changedItem;
+            changedItem_.refreshTask.hour = time[0];
+            changedItem_.refreshTask.min = time[1];
+            auto updateAtTime = time[0] * Constants::MIN_PER_HOUR + time[1];
+            changedItem_.updateAtTime = updateAtTime;
+            AddUpdateAtItem(changedItem_);
+        }
+    } else {
+        HILOG_INFO("updateAtHour : %{public}d ,updateAtMin : %{public}d ",
+            (int)timerCfg.updateAtHour, (int)timerCfg.updateAtMin);
+        changedItem.refreshTask.hour = timerCfg.updateAtHour;
+        changedItem.refreshTask.min = timerCfg.updateAtMin;
+        changedItem.updateAtTime = changedItem.refreshTask.hour * Constants::MIN_PER_HOUR
+            + changedItem.refreshTask.min;
+        AddUpdateAtItem(changedItem);
+    }
+    return true;
+}
+/**
+ * @brief Update update at timer task value.
  * @param formId The Id of the form.
  * @param timerCfg task value.
  * @return Returns true on success, false on failure.
@@ -270,49 +323,8 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
     }
     UpdateAtItem changedItem;
 
-    {
-        std::lock_guard<std::mutex> lock(updateAtMutex_);
-        std::list<UpdateAtItem>::iterator itItem;
-
-        for (itItem = updateAtTimerTasks_.begin(); itItem != updateAtTimerTasks_.end();) {
-            if (itItem->refreshTask.formId == formId) {
-                changedItem = *itItem;
-                itItem = updateAtTimerTasks_.erase(itItem);
-            } else {
-                itItem++;
-            }
-        }
-
-        if (changedItem.refreshTask.formId == 0) {
-            HILOG_ERROR("the updateAtTimer not exist");
-            return false;
-        }
-
-        std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
-        if (updateAtTimes.size() > 0) {
-            bool ret = ERR_OK;
-            for (const auto &time: updateAtTimes) {
-                if (time.size() < TIME_MIN_SIZE) {
-                    HILOG_ERROR("Insufficient length");
-                    return false;
-                }
-                HILOG_INFO("time[0] : %{public}d ,time[1] : %{public}d ", (int)time[0], (int)time[1]);
-                UpdateAtItem changedItem_ = changedItem;
-                changedItem_.refreshTask.hour = time[0];
-                changedItem_.refreshTask.min = time[1];
-                auto updateAtTime = time[0] * Constants::MIN_PER_HOUR + time[1];
-                changedItem_.updateAtTime = updateAtTime;
-                AddUpdateAtItem(changedItem_);
-            }
-        } else {
-            HILOG_INFO("updateAtHour : %{public}d ,updateAtMin : %{public}d ",
-                (int)timerCfg.updateAtHour, (int)timerCfg.updateAtMin);
-            changedItem.refreshTask.hour = timerCfg.updateAtHour;
-            changedItem.refreshTask.min = timerCfg.updateAtMin;
-            changedItem.updateAtTime = changedItem.refreshTask.hour * Constants::MIN_PER_HOUR
-                + changedItem.refreshTask.min;
-            AddUpdateAtItem(changedItem);
-        }
+    if (!UpdateTimerValue(changedItem, formId, timerCfg)) {
+        return false;
     }
 
     if (!UpdateAtTimerAlarm()) {

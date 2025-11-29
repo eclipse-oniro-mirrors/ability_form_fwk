@@ -136,6 +136,19 @@ void FormProviderData::AddImageData(const std::string &picName, const std::share
     imageDataState_ = IMAGE_DATA_STATE_ADDED;
 }
 
+bool FormProviderData::isValidSize(off_t offSize)
+{
+    if (offSize <= 0) {
+        HILOG_ERROR("Get file size failed");
+        return false;
+    }
+    if (offSize > INT32_MAX) {
+        HILOG_ERROR("File size exceeds int32_t limit");
+        return false;
+    }
+    return true;
+}
+
 /**
  * @brief Adds an image to this {@code FormProviderData} instance.
  * @param picName Indicates the name of the image to add.
@@ -150,13 +163,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
 
     off_t offSize = lseek(fd, 0L, SEEK_END);
-    if (offSize <= 0) {
-        HILOG_ERROR("Get file size failed, errno is %{public}d", errno);
-        close(fd);
-        return;
-    }
-    if (offSize > INT32_MAX) {
-        HILOG_ERROR("File size exceeds int32_t limit");
+    if (!isValidSize(offSize)) {
         close(fd);
         return;
     }
