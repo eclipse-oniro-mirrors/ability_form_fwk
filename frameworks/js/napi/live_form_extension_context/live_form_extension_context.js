@@ -30,6 +30,11 @@ export class LiveFormExtensionContext extends ExtensionContext {
     return this.__context_impl__.setWindowBackgroundColor();
   }
 
+  setUIExtCustomDensity(layoutScale) {
+    hilog.sLogI(domainID, TAG, `setUIExtCustomDensity layoutScale: ${layoutScale}`);
+    return this.__context_impl__.setUIExtCustomDensity(layoutScale);
+  }
+
   startAbilityByLiveForm(want) {
     let jsonWant = JSON.stringify(want);
     hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${jsonWant}`);

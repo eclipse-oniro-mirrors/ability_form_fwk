@@ -1378,8 +1378,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_067, TestSize.Level1)
     FormJsInfo formJsInfo;
     formJsInfo.bundleName = "bundleName";
     formJsInfo.moduleName = "moduleName";
-    formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
-        nullptr);
+    formRenderRecordPtr_->contextsMapForModuleName_.emplace(
+        formJsInfo.bundleName + ":" + formJsInfo.moduleName, nullptr);
     bool result = formRenderRecordPtr_->UpdateRuntime(formJsInfo);
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_067 end";

@@ -98,6 +98,7 @@ napi_value JsLiveFormExtensionContext::CreateJsLiveFormExtensionContext(
 
     const char *moduleName = "JsLiveFormExtensionContext";
     BindNativeFunction(env, objValue, "setWindowBackgroundColor", moduleName, SetWindowBackgroundColor);
+    BindNativeFunction(env, objValue, "setUIExtCustomDensity", moduleName, SetUIExtCustomDensity);
     BindNativeFunction(env, objValue, "startAbilityByLiveForm", moduleName, StartAbilityByLiveForm);
     BindNativeFunction(env, objValue, "connectServiceExtensionAbility", moduleName, ConnectAbility);
     BindNativeFunction(env, objValue, "disconnectServiceExtensionAbility", moduleName, DisconnectAbility);
@@ -109,6 +110,12 @@ napi_value JsLiveFormExtensionContext::SetWindowBackgroundColor(napi_env env, na
 {
     HILOG_DEBUG("called");
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnSetWindowBackgroundColor);
+}
+
+napi_value JsLiveFormExtensionContext::SetUIExtCustomDensity(napi_env env, napi_callback_info info)
+{
+    HILOG_DEBUG("called");
+    GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnSetUIExtCustomDensity);
 }
 
 napi_value JsLiveFormExtensionContext::StartAbilityByLiveForm(napi_env env, napi_callback_info info)
@@ -156,6 +163,50 @@ napi_value JsLiveFormExtensionContext::OnSetWindowBackgroundColor(napi_env env, 
 
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleHighQos("JsLiveFormExtensionContext OnSetWindowBackgroundColor", env,
+        CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsLiveFormExtensionContext::OnSetUIExtCustomDensity(napi_env env, NapiCallbackInfo &info)
+{
+    HILOG_DEBUG("called: param size: %{public}d", static_cast<int32_t>(info.argc));
+    if (info.argc != ARGC_ONE) {
+        HILOG_ERROR("argc is not one");
+        ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        return CreateJsUndefined(env);
+    }
+
+    double layoutScale = 1.0;
+    if (!OHOS::AppExecFwk::UnwrapDoubleFromJS2(env, info.argv[0], layoutScale)) {
+        HILOG_ERROR("failed to get layoutScale");
+        ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        return CreateJsUndefined(env);
+    }
+
+    auto context = context_.lock();
+    if (context == nullptr) {
+        HILOG_ERROR("Context is nullptr");
+        ThrowError(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        return CreateJsUndefined(env);
+    }
+
+    auto complete = [weak = context_, layoutScale](napi_env env, NapiAsyncTask &task, int32_t status) {
+        auto context = weak.lock();
+        if (!context) {
+            task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
+                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
+            return;
+        }
+
+        ErrCode errCode = context->SetUIExtCustomDensity(static_cast<float>(layoutScale));
+        JsLiveFormExtensionContext::HandleErrorCode(env, task, errCode);
+    };
+
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleHighQos("JsLiveFormExtensionContext OnSetUIExtCustomDensity", env,
         CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
@@ -314,6 +365,24 @@ napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCal
     NapiAsyncTask::Schedule("JSLiveFormExtensionContext::OnDisconnectAbility",
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
+}
+
+void JsLiveFormExtensionContext::HandleErrorCode(napi_env env, NapiAsyncTask &task, ErrCode errCode)
+{
+    if (errCode == ERR_OK) {
+        task.ResolveWithNoError(env, CreateJsUndefined(env));
+    } else if (errCode == ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME) {
+        task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED),
+            FormErrors::GetInstance().QueryExternalErrorMessage(ERR_APPEXECFWK_FORM_LIVE_OP_PAGE_INFO_MISTMATCH,
+                ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED)));
+    } else if (errCode == ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED) {
+        task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED),
+            FormErrors::GetInstance().QueryExternalErrorMessage(ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED,
+                ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED)));
+    } else {
+        task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
+    }
 }
 
 bool JsLiveFormExtensionContext::CheckConnectionParam(napi_env env, napi_value value,
