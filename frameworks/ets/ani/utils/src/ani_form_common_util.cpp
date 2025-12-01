@@ -22,7 +22,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 namespace {
 constexpr const char* CLASSNAME_BOOL = "Lstd/core/Boolean;";
-constexpr const char* CLASSNAME_ARRAY = "Lescompat/Array;";
+constexpr const char* CLASSNAME_ARRAY = "Lstd/core/Array;";
 
 ani_object CreateBoolean(ani_env *env, ani_boolean value)
 {

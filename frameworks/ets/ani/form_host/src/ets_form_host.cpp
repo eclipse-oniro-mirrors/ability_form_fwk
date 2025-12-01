@@ -516,14 +516,14 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function {
             "deleteForm_inner", "C{std.core.String}:", reinterpret_cast<void *>(DeleteForm)},
         ani_native_function {
-            "deleteInvalidForms_inner", "C{escompat.Array}:i", reinterpret_cast<void *>(DeleteInvalidForms)},
+            "deleteInvalidForms_inner", "C{std.core.Array}:i", reinterpret_cast<void *>(DeleteInvalidForms)},
         ani_native_function {
-            "getAllFormsInfo_inner", ":C{escompat.Array}", reinterpret_cast<void *>(GetAllFormsInfo)},
+            "getAllFormsInfo_inner", ":C{std.core.Array}", reinterpret_cast<void *>(GetAllFormsInfo)},
         ani_native_function {
-            "getFormsInfo_inner", "C{std.core.String}C{std.core.String}:C{escompat.Array}",
+            "getFormsInfo_inner", "C{std.core.String}C{std.core.String}:C{std.core.Array}",
             reinterpret_cast<void *>(GetFormsInfo)},
         ani_native_function {
-            "getFormsInfoByFilter_inner", "C{@ohos.app.form.formInfo.formInfo.FormInfoFilter}:C{escompat.Array}",
+            "getFormsInfoByFilter_inner", "C{@ohos.app.form.formInfo.formInfo.FormInfoFilter}:C{std.core.Array}",
             reinterpret_cast<void *>(GetFormsInfoByFilter)},
         ani_native_function {"isSystemReady_inner", ":", reinterpret_cast<void *>(IsSystemReady)},
         ani_native_function {
@@ -536,25 +536,25 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function {
             "castToNormalForm_inner", "C{std.core.String}:", reinterpret_cast<void *>(CastToNormalForm)},
         ani_native_function {
-            "notifyVisibleForms_inner", "C{escompat.Array}:", reinterpret_cast<void *>(NotifyVisibleForms)},
+            "notifyVisibleForms_inner", "C{std.core.Array}:", reinterpret_cast<void *>(NotifyVisibleForms)},
         ani_native_function {
-            "notifyInvisibleForms_inner", "C{escompat.Array}:", reinterpret_cast<void *>(NotifyInvisibleForms)},
+            "notifyInvisibleForms_inner", "C{std.core.Array}:", reinterpret_cast<void *>(NotifyInvisibleForms)},
         ani_native_function {
-            "setFormUpdate_inner", "C{escompat.Array}z:", reinterpret_cast<void *>(SetEnableFormUpdate)},
+            "setFormUpdate_inner", "C{std.core.Array}z:", reinterpret_cast<void *>(SetEnableFormUpdate)},
         ani_native_function {
             "updateFormLocation", "C{std.core.String}C{@ohos.app.form.formInfo.formInfo.FormLocation}:",
             reinterpret_cast<void *>(UpdateFormLocation)},
         ani_native_function {
-            "setFormsRecyclable_inner", "C{escompat.Array}:", reinterpret_cast<void *>(SetFormsRecyclable)},
+            "setFormsRecyclable_inner", "C{std.core.Array}:", reinterpret_cast<void *>(SetFormsRecyclable)},
         ani_native_function {
-            "recycleForms_inner", "C{escompat.Array}:", reinterpret_cast<void *>(RecycleForms)},
+            "recycleForms_inner", "C{std.core.Array}:", reinterpret_cast<void *>(RecycleForms)},
         ani_native_function {
-            "recoverForms_inner", "C{escompat.Array}:", reinterpret_cast<void *>(RecoverForms)},
+            "recoverForms_inner", "C{std.core.Array}:", reinterpret_cast<void *>(RecoverForms)},
         ani_native_function {
-            "notifyFormsEnableUpdate_inner", "C{escompat.Array}z:",
+            "notifyFormsEnableUpdate_inner", "C{std.core.Array}z:",
             reinterpret_cast<void *>(NotifyFormsEnableUpdate)},
         ani_native_function {
-            "notifyFormsVisible_inner", "C{escompat.Array}z:", reinterpret_cast<void *>(NotifyFormsVisible)},
+            "notifyFormsVisible_inner", "C{std.core.Array}z:", reinterpret_cast<void *>(NotifyFormsVisible)},
     };
     return methods;
 }
