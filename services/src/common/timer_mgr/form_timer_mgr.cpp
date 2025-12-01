@@ -257,12 +257,12 @@ bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timer
 }
 /**
  * @brief Update update at timer task value.
- * @param changedItem UpdateAtItem.
  * @param formId The Id of the form.
  * @param timerCfg task value.
+ * @param changedItem UpdateAtItem.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::UpdateTimerValue(UpdateAtItem &changedItem, int64_t formId, const FormTimerCfg &timerCfg)
+bool FormTimerMgr::UpdateTimerValue(int64_t formId, const FormTimerCfg &timerCfg, UpdateAtItem &changedItem)
 {
     std::lock_guard<std::mutex> lock(updateAtMutex_);
     std::list<UpdateAtItem>::iterator itItem;
@@ -323,7 +323,7 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
     }
     UpdateAtItem changedItem;
 
-    if (!UpdateTimerValue(changedItem, formId, timerCfg)) {
+    if (!UpdateTimerValue(formId, timerCfg, changedItem)) {
         return false;
     }
 
