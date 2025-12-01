@@ -38,6 +38,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
 #include "mock_form_provider_client.h"
+#include "mock_form_refresh_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -395,9 +396,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_017, TestSize.Level0)
     int32_t uid = 1;
     FormProviderData formProviderData;
     MockGetFormRecord(true);
-    MockGetFormRecordParams(true);
-    MockCheckInvalidForm(ERR_OK);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
+    MockRequestRefreshRet(true);
+    FormDataProxy formDataProxy("key", "id");
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, uid, formProviderData, {formDataProxy}));
     GTEST_LOG_(INFO) << "FormMgrAdapter_017 end";
 }
 
@@ -939,7 +940,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_048, TestSize.Level0)
     int64_t formId = 1;
     int64_t nextTime = 1;
     MockGetFormRecord(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
+    MockRequestRefreshRet(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
     GTEST_LOG_(INFO) << "FormMgrAdapter_048 end";
 }
 
@@ -1507,8 +1509,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_084, TestSize.Level0)
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     Want want;
     MockGetFormRecord(true);
-    MockGetMatchedHostClient(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RequestForm(formId, callerToken, want));
+    MockRequestRefreshRet(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RequestForm(formId, callerToken, want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_084 end";
 }
 
@@ -2549,41 +2551,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0117, TestSize.Level0)
     MockNotifyProviderFormDelete(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.HandleDeleteFormCache(dbRecord, uid, formId));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0117 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_0118
- * @tc.desc: test UpdateForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0118, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0118 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    int32_t uid = 1;
-    FormProviderData formProviderData;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0118 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_0119
- * @tc.desc: test UpdateForm function and the return value is ERR_OK.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0119, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0119 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    int32_t uid = 0;
-    FormProviderData formProviderData;
-    MockGetFormRecord(true);
-    MockGetFormRecordParams(true);
-    MockGetFormRecordParamsUid(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0119 end";
 }
 
 /**

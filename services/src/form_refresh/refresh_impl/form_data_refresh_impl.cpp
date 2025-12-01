@@ -15,6 +15,7 @@
 
 #include "form_refresh/refresh_impl/form_data_refresh_impl.h"
 
+#include "form_provider/form_provider_mgr.h"
 #include "form_refresh/strategy/refresh_check_mgr.h"
 #include "form_refresh/strategy/refresh_exec_mgr.h"
 
@@ -33,6 +34,12 @@ int FormDataRefreshImpl::RefreshFormRequest(RefreshData &data)
     factor.callingUid = data.callingUid;
     int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
     if (ret != ERR_OK) {
+        return ret;
+    }
+
+    FormType formType = data.record.uiSyntax;
+    if (formType == FormType::JS) {
+        ret = FormProviderMgr::GetInstance().UpdateForm(data.formId, data.record, data.providerData);
         return ret;
     }
 

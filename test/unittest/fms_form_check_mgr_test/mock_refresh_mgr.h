@@ -22,7 +22,7 @@
 #include "form_mgr_errors.h"
 
 namespace OHOS {
-void MockIsBaseValidPass(OHOS::ErrCode mockRet);
+void MockIsBaseValidPass(ErrCode mockRet);
 void MockAskForProviderData(ErrCode mockRet);
 void MockUpdateByProviderData(ErrCode mockRet);
 void MockIsSystemOverload(bool mockBool);
@@ -30,5 +30,6 @@ void MockIsFormInvisible(bool mockBool);
 void MockIsScreenOff(bool mockBool);
 void MockIsHealthyControl(bool mockBool);
 void MockIsNeedToFresh(bool mockBool);
+void MockFormProviderUpdateForm(ErrCode mockRet);
 }
 #endif // OHOS_MOCK_REFRESH_MGR_H
