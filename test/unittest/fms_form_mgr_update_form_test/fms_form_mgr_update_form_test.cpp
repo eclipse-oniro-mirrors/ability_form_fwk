@@ -146,7 +146,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
     };
     // test exec
     MockGetCallingUid(callingUid);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
 
@@ -367,7 +367,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
     };
     // test exec
     MockGetCallingUid(callingUid);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
 

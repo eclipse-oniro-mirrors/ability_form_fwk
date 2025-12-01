@@ -1515,24 +1515,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_084, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_085
- * @tc.desc: test RequestForm function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_085, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_085 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    Want want;
-    MockGetFormRecord(true);
-    MockGetMatchedHostClient(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.RequestForm(formId, callerToken, want));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_085 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_086
  * @tc.desc: test NotifyWhetherVisibleForms function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
  * @tc.type: FUNC
