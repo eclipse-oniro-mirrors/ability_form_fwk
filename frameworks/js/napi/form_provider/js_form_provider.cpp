@@ -169,8 +169,7 @@ static std::string GetStringByProp(napi_env env, napi_value value, const std::st
         HILOG_ERROR("prop[%{public}s] get size error", prop.c_str());
         return result;
     }
-    result.reserve(size + 1);
-    result.resize(size);
+    result.resize(size + 1);
     if (napi_get_value_string_utf8(env, propValue, result.data(), (size + 1), &size) != napi_ok) {
         HILOG_ERROR("prop[%{public}s] get value error", prop.c_str());
         return "";
