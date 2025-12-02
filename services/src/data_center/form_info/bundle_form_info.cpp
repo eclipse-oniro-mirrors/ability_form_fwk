@@ -29,7 +29,7 @@ namespace AppExecFwk {
 namespace {
 const std::uint32_t ERR_VERSION_CODE = 0;
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
-const std::string DISTRIBUTE_FORM_MODULE = "widgetUiModule";
+constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
 }
 
 BundleFormInfo::BundleFormInfo(const std::string &bundleName) : bundleName_(bundleName)
@@ -45,14 +45,14 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
     }
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     auto formInfoStorages = jsonObject.get<std::vector<AAFwk::FormInfoStorage>>();
-    for (auto parentItem = formInfoStorages.begin(); parentItem != formInfoStorages.end(); ++parentItem) {
-        for (auto childItem = parentItem->formInfos.begin(); childItem != parentItem->formInfos.end(); ++childItem) {
+    for (auto &parentItem : formInfoStorages) {
+        for (auto &childItem : parentItem.formInfos) {
             bool IsBundleDistributed =
-                FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, parentItem->userId);
+                FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, parentItem.userId);
             if (IsBundleDistributed) {
                 std::string uiModuleName =
-                    FormDistributedMgr::GetInstance().GetUiModuleName(bundleName_, parentItem->userId);
-                childItem->customizeDatas.push_back({ DISTRIBUTE_FORM_MODULE, uiModuleName });
+                    FormDistributedMgr::GetInstance().GetUiModuleName(bundleName_, parentItem.userId);
+                childItem.customizeDatas.push_back({ DISTRIBUTE_FORM_MODULE, uiModuleName });
             }
         }
     }
