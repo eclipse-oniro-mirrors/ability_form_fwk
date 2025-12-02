@@ -1538,7 +1538,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
     int formLocation = want.GetParams().GetIntParam(Constants::FORM_LOCATION_KEY,
         static_cast<int>(Constants::FormLocation::OTHER));
     if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
-            formLocation > static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION)) {
+            formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
         HILOG_ERROR("formLocation not FormLocation enum,formLocation = %{public}d", formLocation);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }

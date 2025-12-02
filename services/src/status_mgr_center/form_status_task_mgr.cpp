@@ -14,19 +14,23 @@
  */
 
 #include "status_mgr_center/form_status_task_mgr.h"
-#include "form_render_interface.h"
-#include "fms_log_wrapper.h"
+
 #include "common/util/form_util.h"
+#include "data_center/form_record/form_record_report.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/form_cache_mgr.h"
+#include "data_center/form_info/form_info_rdb_storage_mgr.h"
+#include "feature/form_check/form_abnormal_reporter.h"
+#include "fms_log_wrapper.h"
+#include "form_host_interface.h"
+#include "form_render_interface.h"
 #include "form_event_report.h"
+#include "form_mgr/form_mgr_queue.h"
+#include "form_provider/form_supply_callback.h"
+#include "status_mgr_center/form_event_retry_mgr.h"
 #include "status_mgr_center/form_status_queue.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "status_mgr_center/form_status.h"
-#include "form_mgr/form_mgr_queue.h"
-#include "data_center/form_record/form_record_report.h"
-#include "form_provider/form_supply_callback.h"
-#include "data_center/form_data_mgr.h"
-#include "data_center/form_cache_mgr.h"
-#include "feature/form_check/form_abnormal_reporter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -35,6 +39,7 @@ constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 3000;
 constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
 constexpr int64_t RELEASE_RENDER_DELAY_TIME = 40;
 constexpr int64_t RELEASE_RENDER_DELAY_MSG = 2;
+const std::string EMPTY_STATUS_DATA = "empty_status_data";
 }
 FormStatusTaskMgr::FormStatusTaskMgr()
 {}
@@ -148,10 +153,165 @@ void FormStatusTaskMgr::PostStopRenderingForm(
 }
 
 /**
- * @brief Schedules form recycle timeout task
- * @param formId Form ID
- * @return bool Returns true if the timeout was successfully scheduled, false otherwise
+ * @brief Accept form render done from form render service.
+ * @param formId The Id of the form.
+ * @param want Input data.
+ * @return Returns ERR_OK on success, others on failure.
  */
+int32_t FormStatusTaskMgr::OnRenderFormDone(const int64_t formId, const Want &want)
+{
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+    return ERR_OK;
+}
+ 
+/**
+ * @brief Accept form recover done from form render service.
+ * @param formId The Id of the form.
+ * @param want Input data.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormStatusTaskMgr::OnRecoverFormDone(const int64_t formId, const Want &want)
+{
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+    return ERR_OK;
+}
+ 
+/**
+ * @brief Accept status data of recycled form from render service
+ * @param formId The Id of the form.
+ * @param want Input data.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &want)
+{
+    std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
+    if (statusData.empty()) {
+        HILOG_DEBUG("status data of %{public}" PRId64 " is empty", formId);
+        statusData = EMPTY_STATUS_DATA;
+    }
+    if (FormInfoRdbStorageMgr::GetInstance().UpdateStatusData(std::to_string(formId), statusData) != ERR_OK) {
+        HILOG_ERROR("update status data of %{public}" PRId64 " failed", formId);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+ 
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_DATA_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RECYCLE_DATA_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+ 
+        auto reCycleForm = [formId, newWant = want]() {
+            sptr<IRemoteObject> remoteObjectOfHost = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+            if (remoteObjectOfHost == nullptr) {
+                HILOG_ERROR("null remoteObjectOfHost");
+                return;
+            }
+            sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObjectOfHost);
+            if (remoteFormHost == nullptr) {
+                HILOG_ERROR("null remoteFormHost");
+                return;
+            }
+            remoteFormHost->OnRecycleForm(formId);
+            FormStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
+        };
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event, reCycleForm);
+    }
+    return ERR_OK;
+}
+ 
+/**
+ * @brief Accept form recycle done from form render service.
+ * @param formId The Id of the form.
+ * @param want Input data.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormStatusTaskMgr::OnRecycleFormDone(const int64_t formId, const Want &want)
+{
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (event != static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+    return ERR_OK;
+}
+ 
+/**
+ * @brief Accept form delete done from form render service.
+ * @param formId The Id of the form.
+ * @param want Input data.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormStatusTaskMgr::OnDeleteFormDone(const int64_t formId, const Want &want)
+{
+    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
+    int32_t event =
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL));
+    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        formId,
+        eventId.c_str(),
+        curTid.c_str(),
+        event);
+    if (event != static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL)) {
+        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
+    }
+    if (!eventId.empty() && eventId == curTid) {
+        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+    }
+    return ERR_OK;
+}
+
 bool FormStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
 {
     FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));
@@ -165,11 +325,6 @@ bool FormStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
         std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG), WAIT_RELEASE_RENDERER_TIMEOUT, timeoutTask);
 }
 
-/**
- * @brief Cancel form recycle timeout task
- * @param formId Form ID
- * @return bool Returns true if the timeout was successfully canceled, false otherwise
- */
 bool FormStatusTaskMgr::CancelRecycleTimeout(const int64_t formId)
 {
     return FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));

@@ -201,6 +201,8 @@ napi_value CreateJsFormLocation(napi_env engine)
         engine, objValue, "AI_SUGGESTION", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::AI_SUGGESTION));
     napi_set_named_property(
         engine, objValue, "OTHER", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::OTHER));
+    napi_set_named_property(
+        engine, objValue, "STANDBY", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::STANDBY));
     return objValue;
 }
 

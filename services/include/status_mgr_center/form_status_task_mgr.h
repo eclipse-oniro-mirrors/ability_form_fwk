@@ -74,20 +74,50 @@ public:
     void PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     /**
-     * @brief Schedules form recycle timeout task
-     * @param formId Form ID
-     * @return bool Returns true if the timeout was successfully scheduled, false otherwise
+     * @brief Accept form render done from form render service.
+     * @param formId The Id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
      */
-    bool ScheduleRecycleTimeout(const int64_t formId);
-
+    int32_t OnRenderFormDone(const int64_t formId, const Want &want);
+ 
     /**
-     * @brief Cancel form recycle timeout task
-     * @param formId Form ID
-     * @return bool Returns true if the timeout was successfully canceled, false otherwise
+     * @brief Accept form recover done from form render service.
+     * @param formId The Id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
      */
-    bool CancelRecycleTimeout(const int64_t formId);
+    int32_t OnRecoverFormDone(const int64_t formId, const Want &want);
+ 
+    /**
+     * @brief Accept status data of recycled form from render service
+     * @param formId The Id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRecycleDataDone(const int64_t formId, const Want &want);
+ 
+    /**
+     * @brief Accept form recycle done from form render service.
+     * @param formId The Id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRecycleFormDone(const int64_t formId, const Want &want);
+ 
+    /**
+     * @brief Accept form delete done from form render service.
+     * @param formId The Id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnDeleteFormDone(const int64_t formId, const Want &want);
 
 private:
+    bool ScheduleRecycleTimeout(const int64_t formId);
+ 
+    bool CancelRecycleTimeout(const int64_t formId);
+
     void RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
         const sptr<IRemoteObject> &remoteObjectOfRender);
 
