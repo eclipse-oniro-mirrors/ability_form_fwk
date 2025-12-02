@@ -29,7 +29,6 @@ namespace AppExecFwk {
 namespace {
 const std::uint32_t ERR_VERSION_CODE = 0;
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
-constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
 }
 
 BundleFormInfo::BundleFormInfo(const std::string &bundleName) : bundleName_(bundleName)
@@ -52,7 +51,7 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
             if (IsBundleDistributed) {
                 std::string uiModuleName =
                     FormDistributedMgr::GetInstance().GetUiModuleName(bundleName_, parentItem.userId);
-                childItem.customizeDatas.push_back({ DISTRIBUTE_FORM_MODULE, uiModuleName });
+                childItem.customizeDatas.push_back({ Constants::DISTRIBUTE_FORM_MODULE, uiModuleName });
             }
         }
     }
