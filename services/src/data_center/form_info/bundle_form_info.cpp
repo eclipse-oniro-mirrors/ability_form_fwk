@@ -46,9 +46,9 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
     auto formInfoStorages = jsonObject.get<std::vector<AAFwk::FormInfoStorage>>();
     for (auto &parentItem : formInfoStorages) {
         for (auto &childItem : parentItem.formInfos) {
-            bool IsBundleDistributed =
+            bool isBundleDistributed =
                 FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, parentItem.userId);
-            if (IsBundleDistributed) {
+            if (isBundleDistributed) {
                 std::string uiModuleName =
                     FormDistributedMgr::GetInstance().GetUiModuleName(bundleName_, parentItem.userId);
                 childItem.customizeDatas.push_back({ Constants::DISTRIBUTE_FORM_MODULE, uiModuleName });
