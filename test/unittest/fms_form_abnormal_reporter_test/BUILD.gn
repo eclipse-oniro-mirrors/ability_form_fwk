@@ -23,6 +23,7 @@ ohos_unittest("FmsFormAbnormalReporterTest") {
     "fms_form_abnormal_reporter_test.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_event_report.cpp",
+    "${form_fwk_path}/test/mock/src/mock_param_control.cpp",
     "${form_fwk_path}/services/src/feature/form_check/form_abnormal_reporter.cpp",
   ]
  

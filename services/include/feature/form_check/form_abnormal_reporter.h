@@ -48,8 +48,6 @@ private:
 
     mutable std::mutex lastUpdateTimeSetMutex_;
     std::set<int64_t> lastUpdateTimeSet_;
-    mutable std::mutex formRecorderTimerMutex_;
-    int32_t recorderTimerId_;
     mutable std::mutex formAbnormalInfoMapMutex_;
     std::map<int64_t, FormAbnormalInfo> formAbnormalInfoMap_;
 };
