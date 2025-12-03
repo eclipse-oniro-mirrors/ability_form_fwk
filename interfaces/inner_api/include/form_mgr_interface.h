@@ -314,7 +314,10 @@ public:
      * @param formInfos Return the form information of all forms provided.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos) = 0;
+    virtual int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos) 
+    {
+        return ERR_OK;
+    }
 
     /**
      * @brief Get forms info by bundle name .
@@ -330,7 +333,10 @@ public:
      * @param formInfos Return the form information of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos) = 0;
+    virtual int GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
+    {
+        return ERR_OK;
+    }
 
     /**
      * @brief Get forms info by bundle name and module name.
@@ -350,7 +356,10 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
-                                             std::vector<FormInfo> &formInfos) = 0;
+                                             std::vector<FormInfo> &formInfos)
+    {
+        return ERR_OK;
+    }
 
     /**
      * @brief Get forms info specfied by filter parameters.
