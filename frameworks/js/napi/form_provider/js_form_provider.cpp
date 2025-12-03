@@ -775,6 +775,34 @@ napi_value JsFormProvider::OnOpenFormEditAbility(napi_env env, size_t argc, napi
     return CreateJsUndefined(env);
 }
 
+napi_value JsFormProvider::CloseFormEditAbility(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnCloseFormEditAbility);
+}
+
+napi_value JsFormProvider::OnCloseFormEditAbility(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+    if (!CheckParamNum(env, argc, ARGS_SIZE_ZERO, ARGS_SIZE_ONE)) {
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
+        return CreateJsUndefined(env);
+    }
+
+    bool isMainPage = true;
+    if (argc == ARGS_SIZE_ONE) {
+        if (!ConvertFromJsValue(env, argv[PARAM0], isMainPage)) {
+            NapiFormUtil::ThrowParamError(env, "The isMainPage is invalid");
+            return CreateJsUndefined(env);
+        }
+    }
+    HILOG_INFO("OnCloseFormEditAbility isMainPage: %{public}s", isMainPage ? "true" : "false");
+    auto ret = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    if (ret != ERR_OK) {
+        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+    }
+    return CreateJsUndefined(env);
+}
+
 napi_value JsFormProvider::RequestOverflow(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("Call");

@@ -2137,6 +2137,32 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
+
+ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    int uid = IPCSkeleton::GetCallingUid();
+    std::string callerName;
+    ErrCode ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, callerName);
+    if (ret != ERR_OK || callerName.empty()) {
+        HILOG_ERROR("Get bundleName by uid failed or bundleName empty");
+        return ret == ERR_OK ? ERR_APPEXECFWK_FORM_COMMON_CODE : ret;
+    }
+
+    auto requestMethod = String::Box(
+        isMainPage ? Constants::PARAM_CLOSE_FORM_EDIT_VIEW : Constants::PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW);
+    WantParams wantarams;
+    wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
+    wantarams.SetParam(
+        Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
+    wantarams.SetParam("bundleName", String::Box(callerName));
+
+    Want want;
+    want.SetAction(Constants::FORM_PAGE_ACTION);
+    want.SetParams(wantarams);
+    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
 void FormMgrService::PostConnectNetWork()
 {
     HILOG_DEBUG("start");

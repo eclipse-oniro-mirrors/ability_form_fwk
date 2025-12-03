@@ -85,6 +85,8 @@ namespace Constants {
     constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
     constexpr const char* PARAM_OPEN_FORM_EDIT_VIEW = "openFormEditView";
     constexpr const char* PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
+    constexpr const char* PARAM_CLOSE_FORM_EDIT_VIEW = "closeFormEditView";
+    constexpr const char* PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW = "closeFormEditSecPageView";
     constexpr const char* PARAM_PAGE_ROUTER_SERVICE_CODE = "pageRouterServiceCode";
     constexpr const char* PARAM_SEC_PAGE_ABILITY_NAME = "secPageAbilityName";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";

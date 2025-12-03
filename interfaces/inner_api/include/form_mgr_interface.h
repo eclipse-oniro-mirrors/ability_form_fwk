@@ -788,6 +788,16 @@ public:
     }
 
     /**
+     * @brief Close the form edit ability.
+     * @param isMainPage Close the main edit page.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode CloseFormEditAbility(bool isMainPage)
+    {
+        return ERR_OK;
+    }
+
+    /**
      * @brief Register overflow proxy in fms
      * @param callerToken The form host proxy
      * @return Return ERR_OK on success, others on failure.
@@ -1047,6 +1057,7 @@ public:
         FORM_MGR_GET_PUBLISHED_FORM_INFOS,
         FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
         FORM_MGR_OPEN_FORM_EDIT_ABILITY,
+        FORM_MGR_CLOSE_FORM_EDIT_ABILITY,
         FORM_MGR_REGISTER_OVERFLOW_PROXY,
         FORM_MGR_UNREGISTER_OVERFLOW_PROXY,
         FORM_MGR_REQUEST_OVERFLOW,

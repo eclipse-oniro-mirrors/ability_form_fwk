@@ -298,6 +298,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleIsFormExempt(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY):
             return HandleOpenFormEditAbility(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CLOSE_FORM_EDIT_ABILITY):
+            return HandleCloseFormEditAbility(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_OVERFLOW_PROXY):
             return HandleRegisterOverflowProxy(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_OVERFLOW_PROXY):
@@ -1896,6 +1898,22 @@ ErrCode FormMgrStub::HandleOpenFormEditAbility(MessageParcel &data, MessageParce
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+ErrCode FormMgrStub::HandleCloseFormEditAbility(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    bool isMainPage = true;
+    if (!data.ReadBool(isMainPage)) {
+        HILOG_ERROR("fail to read isMainPage from parcel");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = CloseFormEditAbility(isMainPage);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
 }
 
 ErrCode FormMgrStub::HandleRegisterOverflowProxy(MessageParcel &data, MessageParcel &reply)

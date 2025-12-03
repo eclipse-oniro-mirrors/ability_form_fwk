@@ -2087,6 +2087,25 @@ ErrCode FormMgr::OpenFormEditAbility(const std::string &abilityName, const int64
     return resultCode;
 }
 
+ErrCode FormMgr::CloseFormEditAbility(bool isMainPage)
+{
+    HILOG_INFO("isMainPage: %{public}s", isMainPage ? "true" : "false");
+    ErrCode resultCode = Connect();
+    if (resultCode != ERR_OK) {
+        return resultCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    resultCode = remoteProxy_->CloseFormEditAbility(isMainPage);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail CloseFormEditAbility, errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
 ErrCode FormMgr::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("Call");
