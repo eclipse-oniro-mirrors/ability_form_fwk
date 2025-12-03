@@ -698,16 +698,19 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
             }
 
             std::shared_ptr<OHOS::AppExecFwk::Configuration> config = iter->second->GetConfiguration();
-            if (config != nullptr && configuration_ != nullptr) {
-                std::string colorMode = configuration_->GetItem(SYSTEM_COLORMODE);
-                std::string languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
-                config->AddItem(SYSTEM_COLORMODE, colorMode);
-                config->AddItem(SYSTEM_LANGUAGE, languageTag);
-            }
-            std::string colorMode = AppExecFwk::GetColorModeStr(
-                want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
-            if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
-                config->AddItem(SYSTEM_COLORMODE, colorMode);
+            if (config != nullptr) {
+                std::string colorMode = AppExecFwk::GetColorModeStr(
+                    want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
+                if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
+                    config->AddItem(SYSTEM_COLORMODE, colorMode);
+                } else if (configuration_ != nullptr) {
+                    std::string colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
+                    config->AddItem(SYSTEM_COLORMODE, colorModeTag);
+                }
+                if (configuration_ != nullptr) {
+                    std::string languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
+                    config->AddItem(SYSTEM_LANGUAGE, languageTag);
+                }
             }
             return iter->second;
         }
@@ -724,7 +727,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
         return nullptr;
     }
     auto config = std::make_shared<AppExecFwk::Configuration>(*configuration_);
-    if (context == nullptr) {
+    if (config == nullptr) {
         HILOG_ERROR("Create configuration failed");
         return nullptr;
     }
