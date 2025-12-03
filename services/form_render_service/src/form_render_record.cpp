@@ -726,10 +726,11 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
         HILOG_ERROR("Create context failed");
         return nullptr;
     }
-    auto config = std::make_shared<AppExecFwk::Configuration>(*configuration_);
-    if (config == nullptr) {
-        HILOG_ERROR("Create configuration failed");
-        return nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
+    if (configuration_ == nullptr) {
+        config = std::make_shared<AppExecFwk::Configuration>();
+    } else {
+        config = std::make_shared<AppExecFwk::Configuration>(*configuration_);
     }
 
     std::string colorMode =
