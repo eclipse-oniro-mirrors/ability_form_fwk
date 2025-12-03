@@ -19,6 +19,7 @@
 #include "fms_log_wrapper.h"
 #include "mock_form_data_mgr.h"
 #include "mock_form_event_report.h"
+#include "mock_param_control.h"
 #include "feature/form_check/form_abnormal_info.h"
 #define private public
 #include "feature/form_check/form_abnormal_reporter.h"
@@ -141,8 +142,10 @@ HWTEST_F(FormAbnormalReporterTest, FormAbnormalReporterTest_CheckForms_0001, Tes
     int64_t formId = 123456;
     FormRecord formRecord;
     formRecord.formId = formId;
+    std::vector<int64_t> checkFormIds;
 
     MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckForms(_)).WillRepeatedly(SaveArg<0>(&checkFormIds));
 
     // Test form not found and formIds empty
     FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
@@ -150,19 +153,126 @@ HWTEST_F(FormAbnormalReporterTest, FormAbnormalReporterTest_CheckForms_0001, Tes
         .WillOnce(Return(false));
     FormAbnormalReporter::GetInstance().CheckForms();
     EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
+    EXPECT_EQ(checkFormIds.size(), 0);
 
     // Test valid abnormal form infos
     FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
     formRecord.isSystemApp = false;
     formRecord.transparencyEnabled = true;
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(formId, _))
-        .Times(1)
         .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
     FormAbnormalReporter::GetInstance().CheckForms();
     EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
-
+    EXPECT_EQ(checkFormIds.size(), 1);
+    checkFormIds.clear();
+    
     MockFormDataMgr::obj = nullptr;
     GTEST_LOG_(INFO) << "FormAbnormalReporterTest_CheckForms_0001 end";
+}
+
+/**
+ * @tc.name: FormAbnormalReporterTest_CheckForms_0002
+ * @tc.desc: test CheckForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormAbnormalReporterTest, FormAbnormalReporterTest_CheckForms_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAbnormalReporterTest_CheckForms_0002 start";
+    int64_t formId = 123456;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.isSystemApp = false;
+    formRecord.transparencyEnabled = true;
+    std::vector<int64_t> checkFormIds;
+
+    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckForms(_)).WillRepeatedly(SaveArg<0>(&checkFormIds));
+
+    // Test lock form
+    FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
+    formRecord.lockForm = true;
+    formRecord.protectForm = true;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(formId, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    FormAbnormalReporter::GetInstance().CheckForms();
+    EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
+    EXPECT_EQ(checkFormIds.size(), 0);
+
+    // Test protect form
+    FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
+    formRecord.lockForm = true;
+    formRecord.protectForm = false;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(formId, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    FormAbnormalReporter::GetInstance().CheckForms();
+    EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
+    EXPECT_EQ(checkFormIds.size(), 1);
+    checkFormIds.clear();
+
+    // Test enable form
+    FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
+    formRecord.lockForm = false;
+    formRecord.enableForm = false;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(formId, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    FormAbnormalReporter::GetInstance().CheckForms();
+    EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
+    EXPECT_EQ(checkFormIds.size(), 0);
+    
+    MockFormDataMgr::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormAbnormalReporterTest_CheckForms_0002 end";
+}
+
+/**
+ * @tc.name: FormAbnormalReporterTest_CheckForms_0003
+ * @tc.desc: test CheckForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormAbnormalReporterTest, FormAbnormalReporterTest_CheckForms_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAbnormalReporterTest_CheckForms_0003 start";
+    int64_t formId = 123456;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.isSystemApp = false;
+    formRecord.transparencyEnabled = true;
+    formRecord.lockForm = false;
+    formRecord.enableForm = true;
+    std::vector<int64_t> checkFormIds;
+
+    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+    MockParamControl::obj = std::make_shared<MockParamControl>();
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckForms(_)).WillRepeatedly(SaveArg<0>(&checkFormIds));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(formId, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+
+    // Test due control disable form
+    FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
+    EXPECT_CALL(*MockParamControl::obj, IsFormDisable(_)).WillOnce(Return(true));
+    FormAbnormalReporter::GetInstance().CheckForms();
+    EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
+    EXPECT_EQ(checkFormIds.size(), 0);
+
+    // Test due control remove form
+    FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
+    EXPECT_CALL(*MockParamControl::obj, IsFormDisable(_)).WillOnce(Return(false));
+    EXPECT_CALL(*MockParamControl::obj, IsFormRemove(_)).WillOnce(Return(true));
+    FormAbnormalReporter::GetInstance().CheckForms();
+    EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
+    EXPECT_EQ(checkFormIds.size(), 0);
+
+    // Test form display without mask
+    FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.insert(formId);
+    EXPECT_CALL(*MockParamControl::obj, IsFormDisable(_)).WillOnce(Return(false));
+    EXPECT_CALL(*MockParamControl::obj, IsFormRemove(_)).WillOnce(Return(false));
+    FormAbnormalReporter::GetInstance().CheckForms();
+    EXPECT_EQ(FormAbnormalReporter::GetInstance().lastUpdateTimeSet_.size(), 0);
+    EXPECT_EQ(checkFormIds.size(), 1);
+    EXPECT_EQ(checkFormIds.front(), formId);
+    
+    MockFormDataMgr::obj = nullptr;
+    MockParamControl::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormAbnormalReporterTest_CheckForms_0003 end";
 }
 
 /**

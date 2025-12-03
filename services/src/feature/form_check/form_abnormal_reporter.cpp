@@ -20,6 +20,7 @@
 #include "form_event_report.h"
 #include "common/util/form_timer_util.h"
 #include "data_center/form_data_mgr.h"
+#include "feature/param_update/param_control.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -68,15 +69,26 @@ void FormAbnormalReporter::CheckForms()
         formIdSet.swap(lastUpdateTimeSet_);
     }
 
+    ParamControl &paramControl = ParamControl::GetInstance();
+    FormDataMgr &formDataMgr = FormDataMgr::GetInstance();
     std::vector<int64_t> formIds;
     FormRecord formRecord;
     for (const int64_t &formId : formIdSet) {
-        bool found = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+        bool found = formDataMgr.GetFormRecord(formId, formRecord);
         if (!found) {
             HILOG_WARN("form not found, formId:%{public}" PRId64, formId);
             continue;
         }
         if (formRecord.isSystemApp || !formRecord.transparencyEnabled) {
+            continue;
+        }
+        if (formRecord.lockForm && formRecord.protectForm) {
+            continue;
+        }
+        if (!formRecord.enableForm) {
+            continue;
+        }
+        if (paramControl.IsFormDisable(formRecord) || paramControl.IsFormRemove(formRecord)) {
             continue;
         }
         formIds.emplace_back(formId);
