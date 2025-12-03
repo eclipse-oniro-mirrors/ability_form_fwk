@@ -341,7 +341,7 @@ public:
      * @param formId The Id of the form to acquire data.
      * @param callerToken Indicates the host client.
      * @param requestCode The request code of this acquire form.
-     * @param formData Return the forms' information of customization
+     * @param formData Return the form information of customization
      * @return Returns ERR_OK on success, others on failure.
      */
     int AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
@@ -368,33 +368,58 @@ public:
 
     /**
       * @brief Get All FormsInfo.
-      * @param formInfos Return the forms' information of all forms provided.
+      * @param formInfos Return the form information of all forms provided.
       * @return Returns ERR_OK on success, others on failure.
       */
     int GetAllFormsInfo(std::vector<FormInfo> &formInfos);
 
     /**
+      * @brief Get All TemplateFormsInfo.
+      * @param formInfos Return the form information of all forms provided.
+      * @return Returns ERR_OK on success, others on failure.
+      */
+    int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos);
+
+    /**
      * @brief Get forms info by bundle name .
      * @param bundleName Application name.
-     * @param formInfos Return the forms' information of the specify application name.
+     * @param formInfos Return the form information of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
     int GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos);
 
     /**
+     * @brief Get template forms info by bundle name .
+     * @param bundleName Application name.
+     * @param formInfos Return the form information of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos);
+
+    /**
      * @brief Get forms info by bundle name and module name.
      * @param bundleName bundle name.
      * @param moduleName Module name of hap.
-     * @param formInfos Return the forms' information of the specify bundle name and module name.
+     * @param formInfos Return the form information of the specify bundle name and module name.
      * @return Returns ERR_OK on success, others on failure.
      */
     int GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos);
 
     /**
+     * @brief Get template forms info by bundle name and module name.
+     * @param bundleName bundle name.
+     * @param moduleName Module name of hap.
+     * @param formInfos Return the form information of the specify bundle name and module name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+        std::vector<FormInfo> &formInfos);
+
+    /**
      * @brief Get forms info specfied by filter parameters.
      * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
-     * @param formInfos Return the forms' information specified by filter.
+     * @param formInfos Return the form information specified by filter.
      * @return Returns ERR_OK on success, others on failure.
      */
     int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos);
@@ -423,7 +448,7 @@ public:
 
     /**
      * @brief Handle form add observer.
-     * @param runningFormInfo the running forms' infos of the specify application name.
+     * @param runningFormInfo the running form infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleFormRemoveObserver(const RunningFormInfo runningFormInfo);
@@ -447,7 +472,7 @@ public:
     /**
      * @brief Get all running form infos.
      * @param isUnusedIncluded Indicates whether to include unused forms.
-     * @param runningFormInfos Return the running forms' infos currently.
+     * @param runningFormInfos Return the running form infos currently.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
@@ -456,7 +481,7 @@ public:
      * @brief Get the running form infos by bundle name.
      * @param bundleName Application name.
      * @param isUnusedIncluded Indicates whether to include unused forms.
-     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @param runningFormInfos Return the running form infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetRunningFormInfosByBundleName(

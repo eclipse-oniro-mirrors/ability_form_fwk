@@ -214,6 +214,17 @@ ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_
     return ERR_OK;
 }
 
+ErrCode BundleFormInfo::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    HILOG_DEBUG("begin");
+    std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
+    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
+    for (const auto &item : formInfoStorages_) {
+        item.GetAllTemplateFormsInfo(userId, formInfos);
+    }
+    return ERR_OK;
+}
+
 uint32_t BundleFormInfo::GetVersionCode(int32_t userId)
 {
     HILOG_DEBUG("begin");
@@ -238,6 +249,17 @@ ErrCode BundleFormInfo::GetFormsInfoByModule(const std::string &moduleName, std:
     userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetFormsInfoByModule(userId, moduleName, formInfos);
+    }
+    return ERR_OK;
+}
+
+ErrCode BundleFormInfo::GetTemplateFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
+    int32_t userId)
+{
+    std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
+    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
+    for (const auto &item : formInfoStorages_) {
+        item.GetTemplateFormsInfoByModule(userId, moduleName, formInfos);
     }
     return ERR_OK;
 }

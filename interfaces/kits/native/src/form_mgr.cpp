@@ -1126,7 +1126,7 @@ int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool i
 
 /**
  * @brief Get All FormsInfo.
- * @param formInfos Return the forms' information of all forms provided.
+ * @param formInfos Return the form information of all forms provided.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
@@ -1154,9 +1154,38 @@ int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 }
 
 /**
+ * @brief Get All TemplateFormsInfo.
+ * @param formInfos Return the form information of all forms provided.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgr::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("call");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+ 
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    int resultCode = remoteProxy_->GetAllTemplateFormsInfo(formInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail GetAllTemplateFormsInfo,errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
+/**
  * @brief Get forms info by bundle name .
  * @param bundleName Application name.
- * @param formInfos Return the forms' information of the specify application name.
+ * @param formInfos Return the form information of the specify application name.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
@@ -1188,11 +1217,48 @@ int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &f
     }
     return resultCode;
 }
+
+/**
+ * @brief Get template forms info by bundle name .
+ * @param bundleName Application name.
+ * @param formInfos Return the form information of the specify application name.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgr::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
+{
+    HILOG_INFO("bundleName is %{public}s", bundleName.c_str());
+    if (bundleName.empty()) {
+        HILOG_WARN("fail Get forms info,because empty bundle name");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
+ 
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+ 
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+ 
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    int resultCode = remoteProxy_->GetTemplateFormsInfoByApp(bundleName, formInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail GetTemplateFormsInfoByApp,errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
 /**
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
  * @param moduleName Module name of hap.
- * @param formInfos Return the forms' information of the specify bundle name and module name.
+ * @param formInfos Return the form information of the specify bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
@@ -1227,6 +1293,49 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
+/**
+ * @brief Get template forms info by bundle name and module name.
+ * @param bundleName bundle name.
+ * @param moduleName Module name of hap.
+ * @param formInfos Return the form information of the specify bundle name and module name.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgr::GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+    std::vector<FormInfo> &formInfos)
+{
+    HILOG_INFO("bundleName is %{public}s, moduleName is %{public}s", bundleName.c_str(), moduleName.c_str());
+    if (bundleName.empty()) {
+        HILOG_WARN("fail Get forms info,because empty bundleName");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
+ 
+    if (moduleName.empty()) {
+        HILOG_WARN("fail Get forms info,because empty moduleName");
+        return ERR_APPEXECFWK_FORM_INVALID_MODULENAME;
+    }
+ 
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+ 
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+ 
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    int resultCode = remoteProxy_->GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail GetTemplateFormsInfoByModule,errCode %{public}d", resultCode);
     }
     return resultCode;
 }

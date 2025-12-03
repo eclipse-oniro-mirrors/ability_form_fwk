@@ -366,9 +366,19 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetAllFormsInfo);
     }
 
+    static napi_value GetAllTemplateFormsInfo(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetAllTemplateFormsInfo);
+    }
+
     static napi_value GetFormsInfo(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormsInfo);
+    }
+
+    static napi_value GetTemplateFormsInfo(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetTemplateFormsInfo);
     }
 
     static napi_value ShareForm(napi_env env, napi_callback_info info)
@@ -1375,6 +1385,38 @@ private:
         return result;
     }
 
+    napi_value OnGetAllTemplateFormsInfo(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_DEBUG("call");
+        if (argc > ARGS_ONE || argc < ARGS_ZERO) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
+            return CreateJsUndefined(env);
+        }
+
+        auto errCodeVal = std::make_shared<int32_t>(0);
+        auto formInfoList = std::make_shared<std::vector<FormInfo>>();
+        NapiAsyncTask::ExecuteCallback execute = [formInfos = formInfoList, errCode = errCodeVal]() {
+            if (formInfos == nullptr || errCode == nullptr) {
+                HILOG_ERROR("invalid param");
+                return;
+            }
+            *errCode = FormMgr::GetInstance().GetAllTemplateFormsInfo(*formInfos);
+            if (*errCode != ERR_OK && *errCode != ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE &&
+                *errCode != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+                *errCode = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+            }
+        };
+
+        NapiAsyncTask::CompleteCallback complete = CreateFormInfosCompleteCallback(errCodeVal, formInfoList);
+ 
+        auto callback = (argc == ARGS_ZERO) ? nullptr : argv[PARAM0];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetAllTemplateFormsInfo",
+            env, CreateAsyncTaskWithLastParam(env, callback, std::move(execute), std::move(complete), &result));
+        return result;
+    }
+
     napi_value GetFormsInfoByFilter(napi_env env, size_t argc, napi_value* argv)
     {
         HILOG_INFO("call");
@@ -1495,6 +1537,58 @@ private:
         napi_value result = nullptr;
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetFormsInfo",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
+    }
+
+    napi_value OnGetTemplateFormsInfo(napi_env env, size_t argc, napi_value* argv)
+    {
+        if (argc == ARGS_ONE && IsTypeForNapiValue(env, argv[PARAM0], napi_object)) {
+            return GetFormsInfoByFilter(env, argc, argv);
+        }
+        if (argc > ARGS_THREE || argc < ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
+            return CreateJsUndefined(env);
+        }
+        decltype(argc) convertArgc = 0;
+        std::string bName("");
+        if (!ConvertFromJsValue(env, argv[PARAM0], bName)) {
+            HILOG_ERROR("bundleName convert failed");
+            NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+        std::string mName("");
+        if ((argc == ARGS_TWO || argc == ARGS_THREE) && !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
+            if (!ConvertFromJsValue(env, argv[PARAM1], mName)) {
+                HILOG_ERROR("moduleName convert failed");
+                NapiFormUtil::ThrowParamTypeError(env, "moduleName", "string");
+                return CreateJsUndefined(env);
+            }
+            convertArgc++;
+        }
+
+        auto errCodeVal = std::make_shared<int32_t>(0);
+        auto formInfoList = std::make_shared<std::vector<FormInfo>>();
+        NapiAsyncTask::ExecuteCallback execute = [bName, mName, convertArgc, formInfos = formInfoList,
+            errCode = errCodeVal]() {
+            if (formInfos == nullptr || errCode == nullptr) {
+                HILOG_ERROR("invalid param");
+                return;
+            }
+            *errCode = convertArgc == ARGS_ONE ? FormMgr::GetInstance().GetTemplateFormsInfoByApp(bName, *formInfos) :
+                FormMgr::GetInstance().GetTemplateFormsInfoByModule(bName, mName, *formInfos);
+            if (*errCode != ERR_OK && *errCode != ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE &&
+                *errCode != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+                *errCode = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+            }
+        };
+
+        NapiAsyncTask::CompleteCallback complete = CreateFormInfosCompleteCallback(errCodeVal, formInfoList);
+        napi_value result = nullptr;
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetTemplateFormsInfo",
             env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }
@@ -2132,7 +2226,9 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "notifyFormsVisible", moduleName, JsFormHost::NotifyFormsVisible);
     BindNativeFunction(env, exportObj, "notifyFormsEnableUpdate", moduleName, JsFormHost::NotifyFormsEnableUpdate);
     BindNativeFunction(env, exportObj, "getAllFormsInfo", moduleName, JsFormHost::GetAllFormsInfo);
+    BindNativeFunction(env, exportObj, "getAllTemplateFormsInfo", moduleName, JsFormHost::GetAllTemplateFormsInfo);
     BindNativeFunction(env, exportObj, "getFormsInfo", moduleName, JsFormHost::GetFormsInfo);
+    BindNativeFunction(env, exportObj, "getTemplateFormsInfo", moduleName, JsFormHost::GetTemplateFormsInfo);
     BindNativeFunction(env, exportObj, "shareForm", moduleName, JsFormHost::ShareForm);
     BindNativeFunction(env, exportObj, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);

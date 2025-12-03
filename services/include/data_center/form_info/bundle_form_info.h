@@ -48,9 +48,14 @@ public:
 
     ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
+    ErrCode GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+
     uint32_t GetVersionCode(int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
+        int32_t userId = Constants::INVALID_USER_ID);
+
+    ErrCode GetTemplateFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
         int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByFilter(

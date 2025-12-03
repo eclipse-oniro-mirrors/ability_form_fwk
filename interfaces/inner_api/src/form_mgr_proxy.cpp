@@ -1225,7 +1225,7 @@ int FormMgrProxy::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, b
 
 /**
  * @brief Get All FormsInfo.
- * @param formInfos Return the forms' information of all forms provided.
+ * @param formInfos Return the form information of all forms provided.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrProxy::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
@@ -1245,9 +1245,30 @@ int FormMgrProxy::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 }
 
 /**
+ * @brief Get All TemplateFormsInfo.
+ * @param formInfos Return the form information of all forms provided.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrProxy::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO, data, formInfos);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail GetAllTemplateFormsInfo:%{public}d", error);
+    }
+ 
+    return error;
+}
+
+/**
  * @brief Get forms info by bundle name .
  * @param bundleName Application name.
- * @param formInfos Return the forms' information of the specify application name.
+ * @param formInfos Return the form information of the specify application name.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
@@ -1273,10 +1294,38 @@ int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInf
 }
 
 /**
+ * @brief Get template forms info by bundle name.
+ * @param bundleName Application name.
+ * @param formInfos Return the form information of the specify application name.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrProxy::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
+{
+    HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("write bundleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_APP, data, formInfos);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail GetTemplateFormsInfoByApp:%{public}d", error);
+    }
+ 
+    return error;
+}
+
+/**
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
  * @param moduleName Module name of hap.
- * @param formInfos Return the forms' information of the specify bundle name and module name.
+ * @param formInfos Return the form information of the specify bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
@@ -1303,6 +1352,40 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
         HILOG_ERROR("fail GetFormsInfoByModule:%{public}d", error);
     }
 
+    return error;
+}
+
+/**
+ * @brief Get forms info by bundle name and module name.
+ * @param bundleName bundle name.
+ * @param moduleName Module name of hap.
+ * @param formInfos Return the form information of the specify bundle name and module name.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrProxy::GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+                                               std::vector<FormInfo> &formInfos)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("write bundleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteString(moduleName)) {
+        HILOG_ERROR("fail write moduleName");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE, data, formInfos);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail GetFormsInfoByModule:%{public}d", error);
+    }
+ 
     return error;
 }
 

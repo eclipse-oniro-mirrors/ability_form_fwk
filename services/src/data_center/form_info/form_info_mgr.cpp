@@ -142,6 +142,21 @@ ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t u
     return ERR_OK;
 }
 
+ErrCode FormInfoMgr::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    if (!CheckBundlePermission()) {
+        HILOG_ERROR("CheckBundlePermission is failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+    for (const auto &bundleFormInfo : bundleFormInfoMap_) {
+        if (bundleFormInfo.second != nullptr) {
+            bundleFormInfo.second->GetAllTemplateFormsInfo(formInfos, userId);
+        }
+    }
+    return ERR_OK;
+}
+
 ErrCode FormInfoMgr::GetFormsInfoByFilter(
     const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId)
 {
@@ -196,6 +211,31 @@ ErrCode FormInfoMgr::GetFormsInfoByBundle(
     return ERR_OK;
 }
 
+ErrCode FormInfoMgr::GetTemplateFormsInfoByBundle(
+    const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    if (bundleName.empty()) {
+        HILOG_ERROR("empty bundleName");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+ 
+    if (!CheckBundlePermission() && !IsCaller(bundleName)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+ 
+    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+    auto bundleFormInfoIter = bundleFormInfoMap_.find(bundleName);
+    if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
+        HILOG_ERROR("no forms found");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+ 
+    if (bundleFormInfoIter->second != nullptr) {
+        bundleFormInfoIter->second->GetAllTemplateFormsInfo(formInfos, userId);
+    }
+    return ERR_OK;
+}
+
 ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
     std::vector<FormInfo> &formInfos, int32_t userId)
 {
@@ -210,6 +250,22 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
     }
 
     return GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
+}
+
+ErrCode FormInfoMgr::GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+    std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    if (bundleName.empty()) {
+        HILOG_ERROR("empty bundleName");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+ 
+    if (!CheckBundlePermission() && !IsCaller(bundleName)) {
+        HILOG_ERROR("CheckBundlePermission and IsCaller failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+ 
+    return GetTemplateFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
 }
 
 ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
@@ -229,6 +285,27 @@ ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleN
 
     if (bundleFormInfoIter->second != nullptr) {
         bundleFormInfoIter->second->GetFormsInfoByModule(moduleName, formInfos, userId);
+    }
+    return ERR_OK;
+}
+
+ErrCode FormInfoMgr::GetTemplateFormsInfoByModuleWithoutCheck(const std::string &bundleName,
+    const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    if (bundleName.empty()) {
+        HILOG_ERROR("empty bundleName");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+ 
+    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+    auto bundleFormInfoIter = bundleFormInfoMap_.find(bundleName);
+    if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
+        HILOG_ERROR("no forms found for %{public}s", bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+ 
+    if (bundleFormInfoIter->second != nullptr) {
+        bundleFormInfoIter->second->GetTemplateFormsInfoByModule(moduleName, formInfos, userId);
     }
     return ERR_OK;
 }

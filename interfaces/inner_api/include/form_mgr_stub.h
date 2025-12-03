@@ -250,6 +250,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle GetAllTemplateFormsInfo message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetAllTemplateFormsInfo(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle GetFormsInfoByApp message.
      * @param data input param.
@@ -257,6 +266,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetFormsInfoByApp(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle GetTemplateFormsInfoByApp message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetTemplateFormsInfoByApp(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle GetFormsInfoByModule message.
      * @param data input param.
@@ -264,6 +282,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetFormsInfoByModule(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle GetTemplateFormsInfoByModule message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetTemplateFormsInfoByModule(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle GetFormsInfoByModule message.
      * @param data input param.

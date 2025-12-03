@@ -144,12 +144,25 @@ public:
     {
         return 0;
     }
+    int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos) override
+    {
+        return 0;
+    }
     int GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos) override
+    {
+        return 0;
+    }
+    int GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos) override
     {
         return 0;
     }
     int GetFormsInfoByModule(std::string &bundleName,
         std::string &moduleName, std::vector<FormInfo> &formInfos) override
+    {
+        return 0;
+    }
+    int GetTemplateFormsInfoByModule(const std::string &bundleName,
+        const std::string &moduleName, std::vector<FormInfo> &formInfos) override
     {
         return 0;
     }
@@ -316,6 +329,9 @@ void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &
     formMgrStub->HandleRecvFormShareInfoFromRemote(data, reply);
     formMgrStub->HandleAcquireFormData(data, reply);
     formMgrStub->HandleGetFormInstancesByFilter(data, reply);
+    formMgrStub->HandleGetAllTemplateFormsInfo(data, reply);
+    formMgrStub->HandleGetTemplateFormsInfoByApp(data, reply);
+    formMgrStub->HandleGetTemplateFormsInfoByModule(data, reply);
 }
 
 void HandleFormRequest(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
