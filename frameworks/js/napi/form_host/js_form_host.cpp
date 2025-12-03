@@ -1388,6 +1388,11 @@ private:
     napi_value OnGetAllTemplateFormsInfo(napi_env env, size_t argc, napi_value* argv)
     {
         HILOG_DEBUG("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
         if (argc > ARGS_ONE || argc < ARGS_ZERO) {
             HILOG_ERROR("invalid argc");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
@@ -1543,8 +1548,10 @@ private:
 
     napi_value OnGetTemplateFormsInfo(napi_env env, size_t argc, napi_value* argv)
     {
-        if (argc == ARGS_ONE && IsTypeForNapiValue(env, argv[PARAM0], napi_object)) {
-            return GetFormsInfoByFilter(env, argc, argv);
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
         }
         if (argc > ARGS_THREE || argc < ARGS_ONE) {
             HILOG_ERROR("invalid argc");
