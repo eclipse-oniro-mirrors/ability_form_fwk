@@ -44,6 +44,17 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
     }
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     auto formInfoStorages = jsonObject.get<std::vector<AAFwk::FormInfoStorage>>();
+    for (auto &parentItem : formInfoStorages) {
+        for (auto &childItem : parentItem.formInfos) {
+            bool isBundleDistributed =
+                FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, parentItem.userId);
+            if (isBundleDistributed) {
+                std::string uiModuleName =
+                    FormDistributedMgr::GetInstance().GetUiModuleName(bundleName_, parentItem.userId);
+                childItem.customizeDatas.push_back({ Constants::DISTRIBUTE_FORM_MODULE, uiModuleName });
+            }
+        }
+    }
     formInfoStorages_.insert(formInfoStorages_.end(), formInfoStorages.begin(), formInfoStorages.end());
     return ERR_OK;
 }

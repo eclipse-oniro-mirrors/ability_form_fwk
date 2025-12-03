@@ -954,11 +954,11 @@ ErrCode FormMgrService::Init()
     Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
 #endif
 
+    FormDistributedMgr::GetInstance().Start();
     FormInfoMgr::GetInstance().Start();
     FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     FormCacheMgr::GetInstance().Start();
-    FormDistributedMgr::GetInstance().Start();
 
     formSysEventReceiver_->InitFormInfosAndRegister();
 

@@ -152,6 +152,7 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         FormInfo formInfo(extensionInfo, extensionFormInfo);
         if (distributedFormInfo.isDistributedForm) {
             formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
+            formInfo.customizeDatas.push_back({ Constants::DISTRIBUTE_FORM_MODULE, distributedFormInfo.moduleName });
         }
         formInfo.versionCode = bundleInfo.versionCode;
         formInfo.bundleType = bundleInfo.applicationInfo.bundleType;

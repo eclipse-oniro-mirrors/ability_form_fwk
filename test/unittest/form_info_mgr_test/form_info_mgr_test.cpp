@@ -284,8 +284,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_InitFromJson_0100, TestSize.Level1)
     GTEST_LOG_(INFO) << "BundleFormInfo_InitFromJson_0100 start";
     BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
     std::string formInfoStoragesJson = "";
-    EXPECT_EQ(ERR_APPEXECFWK_PARSE_BAD_PROFILE,
-        bundleFormInfo.InitFromJson(formInfoStoragesJson));
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_BAD_PROFILE, bundleFormInfo.InitFromJson(formInfoStoragesJson));
     GTEST_LOG_(INFO) << "BundleFormInfo_InitFromJson_0100 end";
 }
 
