@@ -1381,7 +1381,7 @@ int FormMgrProxy::GetTemplateFormsInfoByModule(const std::string &bundleName, co
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
  
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE,data, formInfos);
+    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE, data, formInfos);
     if (error != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule:%{public}d", error);
     }
