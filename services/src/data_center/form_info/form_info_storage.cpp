@@ -51,6 +51,9 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
         if (IsFunInterFormInfoFiltered(item) || IsEquipmentLevelFiltered(item)) {
             continue;
         }
+        if (item.isTemplateForm) {
+            continue;
+        }
         formInfos.push_back(item);
     }
 }
@@ -147,6 +150,9 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
         if (IsFunInterFormInfoFiltered(item) || IsEquipmentLevelFiltered(item)) {
             continue;
         }
+        if (item.isTemplateForm) {
+            continue;
+        }
         if (filter.supportDimensions.empty()) {
             formInfos.emplace_back(item);
         } else {
@@ -172,7 +178,7 @@ void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &mo
         if (IsFunInterFormInfoFiltered(item) || IsEquipmentLevelFiltered(item)) {
             continue;
         }
-        if (item.moduleName == moduleName) {
+        if (item.moduleName == moduleName && !item.isTemplateForm) {
             formInfos.push_back(item);
         }
     }

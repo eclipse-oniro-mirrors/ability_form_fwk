@@ -66,7 +66,7 @@ FormDataMgr::FormDataMgr()
 {
     HILOG_INFO("create");
     InitLowMemoryStatus();
-    InitTransparencyFormCapbilityKey();
+    InitTransparencyFormCapabilityKey();
 }
 FormDataMgr::~FormDataMgr()
 {
@@ -3261,14 +3261,14 @@ void FormDataMgr::DueControlForms(
     }
 }
 
-void FormDataMgr::InitTransparencyFormCapbilityKey()
+void FormDataMgr::InitTransparencyFormCapabilityKey()
 {
-    transparencyFormCapbilityKey_ = OHOS::system::GetParameter(TRANSPARENT_FORM_CAPABILITY_PARAM_NAME, "");
+    transparencyFormCapabilityKey_ = OHOS::system::GetParameter(TRANSPARENT_FORM_CAPABILITY_PARAM_NAME, "");
 }
 
-const std::string& FormDataMgr::GetTransparencyFormCapbilityKey()
+const std::string& FormDataMgr::GetTransparencyFormCapabilityKey()
 {
-    return transparencyFormCapbilityKey_;
+    return transparencyFormCapabilityKey_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
