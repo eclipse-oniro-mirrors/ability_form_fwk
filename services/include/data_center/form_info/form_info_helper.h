@@ -27,9 +27,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-struct DistributedFormInfo {
+struct ExtraFormInfo {
     bool isDistributedForm = false;
     std::string moduleName = "";
+    bool isTemplateForm = false;
 };
 
 class FormInfoHelper {
@@ -55,7 +56,7 @@ private:
 
     static void LoadFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
         const ExtensionAbilityInfo &extensionInfo, const std::string &profileInfo,
-        const DistributedFormInfo &distributedFormInfo);
+        const ExtraFormInfo &extraFormInfo);
 
     static void PrintLoadStageFormConfigInfo(const FormInfo &formInfo, bool hasDistributedForm);
 
@@ -68,6 +69,10 @@ private:
 
     static void UpdateBundleTransparencyEnabled(const std::string &bundleName, int32_t userId,
         std::vector<FormInfo> &formInfos);
+
+    static void LoadProfileFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
+        const ExtensionAbilityInfo &extensionInfo, const std::vector<std::string> &profileInfos,
+        const ExtraFormInfo &extraFormInfo);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

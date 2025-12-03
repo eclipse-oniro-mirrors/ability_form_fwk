@@ -55,6 +55,24 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     }
 }
 
+void FormInfoStorage::GetAllTemplateFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
+{
+    HILOG_INFO("GetAllTemplateFormsInfo, caller userId is %{public}d, this userId is %{public}d", userId, this->userId);
+    if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
+        HILOG_ERROR("Invalid userId");
+        return;
+    }
+ 
+    for (const auto &item : this->formInfos) {
+        if (IsFunInterFormInfoFiltered(item)) {
+            continue;
+        }
+        if (item.isTemplateForm) {
+            formInfos.push_back(item);
+        }
+    }
+}
+
 static bool FindMatchDeviceType(const std::vector<std::string> &supportDeviceType, const char *targetDeviceType)
 {
     if (targetDeviceType == nullptr) {
@@ -155,6 +173,24 @@ void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &mo
             continue;
         }
         if (item.moduleName == moduleName) {
+            formInfos.push_back(item);
+        }
+    }
+}
+
+void FormInfoStorage::GetTemplateFormsInfoByModule(int32_t userId, const std::string &moduleName,
+    std::vector<AppExecFwk::FormInfo> &formInfos) const
+{
+    HILOG_INFO("caller userId is:%{public}d, this userId is %{public}d", userId, this->userId);
+    if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
+        HILOG_ERROR("Invalid userId");
+        return;
+    }
+    for (const auto &item : this->formInfos) {
+        if (IsFunInterFormInfoFiltered(item)) {
+            continue;
+        }
+        if (item.moduleName == moduleName && item.isTemplateForm) {
             formInfos.push_back(item);
         }
     }

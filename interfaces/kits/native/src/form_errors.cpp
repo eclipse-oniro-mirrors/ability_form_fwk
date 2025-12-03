@@ -231,7 +231,10 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     },
     {
         ERR_APPEXECFWK_PARCEL_ERROR, { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Data serialization exception." }
-    }
+    },
+    {
+        ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED, { ERR_FORM_EXTERNAL_IPC_ERROR, "" }
+    },
 };
 
 static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG = {

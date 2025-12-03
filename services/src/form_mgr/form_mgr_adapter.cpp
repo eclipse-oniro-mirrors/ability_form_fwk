@@ -3337,10 +3337,22 @@ int FormMgrAdapter::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
     return FormInfoMgr::GetInstance().GetAllFormsInfo(formInfos, GetCallingUserId());
 }
 
+int FormMgrAdapter::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormInfoMgr::GetInstance().GetAllTemplateFormsInfo(formInfos, GetCallingUserId());
+}
+
 int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, formInfos, GetCallingUserId());
+}
+
+int FormMgrAdapter::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormInfoMgr::GetInstance().GetTemplateFormsInfoByBundle(bundleName, formInfos, GetCallingUserId());
 }
 
 int FormMgrAdapter::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
@@ -3354,6 +3366,14 @@ int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName,
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName,
+        formInfos, GetCallingUserId());
+}
+
+int FormMgrAdapter::GetTemplateFormsInfoByModule(const std::string &bundleName,
+    const std::string &moduleName, std::vector<FormInfo> &formInfos)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormInfoMgr::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName,
         formInfos, GetCallingUserId());
 }
 

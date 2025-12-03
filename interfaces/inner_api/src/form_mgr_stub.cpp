@@ -348,6 +348,12 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleIsFormDueControl(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SEND_NON_TRANSPARENT_RATIO):
             return HandleSendNonTransparencyRatio(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO):
+            return HandleGetAllTemplateFormsInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_APP):
+            return HandleGetTemplateFormsInfoByApp(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE):
+            return HandleGetTemplateFormsInfoByModule(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1016,6 +1022,28 @@ int32_t FormMgrStub::HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &r
 }
 
 /**
+ * @brief Handle GetAllTemplateFormsInfo message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleGetAllTemplateFormsInfo(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("max parcel capacity:%{public}zu", MAX_PARCEL_CAPACITY);
+    std::vector<FormInfo> infos;
+    int32_t result = GetAllTemplateFormsInfo(infos);
+    (void)reply.SetMaxCapacity(MAX_PARCEL_CAPACITY);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+/**
  * @brief Handle GetFormsInfoByApp message.
  * @param data input param.
  * @param reply output param.
@@ -1027,6 +1055,28 @@ int32_t FormMgrStub::HandleGetFormsInfoByApp(MessageParcel &data, MessageParcel 
     std::string bundleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = GetFormsInfoByApp(bundleName, infos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief Handle GetTemplateFormsInfoByApp message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleGetTemplateFormsInfoByApp(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    std::vector<FormInfo> infos;
+    int32_t result = GetTemplateFormsInfoByApp(bundleName, infos);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
@@ -1050,6 +1100,29 @@ int32_t FormMgrStub::HandleGetFormsInfoByModule(MessageParcel &data, MessageParc
     std::string moduleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = GetFormsInfoByModule(bundleName, moduleName, infos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief Handle GetTemplateFormsInfoByModule message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleGetTemplateFormsInfoByModule(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    std::string moduleName = data.ReadString();
+    std::vector<FormInfo> infos;
+    int32_t result = GetTemplateFormsInfoByModule(bundleName, moduleName, infos);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
