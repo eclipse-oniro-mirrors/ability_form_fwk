@@ -20,6 +20,7 @@
 #include "iremote_object.h"
 #include "want.h"
 #include "data_center/form_record/form_record.h"
+#include "status_mgr_center/form_status_common.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -114,6 +115,8 @@ public:
     int32_t OnDeleteFormDone(const int64_t formId, const Want &want);
 
 private:
+    bool ScheduleRecycleTimeout(const int64_t formId);
+
     bool ScheduleRecycleTimeout(const int64_t formId);
  
     bool CancelRecycleTimeout(const int64_t formId);

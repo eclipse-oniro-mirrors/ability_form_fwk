@@ -165,9 +165,16 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
 void FormInfoHelper::PrintLoadStageFormConfigInfo(const FormInfo &formInfo, bool hasDistributedForm)
 {
     HILOG_INFO("LoadStageFormConfigInfo, bundleName:%{public}s, name:%{public}s, renderingMode:%{public}d, "
-        "moduleName:%{public}s, hasDistributedForm:%{public}d",
-        formInfo.bundleName.c_str(), formInfo.name.c_str(), static_cast<int>(formInfo.renderingMode),
-        formInfo.moduleName.c_str(), hasDistributedForm);
+        "moduleName:%{public}s, hasDistributedForm:%{public}d, isStandbySupported:%{public}d, "
+        "isStandbyAdapted:%{public}d, isPrivacySensitive:%{public}d",
+        formInfo.bundleName.c_str(),
+        formInfo.name.c_str(),
+        static_cast<int>(formInfo.renderingMode),
+        formInfo.moduleName.c_str(),
+        hasDistributedForm,
+        formInfo.standby.isSupported,
+        formInfo.standby.isAdapted,
+        formInfo.standby.isPrivacySensitive);
 }
 
 void FormInfoHelper::SetDistributedBundleStatus(int32_t userId, const std::string &entryModule,

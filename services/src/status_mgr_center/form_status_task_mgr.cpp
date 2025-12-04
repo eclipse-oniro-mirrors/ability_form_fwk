@@ -160,23 +160,7 @@ void FormStatusTaskMgr::PostStopRenderingForm(
  */
 int32_t FormStatusTaskMgr::OnRenderFormDone(const int64_t formId, const Want &want)
 {
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
-    int32_t event =
-        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL));
-    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
-        formId,
-        eventId.c_str(),
-        curTid.c_str(),
-        event);
-    if (event != static_cast<int32_t>(FormFsmEvent::RENDER_FORM_FAIL)) {
-        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
-    }
-    if (!eventId.empty() && eventId == curTid) {
-        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
-        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
-    }
-    return ERR_OK;
+    return HandleFrsEventReply(formId, want, FormFsmEvent::RENDER_FORM_FAIL);
 }
  
 /**
@@ -187,23 +171,7 @@ int32_t FormStatusTaskMgr::OnRenderFormDone(const int64_t formId, const Want &wa
  */
 int32_t FormStatusTaskMgr::OnRecoverFormDone(const int64_t formId, const Want &want)
 {
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
-    int32_t event =
-        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL));
-    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
-        formId,
-        eventId.c_str(),
-        curTid.c_str(),
-        event);
-    if (event != static_cast<int32_t>(FormFsmEvent::RECOVER_FORM_FAIL)) {
-        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
-    }
-    if (!eventId.empty() && eventId == curTid) {
-        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
-        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
-    }
-    return ERR_OK;
+    return HandleFrsEventReply(formId, want, FormFsmEvent::RECOVER_FORM_FAIL);
 }
  
 /**
@@ -266,23 +234,7 @@ int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &w
  */
 int32_t FormStatusTaskMgr::OnRecycleFormDone(const int64_t formId, const Want &want)
 {
-    std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
-    std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
-    int32_t event =
-        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL));
-    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
-        formId,
-        eventId.c_str(),
-        curTid.c_str(),
-        event);
-    if (event != static_cast<int32_t>(FormFsmEvent::RECYCLE_FORM_FAIL)) {
-        FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
-    }
-    if (!eventId.empty() && eventId == curTid) {
-        FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
-        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
-    }
-    return ERR_OK;
+    return HandleFrsEventReply(formId, want, FormFsmEvent::RECYCLE_FORM_FAIL);
 }
  
 /**
@@ -293,16 +245,22 @@ int32_t FormStatusTaskMgr::OnRecycleFormDone(const int64_t formId, const Want &w
  */
 int32_t FormStatusTaskMgr::OnDeleteFormDone(const int64_t formId, const Want &want)
 {
+    return HandleFrsEventReply(formId, want, FormFsmEvent::DELETE_FORM_FAIL);
+}
+
+int32_t FormStatusTaskMgr::HandleFrsEventReply(const int64_t formId, const Want &want, FormFsmEvent failEvent)
+{
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
     std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
     int32_t event =
-        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL));
+        want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(failEvent));
     HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
         formId,
         eventId.c_str(),
         curTid.c_str(),
         event);
-    if (event != static_cast<int32_t>(FormFsmEvent::DELETE_FORM_FAIL)) {
+ 
+    if (event != static_cast<int32_t>(failEvent)) {
         FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     }
     if (!eventId.empty() && eventId == curTid) {

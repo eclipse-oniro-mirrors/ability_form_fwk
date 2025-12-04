@@ -753,8 +753,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
     applicationInfo->apiTargetVersion = static_cast<int32_t>(want.GetIntParam(Constants::FORM_TARGET_VERSION_KEY, 0));
     context->SetApplicationInfo(applicationInfo);
     HILOG_DEBUG("bundleName is %{public}s, moduleName is %{public}s",
-        formJsInfo.bundleName.c_str(),
-        formJsInfo.moduleName.c_str());
+        formJsInfo.bundleName.c_str(), formJsInfo.moduleName.c_str());
 
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.emplace(GenerateContextKey(formJsInfo), context);
