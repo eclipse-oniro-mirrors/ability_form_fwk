@@ -246,6 +246,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     AppendFormStatus(formRecordInfo.formId, formInfo);
     AppendFormRefreshControlPoints(formInfo, formRecordInfo.enableForm, formRecordInfo.bundleName,
                                    formRecordInfo.formId);
+    AppendIsTemplateForm(formInfo, formRecordInfo.isTemplateForm);
 }
 
 /**
@@ -308,6 +309,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             FormRecord formRecord;
             if (FormDataMgr::GetInstance().GetFormRecord(info.formId, formRecord)) {
                 AppendFormRefreshControlPoints(infosResult, formRecord.enableForm, info.bundleName, info.formId);
+                AppendIsTemplateForm(formInfo, formRecord.isTemplateForm);
             }
             AppendBundleType(info.formBundleType, infosResult);
             AppendLiveFormStatus(std::to_string(info.formId), liveFormStatusMap, infosResult);
@@ -435,6 +437,12 @@ void FormDumpMgr::AppendLiveFormStatus(const std::string &formId,
     } else {
         formInfo += "[ " + iter->second.activeState + " ]\n";
     }
+}
+
+void FormDumpMgr::AppendIsTemplateForm(std::string &formInfo, const bool isTemplateForm) const
+{
+    formInfo += "    isTemplateForm ";
+    formInfo += "[" + std::to_string(isTemplateForm) + "]\n";
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

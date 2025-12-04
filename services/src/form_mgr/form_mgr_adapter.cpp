@@ -2163,6 +2163,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo, const F
     itemInfo.SetDistributedForm(FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, userId));
     itemInfo.SetUiModuleName(FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, userId));
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
+    itemInfo.SetIsTemplateForm();
     return ERR_OK;
 }
 

@@ -515,6 +515,18 @@ public:
      */
     const std::string& GetUiModuleName() const;
 
+    /**
+     * @brief Set isTemplateForm.
+     * @param isTemplateForm istemplateForm.
+     */
+    void SetIsTemplateForm(const bool isTemplateForm);
+
+    /**
+     * @brief Set isTemplateForm.
+     * @return isTemplateForm;
+     */
+    bool GetIsTemplateForm() const;
+
 private:
     /**
      * @brief Equal or not.
@@ -571,6 +583,7 @@ private:
     bool isDataProxyIgnoreFormVisibility_ = false;
     bool isDistributedForm_ = false;
     std::string uiModule_ = ""; // widget module name
+    bool isTemplateForm_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

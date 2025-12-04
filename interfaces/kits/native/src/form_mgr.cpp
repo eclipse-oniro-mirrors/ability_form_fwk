@@ -1146,10 +1146,12 @@ int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    int resultCode = remoteProxy_->GetAllFormsInfo(formInfos);
+    std::vector<FormInfo> inputFormInfos;
+    int resultCode = remoteProxy_->GetAllFormsInfo(inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetAllFormsInfo,errCode %{public}d", resultCode);
     }
+    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1211,10 +1213,12 @@ int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &f
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    int resultCode = remoteProxy_->GetFormsInfoByApp(bundleName, formInfos);
+    std::vector<FormInfo> inputFormInfos;
+    int resultCode = remoteProxy_->GetFormsInfoByApp(inputFormInfos, formInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByApp,errCode %{public}d", resultCode);
     }
+    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1290,10 +1294,12 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    std::vector<FormInfo> inputFormInfos;
+    int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
     }
+    FilterTemplateForm(tempFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1352,10 +1358,12 @@ int FormMgr::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<Form
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    int resultCode = remoteProxy_->GetFormsInfoByFilter(filter, formInfos);
+    std::vector<FormInfo> inputFormInfos;
+    int resultCode = remoteProxy_->GetFormsInfoByFilter(filter, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByFilter,errCode %{public}d", resultCode);
     }
+    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1371,7 +1379,12 @@ int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return remoteProxy_->GetFormsInfo(filter, formInfos);
+    int32_t resultCode = remoteProxy_->GetFormsInfo(filter, inputFormInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail GetFormsInfo,errCode %{public}d", resultCode);
+    }
+    FilterTemplateForm(inputFormInfos, formInfos);
+    return resultCode;
 }
 
 int32_t FormMgr::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
@@ -2490,6 +2503,15 @@ ErrCode FormMgr::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->SendNonTransparencyRatio(formId, ratio);
+}
+
+void FormMgr::FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos, std::vector<FormInfo> &formInfos)
+{
+    for (const auto &item : inputFormInfos) {
+        if (!item.isTemplateForm) {
+            formInfos.push_back(item);
+        }
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
