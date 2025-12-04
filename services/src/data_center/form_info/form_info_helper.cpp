@@ -126,7 +126,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
             LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
         } else {
             auto metaData = !client->GetResConfigFile(extensionInfo, FORM_METADATA_NAME, profileInfos);
-            bool templateMetaData = false;
+            bool templateMetaData = true;
             if (bundleInfo.applicationInfo.isSystemApp) {
                 templateMetaData = !client->GetResConfigFile(extensionInfo, TEMPLATE_FORM_METADATA_NAME,
                     templateProfileInfos);
@@ -295,9 +295,9 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
         HILOG_ERROR("get IBundleMgr failed");
         return false;
     }
-    const std::string &transparencyFormCapbilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapbilityKey();
-    if (transparencyFormCapbilityKey.empty()) {
-        HILOG_ERROR("get transparencyFormCapbilityKey is empty");
+    const std::string &transparencyFormCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
+    if (transparencyFormCapabilityKey.empty()) {
+        HILOG_ERROR("get transparencyFormCapabilityKey is empty");
         return false;
     }
     AppProvisionInfo appProvisionInfo;
@@ -317,7 +317,7 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
             HILOG_ERROR("appServiceCapabilities is not object");
             return false;
         }
-        return jsonObject.contains(transparencyFormCapbilityKey);
+        return jsonObject.contains(transparencyFormCapabilityKey);
     }
 }
 
