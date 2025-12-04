@@ -117,9 +117,9 @@ public:
 private:
     bool ScheduleRecycleTimeout(const int64_t formId);
 
-    bool ScheduleRecycleTimeout(const int64_t formId);
- 
     bool CancelRecycleTimeout(const int64_t formId);
+
+    int32_t HandleFrsEventReply(const int64_t formId, const Want &want, FormFsmEvent failEvent);
 
     void RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
         const sptr<IRemoteObject> &remoteObjectOfRender);
