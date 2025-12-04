@@ -40,6 +40,7 @@ int FormDataRefreshImpl::RefreshFormRequest(RefreshData &data)
     FormType formType = data.record.uiSyntax;
     if (formType == FormType::JS) {
         ret = FormProviderMgr::GetInstance().UpdateForm(data.formId, data.record, data.providerData);
+        HILOG_INFO("update js form, ret:%{public}d", ret);
         return ret;
     }
 
