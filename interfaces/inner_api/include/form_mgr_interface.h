@@ -314,7 +314,7 @@ public:
      * @param formInfos Return the form information of all forms provided.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos) 
+    virtual int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
     {
         return ERR_OK;
     }
