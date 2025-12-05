@@ -1150,8 +1150,9 @@ int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
     int resultCode = remoteProxy_->GetAllFormsInfo(inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetAllFormsInfo,errCode %{public}d", resultCode);
+    } else {
+        FilterTemplateForm(inputFormInfos, formInfos);
     }
-    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1217,8 +1218,9 @@ int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &f
     int resultCode = remoteProxy_->GetFormsInfoByApp(inputFormInfos, formInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByApp,errCode %{public}d", resultCode);
+    } else {
+        FilterTemplateForm(inputFormInfos, formInfos);
     }
-    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1298,8 +1300,9 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
+    } else {
+        FilterTemplateForm(inputFormInfos, formInfos);
     }
-    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 

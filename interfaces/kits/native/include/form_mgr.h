@@ -912,9 +912,10 @@ private:
     /**
     * @brief Filter template forms.
     * @param inputFormInfos Input Form infos.
-    * @param formInfos Form infos.
+    * @param filteredFormInfos Filtered Form infos.
     */
-    void FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos, std::vector<FormInfo> &formInfos);
+    void FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos, 
+        std::vector<FormInfo> &filteredFormInfos);
 
     /**
      * @class FormMgrDeathRecipient
