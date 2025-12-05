@@ -171,6 +171,11 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormDataRefreshImpl_007, TestS
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormDataRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
+    data.record.uiSyntax = FormType::JS;
+    MockFormProviderUpdateForm(ERR_OK);
+    EXPECT_EQ(ERR_OK, FormDataRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    data.record.uiSyntax = FormType::ETS;
     MockUpdateByProviderData(ERR_APPEXECFWK_FORM_DISABLE_REFRESH);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_DISABLE_REFRESH, FormDataRefreshImpl::GetInstance().RefreshFormRequest(data));
 

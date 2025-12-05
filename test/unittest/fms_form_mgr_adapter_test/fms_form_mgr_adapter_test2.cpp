@@ -512,25 +512,6 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0137, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_0138
- * @tc.desc: test UpdateForm function and the return value is ERR_OK.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0138, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0138 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    int32_t uid = 0;
-    FormProviderData formProviderData;
-    MockGetFormRecord(true);
-    MockGetFormRecordParams(true);
-    MockGetFormRecordParamsUid(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0138 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_0139
  * @tc.desc: test AllotFormById function and the return value is ERR_APPEXECFWK_FORM_COMMON_CODE.
  * @tc.type: FUNC
