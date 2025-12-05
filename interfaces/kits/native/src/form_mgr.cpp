@@ -1299,7 +1299,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
     }
-    FilterTemplateForm(tempFormInfos, formInfos);
+    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1379,6 +1379,7 @@ int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    std::vector<FormInfo> inputFormInfos;
     int32_t resultCode = remoteProxy_->GetFormsInfo(filter, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfo,errCode %{public}d", resultCode);

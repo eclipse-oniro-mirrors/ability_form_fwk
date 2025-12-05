@@ -701,12 +701,12 @@ const std::string& FormItemInfo::GetUiModuleName() const
     return uiModule_;
 }
 
-void SetIsTemplateForm(const bool isTemplateForm)
+void FormItemInfo::SetIsTemplateForm(const bool isTemplateForm)
 {
     isTemplateForm_ = isTemplateForm;
 }
 
-bool GetIsTemplateForm() const
+bool FormItemInfo::GetIsTemplateForm() const
 {
     return isTemplateForm_;
 }
