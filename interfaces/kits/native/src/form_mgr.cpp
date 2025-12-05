@@ -1365,8 +1365,9 @@ int FormMgr::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<Form
     int resultCode = remoteProxy_->GetFormsInfoByFilter(filter, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByFilter,errCode %{public}d", resultCode);
+    } else {
+        FilterTemplateForm(inputFormInfos, formInfos);
     }
-    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
@@ -1386,8 +1387,9 @@ int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo
     int32_t resultCode = remoteProxy_->GetFormsInfo(filter, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfo,errCode %{public}d", resultCode);
+    } else {
+        FilterTemplateForm(inputFormInfos, formInfos);
     }
-    FilterTemplateForm(inputFormInfos, formInfos);
     return resultCode;
 }
 
