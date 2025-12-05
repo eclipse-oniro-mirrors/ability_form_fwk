@@ -309,7 +309,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             FormRecord formRecord;
             if (FormDataMgr::GetInstance().GetFormRecord(info.formId, formRecord)) {
                 AppendFormRefreshControlPoints(infosResult, formRecord.enableForm, info.bundleName, info.formId);
-                AppendIsTemplateForm(formInfo, formRecord.isTemplateForm);
+                AppendIsTemplateForm(infosResult, formRecord.isTemplateForm);
             }
             AppendBundleType(info.formBundleType, infosResult);
             AppendLiveFormStatus(std::to_string(info.formId), liveFormStatusMap, infosResult);
