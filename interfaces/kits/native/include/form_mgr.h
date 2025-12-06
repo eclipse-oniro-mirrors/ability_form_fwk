@@ -914,7 +914,7 @@ private:
     * @param inputFormInfos Input Form infos.
     * @param filteredFormInfos Filtered Form infos.
     */
-    void FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos, 
+    void FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos,
         std::vector<FormInfo> &filteredFormInfos);
 
     /**
