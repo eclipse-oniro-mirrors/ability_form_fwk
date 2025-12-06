@@ -2511,7 +2511,7 @@ ErrCode FormMgr::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
     return remoteProxy_->SendNonTransparencyRatio(formId, ratio);
 }
 
-void FormMgr::FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos, 
+void FormMgr::FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos,
     std::vector<FormInfo> &filteredFormInfos)
 {
     for (const auto &item : inputFormInfos) {
