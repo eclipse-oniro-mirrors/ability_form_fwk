@@ -1215,7 +1215,7 @@ int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &f
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::vector<FormInfo> inputFormInfos;
-    int resultCode = remoteProxy_->GetFormsInfoByApp(inputFormInfos, formInfos);
+    int resultCode = remoteProxy_->GetFormsInfoByApp(bundleName, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByApp,errCode %{public}d", resultCode);
     } else {
@@ -2511,11 +2511,12 @@ ErrCode FormMgr::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
     return remoteProxy_->SendNonTransparencyRatio(formId, ratio);
 }
 
-void FormMgr::FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos, std::vector<FormInfo> &formInfos)
+void FormMgr::FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos, 
+    std::vector<FormInfo> &filteredFormInfos)
 {
     for (const auto &item : inputFormInfos) {
         if (!item.isTemplateForm) {
-            formInfos.push_back(item);
+            filteredFormInfos.push_back(item);
         }
     }
 }
