@@ -2519,7 +2519,7 @@ void FormMgr::FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos,
 
     std::copy_if(inputFormInfos.begin(), inputFormInfos.end(),
                  std::back_inserter(filteredFormInfos),
-                 [](const FormInfo& item) { return !item.isTemplateForm; });
+                 [](const FormInfo &item) { return !item.isTemplateForm; });
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
