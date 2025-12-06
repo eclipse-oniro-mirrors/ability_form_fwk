@@ -101,6 +101,7 @@ public:
     // user expect form recycled status
     bool expectRecycled = false;
     uint32_t lastVersionCode = 0;
+    bool isTemplateForm = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

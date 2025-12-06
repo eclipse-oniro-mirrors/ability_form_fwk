@@ -910,6 +910,14 @@ private:
     bool IsRemoteProxyValid();
 
     /**
+    * @brief Filter template forms.
+    * @param inputFormInfos Input Form infos.
+    * @param filteredFormInfos Filtered Form infos.
+    */
+    void FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos,
+        std::vector<FormInfo> &filteredFormInfos);
+
+    /**
      * @class FormMgrDeathRecipient
      * FormMgrDeathRecipient notices IRemoteBroker died.
      */

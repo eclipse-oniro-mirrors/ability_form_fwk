@@ -700,5 +700,15 @@ const std::string& FormItemInfo::GetUiModuleName() const
 {
     return uiModule_;
 }
+
+void FormItemInfo::SetIsTemplateForm(const bool isTemplateForm)
+{
+    isTemplateForm_ = isTemplateForm;
+}
+
+bool FormItemInfo::GetIsTemplateForm() const
+{
+    return isTemplateForm_;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
