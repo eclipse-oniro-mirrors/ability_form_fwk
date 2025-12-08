@@ -787,7 +787,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0151, TestSize.Level0)
     std::string str = "aa";
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY, formMgrAdapter.GetFormInfo(want, formInfo));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_SUPPORTED, formMgrAdapter.GetFormInfo(want, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0151 end";
 }
 
