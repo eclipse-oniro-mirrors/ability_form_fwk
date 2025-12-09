@@ -166,6 +166,11 @@ public:
     void UpdateFormSizeOfGroups(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo);
     bool IsFormVisible(int64_t formId);
     bool IsAllFormsInvisible();
+
+    int32_t SetRenderGroupParams(const int64_t formId, const Want &want);
+
+    int32_t HandleSetRenderGroupParams(const int64_t &formId, const Want &want);
+
 private:
     class RemoteObjHash {
     public:

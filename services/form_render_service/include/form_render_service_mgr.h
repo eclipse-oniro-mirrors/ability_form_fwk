@@ -114,6 +114,8 @@ public:
 
     void MainThreadForceFullGC();
 
+    int32_t SetRenderGroupParams(const int64_t formId, const Want &want);
+
 private:
     void SetCriticalFalseOnAllFormInvisible();
     void FormRenderGCTask(const std::string &uid);

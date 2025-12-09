@@ -942,6 +942,18 @@ bool FormRenderMgrInner::GetIsFRSDiedInLowMemory()
     return isFrsDiedInLowMemory_;
 }
 
+void FormRenderMgrInner::PostSetRenderGroupParamsTask(int64_t formId, const Want &want)
+{
+    HILOG_INFO("call");
+    sptr<IRemoteObject> remoteObject;
+    auto ret = GetRenderObject(remoteObject);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("null remoteObjectGotten");
+        return;
+    }
+    FormRenderTaskMgr::GetInstance().PostSetRenderGroupParams(formId, want, remoteObject);
+}
+
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     HILOG_INFO("Recv FormRenderService death notice");

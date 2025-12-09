@@ -158,7 +158,7 @@ void FormEventUtil::HandleFormReload(
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    FormMgrAdapter::GetInstance().DelayRefreshForms(updatedForms, want);
+    FormMgrAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want);
     if (needReload) {
         FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
     } else {
@@ -724,6 +724,9 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
+    FormRecord oldFormRecord;
+    FormDataMgr::GetInstance().GetFormRecord(formRecord.formId, oldFormRecord);
+    formRecord.formUpgradeInfo = oldFormRecord.formUpgradeInfo;
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 
@@ -742,6 +745,9 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
+    FormRecord oldFormRecord;
+    FormDataMgr::GetInstance().GetFormRecord(formRecord.formId, oldFormRecord);
+    formRecord.formUpgradeInfo = oldFormRecord.formUpgradeInfo;
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 

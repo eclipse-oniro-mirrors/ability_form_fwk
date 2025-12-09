@@ -1472,4 +1472,25 @@ HWTEST_F(FormRenderMgrTest, GetFormRenderMgrInner_001, TestSize.Level0)
     EXPECT_FALSE(formRenderMgr.GetFormSandboxMgrInner(0, sandboxInner));
     GTEST_LOG_(INFO) << "GetFormRenderMgrInner_001 end";
 }
+
+/**
+ * @tc.name: SetRenderGroupParams_001
+ * @tc.desc: test SetRenderGroupParams function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, SetRenderGroupParams_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupParams_001 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    Want want;
+    formRenderMgr.SetRenderGroupParams(1, want);
+    GTEST_LOG_(INFO) << "SetRenderGroupParams_001 end";
+}
 }

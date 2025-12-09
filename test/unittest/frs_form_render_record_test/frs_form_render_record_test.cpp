@@ -3053,3 +3053,24 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration, Test
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_SetRenderGroupParams_001
+ * @tc.desc: Verify SetRenderGroupParams
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_SetRenderGroupParams_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_SetRenderGroupParams_001 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    int64_t formId = 100;
+    Want want;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    EXPECT_EQ(formRenderRecordPtr_->SetRenderGroupParams(formId, want), -1);
+
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    EXPECT_EQ(formRenderRecordPtr_->SetRenderGroupParams(formId, want), 0);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_SetRenderGroupParams_001 end";
+}

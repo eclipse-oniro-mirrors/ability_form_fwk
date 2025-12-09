@@ -902,6 +902,20 @@ void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const Want &wan
     }
 }
 
+void FormMgrAdapter::UpdateFormRenderParamsAfterReload(const int64_t formId)
+{
+    Want renderWant;
+    FormRecord formRecord;
+    FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    std::string transparencyColor = formRecord.formUpgradeInfo.transparencyColor;
+    if (transparencyColor.empty()) {
+        transparencyColor = Constants::DEFAULT_TRANSPARENCY_COLOR;
+    }
+    HILOG_INFO("Need to set transparency color: %{public}s", transparencyColor.c_str());
+    renderWant.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, transparencyColor);
+    FormRenderMgr::GetInstance().SetRenderGroupParams(formId, renderWant);
+}
+
 void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType, const int32_t userId)
 {
     if (formId <= 0 || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {

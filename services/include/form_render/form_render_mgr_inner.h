@@ -99,7 +99,9 @@ public:
     void DisconnectAllRenderConnections();
 
     bool GetIsFRSDiedInLowMemory();
-    
+
+    void PostSetRenderGroupParamsTask(int64_t formId, const Want &want);
+
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection, int32_t level) const;
 

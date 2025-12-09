@@ -822,5 +822,19 @@ bool FormRenderMgr::GetFormSandboxMgrInner(int32_t userId, std::shared_ptr<FormS
     }
     return false;
 }
+
+void FormRenderMgr::SetRenderGroupParams(int64_t formId, const Want &want)
+{
+    HILOG_INFO("call.");
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->PostSetRenderGroupParamsTask(formId, want);
+    }
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->PostSetRenderGroupParamsTask(formId, want);
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

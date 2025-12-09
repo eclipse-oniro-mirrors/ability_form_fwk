@@ -820,9 +820,8 @@ public:
      * @brief Delay refresh forms task when provider update.
      * @param updatedForms Need refresh forms.
      * @param want The want of the request.
-     * @return Returns ERR_OK on success, others on failure.
      */
-    void DelayRefreshForms(const std::vector<FormRecord> &updatedForms, const Want &want);
+    void DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord> &updatedForms, const Want &want);
 
     /**
      * @brief Reacquire form info from form provider.
@@ -1488,6 +1487,12 @@ private:
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 
     void UpdateFormRenderParam(const int64_t formId, const Want &want);
+
+    /**
+     * @brief Update form render service paramters after reload.
+     * @param formId Indicates the id of form.
+     */
+    void UpdateFormRenderParamsAfterReload(const int64_t formId);
 
     void SetVisibleChange(const int64_t formId, const int32_t formVisibleType, const int32_t userId);
 

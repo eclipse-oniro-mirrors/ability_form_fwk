@@ -1178,4 +1178,19 @@ HWTEST_F(FormRenderMgrInnerTest, DisconnectAllRenderConnections_002, TestSize.Le
     EXPECT_EQ(0, formRenderMgrInner.renderFormConnections_.size());
     GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_002 end";
 }
+
+/**
+ * @tc.name: PostSetRenderGroupParamsTask_001
+ * @tc.desc: test PostSetRenderGroupParamsTask function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    Want want;
+    formRenderMgrInner.PostSetRenderGroupParamsTask(1, want);
+    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 end";
+}
 }

@@ -2350,6 +2350,47 @@ void FormRenderRecord::RuntimeMemoryMonitor()
             static_cast<uint64_t>(totalSize), formName, formLocation);
     }
 }
+
+int32_t FormRenderRecord::SetRenderGroupParams(const int64_t formId, const Want &want)
+{
+    HILOG_INFO("SetRenderGroupParams, formId:%{public}" PRId64, formId);
+    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("null eventHandler formId:%{public}" PRId64, formId);
+        return SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED;
+    }
+    auto task = [thisWeakPtr = weak_from_this(), formId, want]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("null renderRecord formId:%{public}" PRId64, formId);
+            return;
+        }
+
+        renderRecord->HandleSetRenderGroupParams(formId, want);
+    };
+
+    eventHandler->PostTask(task, "SetRenderGroupParams");
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::HandleSetRenderGroupParams(const int64_t &formId, const Want &want)
+{
+    HILOG_INFO("HandleSetRenderGroupParams begin,formId:%{public}" PRId64, formId);
+    MarkThreadAlive();
+
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto search = formRendererGroupMap_.find(formId);
+    if (search == formRendererGroupMap_.end()) {
+        HILOG_ERROR("invalid FormRendererGroup formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
+    }
+    if (!search->second) {
+        HILOG_ERROR("FormRendererGroup was found but null");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
+    }
+    search->second->SetUiContentParams(want);
+    return ERR_OK;
+}
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS

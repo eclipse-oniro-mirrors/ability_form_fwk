@@ -883,6 +883,36 @@ void FormRenderServiceMgr::MainThreadForceFullGC()
     };
     mainHandler_->PostTask(task, "MainThreadForceFullGC");
 }
+
+int32_t FormRenderServiceMgr::SetRenderGroupParams(const int64_t formId, const Want &want)
+{
+    if (formId <= 0) {
+        HILOG_ERROR("formId is negative");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("empty uid,formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+        if (search->second == nullptr) {
+            HILOG_ERROR("null renderRecord of %{public}" PRId64, formId);
+            return RENDER_FORM_FAILED;
+        }
+        auto ret = search->second->SetRenderGroupParams(formId, want);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("SetRenderGroupParams %{public}" PRId64 " failed.", formId);
+            return ret;
+        }
+    } else {
+        HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
+        return RENDER_FORM_FAILED;
+    }
+    return ERR_OK;
+}
 }  // namespace FormRender
 }  // namespace AppExecFwk
 }  // namespace OHOS

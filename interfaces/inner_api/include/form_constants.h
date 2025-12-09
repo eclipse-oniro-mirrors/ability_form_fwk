@@ -446,6 +446,8 @@ namespace Constants {
     constexpr const char* IS_DELETE_CACHE_IN_UPGRADE_SCENE = "isDeleteCacheInUpgradeScene";
     // Is form need the addition process on request form
     constexpr const char* IS_NEED_ADDFORM_ON_REQUEST = "isNeedAddForm";
+    // Default transparency color
+    constexpr const char* DEFAULT_TRANSPARENCY_COLOR = "#FFFFFFFF";
 
     const std::string FORM_MGR_CONFIG_DIR = "/data/service/el1/public/update/param_service/install/system/etc/FormMgrConfig/";
 

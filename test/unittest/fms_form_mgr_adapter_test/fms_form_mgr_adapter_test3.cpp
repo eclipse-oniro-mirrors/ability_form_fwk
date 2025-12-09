@@ -1369,6 +1369,23 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_CheckUpdateFormRecord, TestSize.
 }
 
 /**
+ * @tc.name: FormMgrAdapter_DelayRefreshFormsOnAppUpgrade
+ * @tc.desc: test DelayRefreshFormsOnAppUpgrade function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_DelayRefreshFormsOnAppUpgrade, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_DelayRefreshFormsOnAppUpgrade start";
+    FormRecord formRecord;
+    std::vector<FormRecord> updatedForms;
+    updatedForms.push_back(formRecord);
+    Want want;
+    FormMgrAdapter formMgrAdapter;
+    formMgrAdapter.DelayRefreshFormsOnAppUpgrade(updatedForms, want);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_DelayRefreshFormsOnAppUpgrade end";
+}
+
+/**
  * @tc.name: FormMgrAdapter_SwitchLockForms
  * @tc.desc: test SwitchLockForms function.
  * @tc.type: FUNC
@@ -1466,5 +1483,20 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_IsDeleteCacheInUpgradeScene_0003
     MockIsDeleteCacheInUpgradeScene(true);
     EXPECT_EQ(true, formMgrAdapter.IsDeleteCacheInUpgradeScene(record));
     GTEST_LOG_(INFO) << "FormMgrAdapter_IsDeleteCacheInUpgradeScene_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001
+ * @tc.desc: test UpdateFormRenderParamsAfterReload function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    MockGetFormRecord(true);
+    formMgrAdapter.UpdateFormRenderParamsAfterReload(formId);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 end";
 }
 }
