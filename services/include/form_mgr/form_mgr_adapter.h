@@ -860,6 +860,26 @@ public:
      * @return Returns true for form is due controlled.
      */
     bool CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
+
+    /**
+     * @brief Register publish form cross bundle control in fms.
+     * @param callerToken The form provider proxy.
+     * @return Returns ERR_OK for setting success.
+     */
+    ErrCode RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister publish form cross bundle control in fms
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterPublishFormCrossBundleControl();
+
+    /**
+     * @brief Publish form cross bundle control.
+     * @param bundleInfo bundle info.
+     * @return Returns true for can open form manager.
+     */
+    bool PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo);
 private:
     /**
      * @brief Get form configure info.
@@ -1476,6 +1496,8 @@ private:
 
     sptr<IRemoteObject> getLiveFormStatusCallerToken_;
 
+    sptr<IRemoteObject> crossBundleControlCallerToken_;
+
     mutable std::mutex overflowCallerTokenMutex_;
 
     mutable std::mutex sceneanimationCallerTokenMutex_;
@@ -1483,6 +1505,8 @@ private:
     mutable std::mutex getFormRectCallerTokenMutex_;
 
     mutable std::mutex getLiveFormStatusCallerTokenMutex_;
+
+    mutable std::mutex crossBundleControlCallerTokenMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

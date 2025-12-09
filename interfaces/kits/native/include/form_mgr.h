@@ -884,6 +884,19 @@ public:
      */
     ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio);
 
+    /**
+     * @brief Register publish form cross bundle control in fms.
+     * @param callerToken The form provider proxy.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister publish form cross bundle control in fms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterPublishFormCrossBundleControl();
+
 private:
     /**
      * @brief Connect form manager service.

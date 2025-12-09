@@ -80,6 +80,59 @@ ohos_source_set("form_host_delegate_stub") {
   part_name = "form_fwk"
 }
 
+idl_gen_interface("form_provider_delegate_interface") {
+  sources = [ "ipc_idl_gen/IFormProviderDelegate.idl" ]
+  log_domainid = "0xD001301"
+  log_tag = "FormManagerService"
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_source_set("form_provider_delegate_proxy") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":form_provider_delegate_interface")
+  sources = filter_include(output_values, [ "*_proxy.cpp" ])
+  public_configs = [ ":fms_idl_config" ]
+  deps = [ ":form_provider_delegate_interface" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_source_set("form_provider_delegate_stub") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":form_provider_delegate_interface")
+  sources = filter_include(output_values, [ "*_stub.cpp" ])
+  public_configs = [ ":fms_idl_config" ]
+  deps = [ ":form_provider_delegate_interface" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
 config("formmgr_config") {
   include_dirs = [
     "services/config",
@@ -511,6 +564,8 @@ ohos_shared_library("form_manager") {
   deps = [
     ":form_host_delegate_proxy",
     ":form_host_delegate_stub",
+    ":form_provider_delegate_proxy",
+    ":form_provider_delegate_stub",
   ]
 
   external_deps = [

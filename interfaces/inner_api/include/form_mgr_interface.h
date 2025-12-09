@@ -989,6 +989,25 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Register publish form cross bundle control.
+     * @param callerToken The form provider proxy.
+     * @return Returns ERR_OK for setting success.
+     */
+    virtual ErrCode RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Unregister publish form cross bundle control.
+     * @return Returns ERR_OK for setting success.
+     */
+    virtual ErrCode UnregisterPublishFormCrossBundleControl()
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1101,6 +1120,8 @@ public:
         FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO,
         FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_APP,
         FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE,
+        FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
+        FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
     };
 };
 }  // namespace AppExecFwk

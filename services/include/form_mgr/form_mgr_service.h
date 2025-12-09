@@ -898,6 +898,19 @@ public:
      */
     ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio) override;
 
+    /**
+     * @brief Register publish form cross bundle control in fms.
+     * @param callerToken The form provider proxy.
+     * @return Returns ERR_OK on success, others on failure
+     */
+    ErrCode RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister publish form cross bundle control in fms
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterPublishFormCrossBundleControl() override;
+
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
