@@ -39,6 +39,7 @@ export namespace formProvider {
   native function updateFormInner(formId: string, dataObjStr: string, callback: AsyncCallbackWrapper<void>, proxies?: Array<formBindingData.ProxyData>): void;
   native function getFormsInfoInner(callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>, filter?: formInfo.FormInfoFilter): void;
   native function openFormEditAbilityInner(abilityName: string, formId: string, isMainPage: boolean): void;
+  native function closeFormEditAbilityInner(isMainPage: boolean): void;
   native function openFormManagerInner(want: Want): void;
   native function requestPublishFormInner(want: Want, callback: AsyncCallbackWrapper<string>, withFormBindingData: boolean, dataObjStr?: string, proxies?: Array<formBindingData.ProxyData>): void;
   native function isRequestPublishFormSupportedInner(callback: AsyncCallbackWrapper<boolean>): void;
@@ -300,6 +301,14 @@ export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormI
     }
 
     openFormEditAbilityInner(abilityName, formId, isMainPage);
+  }
+
+  export function closeFormEditAbility(isMainPage?: boolean): void {
+    if (isMainPage == undefined) {
+      isMainPage = true;
+    }
+
+    closeFormEditAbilityInner(isMainPage);
   }
 
   export function openFormManager(want: Want): void {

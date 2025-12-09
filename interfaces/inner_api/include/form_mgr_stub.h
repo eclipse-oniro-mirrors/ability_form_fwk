@@ -719,6 +719,14 @@ private:
     ErrCode HandleOpenFormEditAbility(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle close the form edit ability.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleCloseFormEditAbility(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle register overflow proxy in fms
      * @param data Input param
      * @param reply Output param

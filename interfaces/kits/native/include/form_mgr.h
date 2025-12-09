@@ -765,6 +765,13 @@ public:
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage);
 
     /**
+     * @brief Close the form edit ability.
+     * @param isMainPage Close the main edit page.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode CloseFormEditAbility(bool isMainPage);
+
+    /**
      * @brief Register overflow proxy in fms.
      * @param callerToken The form host proxy.
      * @return Returns ERR_OK on success, others on failure.

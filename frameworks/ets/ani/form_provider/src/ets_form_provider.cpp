@@ -193,6 +193,21 @@ void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
     HILOG_DEBUG("End");
 }
 
+void CloseFormEditAbility([[maybe_unused]] ani_env *env, ani_boolean isMainPage)
+{
+    HILOG_DEBUG("Call");
+
+    CheckEnvOrThrow(env);
+
+    auto ret = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("CloseFormEditAbility failed, error code: %{public}d", ret);
+        PrepareExceptionAndThrow(env, ret);
+    }
+
+    HILOG_DEBUG("End");
+}
+
 void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
 {
     HILOG_DEBUG("Call");
@@ -769,10 +784,12 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function{"getFormsInfoInner",
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}C{@ohos.app.form.formInfo.formInfo.FormInfoFilter}:",
             reinterpret_cast<void *>(GetFormsInfo)},
-        ani_native_function{"openFormEditAbilityInner", "C{std.core.String}C{std.core.String}z:",
+        ani_native_function{"openFormEditAbilityInner",
+            "C{std.core.String}C{std.core.String}z:",
             reinterpret_cast<void *>(OpenFormEditAbility)},
-        ani_native_function{"openFormManagerInner", "C{@ohos.app.ability.Want.Want}:",
-            reinterpret_cast<void *>(OpenFormManager)},
+        ani_native_function{"closeFormEditAbilityInner", "z:", reinterpret_cast<void *>(CloseFormEditAbility)},
+        ani_native_function{
+            "openFormManagerInner", "C{@ohos.app.ability.Want.Want}:", reinterpret_cast<void *>(OpenFormManager)},
         ani_native_function{"requestPublishFormInner",
             "C{@ohos.app.ability.Want.Want}"
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}zC{std.core.String}C{escompat.Array}:",
@@ -780,31 +797,24 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function{"isRequestPublishFormSupportedInner",
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(IsRequestPublishFormSupported)},
-        ani_native_function{"getPublishedFormInfosInner", "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
+        ani_native_function{"getPublishedFormInfosInner",
+            "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(GetPublishedFormInfos)},
         ani_native_function{"getPublishedFormInfoByIdInner",
             "C{std.core.String}C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(GetPublishedFormInfoById)},
-        ani_native_function{
-            "nativeGetFormRect", nullptr, reinterpret_cast<void *>(GetFormRect)},
-        ani_native_function{
-            "nativeCancelOverflow", nullptr, reinterpret_cast<void *>(CancelOverflow)},
-        ani_native_function{
-            "nativeRequestOverflow", nullptr, reinterpret_cast<void *>(RequestOverflow)},
+        ani_native_function{"nativeGetFormRect", nullptr, reinterpret_cast<void *>(GetFormRect)},
+        ani_native_function{"nativeCancelOverflow", nullptr, reinterpret_cast<void *>(CancelOverflow)},
+        ani_native_function{"nativeRequestOverflow", nullptr, reinterpret_cast<void *>(RequestOverflow)},
         ani_native_function{
             "nativeDeactivateSceneAnimation", nullptr, reinterpret_cast<void *>(DeactivateSceneAnimation)},
-        ani_native_function{
-            "nativeActivateSceneAnimation", nullptr, reinterpret_cast<void *>(ActivateSceneAnimation)},
+        ani_native_function{"nativeActivateSceneAnimation", nullptr, reinterpret_cast<void *>(ActivateSceneAnimation)},
         ani_native_function{
             "nativeOpenFormManagerCrossBundle", nullptr, reinterpret_cast<void *>(OpenFormManagerCrossBundle)},
-        ani_native_function{
-            "checkFormIDParam", nullptr, reinterpret_cast<void *>(CheckFormIDParam)},
-        ani_native_function{
-            "checkOverflowInfoParam", nullptr, reinterpret_cast<void *>(CheckOverflowInfoParam)},
-        ani_native_function{
-            "nativeReloadForms", nullptr, reinterpret_cast<void *>(ReloadForms)},
-        ani_native_function{
-            "nativeReloadAllForms", nullptr, reinterpret_cast<void *>(ReloadAllForms)},
+        ani_native_function{"checkFormIDParam", nullptr, reinterpret_cast<void *>(CheckFormIDParam)},
+        ani_native_function{"checkOverflowInfoParam", nullptr, reinterpret_cast<void *>(CheckOverflowInfoParam)},
+        ani_native_function{"nativeReloadForms", nullptr, reinterpret_cast<void *>(ReloadForms)},
+        ani_native_function{"nativeReloadAllForms", nullptr, reinterpret_cast<void *>(ReloadAllForms)},
     };
     return methods;
 }

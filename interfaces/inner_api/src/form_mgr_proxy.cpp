@@ -2813,6 +2813,29 @@ ErrCode FormMgrProxy::OpenFormEditAbility(const std::string &abilityName, const 
     return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::CloseFormEditAbility(bool isMainPage)
+{
+    HILOG_DEBUG("start");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isMainPage)) {
+        HILOG_ERROR("fail write isMainPage ");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_CLOSE_FORM_EDIT_ABILITY, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendTransactCmd:%{public}d failed", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 ErrCode FormMgrProxy::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
