@@ -905,9 +905,9 @@ void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const Want &wan
 void FormMgrAdapter::UpdateFormRenderParamsAfterReload(const int64_t formId)
 {
     Want renderWant;
-    FormRecord formRecord;
-    FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
-    std::string transparencyColor = formRecord.formUpgradeInfo.transparencyColor;
+    FormUpgradeInfo formUpgradeInfo;
+    FormDataMgr::GetInstance().GetFormUpgradeInfo(formId, formUpgradeInfo);
+    std::string transparencyColor = formUpgradeInfo.transparencyColor;
     if (transparencyColor.empty()) {
         transparencyColor = Constants::DEFAULT_TRANSPARENCY_COLOR;
     }

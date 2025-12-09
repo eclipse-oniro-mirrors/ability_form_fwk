@@ -1024,6 +1024,20 @@ public:
      */
     const std::string& GetTransparencyFormCapabilityKey();
 
+    /**
+     * @brief Get form upgrade info from formRecord.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetFormUpgradeInfo(const int64_t formId, FormUpgradeInfo& formUpgradeInfo) const;
+
+    /**
+     * @brief Update form upgrade info.
+     * @param formId The Id of the form.
+     * @param FormUpgradeInfo The form upgrade info.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool UpdateFormUpgradeInfo(const int64_t formId, const FormUpgradeInfo& formUpgradeInfo);
+
 private:
     /**
      * @brief Create form record.

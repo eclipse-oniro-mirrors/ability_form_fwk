@@ -1261,12 +1261,15 @@ HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupParams_001, TestSize.Level0)
 
     std::string uid{"20251209"};
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+
     formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
     ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
     EXPECT_EQ(ret, RENDER_FORM_FAILED);
 
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
-    formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
+    formRenderServiceMgr.renderRecordMap_[uid] = formRenderRecord;
     ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
     EXPECT_EQ(ret, ERR_OK);
 

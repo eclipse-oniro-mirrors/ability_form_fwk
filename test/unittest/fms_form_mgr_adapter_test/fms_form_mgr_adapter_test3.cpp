@@ -1495,7 +1495,6 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UpdateFormRenderParamsAfterReloa
     GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 start";
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
-    MockGetFormRecord(true);
     formMgrAdapter.UpdateFormRenderParamsAfterReload(formId);
     GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 end";
 }

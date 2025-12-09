@@ -724,9 +724,9 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
-    FormRecord oldFormRecord;
-    FormDataMgr::GetInstance().GetFormRecord(formRecord.formId, oldFormRecord);
-    formRecord.formUpgradeInfo = oldFormRecord.formUpgradeInfo;
+    FormUpgradeInfo oldFormUpgradeInfo;
+    FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, oldFormUpgradeInfo);
+    formRecord.formUpgradeInfo = oldFormUpgradeInfo;
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 
@@ -745,9 +745,9 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
-    FormRecord oldFormRecord;
-    FormDataMgr::GetInstance().GetFormRecord(formRecord.formId, oldFormRecord);
-    formRecord.formUpgradeInfo = oldFormRecord.formUpgradeInfo;
+    FormUpgradeInfo oldFormUpgradeInfo;
+    FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, oldFormUpgradeInfo);
+    formRecord.formUpgradeInfo = oldFormUpgradeInfo;
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 

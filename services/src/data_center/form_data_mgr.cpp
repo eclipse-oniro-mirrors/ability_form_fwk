@@ -3275,5 +3275,43 @@ const std::string& FormDataMgr::GetTransparencyFormCapabilityKey()
 {
     return transparencyFormCapabilityKey_;
 }
+
+
+/**
+ * @brief Get form upgrade info from formRecord.
+ * @return Returns true on success, false on failure.
+ */
+bool FormDataMgr::GetFormUpgradeInfo(const int64_t formId, FormUpgradeInfo& formUpgradeInfo) const
+{
+    HILOG_DEBUG("get form upgrade info from formRecord by formId");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_ERROR("formInfo not find");
+        return false;
+    }
+    formUpgradeInfo = info->second.formUpgradeInfo;
+
+    HILOG_DEBUG("get form upgrade info successfully");
+    return true;
+}
+
+/**
+ * @brief Update form upgrade info.
+ * @param formId The Id of the form.
+ * @param FormUpgradeInfo The form upgrade info.
+ * @return Returns true if this function is successfully called; returns false otherwise.
+ */
+bool FormDataMgr::UpdateFormUpgradeInfo(const int64_t formId, const FormUpgradeInfo& formUpgradeInfo)
+{
+    HILOG_DEBUG("Update form upgrade info by formId");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        formRecords_[formId].formUpgradeInfo = formUpgradeInfo;
+        return true;
+    }
+    return false;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
