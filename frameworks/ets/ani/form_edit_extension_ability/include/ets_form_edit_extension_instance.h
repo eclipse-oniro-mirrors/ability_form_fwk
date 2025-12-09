@@ -24,4 +24,4 @@ namespace AbilityRuntime {
 FormEditExtension *CreateETSFormEditExtension(const std::unique_ptr<Runtime> &runtime);
 } // namespace AbilityRuntime
 } // namespace OHOS
-#endif // ifndefOHOS_FORM_FWK_ETS_FORM_EDIT_EXTENSION_INSTANCE_H
+#endif // OHOS_FORM_FWK_ETS_FORM_EDIT_EXTENSION_INSTANCE_H

@@ -90,7 +90,7 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
     ani_status status = ANI_ERROR;
     ani_method method = nullptr;
     ani_object object = nullptr;
-    if ((env->FindClass(LIVE_FORM_EXTENSION_CLASS_NAME, &cls)) != ANI_OK) {
+    if ((status = env->FindClass(LIVE_FORM_EXTENSION_CLASS_NAME, &cls)) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
         return;
     }

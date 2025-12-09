@@ -76,7 +76,11 @@ export default class LiveFormExtensionContext extends ExtensionContext {
           }
         });
         taskpool.execute((): void => {
-          this.nativeStartAbilityByLiveForm(want, "", myCall);
+          try {
+            this.nativeStartAbilityByLiveForm(want, "", myCall);
+          } catch (err: BusinessError) {
+            reject(err);
+          }
         });
       });
     return p;

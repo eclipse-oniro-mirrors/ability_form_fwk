@@ -230,6 +230,7 @@ void EtsLiveFormExtensionContext::OnStartAbilityByLiveForm(ani_env *env, ani_obj
     ErrCode errCode = contextPtr->StartAbilityByFms(want, formId);
     if (errCode == ERR_OK) {
         AsyncCallback(env, callback, EtsFormErrorUtil::CreateError(env, errCode), nullptr);
+        return;
     }
     if (errCode == ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED || errCode == ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME) {
         AsyncCallback(env, callback,

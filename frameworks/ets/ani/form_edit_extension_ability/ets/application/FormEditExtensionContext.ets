@@ -46,7 +46,11 @@ export default class FormEditExtensionContext extends UIExtensionContext {
           }
         });
         taskpool.execute((): void => {
-          this.nativeStartSecondPage(want, myCall);
+          try {
+            this.nativeStartSecondPage(want, myCall);
+          } catch (err: BusinessError) {
+            reject(err);
+          }
         });
       });
     return p;
