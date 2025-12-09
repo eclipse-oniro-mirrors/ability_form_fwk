@@ -920,7 +920,6 @@ void EtsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(ani_vm* ani_vm, an
 void EtsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 {
     HILOG_INFO("UnregisterGetLiveFormStatusListener Call");
-    ani_vm_ = nullptr;
     ani_env* env = GetAniEnv();
     if (env == nullptr) {
         HILOG_ERROR("env is null");
@@ -934,6 +933,7 @@ void EtsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
         }
         getLiveFormStatusCallbackRef_ = nullptr;
     }
+    ani_vm_ = nullptr;
 }
 
 class EtsFormStateCallbackClient
