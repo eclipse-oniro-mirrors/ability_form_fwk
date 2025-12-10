@@ -263,9 +263,7 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
             HILOG_INFO("Get thread %{public}d and psid %{public}d", renderRecord->jsThreadId_,
                 renderRecord->processId_);
         };
-        auto eventHandler = GetEventHandler();
-        if (eventHandler != nullptr)
-            eventHandler->PostHighPriorityTask(task, "GotJSThreadId");
+        eventHandler_->PostHighPriorityTask(task, "GotJSThreadId");
 
         hasMonitor_.store(true);
         AddWatchDogThreadMonitor();
