@@ -1618,7 +1618,9 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
             HILOG_ERROR("addForm can't acquire tempForm when select formId");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
-        FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], allotFormWant);
+        if (allotFormWant.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false)) {
+            FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], allotFormWant);
+        }
     }
     const WantParams wholeWantParams = allotFormWant.GetParams();
     record.formLocation = info.GetFormLocation();
