@@ -961,6 +961,7 @@ private:
     static std::string GetCurrentDateTime();
     void SetNetConnect();
     void SetDisConnectTypeTime();
+    bool PublishFormCrossBundleControl(const Want &want);
 
 private:
     std::mutex snapshotSetMutex_;

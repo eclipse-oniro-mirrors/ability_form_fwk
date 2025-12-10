@@ -122,10 +122,10 @@ private:
     bool CheckCallerIsSystemApp();
 };
 
-typedef struct PublishFormCrossBundleControlParam {
+struct PublishFormCrossBundleControlParam {
     AppExecFwk::PublishFormCrossBundleInfo bundleInfo;
     bool isCanOpen = false;
-} PublishFormCrossBundleControlParam;
+};
 
 class JsFormProviderProxyMgr : public AppExecFwk::FormProviderDelegateStub {
 public:
@@ -146,6 +146,7 @@ private:
     DISALLOW_COPY_AND_MOVE(JsFormProviderProxyMgr);
     napi_ref crossBundleControlCallback_ = nullptr;
     napi_env crossBundleControlEnv_;
+    mutable std::mutex crossBundleControlMutex_;
     ErrCode PublishFormCrossBundleControl(const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen);
     void PublishFormCrossBundleControlInner(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam);
     void ConvertParamToNapiValue(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam, napi_value requestObj);

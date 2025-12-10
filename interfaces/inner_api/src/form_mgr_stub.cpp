@@ -2206,6 +2206,10 @@ ErrCode FormMgrStub::HandleRegisterPublishFormCrossBundleControl(MessageParcel &
 {
     HILOG_INFO("call");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (!callerToken) {
+        HILOG_ERROR("caller token is null");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = RegisterPublishFormCrossBundleControl(callerToken);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write proxy failed");

@@ -1282,7 +1282,7 @@ napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env,
 {
     HILOG_INFO("call");
     if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("The app not system-app,can't use system-api");
+        HILOG_ERROR("the app not system-app, can't use system-api");
         NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
         return CreateJsUndefined(env);
     }
@@ -1353,9 +1353,10 @@ sptr<JsFormProviderProxyMgr> JsFormProviderProxyMgr::GetInstance()
 
 bool JsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(napi_env env, napi_ref callbackRef)
 {
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
     HILOG_INFO("call");
     if (callbackRef == nullptr) {
-        HILOG_ERROR("Invalid callback reference");
+        HILOG_ERROR("invalid callback reference");
         return false;
     }
     if (crossBundleControlCallback_ != nullptr) {
@@ -1369,7 +1370,7 @@ bool JsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(napi_env env,
     napi_valuetype valueType;
     napi_typeof(env, callback, &valueType);
     if (valueType != napi_function) {
-        HILOG_ERROR("Callback is not a function");
+        HILOG_ERROR("callback is not a function");
         return false;
     }
     return true;
@@ -1377,8 +1378,12 @@ bool JsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(napi_env env,
 
 bool JsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
 {
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
     HILOG_INFO("call");
-    crossBundleControlCallback_ = nullptr;
+    if (crossBundleControlCallback_) {
+        napi_delete_reference(crossBundleControlEnv_, crossBundleControlCallback_);
+        crossBundleControlCallback_ = nullptr;
+    }
     crossBundleControlEnv_ = nullptr;
     return true;
 }
@@ -1386,6 +1391,7 @@ bool JsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
 ErrCode JsFormProviderProxyMgr::PublishFormCrossBundleControl(
     const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen)
 {
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
     HILOG_INFO("call");
     std::shared_ptr<PublishFormCrossBundleControlParam> dataParam =
         std::make_shared<PublishFormCrossBundleControlParam>();

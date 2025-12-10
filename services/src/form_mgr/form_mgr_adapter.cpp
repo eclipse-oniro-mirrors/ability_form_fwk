@@ -4891,8 +4891,8 @@ sptr<IFormPublishInterceptor> FormMgrAdapter::GetFormPublishInterceptor()
 
 ErrCode FormMgrAdapter::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);
+    HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("callerToken is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -4903,14 +4903,15 @@ ErrCode FormMgrAdapter::RegisterPublishFormCrossBundleControl(const sptr<IRemote
 
 ErrCode FormMgrAdapter::UnregisterPublishFormCrossBundleControl()
 {
-    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);
+    HILOG_INFO("call");
     crossBundleControlCallerToken_ = nullptr;
     return ERR_OK;
 }
 
 bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo)
 {
+    std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);
     HILOG_INFO("call, callerBundleName:%{public}s, targetBundleName:%{public}s, targetTemplateFormDetailId:%{public}s,",
         bundleInfo.callerBundleName.c_str(), bundleInfo.targetBundleName.c_str(), bundleInfo.targetTemplateFormDetailId.c_str());
     if (!crossBundleControlCallerToken_) {
