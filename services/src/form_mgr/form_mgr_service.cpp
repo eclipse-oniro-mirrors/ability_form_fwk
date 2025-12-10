@@ -2403,7 +2403,7 @@ ErrCode FormMgrService::UnregisterPublishFormCrossBundleControl()
 }
 
 bool FormMgrService::PublishFormCrossBundleControl(const Want &want) {
-    bool isShowSingleForm = want.GetBoolParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM, false);
+    bool isShowSingleForm = want.GetBoolParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, false);
     if (!isShowSingleForm) {
         return true;
     }
@@ -2416,7 +2416,7 @@ bool FormMgrService::PublishFormCrossBundleControl(const Want &want) {
     PublishFormCrossBundleInfo bundleInfo;
     bundleInfo.callerBundleName = callerBundleName;
     bundleInfo.targetBundleName = want.GetBundle();
-    bundleInfo.targetTemplateFormDetailId = want.GetStringParam(Constants::TEMPLATE_FORM_DETAIL_ID);
+    bundleInfo.targetTemplateFormDetailId = want.GetStringParam(Constants::TEMPLATE_FORM_DETAIL_ID_KEY);
     return FormMgrAdapter::GetInstance().PublishFormCrossBundleControl(bundleInfo);
 }
 }  // namespace AppExecFwk

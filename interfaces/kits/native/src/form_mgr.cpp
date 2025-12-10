@@ -2528,12 +2528,12 @@ ErrCode FormMgr::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject>
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+        return errCode;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->RegisterPublishFormCrossBundleControl(callerToken);
 }
@@ -2544,12 +2544,12 @@ ErrCode FormMgr::UnregisterPublishFormCrossBundleControl()
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+        return errCode;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UnregisterPublishFormCrossBundleControl();
 }
