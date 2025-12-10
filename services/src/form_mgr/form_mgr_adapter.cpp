@@ -4913,7 +4913,8 @@ bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleI
 {
     std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);
     HILOG_INFO("call, callerBundleName:%{public}s, targetBundleName:%{public}s, targetTemplateFormDetailId:%{public}s,",
-        bundleInfo.callerBundleName.c_str(), bundleInfo.targetBundleName.c_str(), bundleInfo.targetTemplateFormDetailId.c_str());
+        bundleInfo.callerBundleName.c_str(), bundleInfo.targetBundleName.c_str(),
+        bundleInfo.targetTemplateFormDetailId.c_str());
     if (!crossBundleControlCallerToken_) {
         HILOG_ERROR("Fail, crossBundleControlCallerToken_ is nullptr!");
         return false;

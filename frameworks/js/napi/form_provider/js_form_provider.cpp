@@ -1406,7 +1406,8 @@ ErrCode JsFormProviderProxyMgr::PublishFormCrossBundleControl(
     return ERR_OK;
 }
 
-void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam)
+void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
+    std::shared_ptr<PublishFormCrossBundleControlParam> dataParam)
 {
     HILOG_INFO("call");
     napi_handle_scope scope = nullptr;
@@ -1453,7 +1454,8 @@ void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(std::shared_ptr<
     return;
 }
 
-void JsFormProviderProxyMgr::ConvertParamToNapiValue(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam, napi_value requestObj)
+void JsFormProviderProxyMgr::ConvertParamToNapiValue(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam,
+    napi_value requestObj)
 {
     napi_value callerBundleNameValue;
     napi_create_string_utf8(crossBundleControlEnv_, dataParam->bundleInfo.callerBundleName.c_str(),

@@ -2416,7 +2416,7 @@ bool FormMgrService::PublishFormCrossBundleControl(const Want &want) {
     PublishFormCrossBundleInfo bundleInfo;
     bundleInfo.callerBundleName = callerBundleName;
     bundleInfo.targetBundleName = want.GetBundle();
-    bundleInfo.targetTemplateFormDetailId = want.GetStringParam(Constants::TEMPLATE_FORM_DETAIL_ID);;
+    bundleInfo.targetTemplateFormDetailId = want.GetStringParam(Constants::TEMPLATE_FORM_DETAIL_ID);
     return FormMgrAdapter::GetInstance().PublishFormCrossBundleControl(bundleInfo);
 }
 }  // namespace AppExecFwk
