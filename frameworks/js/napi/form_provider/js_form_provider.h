@@ -150,7 +150,6 @@ private:
     ErrCode PublishFormCrossBundleControl(const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen);
     void PublishFormCrossBundleControlInner(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam);
     void ConvertParamToNapiValue(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam, napi_value requestObj);
-
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

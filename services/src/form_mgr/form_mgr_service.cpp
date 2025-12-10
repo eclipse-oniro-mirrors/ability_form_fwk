@@ -2402,7 +2402,8 @@ ErrCode FormMgrService::UnregisterPublishFormCrossBundleControl()
     return FormMgrAdapter::GetInstance().UnregisterPublishFormCrossBundleControl();
 }
 
-bool FormMgrService::PublishFormCrossBundleControl(const Want &want) {
+bool FormMgrService::PublishFormCrossBundleControl(const Want &want)
+{
     bool isShowSingleForm = want.GetBoolParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, false);
     if (!isShowSingleForm) {
         return true;
