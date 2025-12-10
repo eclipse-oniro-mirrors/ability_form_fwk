@@ -2540,5 +2540,37 @@ void FormMgr::FilterTemplateForm(const std::vector<FormInfo> &inputFormInfos,
                  std::back_inserter(filteredFormInfos),
                  [](const FormInfo &item) { return !item.isTemplateForm; });
 }
+
+ErrCode FormMgr::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RegisterPublishFormCrossBundleControl(callerToken);
+}
+
+ErrCode FormMgr::UnregisterPublishFormCrossBundleControl()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UnregisterPublishFormCrossBundleControl();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

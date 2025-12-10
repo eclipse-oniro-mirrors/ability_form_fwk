@@ -356,6 +356,10 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleGetTemplateFormsInfoByApp(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE):
             return HandleGetTemplateFormsInfoByModule(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL):
+            return HandleRegisterPublishFormCrossBundleControl(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL):
+            return HandleUnregisterPublishFormCrossBundleControl(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -2211,6 +2215,33 @@ ErrCode FormMgrStub::HandleSendNonTransparencyRatio(MessageParcel &data, Message
     ErrCode result = SendNonTransparencyRatio(formId, ratio);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (!callerToken) {
+        HILOG_ERROR("caller token is null");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterPublishFormCrossBundleControl(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write proxy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    ErrCode result = UnregisterPublishFormCrossBundleControl();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

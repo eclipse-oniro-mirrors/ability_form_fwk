@@ -436,6 +436,13 @@ namespace Constants {
     constexpr int32_t DUE_INVALID_UPDATE_DURATION = -1;
 
     constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
+
+    constexpr const char* FORM_MANAGER_SHOW_SINGLE_FORM_KEY = "ohos.extra.param.key.form_manager_show_single_form";
+
+    constexpr const char* TEMPLATE_FORM_DETAIL_ID_KEY = "ohos.extra.param.key.template_form_detail_id";
+
+    constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL =
+        "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

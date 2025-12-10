@@ -853,6 +853,22 @@ private:
      */
     ErrCode HandleSendNonTransparencyRatio(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle register publish form cross bundle control in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister publish form cross bundle control in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

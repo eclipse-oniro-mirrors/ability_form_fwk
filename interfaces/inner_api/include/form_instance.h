@@ -83,6 +83,16 @@ struct OverflowInfo : public Parcelable {
     bool Marshalling(Parcel &parcel) const override;
     static OverflowInfo *Unmarshalling(Parcel &parcel);
 };
+
+struct PublishFormCrossBundleInfo : public Parcelable {
+    std::string callerBundleName = "";
+    std::string targetBundleName = "";
+    std::string targetTemplateFormDetailId = "";
+
+    bool ReadFromParcel(Parcel &parcel);
+    bool Marshalling(Parcel &parcel) const override;
+    static PublishFormCrossBundleInfo *Unmarshalling(Parcel &parcel);
+};
 } // namespace AppExecFwk
 
 /* formId：the Id of form.

@@ -91,6 +91,7 @@
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "feature/param_update/param_control.h"
 #include "feature/theme_form/theme_form_client.h"
+#include "iform_provider_delegate.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -4886,6 +4887,48 @@ sptr<IFormPublishInterceptor> FormMgrAdapter::GetFormPublishInterceptor()
 {
     std::lock_guard<std::mutex> lock(formPublishInterceptorMutex_);
     return formPublishInterceptor_;
+}
+
+ErrCode FormMgrAdapter::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);
+    HILOG_INFO("call");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    crossBundleControlCallerToken_ = callerToken;
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::UnregisterPublishFormCrossBundleControl()
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);
+    HILOG_INFO("call");
+    crossBundleControlCallerToken_ = nullptr;
+    return ERR_OK;
+}
+
+bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo)
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);
+    HILOG_INFO("call, callerBundleName:%{public}s, targetBundleName:%{public}s, targetTemplateFormDetailId:%{public}s,",
+        bundleInfo.callerBundleName.c_str(), bundleInfo.targetBundleName.c_str(),
+        bundleInfo.targetTemplateFormDetailId.c_str());
+    if (!crossBundleControlCallerToken_) {
+        HILOG_ERROR("Fail, crossBundleControlCallerToken_ is nullptr!");
+        return false;
+    }
+    sptr<IFormProviderDelegate> remoteFormProviderDelegateProxy =
+        iface_cast<IFormProviderDelegate>(crossBundleControlCallerToken_);
+    if (remoteFormProviderDelegateProxy == nullptr) {
+        HILOG_ERROR("Fail, remoteFormProviderDelegateProxy is nullptr!");
+        return false;
+    }
+    bool isCanOpen = false;
+    ErrCode result = remoteFormProviderDelegateProxy->PublishFormCrossBundleControl(bundleInfo, isCanOpen);
+    HILOG_INFO("result:%{public}d, isCanOpen:%{public}d", result, isCanOpen);
+    return (result == ERR_OK) ? isCanOpen : false;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

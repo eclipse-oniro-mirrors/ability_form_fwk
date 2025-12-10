@@ -1413,7 +1413,10 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
         HILOG_ERROR("capability not support");
         return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
     }
-
+    if (!PublishFormCrossBundleControl(want)) {
+        HILOG_ERROR("PublishFormCrossBundleControl failed.");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 
@@ -2399,6 +2402,49 @@ ErrCode FormMgrService::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
     }
     FormAbnormalReporter::GetInstance().AddRecord(formId, ratio);
     return ERR_OK;
+}
+
+ErrCode FormMgrService::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
+}
+
+ErrCode FormMgrService::UnregisterPublishFormCrossBundleControl()
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterPublishFormCrossBundleControl();
+}
+
+bool FormMgrService::PublishFormCrossBundleControl(const Want &want)
+{
+    bool isShowSingleForm = want.GetBoolParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, false);
+    if (!isShowSingleForm) {
+        return true;
+    }
+    std::string callerBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get BundleName failed");
+        return false;
+    }
+    PublishFormCrossBundleInfo bundleInfo;
+    bundleInfo.callerBundleName = callerBundleName;
+    bundleInfo.targetBundleName = want.GetBundle();
+    bundleInfo.targetTemplateFormDetailId = want.GetStringParam(Constants::TEMPLATE_FORM_DETAIL_ID_KEY);
+    return FormMgrAdapter::GetInstance().PublishFormCrossBundleControl(bundleInfo);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
