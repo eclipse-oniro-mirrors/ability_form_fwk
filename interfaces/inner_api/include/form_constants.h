@@ -439,7 +439,7 @@ namespace Constants {
 
     constexpr const char* TEMPLATE_FORM_DETAIL_ID_KEY = "ohos.extra.param.key.template_form_detail_id";
 
-    constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL = "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL"
+    constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL = "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
