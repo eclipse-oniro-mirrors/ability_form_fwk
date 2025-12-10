@@ -1305,8 +1305,8 @@ napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env,
     ErrCode result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
         JsFormProviderProxyMgr::GetInstance());
     if (result != ERR_OK) {
-        if (result != ERR_FORM_EXTERNAL_PERMISSION_DENIED && result != ERR_FORM_EXTERNAL_NOT_SYSTEM_APP) {
-            result = ERR_FORM_EXTERNAL_IPC_ERROR;
+        if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+            result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
         }
         NapiFormUtil::ThrowByInternalErrorCode(env, result);
         return CreateJsUndefined(env);
@@ -1331,8 +1331,8 @@ napi_value JsFormProvider::OnUnregisterPublishFormCrossBundleControl(napi_env en
     }
     ErrCode result = FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
     if (result != ERR_OK) {
-        if (result != ERR_FORM_EXTERNAL_PERMISSION_DENIED && result != ERR_FORM_EXTERNAL_NOT_SYSTEM_APP) {
-            result = ERR_FORM_EXTERNAL_IPC_ERROR;
+        if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+            result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
         }
         NapiFormUtil::ThrowByInternalErrorCode(env, result);
         return CreateJsUndefined(env);
