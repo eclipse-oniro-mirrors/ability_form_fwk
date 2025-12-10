@@ -723,10 +723,11 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
-    HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormUpgradeInfo oldFormUpgradeInfo;
     FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, oldFormUpgradeInfo);
+    oldFormUpgradeInfo.enableBlurBackground = formInfo.enableBlurBackground;
     formRecord.formUpgradeInfo = oldFormUpgradeInfo;
+    HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 
@@ -745,9 +746,6 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
-    FormUpgradeInfo oldFormUpgradeInfo;
-    FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, oldFormUpgradeInfo);
-    formRecord.formUpgradeInfo = oldFormUpgradeInfo;
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 

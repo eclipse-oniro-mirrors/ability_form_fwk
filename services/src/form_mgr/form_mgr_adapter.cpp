@@ -911,8 +911,12 @@ void FormMgrAdapter::UpdateFormRenderParamsAfterReload(const int64_t formId)
     if (transparencyColor.empty()) {
         transparencyColor = Constants::DEFAULT_TRANSPARENCY_COLOR;
     }
-    HILOG_INFO("Need to set transparency color: %{public}s", transparencyColor.c_str());
     renderWant.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, transparencyColor);
+    if (formUpgradeInfo.enableBlurBackground) {
+        renderWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, true);
+    }
+    HILOG_INFO("Need to set transparencyColor: %{public}s, enableBlurBackground: %{public}d",
+        transparencyColor.c_str(), formUpgradeInfo.enableBlurBackground);
     FormRenderMgr::GetInstance().SetRenderGroupParams(formId, renderWant);
 }
 
