@@ -1957,7 +1957,7 @@ private:
         int32_t formLocation = INVALID_FORM_LOCATION;
         if (napi_get_value_int32(env, argv[PARAM1], &formLocation) == napi_ok) {
             if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
-                 formLocation > static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION)) {
+                 formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
                 HILOG_ERROR("formLocation not FormLocation enum");
                 NapiFormUtil::ThrowParamTypeError(env, "formLocation", "FormLocation enum");
                 return CreateJsUndefined(env);

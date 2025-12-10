@@ -42,6 +42,7 @@ namespace Constants {
     constexpr const char* PARAM_FORM_DIMENSION_KEY = "ohos.extra.param.key.form_dimension";
     constexpr const char* PARAM_FORM_RENDERINGMODE_KEY = "ohos.extra.param.key.form_rendering_mode";
     constexpr const char* PARAM_FORM_OBSCURED_KEY = "ohos.extra.param.key.form_obscured_mode";
+    constexpr const char* PARAM_FORM_COLOR_MODE_KEY = "ohos.extra.param.key.form_color_mode";
     constexpr const char* PARAM_MESSAGE_KEY = "ohos.extra.param.key.message";
     constexpr const char* PARAM_FORM_TEMPORARY_KEY = "ohos.extra.param.key.form_temporary";
     constexpr const char* PARAM_CALLER_BUNDLE_NAME_KEY = "ohos.extra.param.key.caller_bundle_name";
@@ -330,6 +331,8 @@ namespace Constants {
         FORM_MANAGER_NEGATIVE_SCREEN = 5,
         SCREEN_LOCK = 6,
         AI_SUGGESTION = 7,
+        STANDBY = 8,
+        FORM_LOCATION_END
     };
 
     enum class PublishFormErrorCode : int8_t {

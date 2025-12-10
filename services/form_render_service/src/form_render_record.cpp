@@ -38,8 +38,13 @@
 #include "xcollie/watchdog.h"
 #include "dfx_dump_catcher.h"
 #include "form_render_service_mgr.h"
+#include "configuration_convertor.h"
+#include "resource_manager.h"
 
+using namespace OHOS::Global::Resource;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
+using namespace OHOS::AppExecFwk::Constants;
+using namespace OHOS::AppExecFwk::ConfigurationInner;
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -680,21 +685,30 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
             }
             auto applicationInfo = iter->second->GetApplicationInfo();
             if (applicationInfo != nullptr) {
-                uint32_t apiCompatibleVersion = static_cast<uint32_t>(
-                    want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
+                uint32_t apiCompatibleVersion =
+                    static_cast<uint32_t>(want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
                 if (apiCompatibleVersion != 0) {
                     applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
                 }
                 HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
-                    formJsInfo.bundleName.c_str(), applicationInfo->apiCompatibleVersion);
+                    formJsInfo.bundleName.c_str(),
+                    applicationInfo->apiCompatibleVersion);
             }
 
             std::shared_ptr<OHOS::AppExecFwk::Configuration> config = iter->second->GetConfiguration();
-            if (config != nullptr && configuration_ != nullptr) {
-                std::string colorMode = configuration_->GetItem(SYSTEM_COLORMODE);
-                std::string languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
-                config->AddItem(SYSTEM_COLORMODE, colorMode);
-                config->AddItem(SYSTEM_LANGUAGE, languageTag);
+            if (config != nullptr) {
+                std::string colorMode = AppExecFwk::GetColorModeStr(
+                    want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
+                if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
+                    config->AddItem(SYSTEM_COLORMODE, colorMode);
+                } else if (configuration_ != nullptr) {
+                    std::string colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
+                    config->AddItem(SYSTEM_COLORMODE, colorModeTag);
+                }
+                if (configuration_ != nullptr) {
+                    std::string languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
+                    config->AddItem(SYSTEM_LANGUAGE, languageTag);
+                }
             }
             return iter->second;
         }
@@ -710,20 +724,31 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
         HILOG_ERROR("Create context failed");
         return nullptr;
     }
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
+    if (configuration_ == nullptr) {
+        config = std::make_shared<AppExecFwk::Configuration>();
+    } else {
+        config = std::make_shared<AppExecFwk::Configuration>(*configuration_);
+    }
 
-    context->SetConfiguration(configuration_);
+    std::string colorMode =
+        AppExecFwk::GetColorModeStr(want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
+    if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
+        config->AddItem(SYSTEM_COLORMODE, colorMode);
+    }
+
+    context->SetConfiguration(config);
     AppExecFwk::HapModuleInfo hapModuleInfo;
     hapModuleInfo.name = formJsInfo.moduleName;
     hapModuleInfo.hapPath = formJsInfo.jsFormCodePath;
-    hapModuleInfo.compileMode = static_cast<CompileMode>(want.GetIntParam(Constants::FORM_COMPILE_MODE_KEY,
-        static_cast<int32_t>(CompileMode::ES_MODULE)));
+    hapModuleInfo.compileMode = static_cast<CompileMode>(
+        want.GetIntParam(Constants::FORM_COMPILE_MODE_KEY, static_cast<int32_t>(CompileMode::ES_MODULE)));
     context->InitHapModuleInfo(hapModuleInfo);
     auto applicationInfo = std::make_shared<AppExecFwk::ApplicationInfo>();
     applicationInfo->bundleName = formJsInfo.bundleName;
-    applicationInfo->apiCompatibleVersion = static_cast<uint32_t>(want.GetIntParam(
-        Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
-    applicationInfo->apiTargetVersion = static_cast<int32_t>(want.GetIntParam(
-        Constants::FORM_TARGET_VERSION_KEY, 0));
+    applicationInfo->apiCompatibleVersion =
+        static_cast<uint32_t>(want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
+    applicationInfo->apiTargetVersion = static_cast<int32_t>(want.GetIntParam(Constants::FORM_TARGET_VERSION_KEY, 0));
     context->SetApplicationInfo(applicationInfo);
     HILOG_DEBUG("bundleName is %{public}s, moduleName is %{public}s",
         formJsInfo.bundleName.c_str(), formJsInfo.moduleName.c_str());
@@ -1860,15 +1885,11 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, const FormS
         HILOG_INFO("formRequests length: %{public}zu formId: %{public}" PRId64 " width: %{public}f height: %{public}f"
             " borderWidth: %{public}f, formViewScale: %{public}f", iter->second.size(), formId, width, height,
             borderWidth, formViewScale);
-        for (auto& formRequestIter : iter->second) {
-            formRequestIter.second.want.SetParam(
-                OHOS::AppExecFwk::Constants::PARAM_FORM_WIDTH_KEY, static_cast<double>(width));
-            formRequestIter.second.want.SetParam(
-                OHOS::AppExecFwk::Constants::PARAM_FORM_HEIGHT_KEY, static_cast<double>(height));
-            formRequestIter.second.want.SetParam(
-                OHOS::AppExecFwk::Constants::PARAM_FORM_BORDER_WIDTH_KEY, static_cast<float>(borderWidth));
-            formRequestIter.second.want.SetParam(
-                OHOS::AppExecFwk::Constants::PARAM_FORM_VIEW_SCALE, formViewScale);
+        for (auto &formRequestIter : iter->second) {
+            formRequestIter.second.want.SetParam(PARAM_FORM_WIDTH_KEY, static_cast<double>(width));
+            formRequestIter.second.want.SetParam(PARAM_FORM_HEIGHT_KEY, static_cast<double>(height));
+            formRequestIter.second.want.SetParam(PARAM_FORM_BORDER_WIDTH_KEY, static_cast<float>(borderWidth));
+            formRequestIter.second.want.SetParam(PARAM_FORM_VIEW_SCALE, formViewScale);
         }
     }
 
@@ -1901,7 +1922,7 @@ void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId)
             continue;
         }
 
-        formRequest.second.want.SetParam(OHOS::AppExecFwk::Constants::FORM_IS_STATIC_FORM_UPDATE_SIZE, true);
+        formRequest.second.want.SetParam(FORM_IS_STATIC_FORM_UPDATE_SIZE, true);
         PostReAddRecycledForms(formRequest.second.formJsInfo, formRequest.second.want);
     }
 }

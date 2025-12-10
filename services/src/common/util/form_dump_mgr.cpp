@@ -54,6 +54,7 @@ const static std::unordered_map<Constants::FormLocation, std::string> formLocati
     { Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN, "[ FORM_MANAGER_NEGATIVE_SCREEN ]\n" },
     { Constants::FormLocation::SCREEN_LOCK, "[ SCREEN_LOCK ]\n" },
     { Constants::FormLocation::AI_SUGGESTION, "[ AI_SUGGESTION ]\n" },
+    { Constants::FormLocation::STANDBY, "[ STANDBY ]\n" },
 };
 
 const static std::unordered_map<FormVisibilityType, std::string> formVisibilityTypeMap_ = {
