@@ -1027,6 +1027,7 @@ ohos_shared_library("live_form_extension") {
     "hitrace:hitrace_meter",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "window_manager:libdm",
   ]
 
   subsystem_name = "ability"

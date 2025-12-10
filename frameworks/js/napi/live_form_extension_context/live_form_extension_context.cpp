@@ -14,10 +14,14 @@
  */
 
 #include "live_form_extension_context.h"
+#include "display_manager.h"
+#include "display_info.h"
 #include "fms_log_wrapper.h"
+#include "napi_form_util.h"
 #include "form_errors.h"
 #include "form_constants.h"
 #include "form_mgr.h"
+#include "form_mgr_errors.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -25,6 +29,7 @@ using namespace OHOS::AppExecFwk;
 const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
 const std::string REQUEST_METHOD = "startAbilityByLiveForm";
 const std::string TRANSPARENT_COLOR = "#00FFFFFF";
+constexpr float DEFAULT_VIEW_SCALE = 1.0f;
 
 bool LiveFormExtensionContext::SetWindowBackgroundColor()
 {
@@ -44,6 +49,44 @@ bool LiveFormExtensionContext::SetWindowBackgroundColor()
 #endif // SUPPORT_SCREEN
     HILOG_DEBUG("SetWindowBackgroundColor end");
     return true;
+}
+
+ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
+{
+    HILOG_DEBUG("SetUIExtCustomDensity begin");
+#ifdef SUPPORT_SCREEN
+    sptr<Rosen::Window> uiWindow = UIExtensionContext::GetWindow();
+    if (uiWindow == nullptr) {
+        HILOG_ERROR("SetUIExtCustomDensity null uiWindow");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (std::isgreaterequal(layoutScale, DEFAULT_VIEW_SCALE) || std::islessequal(layoutScale, 0.0f)) {
+        HILOG_ERROR("not satisfied within (0, 1), layoutScale: %{public}f", layoutScale);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    HILOG_INFO("SetUIExtCustomDensity layoutScale: %{public}f", layoutScale);
+
+    auto defaultDisplay = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    if (defaultDisplay == nullptr) {
+        HILOG_ERROR("SetUIExtCustomDensity get defaultDisplay failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    auto displayInfo = defaultDisplay->GetDisplayInfo();
+    if (displayInfo == nullptr) {
+        HILOG_ERROR("SetUIExtCustomDensity get displayInfo failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    float density = displayInfo->GetDensityInCurResolution();
+    density = density * layoutScale;
+    Rosen::WMError ret = uiWindow->SetUIExtCustomDensity(density);
+    if (ret != Rosen::WMError::WM_OK) {
+        HILOG_ERROR("SetUIExtCustomDensity failed, ret=%{public}d", ret);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+#endif // SUPPORT_SCREEN
+    HILOG_DEBUG("SetUIExtCustomDensity end");
+    return ERR_OK;
 }
 
 ErrCode LiveFormExtensionContext::StartAbilityByFms(const AAFwk::Want &want, const std::string &formId)
