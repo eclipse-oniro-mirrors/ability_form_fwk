@@ -4927,11 +4927,7 @@ bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleI
     bool isCanOpen = false;
     ErrCode result = remoteFormProviderDelegateProxy->PublishFormCrossBundleControl(bundleInfo, isCanOpen);
     HILOG_INFO("result:%{public}d, isCanOpen:%{public}d", result, isCanOpen);
-    if (result == ERR_OK) {
-        return isCanOpen;
-    } else {
-        return false;
-    }
+    return (result == ERR_OK) ? isCanOpen : false;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
