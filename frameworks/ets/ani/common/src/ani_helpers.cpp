@@ -257,7 +257,7 @@ bool AniParseInt32(ani_env *env, const ani_ref &aniInt, int32_t &out)
     return true;
 }
 
-bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int32_t>& out)
+bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t> &out)
 {
     ani_size size;
     ani_status status = env->Array_GetLength(array, &size);
@@ -268,9 +268,8 @@ bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int3
 
     for (ani_size i = 0; i < size; ++i) {
         ani_ref elementRef;
-        status = env->Array_Get_Ref(array, i, &elementRef);
-        if (status != ANI_OK) {
-            HILOG_ERROR("Array_Get_Ref failed at index %{public}zu!", i);
+        if (env->Array_Get(array, i, &elementRef) != ANI_OK) {
+            HILOG_ERROR("Array_Get failed at index %{public}zu!", i);
             return false;
         }
         int32_t value;
@@ -346,38 +345,27 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
     return true;
 }
 
-ani_array_ref CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t> &vec)
+ani_array CreateAniArrayIntFromStdVector(ani_env *env, std::vector<int32_t> vec)
 {
-    ani_array_ref array = nullptr;
+    ani_array array = nullptr;
     ani_ref undefined_ref;
-    ani_status status = env->GetUndefined(&undefined_ref);
-    if (status != ANI_OK) {
+    if (env->GetUndefined(&undefined_ref) != ANI_OK) {
         HILOG_ERROR("GetUndefined failed");
-        return array;
     }
 
-    if (vec.empty()) {
-        return array;
-    }
-
-    ani_class intCls = nullptr;
-    if (env->FindClass("std.core.Int", &intCls) != ANI_OK) {
-        HILOG_ERROR("Cannot find int class");
-        return array;
-    }
-
-    env->Array_New_Ref(intCls, vec.size(), undefined_ref, &array);
-    ani_size index = 0;
-    for (auto value : vec) {
-        ani_object valueAni = createInt(env, value);
-        ani_status status = env->Array_Set_Ref(array, index, valueAni);
-        if (status != ANI_OK) {
-            HILOG_ERROR("Array_Set_Ref failed, status code: %{public}d", status);
-            break;
+    if (!vec.empty()) {
+        env->Array_New(vec.size(), undefined_ref, &array);
+        ani_size index = 0;
+        for (auto value : vec) {
+            ani_object valueAni = createInt(env, value);
+            ani_status status = env->Array_Set(array, index, valueAni);
+            if (status != ANI_OK) {
+                HILOG_ERROR("Array_Set failed, status code: %{public}d", status);
+                break;
+            }
+            index++;
         }
-        index++;
     }
-
     return array;
 }
 
@@ -569,7 +557,6 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
 
     return true;
 }
-
 
 ani_class GetANIClass(ani_env *env, const char *className)
 {

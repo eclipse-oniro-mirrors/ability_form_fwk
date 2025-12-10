@@ -1431,7 +1431,7 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
         HILOG_ERROR("Cannot get bundle name from filter");
     }
 
-    ani_array_ref supportDimensionAni;
+    ani_array supportDimensionAni;
     if (env->Object_GetPropertyByName_Ref(filterObj, "supportedDimensions",
         reinterpret_cast<ani_ref*>(&supportDimensionAni))) {
         HILOG_ERROR("Cannot get support Dimension Ani");
@@ -1452,9 +1452,8 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
         }
     }
 
-    ani_array_ref supportedShapes;
-    if (env->Object_GetPropertyByName_Ref(filterObj, "supportedShapes",
-        reinterpret_cast<ani_ref*>(&supportedShapes))) {
+    ani_array supportedShapes;
+    if (env->Object_GetPropertyByName_Ref(filterObj, "supportedShapes", reinterpret_cast<ani_ref*>(&supportedShapes))) {
         HILOG_ERROR("Cannot get support Dimension Ani");
     }
 
