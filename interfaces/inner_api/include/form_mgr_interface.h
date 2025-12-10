@@ -428,6 +428,16 @@ public:
     }
 
     /**
+     * @brief Start a ui ability by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode StartUIAbilityByFms(const Want &want)
+    {
+        return 0;
+    }
+
+    /**
      * @brief Start an ability by cross bundle.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
@@ -762,7 +772,7 @@ public:
     {
         return false;
     }
-    
+
     /**
      * @brief Check form bundle signature is debug.
      * @param bundleName The bundle name of form to be check.
@@ -910,7 +920,7 @@ public:
     {
         return ERR_OK;
     }
- 
+
     /**
      * @brief Get the form rect.
      * @param formId The formId.
@@ -943,7 +953,7 @@ public:
     {
         return ERR_OK;
     }
- 
+
     /**
      * @brief Unregister get live form status proxy in fms.
      * @return Returns ERR_OK for setting success.
@@ -1106,6 +1116,7 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_EXEMPT,
         FORM_MGR_NOTIFY_FORM_LOCKED,
         FORM_MGR_START_ABILITY_BY_FMS,
+        FORM_MGR_START_UI_ABILITY_BY_FMS,
         FORM_MGR_START_ABILITY_BY_CROSS_BUNDLE,
         FORM_MGR_GET_PUBLISHED_FORM_INFOS,
         FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,

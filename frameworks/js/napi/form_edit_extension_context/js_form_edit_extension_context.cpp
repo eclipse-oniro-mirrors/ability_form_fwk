@@ -15,21 +15,27 @@
 
 #include "js_form_edit_extension_context.h"
 #include "hilog_tag_wrapper.h"
-#include "js_ui_extension_context.h"
+#include "hitrace_meter.h"
+#include "js_extension_context.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
 #include "napi_common_util.h"
 #include "napi_common_want.h"
 #include "form_constants.h"
+#include "form_errors.h"
 #include "element_name.h"
 #include "js_error_utils.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
+constexpr size_t ARGC_ONE = 1;
 constexpr size_t ARGC_TWO = 2;
+constexpr int32_t INDEX_ZERO = 0;
 constexpr const char *ERR_MSG_PARAMS_ERROR = "Params error";
 constexpr const char *ERR_MSG_INTERNAL_ERROR = "Internal error";
+constexpr const char *ERR_MSG_CONTEXT_RELEASED = "context has released";
+constexpr const char *ERR_MSG_PARSE_WANT_FAILED = "Parse param want failed, want must be Want";
 constexpr int32_t INDEX_ONE = 1;
 } // namespace
 using namespace OHOS::AppExecFwk;
@@ -49,7 +55,7 @@ napi_value JsFormEditExtensionContext::CreateJsFormEditExtensionContext(
         abilityInfo = context->GetAbilityInfo();
     }
 
-    napi_value objValue = JsUIExtensionContext::CreateJsUIExtensionContext(env, context);
+    napi_value objValue = CreateJsExtensionContext(env, context, abilityInfo);
     std::unique_ptr<JsFormEditExtensionContext> jsContext = std::make_unique<JsFormEditExtensionContext>(context);
     napi_status status = napi_wrap(env, objValue, jsContext.release(), Finalizer, nullptr, nullptr);
     if (status != napi_ok) {
@@ -58,6 +64,7 @@ napi_value JsFormEditExtensionContext::CreateJsFormEditExtensionContext(
 
     const char *moduleName = "JsFormEditExtensionContext";
     BindNativeFunction(env, objValue, "startSecondPage", moduleName, StartSecondPage);
+    BindNativeFunction(env, objValue, "startUIAbility", moduleName, StartUIAbility);
 
     return objValue;
 }
@@ -66,6 +73,12 @@ napi_value JsFormEditExtensionContext::StartSecondPage(napi_env env, napi_callba
 {
     TAG_LOGI(AAFwkTag::UI_EXT, "called");
     GET_NAPI_INFO_AND_CALL(env, info, JsFormEditExtensionContext, OnStartSecondPage);
+}
+
+napi_value JsFormEditExtensionContext::StartUIAbility(napi_env env, napi_callback_info info)
+{
+    TAG_LOGI(AAFwkTag::UI_EXT, "StartUIAbility called");
+    GET_NAPI_INFO_AND_CALL(env, info, JsFormEditExtensionContext, OnStartUIAbility);
 }
 
 napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallbackInfo &info)
@@ -110,6 +123,58 @@ napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallb
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleHighQos("JsFormEditExtensionContext OnStartSecondPage", env,
         CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormEditExtensionContext::OnStartUIAbility(napi_env env, NapiCallbackInfo &info)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    TAG_LOGD(AAFwkTag::UI_EXT, "called");
+    if (info.argc < ARGC_ONE) {
+        TAG_LOGE(AAFwkTag::UI_EXT, "invalid argc");
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
+        return CreateJsUndefined(env);
+    }
+
+    AAFwk::Want want;
+    if (!AppExecFwk::UnwrapWant(env, info.argv[INDEX_ZERO], want)) {
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARSE_WANT_FAILED);
+        return CreateJsUndefined(env);
+    }
+
+    auto context = context_.lock();
+    if (context == nullptr) {
+        TAG_LOGE(AAFwkTag::UI_EXT, "Context is released");
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_CONTEXT_RELEASED);
+        return CreateJsUndefined(env);
+    }
+
+    NapiAsyncTask::CompleteCallback complete =
+        [weak = context_, want](napi_env env, NapiAsyncTask &task, int32_t status) {
+            auto context = weak.lock();
+            TAG_LOGD(AAFwkTag::UI_EXT, "OnStartUIAbility begin");
+            if (!context) {
+                TAG_LOGE(AAFwkTag::UI_EXT, "Context is released");
+                task.Reject(env,
+                    CreateJsError(env,
+                        static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR),
+                        ERR_MSG_CONTEXT_RELEASED));
+                return;
+            }
+            auto innerErrCode = context->StartUIAbilityByFms(want);
+            if (innerErrCode == ERR_OK) {
+                task.Resolve(env, CreateJsUndefined(env));
+                return;
+            }
+            auto externalErrCode = FormErrors::GetInstance().QueryExternalErrorCode(innerErrCode);
+            auto errorMsg = FormErrors::GetInstance().QueryExternalErrorMessage(innerErrCode, externalErrCode);
+            task.Reject(env, CreateJsError(env, externalErrCode, errorMsg));
+        };
+
+    napi_value lastParam = (info.argc > ARGC_ONE) ? info.argv[INDEX_ONE] : nullptr;
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleHighQos("JsFormEditExtensionContext OnStartUIAbility",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 } // namespace AbilityRuntime

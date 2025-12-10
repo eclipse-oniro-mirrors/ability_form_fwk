@@ -97,6 +97,8 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
     std::array functions = {
         ani_native_function { "nativeStartSecondPage", nullptr,
             reinterpret_cast<void *>(EtsFormEditExtensionContext::StartSecondPage) },
+        ani_native_function { "nativeStartUIAbility", nullptr,
+            reinterpret_cast<void *>(EtsFormEditExtensionContext::StartUIAbility) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
@@ -222,6 +224,63 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
         return;
     }
     ErrCode errCode = contextPtr->StartAbilityByFms(want);
+    int resultCode = 0;
+    ani_object abilityResult = AppExecFwk::WrapAbilityResult(env, resultCode, want);
+    if (abilityResult == nullptr) {
+        HILOG_ERROR("Wrap abilityResult failed");
+        AsyncCallback(env, callback,
+            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
+            nullptr);
+        return;
+    }
+    AsyncCallback(env, callback, EtsFormErrorUtil::CreateError(env, errCode),
+        abilityResult);
+    return;
+}
+
+void EtsFormEditExtensionContext::StartUIAbility(ani_env *env, ani_object aniObj,
+    ani_object aniWant, ani_object callback)
+{
+    HILOG_INFO("called");
+    if (env == nullptr) {
+        HILOG_ERROR("null env");
+        return;
+    }
+
+    auto etsContext = GetEtsFormEditExtensionContext(env, aniObj);
+    if (etsContext == nullptr) {
+        HILOG_ERROR("null etsContext");
+        return;
+    }
+    etsContext->OnStartUIAbility(env, aniWant, callback);
+}
+
+void EtsFormEditExtensionContext::OnStartUIAbility(ani_env *env, ani_object aniWant, ani_object callback)
+{
+    HILOG_INFO("called");
+    if (env == nullptr) {
+        HILOG_ERROR("null env");
+        return;
+    }
+
+    if (context_.lock() == nullptr) {
+        HILOG_ERROR("Context is released");
+        EtsErrorUtil::ThrowError(env,
+            static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
+        return ;
+    }
+    AAFwk::Want want;
+    AppExecFwk::UnwrapWant(env, aniWant, want);
+
+    auto contextPtr = context_.lock();
+    if (!contextPtr) {
+        HILOG_ERROR("Context is released");
+        AsyncCallback(env, callback,
+            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
+            nullptr);
+        return;
+    }
+    ErrCode errCode = contextPtr->StartUIAbilityByFms(want);
     int resultCode = 0;
     ani_object abilityResult = AppExecFwk::WrapAbilityResult(env, resultCode, want);
     if (abilityResult == nullptr) {

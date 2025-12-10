@@ -235,6 +235,9 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     {
         ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED, { ERR_FORM_EXTERNAL_IPC_ERROR, "" }
     },
+    {
+        ERR_APPEXECFWK_FORM_NOT_UI_ABILITY, { ERR_FORM_EXTERNAL_PARAM_INVALID, "Target ability is not UI ability." }
+    }
 };
 
 static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG = {

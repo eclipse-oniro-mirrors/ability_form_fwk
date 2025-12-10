@@ -494,6 +494,13 @@ public:
     int32_t StartAbilityByFms(const Want &want);
 
     /**
+     * @brief Start a UI ability by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartUIAbilityByFms(const Want &want);
+
+    /**
      * @brief Start an ability by cross bundle.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.

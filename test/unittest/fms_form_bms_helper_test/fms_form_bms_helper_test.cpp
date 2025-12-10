@@ -381,7 +381,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_011, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_011 start";
     FormBmsHelper formBmsHelper;
-    
+
     std::string action = "";
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
@@ -613,7 +613,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_023 start";
     FormBmsHelper formBmsHelper;
-    
+
     Want want;
     std::string deviceId;
     std::string bundleName = "ohos.samples.FormApplication";
@@ -631,16 +631,15 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_023, TestSize.Level1)
 
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
-    ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_023 end";
 }
@@ -798,7 +797,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_031, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_031 start";
     FormBmsHelper formBmsHelper;
-    
+
     std::string action = "";
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
@@ -1030,7 +1029,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_043, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_043 start";
     FormBmsHelper formBmsHelper;
-    
+
     Want want;
     std::string deviceId;
     std::string bundleName = "ohos.samples.FormApplication";
@@ -1048,16 +1047,15 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_043, TestSize.Level1)
 
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
-    ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_043 end";
 }
@@ -1329,7 +1327,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0011, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0011 start";
     FormBmsHelper formBmsHelper;
-    
+
     std::string action = "";
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
@@ -1561,7 +1559,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0023 start";
     FormBmsHelper formBmsHelper;
-    
+
     Want want;
     std::string deviceId;
     std::string bundleName = "ohos.samples.FormApplication";
@@ -1579,16 +1577,15 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
 
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
-    ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0023 end";
 }
@@ -1896,7 +1893,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_111, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_111 start";
     FormBmsHelper formBmsHelper;
-    
+
     std::string action = "";
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
@@ -2128,7 +2125,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_123, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_123 start";
     FormBmsHelper formBmsHelper;
-    
+
     Want want;
     std::string deviceId;
     std::string bundleName = "ohos.samples.FormApplication";
@@ -2146,16 +2143,15 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_123, TestSize.Level1)
 
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
-    ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
+    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_123 end";
 }

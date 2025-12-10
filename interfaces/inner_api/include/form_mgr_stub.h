@@ -371,6 +371,14 @@ private:
     int32_t HandleStartAbilityByFms(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle StartUIAbilityByFms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleStartUIAbilityByFms(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle StartAbilityByCrossBundle message.
      * @param data input param.
      * @param reply output param.
@@ -733,7 +741,7 @@ private:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode HandleRegisterOverflowProxy(MessageParcel &data, MessageParcel &reply);
-    
+
     /**
      * @brief Handle unregister overflow proxy in fms
      * @param data Input param
@@ -788,7 +796,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleUnregisterGetFormRectProxy(MessageParcel &data, MessageParcel &reply);
- 
+
     /**
      * @brief Handle get form rect.
      * @param data input param.
@@ -812,7 +820,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply);
- 
+
     /**
      * @brief Handle unregister getLiveFormStatus proxy in fms
      * @param data input param.

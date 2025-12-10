@@ -37,6 +37,7 @@
 #include "data_center/database/form_db_cache.h"
 #include "common/event/form_event_handler.h"
 #include "data_center/form_info/form_info_mgr.h"
+#include "form_mgr/form_ams_adapter.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_instance.h"
 #include "common/util/form_serial_queue.h"
@@ -1396,6 +1397,14 @@ int32_t FormMgrService::StartAbilityByFms(const Want &want)
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
+ErrCode FormMgrService::StartUIAbilityByFms(const Want &want)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    return FormAmsAdapter::GetInstance().StartUIAbilityByFms(callingUid, want);
 }
 
 int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)

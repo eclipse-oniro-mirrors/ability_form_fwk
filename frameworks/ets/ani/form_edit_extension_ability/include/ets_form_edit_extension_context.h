@@ -34,11 +34,13 @@ public:
     static bool BindNativePtrCleaner(ani_env *env);
     static void Clean(ani_env *env, ani_object object);
     static void StartSecondPage(ani_env *env, ani_object aniObj, ani_object aniWant, ani_object callback);
+    static void StartUIAbility(ani_env *env, ani_object aniObj, ani_object aniWant, ani_object callback);
 
 private:
     static EtsFormEditExtensionContext* GetEtsFormEditExtensionContext(ani_env *env, ani_object obj);
     bool AsyncCallback(ani_env *env, ani_object call, ani_object error, ani_object result);
     void OnStartSecondPage(ani_env *env, ani_object aniWant, ani_object callback);
+    void OnStartUIAbility(ani_env *env, ani_object aniWant, ani_object callback);
 
     std::weak_ptr<FormEditExtensionContext> context_;
 };
