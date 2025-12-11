@@ -779,7 +779,7 @@ std::vector<ani_native_function> GetBindMethods()
             "C{std.core.String}iC{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(SetFormNextRefreshTime)},
         ani_native_function{"updateFormInner",
-            "C{std.core.String}C{std.core.String}C{@ohos.app.form.formProvider.AsyncCallbackWrapper}C{escompat.Array}:",
+            "C{std.core.String}C{std.core.String}C{@ohos.app.form.formProvider.AsyncCallbackWrapper}C{std.core.Array}:",
             reinterpret_cast<void *>(UpdateForm)},
         ani_native_function{"getFormsInfoInner",
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}C{@ohos.app.form.formInfo.formInfo.FormInfoFilter}:",
@@ -792,7 +792,7 @@ std::vector<ani_native_function> GetBindMethods()
             "openFormManagerInner", "C{@ohos.app.ability.Want.Want}:", reinterpret_cast<void *>(OpenFormManager)},
         ani_native_function{"requestPublishFormInner",
             "C{@ohos.app.ability.Want.Want}"
-            "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}zC{std.core.String}C{escompat.Array}:",
+            "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}zC{std.core.String}C{std.core.Array}:",
             reinterpret_cast<void *>(RequestPublishForm)},
         ani_native_function{"isRequestPublishFormSupportedInner",
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",

@@ -291,9 +291,9 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
 
     ani_class recordCls = nullptr;
 
-    ani_status status = env->FindClass("escompat.Record", &recordCls);
+    ani_status status = env->FindClass("std.core.Record", &recordCls);
     if (status != ANI_OK) {
-        HILOG_ERROR("FindClass 'escompat.Record' failed, status: %{public}d", status);
+        HILOG_ERROR("FindClass 'std.core.Record' failed, status: %{public}d", status);
         return false;
     }
 
@@ -591,7 +591,7 @@ ani_ref GetMemberRef(ani_env *env, ani_object object, const char *class_name, co
 
 ani_object GetANIArray(ani_env *env, size_t array_size)
 {
-    ani_class arrayCls = GetANIClass(env, "escompat.Array");
+    ani_class arrayCls = GetANIClass(env, "std.core.Array");
     ani_method arrayCtor;
     ani_status status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
     if (status != ANI_OK) {
@@ -616,7 +616,7 @@ ani_object NewRecordClass(ani_env *env)
     ani_object recordObj = {};
     ani_class recordCls;
 
-    ani_status status = env->FindClass("escompat.Record", &recordCls);
+    ani_status status = env->FindClass("std.core.Record", &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass status = %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
@@ -645,7 +645,7 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
 {
     HILOG_DEBUG("Call");
     ani_class recordCls;
-    ani_status status = env->FindClass("escompat.Record", &recordCls);
+    ani_status status = env->FindClass("std.core.Record", &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass failed status: %{public}d", status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));

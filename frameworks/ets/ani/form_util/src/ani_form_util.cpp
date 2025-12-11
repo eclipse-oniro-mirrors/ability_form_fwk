@@ -28,7 +28,7 @@ constexpr const char* DELEGATOR_RECORD_KEY = "keys";
 constexpr const char* DELEGATOR_RECORD_NEXT = "next";
 constexpr const char* DELEGATOR_RECORD_DONE = "done";
 constexpr const char* DELEGATOR_RECORD_VALUE = "value";
-constexpr const char* DELEGATOR_RECORD_CLASS_NAME = "escompat.Record";
+constexpr const char* DELEGATOR_RECORD_CLASS_NAME = "std.core.Record";
 constexpr const char* DELEGATOR_RECORD_GET = "$_get";
 constexpr const char* DELEGATOR_RECORD_GET_NAME =
     "X{C{std.core.BaseEnum}C{std.core.Numeric}C{std.core.String}}:C{std.core.Object}";
