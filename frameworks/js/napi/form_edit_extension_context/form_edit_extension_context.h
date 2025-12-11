@@ -43,6 +43,8 @@ public:
 
     ErrCode StartAbilityByFms(const AAFwk::Want &want);
 
+    ErrCode StartUIAbilityByFms(const AAFwk::Want &want);
+
 private:
     std::shared_ptr<AAFwk::Want> want_;
 };

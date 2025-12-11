@@ -94,8 +94,7 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
     return g_mockGetAbilityInfoByActionRet;
 }
 
-bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo,
-    ExtensionAbilityInfo &extensionInfo)
+bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo)
 {
     if (g_mockGetAbilityInfoRet) {
         abilityInfo.name = "name";

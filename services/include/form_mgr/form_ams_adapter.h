@@ -13,20 +13,28 @@
  * limitations under the License.
  */
 
-let UIExtensionContext = requireNapi('application.UIExtensionContext');
+#ifndef OHOS_FORM_FWK_FORM_AMS_ADAPTER_H
+#define OHOS_FORM_FWK_FORM_AMS_ADAPTER_H
 
-export class FormEditExtensionContext extends UIExtensionContext {
-    constructor(obj) {
-      super(obj);
-    }
+#include <singleton.h>
+#include "want.h"
 
-    startSecondPage(want, asyncCallback) {
-      console.log('FormEditExtensionContext startSecondPage want: ' + want);
-      return this.__context_impl__.startSecondPage(want, asyncCallback);
-    }
+namespace OHOS {
+namespace AppExecFwk {
+using Want = OHOS::AAFwk::Want;
 
-    startUIAbility(want, callback) {
-      console.log(`FormEditExtensionContext startUIAbility want: ${want}`);
-      return this.__context_impl__.startUIAbility(want, callback);
-    }
-}
+/**
+ * @class FormAmsAdapter
+ * Form start ability request adapter.
+ */
+class FormAmsAdapter final : public DelayedRefSingleton<FormAmsAdapter> {
+DECLARE_DELAYED_REF_SINGLETON(FormAmsAdapter)
+public:
+    DISALLOW_COPY_AND_MOVE(FormAmsAdapter);
+
+    ErrCode StartUIAbilityByFms(const int32_t uid, const Want &want);
+};
+}  // namespace AppExecFwk
+}  // namespace OHOS
+
+#endif // OHOS_FORM_FWK_FORM_AMS_ADAPTER_H

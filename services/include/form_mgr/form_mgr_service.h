@@ -440,6 +440,13 @@ public:
     int32_t StartAbilityByFms(const Want &want) override;
 
     /**
+     * @brief Start a ui ability by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartUIAbilityByFms(const Want &want) override;
+
+    /**
      * @brief Start an ability by cross bundle.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
@@ -766,7 +773,7 @@ public:
         float formViewScale) override;
 
     void SubscribeNetConn();
-    
+
     /**
      * @brief Handle open form edit ability.
      * @param abilityName The form edit ability name.
@@ -840,7 +847,7 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode UnregisterGetFormRectProxy() override;
- 
+
     /**
      * @brief Get the form rect.
      * @param formId The formId.
@@ -857,14 +864,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect) override;
-    
+
     /**
      * @brief Register getLiveFormStatus proxy in fms.
      * @param callerToken The form host proxy.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken) override;
- 
+
     /**
      * @brief Unregister get live form status proxy in fms
      * @return Return ERR_OK on success, others on failure.

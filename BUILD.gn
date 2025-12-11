@@ -219,6 +219,7 @@ ohos_shared_library("libfms") {
     "services/src/form_host/form_host_queue.cpp",
     "services/src/form_host/form_host_record.cpp",
     "services/src/form_host/form_host_task_mgr.cpp",
+    "services/src/form_mgr/form_ams_adapter.cpp",
     "services/src/form_mgr/form_mgr_adapter.cpp",
     "services/src/form_mgr/form_mgr_queue.cpp",
     "services/src/form_mgr/form_mgr_service.cpp",

@@ -360,6 +360,8 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleRegisterPublishFormCrossBundleControl(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL):
             return HandleUnregisterPublishFormCrossBundleControl(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_UI_ABILITY_BY_FMS):
+            return HandleStartUIAbilityByFms(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1313,6 +1315,23 @@ int32_t FormMgrStub::HandleStartAbilityByFms(MessageParcel &data, MessageParcel 
     return result;
 }
 
+ErrCode FormMgrStub::HandleStartUIAbilityByFms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    // retrieve want
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = StartUIAbilityByFms(*want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
 int32_t FormMgrStub::HandleStartAbilityByCrossBundle(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
@@ -2094,7 +2113,7 @@ ErrCode FormMgrStub::HandleUnregisterGetFormRectProxy(MessageParcel &data, Messa
     }
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply)
 {
     int64_t formId = data.ReadInt64();
@@ -2143,7 +2162,7 @@ ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, M
     }
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrStub::HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");

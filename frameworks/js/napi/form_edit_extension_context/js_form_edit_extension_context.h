@@ -36,9 +36,11 @@ public:
                                                           std::shared_ptr<FormEditExtensionContext> context);
 
     static napi_value StartSecondPage(napi_env env, napi_callback_info info);
+    static napi_value StartUIAbility(napi_env env, napi_callback_info info);
 
 private:
     napi_value OnStartSecondPage(napi_env env, NapiCallbackInfo &info);
+    napi_value OnStartUIAbility(napi_env env, NapiCallbackInfo &info);
 
 private:
     std::weak_ptr<FormEditExtensionContext> context_;
