@@ -2016,13 +2016,11 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     }
 
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    bool abilityExisting = false;
     for (const auto &form : formInfos) {
         if (form.abilityName != abilityName) {
             continue;
         }
 
-        abilityExisting = true;
         if ((formName.empty() && form.defaultFlag) || form.name == formName) {
             formInfo = form;
             formInfo.moduleName = moduleName;
@@ -2033,7 +2031,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
 
     HILOG_ERROR("fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
         abilityName.c_str(), formName.c_str(), userId);
-    return abilityExisting ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
+    return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
 }
 
 ErrCode FormMgrAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo,
