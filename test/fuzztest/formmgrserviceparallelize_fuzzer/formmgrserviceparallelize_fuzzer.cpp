@@ -143,6 +143,9 @@ enum IpcCode : std::int16_t {
     RELOAD_ALL_FORMS = 3102,
     IS_FORM_DUE_CONTROL = 3103,
     SEND_NON_TRANSPARENT_RATIO = 3104,
+    GET_ALL_TEMPLATE_FORMS_INFO = 3105,
+    GET_TEMPLATE_FORMS_INFO_BY_APP = 3106,
+    GET_TEMPLATE_FORMS_INFO_BY_MODULE = 3107,
 };
 
 sptr<IRemoteObject> GetMockRemoteObject()
@@ -329,7 +332,10 @@ extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider)
         IpcCode::NOTIFY_UPDATE_FORM_SIZE, IpcCode::REGISTER_GET_LIVE_FORM_STATUS,
         IpcCode::UNREGISTER_GET_LIVE_FORM_STATUS, IpcCode::IS_FORM_BUNDLE_DEBUG_SIGNATURE,
         IpcCode::RELOAD_FORMS, IpcCode::RELOAD_ALL_FORMS,
-        IpcCode::IS_FORM_DUE_CONTROL, IpcCode::SEND_NON_TRANSPARENT_RATIO
+        IpcCode::IS_FORM_DUE_CONTROL, IpcCode::SEND_NON_TRANSPARENT_RATIO,
+        IpcCode::GET_ALL_TEMPLATE_FORMS_INFO,
+        IpcCode::GET_TEMPLATE_FORMS_INFO_BY_APP,
+        IpcCode::GET_TEMPLATE_FORMS_INFO_BY_MODULE,
     };
     int code = provider.PickValueInArray(ipcCodes);
 
@@ -993,6 +999,24 @@ extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider)
             int64_t formId = provider.ConsumeIntegral<int64_t>();
             int32_t ratio = provider.ConsumeIntegralInRange<int32_t>(0, 100);
             OHOS::p_formMgrService->SendNonTransparencyRatio(formId, ratio);
+            break;
+        }
+        case IpcCode::GET_ALL_TEMPLATE_FORMS_INFO: {
+            std::vector<FormInfo> infos;
+            OHOS::p_formMgrService->GetAllTemplateFormsInfo(infos);
+            break;
+        }
+        case IpcCode::GET_TEMPLATE_FORMS_INFO_BY_APP: {
+            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::vector<FormInfo> infos;
+            OHOS::p_formMgrService->GetTemplateFormsInfoByApp(bundleName, infos);
+            break;
+        }
+        case IpcCode::GET_TEMPLATE_FORMS_INFO_BY_MODULE: {
+            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string moduleName = provider.ConsumeRandomLengthString(64);
+            std::vector<FormInfo> infos;
+            OHOS::p_formMgrService->GetTemplateFormsInfoByModule(bundleName, moduleName, infos);
             break;
         }
         default: {
