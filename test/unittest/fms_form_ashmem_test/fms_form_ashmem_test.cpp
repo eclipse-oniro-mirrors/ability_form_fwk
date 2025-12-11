@@ -272,36 +272,5 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_013, TestSize.Level1)
     EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
     GTEST_LOG_(INFO) << "FmsFormAshmemTest_013 end";
 }
-
-/*
-* @tc.number: FmsFormAshmemTest_014
-* @tc.name: test form
-* @tc.desc: test form
-*/
-HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_014, TestSize.Level1)
-{
-    for (int i = 0; i < 42; ++i) {
-        EXPECT_EQ(form_ashmem_->TestFormId1(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId2(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId3(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId4(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId5(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId6(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId7(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId8(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId9(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId10(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId11(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId12(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId13(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId14(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId15(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId16(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId17(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId18(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId19(i), i);
-        EXPECT_EQ(form_ashmem_->TestFormId20(i), i);
-    }
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS

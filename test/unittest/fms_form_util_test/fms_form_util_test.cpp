@@ -212,43 +212,6 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
     auto result = FormUtil::StringSplit(str, Constants::TIME_DELIMETER);
 
     EXPECT_TRUE(result.size() == count);
-    for (int i = 0; i < 42; ++i) {
-        EXPECT_EQ(FormUtil::TestFormId1(i), i);
-        EXPECT_EQ(FormUtil::TestFormId2(i), i);
-        EXPECT_EQ(FormUtil::TestFormId3(i), i);
-        EXPECT_EQ(FormUtil::TestFormId4(i), i);
-        EXPECT_EQ(FormUtil::TestFormId5(i), i);
-        EXPECT_EQ(FormUtil::TestFormId6(i), i);
-        EXPECT_EQ(FormUtil::TestFormId7(i), i);
-        EXPECT_EQ(FormUtil::TestFormId8(i), i);
-        EXPECT_EQ(FormUtil::TestFormId9(i), i);
-        EXPECT_EQ(FormUtil::TestFormId10(i), i);
-        EXPECT_EQ(FormUtil::TestFormId11(i), i);
-        EXPECT_EQ(FormUtil::TestFormId12(i), i);
-        EXPECT_EQ(FormUtil::TestFormId13(i), i);
-        EXPECT_EQ(FormUtil::TestFormId14(i), i);
-        EXPECT_EQ(FormUtil::TestFormId15(i), i);
-        EXPECT_EQ(FormUtil::TestFormId16(i), i);
-        EXPECT_EQ(FormUtil::TestFormId17(i), i);
-        EXPECT_EQ(FormUtil::TestFormId18(i), i);
-        EXPECT_EQ(FormUtil::TestFormId19(i), i);
-        EXPECT_EQ(FormUtil::TestFormId20(i), i);
-        EXPECT_EQ(FormUtil::TestFormId21(i), i);
-        EXPECT_EQ(FormUtil::TestFormId22(i), i);
-        EXPECT_EQ(FormUtil::TestFormId23(i), i);
-        EXPECT_EQ(FormUtil::TestFormId24(i), i);
-        EXPECT_EQ(FormUtil::TestFormId25(i), i);
-        EXPECT_EQ(FormUtil::TestFormId26(i), i);
-        EXPECT_EQ(FormUtil::TestFormId27(i), i);
-        EXPECT_EQ(FormUtil::TestFormId28(i), i);
-        EXPECT_EQ(FormUtil::TestFormId29(i), i);
-        EXPECT_EQ(FormUtil::TestFormId30(i), i);
-        EXPECT_EQ(FormUtil::TestFormId31(i), i);
-        EXPECT_EQ(FormUtil::TestFormId32(i), i);
-        EXPECT_EQ(FormUtil::TestFormId33(i), i);
-        EXPECT_EQ(FormUtil::TestFormId34(i), i);
-        EXPECT_EQ(FormUtil::TestFormId35(i), i);
-    }
 }
 
 /**
