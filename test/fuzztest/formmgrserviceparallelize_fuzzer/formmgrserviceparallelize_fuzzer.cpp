@@ -1003,7 +1003,7 @@ extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider)
         }
         case IpcCode::GET_ALL_TEMPLATE_FORMS_INFO: {
             std::vector<FormInfo> infos;
-            OOHOS::p_formMgrService->GetAllTemplateFormsInfo(infos);
+            OHOS::p_formMgrService->GetAllTemplateFormsInfo(infos);
             break;
         }
         case IpcCode::GET_TEMPLATE_FORMS_INFO_BY_APP: {
