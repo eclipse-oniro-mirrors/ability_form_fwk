@@ -22,18 +22,6 @@ namespace OHOS {
 namespace AppExecFwk {
 constexpr int BASE_REQUEST_CODE_NUM = 10;
 using Want = OHOS::AAFwk::Want;
-
-enum class TestFormNum {
-    Num1 = 1, Num2, Num3, Num4, Num5,
-    Num6, Num7, Num8, Num9, Num10,
-    Num11, Num12, Num13, Num14, Num15,
-    Num16, Num17, Num18, Num19, Num20,
-    Num21, Num22, Num23, Num24, Num25,
-    Num26, Num27, Num28, Num29, Num30,
-    Num31, Num32, Num33, Num34, Num35,
-    Num36, Num37, Num38, Num39, Num40,
-};
-
 /**
  * @class FormUtil
  * form utils.
@@ -103,42 +91,6 @@ public:
      * @return string list.
      */
     static std::vector<std::string> StringSplit(const std::string &in, const std::string &delim);
-    static int TestFormId1(int &formId);
-    static int TestFormId2(int &formId);
-    static int TestFormId3(int &formId);
-    static int TestFormId4(int &formId);
-    static int TestFormId5(int &formId);
-    static int TestFormId6(int &formId);
-    static int TestFormId7(int &formId);
-    static int TestFormId8(int &formId);
-    static int TestFormId9(int &formId);
-    static int TestFormId10(int &formId);
-    static int TestFormId11(int &formId);
-    static int TestFormId12(int &formId);
-    static int TestFormId13(int &formId);
-    static int TestFormId14(int &formId);
-    static int TestFormId15(int &formId);
-    static int TestFormId16(int &formId);
-    static int TestFormId17(int &formId);
-    static int TestFormId18(int &formId);
-    static int TestFormId19(int &formId);
-    static int TestFormId20(int &formId);
-    static int TestFormId21(int &formId);
-    static int TestFormId22(int &formId);
-    static int TestFormId23(int &formId);
-    static int TestFormId24(int &formId);
-    static int TestFormId25(int &formId);
-    static int TestFormId26(int &formId);
-    static int TestFormId27(int &formId);
-    static int TestFormId28(int &formId);
-    static int TestFormId29(int &formId);
-    static int TestFormId30(int &formId);
-    static int TestFormId31(int &formId);
-    static int TestFormId32(int &formId);
-    static int TestFormId33(int &formId);
-    static int TestFormId34(int &formId);
-    static int TestFormId35(int &formId);
-
     /**
      * @brief get current active account id.
      * @return int current active account id.
