@@ -1574,7 +1574,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByModule_000
     MockCheckAcrossLocalAccountsPermission(true);
     // get no template form info cause add normal form
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
-    ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(0, formInfos.size());
 

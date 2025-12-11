@@ -1002,10 +1002,8 @@ extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::GET_ALL_TEMPLATE_FORMS_INFO: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
-            std::string moduleName = provider.ConsumeRandomLengthString(64);
             std::vector<FormInfo> infos;
-            OHOS::p_formMgrService->GetTemplateFormsInfoByModule(bundleName, moduleName, infos);
+            OOHOS::p_formMgrService->GetAllTemplateFormsInfo(infos);
             break;
         }
         case IpcCode::GET_TEMPLATE_FORMS_INFO_BY_APP: {
@@ -1016,8 +1014,9 @@ extern "C" int FuzzIFormMgrService(FuzzedDataProvider &provider)
         }
         case IpcCode::GET_TEMPLATE_FORMS_INFO_BY_MODULE: {
             std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string moduleName = provider.ConsumeRandomLengthString(64);
             std::vector<FormInfo> infos;
-            OHOS::p_formMgrService->GetTemplateFormsInfoByApp(bundleName, infos);
+            OHOS::p_formMgrService->GetTemplateFormsInfoByModule(bundleName, moduleName, infos);
             break;
         }
         default: {
