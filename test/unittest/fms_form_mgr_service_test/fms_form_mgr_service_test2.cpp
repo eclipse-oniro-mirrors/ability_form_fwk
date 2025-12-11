@@ -61,8 +61,37 @@ extern void MockSetThemeManagerAddFormResult(int mockRet);
 
 namespace {
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
-
 const int32_t APP_600 = 600;
+using BundleInfoMap = std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>>;
+const std::string BUNDLE_NAME = "bundleName";
+const std::string MODULE_NAME = "moduleName";
+const std::string ABILITY_NAME = "abilityName";
+const std::string FORM_NAME = "formName";
+
+const BundleInfoMap CreateBundleFormInfoMapWithTemplateForm(bool isTemplateForm = false)
+{
+    std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(BUNDLE_NAME);
+    FormInfo formInfo;
+    formInfo.bundleName = BUNDLE_NAME;
+    formInfo.abilityName = ABILITY_NAME;
+    formInfo.moduleName = MODULE_NAME;
+    formInfo.name = FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2, 5, 7};
+    formInfo.defaultDimension = 1;
+    formInfo.supportShapes = {1};
+    formInfo.isTemplateForm = isTemplateForm;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = 0;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    bundleFormInfoMap.emplace(BUNDLE_NAME, bundleFormInfo);
+    return bundleFormInfoMap;
+}
 
 class MockBundleMgrProxy : public IRemoteProxy<IBundleMgr> {
 public:
@@ -1454,5 +1483,106 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_SendNonTransparencyRatio_0001, T
     ret = formMgrService.SendNonTransparencyRatio(formId, ratio);
     EXPECT_NE(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_SendNonTransparencyRatio_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetAllTemplateFormsInfo_0001
+ * @tc.desc: Verify GetAllTemplateFormsInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetAllTemplateFormsInfo_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetAllTemplateFormsInfo_0001 start";
+    FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
+
+    MockIsSACall(false);
+    MockCheckAcrossLocalAccountsPermission(false);
+    // get empty template form info
+    auto ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
+    EXPECT_NE(ret, ERR_OK);
+    EXPECT_EQ(0, formInfos.size());
+
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    // get no template form info cause add normal form
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
+    ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(0, formInfos.size());
+
+    // get one template form info
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm(true);
+    ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(1, formInfos.size());
+    GTEST_LOG_(INFO) << "FormMgrService_GetAllTemplateFormsInfo_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetTemplateFormsInfoByApp_0001
+ * @tc.desc: Verify GetTemplateFormsInfoByApp
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByApp_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByApp_0001 start";
+    FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
+
+    MockIsSACall(false);
+    MockCheckAcrossLocalAccountsPermission(false);
+    // get empty template form info
+    auto ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    EXPECT_NE(ret, ERR_OK);
+    EXPECT_EQ(0, formInfos.size());
+
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    // get no template form info cause add normal form
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
+    ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(0, formInfos.size());
+
+    // get one template form info
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm(true);
+    ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(1, formInfos.size());
+    GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByApp_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetTemplateFormsInfoByModule_0001
+ * @tc.desc: Verify GetTemplateFormsInfoByModule
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByModule_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByModule_0001 start";
+    FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockCheckAcrossLocalAccountsPermission(false);
+    // get empty template form info
+    auto ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
+    EXPECT_NE(ret, ERR_OK);
+    EXPECT_EQ(0, formInfos.size());
+
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    // get no template form info cause add normal form
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
+    ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(0, formInfos.size());
+
+    // get one template form info
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm(true);
+    ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(1, formInfos.size());
+    GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByModule_0001 end";
 }
 }
