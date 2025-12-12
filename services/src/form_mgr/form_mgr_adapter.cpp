@@ -4929,7 +4929,8 @@ bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleI
     return (result == ERR_OK) ? isCanOpen : false;
 }
 
-bool FormMgrAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record) {
+bool FormMgrAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record)
+{
     if (record.isDataProxy) {
         return false;
     }
