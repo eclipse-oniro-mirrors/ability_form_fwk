@@ -61,8 +61,12 @@ void FormStatusTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, co
 
     for (const int64_t formId : formIds) {
         if (!FormDataMgr::GetInstance().IsExpectRecycled(formId)) {
-            HILOG_WARN("form not need recycle, formId: %{public}" PRId64, formId);
-            continue;
+            FormRecord formRecord;
+            FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+            if (formRecord.lowMemoryRecycleStatus != LowMemoryRecycleStatus::RECYCLABLE) {
+                HILOG_WARN("form not need recycle, formId: %{public}" PRId64, formId);
+                continue;
+            }
         }
         auto recycleForm = [formId, remoteObjectOfHost, remoteObjectOfRender]() {
             FormStatusTaskMgr::GetInstance().RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
@@ -162,7 +166,7 @@ int32_t FormStatusTaskMgr::OnRenderFormDone(const int64_t formId, const Want &wa
 {
     return HandleFrsEventReply(formId, want, FormFsmEvent::RENDER_FORM_FAIL);
 }
- 
+
 /**
  * @brief Accept form recover done from form render service.
  * @param formId The Id of the form.
@@ -173,7 +177,7 @@ int32_t FormStatusTaskMgr::OnRecoverFormDone(const int64_t formId, const Want &w
 {
     return HandleFrsEventReply(formId, want, FormFsmEvent::RECOVER_FORM_FAIL);
 }
- 
+
 /**
  * @brief Accept status data of recycled form from render service
  * @param formId The Id of the form.
@@ -191,7 +195,7 @@ int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &w
         HILOG_ERROR("update status data of %{public}" PRId64 " failed", formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
- 
+
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
     std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
     int32_t event =
@@ -206,7 +210,7 @@ int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &w
     }
     if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
- 
+
         auto reCycleForm = [formId, newWant = want]() {
             sptr<IRemoteObject> remoteObjectOfHost = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
             if (remoteObjectOfHost == nullptr) {
@@ -225,7 +229,7 @@ int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &w
     }
     return ERR_OK;
 }
- 
+
 /**
  * @brief Accept form recycle done from form render service.
  * @param formId The Id of the form.
@@ -236,7 +240,7 @@ int32_t FormStatusTaskMgr::OnRecycleFormDone(const int64_t formId, const Want &w
 {
     return HandleFrsEventReply(formId, want, FormFsmEvent::RECYCLE_FORM_FAIL);
 }
- 
+
 /**
  * @brief Accept form delete done from form render service.
  * @param formId The Id of the form.
@@ -259,7 +263,7 @@ int32_t FormStatusTaskMgr::HandleFrsEventReply(const int64_t formId, const Want 
         eventId.c_str(),
         curTid.c_str(),
         event);
- 
+
     if (event != static_cast<int32_t>(failEvent)) {
         FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
     }
