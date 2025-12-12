@@ -126,13 +126,18 @@ public:
     bool CheckMultiAppFormVersionCode(const FormRecord &formRecord);
 
     bool GetFRSDiedInLowMemoryByUid(int32_t userId);
-    
+
+    bool GetFormRenderMgrInner(int32_t userId, std::shared_ptr<FormRenderMgrInner> &renderInner);
+
+    bool GetFormSandboxMgrInner(int32_t userId,
+        std::shared_ptr<FormSandboxRenderMgrInner> &sandboxInner);
+
 private:
     void InitRenderInner(bool isSandbox, int32_t userId);
 
 private:
     mutable std::mutex isVerifiedMutex_;
-    std::mutex renderInnerMutex_;
+    std::shared_mutex renderInnerMutex_;
     std::mutex taskQueueMutex_;
     std::unordered_map<int32_t, std::queue<std::function<void()>>> taskQueueMap_;
     std::mutex forbiddenTaskMapMutex_;
