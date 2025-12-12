@@ -4928,5 +4928,21 @@ bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleI
     HILOG_INFO("result:%{public}d, isCanOpen:%{public}d", result, isCanOpen);
     return (result == ERR_OK) ? isCanOpen : false;
 }
+
+bool FormMgrAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record) {
+    if (record.isDataProxy) {
+        return false;
+    }
+    FormInfo formInfo;
+    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get formInfo failed");
+        return true;
+    }
+    if (record.isSystemApp && !FormInfoMgr::GetInstance().IsDeleteCacheInUpgradeScene(formInfo)) {
+        return false;
+    }
+    return true;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

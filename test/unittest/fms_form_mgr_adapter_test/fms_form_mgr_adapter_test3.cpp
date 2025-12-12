@@ -36,10 +36,11 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
 #include "mock_form_provider_client.h"
+#include "mock_ipc_skeleton.h"
 #include "inner/mock_form_data_mgr.h"
+#include "inner/mock_form_info_mgr.h"
 #include "inner/mock_form_mgr_adapter.h"
 #include "inner/mock_want.h"
-#include "mock_ipc_skeleton.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1413,5 +1414,57 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0307, TestSize.Level0)
     formMajorInfo.bundleName = "test";
     EXPECT_FALSE(formMgrAdapter.CheckFormDueControl(formMajorInfo, true));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0307 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_IsDeleteCacheInUpgradeScene_0001
+ * @tc.desc: test IsDeleteCacheInUpgradeScene function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_IsDeleteCacheInUpgradeScene_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_IsDeleteCacheInUpgradeScene_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord record;
+    record.isDataProxy = true;
+    EXPECT_EQ(false, formMgrAdapter.IsDeleteCacheInUpgradeScene(record));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_IsDeleteCacheInUpgradeScene_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_IsDeleteCacheInUpgradeScene_0002
+ * @tc.desc: test IsDeleteCacheInUpgradeScene function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_IsDeleteCacheInUpgradeScene_0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_IsDeleteCacheInUpgradeScene_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord record;
+    record.isDataProxy = false;
+    MockGetFormsInfoByRecord(false);
+    EXPECT_EQ(true, formMgrAdapter.IsDeleteCacheInUpgradeScene(record));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_IsDeleteCacheInUpgradeScene_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_IsDeleteCacheInUpgradeScene_0003
+ * @tc.desc: test IsDeleteCacheInUpgradeScene function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_IsDeleteCacheInUpgradeScene_0003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_IsDeleteCacheInUpgradeScene_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord record;
+    record.isDataProxy = false;
+    MockGetFormsInfoByRecord(true);
+    record.isSystemApp = true;
+    MockIsDeleteCacheInUpgradeScene(false);
+    EXPECT_EQ(false, formMgrAdapter.IsDeleteCacheInUpgradeScene(record));
+
+    MockIsDeleteCacheInUpgradeScene(true);
+    EXPECT_EQ(true, formMgrAdapter.IsDeleteCacheInUpgradeScene(record));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_IsDeleteCacheInUpgradeScene_0003 end";
 }
 }

@@ -636,5 +636,17 @@ bool FormInfoMgr::IsMultiAppForm(const FormInfo &formInfo)
     }
     return isMultiAppForm;
 }
+
+bool FormInfoMgr::IsDeleteCacheInUpgradeScene(const FormInfo &formInfo)
+{
+    bool isDeleteCacheInUpgradeScene = true;
+    for (auto dataIter = formInfo.customizeDatas.begin(); dataIter != formInfo.customizeDatas.end(); ++dataIter) {
+        if (Constants::IS_DELETE_CACHE_IN_UPGRADE_SCENE == dataIter->name && "false" == dataIter->value) {
+            isDeleteCacheInUpgradeScene = false;
+            break;
+        }
+    }
+    return isDeleteCacheInUpgradeScene;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

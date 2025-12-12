@@ -1460,3 +1460,25 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0024, TestSize.Level1)
     EXPECT_TRUE(ret);
     GTEST_LOG_(INFO) << "FormInfoMgrTest0024 end";
 }
+
+/**
+ * @tc.name: FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001
+ * @tc.desc: test IsDeleteCacheInUpgradeScene function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001 start";
+    std::string bundleName = "com.form.provider.service";
+    FormInfo info = GetTestFormInfo();
+    bool ret = formInfoMgr_.IsDeleteCacheInUpgradeScene(info);
+    EXPECT_TRUE(ret);
+    FormCustomizeData data = {
+        .name = Constants::IS_DELETE_CACHE_IN_UPGRADE_SCENE,
+        .value = "false"
+    };
+    info.customizeDatas.push_back(data);
+    ret = formInfoMgr_.IsDeleteCacheInUpgradeScene(info);
+    EXPECT_FALSE(ret);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001 end";
+}

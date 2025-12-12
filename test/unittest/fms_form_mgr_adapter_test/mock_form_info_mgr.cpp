@@ -25,6 +25,8 @@ namespace {
     bool g_mockGetFormsInfoByModuleParam = false;
     bool g_mockCheckBundlePermission = true;
     bool g_mockIsCaller = true;
+    bool g_mockGetFormsInfoByRecordRet = true;
+    bool g_mockIsDeleteCacheInUpgradeSceneRet = true;
 }
 
 void MockGetFormsInfoByModule(bool mockRet)
@@ -45,6 +47,16 @@ void MockCheckBundlePermission(bool mockRet)
 void MockIsCaller(bool mockRet)
 {
     g_mockIsCaller = mockRet;
+}
+
+void MockGetFormsInfoByRecord(bool mockRet)
+{
+    g_mockGetFormsInfoByRecordRet = mockRet;
+}
+
+void MockIsDeleteCacheInUpgradeScene(bool mockRet)
+{
+    g_mockIsDeleteCacheInUpgradeSceneRet = mockRet;
 }
 
 namespace OHOS {
@@ -94,6 +106,19 @@ bool FormInfoMgr::CheckBundlePermission()
 {
     GTEST_LOG_(INFO) << "CheckBundlePermission called " << g_mockCheckBundlePermission;
     return g_mockCheckBundlePermission;
+}
+
+ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo)
+{
+    if (g_mockGetFormsInfoByRecordRet) {
+        return ERR_OK;
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+bool FormInfoMgr::IsDeleteCacheInUpgradeScene(const FormInfo &formInfo)
+{
+    return g_mockIsDeleteCacheInUpgradeSceneRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
