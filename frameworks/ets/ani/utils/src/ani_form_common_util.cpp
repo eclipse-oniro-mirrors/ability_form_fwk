@@ -291,7 +291,7 @@ bool GetPropertyBoolByName(ani_env *env, ani_object object, const char *name, bo
     }
     ani_boolean aniValue = ANI_FALSE;
     if ((status = env->Object_CallMethodByName_Boolean(
-        reinterpret_cast<ani_object>(field), "unboxed", nullptr, &aniValue)) != ANI_OK) {
+        reinterpret_cast<ani_object>(field), "toBoolean", nullptr, &aniValue)) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
         return false;
     }
