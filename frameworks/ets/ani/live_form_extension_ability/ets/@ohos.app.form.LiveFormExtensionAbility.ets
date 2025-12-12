@@ -24,7 +24,7 @@ import { RecordData } from '@ohos.base';
 interface LiveFormInfo {
   formId: string;
   rect: formInfo.Rect;
-  borderRadius: number;
+  borderRadius: double;
 }
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
@@ -42,40 +42,40 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
     console.log('onSessionCreate');
     if (!want.parameters) {
       console.error('null parameters');
-      this.onFormDestroy();
+      this.onDestroy();
       return;
     }
 
     let extraInfo = want.parameters?.get("extraInfo") as Record<string, RecordData>;
     if (!extraInfo) {
       console.error('null extraInfo');
-      this.onFormDestroy();
+      this.onDestroy();
       return;
     }
 
     let formInfo = extraInfo?.get("formInfo") as Record<string, RecordData>;
     if (!formInfo) {
       console.error('null formInfo');
-      this.onFormDestroy();
+      this.onDestroy();
       return;
     }
 
     let rect = formInfo?.get("rect") as Record<string, RecordData>;
     if (rect == null) {
       console.error('null rect');
-      this.onFormDestroy();
+      this.onDestroy();
       return;
     }
 
-    let left = rect?.get("left") as int;
-    let top = rect?.get("top") as int;
-    let width = rect?.get("width") as int;
-    let height = rect?.get("height") as int;
+    let left = rect?.get("left") as double;
+    let top = rect?.get("top") as double;
+    let width = rect?.get("width") as double;
+    let height = rect?.get("height") as double;
     let formId = formInfo?.get("formId") as string;
-    let borderRadius = formInfo?.get("borderRadius") as int;
+    let borderRadius = formInfo?.get("borderRadius") as double;
     if (formId == null || borderRadius == null || left == null || top == null || width == null || height == null) {
       console.error('null formInfo data');
-      this.onFormDestroy();
+      this.onDestroy();
       return;
     }
 
@@ -95,10 +95,11 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
     console.log('onLiveFormCreate');
   }
 
-  onFormDestroy(): void {
+  onDestroy(): Promise<void> | undefined {
     console.log('onDestroy');
     let liveFormInfo : LiveFormInfo = { formId: "default", rect: { left: 0, top: 0, width: 0, height: 0}, borderRadius: 0 };
     this.onLiveFormDestroy(liveFormInfo);
+    return undefined;
   }
 
   onLiveFormDestroy(liveFormInfo: LiveFormInfo):void {
