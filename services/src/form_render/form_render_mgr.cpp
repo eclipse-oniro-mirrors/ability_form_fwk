@@ -419,10 +419,12 @@ void FormRenderMgr::OnUnlock(int32_t userId)
     ExecAcquireProviderTask(userId);
 }
 
-void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible)
+void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible, int32_t userId)
 {
     HILOG_INFO("call.");
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    if (userId == Constants::INVALID_USER_ID) {
+        userId = FormUtil::GetCurrentAccountId();
+    }
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(userId, renderInner)) {
         renderInner->PostSetVisibleChangeTask(formId, isVisible);

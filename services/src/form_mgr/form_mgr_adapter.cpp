@@ -891,16 +891,15 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
 
-void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)
+void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType, const int32_t userId)
 {
-    if (formId <= 0
-        || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {
+    if (formId <= 0 || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {
         HILOG_WARN("param is not right");
         return;
     }
 
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
-    FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
+    FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible, userId);
 
     FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
@@ -958,8 +957,8 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
             continue;
         }
-        SetVisibleChange(matchedFormId, formVisibleType);
-        PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+        SetVisibleChange(matchedFormId, formVisibleType, userId);
+        PaddingNotifyVisibleFormsMap(formVisibleType, matchedFormId, formInstanceMaps);
         checkFormIds.push_back(formId);
         // Update info to host and check if the form was created by the system application.
         if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
@@ -1033,8 +1032,7 @@ void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType,
     bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
     FormInstance formInstance;
     // Get the updated card status
-    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, false, formInstance);
+    FormDataMgr::GetInstance().GetFormInstanceById(formId, false, formInstance);
     std::string formHostName = formInstance.formHostName;
     std::string formAllHostName = EMPTY_BUNDLE;
     if (formVisibleType == static_cast<int32_t>(formInstance.formVisiblity)) {
@@ -1625,8 +1623,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
 
     // ark ts form can only exist with one form host
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    if (info.GetUiSyntax() == FormType::ETS &&
-        !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
+    if (info.GetUiSyntax() == FormType::ETS && !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
         HILOG_ERROR("the specified form id does not exist in caller. formId:%{public}s",
             std::to_string(formId).c_str());
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
@@ -3066,22 +3063,30 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         "isTimerRefresh:%{public}d,wantCacheMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
         (int)formRecord.wantCacheMap.size(), formRecord.isHostRefresh);
+    if (!formRecord.needRefresh || formVisibleType != Constants::FORM_VISIBLE) {
+        return true;
+    }
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
-    if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
-        if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
-            RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formRecord.formId, userId);
-        } else {
-            std::string cacheData;
-            std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-            FormHostRecord formHostRecord;
-            (void)FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
-            // If the form has business cache, refresh the form host.
-            if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData, imageDataMap)) {
-                formRecord.formProviderInfo.SetFormDataString(cacheData);
-                formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-                formHostRecord.OnUpdate(matchedFormId, formRecord);
-            }
+    if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
+        RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formRecord.formId, userId);
+        return true;
+    }
+
+    auto onUpdateTask = [matchedFormId, formRecord, callerToken]() mutable {
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        FormHostRecord formHostRecord;
+        (void)FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
+        // If the form has business cache, refresh the form host.
+        if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData, imageDataMap)) {
+            formRecord.formProviderInfo.SetFormDataString(cacheData);
+            formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+            formHostRecord.OnUpdate(matchedFormId, formRecord);
         }
+    };
+    if (!FormMgrQueue::GetInstance().ScheduleTask(0, onUpdateTask)) {
+        HILOG_WARN("post OnUpdate task failed, exec now");
+        onUpdateTask();
     }
     return true;
 }
@@ -3537,8 +3542,7 @@ ErrCode FormMgrAdapter::RegisterFormRouterProxy(
         if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
             // Checks for cross-user operations.
             HILOG_ERROR("The formId:%{public}" PRId64
-                        " corresponds to a card that is not for the currently active user.",
-                formId);
+                        " corresponds to a card that is not for the currently active user.", formId);
             continue;
         } else if (std::find(record.formUserUids.begin(),
             record.formUserUids.end(), uid) == record.formUserUids.end()) {
