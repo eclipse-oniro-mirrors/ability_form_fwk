@@ -688,13 +688,17 @@ void FormRenderRecord::ResetFormConfiguration(const std::shared_ptr<OHOS::AppExe
     const Want &want)
 {
     std::lock_guard<std::mutex> lock(configurationMutex_);
+    if (!config) {
+        HILOG_INFO("config is nullpter");
+        return;
+    }
     std::string colorModeTag = "";
     std::string languageTag = "";
     if (configuration_ != nullptr) {
         colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
         languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
     }
- 
+
     std::string colorMode = AppExecFwk::GetColorModeStr(
         want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
     if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
@@ -702,7 +706,7 @@ void FormRenderRecord::ResetFormConfiguration(const std::shared_ptr<OHOS::AppExe
     } else if (!colorModeTag.empty()) {
         config->AddItem(SYSTEM_COLORMODE, colorModeTag);
     }
- 
+
     if (!languageTag.empty()) {
         config->AddItem(SYSTEM_LANGUAGE, languageTag);
     }
