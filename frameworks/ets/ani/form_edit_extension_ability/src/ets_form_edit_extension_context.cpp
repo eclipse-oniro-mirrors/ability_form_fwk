@@ -31,10 +31,10 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-const char *FORM_EDIT_EXTENSION_CONTEXT = "Lapplication/FormEditExtensionContext/FormEditExtensionContext;";
-const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "Lapplication/UIExtensionContext/Cleaner;";
+const char *FORM_EDIT_EXTENSION_CONTEXT = "application.FormEditExtensionContext.FormEditExtensionContext";
+const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "application.UIExtensionContext.Cleaner";
 constexpr const char* AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER =
-    "Lapplication/FormEditExtensionContext/AsyncCallbackWrapper;";
+    "application.FormEditExtensionContext.AsyncCallbackWrapper";
 constexpr const char *ERR_MSG_INTERNAL_ERROR = "Internal error";
 } // namespace
 using namespace OHOS::AppExecFwk;
@@ -83,7 +83,7 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
         HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "J:V", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }

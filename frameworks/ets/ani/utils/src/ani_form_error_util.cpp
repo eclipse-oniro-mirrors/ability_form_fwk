@@ -59,8 +59,8 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
     { ERR_DISTRIBUTED_SCHEDULE_FAILED, "failed to distributed schedule" },
     { ERR_IN_RECOVERY, "the form is being restored" }
 };
-constexpr const char *BUSINESS_ERROR_CLASS = "L@ohos/base/BusinessError;";
-constexpr const char *ERROR_CLASS_NAME = "Lescompat/Error;";
+constexpr const char *BUSINESS_ERROR_CLASS = "@ohos.base.BusinessError";
+constexpr const char *ERROR_CLASS_NAME = "escompat.Error";
 }
 
 bool EtsFormErrorUtil::ThrowParamError(ani_env *env, const std::string &extraMessage)
@@ -124,7 +124,7 @@ ani_object EtsFormErrorUtil::CreateError(ani_env *env, ani_int code, const std::
         return nullptr;
     }
     ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "ILescompat/Error;:V", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
@@ -183,7 +183,7 @@ ani_object EtsFormErrorUtil::WrapError(ani_env *env, const std::string &msg)
         return nullptr;
     }
     ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;Lescompat/ErrorOptions;:V", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
         ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;

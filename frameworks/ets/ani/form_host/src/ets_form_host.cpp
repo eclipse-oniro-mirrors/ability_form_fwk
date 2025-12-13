@@ -47,16 +47,16 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::Constants;
 namespace {
 constexpr ani_size REFERENCES_MAX_NUMBER = 16;
-constexpr const char* ETS_FORM_HOST_NAME = "L@ohos/app/form/formHost/formHost;";
-constexpr const char* ETS_OVERFLOWREQUEST_NAME = "L@ohos/app/form/formInfo/formInfo/OverflowRequestInner;";
+constexpr const char* ETS_FORM_HOST_NAME = "@ohos.app.form.formHost.formHost";
+constexpr const char* ETS_OVERFLOWREQUEST_NAME = "@ohos.app.form.formInfo.formInfo.OverflowRequestInner";
 constexpr const char* ETS_CHANGESCENEANIMATIONSTATEQUEST_NAME =
-    "L@ohos/app/form/formInfo/formInfo/ChangeSceneAnimationStateRequestInner;";
-constexpr const char* ETS_RECT_NAME = "L@ohos/app/form/formInfo/formInfo/RectInner;";
-constexpr const char* ETS_OVERFLOWINFO_NAME = "L@ohos/app/form/formInfo/formInfo/OverflowInfoInner;";
-constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "L@ohos/app/form/formHost/CallbackWrapper;";
-constexpr const char* ETS_FORM_RECT_INFO_CALLBACK = "L@ohos/app/form/formHost/formHost/GetFormRectInfoCallbackWrapper;";
+    "@ohos.app.form.formInfo.formInfo.ChangeSceneAnimationStateRequestInner";
+constexpr const char* ETS_RECT_NAME = "@ohos.app.form.formInfo.formInfo.RectInner";
+constexpr const char* ETS_OVERFLOWINFO_NAME = "@ohos.app.form.formInfo.formInfo.OverflowInfoInner";
+constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "@ohos.app.form.formHost.CallbackWrapper";
+constexpr const char* ETS_FORM_RECT_INFO_CALLBACK = "@ohos.app.form.formHost.formHost.GetFormRectInfoCallbackWrapper";
 constexpr const char* ETS_LIVE_FORM_STATUS_CALLBACK =
-    "L@ohos/app/form/formHost/formHost/GetLiveFormStatusCallbackWrapper;";
+    "@ohos.app.form.formHost.formHost.GetLiveFormStatusCallbackWrapper";
 constexpr const char *CHECK_PROMISE_SIGNATURE = "C{std.core.Object}:z";
 constexpr const char *CALL_PROMISE_SIGNATURE = "C{std.core.Promise}:";
 constexpr const char *FORM_HOST_FORMINFO_FORMID = "formId";

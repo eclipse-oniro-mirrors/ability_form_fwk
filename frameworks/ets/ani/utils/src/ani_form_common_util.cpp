@@ -30,12 +30,12 @@ constexpr int ZERO_VALUE = 0;
 constexpr int INT_64_LENGTH = 19;
 constexpr int BASE_NUMBER = 9;
 constexpr int64_t HEAD_BIT_NUM = 9000000000000000000;
-constexpr const char* CLASSNAME_BOOL = "Lstd/core/Boolean;";
-constexpr const char* CLASSNAME_ARRAY = "Lstd/core/Array;";
-constexpr const char* CLASSNAME_RUNNING_FORM_INFO = "L@ohos/app/form/formInfo/formInfo/RunningFormInfoInner;";
-constexpr const char* ENUMNAME_VISIBILITYTYPE = "L@ohos/app/form/formInfo/formInfo/VisibilityType;";
-constexpr const char* ENUMNAME_FORMUSAGESTATE = "L@ohos/app/form/formInfo/formInfo/FormUsageState;";
-constexpr const char* ENUMNAME_FORMLOCATION = "L@ohos/app/form/formInfo/formInfo/FormLocation;";
+constexpr const char* CLASSNAME_BOOL = "std.core.Boolean";
+constexpr const char* CLASSNAME_ARRAY = "std.core.Array";
+constexpr const char* CLASSNAME_RUNNING_FORM_INFO = "@ohos.app.form.formInfo.formInfo.RunningFormInfoInner";
+constexpr const char* ENUMNAME_VISIBILITYTYPE = "@ohos.app.form.formInfo.formInfo.VisibilityType";
+constexpr const char* ENUMNAME_FORMUSAGESTATE = "@ohos.app.form.formInfo.formInfo.FormUsageState";
+constexpr const char* ENUMNAME_FORMLOCATION = "@ohos.app.form.formInfo.formInfo.FormLocation";
 
 ani_object CreateBoolean(ani_env *env, ani_boolean value)
 {
@@ -50,7 +50,7 @@ ani_object CreateBoolean(ani_env *env, ani_boolean value)
         return nullptr;
     }
     ani_method ctor = nullptr;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "Z:V", &ctor)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "z:", &ctor)) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
@@ -72,7 +72,7 @@ ani_object CreateAniObject(ani_env* env, const char* className)
         return nullptr;
     }
     ani_method method = nullptr;
-    status = env->Class_FindMethod(cls, "<ctor>", ":V", &method);
+    status = env->Class_FindMethod(cls, "<ctor>", ":", &method);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod ctor failed status: %{public}d", status);
         return nullptr;
@@ -184,7 +184,7 @@ ani_object CreateArrayObject(ani_env *env)
         return nullptr;
     }
     ani_method arrayCtor;
-    status = env->Class_FindMethod(arrayCls, "<ctor>", ":V", &arrayCtor);
+    status = env->Class_FindMethod(arrayCls, "<ctor>", ":", &arrayCtor);
     if (status != ANI_OK) {
         HILOG_ERROR("find ctor failed status: %{public}d", status);
         return nullptr;
@@ -429,7 +429,7 @@ ani_object CreateFormInstances(ani_env *env, const std::vector<AppExecFwk::FormI
     }
 
     ani_method arrayCtor;
-    status = env->Class_FindMethod(arrayCls, "<ctor>", "I:V", &arrayCtor);
+    status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
     if (status != ANI_OK) {
         HILOG_ERROR("find ctor failed status: %{public}d", status);
         return nullptr;
@@ -448,7 +448,7 @@ ani_object CreateFormInstances(ani_env *env, const std::vector<AppExecFwk::FormI
             HILOG_WARN("null aniInfo");
             break;
         }
-        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index, aniInfo);
+        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index, aniInfo);
         if (status != ANI_OK) {
             HILOG_WARN("Object_CallMethodByName_Void failed status: %{public}d", status);
             break;
@@ -473,7 +473,7 @@ ani_object CreateFormInstance(ani_env *env, const AppExecFwk::FormInstance &form
         HILOG_ERROR("FindClass status: %{public}d or null infoClass", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(infoClass, "<ctor>", ":V", &method)) != ANI_OK || method == nullptr) {
+    if ((status = env->Class_FindMethod(infoClass, "<ctor>", ":", &method)) != ANI_OK || method == nullptr) {
         HILOG_ERROR("Class_FindMethod status: %{public}d or null method", status);
         return nullptr;
     }
@@ -526,7 +526,7 @@ ani_object CreateRunningFormInfos(ani_env *env, const std::vector<AppExecFwk::Ru
     }
 
     ani_method arrayCtor;
-    status = env->Class_FindMethod(arrayCls, "<ctor>", "I:V", &arrayCtor);
+    status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
     if (status != ANI_OK) {
         HILOG_ERROR("find ctor failed status: %{public}d", status);
         return nullptr;
@@ -545,7 +545,7 @@ ani_object CreateRunningFormInfos(ani_env *env, const std::vector<AppExecFwk::Ru
             HILOG_WARN("null aniInfo");
             break;
         }
-        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index, aniInfo);
+        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index, aniInfo);
         if (status != ANI_OK) {
             HILOG_WARN("Object_CallMethodByName_Void failed status: %{public}d", status);
             break;
@@ -605,7 +605,7 @@ ani_object CreateRunningFormInfo(ani_env *env, const AppExecFwk::RunningFormInfo
         HILOG_ERROR("FindClass status: %{public}d or null infoClass", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(infoClass, "<ctor>", ":V", &method)) != ANI_OK || method == nullptr) {
+    if ((status = env->Class_FindMethod(infoClass, "<ctor>", ":", &method)) != ANI_OK || method == nullptr) {
         HILOG_ERROR("Class_FindMethod status: %{public}d or null method", status);
         return nullptr;
     }

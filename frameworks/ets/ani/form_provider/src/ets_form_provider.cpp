@@ -36,8 +36,8 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AbilityRuntime::FormAniHelpers;
 using namespace OHOS::AppExecFwk::Constants;
 namespace {
-constexpr const char* FORM_RECT_INNER = "L@ohos/app/form/formInfo/formInfo/RectInner;";
-constexpr const char* PROVIDER_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "L@ohos/app/form/formProvider/AsyncCallbackWrapper;";
+constexpr const char* FORM_RECT_INNER = "@ohos.app.form.formInfo.formInfo.RectInner";
+constexpr const char* PROVIDER_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "@ohos.app.form.formProvider.AsyncCallbackWrapper";
 constexpr const char* PROVIDER_RECT_LEFT = "left";
 constexpr const char* PROVIDER_RECT_TOP = "top";
 constexpr const char* PROVIDER_RECT_WIDTH = "width";
@@ -48,7 +48,7 @@ constexpr const char* PROVIDER_FORMOVERFLOWINFO_AREA = "area";
 constexpr const char* PROVIDER_FORMOVERFLOWINFO_DURATION = "duration";
 constexpr const char* PROVIDER_FORMOVERFLOWINFO_USEDEFAULTANIMATION = "useDefaultAnimation";
 constexpr const char* PROVIDER_CLASS_CONSTRUCTOR = "<ctor>";
-constexpr const char* PROVIDER_SIGNATURE_VOID_VOID = ":V";
+constexpr const char* PROVIDER_SIGNATURE_VOID_VOID = ":";
 
 enum class ActivationState : int32_t {
     DEACTIVATED = 0,
