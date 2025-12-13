@@ -106,7 +106,6 @@ private:
     napi_value OnReloadAllForms(napi_env env, size_t argc, napi_value* argv);
     napi_value OnRegisterPublishFormCrossBundleControl(napi_env env, size_t argc, napi_value* argv);
     napi_value OnUnregisterPublishFormCrossBundleControl(napi_env env, size_t argc, napi_value* argv);
-    napi_value OnUpdateTemplateFormDetailInfo(napi_env env, size_t argc, napi_value* argv);
 
     bool ConvertFromDataProxies(napi_env env, napi_value jsValue,
         std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
