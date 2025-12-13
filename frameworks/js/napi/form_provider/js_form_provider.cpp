@@ -1596,20 +1596,22 @@ bool JsFormProvider::ConvertTemplateFormDetailInfo(napi_env env, napi_value valu
         napi_value propertyValue = nullptr;
         napi_status status = napi_get_named_property(env, value, prop.inputKey, &propertyValue);
         if (status != napi_status::napi_ok) {
+            HILOG_ERROR("get property %{public}s error", prop.inputKey);
             return false;
         }
         if (!ConvertFromJsValue(env, propertyValue, prop.outPutKey)) {
-            HILOG_WARN("parse %{public}s error", prop.inputKey);
+            HILOG_ERROR("parse %{public}s error", prop.inputKey);
             return false;
         }
     }
     napi_value propertyValue = nullptr;
     napi_status status = napi_get_named_property(env, value, "dimension", &propertyValue);
     if (status != napi_status::napi_ok) {
+        HILOG_ERROR("get property dimension error");
         return false;
     }
     if (!ConvertFromJsValue(env, propertyValue, templateFormDetailInfo.dimension)) {
-        HILOG_WARN("parse %{public}s error", "dimension");
+        HILOG_WARN("parse dimension error");
         return false;
     }
     return true;

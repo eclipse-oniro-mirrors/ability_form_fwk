@@ -111,8 +111,7 @@ private:
     napi_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
     napi_env templateFormDetailInfoChangeEnv_;
     ErrCode TemplateFormDetailInfoChange(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
-    void TemplateFormDetailInfoChangeInner(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
-        bool &result);
+    bool TemplateFormDetailInfoChangeInner(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
     void GetTemplateFormInfoArray(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
         napi_value &templateFormInfoArray);
 

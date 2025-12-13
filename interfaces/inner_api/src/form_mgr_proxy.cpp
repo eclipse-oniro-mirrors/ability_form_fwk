@@ -3368,7 +3368,7 @@ ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (templateFormInfo.size() > Constants::TEMPLATE_FORM_MAX_SIZE || !data.WriteInt32(templateFormInfo.size())) {
-        HILOG_ERROR("write templateFormInfo size failed.");
+        HILOG_ERROR("size limit or write templateFormInfo size failed.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     for (const auto &templateFormDetailInfo : templateFormInfo) {

@@ -3143,31 +3143,29 @@ ErrCode JsFormRouterProxyMgr::TemplateFormDetailInfoChange(
 {
     HILOG_DEBUG("call");
     std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
-    bool result = std::make_shared(false);
+    bool result = false;
     std::function<void()> executeFunc = [client = sptr<JsFormRouterProxyMgr>(this), templateFormInfo, &result]() {
-        JsFormRouterProxyMgr::GetInstance()->TemplateFormDetailInfoChangeInner(templateFormInfo, result);
+        result = JsFormRouterProxyMgr::GetInstance()->TemplateFormDetailInfoChangeInner(templateFormInfo);
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::TemplateFormDetailInfoChange");
     HILOG_DEBUG("change successfully, result: %{public}d", result);
     return result ? ERR_OK : ERR_APPEXECFWK_PARCEL_ERROR;
 }
  
-void JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
-    const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo, bool &result)
+bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
+    const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
 {
     HILOG_INFO("call");
 
     if (templateFormInfo.size() > AppExecFwk::Constants::TEMPLATE_FORM_MAX_SIZE) {
-        result = false;
-        return;
+        return false;
     }
 
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(templateFormDetailInfoChangeEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
-        result = false;
-        return;
+        return false;
     }
  
     napi_value callbackFunction = nullptr;
@@ -3179,18 +3177,16 @@ void JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
  
     if (valueType != napi_function) {
         HILOG_ERROR("check valueType failed");
-        result = false;
         napi_close_handle_scope(templateFormDetailInfoChangeEnv_, scope);
-        return;
+        return false;
     }
  
     napi_value templateFormInfoArray;
     napi_status status = napi_create_array(templateFormDetailInfoChangeEnv_, &templateFormInfoArray);
     if (status != napi_ok) {
         HILOG_ERROR("create array failed");
-        result = false;
         napi_close_handle_scope(templateFormDetailInfoChangeEnv_, scope);
-        return;
+        return false;
     }
     GetTemplateFormInfoArray(templateFormInfo, templateFormInfoArray);
     napi_value args[] = { templateFormInfoArray };
@@ -3198,15 +3194,14 @@ void JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
         callbackFunction, 1, args, nullptr);
     if (callStatus != napi_ok) {
         HILOG_ERROR("call callback fail");
-        result = false;
         napi_value callResult = nullptr;
         napi_get_and_clear_last_exception(templateFormDetailInfoChangeEnv_, &callResult);
         napi_close_handle_scope(templateFormDetailInfoChangeEnv_, scope);
-        return;
+        return false;
     }
     HILOG_INFO("change inner successfully");
-    result = true;
     napi_close_handle_scope(templateFormDetailInfoChangeEnv_, scope);
+    return true;
 }
  
 void JsFormRouterProxyMgr::GetTemplateFormInfoArray(

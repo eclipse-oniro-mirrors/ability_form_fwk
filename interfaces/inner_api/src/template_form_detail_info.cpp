@@ -79,7 +79,7 @@ bool TemplateFormDetailInfo::ReadFromParcel(Parcel &parcel)
 TemplateFormDetailInfo *TemplateFormDetailInfo::Unmarshalling(Parcel &parcel)
 {
     std::unique_ptr<TemplateFormDetailInfo> templateFormDetailInfo = std::make_unique<TemplateFormDetailInfo>();
-    if (templateFormDetailInfo && !templateFormDetailInfo->ReadFromParcel(parcel)) {
+    if (!templateFormDetailInfo->ReadFromParcel(parcel)) {
         templateFormDetailInfo = nullptr;
         return nullptr;
     }
