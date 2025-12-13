@@ -100,6 +100,12 @@ public:
         return ERR_OK;
     }
 
+    ErrCode TemplateFormDetailInfoChange(
+        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 
