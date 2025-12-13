@@ -322,7 +322,6 @@ private:
         const sptr<IFormSupply> &formSupplyClient, int32_t renderType);
     void ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config, const Want &want);
 
-
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 
