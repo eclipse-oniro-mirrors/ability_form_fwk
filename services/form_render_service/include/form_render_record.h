@@ -135,6 +135,8 @@ public:
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> GetConfiguration();
+
     void MarkThreadAlive();
 
     void ReleaseRenderer(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty);
@@ -318,6 +320,8 @@ private:
     void ReAddStaticRecycledForms(const int64_t formId);
     void HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
         const sptr<IFormSupply> &formSupplyClient, int32_t renderType);
+    void ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config, const Want &want);
+
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
@@ -343,6 +347,7 @@ private:
     // <formId, <compId, formRequest>>
     std::mutex formRequestsMutex_;
     std::unordered_map<int64_t, std::unordered_map<std::string, Ace::FormRequest>> formRequests_;
+    std::mutex configurationMutex_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
     // <formId, <orderedCompIds, currentCompId>>
     std::mutex recycledFormCompIdsMutex_;
