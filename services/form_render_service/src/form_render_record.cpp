@@ -683,18 +683,16 @@ std::shared_ptr<OHOS::AppExecFwk::Configuration> FormRenderRecord::GetConfigurat
         return std::make_shared<AppExecFwk::Configuration>(*configuration_);
     }
 }
- 
+
 void FormRenderRecord::ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config,
     const Want &want)
 {
+    std::lock_guard<std::mutex> lock(configurationMutex_);
     std::string colorModeTag = "";
     std::string languageTag = "";
-    {
-        std::lock_guard<std::mutex> lock(configurationMutex_);
-        if (configuration_ != nullptr) {
-            colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
-            languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
-        }
+    if (configuration_ != nullptr) {
+        colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
+        languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
     }
  
     std::string colorMode = AppExecFwk::GetColorModeStr(
