@@ -701,6 +701,16 @@ const std::string& FormItemInfo::GetUiModuleName() const
     return uiModule_;
 }
 
+void FormItemInfo::SetTemplateFormImperativeFwk(const std::string &templateFormImperativeFwk)
+{
+    templateFormImperativeFwk_ = templateFormImperativeFwk;
+}
+
+const std::string& FormItemInfo::GetTemplateFormImperativeFwk() const
+{
+    return templateFormImperativeFwk_;
+}
+
 void FormItemInfo::SetIsTemplateForm(const bool isTemplateForm)
 {
     isTemplateForm_ = isTemplateForm;

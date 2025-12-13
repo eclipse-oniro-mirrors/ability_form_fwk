@@ -63,6 +63,11 @@ constexpr char FORM_RENDERER_PROCESS_ON_ADD_SURFACE[] = "ohos.extra.param.key.pr
 constexpr char RENDERING_BLOCK_MONITOR_PREFIX[] = "RenderingBlockMonitorTask_";
 constexpr char MEMORY_MONITOR_PREFIX[] = "MemoryMonitorTask_";
 
+const static std::unordered_map<std::string, int> FORM_IMPERATIVE_MAP = {
+    {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE, 0},
+    {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL, 0}
+};
+
 inline std::string GetThreadNameByBundle(const std::string &bundleName)
 {
     if (bundleName.length() <= THREAD_NAME_LEN) {
@@ -157,8 +162,8 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
 }
 
 FormRenderRecord::FormRenderRecord(
-    const std::string &bundleName, const std::string &uid, const sptr<IFormSupply> client)
-    : bundleName_(bundleName), uid_(uid), formSupplyClient_(client)
+    const std::string &bundleName, const std::string &uid, const sptr<IFormSupply> client) : bundleName_(bundleName),
+    uid_(uid), formSupplyClient_(client), formImperativeFwkCntMap_(FORM_IMPERATIVE_MAP)
 {
     HILOG_INFO("bundleName is %{public}s,uid is %{public}s", bundleName.c_str(), uid.c_str());
     threadState_ = std::make_unique<ThreadState>(CHECK_THREAD_TIME);
@@ -586,6 +591,17 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
     }
+
+    std::string target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
+    {
+        std::lock_guard<std::mutex> cntLock(formImperativeFwkCntMapMutex_);
+        if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL;
+        } else if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE;
+        }
+    }
+    runtime_->SetTemplateFormImperativeFwk(target);
     RegisterUncatchableErrorHandler();
     return true;
 }
@@ -624,7 +640,53 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
     }
+
+    AddFormImperativeFwkCnt(formJsInfo);
+    UpdateFormImperativeFwkCnt(formJsInfo.formId, ADD_IMPERATIVE_FORM);
     return true;
+}
+
+void FormRenderRecord::AddFormImperativeFwkCnt(const FormJsInfo &formJsInfo)
+{
+    std::lock_guard<std::mutex> lock(formImperativeFwkMapMutex_);
+    formImperativeFwkMap_[formJsInfo.formId] = formJsInfo.templateFormImperativeFwk;
+}
+
+void FormRenderRecord::UpdateFormImperativeFwkCnt(const int64_t formId, int num)
+{
+    std::string target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
+    std::string templateFormImperativeFwk;
+    {
+        std::lock_guard<std::mutex> lock(formImperativeFwkMapMutex_);
+        auto iter = formImperativeFwkMap_.find(formId);
+        if (iter == formImperativeFwkMap_.end()) {
+            return ;
+        }
+        templateFormImperativeFwk = iter->second;
+        if (num == DEL_IMPERATIVE_FORM) {
+            formImperativeFwkMap_.erase(iter);
+        }
+    }
+    {
+        std::lock_guard<std::mutex> cntLock(formImperativeFwkCntMapMutex_);
+        if (formImperativeFwkCntMap_.find(templateFormImperativeFwk) == formImperativeFwkCntMap_.end()) {
+            return;
+        }
+        HILOG_INFO("formImperativeFwk:%{public}s isAdd:%{public}d formId:%{public}" PRId64,
+            templateFormImperativeFwk.c_str(), num, formId);
+        formImperativeFwkCntMap_[templateFormImperativeFwk] += num;
+        if (formImperativeFwkCntMap_[templateFormImperativeFwk] < 0) {
+            formImperativeFwkCntMap_[templateFormImperativeFwk] = 0;
+        }
+        if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL;
+        } else if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE;
+        }
+    }
+    if (runtime_) {
+        runtime_->SetTemplateFormImperativeFwk(target);
+    }
 }
 
 bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options)
@@ -1000,6 +1062,8 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
     if (compId.empty()) {
         return;
     }
+    AddFormImperativeFwkCnt(formJsInfo);
+    UpdateFormImperativeFwkCnt(formJsInfo.formId, ADD_IMPERATIVE_FORM);
 
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     Ace::FormRequest formRequest;
@@ -1661,6 +1725,9 @@ int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &status
         }
 
         result = renderRecord->HandleRecycleForm(formId, statusData);
+        if (result == ERR_OK) {
+            renderRecord->UpdateFormImperativeFwkCnt(formId, DEL_IMPERATIVE_FORM);
+        }
     };
     auto eventHandler = GetEventHandler();
     if (eventHandler != nullptr)
@@ -1715,6 +1782,8 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
             return;
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
+        renderRecord->AddFormImperativeFwkCnt(formJsInfo);
+        renderRecord->UpdateFormImperativeFwkCnt(formJsInfo.formId, ADD_IMPERATIVE_FORM);
         FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formJsInfo.formId,
             FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
     };

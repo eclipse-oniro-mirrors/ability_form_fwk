@@ -85,6 +85,7 @@ public:
     ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
         int32_t providerUserId, bool &appFormVisibleNotify);
     bool IsMultiAppForm(const FormInfo &formInfo);
+    bool IsTemplateFormImperativeFwkValid(const FormInfo &formInfo);
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);

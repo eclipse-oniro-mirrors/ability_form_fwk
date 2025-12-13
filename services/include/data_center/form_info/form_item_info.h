@@ -514,6 +514,16 @@ public:
      * @return Ui moduleName.
      */
     const std::string& GetUiModuleName() const;
+    /**
+     * @brief Set templateFormImperativeFwk Mode.
+     * @param templateFormImperativeFwk Mode.
+     */
+    void SetTemplateFormImperativeFwk(const std::string &templateFormImperativeFwk);
+    /**
+     * @brief Get templateFormImperativeFwk.
+     * @return templateFormImperativeFwk Mode.
+     */
+    const std::string& GetTemplateFormImperativeFwk() const;
 
     /**
      * @brief Set isTemplateForm.
@@ -583,6 +593,7 @@ private:
     bool isDataProxyIgnoreFormVisibility_ = false;
     bool isDistributedForm_ = false;
     std::string uiModule_ = ""; // widget module name
+    std::string templateFormImperativeFwk_ = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool isTemplateForm_ = false;
 };
 } // namespace AppExecFwk

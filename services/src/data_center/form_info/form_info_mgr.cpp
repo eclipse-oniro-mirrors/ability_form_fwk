@@ -71,6 +71,7 @@ ErrCode FormInfoMgr::Start()
 
 ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_t userId)
 {
+    HILOG_INFO("UpdateStaticFormInfos: %{public}s.", bundleName.c_str());
     if (bundleName.empty()) {
         HILOG_ERROR("empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -635,6 +636,18 @@ bool FormInfoMgr::IsMultiAppForm(const FormInfo &formInfo)
         ++dataIter;
     }
     return isMultiAppForm;
+}
+
+bool FormInfoMgr::IsTemplateFormImperativeFwkValid(const FormInfo &formInfo)
+{
+    for (const auto &dataIter : formInfo.customizeDatas) {
+        if (dataIter.name == Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NAME &&
+            Constants::TEMPLATE_FORM_IMPERATIVE_FWKS.find(dataIter.value) ==
+            Constants::TEMPLATE_FORM_IMPERATIVE_FWKS.end()) {
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

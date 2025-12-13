@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_CONSTANTS_H
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace OHOS {
@@ -40,6 +41,9 @@ namespace Constants {
     constexpr const char* PARAM_ABILITY_NAME_KEY = "ohos.extra.param.key.ability_name";
     constexpr const char* PARAM_FORM_NAME_KEY = "ohos.extra.param.key.form_name";
     constexpr const char* PARAM_FORM_DIMENSION_KEY = "ohos.extra.param.key.form_dimension";
+    constexpr const char* PARAM_SHOW_SINGLE_FORM_KEY = "ohos.extra.param.key.show_single_form";
+    constexpr const char* PARAM_TEMPLATE_FORM_ID_KEY = "ohos.extra.param.key.template_form_detail_id";
+    constexpr const char* PARAM_TEMPLATE_FORM_DATA_KEY = "ohos.extra.param.key.template_form_data";
     constexpr const char* PARAM_FORM_RENDERINGMODE_KEY = "ohos.extra.param.key.form_rendering_mode";
     constexpr const char* PARAM_FORM_OBSCURED_KEY = "ohos.extra.param.key.form_obscured_mode";
     constexpr const char* PARAM_FORM_COLOR_MODE_KEY = "ohos.extra.param.key.form_color_mode";
@@ -341,6 +345,19 @@ namespace Constants {
         NO_SPACE,
         PARAM_ERROR,
         INTERNAL_ERROR,
+    };
+ 
+    // templateFormImperativeFwk range
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_NONE = "none";
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_LITE = "lite";
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_FULL = "full";
+
+    // Is form contains templateFormImperativeFwk
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_NAME = "templateFormImperativeFwk";
+    const std::set<std::string> TEMPLATE_FORM_IMPERATIVE_FWKS = {
+        TEMPLATE_FORM_IMPERATIVE_FWK_NONE,
+        TEMPLATE_FORM_IMPERATIVE_FWK_LITE,
+        TEMPLATE_FORM_IMPERATIVE_FWK_FULL
     };
 
     struct PublishFormResult {
