@@ -877,6 +877,30 @@ private:
      */
     ErrCode HandleUnregisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle register template form detail info change.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterTemplateFormDetailInfoChange(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister template form detail info change.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterTemplateFormDetailInfoChange(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle update template form detail info.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUpdateTemplateFormDetailInfo(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

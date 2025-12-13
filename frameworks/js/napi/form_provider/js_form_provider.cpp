@@ -1507,5 +1507,112 @@ void JsFormProviderProxyMgr::ConvertParamToNapiValue(std::shared_ptr<PublishForm
     napi_set_named_property(crossBundleControlEnv_, requestObj,
         "targetTemplateFormDetailId", targetTemplateFormDetailIdValue);
 }
+
+napi_value JsFormProvider::UpdateTemplateFormDetailInfo(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnUpdateTemplateFormDetailInfo);
+}
+ 
+napi_value JsFormProvider::OnUpdateTemplateFormDetailInfo(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+ 
+    if (!CheckParamNum(env, argc, ARGS_SIZE_ONE, ARGS_SIZE_ONE)) {
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+        return CreateJsUndefined(env);
+    }
+ 
+    std::vector<TemplateFormDetailInfo> templateFormInfo;
+    if (!ConvertTemplateFormInfo(env, argv[PARAM0], templateFormInfo)) {
+        NapiFormUtil::ThrowParamTypeError(env, "templateFormInfo", "");
+        return CreateJsUndefined(env);
+    }
+ 
+    NapiAsyncTask::CompleteCallback complete =
+        [templateFormInfo](napi_env env, NapiAsyncTask &task, int32_t status) {
+            auto ret = FormMgr::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+        };
+ 
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnUpdateTemplateFormDetailInfo",
+        env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
+    return result;
+}
+ 
+bool JsFormProvider::ConvertTemplateFormInfo(napi_env env, napi_value value,
+    std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
+{
+    bool result = false;
+    napi_is_array(env, value, &result);
+    if (value == nullptr || !result) {
+        HILOG_WARN("jsValue is not array");
+        return false;
+    }
+ 
+    uint32_t length = 0;
+    napi_get_array_length(env, value, &length);
+    if (length > AppExecFwk::Constants::TEMPLATE_FORM_MAX_SIZE) {
+        HILOG_ERROR("size limit");
+        return false;
+    }
+    napi_value element = nullptr;
+    for (uint32_t i = 0; i < length; i++) {
+        AppExecFwk::TemplateFormDetailInfo templateFormDetailInfo;
+        napi_get_element(env, value, i, &element);
+        if (!ConvertTemplateFormDetailInfo(env, element, templateFormDetailInfo)) {
+            HILOG_ERROR("get element from array [%{public}u] error", i);
+            return false;
+        }
+        templateFormInfo.push_back(templateFormDetailInfo);
+    }
+    return true;
+}
+ 
+bool JsFormProvider::ConvertTemplateFormDetailInfo(napi_env env, napi_value value,
+    AppExecFwk::TemplateFormDetailInfo &templateFormDetailInfo)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, value, &valueType);
+    if (value == nullptr || valueType != napi_object) {
+        HILOG_WARN("null jsValue,not object");
+        return false;
+    }
+
+    PropertyMap properties[] = {
+        {"bundleName", templateFormDetailInfo.bundleName},
+        {"moduleName", templateFormDetailInfo.moduleName},
+        {"abilityName", templateFormDetailInfo.abilityName},
+        {"formName", templateFormDetailInfo.formName},
+        {"detailId", templateFormDetailInfo.detailId},
+        {"displayName", templateFormDetailInfo.displayName},
+        {"description", templateFormDetailInfo.description},
+    };
+
+    for (const auto& prop : properties) {
+        napi_value propertyValue = nullptr;
+        napi_status status = napi_get_named_property(env, value, prop.inputKey, &propertyValue);
+        if (status != napi_status::napi_ok) {
+            return false;
+        }
+        if (!ConvertFromJsValue(env, propertyValue, prop.outPutKey)) {
+            HILOG_WARN("parse %{public}s error", prop.inputKey);
+            return false;
+        }
+    }
+    napi_value propertyValue = nullptr;
+    napi_status status = napi_get_named_property(env, value, "dimension", &propertyValue);
+    if (status != napi_status::napi_ok) {
+        return false;
+    }
+    if (!ConvertFromJsValue(env, propertyValue, templateFormDetailInfo.dimension)) {
+        HILOG_WARN("parse %{public}s error", "dimension");
+        return false;
+    }
+    return true;
+}
 }  // namespace AbilityRuntime
 }  // namespace OHOS

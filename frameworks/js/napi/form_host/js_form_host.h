@@ -72,6 +72,11 @@ public:
     bool RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
 
     bool UnregisterGetLiveFormStatusListener();
+
+    bool RegisterTemplateFormDetailInfoChange(napi_env env, napi_ref callback);
+ 
+    bool UnregisterTemplateFormDetailInfoChange();
+
 private:
     static std::mutex mutex_;
     static sptr<JsFormRouterProxyMgr> instance_;
@@ -103,10 +108,19 @@ private:
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
 
+    napi_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
+    napi_env templateFormDetailInfoChangeEnv_;
+    ErrCode TemplateFormDetailInfoChange(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
+    void TemplateFormDetailInfoChangeInner(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
+        bool &result);
+    void GetTemplateFormInfoArray(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
+        napi_value &templateFormInfoArray);
+
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
     mutable std::mutex registerGetFormRectProxyMutex_;
     mutable std::mutex registerGetLiveFormStatusProxyMutex_;
+    mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
 };
 
 class PromiseCallbackInfo {

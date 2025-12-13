@@ -2588,5 +2588,53 @@ ErrCode FormMgr::UnregisterPublishFormCrossBundleControl()
     }
     return remoteProxy_->UnregisterPublishFormCrossBundleControl();
 }
+
+ErrCode FormMgr::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return remoteProxy_->RegisterTemplateFormDetailInfoChange(callerToken);
+}
+ 
+ErrCode FormMgr::UnregisterTemplateFormDetailInfoChange()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return remoteProxy_->UnregisterTemplateFormDetailInfoChange();
+}
+
+ErrCode FormMgr::UpdateTemplateFormDetailInfo(
+    const std::vector<TemplateFormDetailInfo> &templateFormInfo)
+{
+    HILOG_DEBUG("call");
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return remoteProxy_->UpdateTemplateFormDetailInfo(templateFormInfo);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

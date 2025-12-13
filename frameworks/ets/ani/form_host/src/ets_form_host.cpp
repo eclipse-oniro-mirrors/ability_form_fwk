@@ -936,6 +936,12 @@ void EtsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
     ani_vm_ = nullptr;
 }
 
+ErrCode EtsFormRouterProxyMgr::TemplateFormDetailInfoChange(
+    const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
+{
+    return ERR_OK;
+}
+
 class EtsFormStateCallbackClient
     : public FormStateCallbackInterface, public std::enable_shared_from_this<EtsFormStateCallbackClient> {
 public:

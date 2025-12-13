@@ -23,6 +23,7 @@
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "running_form_info.h"
+#include "template_form_detail_info.h"
 #include "iremote_proxy.h"
 
 namespace OHOS {
@@ -866,6 +867,27 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode UnregisterPublishFormCrossBundleControl() override;
+
+    /**
+     * @brief Register template from detail info change proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken) override;
+ 
+    /**
+     * @brief UnRegister template from detail info change proxy in fms.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterTemplateFormDetailInfoChange() override;
+
+    /**
+     * @brief Update template form detail info.
+     * @param templateFormInfo The template form info to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateTemplateFormDetailInfo(
+        const std::vector<TemplateFormDetailInfo> &templateFormInfo) override;
 
 private:
     template<typename T>

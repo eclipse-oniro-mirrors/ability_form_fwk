@@ -4928,5 +4928,67 @@ bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleI
     HILOG_INFO("result:%{public}d, isCanOpen:%{public}d", result, isCanOpen);
     return (result == ERR_OK) ? isCanOpen : false;
 }
+
+ErrCode FormMgrAdapter::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    SetTemplateFormDetailInfoCallerToken(callerToken);
+    return ERR_OK;
+}
+ 
+ErrCode FormMgrAdapter::UnregisterTemplateFormDetailInfoChange()
+{
+    HILOG_INFO("call");
+    ClearTemplateFormDetailInfoCallerToken();
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::UpdateTemplateFormDetailInfo(
+    const std::vector<TemplateFormDetailInfo> &templateFormInfo)
+{
+    HILOG_DEBUG("call");
+    auto templateFormDetailInfoCallerToken = GetTemplateFormDetailInfoCallerToken();
+    if (templateFormDetailInfoCallerToken == nullptr) {
+        HILOG_ERROR("failed, templateFormDetailInfoCallerToken_ is nullptr!");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy =
+        iface_cast<IFormHostDelegate>(templateFormDetailInfoCallerToken);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("failed, remoteFormHostDelegateProxy is nullptr!");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    
+    ErrCode result = remoteFormHostDelegateProxy->TemplateFormDetailInfoChange(templateFormInfo);
+ 
+    HILOG_DEBUG("update result:%{public}d", result);
+    return result;
+}
+
+void FormMgrAdapter::SetTemplateFormDetailInfoCallerToken(
+    const sptr<IRemoteObject> templateFormDetailInfoCallerToken)
+{
+    HILOG_INFO("call");
+    if (templateFormDetailInfoCallerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
+    templateFormDetailInfoCallerToken_ = templateFormDetailInfoCallerToken;
+}
+ 
+void FormMgrAdapter::ClearTemplateFormDetailInfoCallerToken()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
+    templateFormDetailInfoCallerToken_ = nullptr;
+}
+ 
+sptr<IRemoteObject> FormMgrAdapter::GetTemplateFormDetailInfoCallerToken()
+{
+    HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
+    return templateFormDetailInfoCallerToken_;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

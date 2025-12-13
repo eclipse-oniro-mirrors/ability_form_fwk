@@ -58,7 +58,8 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
         JsFormProvider::RegisterPublishFormCrossBundleControl);
     BindNativeFunction(env, exports, "offPublishFormCrossBundleControl", moduleName,
         JsFormProvider::UnregisterPublishFormCrossBundleControl);
-    return exports;
+    BindNativeFunction(env, exports, "updateTemplateFormDetailInfo", moduleName,
+        JsFormProvider::UpdateTemplateFormDetailInfo);
     return exports;
 }
 

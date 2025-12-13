@@ -3312,5 +3312,81 @@ ErrCode FormMgrProxy::UnregisterPublishFormCrossBundleControl()
     }
     return reply.ReadInt32();
 }
+
+ErrCode FormMgrProxy::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+ 
+ErrCode FormMgrProxy::UnregisterTemplateFormDetailInfoChange()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d failed.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
+    const std::vector<TemplateFormDetailInfo> &templateFormInfo)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (templateFormInfo.size() > Constants::TEMPLATE_FORM_MAX_SIZE || !data.WriteInt32(templateFormInfo.size())) {
+        HILOG_ERROR("write templateFormInfo size failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    for (const auto &templateFormDetailInfo : templateFormInfo) {
+        if (!data.WriteParcelable(&templateFormDetailInfo)) {
+            HILOG_ERROR("write templateFormDetailInfo info failed.");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    };
+ 
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode:%{public}d failed.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

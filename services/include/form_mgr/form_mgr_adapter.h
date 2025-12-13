@@ -31,12 +31,14 @@
 #include "form_provider_data.h"
 #include "form_publish_interceptor_interface.h"
 #include "common/util/form_serial_queue.h"
+#include "form_major_info.h"
 #include "form_state_info.h"
-#include "iremote_object.h"
 #include "running_form_info.h"
+#include "template_form_detail_info.h"
+#include "iremote_object.h"
 #include "want.h"
 #include "configuration.h"
-#include "form_major_info.h"
+
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -880,6 +882,28 @@ public:
      * @return Returns true for can open form manager.
      */
     bool PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo);
+
+    /**
+     * @brief Register template from detail info change.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief UnRegister template from detail info change.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterTemplateFormDetailInfoChange();
+
+    /**
+     * @brief Update template form detail info.
+     * @param templateFormInfo The template form info to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateTemplateFormDetailInfo(
+        const std::vector<TemplateFormDetailInfo> &templateFormInfo);
+
 private:
     /**
      * @brief Get form configure info.
@@ -1483,6 +1507,12 @@ private:
 
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
 
+    void SetTemplateFormDetailInfoCallerToken(const sptr<IRemoteObject> templateFormDetailInfoCallerToken);
+ 
+    void ClearTemplateFormDetailInfoCallerToken();
+ 
+    sptr<IRemoteObject> GetTemplateFormDetailInfoCallerToken();
+
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 
@@ -1498,6 +1528,8 @@ private:
 
     sptr<IRemoteObject> crossBundleControlCallerToken_;
 
+    sptr<IRemoteObject> templateFormDetailInfoCallerToken_;
+
     mutable std::mutex overflowCallerTokenMutex_;
 
     mutable std::mutex sceneanimationCallerTokenMutex_;
@@ -1507,6 +1539,8 @@ private:
     mutable std::mutex getLiveFormStatusCallerTokenMutex_;
 
     mutable std::mutex crossBundleControlCallerTokenMutex_;
+
+    mutable std::mutex templateFormDetailInfoCallerTokenMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
