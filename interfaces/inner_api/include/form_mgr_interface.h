@@ -1030,25 +1030,6 @@ public:
     }
 
     /**
-     * @brief Register template from detail info change.
-     * @param callerToken The form host proxy.
-     * @return Return ERR_OK on success, others on failure
-     */
-    virtual ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
-    {
-        return ERR_OK;
-    }
- 
-    /**
-     * @brief UnRegister template from detail info change.
-     * @return Return ERR_OK on success, others on failure
-     */
-    virtual ErrCode UnregisterTemplateFormDetailInfoChange()
-    {
-        return ERR_OK;
-    }
-
-    /**
      * @brief Register template from detail info change proxy in fms.
      * @param callerToken The form host proxy.
      * @return Return ERR_OK on success, others on failure
