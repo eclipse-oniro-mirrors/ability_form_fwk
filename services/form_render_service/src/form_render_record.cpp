@@ -41,15 +41,15 @@
 #include "configuration_convertor.h"
 #include "resource_manager.h"
 
+namespace OHOS {
+namespace AppExecFwk {
+namespace FormRender {
+namespace {
 using namespace OHOS::Global::Resource;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
 using namespace OHOS::AppExecFwk::Constants;
 using namespace OHOS::AppExecFwk::ConfigurationInner;
 
-namespace OHOS {
-namespace AppExecFwk {
-namespace FormRender {
-namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
@@ -660,6 +660,7 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 
 void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
+    std::lock_guard<std::mutex> lock(configurationMutex_);
     if (configuration_) {
         auto checkConfigItem = {SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE};
         for (const auto& item: checkConfigItem) {
@@ -670,6 +671,44 @@ void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::
         }
     } else {
         configuration_ = config;
+    }
+}
+
+std::shared_ptr<OHOS::AppExecFwk::Configuration> FormRenderRecord::GetConfiguration()
+{
+    std::lock_guard<std::mutex> lock(configurationMutex_);
+    if (configuration_ == nullptr) {
+        return std::make_shared<AppExecFwk::Configuration>();
+    } else {
+        return std::make_shared<AppExecFwk::Configuration>(*configuration_);
+    }
+}
+
+void FormRenderRecord::ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config,
+    const Want &want)
+{
+    std::lock_guard<std::mutex> lock(configurationMutex_);
+    if (!config) {
+        HILOG_INFO("config is nullpter");
+        return;
+    }
+    std::string colorModeTag = "";
+    std::string languageTag = "";
+    if (configuration_ != nullptr) {
+        colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
+        languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
+    }
+
+    std::string colorMode = AppExecFwk::GetColorModeStr(
+        want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
+    if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
+        config->AddItem(SYSTEM_COLORMODE, colorMode);
+    } else if (!colorModeTag.empty()) {
+        config->AddItem(SYSTEM_COLORMODE, colorModeTag);
+    }
+
+    if (!languageTag.empty()) {
+        config->AddItem(SYSTEM_LANGUAGE, languageTag);
     }
 }
 
@@ -697,18 +736,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
 
             std::shared_ptr<OHOS::AppExecFwk::Configuration> config = iter->second->GetConfiguration();
             if (config != nullptr) {
-                std::string colorMode = AppExecFwk::GetColorModeStr(
-                    want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
-                if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
-                    config->AddItem(SYSTEM_COLORMODE, colorMode);
-                } else if (configuration_ != nullptr) {
-                    std::string colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
-                    config->AddItem(SYSTEM_COLORMODE, colorModeTag);
-                }
-                if (configuration_ != nullptr) {
-                    std::string languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
-                    config->AddItem(SYSTEM_LANGUAGE, languageTag);
-                }
+                ResetFormConfiguration(config, want);
             }
             return iter->second;
         }
@@ -724,13 +752,8 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
         HILOG_ERROR("Create context failed");
         return nullptr;
     }
-    std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
-    if (configuration_ == nullptr) {
-        config = std::make_shared<AppExecFwk::Configuration>();
-    } else {
-        config = std::make_shared<AppExecFwk::Configuration>(*configuration_);
-    }
 
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = GetConfiguration();
     std::string colorMode =
         AppExecFwk::GetColorModeStr(want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
     if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
