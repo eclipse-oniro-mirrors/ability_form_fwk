@@ -3158,6 +3158,7 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
     HILOG_INFO("call");
 
     if (templateFormInfo.size() > AppExecFwk::Constants::TEMPLATE_FORM_MAX_SIZE) {
+        HILOG_ERROR("size limit");
         return false;
     }
 
