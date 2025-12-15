@@ -2595,12 +2595,12 @@ ErrCode FormMgr::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> 
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return errCode;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->RegisterTemplateFormDetailInfoChange(callerToken);
 }
@@ -2611,12 +2611,12 @@ ErrCode FormMgr::UnregisterTemplateFormDetailInfoChange()
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return errCode;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UnregisterTemplateFormDetailInfoChange();
 }
@@ -2632,7 +2632,7 @@ ErrCode FormMgr::UpdateTemplateFormDetailInfo(
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UpdateTemplateFormDetailInfo(templateFormInfo);
 }

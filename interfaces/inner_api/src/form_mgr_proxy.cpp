@@ -3333,7 +3333,7 @@ ErrCode FormMgrProxy::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObj
         IFormMgr::Message::FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("send request failed, errCode: %{public}d.", error);
-        return error;
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
 }
@@ -3352,8 +3352,8 @@ ErrCode FormMgrProxy::UnregisterTemplateFormDetailInfoChange()
     ErrCode error = SendTransactCmd(
         IFormMgr::Message::FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("send request failed, errCode: %{public}d failed.", error);
-        return error;
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
 }
@@ -3383,8 +3383,8 @@ ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
     int error = SendTransactCmd(
         IFormMgr::Message::FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("send request failed, errCode:%{public}d failed.", error);
-        return error;
+        HILOG_ERROR("send request failed, errCode:%{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
 }

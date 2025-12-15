@@ -3172,6 +3172,11 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
     napi_value callbackFunction = nullptr;
     napi_get_reference_value(templateFormDetailInfoChangeEnv_,
         templateFormDetailInfoChangeCallbackRef_, &callbackFunction);
+
+    if (callbackFunction == nullptr) {
+        HILOG_ERROR("callbackFunction is nullptr");
+        return false;
+    }
  
     napi_valuetype valueType;
     napi_typeof(templateFormDetailInfoChangeEnv_, callbackFunction, &valueType);
