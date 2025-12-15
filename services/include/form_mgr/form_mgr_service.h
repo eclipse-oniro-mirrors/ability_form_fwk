@@ -26,9 +26,11 @@
 #include "form_provider_data.h"
 #include "common/util/form_serial_queue.h"
 #include "common/event/system_event/form_sys_event_receiver.h"
-#include "running_form_info.h"
-#include "iremote_object.h"
 #include "common/util/mem_status_listener.h"
+#include "running_form_info.h"
+#include "template_form_detail_info.h"
+#include "iremote_object.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 enum class ServiceRunningState {
@@ -924,6 +926,27 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode UnregisterPublishFormCrossBundleControl() override;
+
+    /**
+     * @brief Register template from detail info change.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief UnRegister template from detail info change.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterTemplateFormDetailInfoChange() override;
+
+    /**
+     * @brief Update template form detail info.
+     * @param templateFormInfo The template form info to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateTemplateFormDetailInfo(
+        const std::vector<TemplateFormDetailInfo> &templateFormInfo) override;
 
 private:
     /**

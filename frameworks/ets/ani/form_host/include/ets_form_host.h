@@ -27,6 +27,7 @@
 #include "form_instance.h"
 #include "form_mgr.h"
 #include "fms_log_wrapper.h"
+#include "template_form_detail_info.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -141,6 +142,8 @@ private:
         LiveFormInterfaceParam *params);
     static void GetFormRectPromiseCallback(ani_env *env, ani_object aniObj, ani_object obj);
     static bool ConvertFunctionResult(ani_env* env, ani_object retObj, Rect &item);
+    ErrCode TemplateFormDetailInfoChange(
+        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
     mutable std::mutex registerGetFormRectProxyMutex_;

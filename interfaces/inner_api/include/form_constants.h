@@ -464,6 +464,8 @@ namespace Constants {
 
     constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL =
         "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL";
+
+    constexpr const int32_t TEMPLATE_FORM_MAX_SIZE = 20;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

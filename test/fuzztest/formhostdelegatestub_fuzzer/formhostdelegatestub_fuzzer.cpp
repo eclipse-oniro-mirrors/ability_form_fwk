@@ -50,6 +50,11 @@ public:
     {
         return ERR_OK;
     }
+    ErrCode TemplateFormDetailInfoChange(
+        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo) override
+    {
+        return ERR_OK;
+    }
 };
 uint32_t GetU32Data(const char* ptr)
 {
