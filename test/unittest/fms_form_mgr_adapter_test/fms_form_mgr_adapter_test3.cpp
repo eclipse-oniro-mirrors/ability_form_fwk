@@ -995,7 +995,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
      FormMgrAdapter formMgrAdapter;
      int64_t formId = 0;
      int32_t formVisibleType = 0;
-     formMgrAdapter.SetVisibleChange(formId, formVisibleType);
+     formMgrAdapter.SetVisibleChange(formId, formVisibleType, Constants::INVALID_USER_ID);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0285 end";
  }
 
@@ -1010,7 +1010,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
      FormMgrAdapter formMgrAdapter;
      int64_t formId = 1;
      int32_t formVisibleType = Constants::FORM_VISIBLE;
-     formMgrAdapter.SetVisibleChange(formId, formVisibleType);
+     formMgrAdapter.SetVisibleChange(formId, formVisibleType, Constants::INVALID_USER_ID);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0286 end";
  }
 

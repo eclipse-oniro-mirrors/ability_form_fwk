@@ -18,6 +18,7 @@
 
 #include <string>
 #include "form_ashmem.h"
+#include "form_constants.h"
 #include "form_provider_data.h"
 #include "form_info_base.h"
 #include "parcel.h"
@@ -51,6 +52,7 @@ struct FormJsInfo : public Parcelable {
     FormType uiSyntax = FormType::JS;
     bool isDynamic = true;
     bool transparencyEnabled = false;
+    std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;

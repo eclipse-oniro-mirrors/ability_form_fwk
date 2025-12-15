@@ -253,6 +253,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     newRecord.isDataProxyIgnoreFormVisible = formInfo.GetDataProxyIgnoreFormVisibility();
+    newRecord.templateFormImperativeFwk = formInfo.GetTemplateFormImperativeFwk();
     newRecord.isTemplateForm = formInfo.GetIsTemplateForm();
     HILOG_DEBUG("end");
     return newRecord;
@@ -284,6 +285,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.modulePkgNameMap = record.modulePkgNameMap;
     formInfo.formData = record.formProviderInfo.GetFormDataString();
     formInfo.formProviderData = record.formProviderInfo.GetFormData();
+    formInfo.templateFormImperativeFwk = record.templateFormImperativeFwk;
 }
 
 void FormDataMgr::SetConfigMap(const std::map<std::string, int32_t> &configMap)
@@ -3190,6 +3192,7 @@ void FormDataMgr::SetExpectRecycledStatus(const std::vector<int64_t> &formIds, b
         if (info == formRecords_.end()) {
             continue;
         }
+        HILOG_INFO("formId:%{public}" PRId64 " isExpectRecycled:%{public}d", formId, isExpectRecycled);
         info->second.expectRecycled = isExpectRecycled;
     }
 }
@@ -3199,6 +3202,7 @@ void FormDataMgr::SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled)
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info != formRecords_.end()) {
+        HILOG_INFO("formId:%{public}" PRId64 " isExpectRecycled:%{public}d", formId, isExpectRecycled);
         info->second.expectRecycled = isExpectRecycled;
     }
 }

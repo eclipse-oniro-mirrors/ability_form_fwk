@@ -41,15 +41,15 @@
 #include "configuration_convertor.h"
 #include "resource_manager.h"
 
+namespace OHOS {
+namespace AppExecFwk {
+namespace FormRender {
+namespace {
 using namespace OHOS::Global::Resource;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
 using namespace OHOS::AppExecFwk::Constants;
 using namespace OHOS::AppExecFwk::ConfigurationInner;
 
-namespace OHOS {
-namespace AppExecFwk {
-namespace FormRender {
-namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
@@ -62,6 +62,11 @@ constexpr size_t THREAD_NAME_LEN = 15;
 constexpr char FORM_RENDERER_PROCESS_ON_ADD_SURFACE[] = "ohos.extra.param.key.process_on_add_surface";
 constexpr char RENDERING_BLOCK_MONITOR_PREFIX[] = "RenderingBlockMonitorTask_";
 constexpr char MEMORY_MONITOR_PREFIX[] = "MemoryMonitorTask_";
+
+const static std::unordered_map<std::string, int> FORM_IMPERATIVE_MAP = {
+    {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE, 0},
+    {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL, 0}
+};
 
 inline std::string GetThreadNameByBundle(const std::string &bundleName)
 {
@@ -157,8 +162,8 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
 }
 
 FormRenderRecord::FormRenderRecord(
-    const std::string &bundleName, const std::string &uid, const sptr<IFormSupply> client)
-    : bundleName_(bundleName), uid_(uid), formSupplyClient_(client)
+    const std::string &bundleName, const std::string &uid, const sptr<IFormSupply> client) : bundleName_(bundleName),
+    uid_(uid), formSupplyClient_(client), formImperativeFwkCntMap_(FORM_IMPERATIVE_MAP)
 {
     HILOG_INFO("bundleName is %{public}s,uid is %{public}s", bundleName.c_str(), uid.c_str());
     threadState_ = std::make_unique<ThreadState>(CHECK_THREAD_TIME);
@@ -586,6 +591,17 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
     }
+
+    std::string target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
+    {
+        std::lock_guard<std::mutex> cntLock(formImperativeFwkCntMapMutex_);
+        if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL;
+        } else if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE;
+        }
+    }
+    runtime_->SetTemplateFormImperativeFwk(target);
     RegisterUncatchableErrorHandler();
     return true;
 }
@@ -624,7 +640,53 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
     }
+
+    AddFormImperativeFwkCnt(formJsInfo);
+    UpdateFormImperativeFwkCnt(formJsInfo.formId, ADD_IMPERATIVE_FORM);
     return true;
+}
+
+void FormRenderRecord::AddFormImperativeFwkCnt(const FormJsInfo &formJsInfo)
+{
+    std::lock_guard<std::mutex> lock(formImperativeFwkMapMutex_);
+    formImperativeFwkMap_[formJsInfo.formId] = formJsInfo.templateFormImperativeFwk;
+}
+
+void FormRenderRecord::UpdateFormImperativeFwkCnt(const int64_t formId, int num)
+{
+    std::string target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
+    std::string templateFormImperativeFwk;
+    {
+        std::lock_guard<std::mutex> lock(formImperativeFwkMapMutex_);
+        auto iter = formImperativeFwkMap_.find(formId);
+        if (iter == formImperativeFwkMap_.end()) {
+            return ;
+        }
+        templateFormImperativeFwk = iter->second;
+        if (num == DEL_IMPERATIVE_FORM) {
+            formImperativeFwkMap_.erase(iter);
+        }
+    }
+    {
+        std::lock_guard<std::mutex> cntLock(formImperativeFwkCntMapMutex_);
+        if (formImperativeFwkCntMap_.find(templateFormImperativeFwk) == formImperativeFwkCntMap_.end()) {
+            return;
+        }
+        HILOG_INFO("formImperativeFwk:%{public}s isAdd:%{public}d formId:%{public}" PRId64,
+            templateFormImperativeFwk.c_str(), num, formId);
+        formImperativeFwkCntMap_[templateFormImperativeFwk] += num;
+        if (formImperativeFwkCntMap_[templateFormImperativeFwk] < 0) {
+            formImperativeFwkCntMap_[templateFormImperativeFwk] = 0;
+        }
+        if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL;
+        } else if (formImperativeFwkCntMap_[Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE] > 0) {
+            target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE;
+        }
+    }
+    if (runtime_) {
+        runtime_->SetTemplateFormImperativeFwk(target);
+    }
 }
 
 bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options)
@@ -660,6 +722,7 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 
 void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
+    std::lock_guard<std::mutex> lock(configurationMutex_);
     if (configuration_) {
         auto checkConfigItem = {SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE};
         for (const auto& item: checkConfigItem) {
@@ -670,6 +733,44 @@ void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::
         }
     } else {
         configuration_ = config;
+    }
+}
+
+std::shared_ptr<OHOS::AppExecFwk::Configuration> FormRenderRecord::GetConfiguration()
+{
+    std::lock_guard<std::mutex> lock(configurationMutex_);
+    if (configuration_ == nullptr) {
+        return std::make_shared<AppExecFwk::Configuration>();
+    } else {
+        return std::make_shared<AppExecFwk::Configuration>(*configuration_);
+    }
+}
+
+void FormRenderRecord::ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config,
+    const Want &want)
+{
+    std::lock_guard<std::mutex> lock(configurationMutex_);
+    if (!config) {
+        HILOG_INFO("config is nullpter");
+        return;
+    }
+    std::string colorModeTag = "";
+    std::string languageTag = "";
+    if (configuration_ != nullptr) {
+        colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
+        languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
+    }
+
+    std::string colorMode = AppExecFwk::GetColorModeStr(
+        want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
+    if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
+        config->AddItem(SYSTEM_COLORMODE, colorMode);
+    } else if (!colorModeTag.empty()) {
+        config->AddItem(SYSTEM_COLORMODE, colorModeTag);
+    }
+
+    if (!languageTag.empty()) {
+        config->AddItem(SYSTEM_LANGUAGE, languageTag);
     }
 }
 
@@ -697,18 +798,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
 
             std::shared_ptr<OHOS::AppExecFwk::Configuration> config = iter->second->GetConfiguration();
             if (config != nullptr) {
-                std::string colorMode = AppExecFwk::GetColorModeStr(
-                    want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
-                if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
-                    config->AddItem(SYSTEM_COLORMODE, colorMode);
-                } else if (configuration_ != nullptr) {
-                    std::string colorModeTag = configuration_->GetItem(SYSTEM_COLORMODE);
-                    config->AddItem(SYSTEM_COLORMODE, colorModeTag);
-                }
-                if (configuration_ != nullptr) {
-                    std::string languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
-                    config->AddItem(SYSTEM_LANGUAGE, languageTag);
-                }
+                ResetFormConfiguration(config, want);
             }
             return iter->second;
         }
@@ -724,13 +814,8 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
         HILOG_ERROR("Create context failed");
         return nullptr;
     }
-    std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
-    if (configuration_ == nullptr) {
-        config = std::make_shared<AppExecFwk::Configuration>();
-    } else {
-        config = std::make_shared<AppExecFwk::Configuration>(*configuration_);
-    }
 
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = GetConfiguration();
     std::string colorMode =
         AppExecFwk::GetColorModeStr(want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
     if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
@@ -977,6 +1062,8 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
     if (compId.empty()) {
         return;
     }
+    AddFormImperativeFwkCnt(formJsInfo);
+    UpdateFormImperativeFwkCnt(formJsInfo.formId, ADD_IMPERATIVE_FORM);
 
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     Ace::FormRequest formRequest;
@@ -1638,6 +1725,9 @@ int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &status
         }
 
         result = renderRecord->HandleRecycleForm(formId, statusData);
+        if (result == ERR_OK) {
+            renderRecord->UpdateFormImperativeFwkCnt(formId, DEL_IMPERATIVE_FORM);
+        }
     };
     auto eventHandler = GetEventHandler();
     if (eventHandler != nullptr)
@@ -1692,6 +1782,8 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
             return;
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
+        renderRecord->AddFormImperativeFwkCnt(formJsInfo);
+        renderRecord->UpdateFormImperativeFwkCnt(formJsInfo.formId, ADD_IMPERATIVE_FORM);
         FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formJsInfo.formId,
             FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
     };

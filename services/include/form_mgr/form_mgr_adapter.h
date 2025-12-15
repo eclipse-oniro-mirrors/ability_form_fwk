@@ -1464,7 +1464,7 @@ private:
 
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 
-    void SetVisibleChange(const int64_t formId, const int32_t formVisibleType);
+    void SetVisibleChange(const int64_t formId, const int32_t formVisibleType, const int32_t userId);
 
     /**
     * @brief Post Form visible/invisible notify.

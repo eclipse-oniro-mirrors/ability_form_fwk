@@ -86,6 +86,7 @@ public:
         int32_t providerUserId, bool &appFormVisibleNotify);
 
     bool IsMultiAppForm(const FormInfo &formInfo);
+    bool IsTemplateFormImperativeFwkValid(const FormInfo &formInfo);
 
     bool IsDeleteCacheInUpgradeScene(const FormInfo &formInfo);
 

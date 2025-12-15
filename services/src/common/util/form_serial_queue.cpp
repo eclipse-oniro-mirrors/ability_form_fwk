@@ -76,16 +76,17 @@ bool FormSerialQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMs
         HILOG_ERROR("invalid task");
         return false;
     }
+    bool result = true;
     if (item->second != nullptr) {
         int32_t ret = queue_.cancel(item->second);
         if (ret != 0) {
             HILOG_ERROR("CancelDelayTask failed,errCode :%{public}d", ret);
-            return false;
+            result = false;
         }
     }
     taskMap_.erase(eventMsg);
     HILOG_DEBUG("CancelDelayTask success");
-    return true;
+    return result;
 }
 
 bool FormSerialQueue::ScheduleDelayTask(
@@ -112,16 +113,17 @@ bool FormSerialQueue::CancelDelayTask(const std::pair<int64_t, std::string> &eve
         HILOG_ERROR("invalid task");
         return false;
     }
+    bool result = true;
     if (item->second != nullptr) {
         int32_t ret = queue_.cancel(item->second);
         if (ret != 0) {
             HILOG_ERROR("CancelDelayTask failed,errCode :%{public}d", ret);
-            return false;
+            result = false;
         }
     }
     stringTaskMap_.erase(eventMsg);
     HILOG_DEBUG("CancelDelayTask success");
-    return true;
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

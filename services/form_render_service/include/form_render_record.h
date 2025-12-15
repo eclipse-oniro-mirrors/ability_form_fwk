@@ -35,6 +35,10 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 using Want = AAFwk::Want;
+
+constexpr int ADD_IMPERATIVE_FORM = 1;
+constexpr int DEL_IMPERATIVE_FORM = -1;
+
 enum class TaskState {
     NO_RUNNING = 0,
     RUNNING = 0,
@@ -108,6 +112,9 @@ public:
     void DeleteRenderRecord(int64_t formId, const std::string &compId,  const sptr<IRemoteObject> hostRemoteObj,
         bool &isRenderGroupEmpty);
 
+    void AddFormImperativeFwkCnt(const FormJsInfo &formJsInfo);
+    void UpdateFormImperativeFwkCnt(const int64_t formId, int num);
+
     int32_t HandleOnUnlock();
 
     int32_t OnUnlock();
@@ -134,6 +141,8 @@ public:
         const sptr<IFormSupply> &formSupplyClient);
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
+
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> GetConfiguration();
 
     void MarkThreadAlive();
 
@@ -318,6 +327,7 @@ private:
     void ReAddStaticRecycledForms(const int64_t formId);
     void HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
         const sptr<IFormSupply> &formSupplyClient, int32_t renderType);
+    void ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config, const Want &want);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
@@ -343,6 +353,7 @@ private:
     // <formId, <compId, formRequest>>
     std::mutex formRequestsMutex_;
     std::unordered_map<int64_t, std::unordered_map<std::string, Ace::FormRequest>> formRequests_;
+    std::mutex configurationMutex_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
     // <formId, <orderedCompIds, currentCompId>>
     std::mutex recycledFormCompIdsMutex_;
@@ -360,6 +371,10 @@ private:
     std::unordered_map<int64_t, bool> visibilityMap_;
     std::mutex formLocationMutex_;
     std::unordered_map<int64_t, FormLocationInfo> formLocationMap_;
+    std::mutex formImperativeFwkMapMutex_;
+    std::unordered_map<int64_t, std::string> formImperativeFwkMap_;
+    std::mutex formImperativeFwkCntMapMutex_;
+    std::unordered_map<std::string, int> formImperativeFwkCntMap_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
