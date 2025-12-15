@@ -17,12 +17,35 @@
 
 #include "rosen_text/font_collection_mgr.h"
 #include "fms_log_wrapper.h"
+#include "form_constants.h"
+#include "declarative_module_preloader.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 namespace {
-    constexpr size_t LOCALFONTCOLLECTION_MEMORY_LIMIT = 20 * 1024 * 1024;
+constexpr size_t LOCALFONTCOLLECTION_MEMORY_LIMIT = 20 * 1024 * 1024;
+const static std::unordered_map<std::string, Ace::FormJsXNodeLoadMode> FORM_IMPERATIVE_FWK_MAP = {
+    {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE, Ace::FormJsXNodeLoadMode::NONE},
+    {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE, Ace::FormJsXNodeLoadMode::LITE},
+    {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_FULL, Ace::FormJsXNodeLoadMode::FULL}
+};
+}
+
+void JsFormRuntime::SetTemplateFormImperativeFwk(const std::string &templateFormImperativeFwk)
+{
+    HILOG_INFO("templateFormImperativeFwk:%{public}s", templateFormImperativeFwk.c_str());
+    auto nativeEngine = GetNativeEnginePointer();
+    if (nativeEngine == nullptr) {
+        HILOG_ERROR("nativeEngine is nullptr");
+        return;
+    }
+    Ace::FormLoadConfig config;
+    const auto iter = FORM_IMPERATIVE_FWK_MAP.find(templateFormImperativeFwk);
+    if (iter != FORM_IMPERATIVE_FWK_MAP.end()) {
+        config.jsXNodeLoadMode = iter->second;
+    }
+    OHOS::Ace::DeclarativeModulePreloader::UpdateFormJsXNodeConfig(*nativeEngine, config);
 }
 
 void JsFormRuntime::SetLocalFontCollectionMaxSize()

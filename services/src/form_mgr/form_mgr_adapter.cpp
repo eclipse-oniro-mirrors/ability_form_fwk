@@ -2147,6 +2147,20 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo, const F
 void FormMgrAdapter::SetFormItemInfoParams(const BundleInfo& bundleInfo, const FormInfo& formInfo,
     FormItemInfo& itemInfo)
 {
+    std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
+    for (const auto &dataIter : formInfo.customizeDatas) {
+        if (dataIter.name == Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NAME) {
+            auto it = std::find(Constants::TEMPLATE_FORM_IMPERATIVE_FWKS,
+                Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END, dataIter.value);
+            if (it != Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END) {
+                HILOG_INFO("GotTemplateFormImperativeFwk:%{public}s", dataIter.value.c_str());
+                templateFormImperativeFwk = dataIter.value;
+                break;
+            }
+        }
+    }
+    itemInfo.SetTemplateFormImperativeFwk(templateFormImperativeFwk);
+
     if (!bundleInfo.hapModuleInfos.empty()) {
         for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
             SetFormItemModuleInfo(hapModuleInfo, formInfo, itemInfo);

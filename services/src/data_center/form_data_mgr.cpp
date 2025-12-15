@@ -253,6 +253,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     newRecord.isDataProxyIgnoreFormVisible = formInfo.GetDataProxyIgnoreFormVisibility();
+    newRecord.templateFormImperativeFwk = formInfo.GetTemplateFormImperativeFwk();
     newRecord.isTemplateForm = formInfo.GetIsTemplateForm();
     HILOG_DEBUG("end");
     return newRecord;
@@ -284,6 +285,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.modulePkgNameMap = record.modulePkgNameMap;
     formInfo.formData = record.formProviderInfo.GetFormDataString();
     formInfo.formProviderData = record.formProviderInfo.GetFormData();
+    formInfo.templateFormImperativeFwk = record.templateFormImperativeFwk;
 }
 
 void FormDataMgr::SetConfigMap(const std::map<std::string, int32_t> &configMap)

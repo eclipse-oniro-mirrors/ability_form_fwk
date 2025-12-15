@@ -35,6 +35,10 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 using Want = AAFwk::Want;
+
+constexpr int ADD_IMPERATIVE_FORM = 1;
+constexpr int DEL_IMPERATIVE_FORM = -1;
+
 enum class TaskState {
     NO_RUNNING = 0,
     RUNNING = 0,
@@ -107,6 +111,9 @@ public:
      */
     void DeleteRenderRecord(int64_t formId, const std::string &compId,  const sptr<IRemoteObject> hostRemoteObj,
         bool &isRenderGroupEmpty);
+
+    void AddFormImperativeFwkCnt(const FormJsInfo &formJsInfo);
+    void UpdateFormImperativeFwkCnt(const int64_t formId, int num);
 
     int32_t HandleOnUnlock();
 
@@ -364,6 +371,10 @@ private:
     std::unordered_map<int64_t, bool> visibilityMap_;
     std::mutex formLocationMutex_;
     std::unordered_map<int64_t, FormLocationInfo> formLocationMap_;
+    std::mutex formImperativeFwkMapMutex_;
+    std::unordered_map<int64_t, std::string> formImperativeFwkMap_;
+    std::mutex formImperativeFwkCntMapMutex_;
+    std::unordered_map<std::string, int> formImperativeFwkCntMap_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

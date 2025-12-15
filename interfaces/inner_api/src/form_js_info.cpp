@@ -61,6 +61,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     uiSyntax = static_cast<FormType>(parcel.ReadInt32());
     isDynamic = parcel.ReadBool();
     transparencyEnabled = parcel.ReadBool();
+    templateFormImperativeFwk = Str16ToStr8(parcel.ReadString16());
 
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
     if (bindingData == nullptr) {
@@ -139,6 +140,9 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteBool(isDynamic) || !parcel.WriteBool(transparencyEnabled)) {
+        return false;
+    }
+    if (!parcel.WriteString16(Str8ToStr16(templateFormImperativeFwk))) {
         return false;
     }
     if (!WriteObjects(parcel)) {
@@ -343,6 +347,7 @@ FormJsInfo FormJsInfo::CopyFormJsInfoWithoutFormData() const
     copyFormJsInfo.uiSyntax = uiSyntax;
     copyFormJsInfo.isDynamic = isDynamic;
     copyFormJsInfo.transparencyEnabled = transparencyEnabled;
+    copyFormJsInfo.templateFormImperativeFwk = templateFormImperativeFwk;
     return copyFormJsInfo;
 }
 } // namespace AppExecFwk
