@@ -14,6 +14,9 @@
  */
 
 #include "data_center/form_info/form_info_mgr.h"
+
+#include <algorithm>
+
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/database/form_db_cache.h"
@@ -641,10 +644,12 @@ bool FormInfoMgr::IsMultiAppForm(const FormInfo &formInfo)
 bool FormInfoMgr::IsTemplateFormImperativeFwkValid(const FormInfo &formInfo)
 {
     for (const auto &dataIter : formInfo.customizeDatas) {
-        if (dataIter.name == Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NAME &&
-            Constants::TEMPLATE_FORM_IMPERATIVE_FWKS.find(dataIter.value) ==
-            Constants::TEMPLATE_FORM_IMPERATIVE_FWKS.end()) {
-            return false;
+        if (dataIter.name == Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NAME) {
+            auto it = std::find(Constants::TEMPLATE_FORM_IMPERATIVE_FWKS,
+                Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END, dataIter.value);
+            if (it == Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END) {
+                return false;
+            }
         }
     }
     return true;

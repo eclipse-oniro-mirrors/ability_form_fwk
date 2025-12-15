@@ -17,7 +17,6 @@
 #define OHOS_FORM_FWK_FORM_CONSTANTS_H
 
 #include <map>
-#include <set>
 #include <string>
 
 namespace OHOS {
@@ -354,11 +353,12 @@ namespace Constants {
 
     // Is form contains templateFormImperativeFwk
     constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_NAME = "templateFormImperativeFwk";
-    const std::set<std::string> TEMPLATE_FORM_IMPERATIVE_FWKS = {
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWKS[] = {
         TEMPLATE_FORM_IMPERATIVE_FWK_NONE,
         TEMPLATE_FORM_IMPERATIVE_FWK_LITE,
         TEMPLATE_FORM_IMPERATIVE_FWK_FULL
     };
+    constexpr auto TEMPLATE_FORM_IMPERATIVE_FWKS_END = Constants::TEMPLATE_FORM_IMPERATIVE_FWKS + 3;
 
     struct PublishFormResult {
         PublishFormErrorCode code;

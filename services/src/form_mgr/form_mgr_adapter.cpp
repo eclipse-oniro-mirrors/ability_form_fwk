@@ -2150,8 +2150,9 @@ void FormMgrAdapter::SetFormItemInfoParams(const BundleInfo& bundleInfo, const F
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     for (const auto &dataIter : formInfo.customizeDatas) {
         if (dataIter.name == Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NAME) {
-            if (Constants::TEMPLATE_FORM_IMPERATIVE_FWKS.find(dataIter.value) !=
-                Constants::TEMPLATE_FORM_IMPERATIVE_FWKS.end()) {
+            auto it = std::find(Constants::TEMPLATE_FORM_IMPERATIVE_FWKS,
+                Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END, dataIter.value);
+            if (it != Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END) {
                 HILOG_INFO("GotTemplateFormImperativeFwk:%{public}s", dataIter.value.c_str());
                 templateFormImperativeFwk = dataIter.value;
                 break;
