@@ -523,7 +523,7 @@ public:
      * @brief Get templateFormImperativeFwk.
      * @return templateFormImperativeFwk Mode.
      */
-    const std::string& GetTemplateFormImperativeFwk() const;
+    const std::string &GetTemplateFormImperativeFwk() const;
 
     /**
      * @brief Set isTemplateForm.

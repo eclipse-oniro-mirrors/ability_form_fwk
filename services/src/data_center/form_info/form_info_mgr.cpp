@@ -74,7 +74,7 @@ ErrCode FormInfoMgr::Start()
 
 ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_t userId)
 {
-    HILOG_INFO("UpdateStaticFormInfos: %{public}s.", bundleName.c_str());
+    HILOG_INFO("UpdateStaticFormInfos: %{public}s", bundleName.c_str());
     if (bundleName.empty()) {
         HILOG_ERROR("empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
