@@ -19,6 +19,7 @@
 #include <singleton.h>
 #include "iremote_object.h"
 #include "running_form_info.h"
+#include "configuration.h"
 
 namespace OHOS {
 namespace AppExecFwk {

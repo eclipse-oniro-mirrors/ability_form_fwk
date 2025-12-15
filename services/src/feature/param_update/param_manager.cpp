@@ -53,13 +53,13 @@ void ParamManager::InitParam()
     g_currentVersion = LoadVersion();
     std::string presetVersion = ParamReader::GetInstance().GetPathVersion(PARAM_PRESET_PATH);
     long long presetVersionNum;
-    if (!StringUtils::VersionStrToNumber(presetVersion, presetVersionNum)) {
+    if (!VersionStrToNumber(presetVersion, presetVersionNum)) {
         HILOG_ERROR("path version error:%{public}s", presetVersion.c_str());
         return;
     }
     std::string pathVersion = ParamReader::GetInstance().GetPathVersion(Constants::FORM_MGR_CONFIG_DIR);
     long long pathVersionNum;
-    if (!StringUtils::VersionStrToNumber(pathVersion, pathVersionNum)) {
+    if (!VersionStrToNumber(pathVersion, pathVersionNum)) {
         HILOG_ERROR("path version error:%{public}s", pathVersion.c_str());
         return;
     }
@@ -72,7 +72,7 @@ void ParamManager::InitParam()
     }
     std::string currentVersion = g_currentVersion;
     long long currentVersionNum;
-    if (!StringUtils::VersionStrToNumber(currentVersion, currentVersionNum)) {
+    if (!VersionStrToNumber(currentVersion, currentVersionNum)) {
         HILOG_ERROR("current version error:%{public}s", currentVersion.c_str());
         return;
     }
