@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "mock_want.h"
+#include "inner/mock_want.h"
 #include "want.h"
 
 namespace {

@@ -42,6 +42,7 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
     BindNativeFunction(env, exports, "isRequestPublishFormSupported", moduleName,
         JsFormProvider::IsRequestPublishFormSupported);
     BindNativeFunction(env, exports, "openFormEditAbility", moduleName, JsFormProvider::OpenFormEditAbility);
+    BindNativeFunction(env, exports, "closeFormEditAbility", moduleName, JsFormProvider::CloseFormEditAbility);
     BindNativeFunction(env, exports, "requestOverflow", moduleName, JsFormProvider::RequestOverflow);
     BindNativeFunction(env, exports, "cancelOverflow", moduleName, JsFormProvider::CancelOverflow);
     BindNativeFunction(env, exports, "activateSceneAnimation", moduleName, JsFormProvider::ActivateSceneAnimation);
@@ -53,6 +54,11 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
         JsFormProvider::GetPublishedRunningFormInfoById);
     BindNativeFunction(env, exports, "reloadForms", moduleName, JsFormProvider::ReloadForms);
     BindNativeFunction(env, exports, "reloadAllForms", moduleName, JsFormProvider::ReloadAllForms);
+    BindNativeFunction(env, exports, "onPublishFormCrossBundleControl", moduleName,
+        JsFormProvider::RegisterPublishFormCrossBundleControl);
+    BindNativeFunction(env, exports, "offPublishFormCrossBundleControl", moduleName,
+        JsFormProvider::UnregisterPublishFormCrossBundleControl);
+    return exports;
     return exports;
 }
 

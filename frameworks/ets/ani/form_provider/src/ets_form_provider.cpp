@@ -84,7 +84,7 @@ void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, an
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
@@ -105,7 +105,7 @@ void UpdateForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string dat
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, formId) || IsRefUndefined(env, dataObjStr)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -134,7 +134,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
         auto ret = env->Object_GetPropertyByName_Ref(filter, PROVIDER_FORMINFO_MODULENAME, &moduleName);
         if (ret != ANI_OK) {
             HILOG_ERROR("moduleName Object_GetPropertyByName_Ref failed");
-            InvokeAsyncWithBusinessError(env, callback, ERR_FORM_EXTERNAL_PARAM_INVALID, nullptr);
+            InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_INVALID_PARAM, nullptr);
             return;
         }
         formInfoFilter.moduleName = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(moduleName));
@@ -180,13 +180,28 @@ void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
     std::string stdAbilityName = ANIUtils_ANIStringToStdString(env, abilityName);
     if (stdAbilityName.empty()) {
         HILOG_ERROR("abilityName ANIUtils_ANIStringToStdString failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
     auto ret = FormMgr::GetInstance().OpenFormEditAbility(stdAbilityName, formIdNum, isMainPage);
     if (ret != ERR_OK) {
         HILOG_ERROR("OpenFormEditAbility failed, error code: %{public}d", ret);
+        PrepareExceptionAndThrow(env, ret);
+    }
+
+    HILOG_DEBUG("End");
+}
+
+void CloseFormEditAbility([[maybe_unused]] ani_env *env, ani_boolean isMainPage)
+{
+    HILOG_DEBUG("Call");
+
+    CheckEnvOrThrow(env);
+
+    auto ret = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("CloseFormEditAbility failed, error code: %{public}d", ret);
         PrepareExceptionAndThrow(env, ret);
     }
 
@@ -202,7 +217,7 @@ void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
     Want want;
     if (!AppExecFwk::UnwrapWant(env, wantObj, want)) {
         HILOG_ERROR("want parsing failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
     const std::string bundleName = want.GetBundle();
@@ -607,7 +622,7 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
     CheckEnvOrThrow(env);
     if (IsRefUndefined(env, wantObj)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -628,7 +643,7 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
     if (!AppExecFwk::UnwrapWant(env, wantObj, want)) {
         HILOG_ERROR("UnwrapWant failed");
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -669,7 +684,7 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
             formInfosArray, ANI_SETTER_MARKER, PROVIDER_SET_SIGNATURE, index, runningFormInfoAni);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void failed, error code: %{public}d", static_cast<int>(status));
-            InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID),
+            InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE),
                 nullptr);
             break;
         }
@@ -686,7 +701,7 @@ void GetPublishedFormInfoById(ani_env* env, ani_string formId, ani_object callba
     
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID), nullptr);
+            static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
 
@@ -769,10 +784,12 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function{"getFormsInfoInner",
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}C{@ohos.app.form.formInfo.formInfo.FormInfoFilter}:",
             reinterpret_cast<void *>(GetFormsInfo)},
-        ani_native_function{"openFormEditAbilityInner", "C{std.core.String}C{std.core.String}z:",
+        ani_native_function{"openFormEditAbilityInner",
+            "C{std.core.String}C{std.core.String}z:",
             reinterpret_cast<void *>(OpenFormEditAbility)},
-        ani_native_function{"openFormManagerInner", "C{@ohos.app.ability.Want.Want}:",
-            reinterpret_cast<void *>(OpenFormManager)},
+        ani_native_function{"closeFormEditAbilityInner", "z:", reinterpret_cast<void *>(CloseFormEditAbility)},
+        ani_native_function{
+            "openFormManagerInner", "C{@ohos.app.ability.Want.Want}:", reinterpret_cast<void *>(OpenFormManager)},
         ani_native_function{"requestPublishFormInner",
             "C{@ohos.app.ability.Want.Want}"
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}zC{std.core.String}C{escompat.Array}:",
@@ -780,31 +797,24 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function{"isRequestPublishFormSupportedInner",
             "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(IsRequestPublishFormSupported)},
-        ani_native_function{"getPublishedFormInfosInner", "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
+        ani_native_function{"getPublishedFormInfosInner",
+            "C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(GetPublishedFormInfos)},
         ani_native_function{"getPublishedFormInfoByIdInner",
             "C{std.core.String}C{@ohos.app.form.formProvider.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(GetPublishedFormInfoById)},
-        ani_native_function{
-            "nativeGetFormRect", nullptr, reinterpret_cast<void *>(GetFormRect)},
-        ani_native_function{
-            "nativeCancelOverflow", nullptr, reinterpret_cast<void *>(CancelOverflow)},
-        ani_native_function{
-            "nativeRequestOverflow", nullptr, reinterpret_cast<void *>(RequestOverflow)},
+        ani_native_function{"nativeGetFormRect", nullptr, reinterpret_cast<void *>(GetFormRect)},
+        ani_native_function{"nativeCancelOverflow", nullptr, reinterpret_cast<void *>(CancelOverflow)},
+        ani_native_function{"nativeRequestOverflow", nullptr, reinterpret_cast<void *>(RequestOverflow)},
         ani_native_function{
             "nativeDeactivateSceneAnimation", nullptr, reinterpret_cast<void *>(DeactivateSceneAnimation)},
-        ani_native_function{
-            "nativeActivateSceneAnimation", nullptr, reinterpret_cast<void *>(ActivateSceneAnimation)},
+        ani_native_function{"nativeActivateSceneAnimation", nullptr, reinterpret_cast<void *>(ActivateSceneAnimation)},
         ani_native_function{
             "nativeOpenFormManagerCrossBundle", nullptr, reinterpret_cast<void *>(OpenFormManagerCrossBundle)},
-        ani_native_function{
-            "checkFormIDParam", nullptr, reinterpret_cast<void *>(CheckFormIDParam)},
-        ani_native_function{
-            "checkOverflowInfoParam", nullptr, reinterpret_cast<void *>(CheckOverflowInfoParam)},
-        ani_native_function{
-            "nativeReloadForms", nullptr, reinterpret_cast<void *>(ReloadForms)},
-        ani_native_function{
-            "nativeReloadAllForms", nullptr, reinterpret_cast<void *>(ReloadAllForms)},
+        ani_native_function{"checkFormIDParam", nullptr, reinterpret_cast<void *>(CheckFormIDParam)},
+        ani_native_function{"checkOverflowInfoParam", nullptr, reinterpret_cast<void *>(CheckOverflowInfoParam)},
+        ani_native_function{"nativeReloadForms", nullptr, reinterpret_cast<void *>(ReloadForms)},
+        ani_native_function{"nativeReloadAllForms", nullptr, reinterpret_cast<void *>(ReloadAllForms)},
     };
     return methods;
 }

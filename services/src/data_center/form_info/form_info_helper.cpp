@@ -31,6 +31,7 @@ namespace AppExecFwk {
 namespace {
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
 const std::string FORM_METADATA_NAME = "ohos.extension.form";
+const std::string TEMPLATE_FORM_METADATA_NAME = "ohos.extension.templateForm";
 }
 
 bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)
@@ -115,18 +116,28 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
         SetDistributedBundleStatus(userId, bundleInfo.entryModuleName, sharedModule.moduleName,
             bundleInfo.name, hasDistributedForm);
         std::vector<std::string> profileInfos {};
+        std::vector<std::string> templateProfileInfos {};
+        ExtraFormInfo extraFormInfo { hasDistributedForm, sharedModule.moduleName, false };
         if  (hasDistributedForm) {
             if (!client->GetProfileFromSharedHap(sharedModule, extensionInfo, profileInfos)) {
                 HILOG_WARN("fail get profile info from shared hap");
                 continue;
             }
-        } else if (!client->GetResConfigFile(extensionInfo, FORM_METADATA_NAME, profileInfos)) {
-            HILOG_ERROR("fail get form metadata");
-            continue;
-        }
-        for (const auto &profileInfo: profileInfos) {
-            DistributedFormInfo distributedFormInfo { hasDistributedForm, sharedModule.moduleName };
-            LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, distributedFormInfo);
+            LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
+        } else {
+            auto metaData = !client->GetResConfigFile(extensionInfo, FORM_METADATA_NAME, profileInfos);
+            bool templateMetaData = true;
+            if (bundleInfo.applicationInfo.isSystemApp) {
+                templateMetaData = !client->GetResConfigFile(extensionInfo, TEMPLATE_FORM_METADATA_NAME,
+                    templateProfileInfos);
+            }
+            if (metaData && templateMetaData) {
+                HILOG_ERROR("fail get form metadata : %{public}d, %{public}d", metaData, templateMetaData);
+                continue;
+            }
+            LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
+            ExtraFormInfo templateExtraFormInfo { hasDistributedForm, sharedModule.moduleName, true };
+            LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, templateProfileInfos, templateExtraFormInfo);
         }
     }
 
@@ -139,7 +150,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
 
 void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
     const ExtensionAbilityInfo &extensionInfo, const std::string &profileInfo,
-    const DistributedFormInfo &distributedFormInfo)
+    const ExtraFormInfo &extraFormInfo)
 {
     std::vector<ExtensionFormInfo> extensionFormInfos;
     int32_t privacyLevel = 0;
@@ -150,13 +161,15 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
     }
     for (const auto &extensionFormInfo: extensionFormInfos) {
         FormInfo formInfo(extensionInfo, extensionFormInfo);
-        if (distributedFormInfo.isDistributedForm) {
-            formInfo.package = extensionInfo.bundleName + distributedFormInfo.moduleName;
+        if (extraFormInfo.isDistributedForm) {
+            formInfo.package = extensionInfo.bundleName + extraFormInfo.moduleName;
+            formInfo.customizeDatas.push_back({ Constants::DISTRIBUTE_FORM_MODULE, extraFormInfo.moduleName });
         }
         formInfo.versionCode = bundleInfo.versionCode;
         formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
         formInfo.privacyLevel = privacyLevel;
-        PrintLoadStageFormConfigInfo(formInfo, distributedFormInfo.isDistributedForm);
+        formInfo.isTemplateForm = extraFormInfo.isTemplateForm;
+        PrintLoadStageFormConfigInfo(formInfo, extraFormInfo.isDistributedForm);
         SendLoadStageFormConfigEvent(formInfo);
         formInfos.emplace_back(formInfo);
     }
@@ -165,9 +178,16 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
 void FormInfoHelper::PrintLoadStageFormConfigInfo(const FormInfo &formInfo, bool hasDistributedForm)
 {
     HILOG_INFO("LoadStageFormConfigInfo, bundleName:%{public}s, name:%{public}s, renderingMode:%{public}d, "
-        "moduleName:%{public}s, hasDistributedForm:%{public}d",
-        formInfo.bundleName.c_str(), formInfo.name.c_str(), static_cast<int>(formInfo.renderingMode),
-        formInfo.moduleName.c_str(), hasDistributedForm);
+        "moduleName:%{public}s, hasDistributedForm:%{public}d, isStandbySupported:%{public}d, "
+        "isStandbyAdapted:%{public}d, isPrivacySensitive:%{public}d",
+        formInfo.bundleName.c_str(),
+        formInfo.name.c_str(),
+        static_cast<int>(formInfo.renderingMode),
+        formInfo.moduleName.c_str(),
+        hasDistributedForm,
+        formInfo.standby.isSupported,
+        formInfo.standby.isAdapted,
+        formInfo.standby.isPrivacySensitive);
 }
 
 void FormInfoHelper::SetDistributedBundleStatus(int32_t userId, const std::string &entryModule,
@@ -282,9 +302,9 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
         HILOG_ERROR("get IBundleMgr failed");
         return false;
     }
-    const std::string &transparencyFormCapbilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapbilityKey();
-    if (transparencyFormCapbilityKey.empty()) {
-        HILOG_ERROR("get transparencyFormCapbilityKey is empty");
+    const std::string &transparencyFormCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
+    if (transparencyFormCapabilityKey.empty()) {
+        HILOG_ERROR("get transparencyFormCapabilityKey is empty");
         return false;
     }
     AppProvisionInfo appProvisionInfo;
@@ -304,7 +324,16 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
             HILOG_ERROR("appServiceCapabilities is not object");
             return false;
         }
-        return jsonObject.contains(transparencyFormCapbilityKey);
+        return jsonObject.contains(transparencyFormCapabilityKey);
+    }
+}
+
+void FormInfoHelper::LoadProfileFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
+    const ExtensionAbilityInfo &extensionInfo, const std::vector<std::string> &profileInfos,
+    const ExtraFormInfo &extraFormInfo)
+{
+    for (const auto &profileInfo: profileInfos) {
+        LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, extraFormInfo);
     }
 }
 }  // namespace AppExecFwk

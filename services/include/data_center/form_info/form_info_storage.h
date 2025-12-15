@@ -31,13 +31,17 @@ struct FormInfoStorage {
     ~FormInfoStorage() = default;
 
     void GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const;
+    void GetAllTemplateFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const;
     void GetFormsInfoByModule(int32_t userId, const std::string &moduleName,
+        std::vector<AppExecFwk::FormInfo> &formInfos) const;
+    void GetTemplateFormsInfoByModule(int32_t userId, const std::string &moduleName,
         std::vector<AppExecFwk::FormInfo> &formInfos) const;
     void GetFormsInfoByFilter(int32_t userId,
         const AppExecFwk::FormInfoFilter &filter, std::vector<AppExecFwk::FormInfo> &formInfos) const;
 private:
     bool IsGameCard(const AppExecFwk::FormInfo &formInfo) const;
     bool IsFunInterFormInfoFiltered(const AppExecFwk::FormInfo &formInfo) const;
+    bool IsEquipmentLevelFiltered(const AppExecFwk::FormInfo &formInfo) const;
 };
 
 void to_json(nlohmann::json &jsonObject, const FormInfoStorage &formInfoStorage);

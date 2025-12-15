@@ -15,15 +15,17 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include "gmock/gmock.h"
+#include "form_mgr_errors.h"
+#include "fms_log_wrapper.h"
+#include "mock_form_provider_client.h"
+#include "mock_form_host_task_mgr.h"
 #define private public
 #include "bms_mgr/form_bms_helper.h"
 #include "form_host/form_host_callback.h"
 #undef private
-#include "form_mgr_errors.h"
-#include "fms_log_wrapper.h"
-#include "mock_form_provider_client.h"
-#include "gmock/gmock.h"
 
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
@@ -210,5 +212,32 @@ HWTEST_F(FormHostCallbackTest, FormHostCallbackTest_0010, TestSize.Level0)
     formHostCallback.OnEnableForms(formIds, true, callerToken);
     formHostCallback.OnEnableForms(formIds, false, callerToken);
     GTEST_LOG_(INFO) << "FormHostCallbackTest_0010 end";
+}
+
+
+/**
+ * @tc.name: FormHostCallbackTest_OnCheckForms_0001
+ * @tc.desc: test OnEnableForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostCallbackTest, FormHostCallbackTest_OnCheckForms_0001, TestSize.Level0)
+{
+    HILOG_INFO("FormHostCallbackTest_OnCheckForms_0001 start");
+    MockFormHostTaskMgr::obj = std::make_shared<MockFormHostTaskMgr>();
+    EXPECT_CALL(*MockFormHostTaskMgr::obj, PostCheckFormsTaskToHost(_, _)).Times(1);
+
+    FormHostCallback formHostCallback;
+    std::vector<int64_t> formIds;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formHostCallback.OnCheckForms(formIds, callerToken);
+    
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    formHostCallback.OnCheckForms(formIds, nullptr);
+
+    formHostCallback.OnCheckForms(formIds, callerToken);
+
+    MockFormHostTaskMgr::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormHostCallbackTest_OnCheckForms_0001 end";
 }
 }

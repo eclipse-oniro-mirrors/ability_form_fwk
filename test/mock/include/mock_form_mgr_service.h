@@ -60,8 +60,12 @@ public:
     MOCK_METHOD3(NotifyFormsEnableUpdate, int(const std::vector<int64_t> &formIds, bool isEnableUpdate,
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(GetAllFormsInfo, int(std::vector<FormInfo> &formInfos));
+    MOCK_METHOD1(GetAllTemplateFormsInfo, int(std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(GetFormsInfoByApp, int(std::string &bundleName, std::vector<FormInfo> &formInfos));
+    MOCK_METHOD2(GetTemplateFormsInfoByApp, int(const std::string &bundleName, std::vector<FormInfo> &formInfos));
     MOCK_METHOD3(GetFormsInfoByModule, int(std::string &bundleName, std::string &moduleName,
+        std::vector<FormInfo> &formInfos));
+    MOCK_METHOD3(GetTemplateFormsInfoByModule, int(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(GetFormsInfoByFilter, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(GetFormsInfo, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
@@ -137,6 +141,7 @@ public:
         const std::string &abilityName, const std::string &formName));
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
     MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
+    MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
 };
 }
 }

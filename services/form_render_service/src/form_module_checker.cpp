@@ -47,7 +47,10 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "systemDateTime",
     "batteryInfo",
     "commonEventManager",
-    "graphics.uiEffect"
+    "graphics.uiEffect",
+    "arkui.node",
+    "arkui.uicontext",
+    "arkui.modifier"
 };
 const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "i18n",

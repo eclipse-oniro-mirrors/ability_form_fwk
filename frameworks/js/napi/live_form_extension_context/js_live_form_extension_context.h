@@ -38,6 +38,8 @@ public:
 
     static napi_value SetWindowBackgroundColor(napi_env env, napi_callback_info info);
 
+    static napi_value SetUIExtCustomDensity(napi_env env, napi_callback_info info);
+
     static napi_value StartAbilityByLiveForm(napi_env env, napi_callback_info info);
 
     static napi_value ConnectAbility(napi_env env, napi_callback_info info);
@@ -45,7 +47,11 @@ public:
     static napi_value DisconnectAbility(napi_env env, napi_callback_info info);
 
 private:
+    static void HandleErrorCode(napi_env env, NapiAsyncTask &task, ErrCode errCode);
+
     napi_value OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info);
+
+    napi_value OnSetUIExtCustomDensity(napi_env env, NapiCallbackInfo &info);
 
     napi_value OnStartAbilityByLiveForm(napi_env env, NapiCallbackInfo &info);
 

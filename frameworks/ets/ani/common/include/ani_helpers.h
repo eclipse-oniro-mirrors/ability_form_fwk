@@ -82,6 +82,13 @@ void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::
 
 void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo);
 
+void SetFormInfoFunInteractionParams(ani_env *env, ani_object formInfoAni,
+    const AppExecFwk::FormFunInteractionParams &funInteractionParams);
+
+void SetFormInfoSceneAnimationParams(ani_env *env, ani_object formInfoAni,
+    const AppExecFwk::FormSceneAnimationParams &formSceneAnimationParams);
+
+
 ani_object CreateANIObject(ani_env *env, const char *className);
 
 void CheckIfRefValidOrThrow(ani_env *env, ani_object obj);
@@ -117,6 +124,8 @@ ani_env *GetEnvFromVm(ani_vm *vm);
 void DeleteGlobalReference(ani_env *env, ani_ref globalReference);
 
 ani_object CreateBool(ani_env *env, ani_boolean value);
+
+bool VectorHasNegativeValue(const std::vector<int>& vec);
 }  // namespace FormAniHelpers
 }  // namespace AbilityRuntime
 }  // namespace OHOS

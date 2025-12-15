@@ -67,6 +67,9 @@ private:
     static UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg);
     static void HandleFormReload(const std::string &bundleName, const int userId, const bool needReload,
         const std::vector<FormRecord> &updatedForms);
+    static void HandleProviderUpdatedDetail(const std::vector<int64_t> &removedForms,
+        const std::vector<FormRecord> &updatedForms, const std::string &bundleName,
+        const int userId, const bool needReload);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -125,6 +125,7 @@ ohos_shared_library("formrender") {
     "samgr:samgr_proxy",
     "graphic_2d:librender_service_client",
     "graphic_2d:rosen_text",
+    "ace_engine:ace_uicontent",
   ]
 
   subsystem_name = "ability"

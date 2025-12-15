@@ -193,6 +193,15 @@ public:
      * @return Returns true on success, false on failure.
      */
     bool DeleteIntervalTimer(int64_t formId);
+    /**
+     * @brief Start form check timer task.
+     * @return Returns true on success, false on failure.
+     */
+    bool StartFormCheckTimer();
+    /**
+     * @brief Destroy form check timer task.
+     */
+    void DestroyFormCheckTimer();
 
 private:
     /**
@@ -235,6 +244,14 @@ private:
      * @return Returns true on success, false on failure.
      */
     bool UpdateIntervalValue(int64_t formId, const FormTimerCfg &timerCfg);
+    /**
+     * @brief Update update at timer task value.
+     * @param formId The Id of the form.
+     * @param timerCfg task value.
+     * @param changedItem UpdateAtItem.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateTimerValue(int64_t formId, const FormTimerCfg &timerCfg, UpdateAtItem &changedItem);
     /**
      * @brief Update update at timer task value.
      * @param formId The Id of the form.
@@ -374,8 +391,6 @@ private:
         }
     } CompareDynamicRefreshItem;
 
-    int64_t GetBootTimeMs();
-
     bool IsNeedUpdate();
 
     void FormPeriodReport();
@@ -384,7 +399,6 @@ private:
     void InnerClearIntervalReportTimer();
     bool IsDynamicTimerExpired(int64_t formId);
     bool UpdateAtTimerAlarmDetail(FormTimer &timerTask);
-    bool GetNextUpdateTime(long nowAtTime, UpdateAtItem &foundItem, long &nextTime, FormTimer &timerTask);
 
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
@@ -403,6 +417,8 @@ private:
     std::atomic<uint64_t> limiterTimerId_ = 0L;
     uint64_t limiterTimerReportId_ = 0L;
     uint64_t reportDiskUseTimerId_ = 0L;
+    mutable std::mutex formCheckTimerMutex_;
+    uint64_t formCheckTimerId_ = 0L;
 
     mutable std::mutex currentLimiterWantAgentMutex_;
     mutable std::mutex currentUpdateWantAgentMutex_;

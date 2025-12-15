@@ -44,10 +44,18 @@ public:
 
     ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
+    ErrCode GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+
     ErrCode GetFormsInfoByBundle(
+        const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+    
+    ErrCode GetTemplateFormsInfoByBundle(
         const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+
+    ErrCode GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByFilter(
@@ -56,6 +64,9 @@ public:
     ErrCode GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo);
 
     ErrCode GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
+        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+
+    ErrCode GetTemplateFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode AddDynamicFormInfo(FormInfo &formInfo, int32_t userId);
@@ -74,6 +85,7 @@ public:
     ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
         int32_t providerUserId, bool &appFormVisibleNotify);
     bool IsMultiAppForm(const FormInfo &formInfo);
+    bool IsTemplateFormImperativeFwkValid(const FormInfo &formInfo);
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);

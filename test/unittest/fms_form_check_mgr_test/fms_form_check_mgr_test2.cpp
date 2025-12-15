@@ -112,7 +112,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_FormRefreshMgr_004, TestSize.
     RefreshData data;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormRefreshMgr::GetInstance().RequestRefresh(data, -1));
 
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA));
+    EXPECT_EQ(ERR_OK, FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormRefreshMgr_004 end";
 }
 

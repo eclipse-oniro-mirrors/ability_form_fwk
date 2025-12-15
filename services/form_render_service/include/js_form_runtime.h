@@ -30,6 +30,8 @@ public:
     bool InsertHapPath(
         const std::string& bundleName, const std::string& moduleName, const std::string& hapPath);
     void DestroyHapPath();
+
+    void SetTemplateFormImperativeFwk(const std::string& templateFormImperativeFwk);
 private:
     std::string bundleName_;
     std::unordered_set<std::string> moduleNameSet_;

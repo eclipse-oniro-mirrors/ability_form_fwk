@@ -35,10 +35,10 @@
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
-#include "mock_form_data_mgr.h"
 #include "mock_form_provider_client.h"
-#include "mock_form_mgr_adapter_test.h"
-#include "mock_want.h"
+#include "inner/mock_form_data_mgr.h"
+#include "inner/mock_form_mgr_adapter.h"
+#include "inner/mock_want.h"
 #include "mock_ipc_skeleton.h"
 
 using namespace testing::ext;
@@ -994,7 +994,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
      FormMgrAdapter formMgrAdapter;
      int64_t formId = 0;
      int32_t formVisibleType = 0;
-     formMgrAdapter.SetVisibleChange(formId, formVisibleType);
+     formMgrAdapter.SetVisibleChange(formId, formVisibleType, Constants::INVALID_USER_ID);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0285 end";
  }
 
@@ -1009,7 +1009,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
      FormMgrAdapter formMgrAdapter;
      int64_t formId = 1;
      int32_t formVisibleType = Constants::FORM_VISIBLE;
-     formMgrAdapter.SetVisibleChange(formId, formVisibleType);
+     formMgrAdapter.SetVisibleChange(formId, formVisibleType, Constants::INVALID_USER_ID);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0286 end";
  }
 

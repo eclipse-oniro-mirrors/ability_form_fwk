@@ -304,11 +304,24 @@ public:
     {
         return number_;
     }
+    int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos) override
+    {
+        return number_;
+    }
     int GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos) override
     {
         return number_;
     }
+    int GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos) override
+    {
+        return number_;
+    }
     int GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
+        std::vector<FormInfo> &formInfos) override
+    {
+        return number_;
+    }
+    int GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos) override
     {
         return number_;
@@ -448,6 +461,11 @@ public:
     }
 
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio) override
     {
         return ERR_OK;
     }

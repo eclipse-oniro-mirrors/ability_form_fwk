@@ -16,7 +16,7 @@
 import Want from '@ohos.app.ability.Want';
 
 export default namespace formInfo {
-  interface FormInfo {
+  export interface FormInfo {
     bundleName: string;
     moduleName: string;
     abilityName: string;
@@ -42,6 +42,13 @@ export default namespace formInfo {
     readonly previewImages?: Array<int>;
     readonly enableBlurBackground?: boolean;
     readonly renderingMode?: RenderingMode;
+    readonly funInteractionParams?: FunInteractionParams;
+    readonly sceneAnimationParams?: SceneAnimationParams;
+    readonly resizable?: boolean;
+    readonly groupId?: string;
+    readonly isStandbySupported?: boolean;
+    readonly isStandbyAdapted?: boolean;
+    readonly isPrivacySensitive?: boolean;
   }
 
   enum RenderingMode {
@@ -193,6 +200,7 @@ export default namespace formInfo {
     FORM_MANAGER_NEGATIVE_SCREEN = 5,
     SCREEN_LOCK = 6,
     AI_SUGGESTION = 7,
+    STANDBY = 8,
   }
 
   export class formInfoInner implements FormInfo {
@@ -221,6 +229,13 @@ export default namespace formInfo {
     public previewImages?: Array<int> = {};
     public enableBlurBackground?: boolean = false;
     public renderingMode?: RenderingMode = RenderingMode.AUTO_COLOR;
+    public funInteractionParams?: FunInteractionParams = { targetBundleName: "", subBundleName: "" };
+    public sceneAnimationParams?: SceneAnimationParams = { abilityName: "" };
+    public resizable?: boolean = false;
+    public groupId?: string = '';
+    public isStandbySupported?: boolean = true;
+    public isStandbyAdapted?: boolean = false;
+    public isPrivacySensitive?: boolean = false;
   }
 
   export class runningFormInfoInner implements RunningFormInfo {

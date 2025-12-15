@@ -189,6 +189,7 @@ int32_t FormRenderServiceMgr::ProcessStopRenderingForm(
         if (result != ERR_OK) {
             return result;
         }
+        search->UpdateFormImperativeFwkCnt(formJsInfo.formId, DEL_IMPERATIVE_FORM);
     }
     HILOG_INFO("connectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 

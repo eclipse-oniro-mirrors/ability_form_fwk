@@ -73,6 +73,11 @@ public:
     * @param isControl True is control form, false is not control form.
     */
     virtual void ProcessDueControlForm(bool isDisablePolicy, bool isControl) {}
+
+    /**
+     * @brief check if form is abnormal.
+     */
+    virtual void ProcessCheckForm() {}
 };
 
 class FormStateCallbackInterface {

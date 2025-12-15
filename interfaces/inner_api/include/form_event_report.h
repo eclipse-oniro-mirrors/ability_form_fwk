@@ -50,7 +50,7 @@ public:
         const NewFormEventInfo &eventInfo);
     static void SendDiskUseEvent();
     static void SendRequestPublicFormEvent(const std::string &callerBundleName, const std::string &formName,
-        bool withSnapshot = false);
+        RequestFormType funcType);
     static void SendFormFailedEvent(const FormEventName &eventName, int64_t formId, const std::string &bundleName,
         const std::string &formName, int32_t errorType, int32_t errorCode = 0);
     static void SendFRSStatusEvent(
@@ -58,6 +58,8 @@ public:
         const std::vector<uint8_t> &statusList,
         const std::vector<int32_t> &formCountList,
         const std::vector<int64_t> &occurrenceTimeList);
+    static void SendFormAbnormalEvent(const FormAbnormalReportParams &params);
+
 private:
     static std::string ConvertEventName(const FormEventName &eventName);
 };

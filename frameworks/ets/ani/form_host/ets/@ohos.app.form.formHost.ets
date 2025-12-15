@@ -29,8 +29,8 @@ export class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
-class CallbackWrapper<T> {
-  private myFun_: Callback<T> = (data: T) => {}
+export class CallbackWrapper<T> {
+  private myFun_: Callback<T> = (data: T) => { }
 
   constructor(myFun: Callback<T>) {
     this.myFun_ = myFun;
@@ -39,9 +39,15 @@ class CallbackWrapper<T> {
   invoke(data: T): void {
     this.myFun_(data);
   }
+
+  isEqual(callback: Callback<T>): boolean {
+    return (this.myFun_ === callback);
+  }
 }
 
 export default namespace formHost {
+
+  let callbackArray: CallbackWrapper<string>[] = [];
 
   loadLibrary("formHost_ani.z");
 
@@ -84,12 +90,15 @@ export default namespace formHost {
   export native function nativeOffChangeSceneAnimationState(callback?: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
   export native function nativeOnGetFormRect(callback: GetFormRectInfoCallbackWrapper): void;
   export native function nativeOffGetFormRect(callback?: GetFormRectInfoCallbackWrapper): void;
+  export native function nativeOnGetLiveFormStatus(callback: GetLiveFormStatusCallbackWrapper): void;
+  export native function nativeOffGetLiveFormStatus(callback?: GetLiveFormStatusCallbackWrapper): void;
 
   const ERR_OK = 0;
   const INVALID_PARAM_ERROR_CODE = 401;
   const INVALID_PARAM_MESSAGE_ETS = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
     + " 2.Incorrect parameter types;"
     + " 3.Parameter verification failed.";
+  const INVALID_CALLBACK_INDEX = -1;
 
   export function acquireFormState(want: Want, callback: AsyncCallback<formInfo.FormStateInfo>): void {
     if (want === undefined || want === null) {
@@ -861,22 +870,20 @@ export default namespace formHost {
     });
   }
 
-  export function on(type: 'formUninstall', callback: Callback<string>): void {
-    let callbackWrap = new CallbackWrapper<string>(callback);
-    taskpool.execute((): void => {
-      registerFormObserverInner(callbackWrap);
-    });
+  export function onFormUninstall(callback: Callback<string>): void {
+    if (findCallbackIndex(callback) == INVALID_CALLBACK_INDEX) {
+      let callbackWrap = createCallbackWrapper(callback);
+        registerFormObserverInner(callbackWrap);
+    }
   }
 
-  export function off(type: "formUninstall", callback?: Callback<string>): void {
-    taskpool.execute((): void => {
+  export function offFormUninstall(callback?: Callback<string>): void {
       if (callback) {
-        let callbackWrap = new CallbackWrapper<string>(callback);
+        let callbackWrap = createCallbackWrapper(callback);
         unRegisterFormObserverInner(callbackWrap);
       } else {
         unRegisterFormObserverInner();
       }
-    });
   }
 
   export function setRouterProxy(formIds: Array<string>, proxy: Callback<Want>): Promise<void> {
@@ -911,7 +918,6 @@ export default namespace formHost {
     let callbackWrapper = new CallbackWrapper<Want>(proxy);
     taskpool.execute((): void => {
       setRouterProxyInner(formIds, callbackWrapper, call);
-      callback(null, undefined);
     });
   }
 
@@ -942,6 +948,26 @@ export default namespace formHost {
 
     let call = new AsyncCallbackWrapper<void>(callback);
     taskpool.execute((): void => { clearRouterProxyInner(formIds, call); });
+  }
+
+  function findCallbackIndex(callback: Callback<string>) : int {
+    let findIndex = INVALID_CALLBACK_INDEX;
+    callbackArray.forEach((element, index) => {
+      if (element.isEqual(callback)) {
+        findIndex = index;
+      }
+    });
+    return findIndex;
+  }
+
+  function createCallbackWrapper(callback: Callback<string>): CallbackWrapper<string> {
+    let findIndex = findCallbackIndex(callback);
+    if (findIndex != INVALID_CALLBACK_INDEX) {
+      return callbackArray[findIndex];
+    }
+    let callbackWrapper: CallbackWrapper<string> = new CallbackWrapper<string>(callback);
+    callbackArray.push(callbackWrapper)
+    return callbackWrapper;
   }
 
   function onFormOverflow(callback: Callback<formInfo.OverflowRequest>): void {
@@ -983,6 +1009,19 @@ export default namespace formHost {
     formHost.nativeOffGetFormRect(myCall);
   }
 
+  function onGetLiveFormStatus(callback: formInfo.GetLiveFormStatusCallback): void {
+    let myCall = new GetLiveFormStatusCallbackWrapper(callback);
+    formHost.nativeOnGetLiveFormStatus(myCall);
+  }
+
+  function offGetLiveFormStatus(callback?: formInfo.GetLiveFormStatusCallback): void {
+    let myCall: GetLiveFormStatusCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new GetLiveFormStatusCallbackWrapper(callback);
+    }
+    formHost.nativeOffGetLiveFormStatus(myCall);
+  }
+
   class GetFormRectInfoCallbackWrapper {
     private liveFormInterfaceParam: long;
 
@@ -1012,6 +1051,18 @@ export default namespace formHost {
 
     invoke(formId: string): Promise<formInfo.Rect> {
       return this.formRectCallback(formId);
+    }
+  }
+
+  class GetLiveFormStatusCallbackWrapper {
+    private liveFormStatusCallback: formInfo.GetLiveFormStatusCallback = (): Record<string, string> => { }
+
+    constructor(callback: formInfo.GetLiveFormStatusCallback) {
+      this.liveFormStatusCallback = callback;
+    }
+
+    invoke(): Record<string, string> {
+      return this.liveFormStatusCallback();
     }
   }
 }

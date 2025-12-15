@@ -556,6 +556,10 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
         CreateSceneAnimationParamsDatas(env, formInfo.sceneAnimationParams));
     napi_set_named_property(env, objContext, "resizable", CreateJsValue(env, formInfo.resizable));
     napi_set_named_property(env, objContext, "groupId", CreateJsValue(env, formInfo.groupId));
+    napi_set_named_property(env, objContext, "isStandbySupported", CreateJsValue(env, formInfo.standby.isSupported));
+    napi_set_named_property(env, objContext, "isStandbyAdapted", CreateJsValue(env, formInfo.standby.isAdapted));
+    napi_set_named_property(
+        env, objContext, "isPrivacySensitive", CreateJsValue(env, formInfo.standby.isPrivacySensitive));
 
     return objContext;
 }
@@ -710,8 +714,7 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
         HILOG_ERROR("can't get stringSize");
         return "";
     }
-    result.reserve(size + 1);
-    result.resize(size);
+    result.resize(size + 1);
     if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
         HILOG_ERROR("can't get string value");
         return "";

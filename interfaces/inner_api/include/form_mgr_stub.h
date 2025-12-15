@@ -250,6 +250,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle GetAllTemplateFormsInfo message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetAllTemplateFormsInfo(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle GetFormsInfoByApp message.
      * @param data input param.
@@ -257,6 +266,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetFormsInfoByApp(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle GetTemplateFormsInfoByApp message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetTemplateFormsInfoByApp(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle GetFormsInfoByModule message.
      * @param data input param.
@@ -264,6 +282,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetFormsInfoByModule(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle GetTemplateFormsInfoByModule message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetTemplateFormsInfoByModule(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle GetFormsInfoByModule message.
      * @param data input param.
@@ -342,6 +369,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleStartAbilityByFms(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle StartUIAbilityByFms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleStartUIAbilityByFms(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Handle StartAbilityByCrossBundle message.
@@ -692,13 +727,21 @@ private:
     ErrCode HandleOpenFormEditAbility(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle close the form edit ability.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleCloseFormEditAbility(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle register overflow proxy in fms
      * @param data Input param
      * @param reply Output param
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode HandleRegisterOverflowProxy(MessageParcel &data, MessageParcel &reply);
-    
+
     /**
      * @brief Handle unregister overflow proxy in fms
      * @param data Input param
@@ -753,7 +796,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleUnregisterGetFormRectProxy(MessageParcel &data, MessageParcel &reply);
- 
+
     /**
      * @brief Handle get form rect.
      * @param data input param.
@@ -777,7 +820,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply);
- 
+
     /**
      * @brief Handle unregister getLiveFormStatus proxy in fms
      * @param data input param.
@@ -809,6 +852,31 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleIsFormDueControl(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle sending non-transparent ratio.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleSendNonTransparencyRatio(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle register publish form cross bundle control in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister publish form cross bundle control in fms
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

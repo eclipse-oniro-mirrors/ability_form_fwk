@@ -1378,8 +1378,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_067, TestSize.Level1)
     FormJsInfo formJsInfo;
     formJsInfo.bundleName = "bundleName";
     formJsInfo.moduleName = "moduleName";
-    formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
-        nullptr);
+    formRenderRecordPtr_->contextsMapForModuleName_.emplace(
+        formJsInfo.bundleName + ":" + formJsInfo.moduleName, nullptr);
     bool result = formRenderRecordPtr_->UpdateRuntime(formJsInfo);
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_067 end";
@@ -2952,4 +2952,104 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_157, TestSize.Level1)
     formRenderRecordPtr_->RecordFormVisibility(formId, false);
     EXPECT_EQ(formRenderRecordPtr_->visibilityMap_.size(), 0);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_157 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_SetConfiguration
+ * @tc.desc: Verify SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_SetConfiguration, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_SetConfiguration start";
+
+    std::shared_ptr<FormRenderRecord> formRenderRecordPtr =
+        FormRenderRecord::Create("FormRenderRecordTest_SetConfiguration", "uid");
+    formRenderRecordPtr->configuration_ = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<AppExecFwk::Configuration>();
+
+    formRenderRecordPtr->SetConfiguration(config);
+    std::string colorModeTag =
+        formRenderRecordPtr->configuration_->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_TRUE(colorModeTag.empty());
+
+    config->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    formRenderRecordPtr->SetConfiguration(config);
+    colorModeTag = formRenderRecordPtr->configuration_->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_EQ(colorModeTag, "0");
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_SetConfiguration end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_GetConfiguration
+ * @tc.desc: Verify GetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_GetConfiguration, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetConfiguration start";
+
+    std::shared_ptr<FormRenderRecord> formRenderRecordPtr =
+        FormRenderRecord::Create("FormRenderRecordTest_GetConfiguration", "uid");
+    formRenderRecordPtr->configuration_ = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = formRenderRecordPtr->GetConfiguration();
+    std::string colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_TRUE(colorModeTag.empty());
+    std::string sizeScaleTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_FONT_SIZE_SCALE);
+    EXPECT_TRUE(sizeScaleTag.empty());
+
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configNew = std::make_shared<Configuration>();
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_FONT_SIZE_SCALE, "1.7");
+    formRenderRecordPtr->configuration_ = configNew;
+    config = formRenderRecordPtr->GetConfiguration();
+    colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_EQ(colorModeTag, "0");
+    sizeScaleTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_FONT_SIZE_SCALE);
+    EXPECT_EQ(sizeScaleTag, "1.7");
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetConfiguration end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ResetFormConfiguration
+ * @tc.desc: Verify ResetFormConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration start";
+
+    std::shared_ptr<FormRenderRecord> formRenderRecordPtr =
+        FormRenderRecord::Create("FormRenderRecordTest_ResetFormConfiguration", "uid");
+    formRenderRecordPtr->configuration_ = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<AppExecFwk::Configuration>();
+
+    Want want;
+    formRenderRecordPtr->ResetFormConfiguration(config, want);
+    std::string colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_TRUE(colorModeTag.empty());
+
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configNew = std::make_shared<Configuration>();
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, "en");
+    formRenderRecordPtr->configuration_ = configNew;
+    formRenderRecordPtr->ResetFormConfiguration(config, want);
+    colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_EQ(colorModeTag, "0");
+    std::string languageTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE);
+    EXPECT_EQ(languageTag, "en");
+
+    want.SetParam(Constants::PARAM_FORM_COLOR_MODE_KEY, OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET);
+    formRenderRecordPtr->ResetFormConfiguration(config, want);
+    colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_EQ(colorModeTag, "0");
+
+    want.SetParam(Constants::PARAM_FORM_COLOR_MODE_KEY, OHOS::Global::Resource::ColorMode::DARK);
+    formRenderRecordPtr->ResetFormConfiguration(config, want);
+    colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_EQ(colorModeTag, "dark");
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration end";
 }

@@ -20,11 +20,11 @@ ohos_unittest("FmsFormHostCallbackTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
-    "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
+    "fms_form_host_callback_test.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_host_task_mgr.cpp",
+    "${form_fwk_path}/services/src/form_host/form_host_callback.cpp",
   ]
-  sources += [ "fms_form_host_callback_test.cpp" ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
@@ -38,6 +38,7 @@ ohos_unittest("FmsFormHostCallbackTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
   ]
 
   external_deps = [
@@ -52,7 +53,6 @@ ohos_unittest("FmsFormHostCallbackTest") {
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",

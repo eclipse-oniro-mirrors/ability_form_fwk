@@ -38,6 +38,9 @@ constexpr const char *EVENT_KEY_BIND_DURATION = "BIND_DURATION";
 constexpr const char *EVENT_KEY_GET_DURATION = "GET_DURATION";
 constexpr const char *EVENT_KEY_FORM_NAME = "FORM_NAME";
 constexpr const char *EVENT_KEY_FORM_DIMENSION = "FORM_DIMENSION";
+constexpr const char *EVENT_KEY_FORM_LOCATION = "FORM_LOCATION";
+constexpr const char *EVENT_KEY_NONTRANSPARENCY_RATE = "NONTRANSPARENCY_RATE";
+constexpr const char *EVENT_KEY_APP_VERSION = "APP_VERSION";
 constexpr const char *EVENT_KEY_ACQUIRE_DURATION = "ACQUIRE_DURATION";
 constexpr const char *EVENT_KEY_DURATION = "DURATION";
 constexpr const char *EVENT_KEY_DURATION_TYPE = "DURATION_TYPE";
@@ -59,7 +62,7 @@ constexpr const char *EVENT_KEY_RENDERING_MODE = "RENDERING_MODE";
 constexpr const char *EVENT_KEY_CONDITION_TYPE = "CONDITION_TYPE";
 constexpr const char *EVENT_KEY_BUNDLE_FORMNAME = "BUNDLE_FORMNAME";
 constexpr const char *EVENT_KEY_WITH_SNAPSHOT = "WITH_SNAPSHOT";
-constexpr const char *EVENT_KEY_DISTRIBUTED_FORM = "DISTRIBUTED_FORM";
+constexpr const char *EVENT_KEY_IS_DISTRIBUTED_FORM = "IS_DISTRIBUTED_FORM";
 constexpr const char *INVALIDEVENTNAME = "INVALIDEVENTNAME";
 constexpr const char *FORM_ERROR = "FORM_ERROR";
 constexpr const char *FORM_STORAGE_DIR_PATH = "/data/service/el1/public/database/form_storage";
@@ -68,6 +71,7 @@ constexpr const char *EVENT_KEY_IS_LOW_MEMORY = "IS_LOW_MEMORY";
 constexpr const char *EVENT_KEY_OCCURRENCE_TIME = "OCCURRENCE_TIME";
 constexpr const char *EVENT_KEY_STATUS = "STATUS";
 constexpr const char *FORM_RENDER_SERVICE_STATUS_ALTER = "FORM_RENDER_SERVICE_STATUS_ALTER";
+constexpr const char *ABNORMAL_FORM = "ABNORMAL_FORM";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     {FormEventName::ADD_FORM, "ADD_FORM"},
     {FormEventName::REQUEST_FORM, "REQUEST_FORM"},
@@ -120,18 +124,14 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
             break;
         case FormEventName::ACQUIREFORMSTATE_FORM:
             HiSysEventWrite(
-                HiSysEvent::Domain::FORM_MANAGER,
-                name,
-                type,
+                HiSysEvent::Domain::FORM_MANAGER, name, type,
                 EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
                 EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
                 EVENT_KEY_ABILITY_NAME, eventInfo.abilityName);
             break;
         case FormEventName::MESSAGE_EVENT_FORM:
             HiSysEventWrite(
-                HiSysEvent::Domain::FORM_MANAGER,
-                name,
-                type,
+                HiSysEvent::Domain::FORM_MANAGER, name, type,
                 EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
                 EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
                 EVENT_KEY_ABILITY_NAME, eventInfo.abilityName,
@@ -139,10 +139,13 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
             break;
         case FormEventName::ADD_FORM:
             HiSysEventWrite(
-                HiSysEvent::Domain::FORM_MANAGER,
-                name,
-                type,
-                EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm,
+                HiSysEvent::Domain::FORM_MANAGER, name, type,
+                EVENT_KEY_FORM_ID, eventInfo.formId,
+                EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+                EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
+                EVENT_KEY_ABILITY_NAME, eventInfo.abilityName,
+                EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName,
+                EVENT_KEY_IS_DISTRIBUTED_FORM, eventInfo.isDistributedForm,
                 EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension));
             break;
         case FormEventName::ROUTE_EVENT_FORM:
@@ -184,7 +187,9 @@ void FormEventReport::SendSecondFormEvent(const FormEventName &eventName, HiSysE
             HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
                 EVENT_KEY_FORM_ID, eventInfo.formId,
                 EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName,
-                EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm,
+                EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+                EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
+                EVENT_KEY_IS_DISTRIBUTED_FORM, eventInfo.isDistributedForm,
                 EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension));
             break;
         case FormEventName::CASTTEMP_FORM:
@@ -269,7 +274,9 @@ void FormEventReport::SendFormRefreshCountEvent(const FormEventName &eventName, 
             EVENT_KEY_PASSIVER_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.passiveRecoverRefreshTimes),
             EVENT_KEY_HF_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.hfRecoverRefreshTimes),
             EVENT_KEY_OFFLOAD_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.offloadRecoverRefreshTimes),
-            EVENT_KEY_DISABLE_FORM_REFRESH_TIMES, static_cast<int32_t>(eventInfo.disableFormRefreshTimes));
+            EVENT_KEY_DISABLE_FORM_REFRESH_TIMES, static_cast<int32_t>(eventInfo.disableFormRefreshTimes),
+            EVENT_KEY_IS_DISTRIBUTED_FORM, eventInfo.isDistributedForm,
+            EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension));
     }
 }
 void FormEventReport::SendFourthFormEvent(const FormEventName &eventName, HiSysEventType type,
@@ -290,7 +297,7 @@ void FormEventReport::SendFourthFormEvent(const FormEventName &eventName, HiSysE
                 EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(want.
                     GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0)),
                 EVENT_KEY_ABILITY_NAME, want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY),
-                EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm);
+                EVENT_KEY_IS_DISTRIBUTED_FORM, eventInfo.isDistributedForm);
             break;
         case FormEventName::INVALID_PUBLISH_FORM_TO_HOST:
             HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
@@ -361,7 +368,7 @@ void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName
             EVENT_KEY_CONDITION_TYPE, static_cast<int32_t>(eventInfo.conditionType),
             EVENT_KEY_BUNDLE_FORMNAME, eventInfo.bundleAndFormName,
             EVENT_KEY_FORM_ID, eventInfo.formId,
-            EVENT_KEY_DISTRIBUTED_FORM, eventInfo.distributedForm,
+            EVENT_KEY_IS_DISTRIBUTED_FORM, eventInfo.isDistributedForm,
             EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension),
             EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
             EVENT_KEY_ABILITY_NAME, eventInfo.abilityName);
@@ -404,7 +411,7 @@ void FormEventReport::SendDiskUseEvent()
 }
 
 void FormEventReport::SendRequestPublicFormEvent(const std::string &callerBundleName, const std::string &formName,
-    bool withSnapshot)
+    RequestFormType funcType)
 {
     HiSysEventWrite(
         HiSysEvent::Domain::FORM_MANAGER,
@@ -412,7 +419,7 @@ void FormEventReport::SendRequestPublicFormEvent(const std::string &callerBundle
         HiSysEventType::STATISTIC,
         EVENT_KEY_BUNDLE_NAME, callerBundleName,
         EVENT_KEY_FORM_NAME, formName,
-        EVENT_KEY_WITH_SNAPSHOT, withSnapshot);
+        EVENT_KEY_WITH_SNAPSHOT, static_cast<int8_t>(funcType));
 }
 
 void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_t formId, const std::string &bundleName,
@@ -473,6 +480,23 @@ void FormEventReport::SendFRSStatusEvent(
         EVENT_KEY_FORM_COUNT, formCountList,
         EVENT_KEY_IS_LOW_MEMORY, isLowMemoryList,
         EVENT_KEY_STATUS, statusList);
+}
+
+void FormEventReport::SendFormAbnormalEvent(const FormAbnormalReportParams &params)
+{
+    HILOG_DEBUG("call");
+    HiSysEventWrite(
+        HiSysEvent::Domain::FORM_MANAGER,
+        ABNORMAL_FORM,
+        HiSysEventType::STATISTIC,
+        EVENT_KEY_BUNDLE_NAME, params.bundleNames,
+        EVENT_KEY_MODULE_NAME, params.moduleNames,
+        EVENT_KEY_ABILITY_NAME, params.abilityNames,
+        EVENT_KEY_FORM_NAME, params.formNames,
+        EVENT_KEY_FORM_DIMENSION, params.formDimensions,
+        EVENT_KEY_FORM_LOCATION, params.formLocations,
+        EVENT_KEY_APP_VERSION, params.appVersions,
+        EVENT_KEY_NONTRANSPARENCY_RATE, params.nonTransparencyRateList);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

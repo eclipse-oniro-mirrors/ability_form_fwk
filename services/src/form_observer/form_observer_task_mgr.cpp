@@ -95,6 +95,21 @@ void FormObserverTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchRefreshForms);
 }
+
+/**
+* @brief notify configuration update to form provider(task).
+* @param configuration system configuration.
+*/
+void FormObserverTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
+{
+    HILOG_INFO("Call.");
+ 
+    auto batchConfigurationUpdate = [configuration]() {
+        return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchConfigurationUpdate);
+    HILOG_INFO("end");
+}
  
 void FormObserverTaskMgr::FormAdd(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
     const RunningFormInfo &runningFormInfo)

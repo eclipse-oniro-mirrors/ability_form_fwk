@@ -17,6 +17,7 @@
 #include "fms_log_wrapper.h"
 #include "form_event_report.h"
 #include "data_center/form_basic_info_mgr.h"
+#include "data_center/form_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -108,6 +109,8 @@ void FormRecordReport::HandleFormRefreshCount()
         if (formId <= 0 || queue.empty()) {
             return;
         }
+        FormRecord formRecord;
+        (void)FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
         FormRecordReportInfo record = queue.front();
         NewFormEventInfo eventInfo;
         eventInfo.formId = formId;
@@ -124,6 +127,8 @@ void FormRecordReport::HandleFormRefreshCount()
         eventInfo.hfRecoverRefreshTimes = record.hfRecoverRefreshTimes;
         eventInfo.offloadRecoverRefreshTimes = record.offloadRecoverRefreshTimes;
         eventInfo.disableFormRefreshTimes = record.disableFormRefreshTimes;
+        eventInfo.formDimension = formRecord.specification;
+        eventInfo.isDistributedForm = formRecord.isDistributedForm;
         FormEventReport::SendFormRefreshCountEvent(FormEventName::UPDATE_FORM_REFRESH_TIMES,
             HiSysEventType::STATISTIC, eventInfo);
         while (queue.size() > REPORT_INFO_QUEUE_MIN_LEN) {

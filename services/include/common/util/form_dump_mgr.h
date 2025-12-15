@@ -118,6 +118,7 @@ private:
     void AppendBundleType(const BundleType formBundleType, std::string &formInfo) const;
     void AppendFormRefreshControlPoints(
         std::string &formInfo, const bool enableForm, const std::string &bundleName, const int64_t formId) const;
+    void AppendIsTemplateForm(std::string &formInfo, const bool isTemplateForm) const;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

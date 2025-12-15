@@ -46,5 +46,17 @@ ErrCode FormEditExtensionContext::StartAbilityByFms(const AAFwk::Want &want)
     TAG_LOGI(AAFwkTag::UI_EXT, "StartAbilityByFms success");
     return ERR_OK;
 }
+
+ErrCode FormEditExtensionContext::StartUIAbilityByFms(const AAFwk::Want &want)
+{
+    TAG_LOGI(AAFwkTag::UI_EXT, "StartUIAbilityByFms ability: %{public}s", want.GetElement().GetAbilityName().c_str());
+    ErrCode err = AppExecFwk::FormMgr::GetInstance().StartUIAbilityByFms(want);
+    if (err != ERR_OK) {
+        TAG_LOGE(AAFwkTag::UI_EXT, "ret = %{public}d", err);
+        return err;
+    }
+    TAG_LOGI(AAFwkTag::UI_EXT, "StartUIAbilityByFms success");
+    return ERR_OK;
+}
 } // namespace AbilityRuntime
 } // namespace OHOS

@@ -82,11 +82,9 @@ public:
      * @param want The desired action to look for.
      * @param userId Indicates the user ID.
      * @param abilityInfo Indicates the obtained AbilityInfo object.
-     * @param extensionInfo Indicates the obtained extension.
      * @return Returns true on success, false on failure.
      */
-    bool GetAbilityInfo(const Want &want, int32_t userId, AbilityInfo &abilityInfo,
-        ExtensionAbilityInfo &extensionInfo);
+    bool GetAbilityInfo(const Want &want, int32_t userId, AbilityInfo &abilityInfo);
 
     /**
      * @brief Get ability info by action

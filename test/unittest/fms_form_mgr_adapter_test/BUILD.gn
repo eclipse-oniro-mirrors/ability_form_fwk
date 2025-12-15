@@ -30,6 +30,7 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_info_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_mgr_adapter.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_provider_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_refresh_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_render_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_timer_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_want.cpp",
@@ -38,7 +39,6 @@ ohos_unittest("FmsFormMgrAdapterTest") {
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/include",
   ]
 
   configs = []
@@ -121,7 +121,6 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/include",
   ]
 
   configs = []

@@ -80,6 +80,59 @@ ohos_source_set("form_host_delegate_stub") {
   part_name = "form_fwk"
 }
 
+idl_gen_interface("form_provider_delegate_interface") {
+  sources = [ "ipc_idl_gen/IFormProviderDelegate.idl" ]
+  log_domainid = "0xD001301"
+  log_tag = "FormManagerService"
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_source_set("form_provider_delegate_proxy") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":form_provider_delegate_interface")
+  sources = filter_include(output_values, [ "*_proxy.cpp" ])
+  public_configs = [ ":fms_idl_config" ]
+  deps = [ ":form_provider_delegate_interface" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_source_set("form_provider_delegate_stub") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":form_provider_delegate_interface")
+  sources = filter_include(output_values, [ "*_stub.cpp" ])
+  public_configs = [ ":fms_idl_config" ]
+  deps = [ ":form_provider_delegate_interface" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
 config("formmgr_config") {
   include_dirs = [
     "services/config",
@@ -123,6 +176,7 @@ ohos_shared_library("libfms") {
     "services/src/common/util/form_serial_queue.cpp",
     "services/src/common/util/form_trust_mgr.cpp",
     "services/src/common/util/form_util.cpp",
+    "services/src/common/util/form_timer_util.cpp",
     "services/src/common/util/mem_status_listener.cpp",
     "services/src/data_center/database/form_db_cache.cpp",
     "services/src/data_center/database/form_db_info.cpp",
@@ -154,16 +208,18 @@ ohos_shared_library("libfms") {
     "services/src/feature/free_install/free_install_status_callback_stub.cpp",
     "services/src/feature/memory_mgr/form_render_report.cpp",
     "services/src/feature/param_update/param_common_event.cpp",
+    "services/src/feature/param_update/param_control.cpp",
     "services/src/feature/param_update/param_manager.cpp",
     "services/src/feature/param_update/param_reader.cpp",
     "services/src/feature/param_update/sign_tools.cpp",
-    "services/src/feature/param_update/param_control.cpp",
     "services/src/feature/route_proxy/form_router_proxy_mgr.cpp",
     "services/src/feature/theme_form/theme_form_client.cpp",
+    "services/src/feature/form_check/form_abnormal_reporter.cpp",
     "services/src/form_host/form_host_callback.cpp",
     "services/src/form_host/form_host_queue.cpp",
     "services/src/form_host/form_host_record.cpp",
     "services/src/form_host/form_host_task_mgr.cpp",
+    "services/src/form_mgr/form_ams_adapter.cpp",
     "services/src/form_mgr/form_mgr_adapter.cpp",
     "services/src/form_mgr/form_mgr_queue.cpp",
     "services/src/form_mgr/form_mgr_service.cpp",
@@ -476,6 +532,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_instances_filter.cpp",
     "interfaces/inner_api/src/form_js_info.cpp",
     "interfaces/inner_api/src/form_lock_info.cpp",
+    "interfaces/inner_api/src/form_major_info.cpp",
     "interfaces/inner_api/src/form_mgr_proxy.cpp",
     "interfaces/inner_api/src/form_mgr_stub.cpp",
     "interfaces/inner_api/src/form_provider_data.cpp",
@@ -496,7 +553,6 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
     "interfaces/inner_api/src/provider_connect_stub.cpp",
     "interfaces/inner_api/src/running_form_info.cpp",
-    "interfaces/inner_api/src/form_major_info.cpp",
   ]
 
   configs = [ ":formmgr_log_config" ]
@@ -509,6 +565,8 @@ ohos_shared_library("form_manager") {
   deps = [
     ":form_host_delegate_proxy",
     ":form_host_delegate_stub",
+    ":form_provider_delegate_proxy",
+    ":form_provider_delegate_stub",
   ]
 
   external_deps = [
@@ -546,6 +604,7 @@ group("form_napi_packages") {
   if (ability_runtime_graphics) {
     deps = [
       "${form_fwk_napi_path}:form_edit_extension",
+      "${form_fwk_napi_path}:form_edit_extension_ani",
       "${form_fwk_napi_path}:form_edit_extension_module",
       "${form_fwk_napi_path}:formagent",
       "${form_fwk_napi_path}:formbindingdata",
@@ -565,6 +624,7 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formprovider_napi",
       "${form_fwk_napi_path}:formutil_napi",
       "${form_fwk_napi_path}:live_form_extension",
+      "${form_fwk_napi_path}:live_form_extension_ani",
       "${form_fwk_napi_path}:live_form_extension_module",
       "${form_fwk_napi_path}:liveformextensionability_napi",
       "${form_fwk_napi_path}:liveformextensioncontext_napi",
@@ -580,6 +640,8 @@ group("form_ani_packages") {
       "${form_fwk_ani_path}/form_agent:form_agent_etc",
       "${form_fwk_ani_path}/form_binding_data:formBindingData_ani",
       "${form_fwk_ani_path}/form_binding_data:form_binding_data_etc",
+      "${form_fwk_ani_path}/form_edit_extension_ability:form_edit_extension_ability_etc",
+      "${form_fwk_ani_path}/form_edit_extension_ability:form_edit_extension_context_etc",
       "${form_fwk_ani_path}/form_error:form_error_etc",
       "${form_fwk_ani_path}/form_host:formHost_ani",
       "${form_fwk_ani_path}/form_host:form_host_etc",
@@ -589,6 +651,8 @@ group("form_ani_packages") {
       "${form_fwk_ani_path}/form_provider:formProvider_ani",
       "${form_fwk_ani_path}/form_provider:form_provider_etc",
       "${form_fwk_ani_path}/form_util:formutil_ani",
+      "${form_fwk_ani_path}/live_form_extension_ability:live_form_extension_ability_etc",
+      "${form_fwk_ani_path}/live_form_extension_ability:live_form_extension_context_etc",
       "${form_fwk_ani_path}/utils:util_ani",
     ]
   }

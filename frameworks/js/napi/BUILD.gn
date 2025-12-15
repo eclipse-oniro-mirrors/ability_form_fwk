@@ -509,6 +509,7 @@ ohos_shared_library("formprovider") {
     ":formutil_napi",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_provider_delegate_stub",
   ]
 
   external_deps = [
@@ -753,9 +754,14 @@ ohos_shared_library("form_edit_extension") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = ["form_edit_extension_context/"]
+  include_dirs = [
+    "form_edit_extension_context/",
+    "form_edit_extension_ability/",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/include/",
+  ]
 
   sources = [
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_instance.cpp",
     "form_edit_extension_ability/form_edit_extension.cpp",
     "form_edit_extension_ability/js_form_edit_extension.cpp",
     "form_edit_extension_context/form_edit_extension_context.cpp",
@@ -800,7 +806,7 @@ ohos_shared_library("form_edit_extension_module") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = ["form_edit_extension_context/"]
+  include_dirs = [ "form_edit_extension_context/" ]
 
   sources =
       [ "form_edit_extension_ability/form_edit_extension_module_loader.cpp" ]
@@ -829,6 +835,57 @@ ohos_shared_library("form_edit_extension_module") {
   }
 
   relative_install_dir = "extensionability"
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_shared_library("form_edit_extension_ani") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  include_dirs = [
+    "form_edit_extension_context/",
+    "form_edit_extension_ability/",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/include/",
+  ]
+
+  sources = [
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_context.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_impl.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [
+    ":form_edit_extension",
+    "${form_fwk_ani_path}/utils:util_ani",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:fmskit_provider_client",
+    "${form_fwk_path}:form_manager",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_common",
+    "ability_runtime:app_context",
+    "ability_runtime:extensionkit_native",
+    "ability_runtime:runtime",
+    "ability_runtime:ui_extension",
+    "ability_runtime:ui_extension_ani",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_core",
+    "ipc:ipc_napi",
+    "runtime_core:ani",
+  ]
+
   subsystem_name = "ability"
   part_name = "form_fwk"
 }
@@ -930,9 +987,14 @@ ohos_shared_library("live_form_extension") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = [ "live_form_extension_context" ]
+  include_dirs = [
+    "live_form_extension_context",
+    "live_form_extension_ability",
+    "${form_fwk_path}/frameworks/ets/ani/live_form_extension_ability/include/",
+  ]
 
   sources = [
+    "${form_fwk_path}/frameworks/ets/ani/live_form_extension_ability/src/ets_live_form_extension_instance.cpp",
     "live_form_extension_ability/js_live_form_extension.cpp",
     "live_form_extension_ability/live_form_extension.cpp",
     "live_form_extension_context/js_live_form_extension_context.cpp",
@@ -966,6 +1028,7 @@ ohos_shared_library("live_form_extension") {
     "hitrace:hitrace_meter",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "window_manager:libdm",
   ]
 
   subsystem_name = "ability"
@@ -1007,6 +1070,57 @@ ohos_shared_library("live_form_extension_module") {
   }
 
   relative_install_dir = "extensionability"
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_shared_library("live_form_extension_ani") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  include_dirs = [
+    "live_form_extension_context/",
+    "live_form_extension_ability/",
+    "${form_fwk_path}/frameworks/ets/ani/live_form_extension_ability/include/",
+  ]
+
+  sources = [
+    "${form_fwk_path}/frameworks/ets/ani/live_form_extension_ability/src/ets_live_form_extension.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/live_form_extension_ability/src/ets_live_form_extension_context.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/live_form_extension_ability/src/ets_live_form_extension_impl.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [
+    ":live_form_extension",
+    "${form_fwk_ani_path}/utils:util_ani",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:fmskit_provider_client",
+    "${form_fwk_path}:form_manager",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_common",
+    "ability_runtime:app_context",
+    "ability_runtime:extensionkit_native",
+    "ability_runtime:runtime",
+    "ability_runtime:ui_extension",
+    "ability_runtime:ui_extension_ani",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_core",
+    "ipc:ipc_napi",
+    "runtime_core:ani",
+  ]
+
   subsystem_name = "ability"
   part_name = "form_fwk"
 }

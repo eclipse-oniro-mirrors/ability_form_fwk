@@ -186,5 +186,37 @@ OverflowInfo* OverflowInfo::Unmarshalling(Parcel &parcel)
     }
     return object.release();
 }
+
+bool PublishFormCrossBundleInfo::ReadFromParcel(Parcel &parcel)
+{
+    callerBundleName = Str16ToStr8(parcel.ReadString16());
+    targetBundleName = Str16ToStr8(parcel.ReadString16());
+    targetTemplateFormDetailId = Str16ToStr8(parcel.ReadString16());
+    return true;
+}
+
+bool PublishFormCrossBundleInfo::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteString16(Str8ToStr16(callerBundleName))) {
+        return false;
+    }
+    if (!parcel.WriteString16(Str8ToStr16(targetBundleName))) {
+        return false;
+    }
+    if (!parcel.WriteString16(Str8ToStr16(targetTemplateFormDetailId))) {
+        return false;
+    }
+    return true;
+}
+
+PublishFormCrossBundleInfo* PublishFormCrossBundleInfo::Unmarshalling(Parcel &parcel)
+{
+    std::unique_ptr<PublishFormCrossBundleInfo> object = std::make_unique<PublishFormCrossBundleInfo>();
+    if (object && !object->ReadFromParcel(parcel)) {
+        object = nullptr;
+        return nullptr;
+    }
+    return object.release();
+}
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -18,6 +18,7 @@
 #include "js_form_edit_extension.h"
 #include "runtime.h"
 #include "form_edit_extension_context.h"
+#include "ets_form_edit_extension_instance.h"
 namespace OHOS {
 namespace AbilityRuntime {
 FormEditExtension::FormEditExtension()
@@ -33,6 +34,8 @@ FormEditExtension *FormEditExtension::Create(const std::unique_ptr<Runtime> &run
     switch (runtime->GetLanguage()) {
         case Runtime::Language::JS:
             return JsFormEditExtension::Create(runtime);
+        case Runtime::Language::ETS:
+            return CreateETSFormEditExtension(runtime);
         default:
             return new FormEditExtension();
     }

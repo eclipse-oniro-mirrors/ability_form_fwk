@@ -298,6 +298,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleIsFormExempt(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY):
             return HandleOpenFormEditAbility(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CLOSE_FORM_EDIT_ABILITY):
+            return HandleCloseFormEditAbility(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_OVERFLOW_PROXY):
             return HandleRegisterOverflowProxy(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_OVERFLOW_PROXY):
@@ -346,6 +348,20 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleReloadAllForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_DUE_CONTROL):
             return HandleIsFormDueControl(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SEND_NON_TRANSPARENT_RATIO):
+            return HandleSendNonTransparencyRatio(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO):
+            return HandleGetAllTemplateFormsInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_APP):
+            return HandleGetTemplateFormsInfoByApp(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE):
+            return HandleGetTemplateFormsInfoByModule(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL):
+            return HandleRegisterPublishFormCrossBundleControl(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL):
+            return HandleUnregisterPublishFormCrossBundleControl(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_UI_ABILITY_BY_FMS):
+            return HandleStartUIAbilityByFms(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1014,6 +1030,28 @@ int32_t FormMgrStub::HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &r
 }
 
 /**
+ * @brief Handle GetAllTemplateFormsInfo message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleGetAllTemplateFormsInfo(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("max parcel capacity:%{public}zu", MAX_PARCEL_CAPACITY);
+    std::vector<FormInfo> infos;
+    int32_t result = GetAllTemplateFormsInfo(infos);
+    (void)reply.SetMaxCapacity(MAX_PARCEL_CAPACITY);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+/**
  * @brief Handle GetFormsInfoByApp message.
  * @param data input param.
  * @param reply output param.
@@ -1025,6 +1063,28 @@ int32_t FormMgrStub::HandleGetFormsInfoByApp(MessageParcel &data, MessageParcel 
     std::string bundleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = GetFormsInfoByApp(bundleName, infos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief Handle GetTemplateFormsInfoByApp message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleGetTemplateFormsInfoByApp(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    std::vector<FormInfo> infos;
+    int32_t result = GetTemplateFormsInfoByApp(bundleName, infos);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
@@ -1048,6 +1108,29 @@ int32_t FormMgrStub::HandleGetFormsInfoByModule(MessageParcel &data, MessageParc
     std::string moduleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = GetFormsInfoByModule(bundleName, moduleName, infos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief Handle GetTemplateFormsInfoByModule message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleGetTemplateFormsInfoByModule(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    std::string moduleName = data.ReadString();
+    std::vector<FormInfo> infos;
+    int32_t result = GetTemplateFormsInfoByModule(bundleName, moduleName, infos);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
@@ -1225,6 +1308,23 @@ int32_t FormMgrStub::HandleStartAbilityByFms(MessageParcel &data, MessageParcel 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = StartAbilityByFms(*want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+ErrCode FormMgrStub::HandleStartUIAbilityByFms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    // retrieve want
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = StartUIAbilityByFms(*want);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1613,7 +1713,7 @@ bool FormMgrStub::ReadFormDataProxies(MessageParcel &data, std::vector<FormDataP
     for (int32_t i = 0; i < number; i++) {
         std::string key = Str16ToStr8(data.ReadString16());
         std::string subscribeId = Str16ToStr8(data.ReadString16());
-        if (key.empty() || subscribeId.empty()) {
+        if (key.empty()) {
             continue;
         }
         FormDataProxy formDataProxy(key, subscribeId);
@@ -1896,6 +1996,22 @@ ErrCode FormMgrStub::HandleOpenFormEditAbility(MessageParcel &data, MessageParce
     return result;
 }
 
+ErrCode FormMgrStub::HandleCloseFormEditAbility(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    bool isMainPage = true;
+    if (!data.ReadBool(isMainPage)) {
+        HILOG_ERROR("fail to read isMainPage from parcel");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = CloseFormEditAbility(isMainPage);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
 ErrCode FormMgrStub::HandleRegisterOverflowProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("Handle save overflow proxy to service");
@@ -1997,7 +2113,7 @@ ErrCode FormMgrStub::HandleUnregisterGetFormRectProxy(MessageParcel &data, Messa
     }
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply)
 {
     int64_t formId = data.ReadInt64();
@@ -2046,7 +2162,7 @@ ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, M
     }
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrStub::HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
@@ -2104,6 +2220,46 @@ ErrCode FormMgrStub::HandleIsFormDueControl(MessageParcel &data, MessageParcel &
     bool isDisablePolicy = data.ReadBool();
     bool result = IsFormDueControl(*formMajorInfo, isDisablePolicy);
     if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleSendNonTransparencyRatio(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int64_t formId = data.ReadInt64();
+    int32_t ratio = data.ReadInt32();
+    ErrCode result = SendNonTransparencyRatio(formId, ratio);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (!callerToken) {
+        HILOG_ERROR("caller token is null");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterPublishFormCrossBundleControl(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write proxy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterPublishFormCrossBundleControl(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    ErrCode result = UnregisterPublishFormCrossBundleControl();
+    if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

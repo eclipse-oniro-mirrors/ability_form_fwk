@@ -182,5 +182,19 @@ void FormHostCallback::OnDueControlForms(const std::vector<int64_t> &formIds, co
     }
     FormHostTaskMgr::GetInstance().PostDueControlFormsTaskToHost(formIds, isDisablePolicy, isControl, callerToken);
 }
+
+void FormHostCallback::OnCheckForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)
+{
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("null callerToken");
+        return;
+    }
+    FormHostTaskMgr::GetInstance().PostCheckFormsTaskToHost(formIds, callerToken);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

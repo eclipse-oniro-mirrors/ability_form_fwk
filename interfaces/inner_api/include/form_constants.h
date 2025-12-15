@@ -40,9 +40,13 @@ namespace Constants {
     constexpr const char* PARAM_ABILITY_NAME_KEY = "ohos.extra.param.key.ability_name";
     constexpr const char* PARAM_FORM_NAME_KEY = "ohos.extra.param.key.form_name";
     constexpr const char* PARAM_FORM_DIMENSION_KEY = "ohos.extra.param.key.form_dimension";
+    constexpr const char* PARAM_SHOW_SINGLE_FORM_KEY = "ohos.extra.param.key.show_single_form";
+    constexpr const char* PARAM_TEMPLATE_FORM_ID_KEY = "ohos.extra.param.key.template_form_detail_id";
+    constexpr const char* PARAM_TEMPLATE_FORM_DATA_KEY = "ohos.extra.param.key.template_form_data";
     constexpr const char* PARAM_FORM_RENDERINGMODE_KEY = "ohos.extra.param.key.form_rendering_mode";
     constexpr const char* PARAM_FORM_DISABLE_UIFIRST_KEY = "ohos.extra.param.key.disable_uifirst";
     constexpr const char* PARAM_FORM_OBSCURED_KEY = "ohos.extra.param.key.form_obscured_mode";
+    constexpr const char* PARAM_FORM_COLOR_MODE_KEY = "ohos.extra.param.key.form_color_mode";
     constexpr const char* PARAM_MESSAGE_KEY = "ohos.extra.param.key.message";
     constexpr const char* PARAM_FORM_TEMPORARY_KEY = "ohos.extra.param.key.form_temporary";
     constexpr const char* PARAM_CALLER_BUNDLE_NAME_KEY = "ohos.extra.param.key.caller_bundle_name";
@@ -86,6 +90,8 @@ namespace Constants {
     constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
     constexpr const char* PARAM_OPEN_FORM_EDIT_VIEW = "openFormEditView";
     constexpr const char* PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
+    constexpr const char* PARAM_CLOSE_FORM_EDIT_VIEW = "closeFormEditView";
+    constexpr const char* PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW = "closeFormEditSecPageView";
     constexpr const char* PARAM_PAGE_ROUTER_SERVICE_CODE = "pageRouterServiceCode";
     constexpr const char* PARAM_SEC_PAGE_ABILITY_NAME = "secPageAbilityName";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";
@@ -118,6 +124,7 @@ namespace Constants {
     constexpr const char* PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY = "ohos.extra.param.key.add_form_to_host_height";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENX_KEY = "ohos.extra.param.key.add_form_to_host_screenx";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENY_KEY = "ohos.extra.param.key.add_form_to_host_screeny";
+    constexpr const char* PARAM_DELETE_BACKGROUND_IMAGE = "ohos.extra.param.key.form_delete_background_image";
     constexpr const char* CPU_SCENE_ID_CONFIG_UPDATE  = "1";
     constexpr const char* PARAM_DYNAMIC_NAME_KEY = "isDynamic";
     constexpr const char* RECYCLE_FORMS_USER_ID = "ohos.extra.param.key.recycle_forms_user_id";
@@ -143,6 +150,11 @@ namespace Constants {
     constexpr const char* CALLBACK_WRAPPER_CLASS_NAME = "@ohos.app.form.formHost.CallbackWrapper";
     constexpr const char* FORM_STATE_INFO_INNER_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormStateInfoInner";
     constexpr const char* FORM_STATE_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormState";
+    constexpr const char* FUNINTERACTION_PARAMS_INNER_CLASS_NAME =
+        "@ohos.app.form.formInfo.formInfo.FunInteractionParamsInner";
+    constexpr const char* SCENE_ANIMATION_PARAMS_INNER_CLASS_NAME =
+        "@ohos.app.form.formInfo.formInfo.SceneAnimationParamsInner";
+
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
@@ -324,6 +336,8 @@ namespace Constants {
         FORM_MANAGER_NEGATIVE_SCREEN = 5,
         SCREEN_LOCK = 6,
         AI_SUGGESTION = 7,
+        STANDBY = 8,
+        FORM_LOCATION_END
     };
 
     enum class PublishFormErrorCode : int8_t {
@@ -332,6 +346,20 @@ namespace Constants {
         PARAM_ERROR,
         INTERNAL_ERROR,
     };
+ 
+    // templateFormImperativeFwk range
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_NONE = "none";
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_LITE = "lite";
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_FULL = "full";
+
+    // Is form contains templateFormImperativeFwk
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_NAME = "templateFormImperativeFwk";
+    constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWKS[] = {
+        TEMPLATE_FORM_IMPERATIVE_FWK_NONE,
+        TEMPLATE_FORM_IMPERATIVE_FWK_LITE,
+        TEMPLATE_FORM_IMPERATIVE_FWK_FULL
+    };
+    constexpr auto TEMPLATE_FORM_IMPERATIVE_FWKS_END = Constants::TEMPLATE_FORM_IMPERATIVE_FWKS + 3;
 
     struct PublishFormResult {
         PublishFormErrorCode code;
@@ -411,7 +439,7 @@ namespace Constants {
     // Form info max num
     constexpr const int32_t FORM_INFO_MAX_NUM = 16;
     // Form version code
-    constexpr const int32_t FORM_VERSION_CODE = 100001;
+    constexpr const int32_t FORM_VERSION_CODE = 100002;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
     // Is form need the addition process on request form
@@ -428,6 +456,15 @@ namespace Constants {
     constexpr int64_t DETECT_FORM_EXIT_TIMEOUT_DELAY = 10 * 1000;
 
     constexpr int32_t DUE_INVALID_UPDATE_DURATION = -1;
+
+    constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
+
+    constexpr const char* FORM_MANAGER_SHOW_SINGLE_FORM_KEY = "ohos.extra.param.key.form_manager_show_single_form";
+
+    constexpr const char* TEMPLATE_FORM_DETAIL_ID_KEY = "ohos.extra.param.key.template_form_detail_id";
+
+    constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL =
+        "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

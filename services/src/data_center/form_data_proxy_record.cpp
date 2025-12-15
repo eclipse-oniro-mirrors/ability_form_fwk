@@ -113,6 +113,7 @@ void FormDataProxyRecord::GetSubscribeFormDataProxies(const FormDataProxy formDa
     std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token +
         "&dstBundleName=" + bundleName_;
     HILOG_INFO("get sub data, uri:%{public}s, formId_:%{public}" PRId64, uri.c_str(), formId_);
+    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
     auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
     if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
         int64_t subscriberId = formId_;
@@ -494,10 +495,13 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         formProviderData.SetImageDataMap(imageDataMap);
     }
     FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
+    FormRecord formRecord;
+    (void)FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord);
     auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     NewFormEventInfo eventInfo;
     eventInfo.formId = formId_;
     eventInfo.bundleName = bundleName_;
+    eventInfo.isDistributedForm = formRecord.isDistributedForm;
     FormEventReport::SendFourthFormEvent(FormEventName::PROXY_UPDATE_FORM,
         HiSysEventType::STATISTIC, eventInfo, wantCache_);
     if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {
@@ -591,19 +595,35 @@ void FormDataProxyRecord::RetryFailureSubscribes()
         HILOG_ERROR("null dataShareHelper");
         return;
     }
-
-    for (auto& result : rdbSubscribeResultMap_) {
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>> copyRdbSubscribeResultMap;
+    {
+        std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+        copyRdbSubscribeResultMap = rdbSubscribeResultMap_;
+    }
+    for (auto& result : copyRdbSubscribeResultMap) {
         for (auto& records : result.second) {
             auto& record = records.second;
             RetryFailureRdbSubscribes(record);
         }
     }
-
-    for (auto& result : publishSubscribeResultMap_) {
+    {
+        std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+        rdbSubscribeResultMap_ = copyRdbSubscribeResultMap;
+    }
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>> copyPublishSubscribeResultMap;
+    {
+        std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+        copyPublishSubscribeResultMap = publishSubscribeResultMap_;
+    }
+    for (auto& result : copyPublishSubscribeResultMap) {
         for (auto& records : result.second) {
             auto& record = records.second;
             RetryFailurePublishedSubscribes(record);
         }
+    }
+    {
+        std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+        publishSubscribeResultMap_ = copyPublishSubscribeResultMap;
     }
 }
 
@@ -725,6 +745,8 @@ bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &d
 
 void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record, bool isRdbType)
 {
+    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     auto mapIter = resultMap->find(record.uri);
@@ -739,6 +761,8 @@ void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record,
 
 void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string &uri, int64_t subscribeId, bool isRdbType)
 {
+    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     auto mapIter = resultMap->find(uri);
@@ -757,6 +781,8 @@ void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string &uri, in
 void FormDataProxyRecord::PrintSubscribeState(const std::string &uri, int64_t subscribeId, bool isRdbType)
 {
     std::string type = isRdbType ? "rdb" : "published";
+    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     bool alreadySubscribed = true;
@@ -849,6 +875,8 @@ void FormDataProxyRecord::RetryFailurePublishedSubscribes(SubscribeResultRecord 
 
 void FormDataProxyRecord::GetFormSubscribeKeys(std::vector<std::string> &subscribedKeys, bool isRdbType)
 {
+    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
     auto resultMap = isRdbType ? rdbSubscribeResultMap_ : publishSubscribeResultMap_;
     for (auto &result : resultMap) {
         for (auto &records : result.second) {

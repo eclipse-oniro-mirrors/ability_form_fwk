@@ -37,6 +37,7 @@
 #include "data_center/database/form_db_cache.h"
 #include "common/event/form_event_handler.h"
 #include "data_center/form_info/form_info_mgr.h"
+#include "form_mgr/form_ams_adapter.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_instance.h"
 #include "common/util/form_serial_queue.h"
@@ -66,6 +67,7 @@
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
+#include "feature/form_check/form_abnormal_reporter.h"
 #include "feature/param_update/param_common_event.h"
 #include "feature/param_update/param_manager.h"
 #include "string_wrapper.h"
@@ -271,6 +273,9 @@ void FormMgrService::ReportAddFormEvent(const int64_t formId, const Want &want)
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
+    eventInfo.formDimension = static_cast<int64_t>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
+    int32_t userId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    eventInfo.isDistributedForm = FormDistributedMgr::GetInstance().IsBundleDistributed(eventInfo.bundleName, userId);
     int ret = FormBmsHelper::GetInstance().GetCallerBundleName(eventInfo.hostBundleName);
     if (ret != ERR_OK || eventInfo.hostBundleName.empty()) {
         HILOG_ERROR("cannot get host bundle name by uid");
@@ -290,11 +295,11 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
 
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("delete form permission denied");
-        FormRecord record;
-        FormDataMgr::GetInstance().GetFormRecord(formId, record);
         FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED,
             formId,
             record.bundleName,
@@ -310,6 +315,10 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     if (formHostRecords.size() != 0) {
         eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
     }
+    eventInfo.bundleName = record.bundleName;
+    eventInfo.moduleName = record.moduleName;
+    eventInfo.formDimension = record.specification;
+    eventInfo.isDistributedForm = record.isDistributedForm;
     FormEventReport::SendSecondFormEvent(FormEventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_DeleteForm",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
@@ -461,7 +470,7 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::string bundleName;
     FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    FormEventReport::SendRequestPublicFormEvent(bundleName, formName);
+    FormEventReport::SendRequestPublicFormEvent(bundleName, formName, RequestFormType::REQUEST_PUBLISH_FORM);
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
 
@@ -946,11 +955,11 @@ ErrCode FormMgrService::Init()
     Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
 #endif
 
+    FormDistributedMgr::GetInstance().Start();
     FormInfoMgr::GetInstance().Start();
     FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     FormCacheMgr::GetInstance().Start();
-    FormDistributedMgr::GetInstance().Start();
 
     formSysEventReceiver_->InitFormInfosAndRegister();
 
@@ -1148,6 +1157,24 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 }
 
 /**
+ * @brief Get All TemplateFormsInfo.
+ * @param formInfos Return the form information of all forms provided.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetAllTemplateFormsInfo(formInfos);
+}
+
+/**
  * @brief Get forms info by bundle name.
  * @param bundleName Application name.
  * @param formInfos Return the form information of the specify application name.
@@ -1171,6 +1198,29 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
 }
 
 /**
+ * @brief Get template form info by bundle name.
+ * @param bundleName Application name.
+ * @param formInfos Return the form information of the specify application name.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetTemplateFormsInfoByApp",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ErrCode ret = FormMgrAdapter::GetInstance().GetTemplateFormsInfoByApp(bundleName, formInfos);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
+}
+
+/**
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
  * @param moduleName Module name of hap.
@@ -1189,6 +1239,27 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+}
+
+/**
+ * @brief Get template form info by bundle name and module name.
+ * @param bundleName bundle name.
+ * @param moduleName Module name of hap.
+ * @param formInfos Return the form information of the specify bundle name and module name.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+                                                 std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
 int FormMgrService::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
@@ -1328,6 +1399,14 @@ int32_t FormMgrService::StartAbilityByFms(const Want &want)
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 
+ErrCode FormMgrService::StartUIAbilityByFms(const Want &want)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    return FormAmsAdapter::GetInstance().StartUIAbilityByFms(callingUid, want);
+}
+
 int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
 {
     HILOG_INFO("call");
@@ -1343,7 +1422,10 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
         HILOG_ERROR("capability not support");
         return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
     }
-
+    if (!PublishFormCrossBundleControl(want)) {
+        HILOG_ERROR("PublishFormCrossBundleControl failed.");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 
@@ -1910,7 +1992,8 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     std::string bundleName;
     FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    FormEventReport::SendRequestPublicFormEvent(bundleName, formName, true);
+    FormEventReport::SendRequestPublicFormEvent(bundleName, formName,
+        RequestFormType::REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     auto ret = FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
         formId, {}, false);
@@ -2128,6 +2211,32 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
+
+ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    int uid = IPCSkeleton::GetCallingUid();
+    std::string callerName;
+    ErrCode ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, callerName);
+    if (ret != ERR_OK || callerName.empty()) {
+        HILOG_ERROR("Get bundleName by uid failed or bundleName empty");
+        return ret == ERR_OK ? ERR_APPEXECFWK_FORM_COMMON_CODE : ret;
+    }
+
+    auto requestMethod = String::Box(
+        isMainPage ? Constants::PARAM_CLOSE_FORM_EDIT_VIEW : Constants::PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW);
+    WantParams wantarams;
+    wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
+    wantarams.SetParam(
+        Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
+    wantarams.SetParam("bundleName", String::Box(callerName));
+
+    Want want;
+    want.SetAction(Constants::FORM_PAGE_ACTION);
+    want.SetParams(wantarams);
+    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
 void FormMgrService::PostConnectNetWork()
 {
     HILOG_DEBUG("start");
@@ -2290,6 +2399,61 @@ bool FormMgrService::IsFormDueControl(const FormMajorInfo &formMajorInfo, const 
     bool result = FormMgrAdapter::GetInstance().CheckFormDueControl(formMajorInfo, isDisablePolicy);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
+}
+
+ErrCode FormMgrService::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
+{
+    HILOG_DEBUG("call");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("send non-transparency ratio permission denied");
+        return ret;
+    }
+    FormAbnormalReporter::GetInstance().AddRecord(formId, ratio);
+    return ERR_OK;
+}
+
+ErrCode FormMgrService::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
+}
+
+ErrCode FormMgrService::UnregisterPublishFormCrossBundleControl()
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterPublishFormCrossBundleControl();
+}
+
+bool FormMgrService::PublishFormCrossBundleControl(const Want &want)
+{
+    bool isShowSingleForm = want.GetBoolParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, false);
+    if (!isShowSingleForm) {
+        return true;
+    }
+    std::string callerBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get BundleName failed");
+        return false;
+    }
+    PublishFormCrossBundleInfo bundleInfo;
+    bundleInfo.callerBundleName = callerBundleName;
+    bundleInfo.targetBundleName = want.GetBundle();
+    bundleInfo.targetTemplateFormDetailId = want.GetStringParam(Constants::TEMPLATE_FORM_DETAIL_ID_KEY);
+    return FormMgrAdapter::GetInstance().PublishFormCrossBundleControl(bundleInfo);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

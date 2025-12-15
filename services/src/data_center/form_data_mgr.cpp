@@ -66,7 +66,7 @@ FormDataMgr::FormDataMgr()
 {
     HILOG_INFO("create");
     InitLowMemoryStatus();
-    InitTransparencyFormCapbilityKey();
+    InitTransparencyFormCapabilityKey();
 }
 FormDataMgr::~FormDataMgr()
 {
@@ -253,6 +253,8 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.renderingMode = formInfo.GetRenderingMode();
     newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     newRecord.isDataProxyIgnoreFormVisible = formInfo.GetDataProxyIgnoreFormVisibility();
+    newRecord.templateFormImperativeFwk = formInfo.GetTemplateFormImperativeFwk();
+    newRecord.isTemplateForm = formInfo.GetIsTemplateForm();
     HILOG_DEBUG("end");
     return newRecord;
 }
@@ -283,6 +285,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.modulePkgNameMap = record.modulePkgNameMap;
     formInfo.formData = record.formProviderInfo.GetFormDataString();
     formInfo.formProviderData = record.formProviderInfo.GetFormData();
+    formInfo.templateFormImperativeFwk = record.templateFormImperativeFwk;
 }
 
 void FormDataMgr::SetConfigMap(const std::map<std::string, int32_t> &configMap)
@@ -2972,6 +2975,23 @@ void FormDataMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const
     }
 }
 
+void FormDataMgr::CheckForms(const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("start");
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        std::vector<int64_t> matchedFormIds;
+        for (auto formId : formIds) {
+            if (itHostRecord->Contains(formId)) {
+                matchedFormIds.emplace_back(formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnCheckForms(matchedFormIds);
+        }
+    }
+}
+
 void FormDataMgr::GetFormIdsByUserId(int32_t userId, std::vector<int64_t> &formIds)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -3172,6 +3192,7 @@ void FormDataMgr::SetExpectRecycledStatus(const std::vector<int64_t> &formIds, b
         if (info == formRecords_.end()) {
             continue;
         }
+        HILOG_INFO("formId:%{public}" PRId64 " isExpectRecycled:%{public}d", formId, isExpectRecycled);
         info->second.expectRecycled = isExpectRecycled;
     }
 }
@@ -3181,6 +3202,7 @@ void FormDataMgr::SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled)
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info != formRecords_.end()) {
+        HILOG_INFO("formId:%{public}" PRId64 " isExpectRecycled:%{public}d", formId, isExpectRecycled);
         info->second.expectRecycled = isExpectRecycled;
     }
 }
@@ -3244,14 +3266,14 @@ void FormDataMgr::DueControlForms(
     }
 }
 
-void FormDataMgr::InitTransparencyFormCapbilityKey()
+void FormDataMgr::InitTransparencyFormCapabilityKey()
 {
-    transparencyFormCapbilityKey_ = OHOS::system::GetParameter(TRANSPARENT_FORM_CAPABILITY_PARAM_NAME, "");
+    transparencyFormCapabilityKey_ = OHOS::system::GetParameter(TRANSPARENT_FORM_CAPABILITY_PARAM_NAME, "");
 }
 
-const std::string& FormDataMgr::GetTransparencyFormCapbilityKey()
+const std::string& FormDataMgr::GetTransparencyFormCapabilityKey()
 {
-    return transparencyFormCapbilityKey_;
+    return transparencyFormCapabilityKey_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

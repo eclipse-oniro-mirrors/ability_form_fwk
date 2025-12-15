@@ -54,6 +54,7 @@ const static std::unordered_map<Constants::FormLocation, std::string> formLocati
     { Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN, "[ FORM_MANAGER_NEGATIVE_SCREEN ]\n" },
     { Constants::FormLocation::SCREEN_LOCK, "[ SCREEN_LOCK ]\n" },
     { Constants::FormLocation::AI_SUGGESTION, "[ AI_SUGGESTION ]\n" },
+    { Constants::FormLocation::STANDBY, "[ STANDBY ]\n" },
 };
 
 const static std::unordered_map<FormVisibilityType, std::string> formVisibilityTypeMap_ = {
@@ -122,7 +123,22 @@ void FormDumpMgr::DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleF
         formInfos += "    formName [" + info.name + "]\n";
         formInfos += "    type [" + std::string(info.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
-        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n" + LINE_FEED;
+        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n";
+        if (!info.supportDeviceTypes.empty()) {
+            formInfos += "    supportDeviceTypes [";
+            for (const auto &supportDeviceType : info.supportDeviceTypes) {
+                formInfos += " " + supportDeviceType + " ";
+            }
+            formInfos += "]\n";
+        }
+        if (!info.supportDevicePerformanceClasses.empty()) {
+            formInfos += "    supportDevicePerformanceClasses [";
+            for (const auto &supportDevicePerformanceClasses : info.supportDevicePerformanceClasses) {
+                formInfos += " " + std::to_string(supportDevicePerformanceClasses) + " ";
+            }
+            formInfos += "]\n";
+        }
+        formInfos += LINE_FEED;
     }
 }
 
@@ -231,6 +247,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     AppendFormStatus(formRecordInfo.formId, formInfo);
     AppendFormRefreshControlPoints(formInfo, formRecordInfo.enableForm, formRecordInfo.bundleName,
                                    formRecordInfo.formId);
+    AppendIsTemplateForm(formInfo, formRecordInfo.isTemplateForm);
 }
 
 /**
@@ -293,6 +310,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             FormRecord formRecord;
             if (FormDataMgr::GetInstance().GetFormRecord(info.formId, formRecord)) {
                 AppendFormRefreshControlPoints(infosResult, formRecord.enableForm, info.bundleName, info.formId);
+                AppendIsTemplateForm(infosResult, formRecord.isTemplateForm);
             }
             AppendBundleType(info.formBundleType, infosResult);
             AppendLiveFormStatus(std::to_string(info.formId), liveFormStatusMap, infosResult);
@@ -420,6 +438,12 @@ void FormDumpMgr::AppendLiveFormStatus(const std::string &formId,
     } else {
         formInfo += "[ " + iter->second.activeState + " ]\n";
     }
+}
+
+void FormDumpMgr::AppendIsTemplateForm(std::string &formInfo, const bool isTemplateForm) const
+{
+    formInfo += "    isTemplateForm ";
+    formInfo += "[" + std::to_string(isTemplateForm) + "]\n";
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

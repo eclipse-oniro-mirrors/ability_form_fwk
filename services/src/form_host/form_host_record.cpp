@@ -369,6 +369,20 @@ void FormHostRecord::OnLockForms(const std::vector<int64_t> &formIds, const bool
     formHostCallback_->OnLockForms(formIds, lock, formHostClient_);
 }
 
+void FormHostRecord::OnCheckForms(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("start");
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("null formHostCallback_");
+        return;
+    }
+    formHostCallback_->OnCheckForms(formIds, formHostClient_);
+}
+
 void FormHostRecord::GetForms(std::vector<int64_t> &formIds)
 {
     for (const auto &iter : forms_) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,12 +33,13 @@ public:
 
     virtual~MockAbilityMgrProxy() = default;
     int StartAbility(
-        const AAFwk::Want &want, int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1) override
+        const AAFwk::Want &want, int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1,
+        uint64_t specifiedFullTokenId = 0) override
     {
         return 0;
     }
     int StartAbility(const AAFwk::Want &want, const sptr<IRemoteObject> &callerToken,
-        int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1) override
+        int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1, uint64_t specifiedFullTokenId = 0) override
     {
         return 0;
     }
@@ -374,12 +375,13 @@ public:
     }
 
     int StartAbility(
-        const AAFwk::Want &want, int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1) override
+        const AAFwk::Want &want, int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1,
+        uint64_t specifiedFullTokenId = 0) override
     {
         return startAbility_;
     }
     int StartAbility(const AAFwk::Want &want, const sptr<IRemoteObject> &callerToken,
-        int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1) override
+        int32_t userId = DEFAULT_INVAL_VALUE, int requestCode = -1, uint64_t specifiedFullTokenId = 0) override
     {
         return startAbility_;
     }

@@ -17,6 +17,7 @@
 #include "runtime.h"
 #include "fms_log_wrapper.h"
 #include "js_live_form_extension.h"
+#include "ets_live_form_extension_instance.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -34,6 +35,8 @@ LiveFormExtension *LiveFormExtension::Create(const std::unique_ptr<Runtime> &run
     switch (runtime->GetLanguage()) {
         case Runtime::Language::JS:
             return JsLiveFormExtension::Create(runtime);
+        case Runtime::Language::ETS:
+            return CreateETSLiveFormExtension(runtime);
         default:
             return new LiveFormExtension();
     }

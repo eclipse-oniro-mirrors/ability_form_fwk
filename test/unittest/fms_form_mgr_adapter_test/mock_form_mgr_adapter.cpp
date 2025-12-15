@@ -15,7 +15,7 @@
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "data_center/form_info/form_info_mgr.h"
-#include "mock_form_mgr_adapter_test.h"
+#include "inner/mock_form_mgr_adapter.h"
 namespace {
     bool g_mockRequestPublishFormToHost = true;
     OHOS::ErrCode g_mockSceneAnimationCheckResult = OHOS::ERR_OK;

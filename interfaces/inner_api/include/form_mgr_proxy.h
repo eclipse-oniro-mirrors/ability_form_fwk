@@ -268,33 +268,58 @@ public:
 
     /**
      * @brief Get All FormsInfo.
-     * @param formInfos Return the forms' information of all forms provided.
+     * @param formInfos Return the form information of all forms provided.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int GetAllFormsInfo(std::vector<FormInfo> &formInfos) override;
 
     /**
+     * @brief Get All TemplateFormsInfo.
+     * @param formInfos Return the form information of all forms provided.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos) override;
+
+    /**
      * @brief Get forms info by bundle name .
      * @param bundleName Application name.
-     * @param formInfos Return the forms' information of the specify application name.
+     * @param formInfos Return the form information of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos) override;
 
     /**
+     * @brief Get template forms info by bundle name .
+     * @param bundleName Application name.
+     * @param formInfos Return the form information of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos) override;
+
+    /**
      * @brief Get forms info by bundle name and module name.
      * @param bundleName bundle name.
      * @param moduleName Module name of hap.
-     * @param formInfos Return the forms' information of the specify bundle name and module name.
+     * @param formInfos Return the form information of the specify bundle name and module name.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
                                      std::vector<FormInfo> &formInfos) override;
 
     /**
+     * @brief Get template forms info by bundle name and module name.
+     * @param bundleName bundle name.
+     * @param moduleName Module name of hap.
+     * @param formInfos Return the form information of the specify bundle name and module name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+                                             std::vector<FormInfo> &formInfos) override;
+
+    /**
      * @brief Get forms info specfied by filter parameters.
      * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
-     * @param formInfos Return the forms' information specified by filter.
+     * @param formInfos Return the form information specified by filter.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
@@ -303,7 +328,7 @@ public:
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved by form service manager.
     * @param filter Filter that contains attributes that the formInfos have to have.
-    * @param formInfos Return the forms' information of the calling bundle name
+    * @param formInfos Return the form information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
@@ -319,7 +344,7 @@ public:
 
     /**
     * @brief This function is called by formProvider and gets forms info.
-    * @param formInfos Return the forms' information of the calling bundle name
+    * @param formInfos Return the form information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos) override;
@@ -346,6 +371,13 @@ public:
     int32_t StartAbilityByFms(const Want &want) override;
 
     /**
+     * @brief Start a ui ability by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartUIAbilityByFms(const Want &want) override;
+
+    /**
      * @brief Start an ability by cross bundle.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
@@ -368,7 +400,7 @@ public:
      * @param formId The Id of the form to acquire data.
      * @param requestCode The request code of this form.
      * @param callerToken Indicates the host client.
-     * @param formData Return the forms' information of customization
+     * @param formData Return the form information of customization
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
@@ -439,7 +471,7 @@ public:
     /**
      * @brief Get the running form infos.
      * @param isUnusedIncluded Indicates whether to include unused forms.
-     * @param runningFormInfos Return the running forms' infos currently.
+     * @param runningFormInfos Return the running form infos currently.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos) override;
@@ -448,7 +480,7 @@ public:
      * @brief Get the running form infos by bundle name.
      * @param bundleName Application name.
      * @param isUnusedIncluded Indicates whether to include unused forms.
-     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @param runningFormInfos Return the running form infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetRunningFormInfosByBundleName(
@@ -696,6 +728,13 @@ public:
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override;
 
     /**
+     * @brief Close the form edit ability.
+     * @param isMainPage Close the main edit page.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode CloseFormEditAbility(bool isMainPage) override;
+
+    /**
      * @brief Register overflow proxy in fms
      * @param callerToken The form host proxy
      * @return Return ERR_OK on success, others on failure.
@@ -750,7 +789,7 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode UnregisterGetFormRectProxy() override;
- 
+
     /**
      * @brief Get the form rect.
      * @param formId The formId.
@@ -774,7 +813,7 @@ public:
      * @return Return ERR_OK on success, others on failure.
      */
     ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken) override;
- 
+
     /**
      * @brief Unregister get live form status proxy in fms.
      * @return Return ERR_OK on success, others on failure.
@@ -806,6 +845,28 @@ public:
      * @return Returns true for form is due disabled.
      */
     bool IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy) override;
+
+    /**
+     * @brief Send non-transparent ratio.
+     * @param formId The Id of the form to update.
+     * @param ratio Percentage value of non-transparent areas on the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio) override;
+
+    /**
+     * @brief Register publish form cross bundle control in fms.
+     * @param callerToken The form provider proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister publish form cross bundle control in fms.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterPublishFormCrossBundleControl() override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

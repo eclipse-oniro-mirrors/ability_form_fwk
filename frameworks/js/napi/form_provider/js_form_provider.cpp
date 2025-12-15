@@ -49,6 +49,7 @@ constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr size_t ARGS_SIZE_THREE = 3;
 constexpr size_t ARGS_SIZE_FOUR = 4;
+constexpr int REF_COUNT = 1;
 const std::string IS_FORM_AGENT = "isFormAgent";
 enum class ActivationState : int32_t {
     Deactivated = 0,
@@ -169,8 +170,7 @@ static std::string GetStringByProp(napi_env env, napi_value value, const std::st
         HILOG_ERROR("prop[%{public}s] get size error", prop.c_str());
         return result;
     }
-    result.reserve(size + 1);
-    result.resize(size);
+    result.resize(size + 1);
     if (napi_get_value_string_utf8(env, propValue, result.data(), (size + 1), &size) != napi_ok) {
         HILOG_ERROR("prop[%{public}s] get value error", prop.c_str());
         return "";
@@ -776,6 +776,34 @@ napi_value JsFormProvider::OnOpenFormEditAbility(napi_env env, size_t argc, napi
     return CreateJsUndefined(env);
 }
 
+napi_value JsFormProvider::CloseFormEditAbility(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnCloseFormEditAbility);
+}
+
+napi_value JsFormProvider::OnCloseFormEditAbility(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+    if (!CheckParamNum(env, argc, ARGS_SIZE_ZERO, ARGS_SIZE_ONE)) {
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
+        return CreateJsUndefined(env);
+    }
+
+    bool isMainPage = true;
+    if (argc == ARGS_SIZE_ONE) {
+        if (!ConvertFromJsValue(env, argv[PARAM0], isMainPage)) {
+            NapiFormUtil::ThrowParamError(env, "The isMainPage is invalid");
+            return CreateJsUndefined(env);
+        }
+    }
+    HILOG_INFO("OnCloseFormEditAbility isMainPage: %{public}s", isMainPage ? "true" : "false");
+    auto ret = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    if (ret != ERR_OK) {
+        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+    }
+    return CreateJsUndefined(env);
+}
+
 napi_value JsFormProvider::RequestOverflow(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("Call");
@@ -1265,6 +1293,219 @@ napi_value JsFormProvider::OnReloadAllForms(napi_env env, size_t argc, napi_valu
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnReloadAllForms",
         env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
+}
+
+bool JsFormProvider::CheckCallerIsSystemApp()
+{
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
+}
+
+napi_value JsFormProvider::RegisterPublishFormCrossBundleControl(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnRegisterPublishFormCrossBundleControl);
+}
+
+napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("the app not system-app, can't use system-api");
+        NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+        return CreateJsUndefined(env);
+    }
+    
+    if (argc != ARGS_ONE) {
+        HILOG_ERROR("invalid argc");
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+        return CreateJsUndefined(env);
+    }
+
+    if (!IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
+        HILOG_ERROR("invalid param0");
+        NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<PublishFormCrossBundleControlCallback>");
+        return CreateJsUndefined(env);
+    }
+    napi_value callback = argv[PARAM0];
+    napi_ref callbackRef;
+    napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+
+    ErrCode result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
+        JsFormProviderProxyMgr::GetInstance());
+    if (result != ERR_OK) {
+        if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+            result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+        }
+        NapiFormUtil::ThrowByInternalErrorCode(env, result);
+        return CreateJsUndefined(env);
+    }
+    result = JsFormProviderProxyMgr::GetInstance()->RegisterPublishFormCrossBundleControl(
+        env, callbackRef);
+    return CreateJsValue(env, result);
+}
+
+napi_value JsFormProvider::UnregisterPublishFormCrossBundleControl(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnUnregisterPublishFormCrossBundleControl);
+}
+
+napi_value JsFormProvider::OnUnregisterPublishFormCrossBundleControl(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("The app not system-app,can't use system-api");
+        NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+        return CreateJsUndefined(env);
+    }
+    ErrCode result = FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
+    if (result != ERR_OK) {
+        if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+            result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+        }
+        NapiFormUtil::ThrowByInternalErrorCode(env, result);
+        return CreateJsUndefined(env);
+    }
+    result = JsFormProviderProxyMgr::GetInstance()->UnregisterPublishFormCrossBundleControl();
+    return CreateJsValue(env, result);
+}
+
+sptr<JsFormProviderProxyMgr> JsFormProviderProxyMgr::instance_ = nullptr;
+std::mutex JsFormProviderProxyMgr::mutex_;
+sptr<JsFormProviderProxyMgr> JsFormProviderProxyMgr::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = new (std::nothrow) JsFormProviderProxyMgr();
+            if (instance_ == nullptr) {
+                HILOG_ERROR("create JsFormProviderProxyMgr failed");
+            }
+        }
+    }
+    return instance_;
+}
+
+bool JsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(napi_env env, napi_ref callbackRef)
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+    HILOG_INFO("call");
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("invalid callback reference");
+        return false;
+    }
+    if (crossBundleControlCallback_ != nullptr) {
+        napi_delete_reference(env, crossBundleControlCallback_);
+        crossBundleControlCallback_ = nullptr;
+    }
+    crossBundleControlCallback_ = callbackRef;
+    crossBundleControlEnv_ = env;
+    napi_value callback;
+    napi_get_reference_value(env, callbackRef, &callback);
+    napi_valuetype valueType;
+    napi_typeof(env, callback, &valueType);
+    if (valueType != napi_function) {
+        HILOG_ERROR("callback is not a function");
+        return false;
+    }
+    return true;
+}
+
+bool JsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+    HILOG_INFO("call");
+    if (crossBundleControlCallback_) {
+        napi_delete_reference(crossBundleControlEnv_, crossBundleControlCallback_);
+        crossBundleControlCallback_ = nullptr;
+    }
+    crossBundleControlEnv_ = nullptr;
+    return true;
+}
+
+ErrCode JsFormProviderProxyMgr::PublishFormCrossBundleControl(
+    const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen)
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+    HILOG_INFO("call");
+    std::shared_ptr<PublishFormCrossBundleControlParam> dataParam =
+        std::make_shared<PublishFormCrossBundleControlParam>();
+    dataParam->bundleInfo = bundleInfo;
+    dataParam->isCanOpen = isCanOpen;
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
+    std::function<void()> executeCrossBundleControlFunc = [client = sptr<JsFormProviderProxyMgr>(this), dataParam]() {
+        JsFormProviderProxyMgr::GetInstance()->PublishFormCrossBundleControlInner(dataParam);
+    };
+    mainHandler->PostSyncTask(executeCrossBundleControlFunc, "JsFormProviderProxyMgr::PublishFormCrossBundleControl");
+    isCanOpen = dataParam->isCanOpen;
+    return ERR_OK;
+}
+
+void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
+    std::shared_ptr<PublishFormCrossBundleControlParam> dataParam)
+{
+    HILOG_INFO("call");
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(crossBundleControlEnv_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("scope is null.");
+        return;
+    }
+    napi_value requestObj;
+    napi_create_object(crossBundleControlEnv_, &requestObj);
+    ConvertParamToNapiValue(dataParam, requestObj);
+    napi_value callback = nullptr;
+    napi_get_reference_value(crossBundleControlEnv_, crossBundleControlCallback_, &callback);
+    napi_valuetype valueType;
+    napi_typeof(crossBundleControlEnv_, callback, &valueType);
+    if (valueType != napi_function) {
+        dataParam->isCanOpen = false;
+        napi_close_handle_scope(crossBundleControlEnv_, scope);
+        HILOG_ERROR("callback is not function.");
+        return;
+    }
+    napi_value args[] = { requestObj };
+    napi_value callResult = nullptr;
+    napi_status status = napi_call_function(crossBundleControlEnv_, nullptr, callback, ARGS_ONE, args, &callResult);
+    if (status != napi_ok) {
+        dataParam->isCanOpen = false;
+        napi_close_handle_scope(crossBundleControlEnv_, scope);
+        HILOG_ERROR("callback error.");
+        return;
+    }
+    napi_valuetype returnType;
+    napi_typeof(crossBundleControlEnv_, callResult, &returnType);
+    if (returnType == napi_undefined) {
+        dataParam->isCanOpen = false;
+        napi_close_handle_scope(crossBundleControlEnv_, scope);
+        HILOG_ERROR("result is undefined.");
+        return;
+    }
+    if (napi_get_value_bool(crossBundleControlEnv_, callResult, &dataParam->isCanOpen) != napi_ok) {
+        HILOG_ERROR("get value bool error.");
+        dataParam->isCanOpen = false;
+    }
+    napi_close_handle_scope(crossBundleControlEnv_, scope);
+    return;
+}
+
+void JsFormProviderProxyMgr::ConvertParamToNapiValue(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam,
+    napi_value requestObj)
+{
+    napi_value callerBundleNameValue;
+    napi_create_string_utf8(crossBundleControlEnv_, dataParam->bundleInfo.callerBundleName.c_str(),
+        NAPI_AUTO_LENGTH, &callerBundleNameValue);
+    napi_set_named_property(crossBundleControlEnv_, requestObj, "callerBundleName", callerBundleNameValue);
+
+    napi_value targetBundleNameValue;
+    napi_create_string_utf8(crossBundleControlEnv_, dataParam->bundleInfo.targetBundleName.c_str(),
+        NAPI_AUTO_LENGTH, &targetBundleNameValue);
+    napi_set_named_property(crossBundleControlEnv_, requestObj, "targetBundleName", targetBundleNameValue);
+
+    napi_value targetTemplateFormDetailIdValue;
+    napi_create_string_utf8(crossBundleControlEnv_, dataParam->bundleInfo.targetTemplateFormDetailId.c_str(),
+        NAPI_AUTO_LENGTH, &targetTemplateFormDetailIdValue);
+    napi_set_named_property(crossBundleControlEnv_, requestObj,
+        "targetTemplateFormDetailId", targetTemplateFormDetailIdValue);
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

@@ -30,6 +30,8 @@ public:
 
     bool SetWindowBackgroundColor();
 
+    ErrCode SetUIExtCustomDensity(float layoutScale);
+
     ErrCode StartAbilityByFms(const AAFwk::Want &want, const std::string &formId);
 };
 } // namespace AbilityRuntime

@@ -19,6 +19,7 @@
 #include "gmock/gmock.h"
 #include "form_mgr_proxy.h"
 #include "form_provider_data.h"
+#include "mock_i_remote_object.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -124,6 +125,13 @@ public:
         const std::string &abilityName, const std::string &formName));
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
     MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
+    MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
+
+    sptr<IRemoteObject> AsObject()
+    {
+        sptr<MockIRemoteObject> mockIRemoteObject = new MockIRemoteObject();
+        return mockIRemoteObject;
+    }
 };
 }
 }

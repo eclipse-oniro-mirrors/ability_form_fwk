@@ -18,6 +18,8 @@
 
 #include "ability.h"
 #include "form_info_filter.h"
+#include "form_instance.h"
+#include "form_provider_delegate_stub.h"
 #include "form_provider_info.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
@@ -72,6 +74,7 @@ public:
     static napi_value OpenFormManager(napi_env env, napi_callback_info info);
     static napi_value OpenFormManagerCrossBundle(napi_env env, napi_callback_info info);
     static napi_value OpenFormEditAbility(napi_env env, napi_callback_info info);
+    static napi_value CloseFormEditAbility(napi_env env, napi_callback_info info);
     static napi_value RequestOverflow(napi_env env, napi_callback_info info);
     static napi_value CancelOverflow(napi_env env, napi_callback_info info);
     static napi_value ActivateSceneAnimation(napi_env env, napi_callback_info info);
@@ -81,6 +84,8 @@ public:
     static napi_value GetPublishedRunningFormInfos(napi_env env, napi_callback_info info);
     static napi_value ReloadForms(napi_env env, napi_callback_info info);
     static napi_value ReloadAllForms(napi_env env, napi_callback_info info);
+    static napi_value RegisterPublishFormCrossBundleControl(napi_env env, napi_callback_info info);
+    static napi_value UnregisterPublishFormCrossBundleControl(napi_env env, napi_callback_info info);
 
 private:
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
@@ -97,6 +102,8 @@ private:
     napi_value OnGetPublishedRunningFormInfos(napi_env env, size_t argc, napi_value* argv);
     napi_value OnReloadForms(napi_env env, size_t argc, napi_value* argv);
     napi_value OnReloadAllForms(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnRegisterPublishFormCrossBundleControl(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnUnregisterPublishFormCrossBundleControl(napi_env env, size_t argc, napi_value* argv);
 
     bool ConvertFromDataProxies(napi_env env, napi_value jsValue,
         std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
@@ -106,6 +113,7 @@ private:
         size_t &convertArgc, bool &isPromise, AppExecFwk::FormInfoFilter &formInfoFilter);
     napi_value OnUpdateFormParseParam(napi_env env, size_t argc, napi_value* argv, int64_t &formId);
     napi_value OnOpenFormEditAbility(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnCloseFormEditAbility(napi_env env, size_t argc, napi_value* argv);
     napi_value OnRequestOverflow(napi_env env, size_t argc, napi_value* argv);
     napi_value OnCancelOverflow(napi_env env, size_t argc, napi_value* argv);
     napi_value OnActivateSceneAnimation(napi_env env, size_t argc, napi_value* argv);
@@ -113,6 +121,37 @@ private:
     static bool ConvertFormOverflowInfo(napi_env env, napi_value argv, AppExecFwk::OverflowInfo* overflowInfo);
     static bool ConvertOverflowInfoArea(napi_env env, napi_value rangeArea, AppExecFwk::Rect &area);
     static bool GetAndConvertProperty(napi_env env, napi_value object, const char* propertyName, double& outValue);
+    bool CheckCallerIsSystemApp();
+};
+
+struct PublishFormCrossBundleControlParam {
+    AppExecFwk::PublishFormCrossBundleInfo bundleInfo;
+    bool isCanOpen = false;
+};
+
+class JsFormProviderProxyMgr : public AppExecFwk::FormProviderDelegateStub {
+public:
+    JsFormProviderProxyMgr() = default;
+
+    virtual ~JsFormProviderProxyMgr() = default;
+
+    static sptr<JsFormProviderProxyMgr> GetInstance();
+
+    bool RegisterPublishFormCrossBundleControl(napi_env env, napi_ref callback);
+
+    bool UnregisterPublishFormCrossBundleControl();
+private:
+    static std::mutex mutex_;
+    static sptr<JsFormProviderProxyMgr> instance_;
+    mutable std::mutex FormProviderProxyCallbackMutex_;
+
+    DISALLOW_COPY_AND_MOVE(JsFormProviderProxyMgr);
+    napi_ref crossBundleControlCallback_ = nullptr;
+    napi_env crossBundleControlEnv_;
+    mutable std::mutex crossBundleControlMutex_;
+    ErrCode PublishFormCrossBundleControl(const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen);
+    void PublishFormCrossBundleControlInner(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam);
+    void ConvertParamToNapiValue(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam, napi_value requestObj);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

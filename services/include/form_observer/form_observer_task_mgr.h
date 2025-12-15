@@ -19,6 +19,7 @@
 #include <singleton.h>
 #include "iremote_object.h"
 #include "running_form_info.h"
+#include "configuration.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -60,6 +61,12 @@ public:
     * @param formRefreshType batch refresh forms type.
     */
     void PostBatchRefreshForms(const int32_t formRefreshType);
+
+        /**
+     * @brief notify configuration update to form provider(task).
+     * @param configuration system configuration.
+     */
+    void PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration);
 
 private:
     /**

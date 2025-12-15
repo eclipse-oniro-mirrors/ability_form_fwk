@@ -146,7 +146,8 @@ group("unittest") {
     "unittest/fms_form_render_queue_test:unittest",
     "unittest/fms_form_check_mgr_test:unittest",
     "unittest/fms_form_status_mgr_center_test:unittest",
-    "unittest/frs_form_status_mgr_center_test:unittest"
+    "unittest/frs_form_status_mgr_center_test:unittest",
+    "unittest/fms_form_abnormal_reporter_test:unittest"
   ]
 }
 
