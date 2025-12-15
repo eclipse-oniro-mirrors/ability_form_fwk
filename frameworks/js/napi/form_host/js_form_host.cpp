@@ -3144,7 +3144,7 @@ ErrCode JsFormRouterProxyMgr::TemplateFormDetailInfoChange(
     HILOG_DEBUG("call");
     std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
     bool result = false;
-    std::function<void()> executeFunc = [client = sptr<JsFormRouterProxyMgr>(this), templateFormInfo, &result]() {
+    std::function<void()> executeFunc = [templateFormInfo, &result]() {
         result = JsFormRouterProxyMgr::GetInstance()->TemplateFormDetailInfoChangeInner(templateFormInfo);
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::TemplateFormDetailInfoChange");
