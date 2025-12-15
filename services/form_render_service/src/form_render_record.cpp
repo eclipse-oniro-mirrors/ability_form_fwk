@@ -1459,7 +1459,7 @@ int32_t FormRenderRecord::SetRenderGroupEnableFlag(const int64_t formId, bool is
     return ERR_OK;
 }
 
-int32_t FormRenderRecord::HandleSetRenderGroupEnableFlag(const int64_t &formId, bool isEnable)
+int32_t FormRenderRecord::HandleSetRenderGroupEnableFlag(const int64_t formId, bool isEnable)
 {
     HILOG_INFO("HandleSetRenderGroupEnableFlag begin,formId:%{public}" PRId64, formId);
     MarkThreadAlive();

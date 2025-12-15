@@ -218,7 +218,6 @@ int32_t FormRenderStub::HandleSetRenderGroupEnableFlag(MessageParcel &data, Mess
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = SetRenderGroupEnableFlag(formId, isEnable, *want);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    reply.WriteInt32(result);
     return result;
 }
 

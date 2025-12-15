@@ -881,6 +881,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    UpdateFormRenderParam(matchedFormId, updateFormWant);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {
@@ -904,7 +905,6 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         }
         return errCode;
     }
-    UpdateFormRenderParam(data.formId, want);
 
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
