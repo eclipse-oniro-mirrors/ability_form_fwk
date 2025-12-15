@@ -148,16 +148,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
         FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
     }
-
-    if (!removedForms.empty()) {
-        HILOG_INFO("clean removed forms and timer");
-        FormDataMgr::GetInstance().CleanHostRemovedForms(removedForms);
-        for (const int64_t id : removedForms) {
-            FormTimerMgr::GetInstance().RemoveFormTimer(id);
-        }
-    }
-    ParamControl::GetInstance().ReloadDueControlByAppUpgrade(updatedForms);
-    HandleFormReload(bundleName, userId, needReload, updatedForms);
+    HandleProviderUpdatedDetail(removedForms, updatedForms, bundleName, userId, needReload);
 }
 
 void FormEventUtil::HandleFormReload(
@@ -598,7 +589,6 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     reCreateRecord.isInited = record.isInited;
     reCreateRecord.versionUpgrade = record.versionUpgrade;
     reCreateRecord.isCountTimerRefresh = false;
-    reCreateRecord.formId = record.formId;
     reCreateRecord.providerUserId = record.providerUserId;
 
     Want want;
@@ -607,11 +597,6 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, reCreateRecord.formTempFlag);
     want.SetParam(Constants::RECREATE_FORM_KEY, true);
     want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, (int)record.renderingMode);
-    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, reCreateRecord.formId);
-    want.SetParam(Constants::PARAM_FORM_WIDTH_KEY, reCreateRecord.wantCacheMap[formId].
-        GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0));
-    want.SetParam(Constants::PARAM_FORM_HEIGHT_KEY, reCreateRecord.wantCacheMap[formId].
-        GetDoubleParam(Constants::PARAM_FORM_HEIGHT_KEY, 0));
 
     FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want);
 }
@@ -758,6 +743,21 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
+}
+
+void FormEventUtil::HandleProviderUpdatedDetail(const std::vector<int64_t> &removedForms,
+    const std::vector<FormRecord> &updatedForms, const std::string &bundleName,
+    const int userId, const bool needReload)
+{
+    if (!removedForms.empty()) {
+        HILOG_INFO("clean removed forms and timer");
+        FormDataMgr::GetInstance().CleanHostRemovedForms(removedForms);
+        for (const int64_t id : removedForms) {
+            FormTimerMgr::GetInstance().RemoveFormTimer(id);
+        }
+    }
+    ParamControl::GetInstance().ReloadDueControlByAppUpgrade(updatedForms);
+    HandleFormReload(bundleName, userId, needReload, updatedForms);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

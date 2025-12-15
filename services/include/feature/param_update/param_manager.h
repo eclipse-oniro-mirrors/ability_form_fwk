@@ -40,7 +40,8 @@ private:
     std::string LoadParamStr();
     void SaveVersionStr(const std::string &versionStr);
     void SaveParamStr(const std::string &paramStr);
-
+    bool VersionStrToNumber(const std::string &versionStr, long long &versionNum);
+    
     std::string g_paramStr;
     std::string g_currentVersion;
 };

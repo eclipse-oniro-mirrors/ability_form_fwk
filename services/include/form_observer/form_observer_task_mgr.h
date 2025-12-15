@@ -61,6 +61,12 @@ public:
     */
     void PostBatchRefreshForms(const int32_t formRefreshType);
 
+        /**
+     * @brief notify configuration update to form provider(task).
+     * @param configuration system configuration.
+     */
+    void PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration);
+
 private:
     /**
     * @brief Notify remote observer form click event.

@@ -20,6 +20,7 @@
 #include "form_constants.h"
 #include "feature/param_update/param_reader.h"
 #include "feature/param_update/param_control.h"
+#include "common/util/form_util.h"
 #include "common/util/string_utils.h"
 #include "data_center/database/form_rdb_data_mgr.h"
 #include "fms_log_wrapper.h"
@@ -27,6 +28,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
+    constexpr int32_t SEGMENT_LENGTH = 3;
     const std::string PARAM_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
     constexpr const char* FORM_MGR_CONFIG_VERSION = "FormMgrConfig_version";
     constexpr const char* FORM_MGR_CONFIG_DATA = "FormMgrConfig_data";
@@ -41,7 +43,7 @@ ParamManager::ParamManager()
 
 ParamManager::~ParamManager()
 {
-    HILOG_INFO("destory");
+    HILOG_INFO("destroy");
 }
 
 void ParamManager::InitParam()
@@ -149,11 +151,31 @@ void ParamManager::SaveVersionStr(const std::string &versionStr)
 
 void ParamManager::SaveParamStr(const std::string &paramStr)
 {
-     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME,
+    ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME,
         FORM_MGR_CONFIG_DATA, paramStr);
     if (result != ERR_OK) {
         HILOG_ERROR("update formMgrConfig param to rdbstore failed, code is %{public}d", result);
     }
+}
+
+bool ParamManager::VersionStrToNumber(const std::string &versionStr, long long &versionNum)
+{
+    std::smatch matchResults;
+    // version format: aa.bb.yy.rrr,example: 10.10.25.100
+    std::regex reg(R"(^\d{1,3}(\.\d{1,3}){1,3}$)");
+    bool ret = std::regex_match(versionStr, matchResults, reg);
+    if (!ret) {
+        return false;
+    }
+    const char dot = '.';
+    auto tokens = StringUtils::split(versionStr, dot);
+    std::string formatVersionStr;
+    for (const auto &token : tokens) {
+        auto tokenWithZero = std::string(SEGMENT_LENGTH - token.length(), '0') + token;
+        formatVersionStr.append(tokenWithZero);
+    }
+    versionNum = FormUtil::ConvertStringToLongLong(formatVersionStr);
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
