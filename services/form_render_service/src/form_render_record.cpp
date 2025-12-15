@@ -1549,7 +1549,7 @@ int32_t FormRenderRecord::HandleOnUnlock()
 
 int32_t FormRenderRecord::SetRenderGroupEnableFlag(const int64_t formId, bool isEnable)
 {
-    HILOG_INFO("SetRenderGroupEnableFlag, formId:%{public}" PRId64, formId);
+    HILOG_INFO("SetRenderGroupEnableFlag, formId:%{public}" PRId64 ",isEnable:%{public}d", formId, isEnable);
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler formId:%{public}" PRId64, formId);
