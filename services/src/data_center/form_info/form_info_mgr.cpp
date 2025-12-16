@@ -658,15 +658,13 @@ bool FormInfoMgr::IsTemplateFormImperativeFwkValid(const FormInfo &formInfo)
 
 bool FormInfoMgr::IsDeleteCacheInUpgradeScene(const FormInfo &formInfo)
 {
-    bool isDeleteCacheInUpgradeScene = true;
     for (auto dataIter = formInfo.customizeDatas.begin(); dataIter != formInfo.customizeDatas.end(); ++dataIter) {
         if (Constants::IS_DELETE_CACHE_IN_UPGRADE_SCENE == dataIter->name &&
             dataIter->value == IS_DELETE_CACHE_FALSE) {
-            isDeleteCacheInUpgradeScene = false;
-            break;
+            return false;
         }
     }
-    return isDeleteCacheInUpgradeScene;
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
