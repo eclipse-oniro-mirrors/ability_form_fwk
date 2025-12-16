@@ -1385,6 +1385,23 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079, Function | MediumTest | Lev
 }
 
 /**
+ * @tc.number: Fms_FormTimerMgr_0079_1
+ * @tc.name: ClearLimiterTimerResource.
+ * @tc.desc: test ClearLimiterTimerResource function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079_1, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0079_1 start";
+    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
+    ASSERT_NE(nullptr, formTimerMgr);
+    formTimerMgr->limiterTimerId_ = 0;
+    formTimerMgr->CreateLimiterTimer();
+    formTimerMgr->limiterTimerId_ = 1;
+    formTimerMgr->ClearLimiterTimerResource();
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0079_1 end";
+}
+
+/**
  * @tc.number: Fms_FormTimerMgr_0080
  * @tc.name: UpdateDynamicAlarm.
  * @tc.desc: test UpdateDynamicAlarm function.
