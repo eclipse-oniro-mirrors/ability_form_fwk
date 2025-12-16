@@ -862,6 +862,13 @@ public:
     bool CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 
     /**
+     * @brief Check if cache needs to be deleted in upgrade scene
+     * @param record The record of the form.
+     * @return Returns true for form needs to be deleted.
+     */
+    bool IsDeleteCacheInUpgradeScene(const FormRecord &record);
+
+    /**
      * @brief Register publish form cross bundle control in fms.
      * @param callerToken The form provider proxy.
      * @return Returns ERR_OK for setting success.
@@ -880,13 +887,6 @@ public:
      * @return Returns true for can open form manager.
      */
     bool PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo);
-
-    /**
-     * @brief Check if cache needs to be deleted in upgrade scene
-     * @param record The record of the form.
-     * @return Returns true for form needs to be deleted.
-     */
-    bool IsDeleteCacheInUpgradeScene(const FormRecord &record);
 
 private:
     /**
