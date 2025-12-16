@@ -4908,6 +4908,23 @@ sptr<IFormPublishInterceptor> FormMgrAdapter::GetFormPublishInterceptor()
     return formPublishInterceptor_;
 }
 
+bool FormMgrAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record)
+{
+    if (record.isDataProxy) {
+        return false;
+    }
+    FormInfo formInfo;
+    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get formInfo failed");
+        return true;
+    }
+    if (record.isSystemApp && !FormInfoMgr::GetInstance().IsDeleteCacheInUpgradeScene(formInfo)) {
+        return false;
+    }
+    return true;
+}
+
 ErrCode FormMgrAdapter::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
 {
     std::lock_guard<std::mutex> lock(crossBundleControlCallerTokenMutex_);

@@ -290,11 +290,11 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         HILOG_INFO("no updated form");
         return false;
     }
-    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64 ", isDataProxy: %{public}d",
-        formRecord.formName.c_str(), formId, formRecord.isDataProxy);
+    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
 
     // update resource
-    if (!formRecord.isDataProxy) {
+    if (FormMgrAdapter::GetInstance().IsDeleteCacheInUpgradeScene(formRecord)) {
+        HILOG_INFO("Delete cache data in upgrade scene");
         FormCacheMgr::GetInstance().DeleteData(formId);
     }
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);

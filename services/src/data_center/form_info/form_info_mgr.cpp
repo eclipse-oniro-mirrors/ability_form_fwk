@@ -39,6 +39,7 @@ namespace AppExecFwk {
 namespace {
 const std::string FMS_IS_READY_EVENT = "fmsIsReady";
 const std::string PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
+const std::string IS_DELETE_CACHE_FALSE = "false";
 } // namespace
 FormInfoMgr::FormInfoMgr()
 {
@@ -650,6 +651,17 @@ bool FormInfoMgr::IsTemplateFormImperativeFwkValid(const FormInfo &formInfo)
             if (it == Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END) {
                 return false;
             }
+        }
+    }
+    return true;
+}
+
+bool FormInfoMgr::IsDeleteCacheInUpgradeScene(const FormInfo &formInfo)
+{
+    for (auto dataIter = formInfo.customizeDatas.begin(); dataIter != formInfo.customizeDatas.end(); ++dataIter) {
+        if (Constants::IS_DELETE_CACHE_IN_UPGRADE_SCENE == dataIter->name &&
+            dataIter->value == IS_DELETE_CACHE_FALSE) {
+            return false;
         }
     }
     return true;

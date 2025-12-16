@@ -441,6 +441,8 @@ namespace Constants {
     constexpr const int32_t FORM_VERSION_CODE = 100002;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
+    // Is delete cache in upgrade scene
+    constexpr const char* IS_DELETE_CACHE_IN_UPGRADE_SCENE = "isDeleteCacheInUpgradeScene";
     // Is form need the addition process on request form
     constexpr const char* IS_NEED_ADDFORM_ON_REQUEST = "isNeedAddForm";
 
