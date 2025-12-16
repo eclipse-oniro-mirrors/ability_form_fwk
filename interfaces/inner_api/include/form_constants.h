@@ -465,6 +465,9 @@ namespace Constants {
     constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL =
         "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL";
 
+    // When adding Form, distinguish whether the want parameter comes from the host.
+    constexpr const char* IS_ADD_FORM_BY_HOST = "isAddFormByHost";
+
     constexpr const int32_t TEMPLATE_FORM_MAX_SIZE = 20;
 }  // namespace Constants
 }  // namespace AppExecFwk
