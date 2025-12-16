@@ -65,9 +65,7 @@ FormTimerMgr::FormTimerMgr()
 FormTimerMgr::~FormTimerMgr()
 {
     ClearIntervalTimer();
-    if (currentLimiterWantAgent_ != nullptr) {
-        ClearLimiterTimerResource();
-    }
+    ClearLimiterTimerResource();
 }
 /**
  * @brief Add form timer by timer task.
@@ -1104,14 +1102,14 @@ bool FormTimerMgr::UpdateLimiterAlarm()
 void FormTimerMgr::ClearLimiterTimerResource()
 {
     HILOG_INFO("start");
-    if (limiterTimerId_.load() != 0L) {
-        HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_.load());
-        HILOG_INFO("clear limiter timer end");
-        limiterTimerId_.store(0L);
-    }
-
+    std::lock_guard<std::mutex> lock(currentLimiterWantAgentMutex_);
     if (currentLimiterWantAgent_ != nullptr) {
+        if (limiterTimerId_.load() != 0L) {
+            HILOG_INFO("clear limiter timer start");
+            MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_.load());
+            HILOG_INFO("clear limiter timer end");
+            limiterTimerId_.store(0L);
+        }
         IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
         currentLimiterWantAgent_ = nullptr;
     }
@@ -1134,6 +1132,7 @@ bool FormTimerMgr::CreateLimiterTimer()
     if (limiterTimerId_.load() == 0L) {
         limiterTimerId_.store(MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption));
         HILOG_INFO("new timerId:%{public}" PRId64 ".", limiterTimerId_.load());
+        std::lock_guard<std::mutex> lock(currentLimiterWantAgentMutex_);
         currentLimiterWantAgent_ = wantAgent;
     }
     HILOG_INFO("end");
