@@ -89,6 +89,12 @@ struct NapiParamPackage {
     }
 };
 
+struct PropertyMap {
+    const char* inputKey;
+    // String is set as a reference so that the content of outPutKey can be modified.
+    std::string& outPutKey;
+};
+
 class NapiFormUtil {
 public:
     static bool Throw(napi_env env, int32_t errCode, const std::string &errMessage);

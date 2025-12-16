@@ -553,6 +553,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
     "interfaces/inner_api/src/provider_connect_stub.cpp",
     "interfaces/inner_api/src/running_form_info.cpp",
+    "interfaces/inner_api/src/template_form_detail_info.cpp",
   ]
 
   configs = [ ":formmgr_log_config" ]

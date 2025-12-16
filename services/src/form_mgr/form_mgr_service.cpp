@@ -2455,5 +2455,37 @@ bool FormMgrService::PublishFormCrossBundleControl(const Want &want)
     bundleInfo.targetTemplateFormDetailId = want.GetStringParam(Constants::TEMPLATE_FORM_DETAIL_ID_KEY);
     return FormMgrAdapter::GetInstance().PublishFormCrossBundleControl(bundleInfo);
 }
+
+ErrCode FormMgrService::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    return FormMgrAdapter::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
+}
+ 
+ErrCode FormMgrService::UnregisterTemplateFormDetailInfoChange()
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterTemplateFormDetailInfoChange();
+}
+
+ErrCode FormMgrService::UpdateTemplateFormDetailInfo(
+    const std::vector<TemplateFormDetailInfo> &templateFormInfo)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("across local accounts permission failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

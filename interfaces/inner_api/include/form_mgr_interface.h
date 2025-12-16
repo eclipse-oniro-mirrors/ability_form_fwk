@@ -31,6 +31,7 @@
 #include "running_form_info.h"
 #include "form_lock_info.h"
 #include "form_major_info.h"
+#include "template_form_detail_info.h"
 
 #include "want.h"
 
@@ -1028,6 +1029,37 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Register template from detail info change proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    virtual ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
+ 
+    /**
+     * @brief UnRegister template from detail info change proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    virtual ErrCode UnregisterTemplateFormDetailInfoChange()
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Update template form detail info.
+     * @param templateFormInfo The template form info to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UpdateTemplateFormDetailInfo(
+        const std::vector<TemplateFormDetailInfo> &templateFormInfo)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1144,6 +1176,9 @@ public:
         FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE,
         FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
         FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
+        FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
+        FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
+        FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO,
     };
 };
 }  // namespace AppExecFwk
