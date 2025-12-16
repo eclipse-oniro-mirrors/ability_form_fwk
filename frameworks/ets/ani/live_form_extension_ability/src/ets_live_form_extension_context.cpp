@@ -234,10 +234,14 @@ void EtsLiveFormExtensionContext::OnStartAbilityByLiveForm(ani_env *env, ani_obj
     }
     if (errCode == ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED || errCode == ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME) {
         AsyncCallback(env, callback,
-            EtsFormErrorUtil::CreateError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED), nullptr);
+            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED),
+                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED)
+            ), nullptr);
     } else {
         AsyncCallback(env, callback,
-            EtsFormErrorUtil::CreateError(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR), nullptr);
+            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)
+            ), nullptr);
     }
     return;
 }

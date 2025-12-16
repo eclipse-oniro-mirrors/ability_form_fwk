@@ -101,6 +101,7 @@ public:
     // user expect form recycled status
     bool expectRecycled = false;
     uint32_t lastVersionCode = 0;
+    std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool isTemplateForm = false;
 };
 }  // namespace AppExecFwk

@@ -33,10 +33,11 @@
 #include "form_provider_data.h"
 #include "form_provider_data_proxy.h"
 #include "form_state_info.h"
+#include "form_major_info.h"
 #include "running_form_info.h"
+#include "template_form_detail_info.h"
 #include "iremote_object.h"
 #include "want.h"
-#include "form_major_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -494,6 +495,13 @@ public:
     int32_t StartAbilityByFms(const Want &want);
 
     /**
+     * @brief Start a UI ability by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartUIAbilityByFms(const Want &want);
+
+    /**
      * @brief Start an ability by cross bundle.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
@@ -903,6 +911,27 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UnregisterPublishFormCrossBundleControl();
+
+    /**
+     * @brief Register template from detail info change .
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief UnRegister template from detail info change.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterTemplateFormDetailInfoChange();
+
+    /**
+     * @brief Update template form detail info.
+     * @param templateFormInfo The template form info to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateTemplateFormDetailInfo(
+        const std::vector<TemplateFormDetailInfo> &templateFormInfo);
 
 private:
     /**

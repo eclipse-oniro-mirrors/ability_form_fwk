@@ -31,6 +31,7 @@
 #include "running_form_info.h"
 #include "form_lock_info.h"
 #include "form_major_info.h"
+#include "template_form_detail_info.h"
 
 #include "want.h"
 
@@ -428,6 +429,16 @@ public:
     }
 
     /**
+     * @brief Start a ui ability by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode StartUIAbilityByFms(const Want &want)
+    {
+        return 0;
+    }
+
+    /**
      * @brief Start an ability by cross bundle.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
@@ -762,7 +773,7 @@ public:
     {
         return false;
     }
-    
+
     /**
      * @brief Check form bundle signature is debug.
      * @param bundleName The bundle name of form to be check.
@@ -910,7 +921,7 @@ public:
     {
         return ERR_OK;
     }
- 
+
     /**
      * @brief Get the form rect.
      * @param formId The formId.
@@ -943,7 +954,7 @@ public:
     {
         return ERR_OK;
     }
- 
+
     /**
      * @brief Unregister get live form status proxy in fms.
      * @return Returns ERR_OK for setting success.
@@ -1014,6 +1025,37 @@ public:
      * @return Returns ERR_OK for setting success.
      */
     virtual ErrCode UnregisterPublishFormCrossBundleControl()
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Register template from detail info change proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    virtual ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
+ 
+    /**
+     * @brief UnRegister template from detail info change proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    virtual ErrCode UnregisterTemplateFormDetailInfoChange()
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Update template form detail info.
+     * @param templateFormInfo The template form info to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UpdateTemplateFormDetailInfo(
+        const std::vector<TemplateFormDetailInfo> &templateFormInfo)
     {
         return ERR_OK;
     }
@@ -1106,6 +1148,7 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_EXEMPT,
         FORM_MGR_NOTIFY_FORM_LOCKED,
         FORM_MGR_START_ABILITY_BY_FMS,
+        FORM_MGR_START_UI_ABILITY_BY_FMS,
         FORM_MGR_START_ABILITY_BY_CROSS_BUNDLE,
         FORM_MGR_GET_PUBLISHED_FORM_INFOS,
         FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
@@ -1133,6 +1176,9 @@ public:
         FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE,
         FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
         FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
+        FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
+        FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
+        FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO,
     };
 };
 }  // namespace AppExecFwk

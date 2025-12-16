@@ -360,6 +360,14 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleRegisterPublishFormCrossBundleControl(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL):
             return HandleUnregisterPublishFormCrossBundleControl(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_UI_ABILITY_BY_FMS):
+            return HandleStartUIAbilityByFms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE):
+            return HandleRegisterTemplateFormDetailInfoChange(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE):
+            return HandleUnregisterTemplateFormDetailInfoChange(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO):
+            return HandleUpdateTemplateFormDetailInfo(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1313,6 +1321,23 @@ int32_t FormMgrStub::HandleStartAbilityByFms(MessageParcel &data, MessageParcel 
     return result;
 }
 
+ErrCode FormMgrStub::HandleStartUIAbilityByFms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    // retrieve want
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = StartUIAbilityByFms(*want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
 int32_t FormMgrStub::HandleStartAbilityByCrossBundle(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
@@ -2094,7 +2119,7 @@ ErrCode FormMgrStub::HandleUnregisterGetFormRectProxy(MessageParcel &data, Messa
     }
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply)
 {
     int64_t formId = data.ReadInt64();
@@ -2143,7 +2168,7 @@ ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, M
     }
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrStub::HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
@@ -2242,6 +2267,54 @@ ErrCode FormMgrStub::HandleUnregisterPublishFormCrossBundleControl(MessageParcel
     ErrCode result = UnregisterPublishFormCrossBundleControl();
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterTemplateFormDetailInfoChange(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    ErrCode result = RegisterTemplateFormDetailInfoChange(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write proxy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+ 
+ErrCode FormMgrStub::HandleUnregisterTemplateFormDetailInfoChange(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    ErrCode result = UnregisterTemplateFormDetailInfoChange();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUpdateTemplateFormDetailInfo(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::vector<TemplateFormDetailInfo> templateFormInfo;
+    int32_t size = data.ReadInt32();
+    if (size > Constants::TEMPLATE_FORM_MAX_SIZE) {
+        HILOG_ERROR("size limit");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    for (int32_t i = 0; i < size; i++) {
+        auto templateFormDetailInfo = data.ReadParcelable<TemplateFormDetailInfo>();
+        if (templateFormDetailInfo == nullptr) {
+            HILOG_ERROR("read templateFormDetailInfo failed at index %d.", i);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        templateFormInfo.push_back(*templateFormDetailInfo);
+    }
+    ErrCode result = UpdateTemplateFormDetailInfo(templateFormInfo);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write request result failed.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

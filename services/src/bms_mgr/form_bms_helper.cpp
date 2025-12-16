@@ -157,8 +157,7 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
     return true;
 }
 
-bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo,
-    ExtensionAbilityInfo &extensionInfo)
+bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo)
 {
     HILOG_DEBUG("call");
     ElementName element = want.GetElement();
@@ -174,24 +173,8 @@ bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, Abil
         HILOG_ERROR("null iBundleMgr");
         return false;
     }
-    IN_PROCESS_CALL(iBundleMgr->QueryAbilityInfo(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT,
-        userId, abilityInfo));
-    if (abilityInfo.name.empty() || abilityInfo.bundleName.empty()) {
-        HILOG_INFO("get ability info empty,try to get extension info");
-        std::vector<AppExecFwk::ExtensionAbilityInfo> extensionInfos;
-        IN_PROCESS_CALL(iBundleMgr->QueryExtensionAbilityInfos(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT,
-            userId, extensionInfos));
-        if (extensionInfos.empty()) {
-            HILOG_ERROR("get extension info failed");
-            return false;
-        }
-        extensionInfo = extensionInfos.front();
-        if (extensionInfo.bundleName.empty() || extensionInfo.name.empty()) {
-            HILOG_ERROR("get extension info empty");
-            return false;
-        }
-    }
-    return true;
+    return IN_PROCESS_CALL(
+        iBundleMgr->QueryAbilityInfo(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT, userId, abilityInfo));
 }
 
 bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,

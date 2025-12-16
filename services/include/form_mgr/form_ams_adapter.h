@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,37 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_FORM_ASHMEM_H
-#define OHOS_FORM_FWK_FORM_ASHMEM_H
+#ifndef OHOS_FORM_FWK_FORM_AMS_ADAPTER_H
+#define OHOS_FORM_FWK_FORM_AMS_ADAPTER_H
 
-#include "ashmem.h"
+#include <singleton.h>
+#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+using Want = OHOS::AAFwk::Want;
 
 /**
- * @class FormAshmem
- * Defines form ashmem.
+ * @class FormAmsAdapter
+ * Form start ability request adapter.
  */
-class FormAshmem : public Parcelable {
+class FormAmsAdapter final : public DelayedRefSingleton<FormAmsAdapter> {
+DECLARE_DELAYED_REF_SINGLETON(FormAmsAdapter)
 public:
-    FormAshmem() = default;
-    ~FormAshmem();
+    DISALLOW_COPY_AND_MOVE(FormAmsAdapter);
 
-    bool WriteToAshmem(std::string name, char *data, int32_t size);
-    int32_t GetAshmemSize();
-    int32_t GetAshmemFd();
-
-    virtual bool Marshalling(Parcel &parcel) const override;
-    static FormAshmem* Unmarshalling(Parcel &parcel);
-
-    sptr<Ashmem> GetAshmem() const;
-private:
-    bool ReadFromParcel(Parcel &parcel);
-
-    sptr<Ashmem> ashmem_;
+    ErrCode StartUIAbilityByFms(const int32_t uid, const Want &want);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif  // OHOS_FORM_FWK_FORM_ASHMEM_H
+#endif // OHOS_FORM_FWK_FORM_AMS_ADAPTER_H

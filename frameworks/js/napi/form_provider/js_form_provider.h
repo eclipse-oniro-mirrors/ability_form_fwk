@@ -22,6 +22,7 @@
 #include "form_provider_delegate_stub.h"
 #include "form_provider_info.h"
 #include "napi_form_util.h"
+#include "template_form_detail_info.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
@@ -86,6 +87,7 @@ public:
     static napi_value ReloadAllForms(napi_env env, napi_callback_info info);
     static napi_value RegisterPublishFormCrossBundleControl(napi_env env, napi_callback_info info);
     static napi_value UnregisterPublishFormCrossBundleControl(napi_env env, napi_callback_info info);
+    static napi_value UpdateTemplateFormDetailInfo(napi_env env, napi_callback_info info);
 
 private:
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
@@ -118,10 +120,15 @@ private:
     napi_value OnCancelOverflow(napi_env env, size_t argc, napi_value* argv);
     napi_value OnActivateSceneAnimation(napi_env env, size_t argc, napi_value* argv);
     napi_value OnDeactivateSceneAnimation(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnUpdateTemplateFormDetailInfo(napi_env env, size_t argc, napi_value* argv);
     static bool ConvertFormOverflowInfo(napi_env env, napi_value argv, AppExecFwk::OverflowInfo* overflowInfo);
     static bool ConvertOverflowInfoArea(napi_env env, napi_value rangeArea, AppExecFwk::Rect &area);
     static bool GetAndConvertProperty(napi_env env, napi_value object, const char* propertyName, double& outValue);
     bool CheckCallerIsSystemApp();
+    bool ConvertTemplateFormInfo(napi_env env, napi_value value,
+        std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
+    bool ConvertTemplateFormDetailInfo(napi_env env, napi_value value,
+        AppExecFwk::TemplateFormDetailInfo &templateFormDetailInfo);
 };
 
 struct PublishFormCrossBundleControlParam {

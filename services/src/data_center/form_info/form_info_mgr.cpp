@@ -14,6 +14,9 @@
  */
 
 #include "data_center/form_info/form_info_mgr.h"
+
+#include <algorithm>
+
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/database/form_db_cache.h"
@@ -71,6 +74,7 @@ ErrCode FormInfoMgr::Start()
 
 ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_t userId)
 {
+    HILOG_INFO("UpdateStaticFormInfos: %{public}s", bundleName.c_str());
     if (bundleName.empty()) {
         HILOG_ERROR("empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -635,6 +639,20 @@ bool FormInfoMgr::IsMultiAppForm(const FormInfo &formInfo)
         ++dataIter;
     }
     return isMultiAppForm;
+}
+
+bool FormInfoMgr::IsTemplateFormImperativeFwkValid(const FormInfo &formInfo)
+{
+    for (const auto &dataIter : formInfo.customizeDatas) {
+        if (dataIter.name == Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NAME) {
+            auto it = std::find(Constants::TEMPLATE_FORM_IMPERATIVE_FWKS,
+                Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END, dataIter.value);
+            if (it == Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

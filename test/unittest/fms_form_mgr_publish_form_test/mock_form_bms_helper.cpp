@@ -40,8 +40,7 @@ FormBmsHelper::FormBmsHelper()
 FormBmsHelper::~FormBmsHelper()
 {}
 
-bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo,
-    ExtensionAbilityInfo &extensionInfo)
+bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo)
 {
     if (g_mockGetAbilityInfoRet) {
         abilityInfo.name = "name";

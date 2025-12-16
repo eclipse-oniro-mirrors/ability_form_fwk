@@ -891,16 +891,15 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
 
-void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)
+void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType, const int32_t userId)
 {
-    if (formId <= 0
-        || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {
+    if (formId <= 0 || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {
         HILOG_WARN("param is not right");
         return;
     }
 
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
-    FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
+    FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible, userId);
 
     FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
@@ -958,8 +957,8 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
             continue;
         }
-        SetVisibleChange(matchedFormId, formVisibleType);
-        PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+        SetVisibleChange(matchedFormId, formVisibleType, userId);
+        PaddingNotifyVisibleFormsMap(formVisibleType, matchedFormId, formInstanceMaps);
         checkFormIds.push_back(formId);
         // Update info to host and check if the form was created by the system application.
         if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
@@ -1033,8 +1032,7 @@ void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType,
     bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
     FormInstance formInstance;
     // Get the updated card status
-    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, false, formInstance);
+    FormDataMgr::GetInstance().GetFormInstanceById(formId, false, formInstance);
     std::string formHostName = formInstance.formHostName;
     std::string formAllHostName = EMPTY_BUNDLE;
     if (formVisibleType == static_cast<int32_t>(formInstance.formVisiblity)) {
@@ -1520,7 +1518,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
     int formLocation = want.GetParams().GetIntParam(Constants::FORM_LOCATION_KEY,
         static_cast<int>(Constants::FormLocation::OTHER));
     if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
-            formLocation > static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION)) {
+            formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
         HILOG_ERROR("formLocation not FormLocation enum,formLocation = %{public}d", formLocation);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -1628,8 +1626,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
 
     // ark ts form can only exist with one form host
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    if (info.GetUiSyntax() == FormType::ETS &&
-        !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
+    if (info.GetUiSyntax() == FormType::ETS && !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
         HILOG_ERROR("the specified form id does not exist in caller. formId:%{public}s",
             std::to_string(formId).c_str());
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
@@ -2019,13 +2016,11 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     }
 
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    bool abilityExisting = false;
     for (const auto &form : formInfos) {
         if (form.abilityName != abilityName) {
             continue;
         }
 
-        abilityExisting = true;
         if ((formName.empty() && form.defaultFlag) || form.name == formName) {
             formInfo = form;
             formInfo.moduleName = moduleName;
@@ -2036,7 +2031,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
 
     HILOG_ERROR("fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
         abilityName.c_str(), formName.c_str(), userId);
-    return abilityExisting ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
+    return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
 }
 
 ErrCode FormMgrAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo,
@@ -2155,6 +2150,20 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo, const F
 void FormMgrAdapter::SetFormItemInfoParams(const BundleInfo& bundleInfo, const FormInfo& formInfo,
     FormItemInfo& itemInfo)
 {
+    std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
+    for (const auto &dataIter : formInfo.customizeDatas) {
+        if (dataIter.name == Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NAME) {
+            auto it = std::find(Constants::TEMPLATE_FORM_IMPERATIVE_FWKS,
+                Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END, dataIter.value);
+            if (it != Constants::TEMPLATE_FORM_IMPERATIVE_FWKS_END) {
+                HILOG_INFO("GotTemplateFormImperativeFwk:%{public}s", dataIter.value.c_str());
+                templateFormImperativeFwk = dataIter.value;
+                break;
+            }
+        }
+    }
+    itemInfo.SetTemplateFormImperativeFwk(templateFormImperativeFwk);
+
     if (!bundleInfo.hapModuleInfos.empty()) {
         for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
             SetFormItemModuleInfo(hapModuleInfo, formInfo, itemInfo);
@@ -3071,22 +3080,30 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         "isTimerRefresh:%{public}d,wantCacheMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
         (int)formRecord.wantCacheMap.size(), formRecord.isHostRefresh);
+    if (!formRecord.needRefresh || formVisibleType != Constants::FORM_VISIBLE) {
+        return true;
+    }
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
-    if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
-        if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
-            RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formRecord.formId, userId);
-        } else {
-            std::string cacheData;
-            std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-            FormHostRecord formHostRecord;
-            (void)FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
-            // If the form has business cache, refresh the form host.
-            if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData, imageDataMap)) {
-                formRecord.formProviderInfo.SetFormDataString(cacheData);
-                formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-                formHostRecord.OnUpdate(matchedFormId, formRecord);
-            }
+    if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
+        RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formRecord.formId, userId);
+        return true;
+    }
+
+    auto onUpdateTask = [matchedFormId, formRecord, callerToken]() mutable {
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        FormHostRecord formHostRecord;
+        (void)FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
+        // If the form has business cache, refresh the form host.
+        if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData, imageDataMap)) {
+            formRecord.formProviderInfo.SetFormDataString(cacheData);
+            formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+            formHostRecord.OnUpdate(matchedFormId, formRecord);
         }
+    };
+    if (!FormMgrQueue::GetInstance().ScheduleTask(0, onUpdateTask)) {
+        HILOG_WARN("post OnUpdate task failed, exec now");
+        onUpdateTask();
     }
     return true;
 }
@@ -3542,8 +3559,7 @@ ErrCode FormMgrAdapter::RegisterFormRouterProxy(
         if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
             // Checks for cross-user operations.
             HILOG_ERROR("The formId:%{public}" PRId64
-                        " corresponds to a card that is not for the currently active user.",
-                formId);
+                        " corresponds to a card that is not for the currently active user.", formId);
             continue;
         } else if (std::find(record.formUserUids.begin(),
             record.formUserUids.end(), uid) == record.formUserUids.end()) {
@@ -4932,6 +4948,68 @@ bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleI
     ErrCode result = remoteFormProviderDelegateProxy->PublishFormCrossBundleControl(bundleInfo, isCanOpen);
     HILOG_INFO("result:%{public}d, isCanOpen:%{public}d", result, isCanOpen);
     return (result == ERR_OK) ? isCanOpen : false;
+}
+
+ErrCode FormMgrAdapter::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    SetTemplateFormDetailInfoCallerToken(callerToken);
+    return ERR_OK;
+}
+ 
+ErrCode FormMgrAdapter::UnregisterTemplateFormDetailInfoChange()
+{
+    HILOG_INFO("call");
+    ClearTemplateFormDetailInfoCallerToken();
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::UpdateTemplateFormDetailInfo(
+    const std::vector<TemplateFormDetailInfo> &templateFormInfo)
+{
+    HILOG_DEBUG("call");
+    auto templateFormDetailInfoCallerToken = GetTemplateFormDetailInfoCallerToken();
+    if (templateFormDetailInfoCallerToken == nullptr) {
+        HILOG_ERROR("failed, templateFormDetailInfoCallerToken_ is nullptr!");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy =
+        iface_cast<IFormHostDelegate>(templateFormDetailInfoCallerToken);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("failed, remoteFormHostDelegateProxy is nullptr!");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    
+    ErrCode result = remoteFormHostDelegateProxy->TemplateFormDetailInfoChange(templateFormInfo);
+ 
+    HILOG_DEBUG("update result:%{public}d", result);
+    return result;
+}
+
+void FormMgrAdapter::SetTemplateFormDetailInfoCallerToken(
+    const sptr<IRemoteObject> templateFormDetailInfoCallerToken)
+{
+    HILOG_INFO("call");
+    if (templateFormDetailInfoCallerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
+    templateFormDetailInfoCallerToken_ = templateFormDetailInfoCallerToken;
+}
+ 
+void FormMgrAdapter::ClearTemplateFormDetailInfoCallerToken()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
+    templateFormDetailInfoCallerToken_ = nullptr;
+}
+ 
+sptr<IRemoteObject> FormMgrAdapter::GetTemplateFormDetailInfoCallerToken()
+{
+    HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
+    return templateFormDetailInfoCallerToken_;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

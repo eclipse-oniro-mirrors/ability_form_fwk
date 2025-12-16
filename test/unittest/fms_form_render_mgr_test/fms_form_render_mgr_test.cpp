@@ -1446,4 +1446,30 @@ HWTEST_F(FormRenderMgrTest, RerenderAllFormsImmediate_003, TestSize.Level0)
     formRenderMgr.RerenderAllFormsImmediate(userId);
     GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_003 end";
 }
+
+/**
+ * @tc.name: GetFormRenderInner_001
+ * @tc.desc: test GetFormRenderMgrInner and GetFormSandboxMgrInner function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, GetFormRenderMgrInner_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetFormRenderMgrInner_001 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    EXPECT_TRUE(formRenderMgr.GetFormRenderMgrInner(userId, renderInner) && renderInner == formInner);
+
+    std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    EXPECT_TRUE(formRenderMgr.GetFormSandboxMgrInner(userId, sandboxInner) && sandboxInner == formSandboxInner);
+    EXPECT_FALSE(formRenderMgr.GetFormRenderMgrInner(0, renderInner));
+    EXPECT_FALSE(formRenderMgr.GetFormSandboxMgrInner(0, sandboxInner));
+    GTEST_LOG_(INFO) << "GetFormRenderMgrInner_001 end";
+}
 }

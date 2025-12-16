@@ -23,6 +23,7 @@
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "running_form_info.h"
+#include "template_form_detail_info.h"
 #include "iremote_proxy.h"
 
 namespace OHOS {
@@ -369,6 +370,13 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t StartAbilityByFms(const Want &want) override;
+
+    /**
+     * @brief Start a ui ability by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartUIAbilityByFms(const Want &want) override;
 
     /**
      * @brief Start an ability by cross bundle.
@@ -782,7 +790,7 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode UnregisterGetFormRectProxy() override;
- 
+
     /**
      * @brief Get the form rect.
      * @param formId The formId.
@@ -806,7 +814,7 @@ public:
      * @return Return ERR_OK on success, others on failure.
      */
     ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken) override;
- 
+
     /**
      * @brief Unregister get live form status proxy in fms.
      * @return Return ERR_OK on success, others on failure.
@@ -859,6 +867,27 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode UnregisterPublishFormCrossBundleControl() override;
+
+    /**
+     * @brief Register template from detail info change proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken) override;
+ 
+    /**
+     * @brief UnRegister template from detail info change proxy in fms.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterTemplateFormDetailInfoChange() override;
+
+    /**
+     * @brief Update template form detail info.
+     * @param templateFormInfo The template form info to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateTemplateFormDetailInfo(
+        const std::vector<TemplateFormDetailInfo> &templateFormInfo) override;
 
 private:
     template<typename T>

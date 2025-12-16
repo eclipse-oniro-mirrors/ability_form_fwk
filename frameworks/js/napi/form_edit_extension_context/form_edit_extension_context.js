@@ -24,4 +24,9 @@ export class FormEditExtensionContext extends UIExtensionContext {
       console.log('FormEditExtensionContext startSecondPage want: ' + want);
       return this.__context_impl__.startSecondPage(want, asyncCallback);
     }
+
+    startUIAbility(want, callback) {
+      console.log(`FormEditExtensionContext startUIAbility want: ${want}`);
+      return this.__context_impl__.startUIAbility(want, callback);
+    }
 }

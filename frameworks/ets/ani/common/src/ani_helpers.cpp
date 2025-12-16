@@ -412,6 +412,9 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
     env->Object_SetPropertyByName_Boolean(formInfoAni, "transparencyEnabled", formInfo.transparencyEnabled);
     env->Object_SetPropertyByName_Boolean(formInfoAni, "enableBlurBackground", formInfo.enableBlurBackground);
     env->Object_SetPropertyByName_Boolean(formInfoAni, "resizable", formInfo.resizable);
+    env->Object_SetPropertyByName_Boolean(formInfoAni, "isStandbySupported", formInfo.standby.isSupported);
+    env->Object_SetPropertyByName_Boolean(formInfoAni, "isStandbyAdapted", formInfo.standby.isAdapted);
+    env->Object_SetPropertyByName_Boolean(formInfoAni, "isPrivacySensitive", formInfo.standby.isPrivacySensitive);
     // Set enum properties
     env->Object_SetPropertyByName_Int(formInfoAni, "renderingMode", static_cast<int>(formInfo.renderingMode));
     env->Object_SetPropertyByName_Int(formInfoAni, "type", static_cast<int>(formInfo.type));
