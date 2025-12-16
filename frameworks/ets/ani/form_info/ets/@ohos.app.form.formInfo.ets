@@ -284,7 +284,7 @@ export default namespace formInfo {
     overflowInfo?: OverflowInfo;
   }
 
-  interface Rect {
+  export interface Rect {
     left: double;
     top: double;
     width: double;

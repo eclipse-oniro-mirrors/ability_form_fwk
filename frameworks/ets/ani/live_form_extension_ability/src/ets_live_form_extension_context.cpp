@@ -223,13 +223,14 @@ void EtsLiveFormExtensionContext::OnStartAbilityByLiveForm(ani_env *env, ani_obj
     if (!contextPtr) {
         HILOG_ERROR("Context is nullptr");
         AsyncCallback(env, callback,
-            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)),
+            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)),
             nullptr);
         return;
     }
     ErrCode errCode = contextPtr->StartAbilityByFms(want, formId);
     if (errCode == ERR_OK) {
-        AsyncCallback(env, callback, EtsFormErrorUtil::CreateError(env, errCode), nullptr);
+        AsyncCallback(env, callback, nullptr, nullptr);
         return;
     }
     if (errCode == ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED || errCode == ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME) {
