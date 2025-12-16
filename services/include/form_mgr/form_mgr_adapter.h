@@ -1513,6 +1513,18 @@ private:
  
     sptr<IRemoteObject> GetTemplateFormDetailInfoCallerToken();
 
+    void SetFormRectCallerToken(const sptr<IRemoteObject> formRectCallerToken);
+
+    void ClearFormRectCallerToken();
+ 
+    sptr<IRemoteObject> GetFormRectCallerToken();
+
+    void SetLiveFormStatusCallerToken(const sptr<IRemoteObject> liveFormStatusCallerToken);
+
+    void ClearLiveFormStatusCallerToken();
+ 
+    sptr<IRemoteObject> GetLiveFormStatusCallerToken();
+
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 
@@ -1522,9 +1534,9 @@ private:
 
     sptr<IRemoteObject> sceneanimationCallerToken_;
 
-    sptr<IRemoteObject> getFormRectCallerToken_;
+    sptr<IRemoteObject> formRectCallerToken_;
 
-    sptr<IRemoteObject> getLiveFormStatusCallerToken_;
+    sptr<IRemoteObject> liveFormStatusCallerToken_;
 
     sptr<IRemoteObject> crossBundleControlCallerToken_;
 
@@ -1534,9 +1546,9 @@ private:
 
     mutable std::mutex sceneanimationCallerTokenMutex_;
 
-    mutable std::mutex getFormRectCallerTokenMutex_;
+    mutable std::mutex formRectCallerTokenMutex_;
 
-    mutable std::mutex getLiveFormStatusCallerTokenMutex_;
+    mutable std::mutex liveFormStatusCallerTokenMutex_;
 
     mutable std::mutex crossBundleControlCallerTokenMutex_;
 
