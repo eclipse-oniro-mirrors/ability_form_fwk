@@ -4562,7 +4562,7 @@ ErrCode FormMgrAdapter::UnregisterGetLiveFormStatusProxy()
 ErrCode FormMgrAdapter::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("call");
-    sptr<IRemoteObject> liveFormStatusCallerToken = GetFormRectCallerToken();
+    sptr<IRemoteObject> liveFormStatusCallerToken = GetLiveFormStatusCallerToken();
     if (liveFormStatusCallerToken == nullptr) {
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
