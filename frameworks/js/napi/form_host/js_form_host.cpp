@@ -2279,6 +2279,11 @@ private:
         ErrCode result = FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(
             JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
+            if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS &&
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY &&
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+                result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+            }
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -2292,6 +2297,11 @@ private:
         HILOG_INFO("call");
         ErrCode result = FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
         if (result != ERR_OK) {
+            if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS &&
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY &&
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+                result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+            }
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -3119,11 +3129,11 @@ bool JsFormRouterProxyMgr::RegisterTemplateFormDetailInfoChange(napi_env env, na
 
     templateFormDetailInfoChangeCallbackRef_ = callbackRef;
     templateFormDetailInfoChangeEnv_ = env;
- 
+
     HILOG_INFO("registered successfully");
     return true;
 }
- 
+
 bool JsFormRouterProxyMgr::UnregisterTemplateFormDetailInfoChange()
 {
     HILOG_INFO("call");
@@ -3149,9 +3159,9 @@ ErrCode JsFormRouterProxyMgr::TemplateFormDetailInfoChange(
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::TemplateFormDetailInfoChange");
     HILOG_DEBUG("change successfully, result: %{public}d", result);
-    return result ? ERR_OK : ERR_APPEXECFWK_PARCEL_ERROR;
+    return result ? ERR_OK : ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
 }
- 
+
 bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
     const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
 {
@@ -3168,7 +3178,7 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
         HILOG_ERROR("null scope");
         return false;
     }
- 
+
     napi_value callbackFunction = nullptr;
     napi_get_reference_value(templateFormDetailInfoChangeEnv_,
         templateFormDetailInfoChangeCallbackRef_, &callbackFunction);
@@ -3177,16 +3187,16 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
         HILOG_ERROR("callbackFunction is nullptr");
         return false;
     }
- 
+
     napi_valuetype valueType;
     napi_typeof(templateFormDetailInfoChangeEnv_, callbackFunction, &valueType);
- 
+
     if (valueType != napi_function) {
         HILOG_ERROR("check valueType failed");
         napi_close_handle_scope(templateFormDetailInfoChangeEnv_, scope);
         return false;
     }
- 
+
     napi_value templateFormInfoArray;
     napi_status status = napi_create_array(templateFormDetailInfoChangeEnv_, &templateFormInfoArray);
     if (status != napi_ok) {
@@ -3209,7 +3219,7 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
     napi_close_handle_scope(templateFormDetailInfoChangeEnv_, scope);
     return true;
 }
- 
+
 void JsFormRouterProxyMgr::GetTemplateFormInfoArray(
     const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo, napi_value &templateFormInfoArray)
 {
@@ -3218,12 +3228,12 @@ void JsFormRouterProxyMgr::GetTemplateFormInfoArray(
         napi_create_string_utf8(templateFormDetailInfoChangeEnv_, value.c_str(), NAPI_AUTO_LENGTH, &jsValue);
         napi_set_named_property(templateFormDetailInfoChangeEnv_, obj, key, jsValue);
     };
- 
+
     for (size_t i = 0; i < templateFormInfo.size(); ++i) {
         const auto &info = templateFormInfo[i];
         napi_value jsTemplateFormDetailInfo;
         napi_create_object(templateFormDetailInfoChangeEnv_, &jsTemplateFormDetailInfo);
- 
+
         setStringProperty(jsTemplateFormDetailInfo, "bundleName", info.bundleName);
         setStringProperty(jsTemplateFormDetailInfo, "moduleName", info.moduleName);
         setStringProperty(jsTemplateFormDetailInfo, "abilityName", info.abilityName);
@@ -3232,7 +3242,7 @@ void JsFormRouterProxyMgr::GetTemplateFormInfoArray(
         setStringProperty(jsTemplateFormDetailInfo, "detailId", info.detailId);
         setStringProperty(jsTemplateFormDetailInfo, "displayName", info.displayName);
         setStringProperty(jsTemplateFormDetailInfo, "description", info.description);
- 
+
         napi_set_element(templateFormDetailInfoChangeEnv_, templateFormInfoArray,
             static_cast<uint32_t>(i), jsTemplateFormDetailInfo);
     }
@@ -3241,19 +3251,19 @@ void JsFormRouterProxyMgr::GetTemplateFormInfoArray(
 PromiseCallbackInfo::PromiseCallbackInfo(std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam)
     : liveFormInterfaceParam_(liveFormInterfaceParam)
 {}
- 
+
 PromiseCallbackInfo::~PromiseCallbackInfo() = default;
- 
+
 PromiseCallbackInfo* PromiseCallbackInfo::Create(std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam)
 {
     return new (std::nothrow) PromiseCallbackInfo(liveFormInterfaceParam);
 }
- 
+
 void PromiseCallbackInfo::Destroy(PromiseCallbackInfo *callbackInfo)
 {
     delete callbackInfo;
 }
- 
+
 std::shared_ptr<LiveFormInterfaceParam> PromiseCallbackInfo::GetJsCallBackParam()
 {
     return liveFormInterfaceParam_;
