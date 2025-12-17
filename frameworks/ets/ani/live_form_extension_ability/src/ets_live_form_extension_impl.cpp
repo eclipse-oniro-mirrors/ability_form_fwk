@@ -29,9 +29,9 @@ namespace OHOS {
 namespace AbilityRuntime {
 namespace {
 constexpr const char* LIVE_FORM_EXTENSION_CLASS_NAME =
-    "L@ohos/app/form/LiveFormExtensionAbility/LiveFormExtensionAbility";
+    "@ohos.app.form.LiveFormExtensionAbility.LiveFormExtensionAbility";
 constexpr const char* LIVE_FORM_CLASSNAME_ASYNC_CALLBACK_WRAPPER =
-    "L@ohos/app/form/LiveFormExtensionAbility/AsyncCallbackWrapper";
+    "@ohos.app.form.LiveFormExtensionAbility.AsyncCallbackWrapper";
 }
 
 EtsLiveFormExtensionImpl::EtsLiveFormExtensionImpl(const std::unique_ptr<Runtime> &runtime)
