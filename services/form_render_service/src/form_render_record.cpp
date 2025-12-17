@@ -2310,13 +2310,7 @@ void FormRenderRecord::ParseFormLocationMap(std::vector<std::string> &formName, 
 void FormRenderRecord::RuntimeMemoryMonitor()
 {
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
-    if (runtime_ == nullptr || eventHandler == nullptr) {
-        return;
-    }
-
-    auto nativeEnginePtr = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNativeEnginePointer();
-    if (nativeEnginePtr == nullptr) {
-        HILOG_ERROR("null nativeEnginePtr");
+    if (eventHandler == nullptr) {
         return;
     }
 
@@ -2325,7 +2319,18 @@ void FormRenderRecord::RuntimeMemoryMonitor()
     size_t objSize = 0;
     size_t limitSize = 0;
     // GetHeap must be called on the UI thread.
-    auto task = [nativeEnginePtr, &totalSize, &usedSize, &objSize, &limitSize]() {
+    auto task = [weak = weak_from_this(), &totalSize, &usedSize, &objSize, &limitSize]() {
+        auto renderRecord = weak.lock();
+        if (renderRecord == nullptr || renderRecord->runtime_ == nullptr) {
+            return;
+        }
+        auto &jsRuntime = static_cast<AbilityRuntime::JsRuntime &>(*(renderRecord->runtime_));
+        auto nativeEnginePtr = jsRuntime.GetNativeEnginePointer();
+        if (nativeEnginePtr == nullptr) {
+            HILOG_ERROR("null nativeEnginePtr");
+            return;
+        }
+
         totalSize = nativeEnginePtr->GetHeapTotalSize();
         usedSize = nativeEnginePtr->GetHeapUsedSize();
         objSize = nativeEnginePtr->GetHeapObjectSize();
