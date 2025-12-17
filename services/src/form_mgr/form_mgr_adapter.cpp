@@ -4532,6 +4532,7 @@ ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingU
     }
     sptr<IRemoteObject> formRectCallerToken = GetFormRectCallerToken();
     if (formRectCallerToken == nullptr) {
+        HILOG_ERROR("Fail, formRectCallerToken_ is nullptr!");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(formRectCallerToken);
@@ -4564,6 +4565,7 @@ ErrCode FormMgrAdapter::GetLiveFormStatus(std::unordered_map<std::string, std::s
     HILOG_INFO("call");
     sptr<IRemoteObject> liveFormStatusCallerToken = GetLiveFormStatusCallerToken();
     if (liveFormStatusCallerToken == nullptr) {
+        HILOG_ERROR("Fail, liveFormStatusCallerToken_ is nullptr!");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(liveFormStatusCallerToken);
