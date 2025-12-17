@@ -2279,6 +2279,10 @@ private:
         ErrCode result = FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(
             JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
+            if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS && 
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY) {
+                result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+            }
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -2292,6 +2296,10 @@ private:
         HILOG_INFO("call");
         ErrCode result = FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
         if (result != ERR_OK) {
+            if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS && 
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY) {
+                result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+            }
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -3149,7 +3157,7 @@ ErrCode JsFormRouterProxyMgr::TemplateFormDetailInfoChange(
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::TemplateFormDetailInfoChange");
     HILOG_DEBUG("change successfully, result: %{public}d", result);
-    return result ? ERR_OK : ERR_APPEXECFWK_PARCEL_ERROR;
+    return result ? ERR_OK : ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
 }
  
 bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
