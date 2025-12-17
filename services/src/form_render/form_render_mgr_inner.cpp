@@ -285,6 +285,18 @@ void FormRenderMgrInner::NotifyScreenOn()
     remoteFormRenderer->RunCachedConfigurationUpdated();
 }
 
+void FormRenderMgrInner::PostSetRenderGroupEnableFlagTask(int64_t formId, bool isEnable)
+{
+    HILOG_INFO("call");
+    sptr<IRemoteObject> remoteObject;
+    auto ret = GetRenderObject(remoteObject);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("null remoteObjectGotten");
+        return;
+    }
+    FormRenderTaskMgr::GetInstance().PostSetRenderGroupEnableFlag(formId, isEnable, remoteObject);
+}
+
 void FormRenderMgrInner::PostSetVisibleChangeTask(int64_t formId, bool isVisible)
 {
     HILOG_INFO("call");

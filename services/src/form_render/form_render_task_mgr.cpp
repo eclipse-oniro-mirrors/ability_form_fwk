@@ -52,6 +52,16 @@ void FormRenderTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
     FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
     HILOG_DEBUG("end");
 }
+  
+void FormRenderTaskMgr::PostSetRenderGroupEnableFlag(int64_t formId, bool isEnable,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    auto task = [formId, isEnable, remoteObject]() {
+        FormRenderTaskMgr::GetInstance().SetRenderGroupEnableFlag(formId, isEnable, remoteObject);
+    };
+    FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    HILOG_INFO("start task formId:%{public}" PRId64 " isEnable:%{public}d", formId, isEnable);
+}
 
 void FormRenderTaskMgr::PostSetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
 {
@@ -111,6 +121,31 @@ void FormRenderTaskMgr::OnUnlock(const sptr<IRemoteObject> &remoteObject)
         return;
     }
     HILOG_DEBUG("end");
+}
+
+void FormRenderTaskMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable, const sptr<IRemoteObject> &remoteObject)
+{
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("get formRenderProxy failed");
+        return;
+    }
+ 
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
+        return;
+    }
+ 
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
+ 
+    int32_t error = remoteFormRender->SetRenderGroupEnableFlag(formId, isEnable, want);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail");
+        return;
+    }
+    HILOG_INFO("formId: %{public}" PRId64 " isEnable change to: %{public}d", formId, isEnable);
 }
 
 void FormRenderTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)

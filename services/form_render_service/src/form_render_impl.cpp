@@ -90,6 +90,11 @@ int32_t FormRenderImpl::OnUnlock()
     return FormRenderServiceMgr::GetInstance().OnUnlock();
 }
 
+int32_t FormRenderImpl::SetRenderGroupEnableFlag(const int64_t formId, bool isEnable, const Want &want)
+{
+    return FormRenderServiceMgr::GetInstance().SetRenderGroupEnableFlag(formId, isEnable, want);
+}
+
 int32_t FormRenderImpl::SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want)
 {
     return FormRenderServiceMgr::GetInstance().SetVisibleChange(formId, isVisible, want);

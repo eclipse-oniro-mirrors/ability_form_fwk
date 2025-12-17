@@ -1487,6 +1487,8 @@ private:
 
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 
+    void UpdateFormRenderParam(const int64_t formId, const Want &want);
+
     void SetVisibleChange(const int64_t formId, const int32_t formVisibleType, const int32_t userId);
 
     /**

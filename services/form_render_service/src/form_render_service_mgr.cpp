@@ -39,6 +39,7 @@ namespace FormRender {
 namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
+constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20;  // ms
 constexpr int32_t ENABLE_FORM_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
@@ -342,6 +343,36 @@ int32_t FormRenderServiceMgr::OnUnlock()
         }
     }
 
+    return ERR_OK;
+}
+
+int32_t FormRenderServiceMgr::SetRenderGroupEnableFlag(const int64_t formId, bool isEnable, const Want &want)
+{
+    if (formId <= 0) {
+        HILOG_ERROR("formId is negative");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("empty uid,formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s isEnable: %{public}d", formId, uid.c_str(), isEnable);
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+        if (search->second == nullptr) {
+            HILOG_ERROR("null renderRecord of %{public}" PRId64, formId);
+            return SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED;
+        }
+        auto ret = search->second->SetRenderGroupEnableFlag(formId, isEnable);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("SetRenderGroupEnableFlag %{public}" PRId64 " failed.", formId);
+            return ret;
+        }
+    } else {
+        HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
+        return SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED;
+    }
     return ERR_OK;
 }
 

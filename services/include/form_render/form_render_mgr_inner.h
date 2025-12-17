@@ -72,6 +72,8 @@ public:
 
     void NotifyScreenOn();
 
+    void PostSetRenderGroupEnableFlagTask(int64_t formId, bool isEnable);
+
     void PostSetVisibleChangeTask(int64_t formId, bool isVisible);
 
     int32_t GetReRenderCount() const;
