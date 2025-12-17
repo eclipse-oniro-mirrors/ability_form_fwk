@@ -1335,7 +1335,7 @@ ErrCode FormMgrStub::HandleStartUIAbilityByFms(MessageParcel &data, MessageParce
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    return result;
+    return ERR_OK;
 }
 
 int32_t FormMgrStub::HandleStartAbilityByCrossBundle(MessageParcel &data, MessageParcel &reply)

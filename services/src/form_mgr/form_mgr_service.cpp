@@ -2218,9 +2218,13 @@ ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
     int uid = IPCSkeleton::GetCallingUid();
     std::string callerName;
     ErrCode ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, callerName);
-    if (ret != ERR_OK || callerName.empty()) {
-        HILOG_ERROR("Get bundleName by uid failed or bundleName empty");
-        return ret == ERR_OK ? ERR_APPEXECFWK_FORM_COMMON_CODE : ret;
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Get bundleName by uid failed");
+        return ret;
+    }
+    if (callerName.empty()) {
+        HILOG_ERROR("bundleName empty");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
 
     auto requestMethod = String::Box(
@@ -2229,10 +2233,11 @@ ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
     wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
     wantarams.SetParam(
         Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
-    wantarams.SetParam("bundleName", String::Box(callerName));
+    wantarams.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, String::Box(callerName));
 
     Want want;
     want.SetAction(Constants::FORM_PAGE_ACTION);
+    want.SetBundle(callerName);
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }

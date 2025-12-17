@@ -130,7 +130,7 @@ napi_value JsFormEditExtensionContext::OnStartUIAbility(napi_env env, NapiCallba
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     TAG_LOGD(AAFwkTag::UI_EXT, "called");
-    if (info.argc < ARGC_ONE) {
+    if (info.argc != ARGC_TWO) {
         TAG_LOGE(AAFwkTag::UI_EXT, "invalid argc");
         ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
         return CreateJsUndefined(env);

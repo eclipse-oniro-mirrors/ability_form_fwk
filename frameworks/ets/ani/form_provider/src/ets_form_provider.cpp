@@ -139,7 +139,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
         }
         formInfoFilter.moduleName = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(moduleName));
     }
-    
+
     std::vector<FormInfo> formInfos;
     auto ret = FormMgr::GetInstance().GetFormsInfo(formInfoFilter, formInfos);
     if (ret != ERR_OK) {
@@ -162,7 +162,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
         }
         index++;
     }
-    
+
     InvokeAsyncWithBusinessError(env, callback, ret, formInfosArray);
     HILOG_DEBUG("End");
 }
@@ -193,7 +193,7 @@ void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
     HILOG_DEBUG("End");
 }
 
-void CloseFormEditAbility([[maybe_unused]] ani_env *env, ani_boolean isMainPage)
+void CloseFormEditAbility(ani_env *env, ani_boolean isMainPage)
 {
     HILOG_DEBUG("Call");
 
@@ -698,7 +698,7 @@ void GetPublishedFormInfoById(ani_env* env, ani_string formId, ani_object callba
 {
     HILOG_DEBUG("Call");
     CheckEnvOrThrow(env);
-    
+
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
