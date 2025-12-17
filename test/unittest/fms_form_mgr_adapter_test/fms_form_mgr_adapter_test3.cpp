@@ -1341,7 +1341,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0305, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0305 start";
     FormMgrAdapter formMgrAdapter;
     std::unordered_map<std::string, std::string> liveFormStatusMap;
-    formMgrAdapter.getLiveFormStatusCallerToken_ = nullptr;
+    formMgrAdapter.liveFormStatusCallerToken_ = nullptr;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.GetLiveFormStatus(liveFormStatusMap));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0305 end";
 }
