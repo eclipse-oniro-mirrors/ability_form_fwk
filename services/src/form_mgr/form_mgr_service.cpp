@@ -2467,6 +2467,10 @@ ErrCode FormMgrService::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteO
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("across local accounts permission failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
     return FormMgrAdapter::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
 }
  
@@ -2475,6 +2479,10 @@ ErrCode FormMgrService::UnregisterTemplateFormDetailInfoChange()
     HILOG_INFO("call");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("across local accounts permission failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().UnregisterTemplateFormDetailInfoChange();
 }
