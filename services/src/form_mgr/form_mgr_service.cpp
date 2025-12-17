@@ -1171,6 +1171,9 @@ int FormMgrService::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
         HILOG_ERROR("Across local accounts permission failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
     return FormMgrAdapter::GetInstance().GetAllTemplateFormsInfo(formInfos);
 }
 
@@ -1212,6 +1215,9 @@ int FormMgrService::GetTemplateFormsInfoByApp(const std::string &bundleName, std
     if (!CheckAcrossLocalAccountsPermission()) {
         HILOG_ERROR("Across local accounts permission failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetTemplateFormsInfoByApp",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
@@ -1258,6 +1264,9 @@ int FormMgrService::GetTemplateFormsInfoByModule(const std::string &bundleName, 
     if (!CheckAcrossLocalAccountsPermission()) {
         HILOG_ERROR("Across local accounts permission failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
     return FormMgrAdapter::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
 }
@@ -2471,6 +2480,9 @@ ErrCode FormMgrService::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteO
         HILOG_ERROR("across local accounts permission failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
     return FormMgrAdapter::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
 }
  
@@ -2483,6 +2495,9 @@ ErrCode FormMgrService::UnregisterTemplateFormDetailInfoChange()
     if (!CheckAcrossLocalAccountsPermission()) {
         HILOG_ERROR("across local accounts permission failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
     return FormMgrAdapter::GetInstance().UnregisterTemplateFormDetailInfoChange();
 }

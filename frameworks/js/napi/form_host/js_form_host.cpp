@@ -2280,7 +2280,8 @@ private:
             JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
             if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS &&
-                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY) {
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY &&
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
                 result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
             }
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
@@ -2297,7 +2298,8 @@ private:
         ErrCode result = FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
         if (result != ERR_OK) {
             if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS &&
-                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY) {
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY &&
+                result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
                 result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
             }
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
