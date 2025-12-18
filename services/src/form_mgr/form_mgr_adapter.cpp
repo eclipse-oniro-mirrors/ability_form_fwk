@@ -4522,33 +4522,35 @@ ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const in
 
 ErrCode FormMgrAdapter::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
-    std::lock_guard<std::mutex> lock(getFormRectCallerTokenMutex_);
     HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("callerToken is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    getFormRectCallerToken_ = callerToken;
+    SetFormRectCallerToken(callerToken);
     return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::UnregisterGetFormRectProxy()
 {
-    std::lock_guard<std::mutex> lock(getFormRectCallerTokenMutex_);
     HILOG_INFO("call");
-    getFormRectCallerToken_ = nullptr;
+    ClearFormRectCallerToken();
     return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)
 {
-    std::lock_guard<std::mutex> lock(getFormRectCallerTokenMutex_);
     HILOG_INFO("call");
     ErrCode checkResult = CallerCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
         return checkResult;
     }
-    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(getFormRectCallerToken_);
+    sptr<IRemoteObject> formRectCallerToken = GetFormRectCallerToken();
+    if (formRectCallerToken == nullptr) {
+        HILOG_ERROR("Fail, formRectCallerToken_ is nullptr!");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(formRectCallerToken);
     if (remoteFormHostDelegateProxy == nullptr) {
         HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
@@ -4561,33 +4563,31 @@ ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingU
 
 ErrCode FormMgrAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
-    std::lock_guard<std::mutex> lock(getLiveFormStatusCallerTokenMutex_);
     HILOG_INFO("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("callerToken is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    getLiveFormStatusCallerToken_ = callerToken;
+    SetLiveFormStatusCallerToken(callerToken);
     return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::UnregisterGetLiveFormStatusProxy()
 {
-    std::lock_guard<std::mutex> lock(getLiveFormStatusCallerTokenMutex_);
     HILOG_INFO("call");
-    getLiveFormStatusCallerToken_ = nullptr;
+    ClearLiveFormStatusCallerToken();
     return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
-    std::lock_guard<std::mutex> lock(getLiveFormStatusCallerTokenMutex_);
     HILOG_INFO("call");
-    if (!getLiveFormStatusCallerToken_) {
-        HILOG_ERROR("Fail, getLiveFormStatusCallerToken_ is nullptr!");
+    sptr<IRemoteObject> liveFormStatusCallerToken = GetLiveFormStatusCallerToken();
+    if (liveFormStatusCallerToken == nullptr) {
+        HILOG_ERROR("Fail, liveFormStatusCallerToken_ is nullptr!");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
-    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(getLiveFormStatusCallerToken_);
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(liveFormStatusCallerToken);
     if (remoteFormHostDelegateProxy == nullptr) {
         HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
@@ -5038,6 +5038,56 @@ sptr<IRemoteObject> FormMgrAdapter::GetTemplateFormDetailInfoCallerToken()
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
     return templateFormDetailInfoCallerToken_;
+}
+
+void FormMgrAdapter::SetFormRectCallerToken(const sptr<IRemoteObject> formRectCallerToken)
+{
+    HILOG_INFO("call");
+    if (formRectCallerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(formRectCallerTokenMutex_);
+    formRectCallerToken_ = formRectCallerToken;
+}
+
+void FormMgrAdapter::ClearFormRectCallerToken()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(formRectCallerTokenMutex_);
+    formRectCallerToken_ = nullptr;
+}
+ 
+sptr<IRemoteObject> FormMgrAdapter::GetFormRectCallerToken()
+{
+    HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(formRectCallerTokenMutex_);
+    return formRectCallerToken_;
+}
+
+void FormMgrAdapter::SetLiveFormStatusCallerToken(const sptr<IRemoteObject> liveFormStatusCallerToken)
+{
+    HILOG_INFO("call");
+    if (liveFormStatusCallerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(liveFormStatusCallerTokenMutex_);
+    liveFormStatusCallerToken_ = liveFormStatusCallerToken;
+}
+
+void FormMgrAdapter::ClearLiveFormStatusCallerToken()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(liveFormStatusCallerTokenMutex_);
+    liveFormStatusCallerToken_ = nullptr;
+}
+ 
+sptr<IRemoteObject> FormMgrAdapter::GetLiveFormStatusCallerToken()
+{
+    HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(liveFormStatusCallerTokenMutex_);
+    return liveFormStatusCallerToken_;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
