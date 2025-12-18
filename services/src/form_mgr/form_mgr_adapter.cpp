@@ -4512,6 +4512,10 @@ ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const in
 ErrCode FormMgrAdapter::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
+    if (callerToken == nullptr) {	
+        HILOG_ERROR("callerToken is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     SetFormRectCallerToken(callerToken);
     return ERR_OK;
 }
@@ -4549,6 +4553,10 @@ ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingU
 ErrCode FormMgrAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
+    if (callerToken == nullptr) {	
+        HILOG_ERROR("callerToken is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     SetLiveFormStatusCallerToken(callerToken);
     return ERR_OK;
 }
