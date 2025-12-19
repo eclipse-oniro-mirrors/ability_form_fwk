@@ -583,6 +583,24 @@ void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hos
     }
 }
 
+void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host, const int hostCallingUid)
+{
+    int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    if (hostUserId == 0) {
+        HILOG_WARN("hostUserId is 0, get current active userId ");
+        hostUserId = FormUtil::GetCurrentAccountId();
+    }
+    HILOG_WARN("hostUserId:%{public}d", hostUserId);
+    auto renderIter = renderInners_.find(hostUserId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->RemoveHostToken(host);
+    }
+    auto sandboxIter = sandboxInners_.find(hostUserId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->RemoveHostToken(host);
+    }
+}
+
 void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject, const FormRecord &formRecord)
 {
     HILOG_INFO("formUserId:%{public}d", formRecord.userId);

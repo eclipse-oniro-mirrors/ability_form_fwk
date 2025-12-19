@@ -83,6 +83,8 @@ public:
 
     void CleanFormHost(const sptr<IRemoteObject> &host, const int hostCallingUid);
 
+    void RemoveHostToken(const sptr<IRemoteObject> &host, const int hostCallingUid);
+
     void HandleConnectFailed(int64_t formId, int32_t errorCode) const;
 
     bool IsRerenderForRenderServiceDied(int64_t formId);
