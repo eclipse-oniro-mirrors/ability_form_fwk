@@ -572,15 +572,7 @@ void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hos
         return;
     }
 
-    if (Constants::CALLING_UID_TRANSFORM_DIVISOR == 0) {
-        HILOG_ERROR("CALLING_UID_TRANSFORM_DIVISOR is zero");
-        return;
-    }
-    int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
-    if (hostUserId == 0) {
-        HILOG_WARN("hostUserId is 0, get current active userId ");
-        hostUserId = FormUtil::GetCurrentAccountId();
-    }
+    int32_t hostUserId = FormUtil::GetCallerUserId(hostCallingUid);
     HILOG_WARN("hostUserId:%{public}d", hostUserId);
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(hostUserId, renderInner)) {
@@ -599,15 +591,7 @@ void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host, const int h
         return;
     }
 
-    if (Constants::CALLING_UID_TRANSFORM_DIVISOR == 0) {
-        HILOG_ERROR("CALLING_UID_TRANSFORM_DIVISOR is zero");
-        return;
-    }
-    int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
-    if (hostUserId == 0) {
-        HILOG_WARN("hostUserId is 0, get current active userId ");
-        hostUserId = FormUtil::GetCurrentAccountId();
-    }
+    int32_t hostUserId = FormUtil::GetCallerUserId(hostCallingUid);
     HILOG_WARN("hostUserId:%{public}d", hostUserId);
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(hostUserId, renderInner)) {
