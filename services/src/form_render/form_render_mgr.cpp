@@ -591,13 +591,13 @@ void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host, const int h
         hostUserId = FormUtil::GetCurrentAccountId();
     }
     HILOG_WARN("hostUserId:%{public}d", hostUserId);
-    auto renderIter = renderInners_.find(hostUserId);
-    if (renderIter != renderInners_.end()) {
-        renderIter->second->RemoveHostToken(host);
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    if (GetFormRenderMgrInner(hostUserId, renderInner)) {
+        renderInner->RemoveHostToken(host);
     }
-    auto sandboxIter = sandboxInners_.find(hostUserId);
-    if (sandboxIter != sandboxInners_.end()) {
-        sandboxIter->second->RemoveHostToken(host);
+    std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
+    if (GetFormSandboxMgrInner(hostUserId, sandboxInner)) {
+        sandboxInner->RemoveHostToken(host);
     }
 }
 
