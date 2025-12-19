@@ -567,6 +567,15 @@ void FormRenderMgr::reAddConnections(std::vector<int64_t> formIds,
 
 void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hostCallingUid)
 {
+    if (host == nullptr) {
+        HILOG_ERROR("host token is null");
+        return;
+    }
+
+    if (Constants::CALLING_UID_TRANSFORM_DIVISOR == 0) {
+        HILOG_ERROR("CALLING_UID_TRANSFORM_DIVISOR is zero");
+        return;
+    }
     int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     if (hostUserId == 0) {
         HILOG_WARN("hostUserId is 0, get current active userId ");
@@ -585,6 +594,15 @@ void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hos
 
 void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host, const int hostCallingUid)
 {
+    if (host == nullptr) {
+        HILOG_ERROR("host token is null");
+        return;
+    }
+
+    if (Constants::CALLING_UID_TRANSFORM_DIVISOR == 0) {
+        HILOG_ERROR("CALLING_UID_TRANSFORM_DIVISOR is zero");
+        return;
+    }
     int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     if (hostUserId == 0) {
         HILOG_WARN("hostUserId is 0, get current active userId ");
