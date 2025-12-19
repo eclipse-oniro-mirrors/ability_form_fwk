@@ -51,7 +51,6 @@ ohos_fuzztest("FormShareMgrFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "device_manager:devicemanagersdk",
     "ffrt:libffrt",
     "form_fwk:form_manager",
     "hilog:libhilog",
@@ -60,6 +59,9 @@ ohos_fuzztest("FormShareMgrFuzzTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+  if (device_manager_enable) {
+    external_deps += [ "device_manager:devicemanagersdk" ]
+  }
 }
 
 ###############################################################################

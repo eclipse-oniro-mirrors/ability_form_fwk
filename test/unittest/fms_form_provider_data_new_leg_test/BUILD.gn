@@ -53,7 +53,6 @@ ohos_unittest("FmsFormProviderDataNewLegTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
@@ -64,6 +63,9 @@ ohos_unittest("FmsFormProviderDataNewLegTest") {
     "samgr:samgr_proxy",
     "googletest:gmock_main",
   ]
+  if (device_manager_enable) {
+    external_deps += [ "device_manager:devicemanagersdk" ]
+  }
 
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
