@@ -102,3 +102,11 @@ declare_args() {
     hiappevent_global_part_enabled = true
   }
 }
+
+declare_args() {
+  device_manager_enable = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.distributedhardware_device_manager)) {
+    device_manager_enable = true
+  }
+}

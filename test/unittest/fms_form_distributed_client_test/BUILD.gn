@@ -47,7 +47,6 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "dmsfwk:distributed_sdk",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hilog:libhilog",
@@ -58,6 +57,9 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "samgr:samgr_proxy",
     "googletest:gmock_main",
   ]
+  if (device_manager_enable) {
+    external_deps += [ "dmsfwk:distributed_sdk" ]
+  }
 }
 
 group("unittest") {

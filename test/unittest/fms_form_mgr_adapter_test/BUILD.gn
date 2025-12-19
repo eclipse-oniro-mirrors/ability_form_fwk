@@ -63,7 +63,6 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
@@ -77,6 +76,9 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "samgr:samgr_proxy",
     "googletest:gmock_main",
   ]
+  if (device_manager_enable) {
+    external_deps += [ "device_manager:devicemanagersdk" ]
+  }
 
   defines = []
 
@@ -145,7 +147,6 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
@@ -159,6 +160,9 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "samgr:samgr_proxy",
     "googletest:gmock_main",
   ]
+  if (device_manager_enable) {
+    external_deps += [ "device_manager:devicemanagersdk" ]
+  }
 
   defines = []
 
