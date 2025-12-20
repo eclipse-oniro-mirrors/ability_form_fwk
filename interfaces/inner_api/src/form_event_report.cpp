@@ -74,8 +74,10 @@ constexpr const char *FORM_RENDER_SERVICE_STATUS_ALTER = "FORM_RENDER_SERVICE_ST
 constexpr const char *ABNORMAL_FORM = "ABNORMAL_FORM";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     {FormEventName::ADD_FORM, "ADD_FORM"},
+    {FormEventName::ADD_DISTRIBUTED_FORM, "ADD_DISTRIBUTED_FORM"},
     {FormEventName::REQUEST_FORM, "REQUEST_FORM"},
     {FormEventName::DELETE_FORM, "DELETE_FORM"},
+    {FormEventName::DELETE_DISTRIBUTED_FORM, "DELETE_DISTRIBUTED_FORM"},
     {FormEventName::CASTTEMP_FORM, "CASTTEMP_FORM"},
     {FormEventName::ACQUIREFORMSTATE_FORM, "ACQUIREFORMSTATE_FORM"},
     {FormEventName::MESSAGE_EVENT_FORM, "MESSAGE_EVENT_FORM"},
@@ -497,6 +499,31 @@ void FormEventReport::SendFormAbnormalEvent(const FormAbnormalReportParams &para
         EVENT_KEY_FORM_LOCATION, params.formLocations,
         EVENT_KEY_APP_VERSION, params.appVersions,
         EVENT_KEY_NONTRANSPARENCY_RATE, params.nonTransparencyRateList);
+}
+
+void FormEventReport::SendFormFwkUEEvent(const FormEventName &eventName, const FormEventInfo &eventInfo)
+{
+    const std::string name = ConvertEventName(eventName);
+    if (name == INVALIDEVENTNAME) {
+        HILOG_ERROR("invalid eventName");
+        return;
+    }
+
+    switch (eventName) {
+        case FormEventName::ADD_DISTRIBUTED_FORM:
+        case FormEventName::DELETE_DISTRIBUTED_FORM:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_FWK_UE, name, HiSysEventType::BEHAVIOR,
+                EVENT_KEY_FORM_ID, eventInfo.formId,
+                EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+                EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
+                EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension),
+                EVENT_KEY_IS_DISTRIBUTED_FORM, eventInfo.isDistributedForm);
+            break;
+        default:
+            HILOG_ERROR("%{public}s is not UE event", name.c_str());
+            break;
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS
