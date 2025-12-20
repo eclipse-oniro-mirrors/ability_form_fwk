@@ -268,7 +268,8 @@ bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t>
 
     for (ani_size i = 0; i < size; ++i) {
         ani_ref elementRef;
-        if (env->Array_Get(array, i, &elementRef) != ANI_OK) {
+        status = env->Array_Get(array, i, &elementRef);
+        if (status != ANI_OK) {
             HILOG_ERROR("Array_Get failed at index %{public}zu!", i);
             return false;
         }
@@ -345,16 +346,20 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
     return true;
 }
 
-ani_array CreateAniArrayIntFromStdVector(ani_env *env, std::vector<int32_t> vec)
+ani_array CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t> &vec)
 {
     ani_array array = nullptr;
     ani_ref undefined_ref;
     if (env->GetUndefined(&undefined_ref) != ANI_OK) {
         HILOG_ERROR("GetUndefined failed");
+        return array;
     }
 
     if (!vec.empty()) {
-        env->Array_New(vec.size(), undefined_ref, &array);
+        if (env->Array_New(vec.size(), undefined_ref, &array) != ANI_OK) {
+            HILOG_ERROR("Array_New failed");
+            return array;
+        }
         ani_size index = 0;
         for (auto value : vec) {
             ani_object valueAni = createInt(env, value);

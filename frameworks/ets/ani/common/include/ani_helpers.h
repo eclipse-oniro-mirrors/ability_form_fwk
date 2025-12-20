@@ -76,7 +76,7 @@ bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t>
 bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
     const std::vector<AppExecFwk::FormCustomizeData> &customizeData);
 
-ani_array CreateAniArrayIntFromStdVector(ani_env *env, std::vector<int32_t> vec);
+ani_array CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t> &vec);
 
 void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::RunningFormInfo &formInfo);
 
