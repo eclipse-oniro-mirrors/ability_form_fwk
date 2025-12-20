@@ -64,6 +64,8 @@ public:
 
     void CleanFormHost(const sptr<IRemoteObject> &host);
 
+    void RemoveHostToken(const sptr<IRemoteObject> &host);
+
     void OnRenderingBlock(const std::string &bundleName);
 
     ErrCode ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId);
@@ -106,8 +108,6 @@ private:
     void DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const;
 
     void AddHostToken(const sptr<IRemoteObject> &host, int64_t formId);
-
-    void RemoveHostToken(const sptr<IRemoteObject> &host);
 
     void NotifyHostRenderServiceIsDead() const;
 

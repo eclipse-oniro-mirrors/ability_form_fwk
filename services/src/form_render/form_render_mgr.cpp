@@ -567,11 +567,12 @@ void FormRenderMgr::reAddConnections(std::vector<int64_t> formIds,
 
 void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hostCallingUid)
 {
-    int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
-    if (hostUserId == 0) {
-        HILOG_WARN("hostUserId is 0, get current active userId ");
-        hostUserId = FormUtil::GetCurrentAccountId();
+    if (host == nullptr) {
+        HILOG_ERROR("host token is null");
+        return;
     }
+
+    int32_t hostUserId = FormUtil::GetCallerUserId(hostCallingUid);
     HILOG_WARN("hostUserId:%{public}d", hostUserId);
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(hostUserId, renderInner)) {
@@ -580,6 +581,25 @@ void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hos
     std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
     if (GetFormSandboxMgrInner(hostUserId, sandboxInner)) {
         sandboxInner->CleanFormHost(host);
+    }
+}
+
+void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host, const int hostCallingUid)
+{
+    if (host == nullptr) {
+        HILOG_ERROR("host token is null");
+        return;
+    }
+
+    int32_t hostUserId = FormUtil::GetCallerUserId(hostCallingUid);
+    HILOG_WARN("hostUserId:%{public}d", hostUserId);
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    if (GetFormRenderMgrInner(hostUserId, renderInner)) {
+        renderInner->RemoveHostToken(host);
+    }
+    std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
+    if (GetFormSandboxMgrInner(hostUserId, sandboxInner)) {
+        sandboxInner->RemoveHostToken(host);
     }
 }
 
