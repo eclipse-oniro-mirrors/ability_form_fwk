@@ -846,9 +846,9 @@ bool FormDataMgr::RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &cal
         if (callerToken == iter->GetFormHostClient()) {
             if (iter->IsEmpty()) {
                 HILOG_WARN("clientRecords_ is empty, clean form host");
+                FormRenderMgr::GetInstance().RemoveHostToken(callerToken, iter->GetCallerUid());
                 iter->CleanResource();
                 iter = clientRecords_.erase(iter);
-                FormRenderMgr::GetInstance().RemoveHostToken(callerToken, iter->GetCallerUid());
                 return true;
             }
             break;
