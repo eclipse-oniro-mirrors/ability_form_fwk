@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "L@ohos/app/form/formObserver/CallbackWrapper;";
+constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "@ohos.app.form.formObserver.CallbackWrapper";
 constexpr const char* FORM_STATE_OBSERVER_FORMADD = "formAdd";
 constexpr const char* FORM_STATE_OBSERVER_FORMREMOVE = "formRemove";
 constexpr uint KEY_LIMIT = 16;

@@ -37,8 +37,8 @@ using namespace OHOS::AppExecFwk;
 using FormMgr = AppExecFwk::FormMgr;
 namespace {
 const std::string IS_FORM_AGENT = "isFormAgent";
-constexpr const char* ETS_FORM_AGENT_NAME = "L@ohos/app/form/formAgent/formAgent;";
-constexpr const char* AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "L@ohos/app/form/formAgent/AsyncCallbackWrapper;";
+constexpr const char* ETS_FORM_AGENT_NAME = "@ohos.app.form.formAgent.formAgent";
+constexpr const char* AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "@ohos.app.form.formAgent.AsyncCallbackWrapper";
 struct RequestPublishFormCallbackInfo {
     Want want {};
     bool withFormBindingData = false;

@@ -30,8 +30,8 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-    const char *LIVE_FORM_EXTENSION_CONTEXT = "Lapplication/LiveFormExtensionContext/LiveFormExtensionContext;";
-    const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "Lapplication/UIExtensionContext/Cleaner;";
+    const char *LIVE_FORM_EXTENSION_CONTEXT = "application.LiveFormExtensionContext.LiveFormExtensionContext";
+    const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "application.UIExtensionContext.Cleaner";
 }
 
 using namespace OHOS::AppExecFwk;
@@ -79,7 +79,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
         HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "J:V", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }

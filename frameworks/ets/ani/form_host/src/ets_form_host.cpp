@@ -47,16 +47,16 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::Constants;
 namespace {
 constexpr ani_size REFERENCES_MAX_NUMBER = 16;
-constexpr const char* ETS_FORM_HOST_NAME = "L@ohos/app/form/formHost/formHost;";
-constexpr const char* ETS_OVERFLOWREQUEST_NAME = "L@ohos/app/form/formInfo/formInfo/OverflowRequestInner;";
+constexpr const char* ETS_FORM_HOST_NAME = "@ohos.app.form.formHost.formHost";
+constexpr const char* ETS_OVERFLOWREQUEST_NAME = "@ohos.app.form.formInfo.formInfo.OverflowRequestInner";
 constexpr const char* ETS_CHANGESCENEANIMATIONSTATEQUEST_NAME =
-    "L@ohos/app/form/formInfo/formInfo/ChangeSceneAnimationStateRequestInner;";
-constexpr const char* ETS_RECT_NAME = "L@ohos/app/form/formInfo/formInfo/RectInner;";
-constexpr const char* ETS_OVERFLOWINFO_NAME = "L@ohos/app/form/formInfo/formInfo/OverflowInfoInner;";
-constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "L@ohos/app/form/formHost/CallbackWrapper;";
-constexpr const char* ETS_FORM_RECT_INFO_CALLBACK = "L@ohos/app/form/formHost/formHost/GetFormRectInfoCallbackWrapper;";
+    "@ohos.app.form.formInfo.formInfo.ChangeSceneAnimationStateRequestInner";
+constexpr const char* ETS_RECT_NAME = "@ohos.app.form.formInfo.formInfo.RectInner";
+constexpr const char* ETS_OVERFLOWINFO_NAME = "@ohos.app.form.formInfo.formInfo.OverflowInfoInner";
+constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "@ohos.app.form.formHost.CallbackWrapper";
+constexpr const char* ETS_FORM_RECT_INFO_CALLBACK = "@ohos.app.form.formHost.formHost.GetFormRectInfoCallbackWrapper";
 constexpr const char* ETS_LIVE_FORM_STATUS_CALLBACK =
-    "L@ohos/app/form/formHost/formHost/GetLiveFormStatusCallbackWrapper;";
+    "@ohos.app.form.formHost.formHost.GetLiveFormStatusCallbackWrapper";
 constexpr const char *CHECK_PROMISE_SIGNATURE = "C{std.core.Object}:z";
 constexpr const char *CALL_PROMISE_SIGNATURE = "C{std.core.Promise}:";
 constexpr const char *FORM_HOST_FORMINFO_FORMID = "formId";
@@ -1437,7 +1437,7 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
         HILOG_ERROR("Cannot get bundle name from filter");
     }
 
-    ani_array_ref supportDimensionAni;
+    ani_array supportDimensionAni;
     if (env->Object_GetPropertyByName_Ref(filterObj, "supportedDimensions",
         reinterpret_cast<ani_ref*>(&supportDimensionAni))) {
         HILOG_ERROR("Cannot get support Dimension Ani");
@@ -1458,9 +1458,8 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
         }
     }
 
-    ani_array_ref supportedShapes;
-    if (env->Object_GetPropertyByName_Ref(filterObj, "supportedShapes",
-        reinterpret_cast<ani_ref*>(&supportedShapes))) {
+    ani_array supportedShapes;
+    if (env->Object_GetPropertyByName_Ref(filterObj, "supportedShapes", reinterpret_cast<ani_ref*>(&supportedShapes))) {
         HILOG_ERROR("Cannot get support Dimension Ani");
     }
 
@@ -2321,7 +2320,7 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function {"deleteFormInner",
             "C{std.core.String}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:", reinterpret_cast<void *>(DeleteForm)},
         ani_native_function {
-            "deleteInvalidFormsInner", "C{escompat.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "deleteInvalidFormsInner", "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(DeleteInvalidForms)},
         ani_native_function {
             "getAllFormsInfoInner", "C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
@@ -2343,19 +2342,19 @@ std::vector<ani_native_function> GetBindMethods()
             "C{std.core.String}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(RequestForm)},
         ani_native_function {"requestFormWithParamsInner",
-            "C{std.core.String}C{escompat.Record}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "C{std.core.String}C{std.core.Record}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(RequestFormWithParams)},
         ani_native_function {"castToNormalFormInner",
             "C{std.core.String}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(CastToNormalForm)},
         ani_native_function {"notifyVisibleFormsInner",
-            "C{escompat.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(NotifyVisibleForms)},
         ani_native_function {"notifyInvisibleFormsInner",
-            "C{escompat.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(NotifyInvisibleForms)},
         ani_native_function {"setFormUpdateInner",
-            "C{escompat.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "C{std.core.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(SetEnableFormUpdate)},
         ani_native_function{"setPublishFormResult",
             "C{std.core.String}C{@ohos.app.form.formInfo.formInfo.PublishFormResult}:",
@@ -2370,21 +2369,21 @@ std::vector<ani_native_function> GetBindMethods()
             "updateFormLockedStateInner", "C{std.core.String}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(UpdateFormLockedState)},
         ani_native_function {
-            "setFormsRecyclableInner", "C{escompat.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "setFormsRecyclableInner", "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(SetFormsRecyclable)},
         ani_native_function {
-            "recycleFormsInner", "C{escompat.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "recycleFormsInner", "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(RecycleForms)},
-        ani_native_function {"recoverFormsInner", "C{escompat.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+        ani_native_function {"recoverFormsInner", "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(RecoverForms)},
         ani_native_function {
-            "notifyFormsEnableUpdateInner", "C{escompat.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "notifyFormsEnableUpdateInner", "C{std.core.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(NotifyFormsEnableUpdate)},
         ani_native_function {
-            "notifyFormsVisibleInner", "C{escompat.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "notifyFormsVisibleInner", "C{std.core.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(NotifyFormsVisible)},
         ani_native_function {
-            "notifyFormsPrivacyProtectedInner", "C{escompat.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "notifyFormsPrivacyProtectedInner", "C{std.core.Array}zC{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(NotifyFormsPrivacyProtected)},
         ani_native_function {
             "registerFormObserverInner", "C{@ohos.app.form.formHost.CallbackWrapper}:",
@@ -2393,10 +2392,10 @@ std::vector<ani_native_function> GetBindMethods()
             "unRegisterFormObserverInner", "C{@ohos.app.form.formHost.CallbackWrapper}:",
             reinterpret_cast<void *>(UnRegisterFormObserver)},
         ani_native_function {"setRouterProxyInner",
-            "C{escompat.Array}C{@ohos.app.form.formHost.CallbackWrapper}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "C{std.core.Array}C{@ohos.app.form.formHost.CallbackWrapper}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(SetRouterProxy)},
         ani_native_function {
-            "clearRouterProxyInner", "C{escompat.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "clearRouterProxyInner", "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(ClearRouterProxy)},
     };
     return methods;

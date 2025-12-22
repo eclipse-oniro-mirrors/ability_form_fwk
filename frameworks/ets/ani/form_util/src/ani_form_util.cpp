@@ -21,14 +21,14 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-constexpr const char* ETS_FUNINTERACTIONPARAMS_NAME = "L@ohos/app/form/formInfo/formInfo/FunInteractionParamsInner;";
-constexpr const char* ETS_FORMINFO_NAME = "L@ohos/app/form/formInfo/formInfo/FormInfoInner;";
-constexpr const char* ETS_SCENEANIMATIONPARAMS_NAME = "L@ohos/app/form/formInfo/formInfo/SceneAnimationParamsInner;";
+constexpr const char* ETS_FUNINTERACTIONPARAMS_NAME = "@ohos.app.form.formInfo.formInfo.FunInteractionParamsInner";
+constexpr const char* ETS_FORMINFO_NAME = "@ohos.app.form.formInfo.formInfo.FormInfoInner";
+constexpr const char* ETS_SCENEANIMATIONPARAMS_NAME = "@ohos.app.form.formInfo.formInfo.SceneAnimationParamsInner";
 constexpr const char* DELEGATOR_RECORD_KEY = "keys";
 constexpr const char* DELEGATOR_RECORD_NEXT = "next";
 constexpr const char* DELEGATOR_RECORD_DONE = "done";
 constexpr const char* DELEGATOR_RECORD_VALUE = "value";
-constexpr const char* DELEGATOR_RECORD_CLASS_NAME = "escompat.Record";
+constexpr const char* DELEGATOR_RECORD_CLASS_NAME = "std.core.Record";
 constexpr const char* DELEGATOR_RECORD_GET = "$_get";
 constexpr const char* DELEGATOR_RECORD_GET_NAME =
     "X{C{std.core.BaseEnum}C{std.core.Numeric}C{std.core.String}}:C{std.core.Object}";
@@ -78,7 +78,7 @@ ani_object CreateFormInfos(ani_env* env, const std::vector<OHOS::AppExecFwk::For
             HILOG_ERROR("null aniInfo");
             break;
         }
-        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index, aniInfo);
+        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index, aniInfo);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void failed status: %{public}d", status);
             break;

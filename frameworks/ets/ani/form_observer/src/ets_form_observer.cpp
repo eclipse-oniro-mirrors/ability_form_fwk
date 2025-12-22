@@ -35,8 +35,8 @@ namespace OHOS {
 namespace AbilityRuntime {
 using FormMgr = AppExecFwk::FormMgr;
 namespace {
-constexpr const char* ETS_FORM_OBSERVER_NAME = "L@ohos/app/form/formObserver/formObserver;";
-constexpr const char* OBSERVER_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "L@ohos/app/form/formObserver/AsyncCallbackWrapper;";
+constexpr const char* ETS_FORM_OBSERVER_NAME = "@ohos.app.form.formObserver.formObserver";
+constexpr const char* OBSERVER_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "@ohos.app.form.formObserver.AsyncCallbackWrapper";
 }
 class EtsFormObserver {
 public:

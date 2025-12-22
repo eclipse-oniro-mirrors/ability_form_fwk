@@ -71,12 +71,12 @@ void SetStringProperty(ani_env *env, ani_object obj, const char *propName, const
 
 bool AniParseInt32(ani_env *env, const ani_ref &aniInt, int32_t &out);
 
-bool AniParseIntArray(ani_env* env, const ani_array_ref& array, std::vector<int32_t>& out);
+bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t> &out);
 
 bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
     const std::vector<AppExecFwk::FormCustomizeData> &customizeData);
 
-ani_array_ref CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t> &vec);
+ani_array CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t> &vec);
 
 void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::RunningFormInfo &formInfo);
 
