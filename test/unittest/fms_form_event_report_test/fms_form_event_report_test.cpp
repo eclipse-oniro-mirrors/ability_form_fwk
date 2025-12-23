@@ -375,5 +375,26 @@ HWTEST_F(FormFormEventReportTest, SendRequestPublicFormEvent_0100, TestSize.Leve
     std::string formName = "testFormName";
     FormEventReport::SendRequestPublicFormEvent(bundleName, formName, RequestFormType::REQUEST_PUBLISH_FORM);
 }
+
+/**
+ * @tc.name: SendRequestPublicFormEvent_0101
+ * @tc.desc: Check SendFormFwkUEEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issuesI9K1NP
+ */
+HWTEST_F(FormFormEventReportTest, SendRequestPublicFormEvent_0101, TestSize.Level0)
+{
+    FormEventName eventName = FormEventName::LAUNCH_FORM_APP;
+    FormEventInfo eventInfo;
+    FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
+    eventName = FormEventName::ADD_FORM;
+    FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
+    eventName = FormEventName::ADD_DISTRIBUTED_FORM;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "ADD_DISTRIBUTED_FORM");
+    FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
+    eventName = FormEventName::DELETE_DISTRIBUTED_FORM;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "DELETE_DISTRIBUTED_FORM");
+    FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

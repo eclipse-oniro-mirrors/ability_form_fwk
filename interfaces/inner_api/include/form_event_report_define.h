@@ -142,8 +142,10 @@ struct FormAbnormalReportParams {
 enum class FormEventName {
     // form behavior event
     ADD_FORM,
+    ADD_DISTRIBUTED_FORM,
     REQUEST_FORM,
     DELETE_FORM,
+    DELETE_DISTRIBUTED_FORM,
     CASTTEMP_FORM,
     ACQUIREFORMSTATE_FORM,
     MESSAGE_EVENT_FORM,

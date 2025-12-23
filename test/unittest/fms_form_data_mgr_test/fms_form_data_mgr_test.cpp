@@ -3452,6 +3452,25 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteFormRecord_002, TestSize.L
 }
 
 /**
+ * @tc.number: FmsFormDataMgrTest_DeleteFormRecord_003
+ * @tc.name: DeleteFormRecord
+ * @tc.desc: Verify that the return value is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteFormRecord_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteFormRecord_003 start";
+    int64_t formId = FORM_ID_ONE;
+    int callingUid = 0;
+    FormItemInfo form_item_info;
+    InitFormItemInfo(formId, form_item_info);
+    form_item_info.SetFormLocation(Constants::FormLocation::SCREEN_LOCK);
+    FormRecord record = formDataMgr_.AllotFormRecord(form_item_info, callingUid);
+    bool result = formDataMgr_.DeleteFormRecord(FORM_ID_ONE);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteFormRecord_003 end";
+}
+
+/**
  * @tc.number: FmsFormDataMgrTest_CreateHostRecord_001
  * @tc.name: CreateHostRecord
  * @tc.desc: Verify that the return value is correct.

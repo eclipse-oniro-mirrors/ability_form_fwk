@@ -60,6 +60,22 @@ static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(FormUtil::GetCurrentAccountId());
     }
 }
+
+static void ReportDistributedFormEvent(const FormEventName &eventName, const FormRecord &formRecord)
+{
+    if (!formRecord.isDistributedForm) {
+        HILOG_ERROR("formId: %{public}" PRId64 " is not distributed form.", formRecord.formId);
+        return;
+    }
+    FormEventInfo eventInfo;
+    eventInfo.formId = formRecord.formId;
+    eventInfo.bundleName = formRecord.bundleName;
+    eventInfo.moduleName = formRecord.moduleName;
+    eventInfo.formDimension = formRecord.specification;
+    eventInfo.isDistributedForm = formRecord.isDistributedForm;
+
+    FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
+}
 }
 
 FormDataMgr::FormDataMgr()
@@ -110,6 +126,9 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
     FormBasicInfo basic {
         record.formId, record.abilityName, record.bundleName, record.moduleName, record.formName, record.packageName
     };
+    if (record.formLocation == Constants::FormLocation::SCREEN_LOCK) {
+        ReportDistributedFormEvent(FormEventName::ADD_DISTRIBUTED_FORM, record);
+    }
     FormBasicInfoMgr::GetInstance().AddFormBasicInfo(basic);
     return record;
 }
@@ -121,15 +140,24 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
 bool FormDataMgr::DeleteFormRecord(const int64_t formId)
 {
     HILOG_INFO("delete record, form:%{public}" PRId64, formId);
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    auto iter = formRecords_.find(formId);
-    if (iter == formRecords_.end()) {
-        HILOG_ERROR("form record not exist");
-        return false;
+    FormRecord formRecord;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        auto iter = formRecords_.find(formId);
+        if (iter == formRecords_.end()) {
+            HILOG_ERROR("form record not exist");
+            return false;
+        }
+        formRecord = iter->second;
+        formRecords_.erase(iter);
     }
-    formRecords_.erase(iter);
     FormUtil::DeleteFormId(formId);
     FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
+    auto location = formRecord.formLocation;
+    if (location == Constants::FormLocation::DESKTOP || location == Constants::FormLocation::NEGATIVE_SCREEN ||
+        location == Constants::FormLocation::SCREEN_LOCK) {
+        ReportDistributedFormEvent(FormEventName::DELETE_DISTRIBUTED_FORM, formRecord);
+    }
     return true;
 }
 
@@ -2799,16 +2827,21 @@ bool FormDataMgr::HasFormCloudUpdateDuration(const std::string &bundleName) cons
 
 ErrCode FormDataMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
 {
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    auto info = formRecords_.find(formId);
-    if (info == formRecords_.end()) {
-        HILOG_INFO("form info not find, formId:%{public}" PRId64 " formLocation:%{public}d",
+    FormRecord record;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        auto info = formRecords_.find(formId);
+        if (info == formRecords_.end()) {
+            HILOG_INFO("form info not find, formId:%{public}" PRId64 " formLocation:%{public}d",
+                formId, formLocation);
+            return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+        }
+        info->second.formLocation = (Constants::FormLocation)formLocation;
+        record = info->second;
+        HILOG_INFO("success, formId:%{public}" PRId64 " formLocation:%{public}d",
             formId, formLocation);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
-    info->second.formLocation = (Constants::FormLocation)formLocation;
-    HILOG_INFO("success, formId:%{public}" PRId64 " formLocation:%{public}d",
-        formId, formLocation);
+    ReportDistributedFormEvent(FormEventName::ADD_DISTRIBUTED_FORM, record);
     return ERR_OK;
 }
 
