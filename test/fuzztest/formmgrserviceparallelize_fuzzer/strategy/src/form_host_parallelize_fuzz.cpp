@@ -255,7 +255,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
         }
         case IpcCode::UPDATE_FORM_LOCATION: {
             int64_t formId = provider.ConsumeIntegral<int64_t>();
-            int32_t formLocation = provider.ConsumeIntegralInRange<int32_t>(0, 3);
+            int32_t formLocation = provider.ConsumeIntegralInRange<int32_t>(0, NUMBER_3);
             formMgrService_->UpdateFormLocation(formId, formLocation);
             break;
         }

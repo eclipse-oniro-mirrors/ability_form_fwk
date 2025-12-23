@@ -62,7 +62,6 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             formMgrService_->DumpFormTimerByFormId(formId, isTimingService);
             break;
         }
-
         case IpcCode::ROUTER_EVENT: {
             int64_t formId = provider.ConsumeIntegral<int64_t>();
             Want want;
