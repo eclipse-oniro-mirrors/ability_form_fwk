@@ -1240,7 +1240,6 @@ HWTEST_F(FormRenderServiceMgrTest, SetMainRuntimeCb_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 end";
 }
 
-
 /**
  * @tc.name: SetRenderGroupParams_001
  * @tc.desc: Verify SetRenderGroupParams.
