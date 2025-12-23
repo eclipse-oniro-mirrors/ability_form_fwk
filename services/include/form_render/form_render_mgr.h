@@ -52,8 +52,6 @@ public:
 
     void NotifyScreenOn();
 
-    void SetRenderGroupParams(int64_t formId, const Want &want);
-
     void SetRenderGroupEnableFlag(int64_t formId, bool isEnable);
 
     void SetRenderGroupParams(int64_t formId, const Want &want);
