@@ -161,64 +161,6 @@ export namespace formProvider {
     });
   }
 
-export function getPublishedFormInfos(): Promise<Array<formInfo.FormInfo>> {
-  return new Promise<Array<formInfo.FormInfo>>((resolve, reject): void => {
-    let call = new AsyncCallbackWrapper<Array<formInfo.RunningFormInfo>>((err, data) => {
-      if (err && err.code !== ERR_OK) {
-        reject(err);
-        return;
-      }
-      const parsedResult: Array<formInfo.FormInfo> = [];
-      if (!data || data.length === 0) {
-        resolve(parsedResult);
-        return;
-      }
-      for (let i = 0; i < data.length; i++) {
-        const info = getFormInfoInstance();
-        info.name = data[i].formName;
-        info.bundleName = data[i].bundleName;
-        info.moduleName = data[i].moduleName;
-        info.abilityName = data[i].abilityName;
-        info.description = data[i].formDescription;
-        info.defaultDimension = data[i].dimension;
-        parsedResult.push(info);
-      }
-      resolve(parsedResult);
-    });
-    taskpool.execute((): void => {
-      getPublishedFormInfosInner(call);
-    });
-  });
-}
-
-export function getPublishedFormInfoById(formId: string): Promise<formInfo.FormInfo> {
-  return new Promise<formInfo.FormInfo>((resolve, reject: (err: BusinessError) => void): void => {
-    if (formId === "") {
-      reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
-      return;
-    }
-    let call = new AsyncCallbackWrapper<formInfo.RunningFormInfo>((err, data) => {
-      if (err && err.code !== ERR_OK) {
-        reject(err);
-        return;
-      }
-      const parsedResult: formInfo.FormInfo = getFormInfoInstance();
-      if (data) {
-        parsedResult.name = data.formName;
-        parsedResult.bundleName = data.bundleName;
-        parsedResult.moduleName = data.moduleName;
-        parsedResult.abilityName = data.abilityName;
-        parsedResult.description = data.formDescription;
-        parsedResult.defaultDimension = data.dimension;
-      }
-      resolve(parsedResult);
-    });
-    taskpool.execute((): void => {
-      getPublishedFormInfoByIdInner(formId, call);
-    });
-  });
-}
-
   export function getPublishedRunningFormInfos(): Promise<Array<formInfo.RunningFormInfo>> {
     return new Promise<Array<formInfo.RunningFormInfo>>((resolve, reject): void => {
       let call = new AsyncCallbackWrapper<Array<formInfo.RunningFormInfo>>((err, data) => {
