@@ -1486,7 +1486,7 @@ private:
 
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 
-    void UpdateFormRenderParam(const int64_t formId, const Want &want);
+    void UpdateFormRenderParam(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want);
 
     /**
      * @brief Update form render service paramters after reload.

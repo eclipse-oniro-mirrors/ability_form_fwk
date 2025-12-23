@@ -942,7 +942,7 @@ bool FormRenderMgrInner::GetIsFRSDiedInLowMemory()
     return isFrsDiedInLowMemory_;
 }
 
-void FormRenderMgrInner::PostSetRenderGroupParamsTask(int64_t formId, const Want &want)
+void FormRenderMgrInner::PostSetRenderGroupParamsTask(const int64_t formId, const Want &want)
 {
     HILOG_INFO("call");
     sptr<IRemoteObject> remoteObject;

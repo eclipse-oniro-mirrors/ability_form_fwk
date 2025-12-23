@@ -897,7 +897,8 @@ int32_t FormRenderServiceMgr::SetRenderGroupParams(const int64_t formId, const W
     }
     HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
-    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+    auto search = renderRecordMap_.find(uid);
+    if (search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
             HILOG_ERROR("null renderRecord of %{public}" PRId64, formId);
             return RENDER_FORM_FAILED;

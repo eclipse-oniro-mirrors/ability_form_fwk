@@ -456,7 +456,7 @@ int32_t FormRenderProxy::SetRenderGroupParams(const int64_t formId, const Want &
 {
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("error to write interface token formId: %{public}" PRId64, formId);

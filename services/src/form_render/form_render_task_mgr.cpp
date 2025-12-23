@@ -236,10 +236,10 @@ void FormRenderTaskMgr::PostSetRenderGroupParams(int64_t formId, const Want &wan
     const sptr<IRemoteObject> &remoteObject)
 {
     auto task = [formId, want, remoteObject]() {
+        HILOG_INFO("start task formId:%{public}" PRId64, formId);
         FormRenderTaskMgr::GetInstance().SetRenderGroupParams(formId, want, remoteObject);
     };
     FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
-    HILOG_INFO("start task formId:%{public}" PRId64, formId);
 }
 
 void FormRenderTaskMgr::SetRenderGroupParams(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)

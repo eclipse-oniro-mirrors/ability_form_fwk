@@ -240,6 +240,34 @@ public:
      * @param isControl True is control form, false is not control form.
      */
     void OnDueControlForms(const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl);
+
+    /**
+     * @brief Set transparency color of form.
+     * @param formId The Id of the form.
+     * @return true on contains transparentForm, false on does not contain.
+     */
+    bool ContainsTransparentForm(const int64_t formId);
+
+    /**
+     * @brief Set transparency color of form.
+     * @param formId The Id of the form.
+     * @param transparencyColor The transparency color of the form.
+     */
+    void SetTransparentFormColor(const int64_t formId, const std::string &transparencyColor);
+
+    /**
+     * @brief Get transparency color of form.
+     * @param formId The Id of the form.
+     * @return Transparency color of form.
+     */
+    std::string GetTransparentFormColor(const int64_t formId) const;
+
+    /**
+     * @brief Delete transparency color of form.
+     * @param formId The Id of the form.
+     */
+    void DeleteTransparentFormColor(const int64_t formId);
+
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;
@@ -248,6 +276,7 @@ private:
     std::unordered_map<int64_t, bool> forms_;
     std::unordered_map<int64_t, bool> enableUpdateMap_;
     std::unordered_map<int64_t, bool> needRefresh_;
+    std::unordered_map<int64_t, std::string> transparentForms_; // {formId, transparencyColor}
     std::string hostBundleName_ = "";
 
     /**
