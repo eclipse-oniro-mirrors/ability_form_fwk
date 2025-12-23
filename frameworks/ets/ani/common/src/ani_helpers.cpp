@@ -155,7 +155,7 @@ void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &fo
     for (size_t i = 0; i < formDataProxiesArrayLen; i++) {
         ani_ref element;
         if (ANI_OK != env->Object_CallMethodByName_Ref(
-            static_cast<ani_array>(proxiesArrayRef), ANI_GETTER_MARKER, "i:C{std.core.Object}", &element, (ani_int)i)) {
+            static_cast<ani_array>(proxiesArrayRef), ANI_GETTER_MARKER, "i:Y", &element, (ani_int)i)) {
             HILOG_ERROR("Object_CallMethodByName_Ref failed");
             return;
         }
@@ -544,7 +544,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
 
     for (size_t i = 0; i < static_cast<size_t>(arrayLength); i++) {
         ani_ref stringEntryRef;
-        status = env->Object_CallMethodByName_Ref(arrayObj, ANI_GETTER_MARKER, "i:C{std.core.Object}",
+        status = env->Object_CallMethodByName_Ref(arrayObj, ANI_GETTER_MARKER, "i:Y",
             &stringEntryRef, static_cast<ani_int>(i));
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Ref failed, status: %{public}d", status);
@@ -693,7 +693,7 @@ ani_object CreateFormInfoAniArrayFromVec(ani_env *env, const std::vector<AppExec
         ani_object formInfoAni = CreateANIObject(env, FORM_INFO_INNER_CLASS_NAME);
         CheckIfRefValidOrThrow(env, formInfoAni);
         SetFormInfoFields(env, formInfoAni, formInfo);
-        ani_status status = env->Object_CallMethodByName_Void(array, ANI_SETTER_MARKER, "iC{std.core.Object}:",
+        ani_status status = env->Object_CallMethodByName_Void(array, ANI_SETTER_MARKER, "iY:",
             index, formInfoAni);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void  $_set Failed. status code: %{public}d", status);
