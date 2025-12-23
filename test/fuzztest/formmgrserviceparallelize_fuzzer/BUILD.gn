@@ -23,17 +23,32 @@ ohos_fuzztest("FormMgrServiceParallelizeFuzzTest") {
 
   fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmgrserviceparallelize_fuzzer"
 
+  sanitize = {
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+  }
+
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/services/include",
   ]
+
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "formmgrserviceparallelize_fuzzer.cpp" ]
+
+  sources = [
+    "formmgrserviceparallelize_fuzzer.cpp",
+    "strategy/src/form_host_parallelize_fuzz.cpp",
+    "strategy/src/form_observer_parallelize_fuzz.cpp",
+    "strategy/src/form_other_parallelize_fuzz.cpp",
+    "strategy/src/form_provider_parallelize_fuzz.cpp",
+    "strategy/src/form_parallelize_fuzz_util.cpp"
+  ]
 
   deps = [
     "${form_fwk_path}:fms_target",
