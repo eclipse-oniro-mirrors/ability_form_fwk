@@ -2373,7 +2373,7 @@ int32_t FormRenderRecord::SetRenderGroupParams(const int64_t formId, const Want 
     return ERR_OK;
 }
 
-int32_t FormRenderRecord::HandleSetRenderGroupParams(const int64_t &formId, const Want &want)
+int32_t FormRenderRecord::HandleSetRenderGroupParams(const int64_t formId, const Want &want)
 {
     HILOG_INFO("HandleSetRenderGroupParams begin,formId:%{public}" PRId64, formId);
     MarkThreadAlive();
