@@ -38,11 +38,6 @@ public:
 
     virtual void Execute(FuzzedDataProvider &provider) = 0;
 
-    sptr<IRemoteObject> GetMockRemoteObject()
-    {
-        return nullptr;
-    }
-
 protected:
      std::shared_ptr<OHOS::AppExecFwk::FormMgrService> formMgrService_;
      std::shared_ptr<OHOS::AppExecFwk::FormParallelizeFuzzUtil> formParallelizeUtil_;
