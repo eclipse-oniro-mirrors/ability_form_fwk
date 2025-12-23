@@ -29,6 +29,7 @@ namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 
 struct FormUpgradeInfo {
+    bool enableBlurBackground = false;
     std::string transparencyColor = "";
 };
 
