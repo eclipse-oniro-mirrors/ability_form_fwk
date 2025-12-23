@@ -45,7 +45,7 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::FORM_INFOS_BY_NAME: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             std::string formInfos;
             formMgrService_->DumpFormInfoByBundleName(bundleName, formInfos);
             break;
@@ -90,7 +90,7 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::IS_SYSTEM_APP_FORM: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             formMgrService_->IsSystemAppForm(bundleName);
             break;
         }
@@ -101,19 +101,19 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::GET_HOST_FORMS_COUNT: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             int32_t formCount = 0;
             formMgrService_->GetHostFormsCount(bundleName, formCount);
             break;
         }
         case IpcCode::REGISTER_ADD_OBSERVER: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             sptr<IRemoteObject> callerToken = formParallelizeUtil_->GetMockRemoteObject();
             formMgrService_->RegisterAddObserver(bundleName, callerToken);
             break;
         }
         case IpcCode::REGISTER_REMOVE_OBSERVER: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             sptr<IRemoteObject> callerToken = formParallelizeUtil_->GetMockRemoteObject();
             formMgrService_->RegisterRemoveObserver(bundleName, callerToken);
             break;
@@ -125,8 +125,8 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             std::vector<FormDataProxy> formDataProxies;
             size_t proxyCount = provider.ConsumeIntegralInRange<size_t>(0, 4);
             for (size_t i = 0; i < proxyCount; ++i) {
-                std::string key = provider.ConsumeRandomLengthString(32);
-                std::string subscribeId = provider.ConsumeRandomLengthString(32);
+                std::string key = provider.ConsumeRandomLengthString(NUMBER_32);
+                std::string subscribeId = provider.ConsumeRandomLengthString(NUMBER_32);
                 formDataProxies.emplace_back(key, subscribeId);
             }
             formMgrService_->UpdateProxyForm(formId, formProviderData, formDataProxies);
@@ -144,8 +144,8 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             std::vector<FormDataProxy> formDataProxies;
             size_t proxyCount = provider.ConsumeIntegralInRange<size_t>(0, 4);
             for (size_t i = 0; i < proxyCount; ++i) {
-                std::string key = provider.ConsumeRandomLengthString(32);
-                std::string subscribeId = provider.ConsumeRandomLengthString(32);
+                std::string key = provider.ConsumeRandomLengthString(NUMBER_32);
+                std::string subscribeId = provider.ConsumeRandomLengthString(NUMBER_32);
                 formDataProxies.emplace_back(key, subscribeId);
             }
             formMgrService_->RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId,
@@ -163,15 +163,15 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::REGISTER_CLICK_EVENT_OBSERVER: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
-            std::string formEventType = provider.ConsumeRandomLengthString(32);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
+            std::string formEventType = provider.ConsumeRandomLengthString(NUMBER_32);
             sptr<IRemoteObject> observer = formParallelizeUtil_->GetMockRemoteObject();
             formMgrService_->RegisterClickEventObserver(bundleName, formEventType, observer);
             break;
         }
         case IpcCode::UNREGISTER_CLICK_EVENT_OBSERVER: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
-            std::string formEventType = provider.ConsumeRandomLengthString(32);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
+            std::string formEventType = provider.ConsumeRandomLengthString(NUMBER_32);
             sptr<IRemoteObject> observer = formParallelizeUtil_->GetMockRemoteObject();
             formMgrService_->UnregisterClickEventObserver(bundleName, formEventType, observer);
             break;
@@ -194,14 +194,14 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::ENABLE_FORMS: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             int32_t userId = provider.ConsumeIntegral<int32_t>();
             bool enable = provider.ConsumeBool();
             formMgrService_->EnableForms(bundleName, userId, enable);
             break;
         }
         case IpcCode::LOCK_FORMS: {
-            size_t formLockInfosCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formLockInfosCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<FormLockInfo> formLockInfos;
             for (size_t i = 0; i < formLockInfosCount; ++i) {
                 FormLockInfo info;
@@ -213,7 +213,7 @@ void FormOtherParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::IS_FORM_BUNDLE_DEBUG_SIGNATURE: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             formMgrService_->IsFormBundleDebugSignature(bundleName);
             break;
         }

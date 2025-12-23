@@ -30,19 +30,19 @@ void FormObserverParallelizeFuzz::Execute(FuzzedDataProvider &provider)
 
     switch (code) {
         case IpcCode::REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             sptr<IRemoteObject> callerToken = formParallelizeUtil_->GetMockRemoteObject();
             formMgrService_->RegisterFormAddObserverByBundle(bundleName, callerToken);
             break;
         }
         case IpcCode::REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             sptr<IRemoteObject> callerToken = formParallelizeUtil_->GetMockRemoteObject();
             formMgrService_->RegisterFormRemoveObserverByBundle(bundleName, callerToken);
             break;
         }
         case IpcCode::GET_RUNNING_FORM_INFOS_BY_BUNDLE: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             bool isUnusedIncluded = provider.ConsumeBool();
             std::vector<RunningFormInfo> runningFormInfos;
             formMgrService_->GetRunningFormInfosByBundleName(bundleName, isUnusedIncluded, runningFormInfos);

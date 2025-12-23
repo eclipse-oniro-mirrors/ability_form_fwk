@@ -63,7 +63,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::NOTIFY_FORM_WHETHER_VISIBLE: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -74,7 +74,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::LIFECYCLE_UPDATE: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -89,7 +89,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::DELETE_INVALID_FORMS: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -108,7 +108,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::REGISTER_FORM_ROUTER_PROXY: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -118,7 +118,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::UNREGISTER_FORM_ROUTER_PROXY: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -127,7 +127,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::NOTIFY_FORMS_VISIBLE: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -138,7 +138,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::NOTIFY_FORMS_ENABLE_UPDATE: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -166,34 +166,34 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::GET_FORMS_INFO_BY_APP: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             std::vector<FormInfo> formInfos;
             formMgrService_->GetFormsInfoByApp(bundleName, formInfos);
             break;
         }
         case IpcCode::GET_FORMS_INFO_BY_MODULE: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
-            std::string moduleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
+            std::string moduleName = provider.ConsumeRandomLengthString(NUMBER_64);
             std::vector<FormInfo> formInfos;
             formMgrService_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
             break;
         }
         case IpcCode::GET_TEMPLATE_FORMS_INFO_BY_APP: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             std::vector<FormInfo> infos;
             formMgrService_->GetTemplateFormsInfoByApp(bundleName, infos);
             break;
         }
         case IpcCode::GET_TEMPLATE_FORMS_INFO_BY_MODULE: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
-            std::string moduleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
+            std::string moduleName = provider.ConsumeRandomLengthString(NUMBER_64);
             std::vector<FormInfo> infos;
             formMgrService_->GetTemplateFormsInfoByModule(bundleName, moduleName, infos);
             break;
         }
         case IpcCode::SHARE_FORM: {
             int64_t formId = provider.ConsumeIntegral<int64_t>();
-            std::string deviceId = provider.ConsumeRandomLengthString(64);
+            std::string deviceId = provider.ConsumeRandomLengthString(NUMBER_64);
             sptr<IRemoteObject> callerToken = formParallelizeUtil_->GetMockRemoteObject();
             int64_t requestCode = provider.ConsumeIntegral<int64_t>();
             formMgrService_->ShareForm(formId, deviceId, callerToken, requestCode);
@@ -208,7 +208,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::NOTIFY_FORMS_PRIVACY_PROTECTED: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -219,7 +219,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::SET_FORMS_RECYCLABLE: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -228,7 +228,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::RECOVER_FORMS: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -238,7 +238,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::RECYCLE_FORMS: {
-            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, 8);
+            size_t formIdsCount = provider.ConsumeIntegralInRange<size_t>(0, NUMBER_8);
             std::vector<int64_t> formIds;
             for (size_t i = 0; i < formIdsCount; ++i) {
                 formIds.push_back(provider.ConsumeIntegral<int64_t>());
@@ -262,9 +262,9 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
         case IpcCode::SET_PUBLISH_FORM_RESULT: {
             int64_t formId = provider.ConsumeIntegral<int64_t>();
             Constants::PublishFormResult errorCodeInfo;
-            errorCodeInfo.message = provider.ConsumeRandomLengthString(128);
+            errorCodeInfo.message = provider.ConsumeRandomLengthString(NUMBER_128);
             errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(
-                provider.ConsumeIntegralInRange<int32_t>(0, 10));
+                provider.ConsumeIntegralInRange<int32_t>(0, NUMBER_10));
             formMgrService_->SetPublishFormResult(formId, errorCodeInfo);
             break;
         }
@@ -322,12 +322,12 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             break;
         }
         case IpcCode::IS_FORM_BUNDLE_FORBIDDEN: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             formMgrService_->IsFormBundleForbidden(bundleName);
             break;
         }
         case IpcCode::IS_FORM_BUNDLE_PROTECTED: {
-            std::string bundleName = provider.ConsumeRandomLengthString(64);
+            std::string bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
             int64_t formId = provider.ConsumeIntegral<int64_t>();
             formMgrService_->IsFormBundleProtected(bundleName, formId);
             break;
@@ -339,13 +339,13 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
         }
         case IpcCode::STOP_RENDERING_FORM: {
             int64_t formId = provider.ConsumeIntegral<int64_t>();
-            std::string compId = provider.ConsumeRandomLengthString(64);
+            std::string compId = provider.ConsumeRandomLengthString(NUMBER_64);
             formMgrService_->StopRenderingForm(formId, compId);
             break;
         }
         case IpcCode::RELEASE_RENDERER: {
             int64_t formId = provider.ConsumeIntegral<int64_t>();
-            std::string compId = provider.ConsumeRandomLengthString(64);
+            std::string compId = provider.ConsumeRandomLengthString(NUMBER_64);
             formMgrService_->ReleaseRenderer(formId, compId);
             break;
         }
@@ -367,7 +367,7 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
         }
         case IpcCode::SEND_NON_TRANSPARENT_RATIO: {
             int64_t formId = provider.ConsumeIntegral<int64_t>();
-            int32_t ratio = provider.ConsumeIntegralInRange<int32_t>(0, 100);
+            int32_t ratio = provider.ConsumeIntegralInRange<int32_t>(0, NUMBER_100);
             formMgrService_->SendNonTransparencyRatio(formId, ratio);
             break;
         }
