@@ -374,7 +374,7 @@ public:
 
     /**
      * @brief Get All FormsInfo.
-     * @param formInfos Return the form information of all forms provided.
+     * @param formInfos Return all forms provided excluding template card.
      * @return Returns ERR_OK on success, others on failure.
      */
     int GetAllFormsInfo(std::vector<FormInfo> &formInfos);
@@ -406,10 +406,10 @@ public:
      * @brief Get forms info by bundle name and module name.
      * @param bundleName bundle name.
      * @param moduleName Module name of hap.
-     * @param formInfos Return the form information of the specify bundle name and module name.
+     * @param formInfos Return the form information containing template cards in the specified bundle name and module name.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int OriginGetFormsInfoByModule(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos);
+    int GetFullFormsInfoByModule(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos);
 
     /**
      * @brief Get forms info by bundle name and module name.

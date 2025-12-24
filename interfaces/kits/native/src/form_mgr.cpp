@@ -1126,7 +1126,7 @@ int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool i
 
 /**
  * @brief Get All FormsInfo.
- * @param formInfos Return the form information of all forms provided.
+ * @param formInfos Return all forms provided excluding template card.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
@@ -1264,10 +1264,10 @@ int FormMgr::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vecto
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
  * @param moduleName Module name of hap.
- * @param formInfos Return the form information of the specify bundle name and module name.
+ * @param formInfos Return the form information containing template cards in the specified bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgr::OriginGetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
+int FormMgr::GetFullFormsInfoByModule(std::string &bundleName, std::string &moduleName,
     std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("bundleName is %{public}s, moduleName is %{public}s", bundleName.c_str(), moduleName.c_str());
