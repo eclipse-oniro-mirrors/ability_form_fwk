@@ -1314,7 +1314,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     std::vector<FormInfo> &formInfos)
 {
     std::vector<FormInfo> inputFormInfos;
-    int resultCode = OriginGetFormsInfoByModule(bundleName, moduleName, inputFormInfos);
+    int resultCode = GetFullFormsInfoByModule(bundleName, moduleName, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
     } else {
