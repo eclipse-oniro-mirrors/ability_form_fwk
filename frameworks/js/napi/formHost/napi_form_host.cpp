@@ -320,7 +320,7 @@ public:
             }
             HILOG_DEBUG("task end formId: form: %{public}" PRId64 ".", formId);
             std::string formIdString = std::to_string(formId);
-            napi_handle_scope = nullptr;
+            napi_handle_scope scope = nullptr;
             napi_open_handle_scope(sharedThis->env_, &scope);
             if (scope == nullptr) {
                 HILOG_ERROR("null scope");
