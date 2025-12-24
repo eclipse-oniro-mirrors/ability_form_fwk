@@ -210,7 +210,7 @@ void RefreshCacheMgr::CosumeRefreshByDueControl(const std::vector<FormRecord> &d
     }
 }
 
-Want RefreshCacheMgr::CreateWant(std::vector<FormRecord>::iterator &record, const int32_t userId)
+Want RefreshCacheMgr::CreateWant(const std::vector<FormRecord>::iterator &record, const int32_t userId)
 {
     Want want;
     want.SetElementName(record->bundleName, record->abilityName);
@@ -221,11 +221,17 @@ Want RefreshCacheMgr::CreateWant(std::vector<FormRecord>::iterator &record, cons
     want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(record->renderingMode));
     want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, record->isDynamic);
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, record->formTempFlag);
-    WantParams cacheWantParams = record->wantCacheMap[record->formId].GetParams();
+    auto it = record->wantCacheMap.find(record->formId);
+    if (it == record->wantCacheMap.end()) {
+        return want;
+    }
+    WantParams cacheWantParams = it->second.GetParams();
     WantParams wantParams = want.GetParams();
     if (cacheWantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
-        wantParams.SetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY,
-            cacheWantParams.GetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY));
+        auto paramValue = cacheWantParams.GetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY);
+        if (paramValue != nullptr) {
+            wantParams.SetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY, paramValue);
+        }
     }
     want.SetParams(wantParams);
     return want;

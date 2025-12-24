@@ -110,7 +110,7 @@ public:
      */
     void CosumeRefreshByDueControl(const std::vector<FormRecord> &disableFormRecords);
 private:
-    Want CreateWant(std::vector<FormRecord>::iterator &record, const int32_t userId);
+    Want CreateWant(const std::vector<FormRecord>::iterator &record, const int32_t userId);
 
     std::mutex overloadTaskMutex_;
     std::vector<FormTimer> overloadTask_;
