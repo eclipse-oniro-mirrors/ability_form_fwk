@@ -714,6 +714,14 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
         HILOG_ERROR("can't get stringSize");
         return "";
     }
+    if (size == 0) {
+        HILOG_WARN("args size is zero");
+        return "";
+    }
+    if (size >= SIZE_MAX - 1) {
+        HILOG_ERROR("string size too large");
+        return "";
+    }
     result.resize(size + 1);
     if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
         HILOG_ERROR("can't get string value");
