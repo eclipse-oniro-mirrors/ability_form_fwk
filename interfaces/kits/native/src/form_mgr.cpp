@@ -1267,7 +1267,7 @@ int FormMgr::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vecto
  * @param formInfos Return the form information of the specify bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
+int FormMgr::OriginGetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
     std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("bundleName is %{public}s, moduleName is %{public}s", bundleName.c_str(), moduleName.c_str());
@@ -1296,8 +1296,25 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
+/**
+ * @brief Get forms info by bundle name and module name.
+ * @param bundleName bundle name.
+ * @param moduleName Module name of hap.
+ * @param formInfos Return the form information of the specify bundle name and module name.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
+    std::vector<FormInfo> &formInfos)
+{
     std::vector<FormInfo> inputFormInfos;
-    int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, inputFormInfos);
+    int resultCode = OriginGetFormsInfoByModule(bundleName, moduleName, inputFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
     } else {

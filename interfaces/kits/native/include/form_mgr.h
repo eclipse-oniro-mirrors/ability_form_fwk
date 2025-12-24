@@ -409,6 +409,15 @@ public:
      * @param formInfos Return the form information of the specify bundle name and module name.
      * @return Returns ERR_OK on success, others on failure.
      */
+    int OriginGetFormsInfoByModule(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos);
+
+    /**
+     * @brief Get forms info by bundle name and module name.
+     * @param bundleName bundle name.
+     * @param moduleName Module name of hap.
+     * @param formInfos Return the form information of the specify bundle name and module name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
     int GetFormsInfoByModule(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos);
 
     /**
