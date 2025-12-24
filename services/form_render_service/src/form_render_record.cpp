@@ -1336,7 +1336,10 @@ void FormRenderRecord::PostReAddRecycledForms(const FormJsInfo &formJsInfo, cons
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord) {
             int32_t ret = renderRecord->HandleUpdateInJsThread(formJsInfo, newWant);
-            if (ret != ERR_OK) {
+            if (ret == ERR_OK) {
+                const auto compId = newWant.GetStringParam(Constants::FORM_COMP_ID);
+                renderRecord->UpdateFormRequestReleaseState(formJsInfo.formId, compId, false);
+            } else {
                 FormRenderEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
                     formJsInfo.formId,
                     formJsInfo.bundleName,
