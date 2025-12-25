@@ -1275,22 +1275,22 @@ int FormMgr::GetFullFormsInfoByModule(std::string &bundleName, std::string &modu
         HILOG_WARN("fail Get forms info,because empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
- 
+
     if (moduleName.empty()) {
         HILOG_WARN("fail Get forms info,because empty moduleName");
         return ERR_APPEXECFWK_FORM_INVALID_MODULENAME;
     }
- 
+
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
- 
+
     int errCode = Connect();
     if (errCode != ERR_OK) {
         return errCode;
     }
- 
+
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
@@ -1302,7 +1302,7 @@ int FormMgr::GetFullFormsInfoByModule(std::string &bundleName, std::string &modu
     }
     return resultCode;
 }
- 
+
 /**
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
@@ -2619,7 +2619,7 @@ ErrCode FormMgr::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> 
     }
     return remoteProxy_->RegisterTemplateFormDetailInfoChange(callerToken);
 }
- 
+
 ErrCode FormMgr::UnregisterTemplateFormDetailInfoChange()
 {
     HILOG_INFO("call");
