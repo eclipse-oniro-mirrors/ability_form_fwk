@@ -240,6 +240,10 @@ void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
         }
         for (const auto& callback : iter->second) {
             HILOG_ERROR("uninstall formId:%{public}s", std::to_string(formId).c_str());
+            if (callback == nullptr) {
+                HILOG_ERROR("null FormCallback");
+                continue;
+            }
             callback->ProcessFormUninstall(formId);
         }
     }
@@ -270,6 +274,10 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
     } else {
         std::set<std::shared_ptr<FormStateCallbackInterface>> &callbackSet = iter->second;
         for (auto &callback: callbackSet) {
+            if (callback == nullptr) {
+                HILOG_ERROR("null FormCallback");
+                continue;
+            }
             callback->ProcessAcquireState(state);
         }
         formStateCallbackMap_.erase(iter);
@@ -438,6 +446,10 @@ void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
     for (const auto &callback : iter->second) {
         HILOG_DEBUG("formId:%{public}" PRId64 ", jspath:%{public}s, data: %{private}s",
             formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
+        if (callback == nullptr) {
+            HILOG_ERROR("null FormCallback");
+            continue;
+        }
         callback->ProcessFormUpdate(formJsInfo);
     }
 }
@@ -458,6 +470,10 @@ void FormHostClient::OnRecycleForm(const int64_t &formId)
         return;
     }
     for (const auto &callback : iter->second) {
+        if (callback == nullptr) {
+            HILOG_ERROR("null FormCallback");
+            continue;
+        }
         callback->ProcessRecycleForm();
     }
 }

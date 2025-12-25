@@ -34,7 +34,7 @@ using WantParams = OHOS::AAFwk::WantParams;
  * @class FormRenderMgrInner
  * FormRenderMgrInner provides a facility for managing form render life cycle.
  */
-class FormRenderMgrInner {
+class FormRenderMgrInner : public std::enable_shared_from_this<FormRenderMgrInner> {
 public:
     FormRenderMgrInner();
     virtual ~FormRenderMgrInner();

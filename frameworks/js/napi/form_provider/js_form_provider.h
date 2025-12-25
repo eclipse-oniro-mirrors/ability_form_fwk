@@ -121,7 +121,8 @@ private:
     napi_value OnActivateSceneAnimation(napi_env env, size_t argc, napi_value* argv);
     napi_value OnDeactivateSceneAnimation(napi_env env, size_t argc, napi_value* argv);
     napi_value OnUpdateTemplateFormDetailInfo(napi_env env, size_t argc, napi_value* argv);
-    static bool ConvertFormOverflowInfo(napi_env env, napi_value argv, AppExecFwk::OverflowInfo* overflowInfo);
+    static bool ConvertFormOverflowInfo(
+        napi_env env, napi_value argv, const std::shared_ptr<AppExecFwk::OverflowInfo> &overflowInfo);
     static bool ConvertOverflowInfoArea(napi_env env, napi_value rangeArea, AppExecFwk::Rect &area);
     static bool GetAndConvertProperty(napi_env env, napi_value object, const char* propertyName, double& outValue);
     bool CheckCallerIsSystemApp();
