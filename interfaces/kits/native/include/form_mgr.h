@@ -406,7 +406,8 @@ public:
      * @brief Get forms info by bundle name and module name.
      * @param bundleName bundle name.
      * @param moduleName Module name of hap.
-     * @param formInfos Return the form information containing template cards in the specified bundle name and module name.
+     * @param formInfos Return the form information containing template cards in the specified
+     *                  bundle name and module name.
      * @return Returns ERR_OK on success, others on failure.
      */
     int GetFullFormsInfoByModule(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos);
