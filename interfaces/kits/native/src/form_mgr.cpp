@@ -1275,22 +1275,22 @@ int FormMgr::GetFullFormsInfoByModule(std::string &bundleName, std::string &modu
         HILOG_WARN("fail Get forms info,because empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
-
+ 
     if (moduleName.empty()) {
         HILOG_WARN("fail Get forms info,because empty moduleName");
         return ERR_APPEXECFWK_FORM_INVALID_MODULENAME;
     }
-
+ 
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
-
+ 
     int errCode = Connect();
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+ 
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
@@ -1302,12 +1302,12 @@ int FormMgr::GetFullFormsInfoByModule(std::string &bundleName, std::string &modu
     }
     return resultCode;
 }
-
+ 
 /**
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
  * @param moduleName Module name of hap.
- * @param formInfos Return the form information of the specify bundle name and module name.
+ * @param formInfos Return the forms' information of the specify bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
@@ -1316,8 +1316,6 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     std::vector<FormInfo> inputFormInfos;
     int resultCode = GetFullFormsInfoByModule(bundleName, moduleName, inputFormInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
-    } else {
         FilterTemplateForm(inputFormInfos, formInfos);
     }
     return resultCode;
