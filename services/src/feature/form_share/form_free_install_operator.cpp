@@ -32,7 +32,10 @@ FormFreeInstallOperator::FormFreeInstallOperator(const std::string &formShareInf
 
 FormFreeInstallOperator::~FormFreeInstallOperator()
 {
-    freeInstallStatusCallBack_ = nullptr;
+    if (!freeInstallStatusCallBack_) {
+        delete freeInstallStatusCallBack_;
+        freeInstallStatusCallBack_ = nullptr;
+    }
 }
 
 int32_t FormFreeInstallOperator::StartFreeInstall(

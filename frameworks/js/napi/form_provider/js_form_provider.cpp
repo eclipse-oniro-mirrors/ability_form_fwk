@@ -826,14 +826,9 @@ napi_value JsFormProvider::OnRequestOverflow(napi_env env, size_t argc, napi_val
         return CreateJsUndefined(env);
     }
 
-    AppExecFwk::OverflowInfo* overflowInfo = new (std::nothrow) AppExecFwk::OverflowInfo {};
-    if (overflowInfo == nullptr) {
-        HILOG_ERROR("Failed to new overflowInfo");
-        return CreateJsUndefined(env);
-    }
+    std::shared_ptr<AppExecFwk::OverflowInfo> overflowInfo = std::make_shared<AppExecFwk::OverflowInfo>();
     if (!ConvertFormOverflowInfo(env, argv[PARAM1], overflowInfo)) {
         HILOG_ERROR("convert overflowInfo failed");
-        delete overflowInfo;
         NapiFormUtil::ThrowParamError(env, "The overflowInfo is invalid");
         return CreateJsUndefined(env);
     }
@@ -841,7 +836,6 @@ napi_value JsFormProvider::OnRequestOverflow(napi_env env, size_t argc, napi_val
     NapiAsyncTask::CompleteCallback complete =
         [formId, overflowInfo](napi_env env, NapiAsyncTask &task, int32_t status) {
             ErrCode ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, true);
-            delete overflowInfo;
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
@@ -993,7 +987,8 @@ napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc,
     return result;
 }
 
-bool JsFormProvider::ConvertFormOverflowInfo(napi_env env, napi_value argv, AppExecFwk::OverflowInfo* overflowInfo)
+bool JsFormProvider::ConvertFormOverflowInfo(
+    napi_env env, napi_value argv, const std::shared_ptr<AppExecFwk::OverflowInfo> &overflowInfo)
 {
     HILOG_INFO("call");
     napi_valuetype type = napi_undefined;

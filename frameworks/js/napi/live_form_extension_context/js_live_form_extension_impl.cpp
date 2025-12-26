@@ -114,7 +114,7 @@ void JsLiveFormExtensionImpl::BindContext()
         return;
     }
 
-    auto workContext = new (std::nothrow) std::shared_ptr<LiveFormExtensionContext>(context_);
+    auto workContext = new (std::nothrow) std::weak_ptr<LiveFormExtensionContext>(context_);
     napi_coerce_to_native_binding_object(env, contextObj, DetachCallbackFunc, AttachUIExtensionContext,
         workContext, nullptr);
     context_->Bind(jsRuntime_, shellContextRef_.get());

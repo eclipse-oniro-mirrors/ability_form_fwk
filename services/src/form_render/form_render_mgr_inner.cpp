@@ -517,14 +517,20 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
     }
 
     if (renderDeathRecipient_ == nullptr) {
-        renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([this]() {
-            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d", userId_, isActiveUser_);
-            if (isActiveUser_) {
-                RerenderAllForms();
+        renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([weak = weak_from_this()]() {
+            auto renderMgrInner = weak.lock();
+            if (renderMgrInner == nullptr) {
+                HILOG_ERROR("null renderMgrInner");
+                return;
+            }
+            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
+                renderMgrInner->userId_,
+                renderMgrInner->isActiveUser_);
+            if (renderMgrInner->isActiveUser_) {
+                renderMgrInner->RerenderAllForms();
             } else {
-                std::unique_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
-                renderRemoteObj_ = nullptr;
-                guard.unlock();
+                std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
+                renderMgrInner->renderRemoteObj_ = nullptr;
             }
         });
     }

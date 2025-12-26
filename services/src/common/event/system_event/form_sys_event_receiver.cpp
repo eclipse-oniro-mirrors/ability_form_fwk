@@ -207,7 +207,7 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     }
 
-    FormMgrQueue::GetInstance().ScheduleTask(0, [userId, lastUserId, this]() {
+    FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
         if (userId != MAIN_USER_ID) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         }

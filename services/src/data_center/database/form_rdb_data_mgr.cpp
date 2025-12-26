@@ -709,11 +709,11 @@ ErrCode FormRdbDataMgr::LoadRdbStore()
     rdbStoreConfig.SetAllowRebuild(true);
     rdbStoreConfig.SetHaMode(NativeRdb::HAMode::MAIN_REPLICA);
     int32_t errCode = NativeRdb::E_OK;
-    RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(rdbPath);
+    RdbStoreDataCallBackFormInfoStorage rdbDataCallBack(rdbPath);
 
     rdbStore_ = nullptr;
     rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, Constants::FORM_RDB_VERSION,
-        rdbDataCallBack_, errCode);
+        rdbDataCallBack, errCode);
     if (errCode != NativeRdb::E_OK) {
         HILOG_ERROR("Form rdb store init fail, err code is %{public}" PRId32 "", errCode);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,

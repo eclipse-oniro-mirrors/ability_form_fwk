@@ -62,6 +62,10 @@ void JsLiveFormExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRec
     context->SetParentContext(appContext);
 
     auto abilityInfo = record->GetAbilityInfo();
+    if (abilityInfo == nullptr) {
+        HILOG_ERROR("null abilityInfo");
+        return;
+    }
     context->SetAbilityInfo(abilityInfo);
     context->InitHapModuleInfo(abilityInfo);
     context->SetConfiguration(appContext->GetConfiguration());
