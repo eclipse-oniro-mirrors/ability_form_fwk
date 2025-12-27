@@ -237,7 +237,10 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     },
     {
         ERR_APPEXECFWK_FORM_NOT_UI_ABILITY, { ERR_FORM_EXTERNAL_PARAM_INVALID, "Target ability is not UI ability." }
-    }
+    },
+    {
+        ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION, { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION, "" }
+    },
 };
 
 static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG = {
@@ -267,6 +270,7 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,          "The form can not support this operation, Please check whether "
         "the configuration information of sceneAnimationParams in your form_config is correct."},
     { ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR,         "The dimension parameter is incorrect." },
+    { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION,   "The system does not support the current operation."},
 };
 }
 

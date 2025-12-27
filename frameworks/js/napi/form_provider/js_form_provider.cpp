@@ -1527,7 +1527,8 @@ napi_value JsFormProvider::OnUpdateTemplateFormDetailInfo(napi_env env, size_t a
         [templateFormInfo](napi_env env, NapiAsyncTask &task, int32_t status) {
             auto ret = FormMgr::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
             if (ret != ERR_OK) {
-                if (ret != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+                if (ret != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS &&
+                    ret != ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION) {
                     ret = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
                 }
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
