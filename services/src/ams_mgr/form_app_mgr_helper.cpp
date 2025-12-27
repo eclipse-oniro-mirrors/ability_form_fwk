@@ -50,6 +50,10 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAppMgrHelper::GetAppMgr()
 bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, ExtensionAbilityType extensionAbilityType)
 {
     HILOG_INFO("bundleName:%{public}s, extensionAbilityType:%{public}d", bundleName.c_str(), extensionAbilityType);
+    if (bundleName.empty()) {
+        HILOG_ERROR("Empty bundle name");
+        return false;
+    }
     auto appMgrProxy = GetAppMgr();
     if (!appMgrProxy) {
         HILOG_ERROR("Get app mgr failed");
