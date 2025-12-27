@@ -4999,13 +4999,13 @@ ErrCode FormMgrAdapter::UpdateTemplateFormDetailInfo(
     auto templateFormDetailInfoCallerToken = GetTemplateFormDetailInfoCallerToken();
     if (templateFormDetailInfoCallerToken == nullptr) {
         HILOG_ERROR("failed, templateFormDetailInfoCallerToken_ is nullptr!");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION;
     }
     sptr<IFormHostDelegate> remoteFormHostDelegateProxy =
         iface_cast<IFormHostDelegate>(templateFormDetailInfoCallerToken);
     if (remoteFormHostDelegateProxy == nullptr) {
         HILOG_ERROR("failed, remoteFormHostDelegateProxy is nullptr!");
-        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+        return ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION;
     }
     
     ErrCode result = remoteFormHostDelegateProxy->TemplateFormDetailInfoChange(templateFormInfo);
