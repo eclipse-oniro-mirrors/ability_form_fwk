@@ -35,6 +35,7 @@ namespace Constants {
     constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE = "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
+    constexpr const char* PARAM_FORM_MANUAL_CLICK_KEY = "ohos.extra.param.key.mannually_click";
     constexpr const char* PARAM_MODULE_NAME_KEY = "ohos.extra.param.key.module_name";
     constexpr const char* PARAM_BUNDLE_NAME_KEY = "ohos.extra.param.key.bundle_name";
     constexpr const char* PARAM_ABILITY_NAME_KEY = "ohos.extra.param.key.ability_name";

@@ -2994,8 +2994,10 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
 
     want.SetParam(Constants::PARAM_FORM_ID, formId);
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
+    bool flag = want.GetBoolParam(Constants::PARAM_FORM_MANUAL_CLICK_KEY, false);
+    HILOG_INFO("StartAbilityByCall, MANUAL_CLICK:%{public}d", flag);
     int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
-        formBackgroundConnection, callerToken, -1, true, true));
+        formBackgroundConnection, callerToken, -1, true, flag));
     if (result != ERR_OK) {
         HILOG_ERROR("fail StartAbilityByCall, result:%{public}d", result);
         return result;
