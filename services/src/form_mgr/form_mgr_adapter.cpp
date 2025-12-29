@@ -940,10 +940,9 @@ void FormMgrAdapter::UpdateFormRenderParamsAfterReload(const int64_t formId)
         return;
     }
     std::string transparencyColor = formUpgradeInfo.transparencyColor;
-    if (transparencyColor.empty()) {
-        transparencyColor = Constants::DEFAULT_TRANSPARENCY_COLOR;
+    if (!transparencyColor.empty()) {
+        renderWant.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, transparencyColor);
     }
-    renderWant.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, transparencyColor);
     if (formUpgradeInfo.enableBlurBackground) {
         renderWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, true);
     }
