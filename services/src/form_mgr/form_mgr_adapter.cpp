@@ -893,7 +893,8 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
 
-void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const Want &want)
+void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const sptr<IRemoteObject> &callerToken,
+    const Want &want)
 {
     if (want.GetParams().HasParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY)) {
         // isEnable can be true only while PARAM_FORM_DISABLE_UIFIRST_KEY was false.
