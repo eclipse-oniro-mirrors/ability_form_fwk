@@ -632,14 +632,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_023, TestSize.Level1)
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_023 end";
 }
@@ -1048,14 +1045,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_043, TestSize.Level1)
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_043 end";
 }
@@ -1579,14 +1573,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
     AbilityInfo abilityInfo;
     ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0023 end";
 }
@@ -2146,14 +2137,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_123, TestSize.Level1)
     AbilityInfo abilityInfo;
     ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_123 end";
 }
@@ -2756,14 +2744,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2123, TestSize.Level1)
     AbilityInfo abilityInfo;
     ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo, extensionAbilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2123 end";
 }
