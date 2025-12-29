@@ -4795,11 +4795,12 @@ ErrCode FormMgrAdapter::GetFormInfoByFormRecord(const FormRecord &record, FormIn
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-void FormMgrAdapter::DelayRefreshForms(const std::vector<FormRecord> &updatedForms, const Want &want)
+void FormMgrAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord> &updatedForms, const Want &want)
 {
     HILOG_INFO("start");
     auto delayRefreshForms = [updatedForms, want]() {
         for (const auto &updatedForm : updatedForms) {
+            FormMgrAdapter::GetInstance().UpdateFormRenderParamsAfterReload(updatedForm.formId);
             RefreshData data;
             data.formId = updatedForm.formId;
             data.record = updatedForm;
