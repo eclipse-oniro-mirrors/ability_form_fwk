@@ -829,13 +829,13 @@ void FormRenderMgr::SetRenderGroupParams(int64_t formId, const Want &want)
     FormUtil::GetActiveUsers(activeList);
     for (const int32_t userId : activeList) {
         HILOG_INFO("setRenderGroupParams userid: %{public}d", userId);
-        auto renderIter = renderInners_.find(userId);
-        if (renderIter != renderInners_.end()) {
-            renderIter->second->PostSetRenderGroupParamsTask(formId, want);
+        std::shared_ptr<FormRenderMgrInner> renderInner;
+        if (GetFormRenderMgrInner(userId, renderInner)) {
+            renderInner->PostSetRenderGroupParamsTask(formId, want);
         }
-        auto sandboxIter = sandboxInners_.find(userId);
-        if (sandboxIter != sandboxInners_.end()) {
-            sandboxIter->second->PostSetRenderGroupParamsTask(formId, want);
+        std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
+        if (GetFormSandboxMgrInner(userId, sandboxInner)) {
+            sandboxInner->PostSetRenderGroupParamsTask(formId, want);
         }
     }
 }
