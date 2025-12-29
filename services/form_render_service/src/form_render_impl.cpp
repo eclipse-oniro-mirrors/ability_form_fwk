@@ -140,6 +140,11 @@ int32_t FormRenderImpl::CheckPermission()
     }
     return ERR_OK;
 }
+
+int32_t FormRenderImpl::SetRenderGroupParams(int64_t formId, const Want &want)
+{
+    return FormRenderServiceMgr::GetInstance().SetRenderGroupParams(formId, want);
+}
 }  // namespace FormRender
 }  // namespace AppExecFwk
 }  // namespace OHOS

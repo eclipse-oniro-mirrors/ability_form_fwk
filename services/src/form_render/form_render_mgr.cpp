@@ -842,5 +842,22 @@ bool FormRenderMgr::GetFormSandboxMgrInner(int32_t userId, std::shared_ptr<FormS
     }
     return false;
 }
+
+void FormRenderMgr::SetRenderGroupParams(int64_t formId, const Want &want)
+{
+    std::vector<int32_t> activeList;
+    FormUtil::GetActiveUsers(activeList);
+    for (const int32_t userId : activeList) {
+        HILOG_INFO("setRenderGroupParams userid: %{public}d", userId);
+        std::shared_ptr<FormRenderMgrInner> renderInner;
+        if (GetFormRenderMgrInner(userId, renderInner)) {
+            renderInner->PostSetRenderGroupParamsTask(formId, want);
+        }
+        std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
+        if (GetFormSandboxMgrInner(userId, sandboxInner)) {
+            sandboxInner->PostSetRenderGroupParamsTask(formId, want);
+        }
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

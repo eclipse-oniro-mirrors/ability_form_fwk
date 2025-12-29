@@ -231,5 +231,38 @@ void FormRenderTaskMgr::RestoreFormsRecycledStatus(const std::vector<FormRecord>
 
     FormDataMgr::GetInstance().RecycleForms(recycleForms, callingUid, Want());
 }
+
+void FormRenderTaskMgr::PostSetRenderGroupParams(int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    auto task = [formId, want, remoteObject]() {
+        HILOG_INFO("start task formId:%{public}" PRId64, formId);
+        FormRenderTaskMgr::GetInstance().SetRenderGroupParams(formId, want, remoteObject);
+    };
+    FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
+}
+
+void FormRenderTaskMgr::SetRenderGroupParams(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("get formRenderProxy failed");
+        return;
+    }
+
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
+        return;
+    }
+    Want renderWant(want);
+    renderWant.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
+    int32_t error = remoteFormRender->SetRenderGroupParams(formId, renderWant);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail, error code: %{public}d, formId: %{public}" PRId64, error, formId);
+        return;
+    }
+    HILOG_INFO("formId: %{public}" PRId64, formId);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

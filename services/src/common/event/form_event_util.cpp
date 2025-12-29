@@ -158,7 +158,7 @@ void FormEventUtil::HandleFormReload(
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    FormMgrAdapter::GetInstance().DelayRefreshForms(updatedForms, want);
+    FormMgrAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want);
     if (needReload) {
         FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
     } else {
@@ -723,6 +723,10 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
+    FormUpgradeInfo oldFormUpgradeInfo;
+    FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, oldFormUpgradeInfo);
+    oldFormUpgradeInfo.enableBlurBackground = formInfo.enableBlurBackground;
+    formRecord.formUpgradeInfo = oldFormUpgradeInfo;
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }

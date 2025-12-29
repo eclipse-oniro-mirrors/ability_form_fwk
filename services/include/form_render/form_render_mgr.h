@@ -54,6 +54,8 @@ public:
 
     void SetRenderGroupEnableFlag(int64_t formId, bool isEnable);
 
+    void SetRenderGroupParams(int64_t formId, const Want &want);
+
     void SetVisibleChange(int64_t formId, bool isVisible, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord,

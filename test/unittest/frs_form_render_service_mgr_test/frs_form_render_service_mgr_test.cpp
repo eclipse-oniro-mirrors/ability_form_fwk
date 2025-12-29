@@ -1239,3 +1239,38 @@ HWTEST_F(FormRenderServiceMgrTest, SetMainRuntimeCb_001, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 end";
 }
+
+/**
+ * @tc.name: SetRenderGroupParams_001
+ * @tc.desc: Verify SetRenderGroupParams.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupParams_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupParams_001 start";
+    int64_t formId = 0;
+    Want want;
+    FormRenderServiceMgr formRenderServiceMgr;
+    int32_t ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+
+    formId = 1;
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    std::string uid{"20251209"};
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderServiceMgr.renderRecordMap_[uid] = formRenderRecord;
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, ERR_OK);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupParams_001 end";
+}

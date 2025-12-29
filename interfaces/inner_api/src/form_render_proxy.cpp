@@ -451,5 +451,38 @@ int32_t FormRenderProxy::UpdateFormSize(const int64_t &formId, const FormSurface
 
     return ERR_OK;
 }
+
+int32_t FormRenderProxy::SetRenderGroupParams(const int64_t formId, const Want &want)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("error to write interface token formId: %{public}" PRId64, formId);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed formId: %{public}" PRId64, formId);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed formId: %{public}" PRId64, formId);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t error = SendTransactCmd(IFormRender::Message::FORM_SET_RENDER_GROUP_PARAMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed formId: %{public}" PRId64, error, formId);
+        return error;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result != ERR_OK) {
+        HILOG_ERROR("Server returned error:%{public}d formId: %{public}" PRId64, result, formId);
+    }
+    return result;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

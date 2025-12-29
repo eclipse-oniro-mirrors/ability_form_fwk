@@ -27,6 +27,12 @@
 namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
+
+struct FormUpgradeInfo {
+    bool enableBlurBackground = false;
+    std::string transparencyColor = "";
+};
+
 /**
  * @class FormRecord
  * Form data.
@@ -103,6 +109,7 @@ public:
     uint32_t lastVersionCode = 0;
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool isTemplateForm = false;
+    FormUpgradeInfo formUpgradeInfo;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

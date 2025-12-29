@@ -852,6 +852,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     bool isNeedAddForm = want.GetBoolParam(Constants::IS_NEED_ADDFORM_ON_REQUEST, false);
     HILOG_INFO("formId:%{public}" PRId64 ", isNeedAddForm:%{public}d", formId, isNeedAddForm);
     addFormWant.RemoveParam(Constants::IS_NEED_ADDFORM_ON_REQUEST);
+    addFormWant.RemoveParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY);
     Want updateFormWant(addFormWant);
     updateFormWant.RemoveParam(Constants::PARAM_FORM_WIDTH_KEY);
     updateFormWant.RemoveParam(Constants::PARAM_FORM_HEIGHT_KEY);
@@ -864,7 +865,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    UpdateFormRenderParam(matchedFormId, updateFormWant);
+    UpdateFormRenderParam(matchedFormId, callerToken, want);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {
@@ -892,14 +893,63 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
 
-void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const Want &want)
+void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const sptr<IRemoteObject> &callerToken,
+    const Want &want)
 {
-    bool hasparam = want.GetParams().HasParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY);
-    if (hasparam) {
+    if (want.GetParams().HasParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY)) {
         // isEnable can be true only while PARAM_FORM_DISABLE_UIFIRST_KEY was false.
         bool isEnable = !want.GetBoolParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY, false);
         FormRenderMgr::GetInstance().SetRenderGroupEnableFlag(formId, isEnable);
     }
+
+    // set formUpgradeInfo
+    FormUpgradeInfo formUpgradeInfo;
+    FormDataMgr::GetInstance().GetFormUpgradeInfo(formId, formUpgradeInfo);
+    FormHostRecord hostRecord;
+    bool hasRecord = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, hostRecord);
+    bool hasTransparencyKey = want.GetParams().HasParam(Constants::PARAM_FORM_TRANSPARENCY_KEY);
+    std::string curTransparencyColor = Constants::DEFAULT_TRANSPARENCY_COLOR;
+    std::string cacheTransparencyColor = hostRecord.GetTransparentFormColor(formId);
+    if (hasTransparencyKey) {
+        curTransparencyColor = want.GetStringParam(Constants::PARAM_FORM_TRANSPARENCY_KEY);
+        formUpgradeInfo.transparencyColor = curTransparencyColor;
+        FormDataMgr::GetInstance().SetHostTransparentFormColor(formId, curTransparencyColor);
+    } else {
+        formUpgradeInfo.transparencyColor.clear();
+        FormDataMgr::GetInstance().DelHostTransparentFormColor(formId);
+    }
+    HILOG_INFO("FormId:%{public}" PRId64 " curTransparencyColor: %{public}s, cacheTransparencyColor: %{public}s",
+        formId, curTransparencyColor.c_str(), cacheTransparencyColor.c_str());
+    FormDataMgr::GetInstance().UpdateFormUpgradeInfo(formId, formUpgradeInfo);
+ 
+    // whether the transparencyColor matches the cached color; if not, refresh the FRS.
+    if (hasRecord && hasTransparencyKey && curTransparencyColor != cacheTransparencyColor) {
+        // update form render params
+        Want renderWant;
+        renderWant.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, curTransparencyColor);
+        FormRenderMgr::GetInstance().SetRenderGroupParams(formId, renderWant);
+    }
+}
+
+void FormMgrAdapter::UpdateFormRenderParamsAfterReload(const int64_t formId)
+{
+    Want renderWant;
+    FormUpgradeInfo formUpgradeInfo;
+    bool hasFormRecord = FormDataMgr::GetInstance().GetFormUpgradeInfo(formId, formUpgradeInfo);
+    if (!hasFormRecord) {
+        HILOG_ERROR("FormId:%{public}" PRId64 " form record not found.", formId);
+        return;
+    }
+    std::string transparencyColor = formUpgradeInfo.transparencyColor;
+    if (!transparencyColor.empty()) {
+        renderWant.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, transparencyColor);
+    }
+    if (formUpgradeInfo.enableBlurBackground) {
+        renderWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, true);
+    }
+    HILOG_INFO("Need to set transparencyColor: %{public}s, enableBlurBackground: %{public}d",
+        transparencyColor.c_str(), formUpgradeInfo.enableBlurBackground);
+    FormRenderMgr::GetInstance().SetRenderGroupParams(formId, renderWant);
 }
 
 void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType, const int32_t userId)
@@ -4745,11 +4795,12 @@ ErrCode FormMgrAdapter::GetFormInfoByFormRecord(const FormRecord &record, FormIn
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-void FormMgrAdapter::DelayRefreshForms(const std::vector<FormRecord> &updatedForms, const Want &want)
+void FormMgrAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord> &updatedForms, const Want &want)
 {
     HILOG_INFO("start");
     auto delayRefreshForms = [updatedForms, want]() {
         for (const auto &updatedForm : updatedForms) {
+            FormMgrAdapter::GetInstance().UpdateFormRenderParamsAfterReload(updatedForm.formId);
             RefreshData data;
             data.formId = updatedForm.formId;
             data.record = updatedForm;

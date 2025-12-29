@@ -82,6 +82,8 @@ public:
 
     virtual void RunCachedConfigurationUpdated() {}
 
+    virtual int32_t SetRenderGroupParams(const int64_t formId, const Want &want) { return ERR_OK; }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -104,6 +106,7 @@ public:
         FORM_SET_VISIBLE_CHANGE = 3110,
         FORM_UPDATE_FORM_SIZE = 3111,
         FORM_SET_RENDER_GROUP_ENABLE_FLAG = 3112,
+        FORM_SET_RENDER_GROUP_PARAMS = 3113,
     };
 };
 } // namespace AppExecFwk

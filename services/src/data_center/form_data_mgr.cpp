@@ -3308,5 +3308,72 @@ const std::string& FormDataMgr::GetTransparencyFormCapabilityKey()
 {
     return transparencyFormCapabilityKey_;
 }
+
+/**
+ * @brief Update form upgrade info.
+ * @param formId The Id of the form.
+ * @param FormUpgradeInfo The form upgrade info.
+ * @return Returns true if this function is successfully called; returns false otherwise.
+ */
+bool FormDataMgr::UpdateFormUpgradeInfo(const int64_t formId, const FormUpgradeInfo& formUpgradeInfo)
+{
+    HILOG_DEBUG("Update form upgrade info by formId");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        info->second.formUpgradeInfo = formUpgradeInfo;
+        return true;
+    }
+    HILOG_DEBUG("FormId:%{public}" PRId64 " form record not found.", formId);
+    return false;
+}
+
+/**
+ * @brief Get form upgrade info from formRecord.
+ * @return Returns true on success, false on failure.
+ */
+bool FormDataMgr::GetFormUpgradeInfo(const int64_t formId, FormUpgradeInfo& formUpgradeInfo) const
+{
+    HILOG_DEBUG("get form upgrade info from formRecord by formId");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_ERROR("formInfo not find");
+        return false;
+    }
+    formUpgradeInfo = info->second.formUpgradeInfo;
+    HILOG_DEBUG("get form upgrade info successfully");
+    return true;
+}
+
+/**
+ * @brief Set transparent form color form for host clients.
+ * @param formId The Id of the form.
+ * @param transparencyColor The transparent color.
+ */
+void FormDataMgr::SetHostTransparentFormColor(const int64_t formId, const std::string &transparencyColor)
+{
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    std::vector<FormHostRecord>::iterator itHostRecord;
+    for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        if (itHostRecord->Contains(formId)) {
+            HILOG_INFO("formId:%{public}" PRId64 ", transparencyColor:%{public}s", formId, transparencyColor.c_str());
+            itHostRecord->SetTransparentFormColor(formId, transparencyColor);
+        }
+    }
+}
+
+/**
+ * @brief Delete transparent form color form for host clients.
+ * @param formId The Id of the form.
+ */
+void FormDataMgr::DelHostTransparentFormColor(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    std::vector<FormHostRecord>::iterator itHostRecord;
+    for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        itHostRecord->DeleteTransparentFormColor(formId);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
