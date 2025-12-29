@@ -2042,7 +2042,7 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_1013, TestSize.Level1) {
  * @tc.require: issueI639Z3
  */
 HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_1014, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_1012 starts";
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_1014 starts";
     std::string bundleName = "ohos.samples.FormApplication";
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     int result = formMgrProxy->RegisterFormRemoveObserverByBundle(bundleName, callerToken);
