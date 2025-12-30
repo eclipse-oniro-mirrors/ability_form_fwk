@@ -153,7 +153,18 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
         return ERR_OK;
     }
 
-    auto task = [formRecord, newWant = want, remoteObject]() {
+    auto task = [formRecord, newWant = want, weak = weak_from_this()]() {
+        sptr<IRemoteObject> remoteObject;
+        auto formRenderMgrInner = weak.lock();
+        if (!formRenderMgrInner) {
+            HILOG_ERROR("formRenderMgrInner is null.");
+            return;
+        }
+        auto ret = formRenderMgrInner->GetRenderObject(remoteObject);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("get remote object fail.");
+            return;
+        }
         FormRecord newRecord(formRecord);
         std::string cacheData;
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
