@@ -1041,7 +1041,7 @@ export default namespace formHost {
 
     private formRectCallback: formInfo.GetFormRectInfoCallback = (formId: string): Promise<formInfo.Rect> => {
       return new Promise<formInfo.Rect>((resolve: (rect: formInfo.Rect) => void,
-        reject: (rect: formInfo.Rect) => void): void => {
+        reject: (error: Error) => void): void => {
       });
     }
 
