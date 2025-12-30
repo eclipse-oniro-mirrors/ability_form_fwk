@@ -4225,13 +4225,13 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0197, TestSize.Level0)
  }
  
  /**
-  * @tc.name: FormMgrAdapter_0199
+  * @tc.name: FormMgrAdapter_0201
   * @tc.desc: test HandleDeleteTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
   * @tc.type: FUNC
   */
- HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0198, TestSize.Level0)
+ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0201, TestSize.Level0)
  {
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0198 start";
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0201 start";
      FormMgrAdapter formMgrAdapter;
      int64_t formId = 1;
      sptr<IRemoteObject> callerToken = nullptr;
@@ -4241,7 +4241,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0197, TestSize.Level0)
      MockNotifyProviderFormDelete(true);
      MockDeleteHostRecord(false);
      formMgrAdapter.HandleDeleteTempForm(formId, callerToken);
-     GTEST_LOG_(INFO) << "FormMgrAdapter_0198 end";
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0201 end";
  }
 
 /**
