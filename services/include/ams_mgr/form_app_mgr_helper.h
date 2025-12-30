@@ -40,7 +40,7 @@ public:
     bool IsAbilityForeground(const std::string &bundleName, ExtensionAbilityType extensionAbilityType);
 
     /**
-     * @brief Check if ability is foreground
+     * @brief Get running process info
      * @param bundleName the bundle name
      * @param userId the user id that app belong to
      * @param info the running process info
