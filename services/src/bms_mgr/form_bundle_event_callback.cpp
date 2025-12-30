@@ -102,8 +102,8 @@ void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName, 
     HILOG_INFO("active user list len:%{public}zu", activeList.size());
     for (const int32_t userId : activeList) {
         bool needReload = true;
-        FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId, needReload);
         std::function<void()> taskFunc = [bundleName, userId, needReload, needCheckVersion]() {
+            FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId, needReload);
             FormEventUtil::HandleUpdateFormCloud(bundleName);
             FormEventUtil::HandleProviderUpdated(bundleName, userId, needReload, needCheckVersion);
         };
