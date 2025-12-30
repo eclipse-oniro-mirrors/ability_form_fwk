@@ -1571,25 +1571,6 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_070, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderMgrTest_067
- * @tc.desc: test UpdateRenderingForm function and isGetFormRecord is false.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_067, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderMgrTest_067 start";
-    FormRenderMgr formRenderMgr;
-    int64_t formId = 1;
-    FormProviderData formProviderData;
-    WantParams wantParams;
-    bool mergeData = true;
-    MockGetFormRecord(false, 0);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
-        formRenderMgr.UpdateRenderingForm(formId, formProviderData, wantParams, mergeData));
-    GTEST_LOG_(INFO) << "FormRenderMgrTest_067 end";
-}
-
-/**
  * @tc.name: FormRenderMgrTest_071
  * @tc.desc: 1.test UpdateRenderingForm function and isGetFormRecord is true.
  *           2.privacyLevel is 1.
@@ -2929,5 +2910,24 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_141, TestSize.Level0)
     Want want;
     formRenderMgr.SetRenderGroupParams(1, want);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_141 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_0142
+ * @tc.desc: test UpdateRenderingForm function and isGetFormRecord is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_142, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_142 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+    FormProviderData formProviderData;
+    WantParams wantParams;
+    bool mergeData = true;
+    MockGetFormRecord(false, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+        formRenderMgr.UpdateRenderingForm(formId, formProviderData, wantParams, mergeData));
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_142 end";
 }
 }
