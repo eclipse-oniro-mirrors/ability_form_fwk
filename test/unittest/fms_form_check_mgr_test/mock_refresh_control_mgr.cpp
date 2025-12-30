@@ -24,6 +24,7 @@ namespace {
     bool g_mockIsScreenOff = false;
     bool g_mockIsHealthyControl = false;
     bool g_mockIsNeedToFresh = true;
+    bool g_mockIsAddFormFinish = true;
 }
 
 namespace OHOS {
@@ -50,6 +51,11 @@ void MockIsHealthyControl(bool mockBool)
 void MockIsNeedToFresh(bool mockBool)
 {
     g_mockIsNeedToFresh = mockBool;
+}
+
+void MockIsAddFormFinish(bool mockBool)
+{
+    g_mockIsAddFormFinish = mockBool;
 }
 }
 
@@ -82,6 +88,11 @@ bool RefreshControlMgr::IsHealthyControl(const FormRecord &record)
 bool RefreshControlMgr::IsNeedToFresh(FormRecord &record, bool isVisibleToFresh)
 {
     return g_mockIsNeedToFresh;
+}
+
+bool RefreshControlMgr::IsAddFormFinish(const int64_t formId)
+{
+    return g_mockIsAddFormFinish;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

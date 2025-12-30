@@ -18,7 +18,7 @@
 
 #include <singleton.h>
 
-#include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/refresh_impl/base_form_refresh.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -26,12 +26,14 @@ namespace AppExecFwk {
 * @class FormHostRefreshImpl
 * FormHostRefreshImpl is used to deal form host refresh.
 */
-class FormHostRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormHostRefreshImpl> {
+class FormHostRefreshImpl : public BaseFormRefresh, public DelayedRefSingleton<FormHostRefreshImpl> {
     DECLARE_DELAYED_REF_SINGLETON(FormHostRefreshImpl);
 public:
     DISALLOW_COPY_AND_MOVE(FormHostRefreshImpl);
 
-    int RefreshFormRequest(RefreshData &data) override;
+protected:
+    CheckValidFactor BuildCheckFactor(RefreshData &data) override;
+    int DoControlCheck(RefreshData &data) override;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

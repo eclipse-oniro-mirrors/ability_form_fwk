@@ -116,7 +116,7 @@ constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
 const std::string PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
-constexpr int32_t RECONNECT_NUMS = 2;
+constexpr int32_t MAX_RECONNECT_NUMS = 3;
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
 };
@@ -878,7 +878,10 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     data.record = record;
     data.callerToken = callerToken;
     data.want = updateFormWant;
-    if (isNeedAddForm && (record.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(formId))) {
+    bool needAcquireProviderData = FormCacheMgr::GetInstance().NeedAcquireProviderData(formId);
+    HILOG_INFO("formId:%{public}" PRId64 ", isNeedAddForm:%{public}d, needAcquireProviderData:%{public}d, "
+        "needRefresh:%{public}d.", formId, isNeedAddForm, needAcquireProviderData, record.needRefresh);
+    if (isNeedAddForm && (needAcquireProviderData || record.needRefresh)) {
         ErrCode errCode = AcquireProviderFormInfoByFormRecord(record, addFormWant.GetParams());
         auto delayRefreshForm = [data]() mutable {
             FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
@@ -4839,21 +4842,29 @@ int32_t FormMgrAdapter::GetCallingUserId()
 
 ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams)
 {
-    HILOG_INFO("reconnect bundleName:%{public}s,formId:%{public}" PRId64,
-        info.GetProviderBundleName().c_str(), info.GetFormId());
+    HILOG_INFO("reconnect bundleName:%{public}s, formId:%{public}" PRId64, info.GetProviderBundleName().c_str(),
+        info.GetFormId());
     std::lock_guard<std::mutex> lock(reconnectMutex_);
     auto iter = formReconnectMap_.find(info.GetFormId());
     if (iter == formReconnectMap_.end()) {
-        formReconnectMap_.emplace(info.GetFormId(), 1);
-    } else {
-        iter->second++;
-        if (iter->second > RECONNECT_NUMS) {
-            HILOG_ERROR("reconnect fail");
-            formReconnectMap_.erase(info.GetFormId());
-            return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-        }
+        formReconnectMap_.emplace(info.GetFormId(), 0);
     }
-    return AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
+    iter->second++;
+    int32_t delayAcquireProviderFormInfoTime = 0;
+    if (iter->second < MAX_RECONNECT_NUMS) {
+        delayAcquireProviderFormInfoTime = iter->second * RECONNECT_RETRY_DELAY_TIME;
+    } else if (iter->second == MAX_RECONNECT_NUMS) {
+        // schedule a delayed retry after LAST_RECONNECT_RETRY_DELAY_TIME milliseconds
+        delayAcquireProviderFormInfoTime = LAST_RECONNECT_RETRY_DELAY_TIME;
+    } else {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    auto delayAcquireProviderFormInfo = [info, wantParams]() {
+        FormMgrAdapter::GetInstance().AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
+    };
+    HILOG_WARN("reconnect form, schedule retry after %{public}d ms", delayAcquireProviderFormInfoTime);
+    FormMgrQueue::GetInstance().ScheduleTask(delayAcquireProviderFormInfoTime, delayAcquireProviderFormInfo);
+    return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::AcquireProviderFormInfoByFormRecord(const FormRecord &formRecord, const WantParams &wantParams)

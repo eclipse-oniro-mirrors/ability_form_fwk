@@ -34,6 +34,7 @@
 #include "common/util/form_report.h"
 #include "data_center/form_record/form_record_report.h"
 #include "form_mgr/form_mgr_adapter.h"
+#include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "status_mgr_center/form_status_task_mgr.h"
 
 namespace OHOS {
@@ -92,7 +93,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
-    FormReport::GetInstance().SetAddFormFinish(formId);
+    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId);
     FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormRecordReport::GetInstance().SetFormRecordRecordInfo(formId, want);
     FormReport::GetInstance().SetFormRecordInfo(formId, want);

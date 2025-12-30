@@ -6122,4 +6122,42 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetExpectRecycledStatus_004, Tes
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetExpectRecycledStatus_004 end";
 }
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_001 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    FormRecord formRecord0;
+    formRecord0.formId = FORM_ID_ZERO;
+    formRecord0.addFormFinish = false;
+    formDataMgr->formRecords_.emplace(FORM_ID_ZERO, formRecord0);
+    FormRecord formRecord1;
+    formRecord1.formId = FORM_ID_ONE;
+    formRecord0.addFormFinish = true;
+    formDataMgr->formRecords_.emplace(FORM_ID_ONE, formRecord1);
+
+    formDataMgr->SetExpectRecycledStatus({FORM_ID_ZERO, FORM_ID_ONE}, true);
+    EXPECT_FALSE(formDataMgr->GetAddfinishAndSetUpdateFlag(20251230));
+    EXPECT_TRUE(formDataMgr->GetAddfinishAndSetUpdateFlag(FORM_ID_ONE));
+    EXPECT_FALSE(formDataMgr->GetAddfinishAndSetUpdateFlag(FORM_ID_ZERO));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_001 end";
+}
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_002 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    FormRecord formRecord;
+    formRecord.formId = FORM_ID_ZERO;
+    formRecord.addFormFinish = false;
+    formRecord.isNeedUpdateFormOnAddFormFinish = true;
+    formDataMgr->formRecords_.emplace(FORM_ID_ZERO, formRecord);
+    EXPECT_FALSE(formDataMgr->GetAddfinishAndSetUpdateFlag(20251230));
+    EXPECT_TRUE(formDataMgr->GetAddfinishAndSetUpdateFlag(FORM_ID_ZERO));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_002 end";
+}
 }

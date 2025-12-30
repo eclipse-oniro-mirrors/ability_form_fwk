@@ -217,5 +217,26 @@ void RefreshCacheMgr::CosumeRefreshByDueControl(const std::vector<FormRecord> &d
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
     }
 }
+
+void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId)
+{
+    FormRecord record;
+    bool isNeedUpdate = FormDataMgr::GetInstance().GetIsNeedUpdateOnAddFinish(formId, record);
+    if (!isNeedUpdate) {
+        return;
+    }
+
+    HILOG_INFO("formId:%{public}" PRId64", isHostRefresh:%{public}d", formId, record.isHostRefresh);
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
+    if (record.isHostRefresh && record.wantCacheMap.find(formId) != record.wantCacheMap.end()) {
+        FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], want);
+    }
+    RefreshData data;
+    data.formId = formId;
+    data.record = record;
+    data.want = want;
+    FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

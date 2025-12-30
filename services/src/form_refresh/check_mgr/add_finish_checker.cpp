@@ -15,7 +15,8 @@
 
 #include "form_refresh/check_mgr/add_finish_checker.h"
 
-#include "common/util/form_report.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/form_record/form_record.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -25,9 +26,13 @@ AddFinishChecker::~AddFinishChecker() {}
 
 int AddFinishChecker::CheckValid(const CheckValidFactor &factor)
 {
-    bool addFormFinish = false;
-    FormReport::GetInstance().GetAddFormFinish(factor.formId, addFormFinish);
-    if (!addFormFinish) {
+    FormRecord formRecord;
+    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(factor.formId, formRecord);
+    if (!bGetRecord) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 "", factor.formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if (!formRecord.addFormFinish) {
         HILOG_WARN("form is adding:%{public}" PRId64, factor.formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }

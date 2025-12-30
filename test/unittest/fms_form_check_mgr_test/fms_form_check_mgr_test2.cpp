@@ -167,6 +167,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshCacheMgr_005, TestSize
     RefreshCacheMgr::GetInstance().ConsumeRenderTask(FORM_ID_ONE);
     RefreshCacheMgr::GetInstance().AddRenderTask(FORM_ID_ONE, task);
     RefreshCacheMgr::GetInstance().DelRenderTask(FORM_ID_ONE);
+    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(FORM_ID_ONE);
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshCacheMgr_005 end";
 }
 }

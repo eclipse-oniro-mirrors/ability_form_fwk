@@ -3375,5 +3375,38 @@ void FormDataMgr::DelHostTransparentFormColor(const int64_t formId)
         itHostRecord->DeleteTransparentFormColor(formId);
     }
 }
+
+bool FormDataMgr::GetAddfinishAndSetUpdateFlag(const int64_t formId)
+{
+    HILOG_DEBUG("Get if add form finish and set addFinish flag");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_ERROR("formId:%{public}" PRId64 " not found", formId);
+        return false;
+    }
+    if (info->second.addFormFinish) {
+        HILOG_INFO("formId:%{public}" PRId64 " addition has been completed", formId);
+        return true;
+    }
+    info->second.isNeedUpdateFormOnAddFormFinish = true;
+    return false;
+}
+
+bool FormDataMgr::GetIsNeedUpdateOnAddFinish(const int64_t formId, FormRecord &formRecord)
+{
+    HILOG_DEBUG("Consume add unfinish flag.");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_ERROR("formId:%{public}" PRId64 " not found", formId);
+        return false;
+    }
+    bool isNeedUpdate = !info->second.addFormFinish && info->second.isNeedUpdateFormOnAddFormFinish;
+    info->second.addFormFinish = true;
+    info->second.isNeedUpdateFormOnAddFormFinish = false;
+    formRecord = info->second;
+    return isNeedUpdate;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

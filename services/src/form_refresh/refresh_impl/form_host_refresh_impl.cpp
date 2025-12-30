@@ -15,63 +15,60 @@
 
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 
-#include "form_refresh/strategy/refresh_check_mgr.h"
-#include "form_refresh/strategy/refresh_control_mgr.h"
+#include "form_refresh/strategy/refresh_config.h"
 #include "form_refresh/strategy/refresh_exec_mgr.h"
+#include "form_refresh/strategy/refresh_control_mgr.h"
+#include "form_refresh/strategy/refresh_check_mgr.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "common/util/form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+// Configuration for TYPE_HOST - check types and control checks
+static RefreshConfig CreateConfig() {
+    RefreshConfig config;
+    // Check types configuration
+    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_SELF_FORM, TYPE_ACTIVE_USER };
+    // Control checks configuration
+    config.controlCheckFlags = CONTROL_CHECK_HEALTHY_CONTROL | CONTROL_CHECK_SCREEN_OFF | CONTROL_CHECK_NEED_TO_FRESH
+    | CONTROL_CHECK_ADD_FINISH;
+    config.isVisibleToFresh = true;
+    return config;
+}
+}
 
-FormHostRefreshImpl::FormHostRefreshImpl() {}
+FormHostRefreshImpl::FormHostRefreshImpl() : BaseFormRefresh(CreateConfig()) {}
 FormHostRefreshImpl::~FormHostRefreshImpl() {}
 
-int FormHostRefreshImpl::RefreshFormRequest(RefreshData &data)
+CheckValidFactor FormHostRefreshImpl::BuildCheckFactor(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_SELF_FORM, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
-    CheckValidFactor factor;
-    factor.formId = data.formId;
-    factor.record = data.record;
-    factor.callerToken = data.callerToken;
+    CheckValidFactor factor = BaseFormRefresh::BuildCheckFactor(data);
     Want reqWant(data.want);
     reqWant.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
     factor.want = reqWant;
-    int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
-    if (ret != ERR_OK) {
-        return ret;
-    }
+    data.want = reqWant;
+    return factor;
+}
 
+int FormHostRefreshImpl::DoControlCheck(RefreshData &data)
+{
     FormDataMgr::GetInstance().UpdateFormWant(data.formId, data.want, data.record);
     FormDataMgr::GetInstance().UpdateFormRecord(data.formId, data.record);
-    if (RefreshControlMgr::GetInstance().IsHealthyControl(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(data.formId, true);
-        return ERR_OK;
-    }
-
-    if (data.record.isSystemApp) {
-        reqWant.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_HOST);
-    }
-
-    if (RefreshControlMgr::GetInstance().IsScreenOff(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByScreenOff(data.formId, data.want, data.record);
-        return ERR_OK;
-    }
-
-    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
-        FormDataMgr::GetInstance().SetNeedRefresh(data.formId, true);
-        return ERR_OK;
-    }
-
-    FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
-    ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, reqWant);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("ask for provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
+    FormDataMgr::GetInstance().SetHostRefresh(data.formId, true);
+    // Execute base class control checks first
+    int ret = BaseFormRefresh::DoControlCheck(data);
+    if (ret != ERR_CONTINUE_REFRESH) {
         return ret;
     }
 
-    return ERR_OK;
+    // System app special handling
+    if (data.record.isSystemApp) {
+        data.want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_HOST);
+    }
+
+    return ERR_CONTINUE_REFRESH;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

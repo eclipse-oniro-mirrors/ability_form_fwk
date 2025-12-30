@@ -33,6 +33,9 @@ constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_CON_NETWORK_DELAY_TIME = 500; // ms
 constexpr int32_t PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME = 500; // ms
 constexpr int32_t IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME = 2000; // ms
+constexpr int32_t WAIT_ON_ADD_FORM_DELAY_TIME = 50; // ms
+constexpr int32_t RECONNECT_RETRY_DELAY_TIME = 500; // ms
+constexpr int32_t LAST_RECONNECT_RETRY_DELAY_TIME = 1000 * 60 * 30; // ms
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

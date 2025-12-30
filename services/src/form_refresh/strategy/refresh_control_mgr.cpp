@@ -109,5 +109,11 @@ bool RefreshControlMgr::IsNeedToFresh(FormRecord &record, bool isVisibleToFresh)
     return isEnableUpdate;
 }
 
+bool RefreshControlMgr::IsAddFormFinish(const int64_t formId)
+{
+    bool ret = FormDataMgr::GetInstance().GetAddfinishAndSetUpdateFlag(formId);
+    HILOG_INFO("luyangyi check formId:%{public}" PRId64 " IsAddFormFinish result:%{public}d", formId, ret);
+    return ret;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

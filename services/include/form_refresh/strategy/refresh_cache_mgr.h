@@ -109,6 +109,14 @@ public:
      * @param disableFormRecords The due disable form list.
      */
     void CosumeRefreshByDueControl(const std::vector<FormRecord> &disableFormRecords);
+
+    /**
+     * @brief The form add finish, consume cache flag.
+     * @param formId The formId.
+     * @param userId Current active userId.
+     */
+    void ConsumeAddUnfinishFlag(const int64_t formId);
+
 private:
     std::mutex overloadTaskMutex_;
     std::vector<FormTimer> overloadTask_;

@@ -216,6 +216,10 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormHostRefreshImpl_009, TestS
     EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     data.record.enableForm = true;
+    MockIsAddFormFinish(false);
+    EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
+
+    MockIsNeedToFresh(true);
     MockIsScreenOff(true);
     EXPECT_EQ(ERR_OK, FormHostRefreshImpl::GetInstance().RefreshFormRequest(data));
 
@@ -449,5 +453,21 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormProviderRefreshImpl_016, T
     MockAskForProviderData(ERR_OK);
     EXPECT_EQ(ERR_OK, FormProviderRefreshImpl::GetInstance().RefreshFormRequest(data));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormProviderRefreshImpl_016 end";
+}
+
+HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_MultiActiveUsersChecker_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_MultiActiveUsersChecker_001 start";
+
+    int callingUid = 1;
+    FormRecord formRecord;
+    formRecord.providerUserId = callingUid;
+    Want reqWant;
+    CheckValidFactor reqFactor;
+    reqFactor.record = formRecord;
+    reqFactor.want = reqWant;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, MultiActiveUsersChecker::GetInstance().CheckValid(reqFactor));
+
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_MultiActiveUsersChecker_001 end";
 }
 }
