@@ -29,6 +29,7 @@
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
+#include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_info/form_info_mgr.h"
@@ -56,10 +57,12 @@ extern void MockGetFormRecord(bool mockRet);
 extern void MockGetFormRecordParams(bool mockRet);
 extern void MockGetFormRecordParamsUid(bool mockRet);
 extern void MockSceneAnimationCheck(OHOS::ErrCode mockRet);
+extern void MockGetCallerBundleName(bool mockRet);
 
 namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr int32_t DEFAULT_CALLING_UID = 20000001;
+const std::string PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 
 class FmsFormMgrAdapterTest3 : public testing::Test {
 public:
@@ -1431,6 +1434,203 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0307, TestSize.Level0)
     formMajorInfo.bundleName = "test";
     EXPECT_FALSE(formMgrAdapter.CheckFormDueControl(formMajorInfo, true));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0307 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_SetFreeInstallFlag_0001
+ * @tc.desc: test SetFreeInstallFlag function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SetFreeInstallFlag_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SetFreeInstallFlag_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord record;
+    Want want;
+    want.AddFlags(Want::FLAG_INSTALL_ON_DEMAND);
+    record.isSystemApp = true;
+    record.uid = 1;
+    formMgrAdapter.SetFreeInstallFlag(record, want);
+    EXPECT_EQ(1,
+        want.GetIntParam(PARAM_FREE_INSTALL_CALLING_UID, 0));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SetFreeInstallFlag_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_SetFreeInstallFlag_0002
+ * @tc.desc: test SetFreeInstallFlag function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SetFreeInstallFlag_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SetFreeInstallFlag_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord record;
+    Want want;
+    want.AddFlags(Want::FLAG_INSTALL_ON_DEMAND);
+    record.isSystemApp = false;
+    record.uid = 1;
+    formMgrAdapter.SetFreeInstallFlag(record, want);
+    
+    EXPECT_EQ(0,
+        want.GetIntParam(PARAM_FREE_INSTALL_CALLING_UID, 0));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SetFreeInstallFlag_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_SetFreeInstallFlag_0003
+ * @tc.desc: test SetFreeInstallFlag function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_SetFreeInstallFlag_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SetFreeInstallFlag_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord record;
+    Want want;
+    formMgrAdapter.SetFreeInstallFlag(record, want);
+    
+    EXPECT_EQ(0,
+        want.GetIntParam(PARAM_FREE_INSTALL_CALLING_UID, 0));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_SetFreeInstallFlag_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_OpenByOpenType_0001
+ * @tc.desc: test OpenByOpenType function invalid type.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_OpenByOpenType_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0001 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->startAbilityOnlyUIAbility_ = ERR_INVALID_VALUE;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int32_t openType = 99;
+    int32_t openResult = ERR_OK;
+    FormRecord record;
+    record.isSystemApp = true;
+    EXPECT_EQ(false, formMgrAdapter.OpenByOpenType(openType, record, callerToken, want, openResult));
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_OpenByOpenType_0002
+ * @tc.desc: test OpenByOpenType function type open applinking.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_OpenByOpenType_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0002 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->openLink_ = ERR_INVALID_VALUE;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    int32_t openType = static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_APP_LINKING);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int32_t openResult = ERR_OK;
+    FormRecord record;
+    record.isSystemApp = true;
+    MockGetCallerBundleName(false);
+    EXPECT_EQ(true, formMgrAdapter.OpenByOpenType(openType, record, callerToken, want, openResult));
+    EXPECT_EQ(ERR_INVALID_VALUE, openResult);
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_OpenByOpenType_0003
+ * @tc.desc: test OpenByOpenType function type openAtomicService.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_OpenByOpenType_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0003 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->openAtomicService_ = ERR_INVALID_VALUE;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    int32_t openType = static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_ATOMIC_SERVICE);
+    want.SetUri("123456");
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int32_t openResult = ERR_OK;
+    FormRecord record;
+    record.isSystemApp = true;
+    EXPECT_EQ(true, formMgrAdapter.OpenByOpenType(openType, record, callerToken, want, openResult));
+    EXPECT_EQ(ERR_INVALID_VALUE, openResult);
+    EXPECT_EQ(0, want.GetUriString().length());
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_OpenByOpenType_0004
+ * @tc.desc: test OpenByOpenType function not sysApp.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_OpenByOpenType_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0004 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->openAtomicService_ = ERR_INVALID_VALUE;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    int32_t openType = static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_ATOMIC_SERVICE);
+    want.SetUri("123456");
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int32_t openResult = ERR_OK;
+    FormRecord record;
+    record.isSystemApp = false;
+    EXPECT_EQ(true, formMgrAdapter.OpenByOpenType(openType, record, callerToken, want, openResult));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, openResult);
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0004 end";
+}
+
+
+/**
+ * @tc.name: FormMgrAdapter_OpenByOpenType_0005
+ * @tc.desc: test OpenByOpenType function type open applinking but invalid bundleName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_OpenByOpenType_0005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0005 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->openLink_ = ERR_INVALID_VALUE;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    int32_t openType = static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_APP_LINKING);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int32_t openResult = ERR_OK;
+    FormRecord record;
+    record.isSystemApp = true;
+    MockGetCallerBundleName(true);
+    EXPECT_EQ(true, formMgrAdapter.OpenByOpenType(openType, record, callerToken, want, openResult));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, openResult);
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_OpenByOpenType_0005 end";
 }
 
 /**

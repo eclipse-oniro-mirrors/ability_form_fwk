@@ -92,6 +92,7 @@
 #include "feature/param_update/param_control.h"
 #include "feature/theme_form/theme_form_client.h"
 #include "iform_provider_delegate.h"
+#include "start_options.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -2944,7 +2945,17 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    CheckAndSetFreeInstallFlag(record, want);
+    SetFreeInstallFlag(record, want);
+ 
+    if (want.HasParameter(Constants::PARAM_OPEN_TYPE)) {
+        int32_t openType = want.GetIntParam(Constants::PARAM_OPEN_TYPE, -1);
+        HILOG_INFO("Router by OpenType:%{public}d", openType);
+        int32_t openResult = ERR_OK;
+        bool isOpened = OpenByOpenType(openType, record, callerToken, want, openResult);
+        if (isOpened) {
+            return openResult;
+        }
+    }
 
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
@@ -2978,7 +2989,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     return ERR_OK;
 }
 
-void FormMgrAdapter::CheckAndSetFreeInstallFlag(const FormRecord &record, Want &want)
+void FormMgrAdapter::SetFreeInstallFlag(const FormRecord &record, Want &want)
 {
     unsigned int flag = want.GetFlags() & Want::FLAG_INSTALL_ON_DEMAND;
     if (!flag) {
@@ -2991,6 +3002,57 @@ void FormMgrAdapter::CheckAndSetFreeInstallFlag(const FormRecord &record, Want &
         HILOG_WARN("Only system app can set FLAG_INSTALL_ON_DEMAND");
         want.RemoveFlags(Want::FLAG_INSTALL_ON_DEMAND);
     }
+}
+
+bool FormMgrAdapter::OpenByOpenType(const int32_t openType, const FormRecord &record,
+    const sptr<IRemoteObject> &callerToken, Want &want, int32_t &openResult)
+{
+    if (!record.isSystemApp) {
+        HILOG_ERROR("Only system app can use openType");
+        openResult = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+        return true;
+    }
+ 
+    if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_APP_LINKING)) {
+        std::string bundleName;
+        auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("OpenByOpenType get caller bundleName failed");
+            openResult = ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+            return true;
+        }
+        want.SetParam(Want::PARAM_RESV_CALLER_BUNDLE_NAME, bundleName);
+        int32_t result = IN_PROCESS_CALL(
+            FormAmsHelper::GetInstance().GetAbilityManager()->OpenLink(want, callerToken));
+        if (result != ERR_OK && result != START_ABILITY_WAITING) {
+            HILOG_ERROR("failed OpenLink, result:%{public}d", result);
+            openResult = result;
+            return true;
+        }
+        openResult = ERR_OK;
+        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER);
+        return true;
+    }
+    if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_ATOMIC_SERVICE)) {
+        want.SetUri("");
+        StartOptions startOptions;
+        int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->OpenAtomicService(
+            want, startOptions, callerToken));
+        if (result != ERR_OK && result != START_ABILITY_WAITING) {
+            HILOG_ERROR("failed OpenAtomicService, result:%{public}d", result);
+            openResult = result;
+            return true;
+        }
+        openResult = ERR_OK;
+        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER);
+        return true;
+    }
+    if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::START_ABILITY)) {
+        HILOG_INFO("Router by startAbility or uri");
+        return false;
+    }
+    HILOG_ERROR("invalid OpenType:%{public}d", openType);
+    return false;
 }
 
 int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
