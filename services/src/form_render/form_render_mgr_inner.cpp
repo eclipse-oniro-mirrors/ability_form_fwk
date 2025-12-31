@@ -532,10 +532,10 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
                 std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
                 renderMgrInner->renderRemoteObj_ = nullptr;
             }
-            std::lock_guard<std::mutex> lock(formResSchedMutex_);
-            if (formResSched_) {
-                formResSched_->ReportFormLayoutEnd();
-                formResSched_ = nullptr;
+            std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
+            if (renderMgrInner->formResSched_) {
+                renderMgrInner->formResSched_->ReportFormLayoutEnd();
+                renderMgrInner->formResSched_ = nullptr;
             }
         });
     }
