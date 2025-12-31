@@ -61,7 +61,7 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
         return false;
     }
     
-    HILOG_WARN("foreground ui abilities size:%{public}lu", list.size());
+    HILOG_WARN("foreground ui abilities size:%{public}" PRIu64, list.size());
     for (const auto &stateData : list) {
         HILOG_WARN("stateData bundle:%{public}s extensionType:%{public}d",
             stateData.bundleName.c_str(), stateData.extensionType);
