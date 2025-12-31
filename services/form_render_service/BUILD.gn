@@ -74,6 +74,7 @@ ohos_shared_library("formrender") {
     "src/js_form_runtime.cpp",
     "src/form_render_serial_queue.cpp",
     "src/form_render_service_mgr.cpp",
+    "src/form_scoped_qos_promotion.cpp",
     "src/status_mgr_center/form_render_status.cpp",
     "src/status_mgr_center/form_render_status_mgr.cpp",
     "src/status_mgr_center/form_render_status_table.cpp",

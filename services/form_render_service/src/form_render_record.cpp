@@ -31,7 +31,6 @@
 #include "extractor.h"
 #include "dfx_dump_catcher.h"
 #include "nlohmann/json.hpp"
-#include "qos.h"
 #include "resource_manager.h"
 #include "xcollie/watchdog.h"
 
@@ -41,6 +40,7 @@
 #include "form_module_checker.h"
 #include "form_render_event_report.h"
 #include "form_render_service_mgr.h"
+#include "form_scoped_qos_promotion.h"
 #include "status_mgr_center/form_render_status_task_mgr.h"
 
 namespace OHOS {
@@ -489,12 +489,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
 void FormRenderRecord::HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IFormSupply> &formSupplyClient, int32_t renderType)
 {
-    int32_t formLocation = want.GetIntParam(Constants::FORM_LOCATION_KEY, -1);
-    bool promotePriority = formLocation == static_cast<int32_t>(Constants::FormLocation::FORM_CENTER) ||
-                           formLocation == static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER);
-    if (promotePriority) {
-        OHOS::QOS::SetThreadQos(QOS::QosLevel::QOS_USER_INTERACTIVE);
-    }
+    FormScopedQosPromotion scopedPromotion(want.GetIntParam(Constants::FORM_LOCATION_KEY, -1));
     HandleUpdateInJsThread(formJsInfo, want);
     MarkRenderFormTaskDone(renderType);
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
@@ -504,9 +499,6 @@ void FormRenderRecord::HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, co
     if (renderType == Constants::RENDER_FORM && !isVisible) {
         // after FRS restart, if form invisible, need to reset form invisible status.
         HandleSetVisibleChange(formJsInfo.formId, isVisible);
-    }
-    if (promotePriority) {
-        OHOS::QOS::SetThreadQos(QOS::QosLevel::QOS_DEADLINE_REQUEST);
     }
     HILOG_INFO("HandleUpdateRenderRecord end");
 }

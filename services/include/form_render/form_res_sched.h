@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_RES_SCHED_H
 
 #include <stdint.h>
+#include <unistd.h>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,11 +46,11 @@ private:
      * @param pid The connection's key of form ability connection.
      * @param isStart True for form layout start, false for form layout end.
      */
-    void ReportToRss(int32_t pid, int32_t uid, bool isStart);
+    void ReportToRss(pid_t pid, int32_t uid, bool isStart);
 
 private:
     int32_t userId_;
-    int32_t pid_ = 0;
+    pid_t pid_ = 0;
     int32_t uid_ = 0;
 };
 }  // namespace AppExecFwk
