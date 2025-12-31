@@ -60,15 +60,15 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
         HILOG_ERROR("get foreground app failed");
         return false;
     }
-    
-    HILOG_WARN("foreground ui abilities size:%{public}" PRIu64, list.size());
+
     for (const auto &stateData : list) {
-        HILOG_WARN("stateData bundle:%{public}s extensionType:%{public}d",
+        HILOG_DEBUG("stateData bundle:%{public}s extensionType:%{public}d",
             stateData.bundleName.c_str(), stateData.extensionType);
         if (stateData.bundleName == bundleName && stateData.extensionType == extensionAbilityType) {
             return true;
         }
     }
+    HILOG_WARN("foreground applications size:%{public}" PRIu64, list.size());
     return false;
 }
 
