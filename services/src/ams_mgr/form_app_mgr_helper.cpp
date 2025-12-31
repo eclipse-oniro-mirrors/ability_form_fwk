@@ -57,7 +57,7 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
     }
     std::vector<AppExecFwk::AppStateData> list;
     if (IN_PROCESS_CALL(appMgrProxy->GetForegroundApplications(list)) != ERR_OK) {
-        HILOG_ERROR("get foreground app failed");
+        HILOG_ERROR("get foreground app list failed");
         return false;
     }
 
@@ -68,7 +68,7 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
             return true;
         }
     }
-    HILOG_WARN("foreground applications size:%{public}" PRIu64, list.size());
+    HILOG_WARN("ability not foreground, foreground apps size:%{public}u", list.size());
     return false;
 }
 
@@ -88,7 +88,7 @@ bool FormAppMgrHelper::GetRunningProcessInfo(
     std::vector<AppExecFwk::RunningProcessInfo> infos;
     int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
     if (ret != ERR_OK) {
-        HILOG_ERROR("Get running process info failed");
+        HILOG_ERROR("Get running process info list failed");
         return false;
     }
     std::string targetProcessName = bundleName + processNameSuffix;
