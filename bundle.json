@@ -75,7 +75,8 @@
               "selinux_adapter",
               "openssl",
               "window_manager",
-              "graphic_2d"
+              "graphic_2d",
+              "qos_manager"
 
           ],
           "third_party": [

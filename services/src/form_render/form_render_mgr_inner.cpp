@@ -532,6 +532,11 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
                 std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
                 renderMgrInner->renderRemoteObj_ = nullptr;
             }
+            std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
+            if (renderMgrInner->formResSched_) {
+                renderMgrInner->formResSched_->ReportFormLayoutEnd();
+                renderMgrInner->formResSched_ = nullptr;
+            }
         });
     }
     if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
@@ -539,6 +544,9 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
         return;
     }
     SetRenderRemoteObj(renderRemoteObj);
+    std::lock_guard<std::mutex> lock(formResSchedMutex_);
+    formResSched_ = std::make_unique<FormResSched>(GetUserId());
+    formResSched_->ReportFormLayoutStart();
 }
 
 inline ErrCode FormRenderMgrInner::ConnectRenderService(
