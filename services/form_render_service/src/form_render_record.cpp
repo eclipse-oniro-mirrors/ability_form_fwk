@@ -2389,7 +2389,7 @@ int32_t FormRenderRecord::HandleSetRenderGroupParams(const int64_t formId, const
         if (iter == formRequests_.end()) {
             return ERR_APPEXECFWK_FORM_NOT_EXIST_FORM_REQUEST;
         }
-        for (auto& formRequestElement : iter.second) {
+        for (auto& formRequestElement : iter->second) {
             if (hasTransparencyKey) {
                 formRequestElement.second.want.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY,
                     want.GetStringParam(Constants::PARAM_FORM_TRANSPARENCY_KEY));
