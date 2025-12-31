@@ -30,15 +30,16 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 /**
- * @brief form create state
+ * @brief form render state
  */
 enum FormRenderStatus : int64_t {
-    FormRenderStart = 0,
-    FormRenderEnd = 1,
+    FORM_RENDER_START = 0,
+    FORM_RENDER_END = 1,
 };
 }  // namespace
 
-FormResSched::FormResSched(int32_t userId) : userId_(userId) {
+FormResSched::FormResSched(int32_t userId) : userId_(userId)
+{
     HILOG_INFO("Call userId:%{public}d", userId);
     RunningProcessInfo info;
     bool success = FormAppMgrHelper::GetInstance().GetRunningProcessInfo(Constants::FRS_BUNDLE_NAME, userId, info);
@@ -78,7 +79,7 @@ void FormResSched::ReportToRss(pid_t pid, int32_t uid, bool isStart)
 {
 #ifdef RES_SCHEDULE_ENABLE
     HILOG_INFO("pid:%{public}d uid:%{public}d isStart:%{public}d", pid, uid, isStart);
-    auto status = isStart ? FormRenderStatus::FormRenderStart : FormRenderStatus::FormRenderEnd;
+    auto status = isStart ? FormRenderStatus::FORM_RENDER_START : FormRenderStatus::FORM_RENDER_END;
     std::unordered_map<std::string, std::string> payload = {
         {"saId", std::to_string(FORM_MGR_SERVICE_ID)},
         {"pid", std::to_string(pid)},
