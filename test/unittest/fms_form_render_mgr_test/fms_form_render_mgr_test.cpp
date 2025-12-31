@@ -1495,23 +1495,6 @@ HWTEST_F(FormRenderMgrTest, SetRenderGroupParams_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderMgrTest_067
- * @tc.desc: test RenderForm function and return ERR_OK.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_067, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderMgrTest_067 start";
-    FormRenderMgr formRenderMgr;
-    FormRecord formRecord;
-    formRecord.uiSyntax = FormType::JS;
-    WantParams wantParams;
-    sptr<IRemoteObject> hostToken = nullptr;
-    EXPECT_EQ(ERR_OK, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
-    GTEST_LOG_(INFO) << "FormRenderMgrTest_067 end";
-}
-
-/**
  * @tc.name: FormRenderMgrTest_068
  * @tc.desc: test RenderForm function and return ERR_APPEXECFWK_FORM_INVALID_PARAM.
  * @tc.type: FUNC
@@ -2913,7 +2896,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_141, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderMgrTest_0142
+ * @tc.name: FormRenderMgrTest_142
  * @tc.desc: test UpdateRenderingForm function and isGetFormRecord is false.
  * @tc.type: FUNC
  */
@@ -2929,5 +2912,22 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_142, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
         formRenderMgr.UpdateRenderingForm(formId, formProviderData, wantParams, mergeData));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_142 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_143
+ * @tc.desc: test RenderForm function and return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_143, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_143 start";
+    FormRenderMgr formRenderMgr;
+    FormRecord formRecord;
+    formRecord.uiSyntax = FormType::JS;
+    WantParams wantParams;
+    sptr<IRemoteObject> hostToken = nullptr;
+    EXPECT_EQ(ERR_OK, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_143 end";
 }
 }
