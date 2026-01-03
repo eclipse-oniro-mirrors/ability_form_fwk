@@ -75,15 +75,7 @@ void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterato
         record->isRefreshDuringDisableForm, record->isUpdateDuringDisableForm);
     if (record->isRefreshDuringDisableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(record->formId, false);
-        Want want;
-        want.SetElementName(record->bundleName, record->abilityName);
-        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-        want.SetParam(Constants::PARAM_MODULE_NAME_KEY, record->moduleName);
-        want.SetParam(Constants::PARAM_FORM_NAME_KEY, record->formName);
-        want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, record->specification);
-        want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(record->renderingMode));
-        want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, record->isDynamic);
-        want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, record->formTempFlag);
+        Want want = CreateWant(record, userId);
         RefreshData data;
         data.formId = record->formId;
         data.record = *record;
@@ -216,6 +208,33 @@ void RefreshCacheMgr::CosumeRefreshByDueControl(const std::vector<FormRecord> &d
         data.want = reqWant;
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
     }
+}
+
+Want RefreshCacheMgr::CreateWant(const std::vector<FormRecord>::iterator &record, const int32_t userId)
+{
+    Want want;
+    want.SetElementName(record->bundleName, record->abilityName);
+    want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, record->moduleName);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, record->formName);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, record->specification);
+    want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(record->renderingMode));
+    want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, record->isDynamic);
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, record->formTempFlag);
+    auto it = record->wantCacheMap.find(record->formId);
+    if (it == record->wantCacheMap.end()) {
+        return want;
+    }
+    WantParams cacheWantParams = it->second.GetParams();
+    WantParams wantParams = want.GetParams();
+    if (cacheWantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
+        auto paramValue = cacheWantParams.GetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY);
+        if (paramValue != nullptr) {
+            wantParams.SetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY, paramValue);
+        }
+    }
+    want.SetParams(wantParams);
+    return want;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
