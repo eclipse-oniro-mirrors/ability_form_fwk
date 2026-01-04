@@ -233,6 +233,12 @@ Want RefreshCacheMgr::CreateWant(const std::vector<FormRecord>::iterator &record
             wantParams.SetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY, paramValue);
         }
     }
+    if (cacheWantParams.HasParam(Constants::PARAM_VISUAL_EFFECT_TYPE_KEY)) {
+        auto paramValue = cacheWantParams.GetParam(Constants::PARAM_VISUAL_EFFECT_TYPE_KEY);
+        if (paramValue != nullptr) {
+            wantParams.SetParam(Constants::PARAM_VISUAL_EFFECT_TYPE_KEY, paramValue);
+        }
+    }
     want.SetParams(wantParams);
     return want;
 }
