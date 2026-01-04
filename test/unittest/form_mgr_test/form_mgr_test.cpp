@@ -5173,4 +5173,36 @@ HWTEST_F(FormMgrTest, FormMgrTest_SendNonTransparencyRatio_001, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_SendNonTransparencyRatio_001 end";
 }
+
+/**
+ * @tc.name: FormMgrTest_StartUIAbilityByFms_001
+ * @tc.desc: Verify StartUIAbilityByFms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_StartUIAbilityByFms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_StartUIAbilityByFms_001 begin";
+    EXPECT_CALL(*mockProxy, StartUIAbilityByFms(_))
+        .WillOnce(Return(ERR_OK));
+    Want want;
+    auto result = FormMgr::GetInstance().StartUIAbilityByFms(want);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_StartUIAbilityByFms_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_CloseFormEditAbility_001
+ * @tc.desc: Verify CloseFormEditAbility
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_CloseFormEditAbility_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_CloseFormEditAbility_001 begin";
+    EXPECT_CALL(*mockProxy, CloseFormEditAbility(_))
+        .WillOnce(Return(ERR_OK));
+    bool isMainPage = false;
+    auto result = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_CloseFormEditAbility_001 end";
+}
 } // namespace
