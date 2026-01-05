@@ -38,6 +38,7 @@
 #include "common/event/form_event_handler.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr/form_ams_adapter.h"
+#include "form_mgr/form_edit_service.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_instance.h"
 #include "common/util/form_serial_queue.h"
@@ -2225,30 +2226,7 @@ ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     int uid = IPCSkeleton::GetCallingUid();
-    std::string callerName;
-    ErrCode ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, callerName);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("Get bundleName by uid failed");
-        return ret;
-    }
-    if (callerName.empty()) {
-        HILOG_ERROR("bundleName empty");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-
-    auto requestMethod = String::Box(
-        isMainPage ? Constants::PARAM_CLOSE_FORM_EDIT_VIEW : Constants::PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW);
-    WantParams wantarams;
-    wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
-    wantarams.SetParam(
-        Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
-    wantarams.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, String::Box(callerName));
-
-    Want want;
-    want.SetAction(Constants::FORM_PAGE_ACTION);
-    want.SetBundle(callerName);
-    want.SetParams(wantarams);
-    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+    return FormEditService::GetInstance().CloseFormEditAbility(uid, isMainPage);
 }
 
 void FormMgrService::PostConnectNetWork()
@@ -2485,7 +2463,7 @@ ErrCode FormMgrService::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteO
     }
     return FormMgrAdapter::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
 }
- 
+
 ErrCode FormMgrService::UnregisterTemplateFormDetailInfoChange()
 {
     HILOG_INFO("call");
