@@ -5205,4 +5205,36 @@ HWTEST_F(FormMgrTest, FormMgrTest_CloseFormEditAbility_001, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_CloseFormEditAbility_001 end";
 }
+
+/**
+ * @tc.name: FormMgrTest_RegisterPublishFormCrossBundleControl_001
+ * @tc.desc: Verify RegisterPublishFormCrossBundleControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterPublishFormCrossBundleControl_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 start";
+    EXPECT_CALL(*mockProxy, RegisterPublishFormCrossBundleControl(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    bool result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 test end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterPublishFormCrossBundleControl_001
+ * @tc.desc: Verify UnregisterPublishFormCrossBundleControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterPublishFormCrossBundleControl_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 start";
+    EXPECT_CALL(*mockProxy, UnregisterPublishFormCrossBundleControl())
+        .Times(1)
+        .WillOnce(Return(true));
+    bool result = FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 test end";
+}
 } // namespace
