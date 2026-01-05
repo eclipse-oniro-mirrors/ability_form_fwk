@@ -128,6 +128,8 @@ public:
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
     MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
     MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
+    MOCK_METHOD1(RegisterPublishFormCrossBundleControl, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterPublishFormCrossBundleControl, ErrCode());
 
     sptr<IRemoteObject> AsObject()
     {
