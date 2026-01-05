@@ -39,6 +39,7 @@ constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 3000;
 constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
 constexpr int64_t RELEASE_RENDER_DELAY_TIME = 40;
 constexpr int64_t RELEASE_RENDER_DELAY_MSG = 2;
+constexpr uint64_t RESTORE_ECYCLED_DELAY_MS = 20;
 const std::string EMPTY_STATUS_DATA = "empty_status_data";
 }
 FormStatusTaskMgr::FormStatusTaskMgr()
@@ -502,7 +503,8 @@ void FormStatusTaskMgr::RestoreFormRecycledStatus(const FormRecord &formRecord, 
             }
         }
     };
-    FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RECYCLE_DATA, recycleForm);
+    FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RECYCLE_DATA, recycleForm,
+        RESTORE_ECYCLED_DELAY_MS);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

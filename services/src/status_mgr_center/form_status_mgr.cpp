@@ -36,13 +36,14 @@ FormStatusMgr::~FormStatusMgr()
     HILOG_DEBUG("destroy FormStatusMgr");
 }
 
-void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
+void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func,
+    uint64_t delayMs)
 {
     auto task = [formId, event, func]() {
         FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, event, func);
     };
 
-    FormStatusQueue::GetInstance().ScheduleTask(0, task);
+    FormStatusQueue::GetInstance().ScheduleTask(delayMs, task);
 }
 
 void FormStatusMgr::CancelFormEventTimeout(const int64_t formId, std::string eventId)

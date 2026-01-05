@@ -3219,14 +3219,8 @@ bool FormDataMgr::GetFormVisible(int64_t formId)
 
 void FormDataMgr::SetExpectRecycledStatus(const std::vector<int64_t> &formIds, bool isExpectRecycled)
 {
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto formId : formIds) {
-        auto info = formRecords_.find(formId);
-        if (info == formRecords_.end()) {
-            continue;
-        }
-        HILOG_INFO("formId:%{public}" PRId64 " isExpectRecycled:%{public}d", formId, isExpectRecycled);
-        info->second.expectRecycled = isExpectRecycled;
+        SetExpectRecycledStatus(formId, isExpectRecycled);
     }
 }
 
