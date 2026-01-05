@@ -294,6 +294,19 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
  */
 void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo)
 {
+    CreateFormJsInfo(formId, record, record.formProviderInfo.GetFormData(), formInfo);
+}
+
+/**
+ * @brief Create form js info by form record.
+ * @param formId The Id of the form.
+ * @param record Form record.
+ * @param formProviderData The form data.
+ * @param formInfo Js info.
+ */
+void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record,
+    const FormProviderData &formProviderData, FormJsInfo &formInfo)
+{
     formInfo.formId = formId;
     formInfo.bundleName = record.bundleName;
     formInfo.abilityName = record.abilityName;
@@ -311,8 +324,8 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.isDynamic = record.isDynamic;
     formInfo.transparencyEnabled = record.transparencyEnabled;
     formInfo.modulePkgNameMap = record.modulePkgNameMap;
-    formInfo.formData = record.formProviderInfo.GetFormDataString();
-    formInfo.formProviderData = record.formProviderInfo.GetFormData();
+    formInfo.formData = formProviderData.GetDataString();
+    formInfo.formProviderData = formProviderData;
     formInfo.templateFormImperativeFwk = record.templateFormImperativeFwk;
 }
 
@@ -3374,6 +3387,28 @@ void FormDataMgr::DelHostTransparentFormColor(const int64_t formId)
     for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         itHostRecord->DeleteTransparentFormColor(formId);
     }
+}
+
+/**
+* @brief Merges form data into the provider data.
+* @param formId The Id of the form.
+* @param formProviderData The target FormProviderData to receive the merged data.
+* @return Returns true if this function is successfully called; returns false otherwise.
+*/
+bool FormDataMgr::MergeFormData(const int64_t formId, FormProviderData &formProviderData)
+{
+    std::string stringData;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    if (!FormCacheMgr::GetInstance().GetData(formId, stringData, imageDataMap)) {
+        HILOG_INFO("No cache data found for formId: %{public}" PRId64, formId);
+        return false;
+    }
+    FormProviderData formCacheData;
+    formCacheData.SetDataString(stringData);
+    formCacheData.SetImageDataMap(imageDataMap);
+    formCacheData.MergeData(formProviderData.GetData());
+    formProviderData = formCacheData;
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

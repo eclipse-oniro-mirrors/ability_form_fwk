@@ -861,7 +861,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
         return iter->second;
     }
 
-    auto formRendererGroup = CreateFormRendererGroupLock(formJsInfo, context, runtime);
+    auto formRendererGroup = CreateFormRendererGroupLock(context, runtime);
     if (formRendererGroup != nullptr) {
         HILOG_INFO("formRendererGroupMap emplace formId:%{public}s", std::to_string(key).c_str());
         formRendererGroupMap_.emplace(key, formRendererGroup);
@@ -870,7 +870,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
     return formRendererGroup;
 }
 
-std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGroupLock(const FormJsInfo &formJsInfo,
+std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGroupLock(
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
@@ -894,15 +894,14 @@ void FormRenderRecord::UpdateFormRequest(const FormJsInfo &formJsInfo, const Wan
         return;
     }
 
-    std::unordered_map<std::string, Ace::FormRequest> formRequests;
-    if (!GetFormRequestByFormId(formJsInfo.formId, formRequests)) {
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    auto requestsIter = formRequests_.find(formJsInfo.formId);
+    if (requestsIter == formRequests_.end()) {
         return;
     }
 
-    for (const auto &iter : formRequests) {
-        auto formRequest = iter.second;
-        MergeFormData(formRequest, formJsInfo);
-        AddFormRequest(formJsInfo.formId, formRequest);
+    for (auto &iter : requestsIter->second) {
+        iter.second.formJsInfo = formJsInfo.CopyFormJsInfoWithoutFormData();
     }
 }
 
@@ -965,7 +964,7 @@ int32_t FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const W
             continue;
         }
         if (compMaxId == formRequest.compId) {
-            AddRenderer(formRequest.formJsInfo, formRequest.want);
+            AddRenderer(formJsInfo, formRequest.want);
             UpdateFormRequestReleaseState(formJsInfo.formId, formRequest.compId, false);
         }
     }
@@ -977,21 +976,6 @@ int32_t FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const W
     }
 
     return ERR_OK;
-}
-
-void FormRenderRecord::MergeFormData(Ace::FormRequest &formRequest, const FormJsInfo &formJsInfo)
-{
-    FormProviderData formProviderData = FormProviderData(formRequest.formJsInfo.formData, true);
-    nlohmann::json newFormData = formJsInfo.formProviderData.GetData();
-    formProviderData.MergeData(newFormData);
-
-    std::map<std::string, sptr<FormAshmem>> imageMap = formRequest.formJsInfo.imageDataMap;
-    formRequest.formJsInfo = formJsInfo;
-    // if imageDataMap of formJsInfo is empty, do not replace
-    if (formJsInfo.imageDataMap.size() == 0) {
-        formRequest.formJsInfo.imageDataMap = imageMap;
-    }
-    formRequest.formJsInfo.formData = formProviderData.GetDataString();
 }
 
 void FormRenderRecord::AddRenderer(const FormJsInfo &formJsInfo, const Want &want)
@@ -1076,7 +1060,7 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
     formRequest.want = want;
     formRequest.want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     formRequest.isDynamic = formJsInfo.isDynamic;
-    formRequest.formJsInfo = formJsInfo;
+    formRequest.formJsInfo = formJsInfo.CopyFormJsInfoWithoutFormData();
     auto iter = formRequests_.find(formJsInfo.formId);
     if (iter == formRequests_.end()) {
         std::unordered_map<std::string, Ace::FormRequest> formRequests;
@@ -1090,28 +1074,6 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
         iter->second.erase(innerIter);
     }
     iter->second.emplace(compId, formRequest);
-}
-
-void FormRenderRecord::AddFormRequest(int64_t formId, Ace::FormRequest &formRequest)
-{
-    HILOG_INFO("AddFormRequest by FormRequest formId: %{public}s, compId: %{public}s, formData.size: %{public}zu",
-        std::to_string(formId).c_str(),
-        formRequest.compId.c_str(),
-        formRequest.formJsInfo.formData.size());
-    std::lock_guard<std::mutex> lock(formRequestsMutex_);
-    auto iter = formRequests_.find(formId);
-    if (iter == formRequests_.end()) {
-        std::unordered_map<std::string, Ace::FormRequest> formRequests;
-        formRequests.emplace(formRequest.compId, formRequest);
-        formRequests_.emplace(formId, formRequests);
-        return;
-    }
-
-    auto innerIter = iter->second.find(formRequest.compId);
-    if (innerIter != iter->second.end()) {
-        iter->second.erase(innerIter);
-    }
-    iter->second.emplace(formRequest.compId, formRequest);
 }
 
 void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &compId)
@@ -1305,26 +1267,7 @@ void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupply
             if (!formRequest.second.hasRelease) {
                 continue;
             }
-
-            if (formRequest.second.isDynamic) {
-                formIds.push_back(formRequest.second.formJsInfo.formId);
-                continue;
-            }
-
-            std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr, formJsInfo = formRequest.second.formJsInfo, want = formRequest.second.want]() {
-                auto renderRecord = thisWeakPtr.lock();
-                if (!renderRecord) {
-                    HILOG_WARN("null renderRecord, formId:%{public}" PRId64, formJsInfo.formId);
-                    return;
-                }
-                int32_t ret = renderRecord->HandleUpdateInJsThread(formJsInfo, want);
-                if (ret == ERR_OK) {
-                    const auto compId = want.GetStringParam(Constants::FORM_COMP_ID);
-                    renderRecord->UpdateFormRequestReleaseState(formJsInfo.formId, compId, false);
-                }
-            };
-            eventHandler_->PostTask(task, "ReAddAllRecycledForms");
+            formIds.push_back(formRequest.second.formJsInfo.formId);
         }
     }
 
@@ -1353,10 +1296,6 @@ void FormRenderRecord::PostReAddRecycledForms(const FormJsInfo &formJsInfo, cons
             }
         }
     };
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("null eventHandler_");
-        return;
-    }
     auto eventHandler = GetEventHandler();
     if (eventHandler != nullptr)
         eventHandler->PostTask(task, "ReAddRecycledForms");
@@ -1506,7 +1445,7 @@ void FormRenderRecord::UpdateAllFormRequest(const std::vector<FormJsInfo> &formJ
         for (auto& formRequestIter : iter->second) {
             auto& formRequest = formRequestIter.second;
             formRequest.isDynamic = formJsInfo.isDynamic;
-            formRequest.formJsInfo = formJsInfo;
+            formRequest.formJsInfo = formJsInfo.CopyFormJsInfoWithoutFormData();
             formRequest.hasRelease = hasRelease;
         }
     }
@@ -1860,7 +1799,7 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
         return;
     }
 
-    if (!BeforeHandleUpdateForm(formRequests.begin()->second.formJsInfo)) {
+    if (!BeforeHandleUpdateForm(formJsInfo)) {
         HILOG_ERROR("recover form prepare failed");
         return;
     }
@@ -1886,7 +1825,7 @@ bool FormRenderRecord::GetAndDeleteRecycledCompIds(const int64_t &formId,
 }
 
 bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
-    const bool &isHandleClickEvent, std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
+    const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
 {
     auto formId = formJsInfo.formId;
     std::vector<std::string> orderedCompIds;
@@ -1900,10 +1839,6 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex = 0;
     bool currentRequestFound = false;
-    if (!GetFormRequestByFormId(formId, recordFormRequests)) {
-        HILOG_ERROR("find formRequest failed,formId:%{public}" PRId64, formId);
-        return false;
-    }
 
     UpdateGroupRequestsWhenRecover(formId, formJsInfo, orderedCompIds, currentCompId, statusData, isHandleClickEvent,
         currentRequestIndex, groupRequests, currentRequestFound, recordFormRequests);
@@ -1945,8 +1880,7 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
         Ace::FormRequest groupRequest;
         groupRequest.compId = compId;
         groupRequest.want = recordRequest.want;
-        groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
-        MergeMap(groupRequest.formJsInfo.imageDataMap, formJsInfo.imageDataMap);
+        groupRequest.formJsInfo = formJsInfo;
         if (compId == currentCompId) {
             groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
@@ -1956,19 +1890,6 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
                 currentRequestIndex, groupRequest.formJsInfo.formData.size());
         }
         groupRequests.emplace_back(groupRequest);
-    }
-}
-
-void FormRenderRecord::MergeMap(std::map<std::string, sptr<FormAshmem>> &dst,
-    const std::map<std::string, sptr<FormAshmem>> &src)
-{
-    for (auto iter = src.begin(); iter != src.end(); ++iter) {
-        auto search = dst.find(iter->first);
-        if (search == dst.end()) {
-            dst.emplace(*iter);
-        } else {
-            search->second = iter->second;
-        }
     }
 }
 
@@ -2005,7 +1926,8 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
     return true;
 }
 
-void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo)
+void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+    const FormJsInfo &formJsInfo)
 {
     float width = formSurfaceInfo.width;
     float height = formSurfaceInfo.height;
@@ -2041,11 +1963,11 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, const FormS
         group->UpdateFormSizeOfFormRequests(width, height, borderWidth, formViewScale);
     } else {
         HILOG_WARN("formRendererGroup not find, formId:%{public}" PRId64, formId);
-        ReAddStaticRecycledForms(formId);
+        ReAddStaticRecycledForms(formId, formJsInfo);
     }
 }
 
-void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId)
+void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId, const FormJsInfo &formJsInfo)
 {
     if (GetEventHandler(true, true) == nullptr) {
         HILOG_ERROR("null eventHandler");
@@ -2064,7 +1986,7 @@ void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId)
         }
 
         formRequest.second.want.SetParam(FORM_IS_STATIC_FORM_UPDATE_SIZE, true);
-        PostReAddRecycledForms(formRequest.second.formJsInfo, formRequest.second.want);
+        PostReAddRecycledForms(formJsInfo, formRequest.second.want);
     }
 }
 

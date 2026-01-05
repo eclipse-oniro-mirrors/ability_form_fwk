@@ -56,15 +56,9 @@ int FormAppUpgradeRefreshImpl::RefreshFormRequest(RefreshData &data)
 
     if (!FormMgrAdapter::GetInstance().IsDeleteCacheInUpgradeScene(data.record)) {
         FormProviderData formProviderData;
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        if (FormCacheMgr::GetInstance().GetData(data.formId, cacheData, imageDataMap)) {
-            formProviderData.SetDataString(cacheData);
-            formProviderData.SetImageDataMap(imageDataMap);
-            FormMgrAdapter::GetInstance().UpdateForm(data.formId, data.record.uid, formProviderData);
-        }
-        HILOG_INFO("Upgrade APP data agent card update, imageDataState: %{public}d, cacheData: %{public}zu, "
-            "formId: %{public}" PRId64, formProviderData.GetImageDataState(), cacheData.size(), data.formId);
+        formProviderData.EnableDbCache(true);
+        FormMgrAdapter::GetInstance().UpdateForm(data.formId, data.record.uid, formProviderData);
+        HILOG_INFO("Upgrade APP data agent card update, formId: %{public}" PRId64, data.formId);
     }
 
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);

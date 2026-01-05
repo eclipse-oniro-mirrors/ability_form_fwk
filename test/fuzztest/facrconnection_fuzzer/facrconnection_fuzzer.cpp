@@ -214,7 +214,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().SetVisibleChange(num2, isTrue, want);
     FormRenderServiceMgr::GetInstance().RecycleForm(num2, want);
     FormRenderServiceMgr::GetInstance().RecoverForm(formJsInfo, want);
-    FormRenderServiceMgr::GetInstance().UpdateFormSize(num2, formSurfaceInfo, str1);
+    FormRenderServiceMgr::GetInstance().UpdateFormSize(num2, formSurfaceInfo, str1, formJsInfo);
     sptr<IFormSupply> formSupplyClient;
     FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
     FormRenderServiceMgr::GetInstance().ConfirmUnlockState(want);

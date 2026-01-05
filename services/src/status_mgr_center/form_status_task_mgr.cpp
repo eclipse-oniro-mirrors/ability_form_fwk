@@ -31,6 +31,7 @@
 #include "status_mgr_center/form_status_queue.h"
 #include "status_mgr_center/form_status_mgr.h"
 #include "status_mgr_center/form_status.h"
+#include "form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -40,6 +41,32 @@ constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
 constexpr int64_t RELEASE_RENDER_DELAY_TIME = 40;
 constexpr int64_t RELEASE_RENDER_DELAY_MSG = 2;
 const std::string EMPTY_STATUS_DATA = "empty_status_data";
+
+void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, FormJsInfo &formJsInfo)
+{
+    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+    FormProviderData formProviderData;
+    if (renderType != Constants::RENDER_FORM) {
+        HILOG_INFO("renderType is not RENDER_FORM, formId: %{public}" PRId64, formRecord.formId);
+        formProviderData = formRecord.formProviderInfo.GetFormData();
+        // if the form status is not RENDERED or formProviderData is empty, fetch from DB to refresh
+        auto status = FormStatus::GetInstance().GetFormLastStatus(formRecord.formId);
+        if (status != FormFsmStatus::RENDERED || !formProviderData.HasData()) {
+            (void)FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData);
+            HILOG_INFO("update form lastStatus: %{public}s formId: %{public}" PRId64,
+                FormStatusPrint::FormStatusToString(status).c_str(), formRecord.formId);
+        }
+    }
+
+    if (formProviderData.HasData()) {
+        FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formJsInfo);
+        HILOG_INFO("RenderForm formId: %{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+            formRecord.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
+    } else {
+        FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formJsInfo);
+        HILOG_WARN("RenderForm formId: %{public}" PRId64 ", not cache", formRecord.formId);
+    }
+}
 }
 FormStatusTaskMgr::FormStatusTaskMgr()
 {}
@@ -340,8 +367,21 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
         return;
     }
 
+    FormProviderData formProviderData;
+    if (FormStatus::GetInstance().GetFormLastStatus(record.formId) != FormFsmStatus::RENDERED) {
+        formProviderData = record.formProviderInfo.GetFormData();
+        (void)FormDataMgr::GetInstance().MergeFormData(record.formId, formProviderData);
+    }
+
     FormJsInfo formJsInfo;
-    FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formJsInfo);
+    if (formProviderData.HasData()) {
+        FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formProviderData, formJsInfo);
+        HILOG_INFO("RecoverForm formId: %{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+            record.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
+    } else {
+        FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formJsInfo);
+        HILOG_WARN("RecoverForm formId: %{public}" PRId64 ", not cache", record.formId);
+    }
     Want newWant(want);
     std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(record.formId);
     newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
@@ -442,13 +482,14 @@ void FormStatusTaskMgr::RenderForm(
         return;
     }
 
-    FormJsInfo formInfo;
-    FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formInfo);
+    FormJsInfo formJsInfo;
+    CreateRenderFormJsInfo(formRecord, want, formJsInfo);
+
     Want newWant(want);
     std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formRecord.formId);
     newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
 
-    int32_t error = remoteFormRender->RenderForm(formInfo, newWant, FormSupplyCallback::GetInstance());
+    int32_t error = remoteFormRender->RenderForm(formJsInfo, newWant, FormSupplyCallback::GetInstance());
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId, HiSysEventPointType::TYPE_DAILY_REFRESH);
     if (!formRecord.isVisible) {
         FormRecordReport::GetInstance().IncreaseUpdateTimes(

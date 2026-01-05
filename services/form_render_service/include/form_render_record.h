@@ -163,7 +163,8 @@ public:
 
     size_t FormCount();
 
-    void UpdateFormSizeOfGroups(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo);
+    void UpdateFormSizeOfGroups(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+        const FormJsInfo &formJsInfo);
     bool IsFormVisible(int64_t formId);
     bool IsAllFormsInvisible();
 
@@ -196,8 +197,9 @@ private:
     std::shared_ptr<Ace::FormRendererGroup> GetFormRendererGroup(const FormJsInfo &formJsInfo,
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime);
 
-    std::shared_ptr<Ace::FormRendererGroup> CreateFormRendererGroupLock(const FormJsInfo &formJsInfo,
-    const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime);
+    std::shared_ptr<Ace::FormRendererGroup> CreateFormRendererGroupLock(
+        const std::shared_ptr<AbilityRuntime::Context> &context,
+        const std::shared_ptr<AbilityRuntime::Runtime> &runtime);
 
     void UpdateFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
@@ -233,8 +235,6 @@ private:
 
     int32_t HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want);
 
-    void MergeFormData(Ace::FormRequest &formRequest, const FormJsInfo &formJsInfo);
-
     void AddRenderer(const FormJsInfo &formJsInfo, const Want &want);
 
     void UpdateRenderer(const FormJsInfo &formJsInfo);
@@ -246,8 +246,6 @@ private:
     void HandleReleaseInJsThread();
 
     void AddFormRequest(const FormJsInfo &formJsInfo, const Want &want);
-
-    void AddFormRequest(int64_t formId, Ace::FormRequest &formRequest);
 
     void DeleteFormRequest(int64_t formId, const std::string &compId);
 
@@ -271,7 +269,7 @@ private:
         std::vector<std::string> &orderedCompIds, std::string &currentCompId);
 
     bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
-        const bool &isHandleClickEvent, std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
+        const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
     bool RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests, const size_t &currentRequestIndex);
 
     bool ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos);
@@ -285,9 +283,6 @@ private:
         const std::string &statusData, const bool &isHandleClickEvent, size_t &currentRequestIndex,
         std::vector<Ace::FormRequest> &groupRequests, bool &currentRequestFound,
         const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
-
-    void MergeMap(std::map<std::string, sptr<FormAshmem>> &dst,
-        const std::map<std::string, sptr<FormAshmem>> &src);
 
     void MarkRenderFormTaskDone(int32_t renderType);
 
@@ -333,7 +328,7 @@ private:
     void ParseFormLocationMap(std::vector<std::string> &formName, std::vector<uint32_t> &formLocation);
     void RuntimeMemoryMonitor();
     void PostReAddRecycledForms(const FormJsInfo &formJsInfo, const Want &want);
-    void ReAddStaticRecycledForms(const int64_t formId);
+    void ReAddStaticRecycledForms(const int64_t formId, const FormJsInfo &formJsInfo);
     void HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
         const sptr<IFormSupply> &formSupplyClient, int32_t renderType);
     void ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config, const Want &want);

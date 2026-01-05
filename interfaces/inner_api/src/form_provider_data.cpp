@@ -255,7 +255,7 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
  * @brief Merge new data to FormProviderData.
  * @param addJsonData data to merge to FormProviderData
  */
-void FormProviderData::MergeData(nlohmann::json &addJsonData)
+void FormProviderData::MergeData(const nlohmann::json &addJsonData)
 {
     HILOG_DEBUG("merge data");
     if (addJsonData.empty()) {
@@ -594,11 +594,6 @@ FormProviderData* FormProviderData::Unmarshalling(Parcel &parcel)
 void FormProviderData::ClearData()
 {
     jsonFormProviderData_.clear();
-}
-
-bool FormProviderData::NeedCache() const
-{
-    return !jsonFormProviderData_.empty() || !imageDataMap_.empty();
 }
 
 bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string &picName,
