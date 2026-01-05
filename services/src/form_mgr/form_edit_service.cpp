@@ -15,6 +15,9 @@
 
 #include "form_mgr/form_edit_service.h"
 
+#include "string_wrapper.h"
+#include "int_wrapper.h"
+
 #include "form_mgr_errors.h"
 #include "ams_mgr/form_app_mgr_helper.h"
 #include "bms_mgr/form_bms_helper.h"
