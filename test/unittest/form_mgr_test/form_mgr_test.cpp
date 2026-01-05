@@ -5215,10 +5215,10 @@ HWTEST_F(FormMgrTest, FormMgrTest_RegisterPublishFormCrossBundleControl_001, Tes
     GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 start";
     EXPECT_CALL(*mockProxy, RegisterPublishFormCrossBundleControl(_))
         .Times(1)
-        .WillOnce(Return(true));
+        .WillOnce(Return(ERR_OK));
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    bool result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
-    EXPECT_EQ(result, true);
+    auto result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 test end";
 }
 
@@ -5232,9 +5232,9 @@ HWTEST_F(FormMgrTest, FormMgrTest_UnregisterPublishFormCrossBundleControl_001, T
     GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 start";
     EXPECT_CALL(*mockProxy, UnregisterPublishFormCrossBundleControl())
         .Times(1)
-        .WillOnce(Return(true));
-    bool result = FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
-    EXPECT_EQ(result, true);
+        .WillOnce(Return(ERR_OK));
+    auto result = FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 test end";
 }
 } // namespace
