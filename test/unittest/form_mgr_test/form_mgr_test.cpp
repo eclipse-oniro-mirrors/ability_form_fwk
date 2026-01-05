@@ -5034,6 +5034,86 @@ HWTEST_F(FormMgrTest, FormMgrTest_0285, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FormMgrTest_GetAllTemplateFormsInfo_001
+ * @tc.desc: Verify  GetAllTemplateFormsInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetAllTemplateFormsInfo_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 begin";
+    std::vector<FormInfo> formInfos;
+    auto result = FormMgr::GetInstance().GetAllFormsInfo(formInfos);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetTemplateFormsInfoByApp_001
+ * @tc.desc: Verify GetTemplateFormsInfoByApp
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetTemplateFormsInfoByApp_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByApp_001 begin";
+    std::vector<FormInfo> formInfos;
+    const std::string bundleName = "ohos.samples.FormApplication";
+    auto result = FormMgr::GetInstance().GetTemplateFormsInfoByApp(bundleName, formInfos);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByApp_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetTemplateFormsInfoByModule_001
+ * @tc.desc: Verify GetTemplateFormsInfoByModule
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetTemplateFormsInfoByModule_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByModule_001 begin";
+    std::vector<FormInfo> formInfos;
+    const std::string bundleName = "ohos.samples.FormApplication";
+    const std::string moduleName = "entry";
+    auto result = FormMgr::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByModule_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_RegisterTemplateFormDetailInfoChange_001
+ * @tc.desc: Verify RegisterTemplateFormDetailInfoChange
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterTemplateFormDetailInfoChange_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterTemplateFormDetailInfoChange_001 begin";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    auto result = FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterTemplateFormDetailInfoChange_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterTemplateFormDetailInfoChange_001
+ * @tc.desc: Verify UnregisterTemplateFormDetailInfoChange
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterTemplateFormDetailInfoChange_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterTemplateFormDetailInfoChange_001 begin";
+    auto result = FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterTemplateFormDetailInfoChange_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UpdateTemplateFormDetailInfo_001
+ * @tc.desc: Verify UpdateTemplateFormDetailInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UpdateTemplateFormDetailInfo_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UpdateTemplateFormDetailInfo_001 begin";
+    const std::vector<TemplateFormDetailInfo> templateFormInfo;
+    auto result = FormMgr::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_UpdateTemplateFormDetailInfo_001 end";
+}
+
+/**
  * @tc.name: FormMgrTest_ReloadForms_001
  * @tc.desc: Verify ReloadForms
  * @tc.type: FUNC
