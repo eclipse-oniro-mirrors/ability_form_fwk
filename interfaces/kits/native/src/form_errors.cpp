@@ -257,8 +257,8 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     {
         ERR_APPEXECFWK_FORM_EDIT_UNSUPPORT_OPERATION,
         {
-            ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION,
-            "The form edit page is not in the foreground or not owned by caller."
+            ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,
+            "Cannot close the widget editing page. The page is not in the foreground or not owned by the caller."
         }
     },
 };
@@ -292,6 +292,7 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR,         "The dimension parameter is incorrect." },
     { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION,   "The system does not support the current operation."},
     { ERR_FORM_EXTERNAL_FORM_ABILITY_NOT_FOREGROUND,  "The app is not in the foreground." },
+    { ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,     "Cannot close the widget editing page opened by other apps." },
 };
 }
 
