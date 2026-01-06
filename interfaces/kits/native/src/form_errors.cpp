@@ -255,6 +255,10 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION, { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION, "" }
     },
     {
+        ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "The context is not ability context." }
+    },
+    {
         ERR_APPEXECFWK_FORM_EDIT_UNSUPPORT_OPERATION,
         {
             ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,
