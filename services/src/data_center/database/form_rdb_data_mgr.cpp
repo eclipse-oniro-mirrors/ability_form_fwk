@@ -468,9 +468,7 @@ ErrCode FormRdbDataMgr::QueryAllData(const std::string &tableName,
     }
 
     NativeRdb::AbsRdbPredicates absRdbPredicates(tableName);
-    std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
     auto absSharedResultSet = rdbStore->Query(absRdbPredicates, std::vector<std::string>());
-    guard.unlock();
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("null absSharedResultSet");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
