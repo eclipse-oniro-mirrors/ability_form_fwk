@@ -665,7 +665,7 @@ bool FormRdbDataMgr::InsertData(
             rdbStore = GetRdbStore();
             if (rdbStore == nullptr) {
                 HILOG_ERROR("null FormInfoRdbStore");
-                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+                return false;
             }
             ret = rdbStore->InsertWithConflictResolution(
                 rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
