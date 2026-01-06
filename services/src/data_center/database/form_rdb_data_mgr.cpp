@@ -708,7 +708,7 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
             rdbStore = GetRdbStore();
             if (rdbStore == nullptr) {
                 HILOG_ERROR("null FormInfoRdbStore");
-                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+                return false;
             }
             ret = rdbStore->Delete(rowId, absRdbPredicates);
         }
