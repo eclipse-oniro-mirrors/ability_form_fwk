@@ -2417,12 +2417,18 @@ ErrCode JsFormRouterProxyMgr::RouterEvent(int64_t formId, const Want &want)
 {
     HILOG_DEBUG("call");
 
-    std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
-    auto callbackClient = formRouterProxyCallbackMap_.find(formId);
-    if (callbackClient != formRouterProxyCallbackMap_.end()) {
-        if (callbackClient->second != nullptr) {
-            callbackClient->second->ProcessFormRouterProxy(want);
+    std::shared_ptr<FormRouterProxyCallbackClient> formRouterProxyCallbackClient = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
+        auto callbackClient = formRouterProxyCallbackMap_.find(formId);
+        if (callbackClient != formRouterProxyCallbackMap_.end()) {
+            if (callbackClient->second != nullptr) {
+                formRouterProxyCallbackClient = callbackClient->second;
+            }
         }
+    }
+    if (formRouterProxyCallbackClient != nullptr) {
+        formRouterProxyCallbackClient->ProcessFormRouterProxy(want);
     }
     return ERR_OK;
 }
