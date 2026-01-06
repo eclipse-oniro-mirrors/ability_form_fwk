@@ -1551,6 +1551,8 @@ private:
  
     sptr<IRemoteObject> GetLiveFormStatusCallerToken();
 
+    bool CheckUIAbilityContext(const pid_t pid);
+
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 

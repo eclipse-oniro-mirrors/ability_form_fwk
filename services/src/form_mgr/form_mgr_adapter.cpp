@@ -4973,9 +4973,37 @@ void FormMgrAdapter::ClearReconnectNum(int64_t formId)
     formReconnectMap_.erase(formId);
 }
 
+bool FormMgrAdapter::CheckUIAbilityContext(const pid_t pid)
+{
+    auto appMgrProxy = GetAppMgr();
+    if (!appMgrProxy) {
+        HILOG_ERROR("Get app mgr failed");
+        return false;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    OHOS::AppExecFwk::RunningProcessInfo info;
+    int32_t result = appMgrProxy->GetRunningProcessInfoByPid(pid, info);
+    IPCSkeleton::SetCallingIdentity(identity);
+    if (result != ERR_OK) {
+        HILOG_ERROR("GetRunningProcessInfoByPid failed");
+        return false;
+    }
+    if (info.extensionType_ == ExtensionAbilityType::FORM) {
+        HILOG_ERROR("extensionType_ is not uiability");
+        return false;
+    }
+    return true;
+}
+
 ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms)
 {
     HILOG_DEBUG("call");
+    pid_t callingPid = IPCSkeleton::GetCallingPid();
+    if (!CheckUIAbilityContext(callingPid)) {
+        HILOG_ERROR("check uiAbility failed");
+        return ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY;
+    }
+
     int callingUid = IPCSkeleton::GetCallingUid();
     RefreshData data;
     data.callingUid = callingUid;
