@@ -728,6 +728,8 @@ bool FormRdbDataMgr::IsFormRdbLoaded()
 
     if (rdbStore != nullptr) {
         return true;
+    } else {
+        return false;
     }
 
     for (auto iter = formRdbTableCfgMap_.begin(); iter != formRdbTableCfgMap_.end(); iter++) {
