@@ -139,7 +139,7 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int32_t ret = rdbStore->ExecuteSql(sql); 
+    int32_t ret = rdbStore->ExecuteSql(sql);
     if (ret == NativeRdb::E_OK) {
         if (rdbStore->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore->Backup("");
@@ -648,7 +648,7 @@ bool FormRdbDataMgr::InsertData(
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
         HILOG_ERROR("null FormInfoRdbStore");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
 
     int32_t ret = NativeRdb::E_OK;
@@ -690,7 +690,7 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
         HILOG_ERROR("null FormInfoRdbStore");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return false;
     }
 
     int32_t ret = NativeRdb::E_OK;
@@ -728,14 +728,6 @@ bool FormRdbDataMgr::IsFormRdbLoaded()
 
     if (rdbStore != nullptr) {
         return true;
-    }
-
-    HILOG_WARN("null Rdb, need to reload");
-    
-    auto rdbStore = LoadRdbStore();
-    if (rdbStore == nullptr) {
-        HILOG_ERROR("Load rdb failed");
-        return false;
     }
 
     for (auto iter = formRdbTableCfgMap_.begin(); iter != formRdbTableCfgMap_.end(); iter++) {
