@@ -107,7 +107,8 @@ ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableC
         formRdbTableCfgMap_.emplace(formRdbTableConfig.tableName, formRdbTableConfig);
     }
 
-    if (rdbStore_ == nullptr && LoadRdbStore() != ERR_OK) {
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
         HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
@@ -116,7 +117,7 @@ ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableC
         : "CREATE TABLE IF NOT EXISTS " + formRdbTableConfig.tableName
             + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
 
-    int32_t ret = rdbStore_->ExecuteSql(createTableSql);
+    int32_t ret = rdbStore->ExecuteSql(createTableSql);
     if (ret != NativeRdb::E_OK) {
         HILOG_ERROR("Create rdb table failed, ret:%{public}" PRId32 "", ret);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -132,16 +133,27 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int32_t ret = rdbStore_->ExecuteSql(sql); 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    int32_t ret = rdbStore->ExecuteSql(sql); 
     if (ret == NativeRdb::E_OK) {
-        if (rdbStore_->IsSlaveDiffFromMaster()) {
-            auto backupRet = rdbStore_->Backup("");
+        if (rdbStore->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore->Backup("");
             HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            ret = rdbStore_->ExecuteSql(sql);
+            rdbStore = GetRdbStore();
+            if (rdbStore == nullptr) {
+                HILOG_ERROR("null FormInfoRdbStore");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
+            ret = rdbStore->ExecuteSql(sql);
         }
     }
 
@@ -166,22 +178,33 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_KEY, key);
     int32_t ret = NativeRdb::E_OK;
     int64_t rowId = -1;
-    ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
+    ret = rdbStore->InsertWithConflictResolution(rowId, tableName, valuesBucket,
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     if (ret == NativeRdb::E_OK) {
-        if (rdbStore_->IsSlaveDiffFromMaster()) {
-            auto backupRet = rdbStore_->Backup("");
+        if (rdbStore->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore->Backup("");
             HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             int64_t rowId = -1;
-            ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
+            rdbStore = GetRdbStore();
+            if (rdbStore == nullptr) {
+                HILOG_ERROR("null FormInfoRdbStore");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
+            ret = rdbStore->InsertWithConflictResolution(rowId, tableName, valuesBucket,
                 NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
         }
     }
@@ -206,23 +229,34 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_KEY, key);
     valuesBucket.PutString(FORM_VALUE, value);
     int32_t ret = NativeRdb::E_OK;
     int64_t rowId = -1;
-    ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
+    ret = rdbStore->InsertWithConflictResolution(rowId, tableName, valuesBucket,
         NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     if (ret == NativeRdb::E_OK) {
-        if (rdbStore_->IsSlaveDiffFromMaster()) {
-            auto backupRet = rdbStore_->Backup("");
+        if (rdbStore->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore->Backup("");
             HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             int64_t rowId = -1;
-            ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
+            rdbStore = GetRdbStore();
+            if (rdbStore == nullptr) {
+                HILOG_ERROR("null FormInfoRdbStore");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
+            ret = rdbStore->InsertWithConflictResolution(rowId, tableName, valuesBucket,
                 NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
         }
     }
@@ -248,22 +282,33 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     NativeRdb::AbsRdbPredicates absRdbPredicates(tableName);
     absRdbPredicates.EqualTo(FORM_KEY, key);
     int32_t ret = NativeRdb::E_OK;
     int32_t rowId = -1;
-    ret = rdbStore_->Delete(rowId, absRdbPredicates);
+    ret = rdbStore->Delete(rowId, absRdbPredicates);
 
     if (ret == NativeRdb::E_OK) {
-        if (rdbStore_->IsSlaveDiffFromMaster()) {
-            auto backupRet = rdbStore_->Backup("");
+        if (rdbStore->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore->Backup("");
             HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             int32_t rowId = -1;
-            ret = rdbStore_->Delete(rowId, absRdbPredicates);
+            rdbStore = GetRdbStore();
+            if (rdbStore == nullptr) {
+                HILOG_ERROR("null FormInfoRdbStore");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
+            ret = rdbStore->Delete(rowId, absRdbPredicates);
         }
     }
 
@@ -289,9 +334,15 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     NativeRdb::AbsRdbPredicates absRdbPredicates(tableName);
     absRdbPredicates.EqualTo(FORM_KEY, key);
-    auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
+    auto absSharedResultSet = rdbStore->Query(absRdbPredicates, std::vector<std::string>());
 
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("null absSharedResultSet");
@@ -339,9 +390,15 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     NativeRdb::AbsRdbPredicates absRdbPredicates(tableName);
     absRdbPredicates.BeginsWith(FORM_KEY, key);
-    auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
+    auto absSharedResultSet = rdbStore->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("null absSharedResultSet");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -404,9 +461,15 @@ ErrCode FormRdbDataMgr::QueryAllData(const std::string &tableName,
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     NativeRdb::AbsRdbPredicates absRdbPredicates(tableName);
     std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
-    auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
+    auto absSharedResultSet = rdbStore->Query(absRdbPredicates, std::vector<std::string>());
     guard.unlock();
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("null absSharedResultSet");
@@ -469,10 +532,14 @@ ErrCode FormRdbDataMgr::QueryAllKeys(const std::string &tableName, std::set<std:
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     NativeRdb::AbsRdbPredicates absRdbPredicates(tableName);
-    std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
-    auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
-    guard.unlock();
+    auto absSharedResultSet = rdbStore->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("null absSharedResultSet");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -521,7 +588,14 @@ std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QueryData(
         HILOG_ERROR("null FormInfoRdbStore");
         return nullptr;
     }
-    return rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
+
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return nullptr;
+    }
+
+    return rdbStore->Query(absRdbPredicates, std::vector<std::string>());
 }
 
 std::shared_ptr<NativeRdb::ResultSet> FormRdbDataMgr::QueryDataByStep(
@@ -533,8 +607,13 @@ std::shared_ptr<NativeRdb::ResultSet> FormRdbDataMgr::QueryDataByStep(
         return nullptr;
     }
 
-    std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
-    return rdbStore_->QueryByStep(absRdbPredicates, std::vector<std::string>());
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return nullptr;
+    }
+
+    return rdbStore->QueryByStep(absRdbPredicates, std::vector<std::string>());
 }
 
 std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QuerySql(const std::string &sql)
@@ -544,8 +623,14 @@ std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QuerySql(const st
         HILOG_ERROR("null FormInfoRdbStore");
         return nullptr;
     }
-    std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
-    return rdbStore_->QuerySql(sql, std::vector<std::string>());
+
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return nullptr;
+    }
+
+    return rdbStore->QuerySql(sql, std::vector<std::string>());
 }
 
 bool FormRdbDataMgr::InsertData(
@@ -562,18 +647,29 @@ bool FormRdbDataMgr::InsertData(
         return false;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     int32_t ret = NativeRdb::E_OK;
-    ret = rdbStore_->InsertWithConflictResolution(
+    ret = rdbStore->InsertWithConflictResolution(
         rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     if (ret == NativeRdb::E_OK) {
-        if (rdbStore_->IsSlaveDiffFromMaster()) {
-            auto backupRet = rdbStore_->Backup("");
+        if (rdbStore->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore->Backup("");
             HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            ret = rdbStore_->InsertWithConflictResolution(
+            rdbStore = GetRdbStore();
+            if (rdbStore == nullptr) {
+                HILOG_ERROR("null FormInfoRdbStore");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
+            ret = rdbStore->InsertWithConflictResolution(
                 rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
         }
     }
@@ -593,20 +689,30 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
         return false;
     }
 
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     int32_t ret = NativeRdb::E_OK;
     int32_t rowId = -1;
-    ret = rdbStore_->Delete(rowId, absRdbPredicates);
-
+    ret = rdbStore->Delete(rowId, absRdbPredicates);
     if (ret == NativeRdb::E_OK) {
-        if (rdbStore_->IsSlaveDiffFromMaster()) {
-            auto backupRet = rdbStore_->Backup("");
+        if (rdbStore->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore->Backup("");
             HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             int32_t rowId = -1;
-            ret = rdbStore_->Delete(rowId, absRdbPredicates);
+            rdbStore = GetRdbStore();
+            if (rdbStore == nullptr) {
+                HILOG_ERROR("null FormInfoRdbStore");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
+            ret = rdbStore->Delete(rowId, absRdbPredicates);
         }
     }
 
@@ -620,16 +726,16 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
 
 bool FormRdbDataMgr::IsFormRdbLoaded()
 {
-    if (rdbStore_ != nullptr) {
-        return true;
-    }
-    std::unique_lock<std::shared_mutex> guard(rdbStoreMutex_);
-    if (rdbStore_ != nullptr) {
+    auto rdbStore = GetRdbStore();
+
+    if (rdbStore != nullptr) {
         return true;
     }
 
     HILOG_WARN("null Rdb, need to reload");
-    if (LoadRdbStore() != ERR_OK) {
+    
+    auto rdbStore = LoadRdbStore();
+    if (rdbStore == nullptr) {
         HILOG_ERROR("Load rdb failed");
         return false;
     }
@@ -638,7 +744,7 @@ bool FormRdbDataMgr::IsFormRdbLoaded()
         std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
             : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
             + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-        int32_t ret = rdbStore_->ExecuteSql(createTableSql);
+        int32_t ret = rdbStore->ExecuteSql(createTableSql);
         if (ret != NativeRdb::E_OK) {
             HILOG_ERROR("Recreate form rdb table failed, ret:%{public}" PRId32 ", name is %{public}s",
                 ret, iter->first.c_str());
@@ -654,8 +760,8 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    std::unique_lock<std::shared_mutex> guard(rdbStoreMutex_);
-    if (rdbStore_ == nullptr) {
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
         HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
@@ -664,16 +770,23 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         return ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD;
     }
 
-    auto restoreRet = rdbStore_->Restore("");
+    // 用备库恢复主库
+    auto restoreRet = rdbStore->Restore("");
     if (restoreRet == NativeRdb::E_OK) {
         HILOG_INFO("Restore rdb succeeded");
     } else {
         HILOG_WARN("Restore rdb failed, errorCode:%{public}" PRId32, restoreRet);
+        if (restoreRet == NativeRdb::E_SQLITE_CORRUPT) {
+            // 删库，避免拿到缓存的开库信息
+            HILOG_WARN("Need rdb clear cache, delete db");
+            std::string rdbPath = Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME;
+            NativeRdb::RdbHelper::DeleteRdbStore(rdbPath);
+        }
     }
 
-    ErrCode ret = LoadRdbStore();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("Reload form rdb failed, ret:%{public}" PRId32 ".", ret);
+    rdbStore = LoadRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("Reload form rdb failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     lastRdbBuildTime_ = curTime;
@@ -684,7 +797,7 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
             std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
                 : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
                 + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-            int32_t result = rdbStore_->ExecuteSql(createTableSql);
+            int32_t result = rdbStore->ExecuteSql(createTableSql);
             if (result != NativeRdb::E_OK) {
                 HILOG_ERROR("Recreate form rdb table failed, ret:%{public}" PRId32 ", name is %{public}s",
                     result, iter->first.c_str());
@@ -694,8 +807,9 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
     return ERR_OK;
 }
 
-ErrCode FormRdbDataMgr::LoadRdbStore()
+std::shared_ptr<NativeRdb::RdbStore> FormRdbDataMgr::LoadRdbStore()
 {
+    std::unique_lock<std::shared_mutex> lock(rdbStoreMutex_);
     std::string rdbPath = Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME;
     NativeRdb::RdbStoreConfig rdbStoreConfig(
         rdbPath,
@@ -719,9 +833,21 @@ ErrCode FormRdbDataMgr::LoadRdbStore()
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
             static_cast<int64_t>(CallDbFailedErrorType::DATABASE_RESET_CONNECT_FAILED));
         rdbStore_ = nullptr;
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return ERR_OK;
+    return rdbStore_;
+}
+
+std::shared_ptr<NativeRdb::RdbStore> FormRdbDataMgr::GetRdbStore()
+{
+    std::shared_ptr<NativeRdb::RdbStore> rdbStore = nullptr;
+    {
+        std::shared_lock<std::shared_mutex> lock(rdbStoreMutex_);
+        rdbStore = rdbStore_;
+    }
+    if (rdbStore == nullptr) {
+        return LoadRdbStore();
+    }
+    return rdbStore;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
