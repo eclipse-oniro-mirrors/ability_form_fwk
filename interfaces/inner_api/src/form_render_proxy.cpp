@@ -417,8 +417,8 @@ void FormRenderProxy::RunCachedConfigurationUpdated()
     }
 }
 
-int32_t FormRenderProxy::UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
-    const std::string &uid)
+int32_t FormRenderProxy::UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+    const std::string &uid, const FormJsInfo &formJsInfo)
 {
     MessageParcel data;
     MessageOption option(MessageOption::TF_ASYNC);
@@ -436,6 +436,10 @@ int32_t FormRenderProxy::UpdateFormSize(const int64_t &formId, const FormSurface
     }
     if (!data.WriteString(uid)) {
         HILOG_ERROR("fail write uid");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&formJsInfo)) {
+        HILOG_ERROR("fail write formJsInfo");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageParcel reply;

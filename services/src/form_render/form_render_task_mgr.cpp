@@ -23,6 +23,7 @@
 #include "form_event_report.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_record/form_record.h"
+#include "data_center/form_cache_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -52,7 +53,7 @@ void FormRenderTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
     FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
     HILOG_DEBUG("end");
 }
-  
+
 void FormRenderTaskMgr::PostSetRenderGroupEnableFlag(int64_t formId, bool isEnable,
     const sptr<IRemoteObject> &remoteObject)
 {
@@ -97,7 +98,20 @@ void FormRenderTaskMgr::UpdateFormSize(const int64_t &formId, const FormSurfaceI
         return;
     }
 
-    int32_t error = remoteFormRender->UpdateFormSize(formId, formSurfaceInfo, uid);
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
+        return;
+    }
+
+    FormProviderData formProviderData;
+    FormJsInfo formJsInfo;
+    if (!formRecord.isDynamic) {
+        (void)FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData);
+        FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formJsInfo);
+    }
+
+    int32_t error = remoteFormRender->UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo);
     if (error != ERR_OK) {
         HILOG_ERROR("fail Update FormSize");
         return;
@@ -130,16 +144,16 @@ void FormRenderTaskMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable, 
         HILOG_ERROR("get formRenderProxy failed");
         return;
     }
- 
+
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
         HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
         return;
     }
- 
+
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
- 
+
     int32_t error = remoteFormRender->SetRenderGroupEnableFlag(formId, isEnable, want);
     if (error != ERR_OK) {
         HILOG_ERROR("fail");
@@ -194,8 +208,10 @@ void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, 
 
     std::vector<FormJsInfo> formJsInfos;
     for (const auto &formRecord : formRecords) {
+        FormProviderData formProviderData = formRecord.formProviderInfo.GetFormData();
+        (void)FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData);
         FormJsInfo formInfo;
-        FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formInfo);
+        FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formInfo);
         formJsInfos.emplace_back(formInfo);
     }
 

@@ -35,16 +35,26 @@ bool FormStatus::HasFormStatus(const int64_t formId)
     return !(formStatusMap_.find(formId) == formStatusMap_.end());
 }
 
-FormFsmStatus FormStatus::GetFormStatus(const int64_t formId)
+const std::pair<FormFsmStatus, FormFsmStatus> FormStatus::GetFormStatusPair(const int64_t formId)
 {
     std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
         HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
-        return FormFsmStatus::INIT;
+        return std::make_pair(FormFsmStatus::INIT, FormFsmStatus::INIT);
     }
 
     return iter->second;
+}
+
+FormFsmStatus FormStatus::GetFormStatus(const int64_t formId)
+{
+    return GetFormStatusPair(formId).second;
+}
+ 
+FormFsmStatus FormStatus::GetFormLastStatus(const int64_t formId)
+{
+    return GetFormStatusPair(formId).first;
 }
 
 void FormStatus::SetFormStatus(const int64_t formId, FormFsmStatus formStatus)
@@ -53,13 +63,12 @@ void FormStatus::SetFormStatus(const int64_t formId, FormFsmStatus formStatus)
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
         HILOG_INFO("set new form status, formId:%{public}" PRId64 ", status is %{public}d.",
-            formId,
-            static_cast<int32_t>(formStatus));
-        formStatusMap_.emplace(formId, formStatus);
+            formId, static_cast<int32_t>(formStatus));
+        formStatusMap_.emplace(formId, std::make_pair(FormFsmStatus::INIT, formStatus));
         return;
     }
 
-    iter->second = formStatus;
+    iter->second = std::make_pair(iter->second.second, formStatus);
     HILOG_DEBUG(
         "set form status, formId:%{public}" PRId64 ", status is %{public}d.", formId, static_cast<int32_t>(formStatus));
 }
@@ -78,18 +87,13 @@ void FormStatus::DeleteFormStatus(const int64_t formId)
 
 bool FormStatus::IsFormProcessRecycle(const int64_t formId)
 {
-    std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
-    auto iter = formStatusMap_.find(formId);
-    if (iter == formStatusMap_.end()) {
-        HILOG_DEBUG("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
-        return false;
-    }
+    FormFsmStatus status = GetFormStatus(formId);
     HILOG_INFO("formId:%{public}" PRId64 ", curStatus:%{public}s",
         formId,
-        FormStatusPrint::FormStatusToString(iter->second).c_str());
+        FormStatusPrint::FormStatusToString(status).c_str());
 
-    return iter->second == FormFsmStatus::RECYCLED || iter->second == FormFsmStatus::RECYCLING_DATA ||
-           iter->second == FormFsmStatus::RECYCLING;
+    return status == FormFsmStatus::RECYCLED || status == FormFsmStatus::RECYCLING_DATA ||
+           status == FormFsmStatus::RECYCLING;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

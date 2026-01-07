@@ -41,9 +41,16 @@ public:
     /**
      * @brief Gets the form status of a form
      * @param formId The ID of the form
-     * @return The form status of the form
+     * @return The form current status of the form
      */
     FormFsmStatus GetFormStatus(const int64_t formId);
+
+    /**
+     * @brief Gets the form status of a form
+     * @param formId The ID of the form
+     * @return The form last status of the form
+     */
+    FormFsmStatus GetFormLastStatus(const int64_t formId);
 
     /**
      * @brief Sets the form status of a form
@@ -66,9 +73,11 @@ public:
     bool IsFormProcessRecycle(const int64_t formId);
 
 private:
-    // <formId, formStatus>
+    const std::pair<FormFsmStatus, FormFsmStatus> GetFormStatusPair(const int64_t formId);
+private:
     std::shared_mutex formStatusMutex_;
-    std::unordered_map<int64_t, FormFsmStatus> formStatusMap_;
+    // <formId, <lastStatus, curStatus>>
+    std::unordered_map<int64_t, std::pair<FormFsmStatus, FormFsmStatus>> formStatusMap_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

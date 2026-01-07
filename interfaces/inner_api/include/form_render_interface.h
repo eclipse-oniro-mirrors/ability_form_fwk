@@ -77,8 +77,8 @@ public:
 
     virtual int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) { return ERR_OK; }
 
-    virtual int32_t UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
-        const std::string &uid) { return ERR_OK; }
+    virtual int32_t UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+        const std::string &uid, const FormJsInfo &formJsInfo) { return ERR_OK; }
 
     virtual void RunCachedConfigurationUpdated() {}
 

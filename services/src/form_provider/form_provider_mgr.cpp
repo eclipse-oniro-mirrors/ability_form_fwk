@@ -132,15 +132,9 @@ void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &re
 {
     if (isFormProviderUpdate && record.isDataProxy) {
         FormProviderData formProviderData;
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        if (FormCacheMgr::GetInstance().GetData(formId, cacheData, imageDataMap)) {
-            formProviderData.SetDataString(cacheData);
-            formProviderData.SetImageDataMap(imageDataMap);
-            FormMgrAdapter::GetInstance().UpdateForm(formId, record.uid, formProviderData);
-        }
-        HILOG_INFO("Upgrade APP data agent card update, cacheData: %{public}zu, formId:%{public}" PRId64,
-            cacheData.size(), formId);
+        formProviderData.EnableDbCache(true);
+        FormMgrAdapter::GetInstance().UpdateForm(formId, record.uid, formProviderData);
+        HILOG_INFO("Upgrade APP data agent card update, formId:%{public}" PRId64, formId);
     }
 }
 

@@ -346,7 +346,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_012, TestSize.Level0)
     FormJsInfo formJsInfo;
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
-    EXPECT_NE(nullptr, formRenderRecordPtr_->CreateFormRendererGroupLock(formJsInfo, context, runtime));
+    EXPECT_NE(nullptr, formRenderRecordPtr_->CreateFormRendererGroupLock(context, runtime));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_012 end";
 }
 
@@ -723,23 +723,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_032, TestSize.Level0)
 
     formRenderRecordPtr_->AddFormRequest(formJsInfo, want);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_032 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_033
- * @tc.desc: Verify AddFormRequest
- * @tc.type: FUNC
- * @tc.require: IssueI7X4L4
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_033, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_033 start";
-
-    int64_t formId = 1;
-    Ace::FormRequest formRequest;
-    Want want;
-    formRenderRecordPtr_->AddFormRequest(formId, formRequest);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_033 end";
 }
 
 /**
@@ -1136,25 +1119,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_054, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_055
- * @tc.desc: Test MergeFormData
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_055, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_055 start";
-    EXPECT_TRUE(formRenderRecordPtr_);
-
-    FormRequest request;
-    request.formJsInfo.formData = "test";
-    FormJsInfo info;
-
-    formRenderRecordPtr_->MergeFormData(request, info);
-    EXPECT_EQ("", request.formJsInfo.formData);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_055 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_056
  * @tc.desc: Test RunTask
  * @tc.type: FUNC
@@ -1464,9 +1428,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_071, TestSize.Level1)
     formRequest.hasRelease = true;
     EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
         false);
-    formRenderRecordPtr_->AddFormRequest(formId, formRequest);
-    EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
-        true);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_071 end";
 }
 
@@ -2157,11 +2118,10 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_111, TestSize.Level1)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_112, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_112 start";
-    FormJsInfo formJsInfo;
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecordPtr_->eventHandler_ = nullptr;
-    formRenderRecordPtr_->CreateFormRendererGroupLock(formJsInfo, context, runtime);
+    formRenderRecordPtr_->CreateFormRendererGroupLock(context, runtime);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_112 end";
 }
 
@@ -2188,7 +2148,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_113, TestSize.Level1)
     formRequest.hasRelease = true;
     EXPECT_EQ(formRenderRecordPtr->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
         false);
-    formRenderRecordPtr->AddFormRequest(formId, formRequest);
 
     int32_t ret = formRenderRecordPtr->HandleUpdateForm(formJsInfo, want);
     EXPECT_EQ(ret, ERR_OK);
@@ -2316,7 +2275,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_119, TestSize.Level1)
     EXPECT_EQ(formRequestMap.find(compId) != formRequestMap.end(), true);
 
     auto formRequest = formRequestMap.find(compId)->second;
-    EXPECT_EQ(formRequest.formJsInfo.formData, formJsInfo.formProviderData.GetDataString());
+    EXPECT_EQ(formRequest.formJsInfo.formData, "");
     GTEST_LOG_(INFO) << "FormRenderRecordTest_119 end";
 }
 
@@ -2741,31 +2700,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_144, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_145
- * @tc.desc: Verify MergeMap
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_145, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_145 start";
-    sptr<FormAshmem> formAshmem1;
-    sptr<FormAshmem> formAshmem2;
-    sptr<FormAshmem> formAshmem3;
-    sptr<FormAshmem> formAshmem4;
-    sptr<FormAshmem> formAshmem5;
-    std::map<std::string, sptr<FormAshmem>> dst;
-    dst.insert({"123", formAshmem1});
-    dst.insert({"456", formAshmem2});
-    dst.insert({"789", formAshmem4});
-    std::map<std::string, sptr<FormAshmem>> src;
-    src.insert({"123", formAshmem1});
-    src.insert({"345", formAshmem3});
-    src.insert({"789", formAshmem5});
-    formRenderRecordPtr_->MergeMap(dst, src);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_145 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_146
  * @tc.desc: Verify UpdateFormSizeOfGroups
  * @tc.type: FUNC
@@ -2779,7 +2713,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_146, TestSize.Level1)
     formSurfaceInfo.height = 1;
     formSurfaceInfo.borderWidth = 1;
     formSurfaceInfo.formViewScale = 1;
-    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, formSurfaceInfo);
+    FormJsInfo formJsInfo;
+    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, formSurfaceInfo, formJsInfo);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_146 end";
 }
 
@@ -2805,7 +2740,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_147, TestSize.Level1)
     formSurfaceInfo.height = 1;
     formSurfaceInfo.borderWidth = 1;
     formSurfaceInfo.formViewScale = 1;
-    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, formSurfaceInfo);
+    FormJsInfo formJsInfo;
+    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, formSurfaceInfo, formJsInfo);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_147 end";
 }
 

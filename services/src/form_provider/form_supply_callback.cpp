@@ -355,8 +355,17 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
 int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds)
 {
     HILOG_INFO("recover forms by config update");
-    Want want;
-    return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
+    for (int64_t formId : formIds) {
+        FormRecord formRecord;
+        if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord) || formRecord.isDynamic) {
+            continue;
+        }
+        HILOG_INFO("recover static form");
+        FormProviderData formProviderData;
+        formProviderData.EnableDbCache(true);
+        FormMgrAdapter::GetInstance().UpdateForm(formId, formRecord.uid, formProviderData);
+    }
+    return FormMgrAdapter::GetInstance().RecoverForms(formIds, Want());
 }
 
 int32_t FormSupplyCallback::OnNotifyRefreshForm(const int64_t formId)
