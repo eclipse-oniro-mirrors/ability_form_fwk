@@ -1412,7 +1412,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0306, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     FormItemInfo info;
     info.SetFormId(1);
- 
+
     WantParams wantParams;
     EXPECT_EQ(ERR_OK, formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
     EXPECT_EQ(ERR_OK, formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
