@@ -26,12 +26,7 @@ AddFinishChecker::~AddFinishChecker() {}
 
 int AddFinishChecker::CheckValid(const CheckValidFactor &factor)
 {
-    FormRecord formRecord;
-    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(factor.formId, formRecord);
-    if (!bGetRecord) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 "", factor.formId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
+    FormRecord formRecord = factor.record;
     if (!formRecord.addFormFinish) {
         HILOG_WARN("form is adding:%{public}" PRId64, factor.formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
