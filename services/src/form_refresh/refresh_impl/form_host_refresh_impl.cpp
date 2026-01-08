@@ -27,7 +27,8 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 // Configuration for TYPE_HOST - check types and control checks
-static RefreshConfig CreateConfig() {
+static RefreshConfig CreateConfig()
+{
     RefreshConfig config;
     // Check types configuration
     config.checkTypes = { TYPE_UNTRUST_APP, TYPE_SELF_FORM, TYPE_ACTIVE_USER };
