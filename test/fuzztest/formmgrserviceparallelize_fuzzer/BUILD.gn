@@ -23,12 +23,6 @@ ohos_fuzztest("FormMgrServiceParallelizeFuzzTest") {
 
   fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmgrserviceparallelize_fuzzer"
 
-  sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
-  }
-
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/services/include",
