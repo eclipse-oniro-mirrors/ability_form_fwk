@@ -62,9 +62,9 @@ constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr size_t THREAD_NAME_LEN = 15;
-constexpr char FORM_RENDERER_PROCESS_ON_ADD_SURFACE[] = "ohos.extra.param.key.process_on_add_surface";
-constexpr char RENDERING_BLOCK_MONITOR_PREFIX[] = "RenderingBlockMonitorTask_";
-constexpr char MEMORY_MONITOR_PREFIX[] = "MemoryMonitorTask_";
+constexpr const char *FORM_RENDERER_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
+constexpr const char *RENDERING_BLOCK_MONITOR_PREFIX = "RenderingBlockMonitorTask_";
+constexpr const char *MEMORY_MONITOR_PREFIX = "MemoryMonitorTask_";
 
 const static std::unordered_map<std::string, int> FORM_IMPERATIVE_MAP = {
     {Constants::TEMPLATE_FORM_IMPERATIVE_FWK_LITE, 0},
