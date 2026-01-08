@@ -461,6 +461,13 @@ namespace Constants {
 
     constexpr int32_t DUE_INVALID_UPDATE_DURATION = -1;
 
+    enum class CardActionParamOpenType : int8_t {
+        START_ABILITY = 0,
+        OPEN_APP_LINKING = 1,
+        OPEN_ATOMIC_SERVICE = 2,
+    };
+    const std::string PARAM_OPEN_TYPE = "ohos.form.action.key.open_type";
+
     constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
 
     constexpr const char* FORM_MANAGER_SHOW_SINGLE_FORM_KEY = "ohos.extra.param.key.form_manager_show_single_form";

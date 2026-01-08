@@ -1430,7 +1430,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ReloadForms_0001, TestSize.Level
     std::string abilityName = "testAbility";
     std::string formName = "testForm";
     ErrCode ret = formMgrService.ReloadForms(reloadNum, moduleName, abilityName, formName);
-    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY);
     GTEST_LOG_(INFO) << "FormMgrService_ReloadForms_0001 end";
 }
 
@@ -1445,7 +1445,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ReloadAllForms_0001, TestSize.Le
     FormMgrService formMgrService;
     int32_t reloadNum = 0;
     ErrCode ret = formMgrService.ReloadAllForms(reloadNum);
-    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY);
     GTEST_LOG_(INFO) << "FormMgrService_ReloadAllForms_0001 end";
 }
 

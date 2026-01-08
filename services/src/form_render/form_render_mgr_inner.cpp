@@ -153,16 +153,8 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
         return ERR_OK;
     }
 
-    auto task = [formRecord, newWant = want, remoteObject]() {
-        FormRecord newRecord(formRecord);
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        bool hasCacheData = FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap);
-        if (hasCacheData) {
-            newRecord.formProviderInfo.SetFormDataString(cacheData);
-            newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-        }
-        FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, newWant, remoteObject);
+    auto task = [formRecord, want, remoteObject]() {
+        FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
     };
     RefreshCacheMgr::GetInstance().AddRenderTask(formRecord.formId, task);
     return ERR_OK;
@@ -185,14 +177,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
 
     if (formRecord.formProviderInfo.NeedCache()) {
         FormCacheMgr::GetInstance().AddData(formRecord.formId, formRecord.formProviderInfo.GetFormData());
-        if (FormStatus::GetInstance().GetFormStatus(formRecord.formId) == FormFsmStatus::RECYCLED) {
-            std::string cacheData;
-            std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-            if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
-                formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-            }
-        }
-    } else {
+    } else if (!formProviderData.IsDbCacheEnabled()) {
         HILOG_DEBUG("need to delete data");
         FormCacheMgr::GetInstance().DeleteData(formRecord.formId);
     }
@@ -532,6 +517,11 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
                 std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
                 renderMgrInner->renderRemoteObj_ = nullptr;
             }
+            std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
+            if (renderMgrInner->formResSched_) {
+                renderMgrInner->formResSched_->ReportFormLayoutEnd();
+                renderMgrInner->formResSched_ = nullptr;
+            }
         });
     }
     if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
@@ -539,6 +529,9 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
         return;
     }
     SetRenderRemoteObj(renderRemoteObj);
+    std::lock_guard<std::mutex> lock(formResSchedMutex_);
+    formResSched_ = std::make_unique<FormResSched>(GetUserId());
+    formResSched_->ReportFormLayoutStart();
 }
 
 inline ErrCode FormRenderMgrInner::ConnectRenderService(
@@ -749,12 +742,6 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
         if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
             HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
             continue;
-        }
-
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
-            formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
         }
 
         std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;

@@ -5034,6 +5034,86 @@ HWTEST_F(FormMgrTest, FormMgrTest_0285, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FormMgrTest_GetAllTemplateFormsInfo_001
+ * @tc.desc: Verify  GetAllTemplateFormsInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetAllTemplateFormsInfo_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 begin";
+    std::vector<FormInfo> formInfos;
+    auto result = FormMgr::GetInstance().GetAllFormsInfo(formInfos);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetTemplateFormsInfoByApp_001
+ * @tc.desc: Verify GetTemplateFormsInfoByApp
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetTemplateFormsInfoByApp_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByApp_001 begin";
+    std::vector<FormInfo> formInfos;
+    const std::string bundleName = "ohos.samples.FormApplication";
+    auto result = FormMgr::GetInstance().GetTemplateFormsInfoByApp(bundleName, formInfos);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByApp_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetTemplateFormsInfoByModule_001
+ * @tc.desc: Verify GetTemplateFormsInfoByModule
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetTemplateFormsInfoByModule_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByModule_001 begin";
+    std::vector<FormInfo> formInfos;
+    const std::string bundleName = "ohos.samples.FormApplication";
+    const std::string moduleName = "entry";
+    auto result = FormMgr::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByModule_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_RegisterTemplateFormDetailInfoChange_001
+ * @tc.desc: Verify RegisterTemplateFormDetailInfoChange
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterTemplateFormDetailInfoChange_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterTemplateFormDetailInfoChange_001 begin";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    auto result = FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterTemplateFormDetailInfoChange_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterTemplateFormDetailInfoChange_001
+ * @tc.desc: Verify UnregisterTemplateFormDetailInfoChange
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterTemplateFormDetailInfoChange_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterTemplateFormDetailInfoChange_001 begin";
+    auto result = FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterTemplateFormDetailInfoChange_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UpdateTemplateFormDetailInfo_001
+ * @tc.desc: Verify UpdateTemplateFormDetailInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UpdateTemplateFormDetailInfo_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UpdateTemplateFormDetailInfo_001 begin";
+    const std::vector<TemplateFormDetailInfo> templateFormInfo;
+    auto result = FormMgr::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_UpdateTemplateFormDetailInfo_001 end";
+}
+
+/**
  * @tc.name: FormMgrTest_ReloadForms_001
  * @tc.desc: Verify ReloadForms
  * @tc.type: FUNC
@@ -5172,5 +5252,69 @@ HWTEST_F(FormMgrTest, FormMgrTest_SendNonTransparencyRatio_001, TestSize.Level1)
     auto result = FormMgr::GetInstance().SendNonTransparencyRatio(formId, ratio);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_SendNonTransparencyRatio_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_StartUIAbilityByFms_001
+ * @tc.desc: Verify StartUIAbilityByFms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_StartUIAbilityByFms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_StartUIAbilityByFms_001 begin";
+    EXPECT_CALL(*mockProxy, StartUIAbilityByFms(_))
+        .WillOnce(Return(ERR_OK));
+    Want want;
+    auto result = FormMgr::GetInstance().StartUIAbilityByFms(want);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_StartUIAbilityByFms_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_CloseFormEditAbility_001
+ * @tc.desc: Verify CloseFormEditAbility
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_CloseFormEditAbility_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_CloseFormEditAbility_001 begin";
+    EXPECT_CALL(*mockProxy, CloseFormEditAbility(_))
+        .WillOnce(Return(ERR_OK));
+    bool isMainPage = false;
+    auto result = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_CloseFormEditAbility_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_RegisterPublishFormCrossBundleControl_001
+ * @tc.desc: Verify RegisterPublishFormCrossBundleControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterPublishFormCrossBundleControl_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 start";
+    EXPECT_CALL(*mockProxy, RegisterPublishFormCrossBundleControl(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    auto result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 test end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterPublishFormCrossBundleControl_001
+ * @tc.desc: Verify UnregisterPublishFormCrossBundleControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterPublishFormCrossBundleControl_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 start";
+    EXPECT_CALL(*mockProxy, UnregisterPublishFormCrossBundleControl())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 test end";
 }
 } // namespace

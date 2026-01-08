@@ -872,7 +872,7 @@ void FormTimerMgr::SetTimeSpeed(int32_t timeSpeed)
     HandleResetLimiter();
     ClearIntervalTimer();
     FormPeriodReport();
-    int32_t formCheckTimerId;
+    uint64_t formCheckTimerId;
     {
         std::lock_guard<std::mutex> lock(formCheckTimerMutex_);
         formCheckTimerId = formCheckTimerId_;

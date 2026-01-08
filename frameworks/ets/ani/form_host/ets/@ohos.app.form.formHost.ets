@@ -92,6 +92,7 @@ export default namespace formHost {
   export native function nativeOffGetFormRect(callback?: GetFormRectInfoCallbackWrapper): void;
   export native function nativeOnGetLiveFormStatus(callback: GetLiveFormStatusCallbackWrapper): void;
   export native function nativeOffGetLiveFormStatus(callback?: GetLiveFormStatusCallbackWrapper): void;
+  export native function nativeUpdateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void;
 
   const ERR_OK = 0;
   const INVALID_PARAM_ERROR_CODE = 401;
@@ -1022,6 +1023,10 @@ export default namespace formHost {
     formHost.nativeOffGetLiveFormStatus(myCall);
   }
 
+  function updateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void {
+    formHost.nativeUpdateFormSize(formId, newDimension, newRect);
+  }
+
   class GetFormRectInfoCallbackWrapper {
     private liveFormInterfaceParam: long;
 
@@ -1041,7 +1046,7 @@ export default namespace formHost {
 
     private formRectCallback: formInfo.GetFormRectInfoCallback = (formId: string): Promise<formInfo.Rect> => {
       return new Promise<formInfo.Rect>((resolve: (rect: formInfo.Rect) => void,
-        reject: (rect: formInfo.Rect) => void): void => {
+        reject: (error: Error) => void): void => {
       });
     }
 

@@ -61,7 +61,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
-    formRenderRecord->CreateFormRendererGroupLock(formJsInfo, context, runtime);
+    formRenderRecord->CreateFormRendererGroupLock(context, runtime);
     formRenderRecord->HandleDeleteInJsThread(formId, compId);
     formRenderRecord->HandleDestroyInJsThread();
     formRenderRecord->ReleaseHapFileHandle();

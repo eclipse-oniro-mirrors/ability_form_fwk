@@ -118,6 +118,8 @@ public:
     void ConsumeAddUnfinishFlag(const int64_t formId);
 
 private:
+    Want CreateWant(const std::vector<FormRecord>::iterator &record, const int32_t userId);
+
     std::mutex overloadTaskMutex_;
     std::vector<FormTimer> overloadTask_;
     std::mutex renderTaskMapMutex_;
