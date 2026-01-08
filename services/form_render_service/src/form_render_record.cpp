@@ -2306,6 +2306,25 @@ int32_t FormRenderRecord::HandleSetRenderGroupParams(const int64_t formId, const
 {
     HILOG_INFO("HandleSetRenderGroupParams begin,formId:%{public}" PRId64, formId);
     MarkThreadAlive();
+    {
+        bool hasTransparencyKey = want.GetParams().HasParam(Constants::PARAM_FORM_TRANSPARENCY_KEY);
+        bool hasEnableBlurBackgroundKey = want.GetParams().HasParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY);
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        auto iter = formRequests_.find(formId);
+        if (iter == formRequests_.end()) {
+            return ERR_APPEXECFWK_FORM_NOT_EXIST_FORM_REQUEST;
+        }
+        for (auto& formRequestElement : iter->second) {
+            if (hasTransparencyKey) {
+                formRequestElement.second.want.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY,
+                    want.GetStringParam(Constants::PARAM_FORM_TRANSPARENCY_KEY));
+            }
+            if (hasEnableBlurBackgroundKey) {
+                formRequestElement.second.want.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY,
+                    want.GetBoolParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, false));
+            }
+        }
+    }
 
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto search = formRendererGroupMap_.find(formId);
