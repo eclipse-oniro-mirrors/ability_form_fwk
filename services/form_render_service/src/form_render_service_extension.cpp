@@ -52,15 +52,17 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
     if (context) {
         FormRenderServiceMgr::GetInstance().SetConfiguration(context->GetConfiguration());
     }
-    std::weak_ptr<FormRenderServiceExtension> thisWeakPtr(shared_from_this());
-    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb([thisWeakPtr]() -> const std::unique_ptr<Runtime>& {
-        auto formRenderServiceExtension = thisWeakPtr.lock();
-        if (formRenderServiceExtension == nullptr) {
-            HILOG_ERROR("null formRenderServiceExtension");
-            return nullptr;
+    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb(
+        [weak = std::enable_shared_from_this<FormRenderServiceExtension>::weak_from_this()]()
+            -> const std::unique_ptr<Runtime>& {
+            auto serviceExtension = weak.lock();
+            if (serviceExtension == nullptr) {
+                HILOG_ERROR("null formRenderServiceExtension");
+                return nullptr;
+            }
+            return serviceExtension->runtime_;
         }
-        return formRenderServiceExtension.runtime_;
-    });
+    );
     // Prevents FRS-processe from being frozen (Phone, WGR, PC only)
     OHOS::BackgroundTaskMgr::EfficiencyResourceInfo resourceInfo(
         OHOS::BackgroundTaskMgr::ResourceType::Type::CPU, true, 0, "", true);
