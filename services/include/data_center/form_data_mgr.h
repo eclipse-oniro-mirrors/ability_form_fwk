@@ -1068,6 +1068,21 @@ public:
     * @return Returns true if this function is successfully called; returns false otherwise.
     */
     bool MergeFormData(const int64_t formId, FormProviderData &formProviderData);
+
+    /**
+     * @brief Update form host params.
+     * @param formId form id.
+     * @param want want.
+     */
+    void UpdateFormHostParams(const int64_t formId, const Want &want);
+
+    /**
+     * @brief Get form host params.
+     * @param formId form id.
+     * @param want want.
+     */
+    void GetFormHostParams(const int64_t formId, Want &want);
+
 private:
     /**
      * @brief Create form record.

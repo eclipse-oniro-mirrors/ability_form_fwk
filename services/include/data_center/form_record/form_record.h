@@ -110,6 +110,7 @@ public:
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool isTemplateForm = false;
     FormUpgradeInfo formUpgradeInfo;
+    AAFwk::WantParams formHostParams;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
