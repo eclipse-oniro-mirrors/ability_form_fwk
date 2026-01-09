@@ -481,6 +481,8 @@ namespace Constants {
     constexpr const char* IS_ADD_FORM_BY_HOST = "isAddFormByHost";
 
     constexpr const int32_t TEMPLATE_FORM_MAX_SIZE = 20;
+
+    constexpr const char* PARAM_VISUAL_EFFECT_TYPE_KEY = "visualEffectType";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
