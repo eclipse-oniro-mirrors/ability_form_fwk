@@ -175,7 +175,9 @@ private:
 
     ErrCode CheckAndRebuildRdbStore(int32_t rdbOperateRet);
 
-    ErrCode LoadRdbStore();
+    std::shared_ptr<NativeRdb::RdbStore> LoadRdbStore();
+
+    std::shared_ptr<NativeRdb::RdbStore> GetRdbStore();
 
     std::map<std::string, FormRdbTableConfig> formRdbTableCfgMap_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
