@@ -1417,6 +1417,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0306, TestSize.Level0)
     EXPECT_EQ(ERR_OK, formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
     EXPECT_EQ(ERR_OK, formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
     EXPECT_EQ(ERR_OK, formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
         formMgrAdapter.ReAcquireProviderFormInfoAsync(info, wantParams));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0306 end";

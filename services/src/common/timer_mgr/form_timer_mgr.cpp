@@ -995,7 +995,7 @@ void FormTimerMgr::OnIntervalTimeOut()
             int64_t bootTime = FormTimerUtil::GetBootTimeMs();
             HILOG_DEBUG("bootTime:%{public}s settedTime:%{public}s", std::to_string(bootTime).c_str(),
                 std::to_string(itItem->settedTime).c_str());
-            int64_t exceedTime = PERIODIC_REFRESH_MULTIPLE * intervalTask.period / timeSpeed_;
+            int64_t exceedTime = PERIODIC_REFRESH_MULTIPLE * intervalTask.period;
             if (itItem != dynamicRefreshTasks_.end() && bootTime - itItem->settedTime  <= exceedTime) {
                 HILOG_INFO("skip periodic refresh for formId:%{public}" PRId64 " due to SetNextRefreshTime",
                     intervalTask.formId);

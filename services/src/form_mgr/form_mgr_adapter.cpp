@@ -117,7 +117,7 @@ constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
 const std::string PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
-constexpr int32_t MAX_RECONNECT_NUMS = 3;
+constexpr int32_t MAX_RECONNECT_NUMS = 4;
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
 };
