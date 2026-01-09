@@ -27,7 +27,7 @@ FormDataRefreshImpl::~FormDataRefreshImpl() {}
 
 int FormDataRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_CALLING_USER };
+    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_CALLING_USER, TYPE_MULTI_ACTIVE_USERS};
     CheckValidFactor factor;
     factor.formId = data.formId;
     factor.record = data.record;

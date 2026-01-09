@@ -250,9 +250,7 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    bool addFormFinish = false;
-    FormReport::GetInstance().GetAddFormFinish(formId, addFormFinish);
-    if (!addFormFinish) {
+    if (!record.addFormFinish) {
         HILOG_ERROR("form is adding form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
