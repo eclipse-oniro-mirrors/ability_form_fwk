@@ -34,7 +34,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string KEY_DELIMITER = "?"; // the delimiter between key and uid
+constexpr const char *KEY_DELIMITER = "?"; // the delimiter between key and uid
 } // namespace
 
 class PermissionCustomizeListener : public Security::AccessToken::PermStateChangeCallbackCustomize {

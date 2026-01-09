@@ -19,11 +19,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string FORM_EVENT_TIMEOUT_QUEUE = "FormEventTimeoutQueue";
+constexpr const char *FORM_EVENT_TIMEOUT_QUEUE = "FormEventTimeoutQueue";
 }
 FormEventTimeoutQueue::FormEventTimeoutQueue()
 {
-    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_EVENT_TIMEOUT_QUEUE.c_str());
+    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_EVENT_TIMEOUT_QUEUE);
     HILOG_INFO("create FormEventTimeoutQueue");
 }
 

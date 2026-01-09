@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string LOCK_FORM_EXEMPT_TABLE = "lock_form_exempt_table";
+constexpr const char *LOCK_FORM_EXEMPT_TABLE = "lock_form_exempt_table";
 }
 
 FormExemptLockMgr::FormExemptLockMgr()

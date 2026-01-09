@@ -19,7 +19,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
 const std::string INVALID_VALUE = "";
+}
 
 FormBasicInfoMgr::FormBasicInfoMgr()
 {

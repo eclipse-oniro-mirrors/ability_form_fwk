@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string LOCK_FORM_BUNDLE_TABLE = "lock_form_bundle_table";
+constexpr const char *LOCK_FORM_BUNDLE_TABLE = "lock_form_bundle_table";
 constexpr int32_t DEFAULT_USER_ID = 100;
 }
 

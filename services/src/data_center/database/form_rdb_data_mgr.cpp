@@ -30,8 +30,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string FORM_KEY = "KEY";
-const std::string FORM_VALUE = "VALUE";
+constexpr const char *FORM_KEY = "KEY";
+constexpr const char *FORM_VALUE = "VALUE";
 const int32_t FORM_KEY_INDEX = 0;
 const int32_t FORM_VALUE_INDEX = 1;
 const int64_t MIN_FORM_RDB_REBUILD_INTERVAL = 10000; // 10s

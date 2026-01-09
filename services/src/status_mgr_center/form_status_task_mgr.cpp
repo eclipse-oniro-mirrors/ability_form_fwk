@@ -41,7 +41,7 @@ constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
 constexpr int64_t RELEASE_RENDER_DELAY_TIME = 40;
 constexpr int64_t RELEASE_RENDER_DELAY_MSG = 2;
 constexpr uint64_t RESTORE_ECYCLED_DELAY_MS = 20;
-const std::string EMPTY_STATUS_DATA = "empty_status_data";
+constexpr const char *EMPTY_STATUS_DATA = "empty_status_data";
 
 void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, FormJsInfo &formJsInfo)
 {

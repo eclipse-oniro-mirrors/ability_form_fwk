@@ -86,11 +86,11 @@ HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_002, TestSize.Level1)
 HWTEST_F(FormBasicInfoMgrTest, FormBasicInfoMgr_003, TestSize.Level1)
 {
     int64_t formId = 1;
-    const auto abilityName = formBasicInfoMgr.GetFormAbilityName(formId);
-    const auto bundleName = formBasicInfoMgr.GetFormBundleName(formId);
-    const auto moudleName = formBasicInfoMgr.GetFormModuleName(formId);
-    const auto formName = formBasicInfoMgr.GetFormName(formId);
-    const auto packageName = formBasicInfoMgr.GetFormPackageName(formId);
+    const std::string abilityName = formBasicInfoMgr.GetFormAbilityName(formId);
+    const std::string bundleName = formBasicInfoMgr.GetFormBundleName(formId);
+    const std::string moudleName = formBasicInfoMgr.GetFormModuleName(formId);
+    const std::string formName = formBasicInfoMgr.GetFormName(formId);
+    const std::string packageName = formBasicInfoMgr.GetFormPackageName(formId);
     EXPECT_EQ(abilityName, INVALID_VALUE);
     EXPECT_EQ(bundleName, INVALID_VALUE);
     EXPECT_EQ(moudleName, INVALID_VALUE);

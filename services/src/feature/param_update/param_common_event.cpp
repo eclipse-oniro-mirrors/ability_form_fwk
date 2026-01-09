@@ -30,12 +30,12 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    constexpr int32_t RETRY_SUBSCRIBER = 3;
-    const std::string EVENT_INFO_TYPE = "type";
-    const std::string EVENT_INFO_SUBTYPE = "subtype";
-    const std::string CFG_UPDATED_ACTION = "usual.event.DUE_SA_CFG_UPDATED";
-    const std::string PARAM_CONFIG_TYPE = "FormMgrConfig";
-    const std::string RECEIVE_UPDATE_PERMISSION = "ohos.permission.RECEIVE_UPDATE_MESSAGE";
+constexpr int32_t RETRY_SUBSCRIBER = 3;
+constexpr const char *EVENT_INFO_TYPE = "type";
+constexpr const char *EVENT_INFO_SUBTYPE = "subtype";
+constexpr const char *CFG_UPDATED_ACTION = "usual.event.DUE_SA_CFG_UPDATED";
+constexpr const char *PARAM_CONFIG_TYPE = "FormMgrConfig";
+constexpr const char *RECEIVE_UPDATE_PERMISSION = "ohos.permission.RECEIVE_UPDATE_MESSAGE";
 }
 
 ParamCommonEvent::ParamCommonEvent()

@@ -31,6 +31,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
 const std::string LINE_FEED = "\n";
 
 const static std::unordered_map<FormFsmStatus, std::string> formStatusMap_ = {
@@ -62,6 +63,7 @@ const static std::unordered_map<FormVisibilityType, std::string> formVisibilityT
     { FormVisibilityType::VISIBLE, "[ VISIBLE ] \n" },
     { FormVisibilityType::INVISIBLE, "[ INVISIBLE ] \n" },
 };
+}
 
 FormDumpMgr::FormDumpMgr() {}
 FormDumpMgr::~FormDumpMgr() {}

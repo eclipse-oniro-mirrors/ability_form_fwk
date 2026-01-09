@@ -24,19 +24,19 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string DUE_PARAM_UPDATE_CTRL = "formUpdateDurationCtrl";
-const std::string DUE_PARAM_DISABLE_CTRL = "formDisableCtrl";
-const std::string DUE_PARAM_BUNDLENAME = "bundleName";
-const std::string DUE_PARAM_MODULENAME = "moduleName";
-const std::string DUE_PARAM_ABILITYNAME = "abilityName";
-const std::string DUE_PARAM_FORMNAME = "formName";
-const std::string DUE_PARAM_DIMENSION = "dimension";
-const std::string DUE_PARAM_APP_VERSION_START = "appVersionStart";
-const std::string DUE_PARAM_APP_VERSION_END = "appVersionEnd";
-const std::string DUE_PARAM_UPDATE_DURATION = "updateDuration";
-const std::string DUE_PARAM_POLICY = "policy";
-const std::string DUE_POLICY_DISABLE = "disable";
-const std::string DUE_POLICY_REMOVE = "remove";
+constexpr const char *DUE_PARAM_UPDATE_CTRL = "formUpdateDurationCtrl";
+constexpr const char *DUE_PARAM_DISABLE_CTRL = "formDisableCtrl";
+constexpr const char *DUE_PARAM_BUNDLENAME = "bundleName";
+constexpr const char *DUE_PARAM_MODULENAME = "moduleName";
+constexpr const char *DUE_PARAM_ABILITYNAME = "abilityName";
+constexpr const char *DUE_PARAM_FORMNAME = "formName";
+constexpr const char *DUE_PARAM_DIMENSION = "dimension";
+constexpr const char *DUE_PARAM_APP_VERSION_START = "appVersionStart";
+constexpr const char *DUE_PARAM_APP_VERSION_END = "appVersionEnd";
+constexpr const char *DUE_PARAM_UPDATE_DURATION = "updateDuration";
+constexpr const char *DUE_PARAM_POLICY = "policy";
+constexpr const char *DUE_POLICY_DISABLE = "disable";
+constexpr const char *DUE_POLICY_REMOVE = "remove";
 }
 
 ParamControl::ParamControl() {}

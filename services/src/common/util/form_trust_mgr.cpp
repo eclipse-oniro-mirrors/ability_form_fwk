@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string UNTRUST_LIST = "untrust_list";
+constexpr const char *UNTRUST_LIST = "untrust_list";
 const int32_t UNTRUST_THRESHOLD = 3;
 } // namespace
 

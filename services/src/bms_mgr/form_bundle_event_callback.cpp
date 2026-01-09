@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
+constexpr const char *BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
 } // namespace
 
 FormBundleEventCallback::FormBundleEventCallback()

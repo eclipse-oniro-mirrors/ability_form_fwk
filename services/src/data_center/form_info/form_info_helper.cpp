@@ -30,8 +30,8 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
-const std::string FORM_METADATA_NAME = "ohos.extension.form";
-const std::string TEMPLATE_FORM_METADATA_NAME = "ohos.extension.templateForm";
+constexpr const char *FORM_METADATA_NAME = "ohos.extension.form";
+constexpr const char *TEMPLATE_FORM_METADATA_NAME = "ohos.extension.templateForm";
 }
 
 bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)

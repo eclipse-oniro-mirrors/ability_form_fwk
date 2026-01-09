@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    const std::string FORBIDDEN_FORM_BUNDLE_TABLE = "forbidden_form_bundle_table";
+constexpr const char *FORBIDDEN_FORM_BUNDLE_TABLE = "forbidden_form_bundle_table";
 }
 
 FormBundleForbidMgr::FormBundleForbidMgr()
