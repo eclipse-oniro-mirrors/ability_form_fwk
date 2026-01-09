@@ -3425,7 +3425,8 @@ void FormDataMgr::UpdateFormHostParams(const int64_t formId, const Want &want)
             formRecord->second.formHostParams.SetParam(paramKey, paramValue);
         }
     }
-    HILOG_INFO(" end, formId:%{public}" PRId64 ", formHostParams:%{public}s.", formId, formRecord->second.formHostParams.ToString().c_str());
+    HILOG_INFO(" end, formId:%{public}" PRId64 ", formHostParams:%{public}s.",
+        formId, formRecord->second.formHostParams.ToString().c_str());
 }
 
 void FormDataMgr::GetFormHostParams(const int64_t formId, Want &want)
