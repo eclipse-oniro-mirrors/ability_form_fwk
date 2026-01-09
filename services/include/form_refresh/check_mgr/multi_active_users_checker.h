@@ -23,9 +23,9 @@
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class MultiActiveUsersChecker
-* MultiActiveUsersChecker is used to check current active user match.
-*/
+ * @class MultiActiveUsersChecker
+ * MultiActiveUsersChecker is used to check current active user match.
+ */
 class MultiActiveUsersChecker : public IBaseChecker, public DelayedRefSingleton<MultiActiveUsersChecker> {
     DECLARE_DELAYED_REF_SINGLETON(MultiActiveUsersChecker);
 public:
