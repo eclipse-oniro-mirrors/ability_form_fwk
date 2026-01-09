@@ -115,6 +115,8 @@ constexpr const char *API_ALLOW_LIST[] = {
     "graphics.text.FontCollection.loadFont",
     "graphics.text.FontCollection.unloadFont",
     "graphics.text.FontCollection.clearCaches",
+    "graphics.text.FontCollection.loadFontSyncWithCheck",
+    "graphics.text.FontCollection.loadFontWithCheck",
 };
 } // namespace
 
