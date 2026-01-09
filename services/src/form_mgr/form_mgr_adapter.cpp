@@ -4909,7 +4909,7 @@ ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info,
     std::lock_guard<std::mutex> lock(reconnectMutex_);
     auto iter = formReconnectMap_.find(info.GetFormId());
     if (iter == formReconnectMap_.end()) {
-        formReconnectMap_.emplace(info.GetFormId(), 0);
+        iter = formReconnectMap_.emplace(info.GetFormId(), 0).first;
     }
     iter->second++;
     int32_t delayAcquireProviderFormInfoTime = 0;
