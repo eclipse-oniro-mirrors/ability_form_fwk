@@ -28,7 +28,7 @@ FormNextTimeRefreshImpl::~FormNextTimeRefreshImpl() {}
 int FormNextTimeRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
     const std::vector<int32_t> checkTypes = {
-        TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_CALLING_BUNDLE, TYPE_ADD_FINISH
+        TYPE_UNTRUST_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_CALLING_BUNDLE, TYPE_ADD_FINISH
     };
     CheckValidFactor factor;
     factor.formId = data.formId;

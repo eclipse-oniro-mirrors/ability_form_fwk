@@ -1062,6 +1062,21 @@ public:
     void DelHostTransparentFormColor(const int64_t formId);
 
     /**
+     * @brief Get addFormFinish and set isNeedUpdateFormOnAddFormFinish flag atomic method.
+     * @param formId The Id of the form.
+     * @return Returns value of addFormFinish.
+     */
+    bool GetAddfinishAndSetUpdateFlag(const int64_t formId);
+
+    /**
+     * @brief Is needUpdate On addFinish atomic method.
+     * @param formId The Id of the form.
+     * @param formRecord form record.
+     * @return Returns value of IsNeedUpdate.
+     */
+    bool GetIsNeedUpdateOnAddFinish(const int64_t formId, FormRecord &formRecord);
+
+    /**
     * @brief Merges form data into the provider data.
     * @param formId The Id of the form.
     * @param formProviderData The target FormProviderData to receive the merged data.

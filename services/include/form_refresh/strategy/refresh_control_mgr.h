@@ -65,6 +65,11 @@ public:
      */
     bool IsNeedToFresh(FormRecord &record, bool isVisibleToFresh);
 
+    /**
+     * @brief Whether the form add finish.
+     */
+    bool IsAddFormFinish(const int64_t formId);
+
 private:
 #ifdef RES_SCHEDULE_ENABLE
     bool isSystemOverload_ = false;

@@ -47,6 +47,8 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "${form_fwk_path}/services/src/form_refresh/check_mgr/self_form_checker.cpp",
     "${form_fwk_path}/services/src/form_refresh/check_mgr/system_app_checker.cpp",
     "${form_fwk_path}/services/src/form_refresh/check_mgr/untrust_app_checker.cpp",
+    "${form_fwk_path}/services/src/form_refresh/check_mgr/multi_active_users_checker.cpp",
+    "${form_fwk_path}/services/src/form_refresh/refresh_impl/base_form_refresh.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_data_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_force_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_host_refresh_impl.cpp",

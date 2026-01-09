@@ -31,7 +31,7 @@ int FormProviderRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
     HILOG_DEBUG("call");
     int64_t formId = data.record.formId;
-    static const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    static const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_ADD_FINISH };
     CheckValidFactor factor;
     factor.formId = formId;
     factor.record = data.record;
