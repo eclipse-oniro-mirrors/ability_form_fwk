@@ -270,35 +270,6 @@ HWTEST_F(FormReportTest, FormReport_015, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormReport_016
- * @tc.desc: test GetAddFormFinish function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormReportTest, FormReport_016, TestSize.Level1)
-{
-    formReport.SetFormRecordInfo(testFormId, want);
-    formReport.InsertFormId(testFormId);
-    bool addFormFinish;
-    formReport.GetAddFormFinish(testFormId, addFormFinish);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
-}
-
-/**
- * @tc.name: FormReport_017
- * @tc.desc: test SetAddFormFinish function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormReportTest, FormReport_017, TestSize.Level1)
-{
-    formReport.SetFormRecordInfo(testFormId, want);
-    formReport.InsertFormId(testFormId);
-    formReport.SetAddFormFinish(testFormId);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
-}
-
-/**
  * @tc.name: FormReport_018
  * @tc.desc: test SetFormRecordInfo function.
  * @tc.type: FUNC
@@ -513,22 +484,6 @@ HWTEST_F(FormReportTest, FormReport_032, TestSize.Level1)
     auto statisticIt = formReport.GetStatistic().find(testFormId);
     EXPECT_NE(statisticIt, formReport.GetStatistic().end());
 }
-
-/**
- * @tc.name: FormReport_033
- * @tc.desc: test GetAddFormFinish function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormReportTest, FormReport_033, TestSize.Level1)
-{
-    formReport.SetFormRecordInfo(testFormId, want);
-    formReport.InsertFormId(testFormId);
-    bool addFormFinish;
-    formReport.GetAddFormFinish(testFormId, addFormFinish);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
-}
-
 
 /**
  * @tc.name: FormReport_034

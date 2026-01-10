@@ -74,6 +74,8 @@ constexpr const char* FORM_HOST_RECT_HEIGHT = "height";
 constexpr const char* FORM_HOST_OVERFLOWINFO_AREA = "area";
 constexpr const char* FORM_HOST_OVERFLOWINFO_DURATION = "duration";
 constexpr const char* FORM_HOST_OVERFLOWINFO_USEDEFAULTANIMATION = "useDefaultAnimation";
+constexpr const char* FORM_HOST_UPDATEFORMSIZE =
+    "C{std.core.String}C{@ohos.app.form.formInfo.formInfo.FormDimension}C{@ohos.app.form.formInfo.formInfo.Rect}:";
 
 constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
 
@@ -2304,6 +2306,54 @@ void ClearRouterProxy(ani_env *env, ani_object arrayObj, ani_object callback)
     HILOG_DEBUG("End");
 }
 
+void UpdateFormSize(ani_env *env, ani_string aniFormId, ani_object aniNewDimension, ani_object aniNewRect)
+{
+    HILOG_DEBUG("call");
+    CheckEnvOrThrow(env);
+    if (IsRefUndefined(env, aniNewDimension) || IsRefUndefined(env, aniNewRect)) {
+        PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
+        return;
+    }
+
+    int64_t formId = FormIdAniStrtoInt64(env, aniFormId);
+    if (formId == INVALID_FORMID) {
+        HILOG_ERROR("Convert formId failed");
+        EtsErrorUtil::ThrowError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FORM_ID_NOT_EXIST),
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FORM_ID_NOT_EXIST));
+        return;
+    }
+
+    int32_t newDimension = 0;
+    ani_status status = GetEnumValueInt(env, aniNewDimension, newDimension);
+    if (status == ANI_OK) {
+        if (newDimension < static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN) ||
+            newDimension > static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX)) {
+            HILOG_ERROR("newDimension not Dimension enum");
+            EtsErrorUtil::ThrowError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR),
+                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR));
+            return;
+        }
+    } else {
+        HILOG_ERROR("newDimension not number, status:%{public}d", status);
+        EtsErrorUtil::ThrowError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR),
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR));
+        return;
+    }
+
+    std::unique_ptr<AppExecFwk::Rect> newRect = std::make_unique<AppExecFwk::Rect>();
+    if (!UnwrapFormRect(env, aniNewRect, *newRect)) {
+        HILOG_ERROR("convert newRect failed");
+        EtsErrorUtil::ThrowInvalidParamError(env, "The newRect is invalid");
+        return;
+    }
+    
+    auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimension, *newRect);
+    if (ret == ERR_OK) {
+        return;
+    }
+    EtsErrorUtil::ThrowError(env, ret, FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ret));
+}
+
 std::vector<ani_native_function> GetBindMethods()
 {
     std::vector methods = {
@@ -2397,6 +2447,10 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function {
             "clearRouterProxyInner", "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(ClearRouterProxy)},
+        ani_native_function {
+            "nativeUpdateFormSize",
+            FORM_HOST_UPDATEFORMSIZE,
+            reinterpret_cast<void *>(UpdateFormSize)},
     };
     return methods;
 }

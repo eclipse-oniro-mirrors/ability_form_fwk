@@ -845,6 +845,18 @@ public:
         return startAbilityOnlyUIAbility_;
     }
 
+    int32_t OpenLink(const Want &want, sptr<IRemoteObject> callerToken, int32_t userId = DEFAULT_INVAL_VALUE,
+        int requestCode = DEFAULT_INVAL_VALUE, bool hideFailureTipDialog = false)
+    {
+        return openLink_;
+    }
+
+    int32_t OpenAtomicService(Want& want, const StartOptions &options, sptr<IRemoteObject> callerToken,
+        int32_t requestCode = DEFAULT_INVAL_VALUE, int32_t userId = DEFAULT_INVAL_VALUE)
+    {
+        return openAtomicService_;
+    }
+
     int32_t startAbility_ = 0;
 
     int32_t startAbilityByCall_ = 0;
@@ -852,6 +864,10 @@ public:
     int32_t startAbilityWithSpecifyTokenId_ = 0;
 
     int32_t startAbilityOnlyUIAbility_ = 0;
+    
+    int32_t openLink_ = 0;
+
+    int32_t openAtomicService_ = 0;
 private:
     Semaphore sem_;
 };

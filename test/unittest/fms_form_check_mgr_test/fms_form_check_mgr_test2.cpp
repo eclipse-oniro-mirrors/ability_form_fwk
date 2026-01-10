@@ -112,7 +112,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_FormRefreshMgr_004, TestSize.
     RefreshData data;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormRefreshMgr::GetInstance().RequestRefresh(data, -1));
 
-    EXPECT_EQ(ERR_OK, FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA));
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormRefreshMgr_004 end";
 }
 
@@ -167,6 +167,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshCacheMgr_005, TestSize
     RefreshCacheMgr::GetInstance().ConsumeRenderTask(FORM_ID_ONE);
     RefreshCacheMgr::GetInstance().AddRenderTask(FORM_ID_ONE, task);
     RefreshCacheMgr::GetInstance().DelRenderTask(FORM_ID_ONE);
+    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(FORM_ID_ONE);
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshCacheMgr_005 end";
 }
 }

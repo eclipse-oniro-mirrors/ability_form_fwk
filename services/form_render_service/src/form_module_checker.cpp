@@ -27,9 +27,9 @@
 #include "config_policy_utils.h"
 
 namespace {
-const std::string FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
-const std::string KEY_MODULE_ALLOW = "moduleAllowList";
-const std::vector<std::string> MODULE_ALLOW_LIST = {
+constexpr const char *FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
+constexpr const char *KEY_MODULE_ALLOW = "moduleAllowList";
+constexpr const char *MODULE_ALLOW_LIST[] = {
     "mediaquery",
     "display",
     "effectKit",
@@ -52,7 +52,7 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "arkui.uicontext",
     "arkui.modifier"
 };
-const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
+constexpr const char *MODULE_ALLOW_WITH_API_LIST[] = {
     "i18n",
     "font",
     "multimedia.image",
@@ -61,14 +61,14 @@ const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "process",
     "graphics.text"
 };
-const std::vector<std::string> API_ALLOW_LIST = {
+constexpr const char *API_ALLOW_LIST[] = {
     "i18n.System.getSystemLanguage",
     "i18n.System.is24HourClock",
     "i18n.System.getSystemLocale",
     "i18n.System.getSystemRegion",
     "i18n.isRTL",
     "i18n.getTimeZone",
-    "i18n.getCalendar"
+    "i18n.getCalendar",
     "i18n.Calendar.*",
     "i18n.TimeZone.*",
     "i18n.Unicode.*",
@@ -165,7 +165,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         }
     }
     for (const auto& item : MODULE_ALLOW_LIST) {
-        if (item == moduleName) {
+        if (std::strcmp(item, moduleName) == 0) {
             HILOG_DEBUG("load moduleName= %{public}s", moduleName);
             return true;
         }
@@ -201,7 +201,7 @@ std::vector<std::string> FormModuleChecker::GetModuleAllowList()
     HILOG_INFO("read moduleAllowList from config file");
     std::vector<std::string> result;
     char buf[MAX_PATH_LEN];
-    char* path = GetOneCfgFile(FORM_MODULE_WHITE_LIST_PATH.c_str(), buf, MAX_PATH_LEN);
+    char* path = GetOneCfgFile(FORM_MODULE_WHITE_LIST_PATH, buf, MAX_PATH_LEN);
     if (path == nullptr || *path == '\0') {
         HILOG_ERROR("config file not found");
         return result;

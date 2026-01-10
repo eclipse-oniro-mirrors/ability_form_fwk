@@ -92,6 +92,7 @@
 #include "feature/param_update/param_control.h"
 #include "feature/theme_form/theme_form_client.h"
 #include "iform_provider_delegate.h"
+#include "start_options.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -116,7 +117,7 @@ constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
 const std::string PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
-constexpr int32_t RECONNECT_NUMS = 2;
+constexpr int32_t MAX_RECONNECT_NUMS = 3;
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
 };
@@ -878,7 +879,10 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     data.record = record;
     data.callerToken = callerToken;
     data.want = updateFormWant;
-    if (isNeedAddForm && (record.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(formId))) {
+    bool needAcquireProviderData = FormCacheMgr::GetInstance().NeedAcquireProviderData(formId);
+    HILOG_INFO("formId:%{public}" PRId64 ", isNeedAddForm:%{public}d, needAcquireProviderData:%{public}d, "
+        "needRefresh:%{public}d.", formId, isNeedAddForm, needAcquireProviderData, record.needRefresh);
+    if (isNeedAddForm && (needAcquireProviderData || record.needRefresh)) {
         ErrCode errCode = AcquireProviderFormInfoByFormRecord(record, addFormWant.GetParams());
         auto delayRefreshForm = [data]() mutable {
             FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
@@ -2944,7 +2948,17 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    CheckAndSetFreeInstallFlag(record, want);
+    SetFreeInstallFlag(record, want);
+ 
+    if (want.HasParameter(Constants::PARAM_OPEN_TYPE)) {
+        int32_t openType = want.GetIntParam(Constants::PARAM_OPEN_TYPE, -1);
+        HILOG_INFO("Router by OpenType:%{public}d", openType);
+        int32_t openResult = ERR_OK;
+        bool isOpened = OpenByOpenType(openType, record, callerToken, want, openResult);
+        if (isOpened) {
+            return openResult;
+        }
+    }
 
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
@@ -2978,7 +2992,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     return ERR_OK;
 }
 
-void FormMgrAdapter::CheckAndSetFreeInstallFlag(const FormRecord &record, Want &want)
+void FormMgrAdapter::SetFreeInstallFlag(const FormRecord &record, Want &want)
 {
     unsigned int flag = want.GetFlags() & Want::FLAG_INSTALL_ON_DEMAND;
     if (!flag) {
@@ -2991,6 +3005,57 @@ void FormMgrAdapter::CheckAndSetFreeInstallFlag(const FormRecord &record, Want &
         HILOG_WARN("Only system app can set FLAG_INSTALL_ON_DEMAND");
         want.RemoveFlags(Want::FLAG_INSTALL_ON_DEMAND);
     }
+}
+
+bool FormMgrAdapter::OpenByOpenType(const int32_t openType, const FormRecord &record,
+    const sptr<IRemoteObject> &callerToken, Want &want, int32_t &openResult)
+{
+    if (!record.isSystemApp) {
+        HILOG_ERROR("Only system app can use openType");
+        openResult = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+        return true;
+    }
+ 
+    if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_APP_LINKING)) {
+        std::string bundleName;
+        auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("OpenByOpenType get caller bundleName failed");
+            openResult = ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+            return true;
+        }
+        want.SetParam(Want::PARAM_RESV_CALLER_BUNDLE_NAME, bundleName);
+        int32_t result = IN_PROCESS_CALL(
+            FormAmsHelper::GetInstance().GetAbilityManager()->OpenLink(want, callerToken));
+        if (result != ERR_OK && result != START_ABILITY_WAITING) {
+            HILOG_ERROR("failed OpenLink, result:%{public}d", result);
+            openResult = result;
+            return true;
+        }
+        openResult = ERR_OK;
+        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER);
+        return true;
+    }
+    if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_ATOMIC_SERVICE)) {
+        want.SetUri("");
+        StartOptions startOptions;
+        int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->OpenAtomicService(
+            want, startOptions, callerToken));
+        if (result != ERR_OK && result != START_ABILITY_WAITING) {
+            HILOG_ERROR("failed OpenAtomicService, result:%{public}d", result);
+            openResult = result;
+            return true;
+        }
+        openResult = ERR_OK;
+        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER);
+        return true;
+    }
+    if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::START_ABILITY)) {
+        HILOG_INFO("Router by startAbility or uri");
+        return false;
+    }
+    HILOG_ERROR("invalid OpenType:%{public}d", openType);
+    return false;
 }
 
 int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
@@ -4839,21 +4904,29 @@ int32_t FormMgrAdapter::GetCallingUserId()
 
 ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams)
 {
-    HILOG_INFO("reconnect bundleName:%{public}s,formId:%{public}" PRId64,
-        info.GetProviderBundleName().c_str(), info.GetFormId());
+    HILOG_INFO("reconnect bundleName:%{public}s, formId:%{public}" PRId64, info.GetProviderBundleName().c_str(),
+        info.GetFormId());
     std::lock_guard<std::mutex> lock(reconnectMutex_);
     auto iter = formReconnectMap_.find(info.GetFormId());
     if (iter == formReconnectMap_.end()) {
-        formReconnectMap_.emplace(info.GetFormId(), 1);
-    } else {
-        iter->second++;
-        if (iter->second > RECONNECT_NUMS) {
-            HILOG_ERROR("reconnect fail");
-            formReconnectMap_.erase(info.GetFormId());
-            return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-        }
+        iter = formReconnectMap_.emplace(info.GetFormId(), 0).first;
     }
-    return AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
+    iter->second++;
+    int32_t delayAcquireProviderFormInfoTime = 0;
+    if (iter->second < MAX_RECONNECT_NUMS) {
+        delayAcquireProviderFormInfoTime = iter->second * RECONNECT_RETRY_DELAY_TIME;
+    } else if (iter->second == MAX_RECONNECT_NUMS) {
+        // schedule a delayed retry after LAST_RECONNECT_RETRY_DELAY_TIME milliseconds
+        delayAcquireProviderFormInfoTime = LAST_RECONNECT_RETRY_DELAY_TIME;
+    } else {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    auto delayAcquireProviderFormInfo = [info, wantParams]() {
+        FormMgrAdapter::GetInstance().AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
+    };
+    HILOG_WARN("reconnect form, schedule retry after %{public}d ms", delayAcquireProviderFormInfoTime);
+    FormMgrQueue::GetInstance().ScheduleTask(delayAcquireProviderFormInfoTime, delayAcquireProviderFormInfo);
+    return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::AcquireProviderFormInfoByFormRecord(const FormRecord &formRecord, const WantParams &wantParams)
@@ -4911,9 +4984,37 @@ void FormMgrAdapter::ClearReconnectNum(int64_t formId)
     formReconnectMap_.erase(formId);
 }
 
+bool FormMgrAdapter::CheckUIAbilityContext(const pid_t pid)
+{
+    auto appMgrProxy = GetAppMgr();
+    if (!appMgrProxy) {
+        HILOG_ERROR("Get app mgr failed");
+        return false;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    OHOS::AppExecFwk::RunningProcessInfo info;
+    int32_t result = appMgrProxy->GetRunningProcessInfoByPid(pid, info);
+    IPCSkeleton::SetCallingIdentity(identity);
+    if (result != ERR_OK) {
+        HILOG_ERROR("GetRunningProcessInfoByPid failed");
+        return false;
+    }
+    if (info.extensionType_ == ExtensionAbilityType::FORM) {
+        HILOG_ERROR("extensionType_ is not uiability");
+        return false;
+    }
+    return true;
+}
+
 ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms)
 {
     HILOG_DEBUG("call");
+    pid_t callingPid = IPCSkeleton::GetCallingPid();
+    if (!CheckUIAbilityContext(callingPid)) {
+        HILOG_ERROR("check uiAbility failed");
+        return ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY;
+    }
+
     int callingUid = IPCSkeleton::GetCallingUid();
     RefreshData data;
     data.callingUid = callingUid;
@@ -4972,9 +5073,6 @@ sptr<IFormPublishInterceptor> FormMgrAdapter::GetFormPublishInterceptor()
 
 bool FormMgrAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record)
 {
-    if (record.isDataProxy) {
-        return false;
-    }
     FormInfo formInfo;
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo);
     if (errCode != ERR_OK) {

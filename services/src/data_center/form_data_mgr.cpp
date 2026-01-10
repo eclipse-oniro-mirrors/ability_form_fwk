@@ -294,6 +294,19 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
  */
 void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo)
 {
+    CreateFormJsInfo(formId, record, record.formProviderInfo.GetFormData(), formInfo);
+}
+
+/**
+ * @brief Create form js info by form record.
+ * @param formId The Id of the form.
+ * @param record Form record.
+ * @param formProviderData The form data.
+ * @param formInfo Js info.
+ */
+void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record,
+    const FormProviderData &formProviderData, FormJsInfo &formInfo)
+{
     formInfo.formId = formId;
     formInfo.bundleName = record.bundleName;
     formInfo.abilityName = record.abilityName;
@@ -311,8 +324,8 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.isDynamic = record.isDynamic;
     formInfo.transparencyEnabled = record.transparencyEnabled;
     formInfo.modulePkgNameMap = record.modulePkgNameMap;
-    formInfo.formData = record.formProviderInfo.GetFormDataString();
-    formInfo.formProviderData = record.formProviderInfo.GetFormData();
+    formInfo.formData = formProviderData.GetDataString();
+    formInfo.formProviderData = formProviderData;
     formInfo.templateFormImperativeFwk = record.templateFormImperativeFwk;
 }
 
@@ -3219,14 +3232,8 @@ bool FormDataMgr::GetFormVisible(int64_t formId)
 
 void FormDataMgr::SetExpectRecycledStatus(const std::vector<int64_t> &formIds, bool isExpectRecycled)
 {
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto formId : formIds) {
-        auto info = formRecords_.find(formId);
-        if (info == formRecords_.end()) {
-            continue;
-        }
-        HILOG_INFO("formId:%{public}" PRId64 " isExpectRecycled:%{public}d", formId, isExpectRecycled);
-        info->second.expectRecycled = isExpectRecycled;
+        SetExpectRecycledStatus(formId, isExpectRecycled);
     }
 }
 
@@ -3374,6 +3381,61 @@ void FormDataMgr::DelHostTransparentFormColor(const int64_t formId)
     for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         itHostRecord->DeleteTransparentFormColor(formId);
     }
+}
+
+bool FormDataMgr::GetAddfinishAndSetUpdateFlag(const int64_t formId)
+{
+    HILOG_DEBUG("Get if add form finish and set addFinish flag");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_ERROR("formId:%{public}" PRId64 " not found", formId);
+        return false;
+    }
+    if (info->second.addFormFinish) {
+        HILOG_INFO("formId:%{public}" PRId64 " addition has been completed", formId);
+        return true;
+    }
+    info->second.isNeedUpdateFormOnAddFormFinish = true;
+    return false;
+}
+
+bool FormDataMgr::GetIsNeedUpdateOnAddFinish(const int64_t formId, FormRecord &formRecord)
+{
+    HILOG_DEBUG("Consume add unfinish flag.");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_ERROR("formId:%{public}" PRId64 " not found", formId);
+        return false;
+    }
+    bool isNeedUpdate = !info->second.addFormFinish && info->second.isNeedUpdateFormOnAddFormFinish;
+    info->second.addFormFinish = true;
+    info->second.isNeedUpdateFormOnAddFormFinish = false;
+    formRecord = info->second;
+    return isNeedUpdate;
+}
+
+/**
+* @brief Merges form data into the provider data.
+* @param formId The Id of the form.
+* @param formProviderData The target FormProviderData to receive the merged data.
+* @return Returns true if this function is successfully called; returns false otherwise.
+*/
+bool FormDataMgr::MergeFormData(const int64_t formId, FormProviderData &formProviderData)
+{
+    std::string stringData;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    if (!FormCacheMgr::GetInstance().GetData(formId, stringData, imageDataMap)) {
+        HILOG_INFO("No cache data found for formId: %{public}" PRId64, formId);
+        return false;
+    }
+    FormProviderData formCacheData;
+    formCacheData.SetDataString(stringData);
+    formCacheData.SetImageDataMap(imageDataMap);
+    formCacheData.MergeData(formProviderData.GetData());
+    formProviderData = formCacheData;
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

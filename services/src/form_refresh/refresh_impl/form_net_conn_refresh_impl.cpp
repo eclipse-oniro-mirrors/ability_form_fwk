@@ -30,7 +30,8 @@ FormNetConnRefreshImpl::~FormNetConnRefreshImpl() {}
 
 int FormNetConnRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_SYSTEM_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_SYSTEM_APP, TYPE_MULTI_ACTIVE_USERS,
+        TYPE_ADD_FINISH };
     CheckValidFactor factor;
     factor.formId = data.formId;
     factor.record = data.record;

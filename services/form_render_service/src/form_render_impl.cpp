@@ -121,10 +121,10 @@ int32_t FormRenderImpl::RecoverForm(const FormJsInfo &formJsInfo, const Want &wa
     return FormRenderStatusMgr::GetInstance().PostFormEvent(formJsInfo.formId, FormFsmEvent::RECOVER_FORM, recoverForm);
 }
 
-int32_t FormRenderImpl::UpdateFormSize(
-    const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid)
+int32_t FormRenderImpl::UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+    const std::string &uid, const FormJsInfo &formJsInfo)
 {
-    return FormRenderServiceMgr::GetInstance().UpdateFormSize(formId, formSurfaceInfo, uid);
+    return FormRenderServiceMgr::GetInstance().UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo);
 }
 
 bool FormRenderImpl::CheckIsFoundationCall()

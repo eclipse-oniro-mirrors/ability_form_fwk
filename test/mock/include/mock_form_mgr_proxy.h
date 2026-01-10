@@ -29,6 +29,8 @@ public:
     MOCK_METHOD2(GetFormsInfo, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
     MOCK_METHOD0(IsRequestPublishFormSupported, bool());
     MOCK_METHOD2(StartAbility, int32_t(const Want &want, const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD1(StartUIAbilityByFms, ErrCode(const Want &want));
+    MOCK_METHOD1(CloseFormEditAbility, ErrCode(bool isMainPage));
     MOCK_METHOD2(UpdateForm, int32_t(int64_t formId, const FormProviderData &formBindingData));
     MOCK_METHOD3(RequestForm, int32_t(int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want));
     MOCK_METHOD3(MessageEvent, int32_t(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken));
@@ -126,6 +128,8 @@ public:
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
     MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
     MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
+    MOCK_METHOD1(RegisterPublishFormCrossBundleControl, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterPublishFormCrossBundleControl, ErrCode());
 
     sptr<IRemoteObject> AsObject()
     {

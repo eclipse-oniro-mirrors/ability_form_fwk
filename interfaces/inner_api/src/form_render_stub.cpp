@@ -307,9 +307,16 @@ int32_t FormRenderStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string uid = data.ReadString();
+
+    std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
+    if (!formJsInfo) {
+        HILOG_ERROR("ReadParcelable<formJsInfo> fail");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_UpdateFormSize",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    int32_t result = UpdateFormSize(formId, *formSurfaceInfo, uid);
+
+    int32_t result = UpdateFormSize(formId, *formSurfaceInfo, uid, *formJsInfo);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;

@@ -21,10 +21,12 @@
 #include <shared_mutex>
 #include <unordered_map>
 
+#include "want.h"
+
 #include "data_center/form_record/form_record.h"
 #include "form_render/form_render_connection.h"
+#include "form_render/form_res_sched.h"
 #include "form_render_interface.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -153,11 +155,13 @@ private:
 
     mutable std::mutex resourceMutex_;
     mutable std::shared_mutex renderRemoteObjMutex_;
+    mutable std::mutex formResSchedMutex_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     // <hostToken, formIds>
     std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> etsHosts_;
     sptr<IFormRender> renderRemoteObj_ = nullptr;
+    std::unique_ptr<FormResSched> formResSched_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
     // userId_ is Active User

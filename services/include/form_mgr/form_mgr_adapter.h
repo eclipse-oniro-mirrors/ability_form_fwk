@@ -304,11 +304,23 @@ public:
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
-     * @brief Check record isSystemApp And Set FreeInstallFlag
+     * @brief Set FreeInstallFlag of want
      * @param record form record.
      * @param want the want of the ability to modify.
      */
-    void CheckAndSetFreeInstallFlag(const FormRecord &record, Want &want);
+    void SetFreeInstallFlag(const FormRecord &record, Want &want);
+
+    /**
+     * @brief Open Action By OpenType
+     * @param openType openType of form action
+     * @param record form record.
+     * @param callerToken Caller ability token.
+     * @param want the want of the ability to start.
+     * @param openResult the result of open action.
+     * @return Returns true if executed open action, false otherwise.
+     */
+    bool OpenByOpenType(const int32_t openType, const FormRecord &record,
+        const sptr<IRemoteObject> &callerToken, Want &want, int32_t &openResult);
 
     /**
      * @brief Process background router event.
@@ -1449,7 +1461,7 @@ private:
     std::unique_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::mutex formResultMutex_;
     std::condition_variable condition_;
-    std::map<int64_t, int32_t> formReconnectMap_;
+    std::unordered_map<int64_t, int32_t> formReconnectMap_;
     std::mutex reconnectMutex_;
 #ifdef THEME_MGR_ENABLE
     /**
@@ -1538,6 +1550,8 @@ private:
     void ClearLiveFormStatusCallerToken();
  
     sptr<IRemoteObject> GetLiveFormStatusCallerToken();
+
+    bool CheckUIAbilityContext(const pid_t pid);
 
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;

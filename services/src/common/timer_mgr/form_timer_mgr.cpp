@@ -56,6 +56,7 @@ constexpr int64_t TIMER_UPDATE_INTERVAL = 5 * 60 * 1000;
 constexpr int64_t TIMER_UPDATEAT_CREATE_BEHIND_TRIGGER = 10 * 1000;
 constexpr int64_t CHECK_INTERVAL = 6 * 60 * 60 * 1000;
 constexpr int TIME_MIN_SIZE = 2;
+constexpr int PERIODIC_REFRESH_MULTIPLE = 2;
 } // namespace
 
 FormTimerMgr::FormTimerMgr()
@@ -487,10 +488,8 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
             }
         }
         if (!isExist) {
-            DynamicRefreshItem theItem;
-            theItem.formId = formId;
-            theItem.settedTime = refreshTime;
-            theItem.userId = userId;
+            DynamicRefreshItem theItem(formId, refreshTime, userId);
+            theItem.nextRefreshFlag = true;
             dynamicRefreshTasks_.emplace_back(theItem);
         }
         dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
@@ -505,7 +504,6 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
         return false;
     }
     refreshLimiter_.AddItem(formId);
-    SetEnableFlag(formId, false);
 
     return true;
 }
@@ -874,7 +872,7 @@ void FormTimerMgr::SetTimeSpeed(int32_t timeSpeed)
     HandleResetLimiter();
     ClearIntervalTimer();
     FormPeriodReport();
-    int32_t formCheckTimerId;
+    uint64_t formCheckTimerId;
     {
         std::lock_guard<std::mutex> lock(formCheckTimerMutex_);
         formCheckTimerId = formCheckTimerId_;
@@ -972,7 +970,7 @@ void FormTimerMgr::OnIntervalTimeOut()
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     for (auto &intervalPair : intervalTimerTasks_) {
         FormTimer &intervalTask = intervalPair.second;
-        HILOG_BRIEF("intervalTask formId:%{public}" PRId64 ", period:%{public}" PRId64 ""
+        HILOG_BRIEF("intervalTask formId:%{public}" PRId64 ", period:%{public}" PRId64 " "
             "currentTime:%{public}" PRId64 ", refreshTime:%{public}" PRId64 ", isEnable:%{public}d",
             intervalTask.formId, intervalTask.period, currentTime,
             intervalTask.refreshTime, intervalTask.isEnable);
@@ -982,13 +980,27 @@ void FormTimerMgr::OnIntervalTimeOut()
             continue;
         }
 
-        // Verify if the next refresh will expire
-        if (!intervalTask.isEnable) {
+        if (!refreshLimiter_.IsEnableRefresh(intervalTask.formId)) {
             continue;
         }
 
-        if (!refreshLimiter_.IsEnableRefresh(intervalTask.formId)) {
-            continue;
+        // If a SetNextRefreshTime exists for this form, skip this periodic refresh
+        // unless the next refresh gap time is delayed beyond twice the configured period.
+        {
+            std::lock_guard<std::mutex> dynLock(dynamicMutex_);
+            auto itItem = std::find_if(dynamicRefreshTasks_.begin(), dynamicRefreshTasks_.end(),
+                [&intervalTask](const auto &it) {
+                    return it.nextRefreshFlag && it.formId == intervalTask.formId;
+                });
+            int64_t bootTime = FormTimerUtil::GetBootTimeMs();
+            HILOG_DEBUG("bootTime:%{public}s settedTime:%{public}s", std::to_string(bootTime).c_str(),
+                std::to_string(itItem->settedTime).c_str());
+            int64_t exceedTime = PERIODIC_REFRESH_MULTIPLE * intervalTask.period / timeSpeed_;
+            if (itItem != dynamicRefreshTasks_.end() && bootTime - itItem->settedTime  <= exceedTime) {
+                HILOG_INFO("skip periodic refresh for formId:%{public}" PRId64 " due to SetNextRefreshTime",
+                    intervalTask.formId);
+                continue;
+            }
         }
 
         intervalTask.refreshTime = currentTime;

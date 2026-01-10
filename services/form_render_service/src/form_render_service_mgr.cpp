@@ -45,8 +45,8 @@ constexpr int32_t ENABLE_FORM_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
 constexpr int64_t MIN_DURATION_MS = 1500;
 constexpr int64_t TASK_ONCONFIGURATIONUPDATED_DELAY_MS = 1000;
-const std::string FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
-const std::string TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
+constexpr const char *FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
+constexpr const char *TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
 }  // namespace
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -651,8 +651,8 @@ void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
     }
 }
 
-int32_t FormRenderServiceMgr::UpdateFormSize(
-    const int64_t formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid)
+int32_t FormRenderServiceMgr::UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+    const std::string &uid, const FormJsInfo &formJsInfo)
 {
     SetCriticalTrueOnFormActivity();
 
@@ -662,7 +662,7 @@ int32_t FormRenderServiceMgr::UpdateFormSize(
             HILOG_ERROR("UpdateFormSize null renderRecord of %{public}" PRId64, formId);
             return UPDATE_FORM_SIZE_FAILED;
         }
-        search->second->UpdateFormSizeOfGroups(formId, formSurfaceInfo);
+        search->second->UpdateFormSizeOfGroups(formId, formSurfaceInfo, formJsInfo);
         return ERR_OK;
     }
     HILOG_ERROR("can't find render record of %{public}" PRId64, formId);

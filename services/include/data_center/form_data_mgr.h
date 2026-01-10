@@ -67,6 +67,16 @@ public:
      * @param formInfo Js info.
      */
     void CreateFormJsInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo);
+
+    /**
+     * @brief Create form js info by form record.
+     * @param formId The Id of the form.
+     * @param record Form record.
+     * @param formProviderData The form data.
+     * @param formInfo Js info.
+     */
+    void CreateFormJsInfo(const int64_t formId, const FormRecord &record, const FormProviderData &formProviderData,
+        FormJsInfo &formInfo);
     /**
      * @brief Delete form js info by form record.
      * @param formId The Id of the form.
@@ -1051,6 +1061,28 @@ public:
      */
     void DelHostTransparentFormColor(const int64_t formId);
 
+    /**
+     * @brief Get addFormFinish and set isNeedUpdateFormOnAddFormFinish flag atomic method.
+     * @param formId The Id of the form.
+     * @return Returns value of addFormFinish.
+     */
+    bool GetAddfinishAndSetUpdateFlag(const int64_t formId);
+
+    /**
+     * @brief Is needUpdate On addFinish atomic method.
+     * @param formId The Id of the form.
+     * @param formRecord form record.
+     * @return Returns value of IsNeedUpdate.
+     */
+    bool GetIsNeedUpdateOnAddFinish(const int64_t formId, FormRecord &formRecord);
+
+    /**
+    * @brief Merges form data into the provider data.
+    * @param formId The Id of the form.
+    * @param formProviderData The target FormProviderData to receive the merged data.
+    * @return Returns true if this function is successfully called; returns false otherwise.
+    */
+    bool MergeFormData(const int64_t formId, FormProviderData &formProviderData);
 private:
     /**
      * @brief Create form record.
