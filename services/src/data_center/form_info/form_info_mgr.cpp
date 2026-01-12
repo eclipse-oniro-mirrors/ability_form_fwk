@@ -37,9 +37,9 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string FMS_IS_READY_EVENT = "fmsIsReady";
-const std::string PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
-const std::string IS_DELETE_CACHE_FALSE = "false";
+constexpr const char *FMS_IS_READY_EVENT = "fmsIsReady";
+constexpr const char *PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
+constexpr const char *IS_DELETE_CACHE_FALSE = "false";
 } // namespace
 FormInfoMgr::FormInfoMgr()
 {

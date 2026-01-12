@@ -26,24 +26,24 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string JSON_EMPTY_STRING = "{}";
-const std::string JSON_NULL_STRING = "null";
+constexpr const char *JSON_EMPTY_STRING = "{}";
+constexpr const char *JSON_NULL_STRING = "null";
 
-const std::string FORM_CACHE_TABLE = "form_cache";
-const std::string FORM_ID = "FORM_ID";
-const std::string DATA_CACHE = "DATA_CACHE";
+constexpr const char *FORM_CACHE_TABLE = "form_cache";
+constexpr const char *FORM_ID = "FORM_ID";
+constexpr const char *DATA_CACHE = "DATA_CACHE";
 const int32_t DATA_CACHE_INDEX = 1;
-const std::string FORM_IMAGES = "FORM_IMAGES";
+constexpr const char *FORM_IMAGES = "FORM_IMAGES";
 const int32_t FORM_IMAGES_INDEX = 2;
-const std::string CACHE_STATE = "CACHE_STATE";
+constexpr const char *CACHE_STATE = "CACHE_STATE";
 const int32_t CACHE_STATE_INDEX = 3;
 
-const std::string IMG_CACHE_TABLE = "img_cache";
-const std::string IMAGE_ID = "IMAGE_ID";
+constexpr const char *IMG_CACHE_TABLE = "img_cache";
+constexpr const char *IMAGE_ID = "IMAGE_ID";
 const int32_t IMAGE_ID_INDEX = 0;
-const std::string IMAGE_BIT = "IMAGE_BIT";
+constexpr const char *IMAGE_BIT = "IMAGE_BIT";
 const int32_t IMAGE_BIT_INDEX = 1;
-const std::string IMAGE_SIZE = "IMAGE_SIZE";
+constexpr const char *IMAGE_SIZE = "IMAGE_SIZE";
 const int32_t IMAGE_SIZE_INDEX = 2;
 
 const int32_t INVALID_INDEX = -1;
@@ -69,7 +69,7 @@ void FormCacheMgr::CreateFormCacheTable()
 {
     FormRdbTableConfig formRdbCacheTableConfig;
     formRdbCacheTableConfig.tableName = FORM_CACHE_TABLE;
-    formRdbCacheTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + FORM_CACHE_TABLE
+    formRdbCacheTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbCacheTableConfig.tableName
         + " (FORM_ID TEXT NOT NULL PRIMARY KEY, DATA_CACHE TEXT, FORM_IMAGES TEXT, CACHE_STATE INTEGER);";
     if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbCacheTableConfig) != ERR_OK) {
         HILOG_ERROR("Form cache mgr init form rdb cache table fail");
@@ -77,7 +77,7 @@ void FormCacheMgr::CreateFormCacheTable()
 
     FormRdbTableConfig formRdbImgTableConfig;
     formRdbImgTableConfig.tableName = IMG_CACHE_TABLE;
-    formRdbImgTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + IMG_CACHE_TABLE
+    formRdbImgTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbImgTableConfig.tableName
         + " (IMAGE_ID INTEGER PRIMARY KEY AUTOINCREMENT, IMAGE_BIT BLOB, IMAGE_SIZE TEXT);";
     if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbImgTableConfig) != ERR_OK) {
         HILOG_ERROR("Form cache mgr init form rdb img table fail");
@@ -516,7 +516,7 @@ bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
         return false;
     }
     HILOG_INFO("size:%{public}zu", rowIds.size());
-    std::string sql = "DELETE FROM " + IMG_CACHE_TABLE + " WHERE " + IMAGE_ID + " IN (";
+    std::string sql = "DELETE FROM " + std::string(IMG_CACHE_TABLE) + " WHERE " + IMAGE_ID + " IN (";
     for (auto iter = rowIds.begin(); iter != rowIds.end(); ++iter) {
         sql += "\'";
         sql += *iter;
@@ -529,7 +529,7 @@ bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
 
 void FormCacheMgr::ResetCacheStateAfterReboot()
 {
-    std::string sql = "UPDATE " + FORM_CACHE_TABLE + " SET " + CACHE_STATE + " = 1;";
+    std::string sql = "UPDATE " + std::string(FORM_CACHE_TABLE) + " SET " + CACHE_STATE + " = 1;";
     FormRdbDataMgr::GetInstance().ExecuteSql(sql);
 }
 }  // namespace AppExecFwk

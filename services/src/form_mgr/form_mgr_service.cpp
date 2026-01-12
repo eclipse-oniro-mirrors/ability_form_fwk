@@ -100,7 +100,8 @@ const int32_t API_TIME_OUT = 5;
 const int32_t API_TIME_OUT_30S = 30;
 const int32_t CONDITION_NETWORK = 1;
 const long FORM_DISCON_NETWORK_CHECK_TIME = 600000; // ms
-constexpr char APP_PROVISION_TYPE_DEBUG[] = "debug";
+constexpr const char *APP_PROVISION_TYPE_DEBUG = "debug";
+constexpr const char *FORM_MGR_SERVICE_QUEUE = "FormMgrServiceQueue";
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::OVERHEATED);
@@ -111,10 +112,6 @@ using namespace OHOS::NetManagerStandard;
 
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<FormMgrService>::GetInstance().get());
-
-const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
-
-const std::string FORM_MGR_SERVICE_QUEUE = "FormMgrServiceQueue";
 
 constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
 
@@ -928,7 +925,7 @@ void FormMgrService::SubscribeNetConn()
 ErrCode FormMgrService::Init()
 {
     HILOG_INFO("call");
-    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE.c_str());
+    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE);
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("Init failed,null serialQueue_");
         return ERR_INVALID_OPERATION;

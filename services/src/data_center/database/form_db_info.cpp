@@ -20,18 +20,18 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string INNER_FORM_INFO_FORM_ID = "formId";
-const std::string INNER_FORM_INFO_USER_ID = "userId";
-const std::string INNER_FORM_INFO_PROVIDER_USER_ID = "providerUserId";
-const std::string INNER_FORM_INFO_FORM_NAME = "formName";
-const std::string INNER_FORM_INFO_BUNDLE_NAME = "bundleName";
-const std::string INNER_FORM_INFO_MODULE_NAME = "moduleName";
-const std::string INNER_FORM_INFO_ABILITY_NAME = "abilityName";
-const std::string INNER_FORM_INFO_FORM_USER_UIDS = "formUserUids";
-const std::string INNER_FORM_INFO_FORM_LOCATION = "formLocation";
-const std::string INNER_FORM_INFO_FORM_ENABLE = "enableForm";
-const std::string INNER_FORM_INFO_FORM_LOCK = "lockForm";
-const std::string INNER_FORM_INFO_IS_THEMEFORM = "isThemeForm";
+constexpr const char *INNER_FORM_INFO_FORM_ID = "formId";
+constexpr const char *INNER_FORM_INFO_USER_ID = "userId";
+constexpr const char *INNER_FORM_INFO_PROVIDER_USER_ID = "providerUserId";
+constexpr const char *INNER_FORM_INFO_FORM_NAME = "formName";
+constexpr const char *INNER_FORM_INFO_BUNDLE_NAME = "bundleName";
+constexpr const char *INNER_FORM_INFO_MODULE_NAME = "moduleName";
+constexpr const char *INNER_FORM_INFO_ABILITY_NAME = "abilityName";
+constexpr const char *INNER_FORM_INFO_FORM_USER_UIDS = "formUserUids";
+constexpr const char *INNER_FORM_INFO_FORM_LOCATION = "formLocation";
+constexpr const char *INNER_FORM_INFO_FORM_ENABLE = "enableForm";
+constexpr const char *INNER_FORM_INFO_FORM_LOCK = "lockForm";
+constexpr const char *INNER_FORM_INFO_IS_THEMEFORM = "isThemeForm";
 } // namespace
 
 /**

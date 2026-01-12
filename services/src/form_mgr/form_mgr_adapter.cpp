@@ -104,19 +104,19 @@ constexpr int32_t DEFAULT_USER_ID = 100;
 constexpr int32_t BUNDLE_NAME_INDEX = 0;
 constexpr int32_t USER_ID_INDEX = 1;
 constexpr int32_t INSTANCE_SEQ_INDEX = 2;
-const std::string BUNDLE_INFO_SEPARATOR = "_";
-const std::string POINT_ETS = ".ets";
+constexpr const char *BUNDLE_INFO_SEPARATOR = "_";
+constexpr const char *POINT_ETS = ".ets";
 constexpr int DATA_FIELD = 1;
 constexpr int FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH = 3; // update level is 1~336, so max length is 3.
-const std::string EMPTY_BUNDLE = "";
-const std::string FORM_CLICK_ROUTER = "router";
-const std::string FORM_CLICK_MESSAGE = "message";
-const std::string FORM_CLICK_CALL = "call";
-const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
+constexpr const char *EMPTY_BUNDLE = "";
+constexpr const char *FORM_CLICK_ROUTER = "router";
+constexpr const char *FORM_CLICK_MESSAGE = "message";
+constexpr const char *FORM_CLICK_CALL = "call";
+constexpr const char *FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
 constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
-const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
-const std::string FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
-const std::string PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
+constexpr const char *FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
+constexpr const char *FORM_DATA_PROXY_IGNORE_VISIBILITY = "ohos.extension.form_data_proxy_ignore_visibility";
+constexpr const char *PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 constexpr int32_t MAX_RECONNECT_NUMS = 4;
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
@@ -136,7 +136,7 @@ void FormMgrAdapter::Init()
 {
     FormDataMgr::GetInstance().GetConfigParamFormMap(Constants::VISIBLE_NOTIFY_DELAY, visibleNotifyDelay_);
     HILOG_INFO("load visibleNotifyDelayTime:%{public}d", visibleNotifyDelay_);
-    serialQueue_ = std::make_unique<FormSerialQueue>(FORM_ADD_FORM_TIMER_TASK_QUEUE.c_str());
+    serialQueue_ = std::make_unique<FormSerialQueue>(FORM_ADD_FORM_TIMER_TASK_QUEUE);
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("FormMgrAdapter Init fail, due to create serialQueue_ error");
     }
@@ -2183,8 +2183,8 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo, const F
     itemInfo.SetJsComponentName(formInfo.jsComponentName);
     itemInfo.SetFormVisibleNotify(formInfo.formVisibleNotify);
     auto formSrc = formInfo.src;
-    if (formSrc.rfind(POINT_ETS) == formSrc.size() - POINT_ETS.size()) {
-        formSrc.erase(formSrc.end() - POINT_ETS.size(), formSrc.end());
+    if (formSrc.rfind(POINT_ETS) == formSrc.size() - strlen(POINT_ETS)) {
+        formSrc.erase(formSrc.end() - strlen(POINT_ETS), formSrc.end());
     }
     itemInfo.SetFormSrc(formSrc);
     itemInfo.SetFormWindow(formInfo.window);

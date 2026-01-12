@@ -19,11 +19,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string FORM_HOST_QUEUE = "FormHostQueue";
+constexpr const char *FORM_HOST_QUEUE = "FormHostQueue";
 }
 FormHostQueue::FormHostQueue()
 {
-    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_HOST_QUEUE.c_str());
+    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_HOST_QUEUE);
     HILOG_INFO("create FormHostQueue");
 }
 

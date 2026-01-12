@@ -48,7 +48,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr size_t LAST_CONNECTION = 1;
-const std::string DLP_INDEX = "ohos.dlp.params.index";
+constexpr const char *DLP_INDEX = "ohos.dlp.params.index";
 const int FORM_DISCONNECT_FRS_DELAY_TIME = 5000; // ms
 }
 using Want = OHOS::AAFwk::Want;

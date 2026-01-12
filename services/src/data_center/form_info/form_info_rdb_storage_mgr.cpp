@@ -27,10 +27,10 @@ namespace AppExecFwk {
 namespace {
 constexpr int32_t MAX_TIMES = 600; // 600 * 100ms = 1min
 constexpr int32_t SLEEP_INTERVAL = 100 * 1000; // 100ms
-const std::string FORM_INFO_PREFIX = "formInfo_";
-const std::string FORM_ID_PREFIX = "formId_";
-const std::string STATUS_DATA_PREFIX = "statusData_";
-const std::string FORM_VERSION_KEY = "versionCode_form";
+constexpr const char *FORM_INFO_PREFIX = "formInfo_";
+constexpr const char *FORM_ID_PREFIX = "formId_";
+constexpr const char *STATUS_DATA_PREFIX = "statusData_";
+constexpr const char *FORM_VERSION_KEY = "versionCode_form";
 constexpr char MULTI_APP_FORM_VERSION_PREFIX[] = "versionCode_multiAppForm_";
 } // namespace
 
@@ -63,7 +63,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
     }
 
     for (const auto &item: value) {
-        formInfoStorages.emplace_back(item.first.substr(FORM_INFO_PREFIX.length()), item.second);
+        formInfoStorages.emplace_back(item.first.substr(strlen(FORM_INFO_PREFIX)), item.second);
     }
 
     return ERR_OK;

@@ -46,7 +46,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string HICAR_FORM = "phone_hicar";
+constexpr const char *HICAR_FORM = "phone_hicar";
 }
 FormProviderMgr::FormProviderMgr() {}
 FormProviderMgr::~FormProviderMgr() {}

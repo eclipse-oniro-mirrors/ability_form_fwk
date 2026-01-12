@@ -30,11 +30,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    const std::string CERT_ENC_FILE = "CERT.ENC";
-    const std::string CERT_SF_FILE = "CERT.SF";
-    const std::string MANIFEST_MF_FILE = "MANIFEST.MF";
-    const std::string FILE_SHA_KEY = "Name: ";
-    const std::string PUBKEY_PATH = "/system/etc/update/hwkey_param_upgrade_v1.pem";
+constexpr const char *CERT_ENC_FILE = "CERT.ENC";
+constexpr const char *CERT_SF_FILE = "CERT.SF";
+constexpr const char *MANIFEST_MF_FILE = "MANIFEST.MF";
+constexpr const char *FILE_SHA_KEY = "Name: ";
+constexpr const char *PUBKEY_PATH = "/system/etc/update/hwkey_param_upgrade_v1.pem";
 }
 
 ParamReader::ParamReader()
