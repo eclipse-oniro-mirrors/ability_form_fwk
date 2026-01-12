@@ -144,6 +144,8 @@ private:
      */
     void RecoverFRSOnFormActivity();
 
+    void ExecOnUnlockTask(const sptr<IRemoteObject> &remoteObject);
+
 private:
     class RemoteObjHash {
     public:
