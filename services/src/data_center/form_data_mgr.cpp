@@ -48,7 +48,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr const char *MEMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.watermark";
+constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.watermark";
 constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
 constexpr const char *FORM_HOST_PARAM_NAMES[] = {Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY,
     Constants::PARAM_VISUAL_EFFECT_TYPE_KEY, Constants::PARAM_FORM_DISABLE_UIFIRST_KEY};
