@@ -16,10 +16,9 @@
 #ifndef OHOS_FORM_FWK_BASE_FORM_REFRESH_H
 #define OHOS_FORM_FWK_BASE_FORM_REFRESH_H
 
-#include "form_refresh/refresh_impl/base_form_refresh.h"
 #include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/strategy/refresh_check_mgr.h"
 #include "form_refresh/strategy/refresh_config.h"
-#include "form_refresh/check_mgr/base_checker_interface.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -39,6 +38,7 @@ public:
      * @brief Constructor
      * @param config Refresh configuration
      */
+    BaseFormRefresh();
     explicit BaseFormRefresh(RefreshConfig config);
     virtual ~BaseFormRefresh() = default;
 

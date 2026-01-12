@@ -18,20 +18,21 @@
 
 #include <singleton.h>
 
-#include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/refresh_impl/base_form_refresh.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class FormNetConnRefreshImpl
-* FormNetConnRefreshImpl is used to deal network reconnect refresh.
-*/
-class FormNetConnRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormNetConnRefreshImpl> {
+ * @class FormNetConnRefreshImpl
+ * FormNetConnRefreshImpl is used to deal network reconnect refresh.
+ */
+class FormNetConnRefreshImpl : public BaseFormRefresh, public DelayedRefSingleton<FormNetConnRefreshImpl> {
     DECLARE_DELAYED_REF_SINGLETON(FormNetConnRefreshImpl);
 public:
     DISALLOW_COPY_AND_MOVE(FormNetConnRefreshImpl);
 
-    int RefreshFormRequest(RefreshData &data) override;
+protected:
+    int DoRefresh(RefreshData &data) override;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

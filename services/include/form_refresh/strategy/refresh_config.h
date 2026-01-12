@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_REFRESH_CONFIG_H
 
 #include <vector>
+#include "form_constants.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -44,8 +45,11 @@ struct RefreshConfig {
     std::vector<int32_t> checkTypes;
 
     // Control check flags
-    uint32_t controlCheckFlags = 0;
-    
+    uint32_t controlCheckFlags = CONTROL_CHECK_NONE;
+
+    // Refresh type used in invisible control
+    int32_t refreshType = Constants::REFRESHTYPE_DEFAULT;
+
     // Control check visibility parameter for IsNeedToFresh
     bool isVisibleToFresh = true;
 };

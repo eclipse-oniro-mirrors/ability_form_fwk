@@ -18,15 +18,15 @@
 
 #include <singleton.h>
 
-#include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/refresh_impl/base_form_refresh.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class FormForceRefreshImpl
-* FormForceRefreshImpl is used to deal SA request refresh form.
-*/
-class FormForceRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormForceRefreshImpl> {
+ * @class FormForceRefreshImpl
+ * FormForceRefreshImpl is used to deal SA request refresh form.
+ */
+class FormForceRefreshImpl : public BaseFormRefresh, public DelayedRefSingleton<FormForceRefreshImpl> {
     DECLARE_DELAYED_REF_SINGLETON(FormForceRefreshImpl);
 public:
     DISALLOW_COPY_AND_MOVE(FormForceRefreshImpl);

@@ -15,27 +15,20 @@
 
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 
-#include "form_refresh/strategy/refresh_config.h"
-#include "form_refresh/strategy/refresh_exec_mgr.h"
-#include "form_refresh/strategy/refresh_control_mgr.h"
-#include "form_refresh/strategy/refresh_check_mgr.h"
-#include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
-#include "common/util/form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-// Configuration for TYPE_HOST - check types and control checks
+// Configuration for form host refresh, check types and control checks
 static RefreshConfig CreateConfig()
 {
     RefreshConfig config;
     // Check types configuration
     config.checkTypes = { TYPE_UNTRUST_APP, TYPE_SELF_FORM, TYPE_ACTIVE_USER };
     // Control checks configuration
-    config.controlCheckFlags = CONTROL_CHECK_HEALTHY_CONTROL | CONTROL_CHECK_SCREEN_OFF | CONTROL_CHECK_NEED_TO_FRESH
-    | CONTROL_CHECK_ADD_FINISH;
-    config.isVisibleToFresh = true;
+    config.controlCheckFlags = CONTROL_CHECK_HEALTHY_CONTROL | CONTROL_CHECK_SCREEN_OFF | CONTROL_CHECK_NEED_TO_FRESH |
+        CONTROL_CHECK_ADD_FINISH;
     return config;
 }
 }
@@ -43,28 +36,18 @@ static RefreshConfig CreateConfig()
 FormHostRefreshImpl::FormHostRefreshImpl() : BaseFormRefresh(CreateConfig()) {}
 FormHostRefreshImpl::~FormHostRefreshImpl() {}
 
-CheckValidFactor FormHostRefreshImpl::BuildCheckFactor(RefreshData &data)
-{
-    CheckValidFactor factor = BaseFormRefresh::BuildCheckFactor(data);
-    Want reqWant(data.want);
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
-    factor.want = reqWant;
-    data.want = reqWant;
-    return factor;
-}
-
 int FormHostRefreshImpl::DoControlCheck(RefreshData &data)
 {
     FormDataMgr::GetInstance().UpdateFormWant(data.formId, data.want, data.record);
     FormDataMgr::GetInstance().UpdateFormRecord(data.formId, data.record);
     FormDataMgr::GetInstance().SetHostRefresh(data.formId, true);
-    // Execute base class control checks first
+    // Execute base class control checks
     int ret = BaseFormRefresh::DoControlCheck(data);
     if (ret != ERR_CONTINUE_REFRESH) {
         return ret;
     }
 
-    // System app special handling
+    // System app set refresh type
     if (data.record.isSystemApp) {
         data.want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_HOST);
     }

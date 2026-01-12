@@ -15,39 +15,35 @@
 
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
 
-#include "form_refresh/strategy/refresh_check_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "data_center/form_record/form_record_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+// Configuration for form next time refresh, check types and control checks
+static RefreshConfig CreateConfig()
+{
+    RefreshConfig config;
+    // Check types configuration
+    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_CALLING_BUNDLE, TYPE_ADD_FINISH };
+    // Control checks configuration
+    config.controlCheckFlags = CONTROL_CHECK_NONE;
+    return config;
+}
+}
 
-FormNextTimeRefreshImpl::FormNextTimeRefreshImpl() {}
+FormNextTimeRefreshImpl::FormNextTimeRefreshImpl() : BaseFormRefresh(CreateConfig()) {}
 FormNextTimeRefreshImpl::~FormNextTimeRefreshImpl() {}
 
-int FormNextTimeRefreshImpl::RefreshFormRequest(RefreshData &data)
+int FormNextTimeRefreshImpl::DoRefresh(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = {
-        TYPE_UNTRUST_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_CALLING_BUNDLE, TYPE_ADD_FINISH
-    };
-    CheckValidFactor factor;
-    factor.formId = data.formId;
-    factor.record = data.record;
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    Want reqWant;
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-    factor.want = reqWant;
-    int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
-    if (ret != ERR_OK) {
-        return ret;
-    }
-
     if (data.nextTime < 0) {
         HILOG_ERROR("nextTime is negative, formId:%{public}" PRId64, data.formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
- 
-    const int32_t MAX_NEXT_TIME = INT32_MAX / Constants::SEC_PER_MIN;
+
+    static const int32_t MAX_NEXT_TIME = INT32_MAX / Constants::SEC_PER_MIN;
     if (data.nextTime > MAX_NEXT_TIME) {
         HILOG_ERROR("nextTime exceeds safety range, formId:%{public}" PRId64, data.formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -66,6 +62,7 @@ int FormNextTimeRefreshImpl::RefreshFormRequest(RefreshData &data)
     }
 
     int64_t safeNextTime = static_cast<int64_t>(data.nextTime) * Constants::SEC_PER_MIN;
+    int32_t userId = FormUtil::GetCurrentAccountId();
     if (!FormTimerMgr::GetInstance().SetNextRefreshTime(data.formId, safeNextTime, userId)) {
         HILOG_ERROR("set next time refresh failed, formId:%{public}" PRId64, data.formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
