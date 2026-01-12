@@ -112,6 +112,7 @@ public:
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool addFormFinish = false;
     bool isNeedUpdateFormOnAddFormFinish = false;
+    AAFwk::WantParams formHostParams;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

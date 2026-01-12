@@ -48,8 +48,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr char MEMMORY_WATERMARK[] = "resourceschedule.memmgr.min.memmory.watermark";
-constexpr char TRANSPARENT_FORM_CAPABILITY_PARAM_NAME[] = "const.form.transparentForm.capability";
+constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.watermark";
+constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
+constexpr const char *FORM_HOST_PARAM_NAMES[] = {Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY,
+    Constants::PARAM_VISUAL_EFFECT_TYPE_KEY, Constants::PARAM_FORM_DISABLE_UIFIRST_KEY};
 
 static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
 {
@@ -3436,6 +3438,51 @@ bool FormDataMgr::MergeFormData(const int64_t formId, FormProviderData &formProv
     formCacheData.MergeData(formProviderData.GetData());
     formProviderData = formCacheData;
     return true;
+}
+
+void FormDataMgr::UpdateFormHostParams(const int64_t formId, const Want &want)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto formRecord = formRecords_.find(formId);
+    if (formRecord == formRecords_.end()) {
+        HILOG_ERROR("form record is not exist.");
+        return;
+    }
+    WantParams wantParams = want.GetParams();
+    for (auto paramKey : FORM_HOST_PARAM_NAMES) {
+        if (!wantParams.HasParam(paramKey)) {
+            continue;
+        }
+        auto paramValue = wantParams.GetParam(paramKey);
+        if (paramValue != nullptr) {
+            formRecord->second.formHostParams.SetParam(paramKey, paramValue);
+        }
+    }
+    HILOG_INFO(" end, formId:%{public}" PRId64 ", formHostParams:%{public}s.",
+        formId, formRecord->second.formHostParams.ToString().c_str());
+}
+
+void FormDataMgr::GetFormHostParams(const int64_t formId, Want &want)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto formRecord = formRecords_.find(formId);
+    if (formRecord == formRecords_.end()) {
+        HILOG_ERROR("form record is not exist.");
+        return;
+    }
+    WantParams formHostParams = formRecord->second.formHostParams;
+    WantParams wantParams = want.GetParams();
+    for (auto paramKey : FORM_HOST_PARAM_NAMES) {
+        if (!formHostParams.HasParam(paramKey)) {
+            continue;
+        }
+        auto paramValue = formHostParams.GetParam(paramKey);
+        if (paramValue != nullptr) {
+            wantParams.SetParam(paramKey, paramValue);
+        }
+    }
+    want.SetParams(wantParams);
+    HILOG_INFO(" end, formId:%{public}" PRId64 ", wantParams:%{public}s.", formId, wantParams.ToString().c_str());
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

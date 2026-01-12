@@ -366,6 +366,7 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
             HandleFormAddObserver(formJsInfo.formId);
         }
     }
+    FormDataMgr::GetInstance().UpdateFormHostParams(formJsInfo.formId, want);
     return ret;
 }
 
@@ -867,6 +868,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     UpdateFormRenderParam(matchedFormId, callerToken, want);
+    FormDataMgr::GetInstance().UpdateFormHostParams(formId, want);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {
