@@ -153,7 +153,18 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
         return ERR_OK;
     }
 
-    auto task = [formRecord, want, remoteObject]() {
+    auto task = [formRecord, want, weak = weak_from_this()]() {
+        sptr<IRemoteObject> remoteObject;
+        auto formRenderMgrInner = weak.lock();
+        if (!formRenderMgrInner) {
+            HILOG_ERROR("formRenderMgrInner is null.");
+            return;
+        }
+        auto ret = formRenderMgrInner->GetRenderObject(remoteObject);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("get remote object fail.");
+            return;
+        }
         FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
     };
     RefreshCacheMgr::GetInstance().AddRenderTask(formRecord.formId, task);
