@@ -5042,7 +5042,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_GetAllTemplateFormsInfo_001, TestSize.Level1) 
     GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 begin";
     std::vector<FormInfo> formInfos;
     auto result = FormMgr::GetInstance().GetAllTemplateFormsInfo(formInfos);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, ERROR_NUMS);
     GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 end";
 }
 
