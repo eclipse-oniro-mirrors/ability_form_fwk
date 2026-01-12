@@ -17,12 +17,12 @@ export namespace formBindingData {
 
   loadLibraryWithPermissionCheck("formBindingData_ani.z", "@ohos.app.form.formBindingData");
 
-  interface ProxyData {
+  export interface ProxyData {
     key: string;
     subscriberId?: string;
   }
 
-  interface FormBindingData {
+  export interface FormBindingData {
     data: Object;
     proxies?: Array<ProxyData>;
   }
