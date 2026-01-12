@@ -244,12 +244,17 @@ void FormRenderMgrInner::PostOnUnlockTask()
 {
     HILOG_DEBUG("call");
     RecoverFRSOnFormActivity();
+    std::unique_lock<std::mutex> guard(onUnlockTaskMutex_);
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
-        HILOG_ERROR("null remoteObjectGotten");
+        HILOG_WARN("null remoteObjectGotten");
+        onUnlockTask_ = [](const sptr<IRemoteObject> &remoteObject) {
+            FormRenderTaskMgr::GetInstance().PostOnUnlock(remoteObject);
+        };
         return;
     }
+    guard.unlock();
     FormRenderTaskMgr::GetInstance().PostOnUnlock(remoteObject);
 }
 
@@ -529,6 +534,13 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
         return;
     }
     SetRenderRemoteObj(renderRemoteObj);
+    std::unique_lock<std::mutex> unlockTaskLock(onUnlockTaskMutex_);
+    if (onUnlockTask_) {
+        onUnlockTask_(remoteObject);
+        onUnlockTask_ = nullptr;
+    }
+    unlockTaskLock.unlock();
+
     std::lock_guard<std::mutex> lock(formResSchedMutex_);
     formResSched_ = std::make_unique<FormResSched>(GetUserId());
     formResSched_->ReportFormLayoutStart();
