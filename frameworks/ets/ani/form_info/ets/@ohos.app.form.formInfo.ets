@@ -68,7 +68,7 @@ export default namespace formInfo {
     MODE_LIGHT = 1
   }
 
-  interface FormStateInfo {
+  export interface FormStateInfo {
     formState: FormState;
     want: Want;
   }
@@ -100,7 +100,7 @@ export default namespace formInfo {
     FORM_PERMISSION_GRANTED_KEY = 'ohos.extra.param.key.permission_granted',
   }
 
-  interface FormInfoFilter {
+  export interface FormInfoFilter {
     bundleName?: string;
     moduleName?: string;
     supportedDimensions?: Array<int>;
@@ -135,7 +135,7 @@ export default namespace formInfo {
     FORM_SHARE = 2
   }
 
-  interface PublishFormResult {
+  export interface PublishFormResult {
     code: PublishFormErrorCode;
     message: string;
   }
@@ -147,7 +147,7 @@ export default namespace formInfo {
     INTERNAL_ERROR = 3
   }
 
-  interface FormProviderFilter {
+  export interface FormProviderFilter {
     bundleName: string;
     formName?: string;
     moduleName?: string;
@@ -298,7 +298,7 @@ export default namespace formInfo {
     height: double;
   }
 
-  interface OverflowInfo {
+  export interface OverflowInfo {
     area: Rect;
     duration: int;
     useDefaultAnimation?: boolean;
