@@ -144,6 +144,8 @@ private:
      */
     void RecoverFRSOnFormActivity();
 
+    void ExecOnUnlockTask(const sptr<IRemoteObject> &remoteObject);
+
 private:
     class RemoteObjHash {
     public:
@@ -154,13 +156,16 @@ private:
     };
 
     mutable std::mutex resourceMutex_;
-    mutable std::shared_mutex renderRemoteObjMutex_;
-    mutable std::mutex formResSchedMutex_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     // <hostToken, formIds>
     std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> etsHosts_;
+
+    mutable std::shared_mutex renderRemoteObjMutex_;
     sptr<IFormRender> renderRemoteObj_ = nullptr;
+    mutable std::mutex onUnlockTaskMutex_;
+    std::function<void(const sptr<IRemoteObject> &remoteObject)> onUnlockTask_ = nullptr;
+    mutable std::mutex formResSchedMutex_;
     std::unique_ptr<FormResSched> formResSched_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
