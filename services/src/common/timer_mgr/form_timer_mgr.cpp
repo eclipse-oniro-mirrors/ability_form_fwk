@@ -729,7 +729,6 @@ bool FormTimerMgr::OnDynamicTimeTrigger(int64_t updateTime)
                     FormTimer timerTask(itItem->formId, true, itItem->userId);
                     updateList.emplace_back(timerTask);
                 }
-                SetIntervalEnableFlag(itItem->formId, true);
                 itItem = dynamicRefreshTasks_.erase(itItem);
             } else {
                 itItem++;
@@ -943,9 +942,6 @@ bool FormTimerMgr::DeleteDynamicItem(int64_t formId)
         for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
             if (itItem->formId == formId) {
                 itItem = dynamicRefreshTasks_.erase(itItem);
-                if (itItem != dynamicRefreshTasks_.end()) {
-                    SetIntervalEnableFlag(itItem->formId, true);
-                }
                 break;
             }
             ++itItem;
