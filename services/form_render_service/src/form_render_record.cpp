@@ -754,7 +754,6 @@ std::shared_ptr<OHOS::AppExecFwk::Configuration> FormRenderRecord::GetConfigurat
 void FormRenderRecord::ResetFormConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config,
     const Want &want)
 {
-    std::lock_guard<std::mutex> lock(configurationMutex_);
     if (!config) {
         HILOG_INFO("config is nullpter");
         return;
@@ -763,7 +762,7 @@ void FormRenderRecord::ResetFormConfiguration(const std::shared_ptr<OHOS::AppExe
         want.GetIntParam(PARAM_FORM_COLOR_MODE_KEY, ColorMode::COLOR_MODE_NOT_SET));
     if (!colorMode.empty() && colorMode != COLOR_MODE_AUTO) {
         config->AddItem(SYSTEM_COLORMODE, colorMode);
-    } 
+    }
 }
 
 std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const FormJsInfo &formJsInfo, const Want &want)
@@ -2331,6 +2330,10 @@ int32_t FormRenderRecord::HandleSetRenderGroupParams(const int64_t formId, const
 void FormRenderRecord::UpdateContextConfiguration()
 {
     std::shared_ptr<OHOS::AppExecFwk::Configuration> config = GetConfiguration();
+    if (config == nullptr) {
+        HILOG_ERROR("config is null.");
+        return;
+    }
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
     for (auto& iter : contextsMapForModuleName_) {
         if (!iter.second) {
