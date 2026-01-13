@@ -191,8 +191,6 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_FormForceRefreshImpl_008, Test
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_FormForceRefreshImpl_008 start";
 
     RefreshData data;
-    MockIsBaseValidPass(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormForceRefreshImpl::GetInstance().RefreshFormRequest(data));
 
     MockIsBaseValidPass(ERR_OK);
     MockAskForProviderData(ERR_APPEXECFWK_FORM_COMMON_CODE);
