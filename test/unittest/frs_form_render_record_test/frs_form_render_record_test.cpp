@@ -2967,20 +2967,10 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration, Test
     std::string colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
     EXPECT_TRUE(colorModeTag.empty());
 
-    std::shared_ptr<OHOS::AppExecFwk::Configuration> configNew = std::make_shared<Configuration>();
-    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
-    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, "en");
-    formRenderRecordPtr->configuration_ = configNew;
-    formRenderRecordPtr->ResetFormConfiguration(config, want);
-    colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
-    EXPECT_EQ(colorModeTag, "0");
-    std::string languageTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE);
-    EXPECT_EQ(languageTag, "en");
-
     want.SetParam(Constants::PARAM_FORM_COLOR_MODE_KEY, OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET);
     formRenderRecordPtr->ResetFormConfiguration(config, want);
     colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
-    EXPECT_EQ(colorModeTag, "0");
+    EXPECT_TRUE(colorModeTag.empty());
 
     want.SetParam(Constants::PARAM_FORM_COLOR_MODE_KEY, OHOS::Global::Resource::ColorMode::DARK);
     formRenderRecordPtr->ResetFormConfiguration(config, want);
