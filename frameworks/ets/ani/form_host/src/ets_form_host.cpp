@@ -57,7 +57,7 @@ constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "@ohos.app.form.formHost.Call
 constexpr const char* ETS_FORM_RECT_INFO_CALLBACK = "@ohos.app.form.formHost.formHost.GetFormRectInfoCallbackWrapper";
 constexpr const char* ETS_LIVE_FORM_STATUS_CALLBACK =
     "@ohos.app.form.formHost.formHost.GetLiveFormStatusCallbackWrapper";
-constexpr const char *CHECK_PROMISE_SIGNATURE = "C{std.core.Object}:z";
+constexpr const char *CHECK_PROMISE_SIGNATURE = "Y:z";
 constexpr const char *CALL_PROMISE_SIGNATURE = "C{std.core.Promise}:";
 constexpr const char *FORM_HOST_FORMINFO_FORMID = "formId";
 constexpr const char *FORM_HOST_FORMINFO_STATE = "state";
@@ -1178,7 +1178,7 @@ void AcquireFormData([[maybe_unused]] ani_env *env, ani_string formId, ani_objec
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
     }
-   
+
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
@@ -1191,7 +1191,7 @@ void AcquireFormData([[maybe_unused]] ani_env *env, ani_string formId, ani_objec
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
         return;
     }
-    
+
     int64_t requestCode = SystemTimeMillis();
     ani_vm* vm;
     auto stat = env->GetVM(&vm);
@@ -1254,7 +1254,7 @@ void InnerShareForm(ani_vm* vm, ani_ref callBackGlobRef, int32_t code)
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
     }
-   
+
     callBackGlobRef = nullptr;
     HILOG_DEBUG("End");
 }
@@ -1270,7 +1270,7 @@ void ShareForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string devi
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
     }
-   
+
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback, static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
@@ -1287,7 +1287,7 @@ void ShareForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string devi
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
         return;
     }
-    
+
     std::string stdDeviceId = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(deviceId));
     if (stdDeviceId.empty()) {
         HILOG_ERROR("deviceId ANIUtils_ANIStringToStdString failed");
@@ -1358,7 +1358,7 @@ void AddForm([[maybe_unused]] ani_env *env, ani_object wantObject, ani_object ca
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
     }
-   
+
     InvokeAsyncWithBusinessError(env, callback, ERR_OK, runningFormInfoObject);
     HILOG_DEBUG("End");
 }
@@ -1444,7 +1444,7 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
         reinterpret_cast<ani_ref*>(&supportDimensionAni))) {
         HILOG_ERROR("Cannot get support Dimension Ani");
     }
-   
+
     ani_boolean isUndefined = true;
     if (env->Reference_IsUndefined(supportDimensionAni, &isUndefined) != ANI_OK) {
         HILOG_ERROR("Reference_IsUndefined failed");
@@ -1601,7 +1601,7 @@ void NotifyFormsEnableUpdate([[maybe_unused]] ani_env *env, ani_object arrayObj,
         InvokeAsyncWithBusinessError(env, callback, static_cast<int32_t>(ret), nullptr);
         return;
     }
-   
+
     InvokeAsyncWithBusinessError(env, callback, ERR_OK, nullptr);
     HILOG_DEBUG("End");
 }
@@ -2112,7 +2112,7 @@ public:
             HILOG_INFO("null handler");
             return;
         }
-       
+
         m_handler->PostSyncTask([thisWeakPtr = weak_from_this(), formId]() {
             auto sharedThis = thisWeakPtr.lock();
             if (sharedThis == nullptr) {
@@ -2130,7 +2130,7 @@ public:
             ani_string formIdAniStr {};
             ani_status newString_status = env->String_NewUTF8(formIdString.c_str(), formIdString.size(), &formIdAniStr);
             HILOG_INFO("String_NewUTF8 status: %{public}d", newString_status);
-           
+
             auto res = InvokeCallback(env, static_cast<ani_object>(sharedThis->m_callback), formIdAniStr);
             if (!res) {
                 HILOG_ERROR("Cannot call callback");
@@ -2173,7 +2173,7 @@ void AddFormUninstallCallback(ani_env* env, ani_object callback)
             return;
         }
     }
-   
+
     ani_ref uninstallCallback = nullptr;
     auto globalrefStatus = env->GlobalReference_Create(callback, &uninstallCallback);
     if (globalrefStatus != ANI_OK) {
@@ -2198,7 +2198,7 @@ void RemoveFormUninstallCallback(ani_env* env, ani_object callback)
 {
     HILOG_DEBUG("Call");
     std::lock_guard<std::mutex> lock(g_formUninstallCallbackListMutex);
-   
+
     for (auto it = g_formUninstallCallbackList.begin(); it != g_formUninstallCallbackList.end(); ++it) {
         if ((*it)->IsStrictEqual(callback)) {
             HILOG_INFO("Removing FormUninstallCallback");
@@ -2206,7 +2206,7 @@ void RemoveFormUninstallCallback(ani_env* env, ani_object callback)
             return;
         }
     }
-   
+
     HILOG_DEBUG("End");
 }
 
@@ -2218,7 +2218,7 @@ void RegisterFormObserver(ani_env* env, ani_object callback)
         PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
         return;
     }
-   
+
     FormHostClient::GetInstance()->RegisterUninstallCallback(OnFormUninstallCallback);
     AddFormUninstallCallback(env, callback);
     HILOG_DEBUG("End");
@@ -2232,7 +2232,7 @@ void UnRegisterFormObserver(ani_env* env, ani_object callback)
         PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
         return;
     }
-   
+
     ani_boolean isUndefined = true;
     env->Reference_IsUndefined(callback, &isUndefined);
     if (!isUndefined) {

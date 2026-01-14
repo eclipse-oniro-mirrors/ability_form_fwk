@@ -31,7 +31,7 @@ constexpr const char* DELEGATOR_RECORD_VALUE = "value";
 constexpr const char* DELEGATOR_RECORD_CLASS_NAME = "std.core.Record";
 constexpr const char* DELEGATOR_RECORD_GET = "$_get";
 constexpr const char* DELEGATOR_RECORD_GET_NAME =
-    "X{C{std.core.BaseEnum}C{std.core.Numeric}C{std.core.String}}:C{std.core.Object}";
+    "X{C{std.core.BaseEnum}C{std.core.Numeric}C{std.core.String}}:Y";
 }
 
 ani_object CreateFunInteractionParamsDatas(ani_env* env,
