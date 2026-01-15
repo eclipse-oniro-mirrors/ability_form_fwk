@@ -2573,6 +2573,7 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     }
     HILOG_INFO("RequestOverflowInner fail");
     dataParam->result = false;
+    dataParam->errCode = ERR_GET_INFO_FAILED;
     if (status == napi_pending_exception) {
         dataParam->errCode = NapiFormUtil::CatchErrorCode(overflowEnv_);
     }
