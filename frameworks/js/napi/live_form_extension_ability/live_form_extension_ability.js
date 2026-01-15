@@ -19,7 +19,6 @@ let UIExtensionAbility = requireNapi('app.ability.UIExtensionAbility');
 const domainID = 0xD001301;
 const TAG = 'FormManagerService';
 const FORM_LAYOUT_SCALE = 'layout_scale';
-const DEFAULT_LAYOUT_SCALE = 1;
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
   liveFormInfo = undefined;
@@ -56,7 +55,7 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
       });
 
     let layoutScale = want.parameters[FORM_LAYOUT_SCALE];
-    if (layoutScale > 0  && layoutScale < DEFAULT_LAYOUT_SCALE) {
+    if (layoutScale > 0) {
       try {
         this.context.setUIExtCustomDensity(layoutScale)
           .then(() => {
