@@ -17,6 +17,7 @@
 #include <cstring>
 #include <cinttypes>
 #include <regex>
+#include <charconv>
 
 #include "ani_form_common_util.h"
 #include "ani_enum_convert.h"
@@ -315,39 +316,37 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
     if (regex_match(strInfo, match, pattern)) {
         HILOG_DEBUG("regex_match successed");
         if (strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1) != "-") {  // maximum: 9223372036854775807
-            if (strLength < INT_64_LENGTH) {
-                int64Value = std::stoll(strInfo);
-                return true;
-            }
             int maxSubValue = ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
-            if (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER) {
-                int64Value = std::stoll(strInfo);
-                return true;
-            }
             // Means 0x7FFFFFFFFFFFFFFF remove the first number:(2^63 - 1 - 9 * 10 ^ 19)
             int64_t subValue = std::stoll(strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1));
-            if (strLength == INT_64_LENGTH && subValue <= (INT64_MAX - HEAD_BIT_NUM)) {
-                int64Value = std::stoll(strInfo);
-                return true;
+            if (strLength < INT_64_LENGTH || (strLength == INT_64_LENGTH && 
+                (maxSubValue < BASE_NUMBER || subValue <= (INT64_MAX - HEAD_BIT_NUM)))) {
+                auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+                return result.ec == std::errc() ? true : false;
             }
             return false;
         }
         if (strLength < INT_64_LENGTH + 1) {  // The minimum value: -9223372036854775808
-            int64Value = std::stoll(strInfo);
-            return true;
+            auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+            return result.ec == std::errc() ? true : false;
         }
         if (strLength == INT_64_LENGTH + 1) {
             int minSubValue = ConvertStringToInt(strInfo.substr(1, 1));
             if (minSubValue < BASE_NUMBER) {
-                int64Value = std::stoll(strInfo);
-                return true;
+                auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+                return result.ec == std::errc() ? true : false;
             }
 
             // Means 0x8000000000000000 remove the first number:-(2^63 - 9 * 10 ^ 19)
-            int64_t subValue = std::stoll(strInfo.substr(ZERO_VALUE + 2, INT_64_LENGTH - 1));
+            int64_t subValue;
+            newStrInfo = strInfo.substr(ZERO_VALUE + 2, INT_64_LENGTH - 1);
+            auto result = std::from_chars(newStrInfo.data(), newStrInfo.data() + newStrInfo.size(), subValue);
+            if (result.ec != std::errc()) {
+                return false;
+            }
             if (subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
-                int64Value = std::stoll(strInfo);
-                return true;
+                auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+                return result.ec == std::errc() ? true : false;
             }
         }
     }

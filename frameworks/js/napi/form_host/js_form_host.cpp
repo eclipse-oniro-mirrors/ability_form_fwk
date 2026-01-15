@@ -3191,6 +3191,7 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
 
     if (callbackFunction == nullptr) {
         HILOG_ERROR("callbackFunction is nullptr");
+        napi_close_handle_scope(templateFormDetailInfoChangeEnv_, scope);
         return false;
     }
 

@@ -2308,6 +2308,7 @@ ErrCode FormMgrStub::HandleUpdateTemplateFormDetailInfo(MessageParcel &data, Mes
         auto templateFormDetailInfo = data.ReadParcelable<TemplateFormDetailInfo>();
         if (templateFormDetailInfo == nullptr) {
             HILOG_ERROR("read templateFormDetailInfo failed at index %d.", i);
+            delete templateFormDetailInfo;
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
         templateFormInfo.push_back(*templateFormDetailInfo);

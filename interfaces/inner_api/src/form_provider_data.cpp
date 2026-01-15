@@ -183,7 +183,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         HILOG_ERROR("malloc memory failed, errno is %{public}d", errno);
         return;
     }
-    size_t totalRead = 0;
+    int32_t totalRead = 0;
     while (totalRead < size) {
         ssize_t bytesRead = read(fd, bytes + totalRead, size - totalRead);
         if (bytesRead == -1) {
