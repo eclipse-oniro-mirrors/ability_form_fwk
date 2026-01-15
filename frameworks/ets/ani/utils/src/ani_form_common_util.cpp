@@ -28,6 +28,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 namespace {
 constexpr int ZERO_VALUE = 0;
+constexpr int TWO_VALUE = 2;
 constexpr int INT_64_LENGTH = 19;
 constexpr int BASE_NUMBER = 9;
 constexpr int64_t HEAD_BIT_NUM = 9000000000000000000;
@@ -319,7 +320,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
             int maxSubValue = ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
             // Means 0x7FFFFFFFFFFFFFFF remove the first number:(2^63 - 1 - 9 * 10 ^ 19)
             int64_t subValue = std::stoll(strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1));
-            if (strLength < INT_64_LENGTH || (strLength == INT_64_LENGTH && 
+            if (strLength < INT_64_LENGTH || (strLength == INT_64_LENGTH &&
                 (maxSubValue < BASE_NUMBER || subValue <= (INT64_MAX - HEAD_BIT_NUM)))) {
                 auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
                 return result.ec == std::errc() ? true : false;
@@ -339,7 +340,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
 
             // Means 0x8000000000000000 remove the first number:-(2^63 - 9 * 10 ^ 19)
             int64_t subValue;
-            newStrInfo = strInfo.substr(ZERO_VALUE + 2, INT_64_LENGTH - 1);
+            newStrInfo = strInfo.substr(ZERO_VALUE + TWO_VALUE, INT_64_LENGTH - 1);
             auto result = std::from_chars(newStrInfo.data(), newStrInfo.data() + newStrInfo.size(), subValue);
             if (result.ec != std::errc()) {
                 return false;

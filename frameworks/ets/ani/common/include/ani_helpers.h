@@ -39,6 +39,7 @@ using namespace OHOS::AppExecFwk;
 
 constexpr int64_t INVALID_FORMID = -1;
 constexpr int ZERO_VALUE = 0;
+constexpr int TOW_VALUE = 2;
 constexpr int INT_64_LENGTH = 19;
 constexpr int BASE_NUMBER = 9;
 constexpr int BASE_REQUEST_CODE_NUM = 10;
