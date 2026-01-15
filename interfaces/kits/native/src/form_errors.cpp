@@ -265,6 +265,29 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
             "Cannot close the widget editing page. The page is not in the foreground or not owned by the caller."
         }
     },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_IS_OVERFLOWING,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form is overflowing." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_DEVICE_STATUS_ERROR,
+        {
+            ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,
+            "Device status check failed, possibly due to power saving mode or temperature control."
+        }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_HOST_STATUS_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Form Host status check failed." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_COMPETITION_FAILED,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form overflow competition failure." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_PARAMS_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form overflow request parameter is invalid." }
+    }
 };
 
 static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG = {

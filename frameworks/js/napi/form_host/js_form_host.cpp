@@ -2524,9 +2524,10 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
         JsFormRouterProxyMgr::GetInstance()->RequestOverflowInner(dataParam);
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::RequestOverflow");
-    HILOG_INFO("call RequestOverflow end, result:%{public}d", dataParam->result);
+    HILOG_INFO("call RequestOverflow end, result:%{public}d, errCode:%{public}d", dataParam->result,
+        dataParam->errCode);
     bool result = dataParam->result;
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : dataParam->errCode;
 }
 
 void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
@@ -2564,17 +2565,17 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
 
     napi_value args[] = { requestObj };
     napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, nullptr);
-    if (status != napi_ok) {
-        HILOG_INFO("RequestOverflowInner fail");
-        dataParam->result = false;
-        napi_value callResult = nullptr;
-        napi_get_and_clear_last_exception(overflowEnv_, &callResult);
+    if (status == napi_ok) {
+        HILOG_INFO("RequestOverflowInner success");
+        dataParam->result = true;
         napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
-
-    HILOG_INFO("RequestOverflowInner success");
-    dataParam->result = true;
+    HILOG_INFO("RequestOverflowInner fail");
+    dataParam->result = false;
+    if (status == napi_pending_exception) {
+        dataParam->errCode = NapiFormUtil::CatchErrorCode(overflowEnv_);
+    }
     napi_close_handle_scope(overflowEnv_, scope);
 }
 
