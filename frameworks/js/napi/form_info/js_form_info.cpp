@@ -111,6 +111,8 @@ napi_value CreateJsFormParam(napi_env engine)
         "FORM_WIDTH_VP_KEY", CreateJsValue(engine, AppExecFwk::Constants::FORM_WIDTH_VP_KEY));
     napi_set_named_property(engine, objValue,
         "FORM_HEIGHT_VP_KEY", CreateJsValue(engine, AppExecFwk::Constants::FORM_HEIGHT_VP_KEY));
+    napi_set_named_property(engine, objValue,
+        "ORIGINAL_FORM_KEY", CreateJsValue(engine, AppExecFwk::Constants::ORIGINAL_FORM_KEY));
     return objValue;
 }
 
@@ -164,6 +166,8 @@ napi_value CreateJsFormLaunchReason(napi_env engine)
     napi_set_named_property(
         engine, objValue, "FORM_DEFAULT", CreateJsValue(engine, AppExecFwk::Constants::FORM_DEFAULT));
     napi_set_named_property(engine, objValue, "FORM_SHARE", CreateJsValue(engine, AppExecFwk::Constants::FORM_SHARE));
+    napi_set_named_property(
+        engine, objValue, "FORM_SIZE_CHANGE", CreateJsValue(engine, AppExecFwk::Constants::FORM_SIZE_CHANGE));
     return objValue;
 }
 
