@@ -192,7 +192,10 @@ void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &change
             HILOG_ERROR("null formDataRecord.");
             return;
         }
+        int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_UpdateRdbDataForm",
+            API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
         formDataRecord->UpdateRdbDataForm(data);
+        HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     };
     if (!FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc)) {
         HILOG_ERROR("fail UpdateRdbDataForm.");
