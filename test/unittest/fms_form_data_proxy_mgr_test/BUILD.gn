@@ -58,6 +58,7 @@ ohos_unittest("FmsFormDataProxyMgrTest") {
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
