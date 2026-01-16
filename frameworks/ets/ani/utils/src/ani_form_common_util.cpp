@@ -340,7 +340,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
 
             // Means 0x8000000000000000 remove the first number:-(2^63 - 9 * 10 ^ 19)
             int64_t subValue;
-            newStrInfo = strInfo.substr(ZERO_VALUE + TWO_VALUE, INT_64_LENGTH - 1);
+            const std::string newStrInfo = strInfo.substr(ZERO_VALUE + TWO_VALUE, INT_64_LENGTH - 1);
             auto result = std::from_chars(newStrInfo.data(), newStrInfo.data() + newStrInfo.size(), subValue);
             if (result.ec != std::errc()) {
                 return false;
