@@ -39,8 +39,15 @@ bool FormMgrQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
         HILOG_ERROR("null serialQueue_");
         return false;
     }
+
+    auto task = [func = std::move(func)] () {
+        int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_QueueTak",
+            QUEUE_TASK_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+        func();
+        HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    };
  
-    return serialQueue_->ScheduleTask(ms, func);
+    return serialQueue_->ScheduleTask(ms, task);
 }
  
 void FormMgrQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg,
@@ -51,8 +58,15 @@ void FormMgrQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg
         HILOG_ERROR("null serialQueue_");
         return;
     }
+
+    auto task = [func = std::move(func)] () {
+        int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_QueueTak",
+            QUEUE_TASK_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+        func();
+        HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    };
  
-    serialQueue_->ScheduleDelayTask(eventMsg, ms, func);
+    serialQueue_->ScheduleDelayTask(eventMsg, ms, task);
 }
 
 void FormMgrQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
