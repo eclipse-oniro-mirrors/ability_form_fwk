@@ -165,7 +165,15 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
             HILOG_ERROR("get remote object fail.");
             return;
         }
-        FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
+        FormRecord newRecord(formRecord);
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        bool hasCacheData = FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap);
+        if (hasCacheData) {
+            newRecord.formProviderInfo.SetFormDataString(cacheData);
+            newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+        }
+        FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, want, remoteObject);
     };
     RefreshCacheMgr::GetInstance().AddRenderTask(formRecord.formId, task);
     return ERR_OK;
