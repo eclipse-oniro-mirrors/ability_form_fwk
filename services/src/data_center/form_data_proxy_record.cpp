@@ -35,6 +35,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr const char *KEY_DELIMITER = "?"; // the delimiter between key and uid
+const int32_t UPDATE_DATA_TIME_OUT = 5;
 } // namespace
 
 class PermissionCustomizeListener : public Security::AccessToken::PermStateChangeCallbackCustomize {
@@ -193,7 +194,7 @@ void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &change
             return;
         }
         int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_UpdateRdbDataForm",
-            API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+            UPDATE_DATA_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
         formDataRecord->UpdateRdbDataForm(data);
         HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     };
