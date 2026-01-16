@@ -172,6 +172,8 @@ public:
 
     int32_t HandleSetRenderGroupParams(const int64_t formId, const Want &want);
 
+    void UpdateContextConfiguration();
+
 private:
     class RemoteObjHash {
     public:
