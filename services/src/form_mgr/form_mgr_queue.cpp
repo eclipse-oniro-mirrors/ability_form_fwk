@@ -16,6 +16,9 @@
 #include "form_mgr/form_mgr_queue.h"
 #include "fms_log_wrapper.h"
 
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
