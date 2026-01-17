@@ -397,28 +397,29 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
 {
     char *base = nullptr;
     int fd = ReadFileDescriptor(parcel);
+    if (fd < 0) {
+        HILOG_ERROR("ReadFileDescriptor Error");
+        return nullptr;
+    }
+    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
     if (!CheckAshmemSize(fd, bufferSize)) {
         HILOG_INFO("ReadAshmemDataFromParcel check ashmem size failed, fd:[%{public}d].", fd);
-        close(fd);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return nullptr;
     }
     if (bufferSize <= 0 || bufferSize > MAX_BUFFER_SIZE) {
         HILOG_INFO("malloc parameter bufferSize:[%{public}d] error.", bufferSize);
-        close(fd);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return nullptr;
     }
 
     void *ptr = ::mmap(nullptr, bufferSize, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
         HILOG_INFO("ReadImageData map failed, errno:%{public}d", errno);
-        close(fd);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return nullptr;
     }
-    if (fd == -1) {
-        HILOG_ERROR("ReadFileDescriptor Error");
-        return nullptr;
-    }
-    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
+
     base = static_cast<char *>(malloc(bufferSize));
     if (base == nullptr) {
         ::munmap(ptr, bufferSize);
@@ -474,7 +475,8 @@ bool FormProviderData::WriteFileDescriptor(Parcel &parcel, int fd) const
     sptr<IPCFileDescriptor> descriptor = new IPCFileDescriptor(dupFd);
     bool result = parcel.WriteObject<IPCFileDescriptor>(descriptor);
     if (!result) {
-        close(dupFd);
+        fdsan_exchange_owner_tag(dupFd, 0, Constants::FORM_DOMAIN_ID);
+        fdsan_close_with_tag(dupFd, Constants::FORM_DOMAIN_ID);
     }
     return result;
 }
