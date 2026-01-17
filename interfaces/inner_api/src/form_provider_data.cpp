@@ -164,18 +164,15 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
 
     off_t offSize = lseek(fd, 0L, SEEK_END);
     if (!isValidSize(offSize)) {
-        close(fd);
         return;
     }
     int32_t size = static_cast<int32_t>(offSize);
     HILOG_BRIEF("File size is %{public}d", size);
     if (lseek(fd, 0L, SEEK_SET) == -1) {
-        close(fd);
         return;
     }
     if (size > MAX_IMAGE_BYTE_SIZE) {
         HILOG_ERROR("File is too large");
-        close(fd);
         return;
     }
     char* bytes = new (std::nothrow) char[size];
@@ -188,13 +185,11 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         ssize_t bytesRead = read(fd, bytes + totalRead, size - totalRead);
         if (bytesRead == -1) {
             delete[] bytes;
-            close(fd);
             HILOG_ERROR("Read error: errno is %{public}d", errno);
             return;
         } else if (bytesRead == 0) {
             HILOG_ERROR("Unexpected end of file");
             delete[] bytes;
-            close(fd);
             return;
         }
         totalRead += bytesRead;
