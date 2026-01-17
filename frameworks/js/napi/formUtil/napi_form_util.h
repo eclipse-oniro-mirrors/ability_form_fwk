@@ -118,6 +118,8 @@ public:
     static long long ConvertStringToLongLong(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
 
     static void RejectCurrentTask(napi_env env, NapiAsyncTask &task, int32_t errCode);
+
+    static int CatchErrorCode(napi_env env);
 private:
     static std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type);
 };

@@ -845,5 +845,22 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
     rect.height = rectHeight;
     return true;
 }
+
+int NapiFormUtil::CatchErrorCode(napi_env env)
+{
+    napi_value errResult;
+    if (napi_get_and_clear_last_exception(env, &errResult) == napi_ok) {
+        napi_value errCode;
+        napi_get_named_property(env, errResult, "code", &errCode);
+        napi_valuetype errCodeType;
+        napi_typeof(env, errCode, &errCodeType);
+        if (errCodeType == napi_number) {
+            int32_t errCodeInt;
+            napi_get_value_int32(env, errCode, &errCodeInt);
+            return errCodeInt;
+        }
+    }
+    return ERR_GET_INFO_FAILED;
+}
 }  // namespace AbilityRuntime
 }  // namespace OHOS

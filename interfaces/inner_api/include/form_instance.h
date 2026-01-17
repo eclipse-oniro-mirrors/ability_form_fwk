@@ -115,6 +115,7 @@ typedef struct LiveFormInterfaceParam {
     bool result = false;
     AppExecFwk::Rect formRect;
     std::unordered_map<std::string, std::string> liveFormStatusMap;
+    ErrCode errCode = ERR_OK;
 } LiveFormInterfaceParam;
 } // namespace OHOS
 #endif // FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H

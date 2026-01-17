@@ -255,16 +255,40 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION, { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION, "" }
     },
     {
-        ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY,
-        { ERR_FORM_EXTERNAL_PARAM_INVALID, "The context is not ability context." }
-    },
-    {
         ERR_APPEXECFWK_FORM_EDIT_UNSUPPORT_OPERATION,
         {
             ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,
             "Cannot close the widget editing page. The page is not in the foreground or not owned by the caller."
         }
     },
+    {
+        ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "The context is not ability context." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_IS_ACTIVING,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form is activing." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_POWER_MODE_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Device status check failed, possibly due to power saving mode." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_HOT_CONTROL,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Device status check failed, possibly due to hot control." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_HOST_STATUS_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Form Host status check failed." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_COMPETITION_FAILED,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form overflow competition failure." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_PARAMS_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form overflow request parameter is invalid." }
+    }
 };
 
 static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG = {
