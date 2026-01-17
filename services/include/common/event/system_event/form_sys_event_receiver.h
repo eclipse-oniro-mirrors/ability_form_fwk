@@ -58,6 +58,7 @@ private:
     void RecycleForms(int32_t userId);
 private:
     int32_t lastUserId_ = 0;
+    std::mutex lastUserIdMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

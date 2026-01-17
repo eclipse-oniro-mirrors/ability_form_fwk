@@ -182,8 +182,9 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
 void FormAmsHelper::RegisterConfigurationObserver()
 {
     HILOG_INFO("begin");
-    if (configurationObserver != nullptr) {
-        HILOG_WARN("configurationObserver not null");
+    std::lock_guard<std::mutex> lock(configObserverMutex_);
+    if (configurationObserver_ != nullptr) {
+        HILOG_WARN("configurationObserver_ not null");
         return;
     }
     sptr<IConfigurationObserver> configurationObserver(new (std::nothrow) FormFwkResourceObserver());
@@ -196,15 +197,21 @@ void FormAmsHelper::RegisterConfigurationObserver()
         HILOG_ERROR("create appMgrClient failed");
         return;
     }
-    appMgrClient->RegisterConfigurationObserver(configurationObserver);
+    AppMgrResultCode resCode = appMgrClient->RegisterConfigurationObserver(configurationObserver);
+    if (resCode != AppMgrResultCode::RESULT_OK) {
+        HILOG_ERROR("RegisterConfigurationObserver failed");
+        return;
+    }
+    configurationObserver_ = configurationObserver;
     HILOG_INFO("end");
 }
 
 void FormAmsHelper::UnRegisterConfigurationObserver()
 {
     HILOG_INFO("begin");
-    if (configurationObserver == nullptr) {
-        HILOG_WARN("null configurationObserver");
+    std::lock_guard<std::mutex> lock(configObserverMutex_);
+    if (configurationObserver_ == nullptr) {
+        HILOG_WARN("null configurationObserver_");
         return;
     }
     auto appMgrClient = std::make_unique<AppMgrClient>();
@@ -212,7 +219,12 @@ void FormAmsHelper::UnRegisterConfigurationObserver()
         HILOG_ERROR("create appMgrClient failed");
         return;
     }
-    appMgrClient->UnregisterConfigurationObserver(configurationObserver);
+    AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(configurationObserver_);
+    if (resCode != AppMgrResultCode::RESULT_OK) {
+        HILOG_ERROR("UnregisterConfigurationObserver failed");
+        return;
+    }
+    configurationObserver_ = nullptr;
     HILOG_INFO("end");
 }
 

@@ -35,12 +35,6 @@ public:
     DISALLOW_COPY_AND_MOVE(FormExemptLockMgr);
 
     /**
-     * @brief Init form bundle exempt mgr.
-     * @return True for sucessful init, false for failed init.
-     */
-    bool Init();
-
-    /**
      * @brief Get whether bundle is exempt.
      * @param formId The Id of the forms.
      * @return True for exempt, false for not exempt.
@@ -56,10 +50,10 @@ public:
 
 private:
     /**
-     * @brief check whether exempt lock mgr is init.
-     * @return True for inited, false for not init.
+     * @brief Init form bundle exempt mgr.
+     * @return True for sucessful init, false for failed init.
      */
-    bool IsExemptLockMgrInit();
+    bool Init();
 
 private:
     bool isInitialized_ = false;

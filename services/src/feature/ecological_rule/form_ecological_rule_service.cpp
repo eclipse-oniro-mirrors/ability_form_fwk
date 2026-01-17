@@ -32,7 +32,6 @@ std::mutex FormEcologicalRuleClient::instanceLock_;
 sptr<IFormEcologicalRule> FormEcologicalRuleClient::ecologicalRuleMgrServiceProxy_;
 sptr<IRemoteObject::DeathRecipient> FormEcologicalRuleClient::deathRecipient_;
 
-
 FormEcologicalRuleClient::FormEcologicalRuleClient()
 {}
 
@@ -58,9 +57,9 @@ sptr<IFormEcologicalRule> FormEcologicalRuleClient::ConnectService()
         return nullptr;
     }
 
-    auto systemAbility = samgr->CheckSystemAbility(6105);
+    auto systemAbility = samgr->CheckSystemAbility(ECOLOGICAL_RULE_MANAGER_SA_ID);
     if (systemAbility == nullptr) {
-        HILOG_ERROR("CheckSystemAbility error, ECOLOGICALRULEMANAGERSERVICE_ID = 6105");
+        HILOG_ERROR("CheckSystemAbility error, ECOLOGICAL_RULE_MANAGER_SA_ID = 6105");
         return nullptr;
     }
 
@@ -78,6 +77,7 @@ sptr<IFormEcologicalRule> FormEcologicalRuleClient::ConnectService()
 
 bool FormEcologicalRuleClient::CheckConnectService()
 {
+    std::lock_guard<std::mutex> lock(instanceLock_);
     if (ecologicalRuleMgrServiceProxy_ == nullptr) {
         HILOG_DEBUG("redo ConnectService");
         ecologicalRuleMgrServiceProxy_ = ConnectService();
@@ -91,6 +91,7 @@ bool FormEcologicalRuleClient::CheckConnectService()
 
 void FormEcologicalRuleClient::OnRemoteSaDied(const wptr<IRemoteObject> &object)
 {
+    std::lock_guard<std::mutex> lock(instanceLock_);
     ecologicalRuleMgrServiceProxy_ = ConnectService();
 }
 

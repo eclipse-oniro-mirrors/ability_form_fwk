@@ -35,12 +35,6 @@ public:
     DISALLOW_COPY_AND_MOVE(FormBundleLockMgr);
 
     /**
-     * @brief Init form bundle lock mgr.
-     * @return True for sucessful init, false for failed init.
-     */
-    bool Init();
-
-    /**
      * @brief Get whether bundle is lock.
      * @param bundleName Bundle name to be check.
      * @return True for lock, false for not lock.
@@ -70,10 +64,10 @@ public:
 
 private:
     /**
-     * @brief check whether bundle lock mgr is init.
-     * @return True for inited, false for not init.
+     * @brief Init form bundle lock mgr.
+     * @return True for sucessful init, false for failed init.
      */
-    bool IsBundleLockMgrInit();
+    bool Init();
 
 private:
     bool isInitialized_ = false;
