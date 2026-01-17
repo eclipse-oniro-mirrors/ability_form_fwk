@@ -255,10 +255,6 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION, { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION, "" }
     },
     {
-        ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY,
-        { ERR_FORM_EXTERNAL_PARAM_INVALID, "The context is not ability context." }
-    },
-    {
         ERR_APPEXECFWK_FORM_EDIT_UNSUPPORT_OPERATION,
         {
             ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,
@@ -266,15 +262,20 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         }
     },
     {
-        ERR_APPEXECFWK_LIVE_FORM_IS_OVERFLOWING,
-        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form is overflowing." }
+        ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "The context is not ability context." }
     },
     {
-        ERR_APPEXECFWK_LIVE_FORM_DEVICE_STATUS_ERROR,
-        {
-            ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,
-            "Device status check failed, possibly due to power saving mode or temperature control."
-        }
+        ERR_APPEXECFWK_LIVE_FORM_IS_ACTIVING,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form is activing." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_POWER_MODE_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Device status check failed, possibly due to power saving mode." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_HOT_CONTROL,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Device status check failed, possibly due to hot control." }
     },
     {
         ERR_APPEXECFWK_LIVE_FORM_HOST_STATUS_ERROR,
