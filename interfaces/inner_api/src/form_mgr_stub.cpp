@@ -2305,7 +2305,7 @@ ErrCode FormMgrStub::HandleUpdateTemplateFormDetailInfo(MessageParcel &data, Mes
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     for (int32_t i = 0; i < size; i++) {
-        auto templateFormDetailInfo = data.ReadParcelable<TemplateFormDetailInfo>();
+        std::unique_ptr<TemplateFormDetailInfo> templateFormDetailInfo(data.ReadParcelable<TemplateFormDetailInfo>());
         if (templateFormDetailInfo == nullptr) {
             HILOG_ERROR("read templateFormDetailInfo failed at index %d.", i);
             return ERR_APPEXECFWK_PARCEL_ERROR;

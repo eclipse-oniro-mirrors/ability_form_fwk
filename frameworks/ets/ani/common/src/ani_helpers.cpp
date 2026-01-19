@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <charconv>
 #include "ani_helpers.h"
 #include "form_mgr_errors.h"
 
@@ -71,37 +72,37 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
     std::smatch match;
     if (regex_match(strInfo, match, pattern)) {
         if (strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1) != "-") {
-            if (strLength < INT_64_LENGTH) {
-                int64Value = std::stoll(strInfo);
-                return true;
-            }
             int maxSubValue = ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
-            if (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER) {
-                int64Value = std::stoll(strInfo);
-                return true;
+            if (strLength < INT_64_LENGTH || (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER)) {
+                auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+                return result.ec == std::errc() ? true : false;
             }
-            int64_t subValue = std::stoll(strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1));
+            int64_t subValue;
+            const std::string newStrInfo = strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1);
+            auto checkResult = std::from_chars(newStrInfo.data(), newStrInfo.data() + newStrInfo.size(), subValue);
+            if (checkResult.ec != std::errc()) {
+                return false;
+            }
             if (strLength == INT_64_LENGTH && subValue <= (INT64_MAX - HEAD_BIT_NUM)) {
-                int64Value = std::stoll(strInfo);
-                return true;
+                auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+                return result.ec == std::errc() ? true : false;
             }
             return false;
         }
-        if (strLength < INT_64_LENGTH + 1) {
-            int64Value = std::stoll(strInfo);
-            return true;
+        int minSubValue = ConvertStringToInt(strInfo.substr(1, 1));
+        if (strLength < INT_64_LENGTH + 1 || (strLength == INT_64_LENGTH + 1 && minSubValue < BASE_NUMBER)) {
+            auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+            return result.ec == std::errc() ? true : false;
         }
-        if (strLength == INT_64_LENGTH + 1) {
-            int minSubValue = ConvertStringToInt(strInfo.substr(1, 1));
-            if (minSubValue < BASE_NUMBER) {
-                int64Value = std::stoll(strInfo);
-                return true;
-            }
-            int64_t subValue = std::stoll(strInfo.substr(ZERO_VALUE + 2, INT_64_LENGTH - 1));
-            if (subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
-                int64Value = std::stoll(strInfo);
-                return true;
-            }
+        int64_t subValue;
+        const std::string newStrInfo = strInfo.substr(ZERO_VALUE + TOW_VALUE, INT_64_LENGTH - 1);
+        auto checkResult = std::from_chars(newStrInfo.data(), newStrInfo.data() + newStrInfo.size(), subValue);
+        if (checkResult.ec != std::errc()) {
+            return false;
+        }
+        if (subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
+            auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
+            return result.ec == std::errc() ? true : false;
         }
     }
     HILOG_DEBUG("regex_match failed");
