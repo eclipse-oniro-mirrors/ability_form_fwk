@@ -18,6 +18,7 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "facrconnection_fuzzer:fuzztest",
     "formabilityconnection_fuzzer:fuzztest",
     "formabilityconnectionreporter_fuzzer:fuzztest",
     "formashmem_fuzzer:fuzztest",
@@ -31,6 +32,7 @@ group("fuzztest") {
     "formdatamgrthree_fuzzer:fuzztest",
     "formdatamgrtwo_fuzzer:fuzztest",
     "formdbcache_fuzzer:fuzztest",
+    "formdbcacheannex_fuzzer:fuzztest",
     "formecologicalruleparam_fuzzer:fuzztest",
     "formerrors_fuzzer:fuzztest",
     "formeventreport_fuzzer:fuzztest",
@@ -75,6 +77,7 @@ group("fuzztest") {
     "formsupplycallback_fuzzer:fuzztest",
     "formsupplyproxy_fuzzer:fuzztest",
     "formsupplystub_fuzzer:fuzztest",
+    "formsyseventreceiver_fuzzer:fuzztest",
     "formtimermgr_fuzzer:fuzztest",
     "formtimermgrannex_fuzzer:fuzztest",
     "formutil_fuzzer:fuzztest",
