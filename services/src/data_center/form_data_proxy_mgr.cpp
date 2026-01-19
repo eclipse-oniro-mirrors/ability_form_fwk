@@ -204,8 +204,10 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
         auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
         if (ret == ERR_OK) {
             HILOG_INFO("subscribe data proxy success, formId:%{public}" PRId64, formId);
-            std::lock_guard<std::mutex> lock(FormDataProxyMgr::GetInstance().formDataProxyRecordMutex_);
-            FormDataProxyMgr::GetInstance().formDataProxyRecordMap_[formId] = formDataProxyRecord;
+            {
+                std::lock_guard<std::mutex> lock(FormDataProxyMgr::GetInstance().formDataProxyRecordMutex_);
+                FormDataProxyMgr::GetInstance().formDataProxyRecordMap_[formId] = formDataProxyRecord;
+            }
             if (!FormDataMgr::GetInstance().GetFormVisible(formId)) {
                 HILOG_INFO("form is invisible, disable subscribe. formId:%{public}" PRId64, formId);
                 FormDataProxyMgr::GetInstance().DisableSubscribeFormData({ formId });
