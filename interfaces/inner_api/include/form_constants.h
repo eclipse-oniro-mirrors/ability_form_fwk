@@ -415,6 +415,8 @@ namespace Constants {
     constexpr int32_t FORM_DEFAULT = 1;
     // The form launch reason which means that the form is share.
     constexpr int32_t FORM_SHARE = 2;
+    // The form launch reason which means that the form size change.
+    constexpr int32_t FORM_SIZE_CHANGE = 3;
     // Specify the form Id
     constexpr const char* PARAM_FORM_MIGRATE_FORM_KEY = "ohos.extra.param.key.migrate_form";
     // For click message event
@@ -483,6 +485,8 @@ namespace Constants {
     constexpr const int32_t TEMPLATE_FORM_MAX_SIZE = 20;
 
     constexpr const char* PARAM_VISUAL_EFFECT_TYPE_KEY = "visualEffectType";
+
+    constexpr const char* ORIGINAL_FORM_KEY = "ohos.extra.param.key.original_form_id";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
