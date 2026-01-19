@@ -72,7 +72,7 @@ public:
     void ProcessEvent(int64_t msg, int64_t eventId, int64_t delayTime = 0);
 
 private:
-    static int64_t eventId_;
+    static std::atomic<int64_t> eventId_;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::set<std::shared_ptr<FormEventTimeoutObserver>> observers_;
     mutable std::mutex observerMutex_;

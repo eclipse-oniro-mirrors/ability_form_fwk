@@ -35,6 +35,10 @@ FormBundleForbidMgr::~FormBundleForbidMgr()
 
 bool FormBundleForbidMgr::Init()
 {
+    std::unique_lock<std::shared_mutex> lock(bundleForbiddenSetMutex_);
+    if (isInitialized_) {
+        return true;
+    }
     FormRdbTableConfig formRdbTableConfig;
     formRdbTableConfig.tableName = FORBIDDEN_FORM_BUNDLE_TABLE;
     formRdbTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " +
@@ -57,7 +61,8 @@ bool FormBundleForbidMgr::IsBundleForbidden(const std::string &bundleName)
         return false;
     }
 
-    if (!IsBundleForbidMgrInit()) {
+    if (!Init()) {
+        HILOG_ERROR("Form bundle forbid mgr not init");
         return false;
     }
 
@@ -73,12 +78,12 @@ void FormBundleForbidMgr::SetBundleForbiddenStatus(const std::string &bundleName
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(bundleForbiddenSetMutex_);
-    if (!isInitialized_ && !Init()) {
+    if (!Init()) {
         HILOG_ERROR("Form bundle forbid mgr not init");
         return;
     }
 
+    std::unique_lock<std::shared_mutex> lock(bundleForbiddenSetMutex_);
     auto iter = formBundleForbiddenSet_.find(bundleName);
     if (isForbidden && iter == formBundleForbiddenSet_.end()) {
         formBundleForbiddenSet_.insert(bundleName);
@@ -87,16 +92,6 @@ void FormBundleForbidMgr::SetBundleForbiddenStatus(const std::string &bundleName
         formBundleForbiddenSet_.erase(bundleName);
         FormRdbDataMgr::GetInstance().DeleteData(FORBIDDEN_FORM_BUNDLE_TABLE, bundleName);
     }
-}
-
-bool FormBundleForbidMgr::IsBundleForbidMgrInit()
-{
-    std::unique_lock<std::shared_mutex> lock(bundleForbiddenSetMutex_);
-    if (!isInitialized_ && !Init()) {
-        HILOG_ERROR("Form bundle forbid mgr not init");
-        return false;
-    }
-    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

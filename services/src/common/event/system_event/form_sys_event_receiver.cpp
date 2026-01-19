@@ -189,20 +189,23 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         return;
     }
 
-    if (lastUserId_ == 0) {
-        HILOG_INFO("reboot init lastUserId");
+    {
+        std::lock_guard<std::mutex> lock(lastUserIdMutex_);
+        if (lastUserId_ == 0) {
+            HILOG_INFO("reboot init lastUserId");
+            lastUserId_ = userId;
+            return;
+        }
+ 
+        if (lastUserId_ == userId) {
+            HILOG_WARN("same userId");
+            return;
+        }
+ 
         lastUserId_ = userId;
-        return;
+        HILOG_INFO("switch to userId: (%{public}d)", userId);
     }
 
-    if (lastUserId_ == userId) {
-        HILOG_WARN("same userId");
-        return;
-    }
-
-    int32_t lastUserId = lastUserId_;
-    lastUserId_ = userId;
-    HILOG_INFO("switch to userId: (%{public}d)", userId);
     if (FormRenderMgr::GetInstance().GetFRSDiedInLowMemoryByUid(userId)) {
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     }

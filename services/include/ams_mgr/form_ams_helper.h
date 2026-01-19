@@ -109,7 +109,8 @@ private:
     void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
-    sptr<IConfigurationObserver> configurationObserver = nullptr;
+    sptr<IConfigurationObserver> configurationObserver_ = nullptr;
+    std::mutex configObserverMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

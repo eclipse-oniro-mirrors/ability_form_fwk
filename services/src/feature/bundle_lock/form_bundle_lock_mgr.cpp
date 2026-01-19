@@ -38,6 +38,10 @@ FormBundleLockMgr::~FormBundleLockMgr()
 
 bool FormBundleLockMgr::Init()
 {
+    std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
+    if (isInitialized_) {
+        return true;
+    }
     FormRdbTableConfig formRdbTableConfig;
     formRdbTableConfig.tableName = LOCK_FORM_BUNDLE_TABLE;
     formRdbTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " +
@@ -70,7 +74,8 @@ bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, int64_t form
         return false;
     }
 
-    if (!IsBundleLockMgrInit()) {
+    if (!Init()) {
+        HILOG_ERROR("Form bundle lock mgr not init");
         return false;
     }
 
@@ -86,12 +91,12 @@ void FormBundleLockMgr::SetBundleLockStatus(const std::string &bundleName, bool 
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
-    if (!isInitialized_ && !Init()) {
+    if (!Init()) {
         HILOG_ERROR("Form bundle lock mgr not init");
         return;
     }
 
+    std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
     auto iter = formBundleLockSet_.find(bundleName);
     if (isLock && iter == formBundleLockSet_.end()) {
         formBundleLockSet_.insert(bundleName);
@@ -139,16 +144,6 @@ void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bo
     } else {
         HILOG_ERROR("set bundle protect status failed");
     }
-}
-
-bool FormBundleLockMgr::IsBundleLockMgrInit()
-{
-    std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
-    if (!isInitialized_ && !Init()) {
-        HILOG_ERROR("Form bundle lock mgr not init");
-        return false;
-    }
-    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -36,22 +36,24 @@ RefreshControlMgr::~RefreshControlMgr() {}
 #ifdef RES_SCHEDULE_ENABLE
 void RefreshControlMgr::SetSystemOverloadFlag(bool flag)
 {
-    if (isSystemOverload_ && !flag) {
+    bool isSystemOverload = isSystemOverload_.load();
+    if (isSystemOverload && !flag) {
         RefreshCacheMgr::GetInstance().ConsumeOverloadTaskQueue();
     }
 
-    HILOG_INFO("isSystemOverload_:%{public}d, new flag:%{public}d", isSystemOverload_, flag);
-    isSystemOverload_ = flag;
+    HILOG_INFO("isSystemOverload_ old: %{public}d, new: %{public}d", isSystemOverload, flag);
+    isSystemOverload_.store(flag);
 }
 #endif
 
 bool RefreshControlMgr::IsSystemOverload()
 {
 #ifdef RES_SCHEDULE_ENABLE
-    if (isSystemOverload_) {
+    bool isSystemOverload = isSystemOverload_.load();
+    if (isSystemOverload) {
         HILOG_WARN("system overload");
     }
-    return isSystemOverload_;
+    return isSystemOverload;
 #endif
     return false;
 }

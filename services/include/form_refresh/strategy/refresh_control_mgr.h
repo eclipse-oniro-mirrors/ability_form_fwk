@@ -72,7 +72,7 @@ public:
 
 private:
 #ifdef RES_SCHEDULE_ENABLE
-    bool isSystemOverload_ = false;
+    std::atomic<bool> isSystemOverload_{false};
 #endif
 };
 } // namespace AppExecFwk
