@@ -23,7 +23,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr const char *FORM_MGR_QUEUE = "FormMgrQueue";
-const int32_t QUEUE_TASK_TIME_OUT = 5;
+constexpr int32_t QUEUE_TASK_TIME_OUT = 5;
 }
 FormMgrQueue::FormMgrQueue()
 {
