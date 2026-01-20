@@ -2148,7 +2148,7 @@ void FormRenderRecord::RegisterResolveBufferCallback()
         return;
     }
     auto resolveBufferCallback = [runtime = runtime_](
-        std::string &dirPath, uint8_t **buff, size_t *buffSize, std::string &errorMsg) {
+        std::string dirPath, uint8_t **buff, size_t *buffSize, std::string &errorMsg) {
         const std::string errStr = "get hsp buffer failed, not support to load hsp in FormRender";
         HILOG_ERROR("%{public}s", errStr.c_str());
         if (runtime == nullptr) {
