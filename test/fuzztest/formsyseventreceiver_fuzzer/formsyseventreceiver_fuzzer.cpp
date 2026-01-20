@@ -62,7 +62,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     int uid = static_cast<int>(GetU32Data(data));
     FormEventUtil::HandleFormHostDataCleared(uid);
     AAFwk::Want want;
-    formSysEventReceiver.HandleAbilityUpdate(want, bundleName);
     formSysEventReceiver.HandlePackageDataCleared(bundleName, userId);
     formSysEventReceiver.HandleUserUnlocked(uid);
     formSysEventReceiver.HandleUserSwitched(eventData);

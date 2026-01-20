@@ -40,8 +40,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormDbCache formDbCache;
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
     FormRecord record;
+    record.formId = formId;
     formDbCache.GetDBRecord(formId, record);
     FormDBInfo records;
+    records.formId = formId;
     formDbCache.GetDBRecord(formId, records);
     formDbCache.UpdateDBRecord(formId, record);
     int uid = static_cast<int>(GetU32Data(data));
@@ -64,8 +66,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::set<int64_t> matchedFormIds;
     matchedFormIds.insert(formId);
     formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
-    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
-    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
     return true;
 }
 
