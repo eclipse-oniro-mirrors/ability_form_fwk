@@ -347,7 +347,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
         }
         if (strLength == INT_64_LENGTH + 1 && subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
             auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
-            return result.ec == std::errc()e;
+            return result.ec == std::errc();
         }
     }
     HILOG_DEBUG("regex_match failed");
