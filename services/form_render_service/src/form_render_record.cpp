@@ -2148,9 +2148,13 @@ void FormRenderRecord::RegisterResolveBufferCallback()
         return;
     }
     auto resolveBufferCallback = [runtime = runtime_](
-        std::string dirPath, uint8_t **buff, size_t *buffSize, std::string &errorMsg) {
-        std::string errStr = "get hsp buffer failed, not support to load hsp in FormRender";
+        std::string &dirPath, uint8_t **buff, size_t *buffSize, std::string &errorMsg) {
+        const std::string errStr = "get hsp buffer failed, not support to load hsp in FormRender";
         HILOG_ERROR("%{public}s", errStr.c_str());
+        if (runtime == nullptr) {
+            HILOG_ERROR("null runtime");
+            return false;
+        }
         auto vm = runtime->GetEcmaVm();
         auto error = panda::Exception::TypeError(vm, panda::StringRef::NewFromUtf8(vm, errStr.c_str()));
         panda::JSNApi::ThrowException(vm, error);
