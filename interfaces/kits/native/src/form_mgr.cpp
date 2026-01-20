@@ -1315,7 +1315,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
 {
     std::vector<FormInfo> inputFormInfos;
     int resultCode = GetFullFormsInfoByModule(bundleName, moduleName, inputFormInfos);
-    if (resultCode != ERR_OK) {
+    if (resultCode == ERR_OK) {
         FilterTemplateForm(inputFormInfos, formInfos);
     }
     return resultCode;
