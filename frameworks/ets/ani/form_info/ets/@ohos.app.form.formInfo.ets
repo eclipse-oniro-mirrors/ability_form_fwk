@@ -68,7 +68,7 @@ export default namespace formInfo {
     MODE_LIGHT = 1
   }
 
-  export interface FormStateInfo {
+  interface FormStateInfo {
     formState: FormState;
     want: Want;
   }
@@ -98,9 +98,10 @@ export default namespace formInfo {
     HOST_BG_INVERSE_COLOR_KEY = 'ohos.extra.param.key.host_bg_inverse_color',
     FORM_PERMISSION_NAME_KEY = 'ohos.extra.param.key.permission_name',
     FORM_PERMISSION_GRANTED_KEY = 'ohos.extra.param.key.permission_granted',
+    ORIGINAL_FORM_KEY = 'ohos.extra.param.key.original_form_id',
   }
 
-  export interface FormInfoFilter {
+  interface FormInfoFilter {
     bundleName?: string;
     moduleName?: string;
     supportedDimensions?: Array<int>;
@@ -132,10 +133,11 @@ export default namespace formInfo {
 
   enum LaunchReason {
     FORM_DEFAULT = 1,
-    FORM_SHARE = 2
+    FORM_SHARE = 2,
+    FORM_SIZE_CHANGE = 3
   }
 
-  export interface PublishFormResult {
+  interface PublishFormResult {
     code: PublishFormErrorCode;
     message: string;
   }
@@ -147,7 +149,7 @@ export default namespace formInfo {
     INTERNAL_ERROR = 3
   }
 
-  export interface FormProviderFilter {
+  interface FormProviderFilter {
     bundleName: string;
     formName?: string;
     moduleName?: string;
@@ -284,7 +286,7 @@ export default namespace formInfo {
     overflowInfo?: OverflowInfo;
   }
 
-  export interface Rect {
+  interface Rect {
     left: double;
     top: double;
     width: double;
@@ -298,7 +300,7 @@ export default namespace formInfo {
     height: double;
   }
 
-  export interface OverflowInfo {
+  interface OverflowInfo {
     area: Rect;
     duration: int;
     useDefaultAnimation?: boolean;
