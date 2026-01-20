@@ -95,7 +95,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
             return result.ec == std::errc();
         }
         int64_t subValue;
-        const std::string newStrInfo = strInfo.substr(ZERO_VALUE + TOW_VALUE, INT_64_LENGTH - 1);
+        const std::string newStrInfo = strInfo.substr(ZERO_VALUE + TWO_VALUE, INT_64_LENGTH - 1);
         auto checkResult = std::from_chars(newStrInfo.data(), newStrInfo.data() + newStrInfo.size(), subValue);
         if (checkResult.ec != std::errc()) {
             return false;
