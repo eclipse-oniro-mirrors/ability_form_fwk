@@ -1684,8 +1684,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
         if (!allotFormWant.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false)) {
-            HILOG_INFO("is not add form by host, don't merge data");
-            FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], allotFormWant);
+            FormDataMgr::GetInstance().GetFormHostParams(formId, allotFormWant);
         }
     }
     const WantParams wholeWantParams = allotFormWant.GetParams();

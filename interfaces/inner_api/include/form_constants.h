@@ -487,6 +487,8 @@ namespace Constants {
     constexpr const char* PARAM_VISUAL_EFFECT_TYPE_KEY = "visualEffectType";
 
     constexpr const char* ORIGINAL_FORM_KEY = "ohos.extra.param.key.original_form_id";
+
+    constexpr const char* FORM_ENABLE_MATERIAL_BACKGROUND_KEY = "ohos.extra.param.key.form_enable_material_background";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
