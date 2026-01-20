@@ -320,7 +320,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
             int maxSubValue = ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
             if (strLength < INT_64_LENGTH || (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER)) {
                 auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
-                return result.ec == std::errc() ? true : false;
+                return result.ec == std::errc();
             }
             int64_t subValue;
             const std::string newStrInfo = strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1);
@@ -330,14 +330,14 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
             }
             if (strLength == INT_64_LENGTH && subValue <= (INT64_MAX - HEAD_BIT_NUM)) {
                 auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
-                return result.ec == std::errc() ? true : false;
+                return result.ec == std::errc();
             }
             return false;
         }
         int minSubValue = ConvertStringToInt(strInfo.substr(1, 1));
         if (strLength < INT_64_LENGTH + 1 || (strLength == INT_64_LENGTH + 1 && minSubValue < BASE_NUMBER)) {
             auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
-            return result.ec == std::errc() ? true : false;
+            return result.ec == std::errc();
         }
         int64_t subValue;
         const std::string newStrInfo = strInfo.substr(ZERO_VALUE + TWO_VALUE, INT_64_LENGTH - 1);
@@ -347,7 +347,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
         }
         if (strLength == INT_64_LENGTH + 1 && subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
             auto result = std::from_chars(strInfo.data(), strInfo.data() + strLength, int64Value);
-            return result.ec == std::errc() ? true : false;
+            return result.ec == std::errc()e;
         }
     }
     HILOG_DEBUG("regex_match failed");
