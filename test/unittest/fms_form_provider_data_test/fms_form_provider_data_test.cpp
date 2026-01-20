@@ -986,4 +986,27 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_050, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_050 end";
 
 }
+
+/**
+ 0* @tc.name: FmsFormProviderDataTest_051
+ * @tc.desc: Verify the EnableDbCache and IsDbCacheEnabled function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_051, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_051 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+
+    formProviderData.EnableDbCache(true);
+    EXPECT_TRUE(formProviderData.IsDbCacheEnabled());
+    EXPECT_TRUE(formProviderData.enableDbCache_);
+
+    formProviderData.EnableDbCache(false);
+    EXPECT_FALSE(formProviderData.IsDbCacheEnabled());
+    EXPECT_FALSE(formProviderData.enableDbCache_);
+
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_051 end";
+
+}
 }
