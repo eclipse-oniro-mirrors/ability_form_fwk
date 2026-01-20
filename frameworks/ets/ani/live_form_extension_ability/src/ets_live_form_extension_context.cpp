@@ -14,7 +14,6 @@
  */
 
 #include "ets_live_form_extension_context.h"
-#include "ets_ui_extension_context.h"
 #include "ets_runtime.h"
 #include "ani_common_util.h"
 #include "ani_common_want.h"
@@ -26,12 +25,38 @@
 #include "form_constants.h"
 #include "form_errors.h"
 #include "form_mgr_errors.h"
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-    const char *LIVE_FORM_EXTENSION_CONTEXT = "application.LiveFormExtensionContext.LiveFormExtensionContext";
-    const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "application.UIExtensionContext.Cleaner";
+static std::mutex g_connectsMutex;
+int32_t g_serialNumber = 0;
+static std::map<EtsUIExtensionConnectionKey, sptr<EtsUIExtensionConnection>, Etskey_compare> g_connects;
+constexpr const int FAILED_CODE = -1;
+constexpr const char *LIVE_FORM_EXTENSION_CONTEXT = "Lapplication/LiveFormExtensionContext/LiveFormExtensionContext;";
+constexpr const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "Lapplication/UIExtensionContext/Cleaner;";
+constexpr const char *SIGNATURE_CONNECT_SERVICE_EXTENSION =
+"L@ohos/app/ability/Want/Want;Lability/connectOptions/ConnectOptions;:J";
+constexpr const char *SIGNATURE_DISCONNECT_SERVICE_EXTENSION = "JLutils/AbilityUtils/AsyncCallbackWrapper;:V";
+
+void RemoveConnection(int64_t connectId)
+{
+    std::lock_guard<std::mutex> lock(g_connectsMutex);
+    auto item = std::find_if(g_connects.begin(), g_connects.end(), [connectId](const auto &obj) {
+        return connectId == obj.first.id;
+    });
+    if (item != g_connects.end()) {
+        HILOG_DEBUG("ability exist");
+        if (item->second) {
+            item->second->RemoveConnectionObject();
+        }
+        g_connects.erase(item);
+    } else {
+        HILOG_DEBUG("ability not exist");
+    }
+}
 }
 
 using namespace OHOS::AppExecFwk;
@@ -55,6 +80,46 @@ EtsLiveFormExtensionContext* EtsLiveFormExtensionContext::GetEtsLiveFormExtensio
         return nullptr;
     }
     return etsContext;
+}
+
+bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object connectOptionsObj,
+    sptr<EtsUIExtensionConnection> &connection, AAFwk::Want &want)
+{
+    ani_type type = nullptr;
+    ani_boolean res = ANI_FALSE;
+    ani_status status = ANI_ERROR;
+    if ((status = env->Object_GetType(connectOptionsObj, &type)) != ANI_OK) {
+        HILOG_ERROR("Failed to Object_GetType, status: %{public}d", status);
+        return false;
+    }
+    if (type == nullptr) {
+        HILOG_ERROR("null type");
+        return false;
+    }
+    if ((status = env->Object_InstanceOf(connectOptionsObj, type, &res)) != ANI_OK) {
+        HILOG_ERROR("Failed to Object_InstanceOf, status: %{public}d", status);
+        return false;
+    }
+    if (res != ANI_TRUE) {
+        HILOG_ERROR("Failed to CheckConnectionParam");
+        return false;
+    }
+    connection->SetConnectionRef(connectOptionsObj);
+    EtsUIExtensionConnectionKey key;
+    {
+        std::lock_guard guard(g_connectsMutex);
+        key.id = g_serialNumber;
+        key.want = want;
+        connection->SetConnectionId(key.id);
+        g_connects.emplace(key, connection);
+        if (g_serialNumber < INT32_MAX) {
+            g_serialNumber++;
+        } else {
+            g_serialNumber = 0;
+        }
+    }
+    HILOG_DEBUG("Failed to find connection, make new one");
+    return true;
 }
 
 ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
@@ -93,6 +158,10 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
     std::array functions = {
         ani_native_function { "nativeStartAbilityByLiveForm", nullptr,
             reinterpret_cast<void *>(EtsLiveFormExtensionContext::StartAbilityByLiveForm) },
+        ani_native_function { "nativeConnectServiceExtensionAbility", SIGNATURE_CONNECT_SERVICE_EXTENSION,
+            reinterpret_cast<void *>(EtsLiveFormExtensionContext::ConnectServiceExtensionAbility) },
+        ani_native_function { "nativeDisconnectServiceExtensionAbility", SIGNATURE_DISCONNECT_SERVICE_EXTENSION,
+            reinterpret_cast<void *>(EtsLiveFormExtensionContext::DisconnectServiceExtensionAbility) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
@@ -245,6 +314,129 @@ void EtsLiveFormExtensionContext::OnStartAbilityByLiveForm(ani_env *env, ani_obj
             ), nullptr);
     }
     return;
+}
+
+ani_long EtsLiveFormExtensionContext::ConnectServiceExtensionAbility(ani_env *env, ani_object aniObj,
+    ani_object wantObj, ani_object connectOptionsObj)
+{
+    HILOG_DEBUG("ConnectServiceExtensionAbility");
+
+    auto etsContext = GetEtsLiveFormExtensionContext(env, aniObj);
+    if (etsContext == nullptr) {
+        HILOG_ERROR("null etsLiveFormExtensionContext");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        return FAILED_CODE;
+    }
+    return etsContext->OnConnectServiceExtensionAbility(env, aniObj, wantObj, connectOptionsObj);
+}
+
+void EtsLiveFormExtensionContext::DisconnectServiceExtensionAbility(ani_env *env, ani_object aniObj,
+    ani_long connectId, ani_object callback)
+{
+    HILOG_DEBUG("DisconnectServiceExtensionAbility");
+    auto etsContext = GetEtsLiveFormExtensionContext(env, aniObj);
+    if (etsContext == nullptr) {
+        HILOG_ERROR("null etsLiveFormExtensionContext");
+        return;
+    }
+    etsContext->OnDisconnectServiceExtensionAbility(env, aniObj, connectId, callback);
+}
+
+ani_long EtsLiveFormExtensionContext::OnConnectServiceExtensionAbility(ani_env *env, ani_object aniObj,
+    ani_object wantObj, ani_object connectOptionsObj)
+{
+    HILOG_DEBUG("OnConnectServiceExtensionAbility");
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    if (!Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken)) {
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_NOT_SYSTEM_APP));
+        return FAILED_CODE;
+    }
+    ani_status status = ANI_ERROR;
+    auto context = context_.lock();
+    if (context == nullptr) {
+        HILOG_ERROR("Context is nullptr");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        return FAILED_CODE;
+    }
+    AAFwk::Want want;
+    if (!OHOS::AppExecFwk::UnwrapWant(env, wantObj, want)) {
+        HILOG_ERROR("Failed to UnwrapWant");
+        EtsFormErrorUtil::ThrowParamError(env, "Failed to UnwrapWant");
+        return FAILED_CODE;
+    }
+    ani_vm *etsVm = nullptr;
+    if ((status = env->GetVM(&etsVm)) != ANI_OK || etsVm == nullptr) {
+        HILOG_ERROR("Failed to getVM, status: %{public}d", status);
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        return FAILED_CODE;
+    }
+    sptr<EtsUIExtensionConnection> connection = new (std::nothrow) EtsUIExtensionConnection(etsVm);
+    if (connection == nullptr) {
+        HILOG_ERROR("null connection");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        return FAILED_CODE;
+    }
+    if (!CheckConnectionParam(env, connectOptionsObj, connection, want)) {
+        HILOG_ERROR("Failed to CheckConnectionParam");
+        EtsFormErrorUtil::ThrowParamError(env, "Failed to CheckConnectionParam");
+        return FAILED_CODE;
+    }
+    auto innerErrCode = context->ConnectAbility(want, connection);
+    double connectId = connection->GetConnectionId();
+    if (innerErrCode != ERR_OK) {
+        HILOG_ERROR("Faied to ConnectAbility, innerErrCode is %{public}d", innerErrCode);
+        RemoveConnection(connectId);
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        return FAILED_CODE;
+    }
+    return static_cast<ani_long>(connectId);
+}
+
+void EtsLiveFormExtensionContext::OnDisconnectServiceExtensionAbility(ani_env *env, ani_object aniObj,
+    ani_long connectId, ani_object callback)
+{
+    HILOG_DEBUG("OnDisconnectServiceExtensionAbility");
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    if (!Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken)) {
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_NOT_SYSTEM_APP));
+        return;
+    }
+
+    ani_object aniObject = nullptr;
+    auto context = context_.lock();
+    if (context == nullptr) {
+        HILOG_ERROR("Context is nullptr");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
+        return;
+    }
+    AAFwk::Want want;
+    sptr<EtsUIExtensionConnection> connection = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(g_connectsMutex);
+        auto item = std::find_if(
+            g_connects.begin(), g_connects.end(), [&connectId](const auto &obj) { return connectId == obj.first.id; });
+        if (item != g_connects.end()) {
+            want = item->first.want;
+            connection = item->second;
+            g_connects.erase(item);
+        } else {
+            HILOG_INFO("Failed to found connection");
+        }
+    }
+    if (!connection) {
+        aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
+        HILOG_ERROR("null connection");
+        return;
+    }
+    ErrCode ret = context->DisconnectAbility(want, connection);
+    if (ret == ERR_OK) {
+        aniObject = EtsFormErrorUtil::CreateError(env, ret);
+    } else {
+        aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+    }
+    AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
 }
 } // namespace AbilityRuntime
 } // namespace OHOS
