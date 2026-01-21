@@ -2099,8 +2099,8 @@ bool FormMgrService::IsFormBundleProtected(const std::string &bundleName, int64_
 bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
 {
     HILOG_DEBUG("call");
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
+    ErrCode checkResult = CheckFormPermission();
+    if (checkResult != ERR_OK) {
         HILOG_ERROR("check bundle signature permission denied");
         return false;
     }
