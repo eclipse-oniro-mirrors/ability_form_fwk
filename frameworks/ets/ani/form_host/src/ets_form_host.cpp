@@ -2442,7 +2442,8 @@ std::vector<ani_native_function> GetBindMethods()
             "unRegisterFormObserverInner", "C{@ohos.app.form.formHost.CallbackWrapper}:",
             reinterpret_cast<void *>(UnRegisterFormObserver)},
         ani_native_function {"setRouterProxyInner",
-            "C{std.core.Array}C{@ohos.app.form.formHost.CallbackWrapper}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            "C{std.core.Array}C{@ohos.app.form.formHost.CallbackWrapper}"
+            "C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(SetRouterProxy)},
         ani_native_function {
             "clearRouterProxyInner", "C{std.core.Array}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
