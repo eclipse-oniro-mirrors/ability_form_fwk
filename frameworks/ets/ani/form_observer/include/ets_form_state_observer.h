@@ -154,6 +154,8 @@ private:
     mutable std::mutex removeFormCallbackMutex_;
     mutable std::mutex formIsvisibleCallbackMutex_;
     mutable std::mutex formEventMapMutex_;
+    mutable std::mutex ani_vm_Mutex_;
+    mutable std::mutex handler_Mutex_;
 
     std::map<std::string, std::vector<std::shared_ptr<EtsFormAddCallbackClient>>> formAddCallbackMap_;
     std::map<std::string, std::vector<std::shared_ptr<EtsFormRemoveCallbackClient>>> formRemoveCallbackMap_;

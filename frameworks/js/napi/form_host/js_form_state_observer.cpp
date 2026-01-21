@@ -444,6 +444,7 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
 int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
     const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &formInstances)
 {
+    std::lock_guard<std::mutex> lock(handlerMutex_);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
@@ -498,6 +499,7 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
     const std::string &bundleName, const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(handlerMutex_);
     if (callType.empty()) {
         HILOG_ERROR("empty Calltype");
         return ERR_INVALID_VALUE;

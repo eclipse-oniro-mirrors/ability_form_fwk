@@ -37,6 +37,7 @@ EtsFormAddCallbackClient::EtsFormAddCallbackClient(ani_env* env, ani_ref callbac
 {
     env_ = env;
     callbackRef_ = callbackRef;
+    std::lock_guard<std::mutex> lock(handler_Mutex_);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
 }
 
@@ -96,6 +97,7 @@ EtsFormRemoveCallbackClient::EtsFormRemoveCallbackClient(ani_env* env, ani_ref c
 {
     env_ = env;
     callbackRef_ = callbackRef;
+    std::lock_guard<std::mutex> lock(handler_Mutex_);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
 }
 
@@ -393,6 +395,7 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
     bool isVisibility, std::string &bundleName, sptr<EtsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(ani_vm_Mutex_);
     if (ani_vm_ == nullptr) {
         ani_vm_ = ani_vm;
     }
@@ -522,6 +525,7 @@ ErrCode EtsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::st
 int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
     const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &formInstances)
 {
+    std::lock_guard<std::mutex> lock(handler_Mutex_);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
@@ -589,6 +593,7 @@ ErrCode EtsFormStateObserver::OnFormClickEvent(
         HILOG_ERROR("empty Calltype");
         return ERR_INVALID_VALUE;
     }
+    std::lock_guard<std::mutex> lock(handler_Mutex_);
     if (handler_ == nullptr) {
         handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     }
