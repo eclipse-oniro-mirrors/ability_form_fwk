@@ -68,7 +68,7 @@ export default namespace formInfo {
     MODE_LIGHT = 1
   }
 
-  interface FormStateInfo {
+  export interface FormStateInfo {
     formState: FormState;
     want: Want;
   }
@@ -101,7 +101,7 @@ export default namespace formInfo {
     ORIGINAL_FORM_KEY = 'ohos.extra.param.key.original_form_id',
   }
 
-  interface FormInfoFilter {
+  export interface FormInfoFilter {
     bundleName?: string;
     moduleName?: string;
     supportedDimensions?: Array<int>;
@@ -137,7 +137,7 @@ export default namespace formInfo {
     FORM_SIZE_CHANGE = 3
   }
 
-  interface PublishFormResult {
+  export interface PublishFormResult {
     code: PublishFormErrorCode;
     message: string;
   }
@@ -149,7 +149,7 @@ export default namespace formInfo {
     INTERNAL_ERROR = 3
   }
 
-  interface FormProviderFilter {
+  export interface FormProviderFilter {
     bundleName: string;
     formName?: string;
     moduleName?: string;
@@ -286,7 +286,7 @@ export default namespace formInfo {
     overflowInfo?: OverflowInfo;
   }
 
-  interface Rect {
+  export interface Rect {
     left: double;
     top: double;
     width: double;
@@ -300,7 +300,7 @@ export default namespace formInfo {
     height: double;
   }
 
-  interface OverflowInfo {
+  export interface OverflowInfo {
     area: Rect;
     duration: int;
     useDefaultAnimation?: boolean;
