@@ -98,6 +98,7 @@ export default namespace formInfo {
     HOST_BG_INVERSE_COLOR_KEY = 'ohos.extra.param.key.host_bg_inverse_color',
     FORM_PERMISSION_NAME_KEY = 'ohos.extra.param.key.permission_name',
     FORM_PERMISSION_GRANTED_KEY = 'ohos.extra.param.key.permission_granted',
+    ORIGINAL_FORM_KEY = 'ohos.extra.param.key.original_form_id',
   }
 
   export interface FormInfoFilter {
@@ -132,7 +133,8 @@ export default namespace formInfo {
 
   enum LaunchReason {
     FORM_DEFAULT = 1,
-    FORM_SHARE = 2
+    FORM_SHARE = 2,
+    FORM_SIZE_CHANGE = 3
   }
 
   export interface PublishFormResult {
