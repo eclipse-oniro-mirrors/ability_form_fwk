@@ -4,7 +4,7 @@
     "vendor": "ohos",
     "versionCode": 5000003,
     "versionName": "5.0.0.3",
-    "minAPIVersion": 9,
+    "minAPIVersion": 20,
     "targetAPIVersion": 20,
     "icon": "",
     "label": "$string:app_name",
