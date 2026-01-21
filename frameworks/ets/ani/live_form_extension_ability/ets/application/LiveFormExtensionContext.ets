@@ -104,7 +104,11 @@ export default class LiveFormExtensionContext extends ExtensionContext {
           }
         });
         taskpool.execute((): void => {
-          this.nativeDisconnectServiceExtensionAbility(connectionId, myCall);
+          try {
+            this.nativeDisconnectServiceExtensionAbility(connectionId, myCall);
+          } catch (err: BusinessError) {
+            reject(err);
+          }
         });
       });
     return p;
