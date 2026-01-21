@@ -2102,7 +2102,7 @@ bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("check bundle signature permission denied");
-        return ret;
+        return false;
     }
     BundleInfo bundleInfo;
     int32_t userId = FormUtil::GetCurrentAccountId();
