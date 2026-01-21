@@ -32,7 +32,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 namespace {
 static std::mutex g_connectsMutex;
-int32_t g_serialNumber = 0;
+uint32_t g_serialNumber = 0;
 static std::map<EtsUIExtensionConnectionKey, sptr<EtsUIExtensionConnection>, Etskey_compare> g_connects;
 constexpr const int FAILED_CODE = -1;
 constexpr const char *LIVE_FORM_EXTENSION_CONTEXT = "Lapplication/LiveFormExtensionContext/LiveFormExtensionContext;";
@@ -85,6 +85,10 @@ EtsLiveFormExtensionContext* EtsLiveFormExtensionContext::GetEtsLiveFormExtensio
 bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object connectOptionsObj,
     sptr<EtsUIExtensionConnection> &connection, AAFwk::Want &want)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("null env");
+        return false;
+    }
     ani_type type = nullptr;
     ani_boolean res = ANI_FALSE;
     ani_status status = ANI_ERROR;
@@ -419,22 +423,24 @@ void EtsLiveFormExtensionContext::OnDisconnectServiceExtensionAbility(ani_env *e
         if (item != g_connects.end()) {
             want = item->first.want;
             connection = item->second;
-            g_connects.erase(item);
         } else {
             HILOG_INFO("Failed to found connection");
         }
-    }
-    if (!connection) {
-        aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
-        AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
-        HILOG_ERROR("null connection");
-        return;
-    }
-    ErrCode ret = context->DisconnectAbility(want, connection);
-    if (ret == ERR_OK) {
-        aniObject = EtsFormErrorUtil::CreateError(env, ret);
-    } else {
-        aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+    
+        if (!connection) {
+            aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+            AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
+            HILOG_ERROR("null connection");
+            return;
+        }
+
+        ErrCode ret = context->DisconnectAbility(want, connection);
+        if (ret == ERR_OK) {
+            aniObject = EtsFormErrorUtil::CreateError(env, ret);
+            g_connects.erase(item);
+        } else {
+            aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        }
     }
     AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
 }
