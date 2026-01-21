@@ -94,8 +94,9 @@ export default class LiveFormExtensionContext extends ExtensionContext {
   }
 
   disconnectServiceExtensionAbility(connectionId: long): Promise<void> {
-    let p =
-      new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
+    let p : Promise<void> = new Promise<void>((
+      resolve: (data: undefined) => void,
+      reject: (err: BusinessError) => void): void => {
         let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
           if (err == null || err.code == 0) {
             resolve(undefined);
