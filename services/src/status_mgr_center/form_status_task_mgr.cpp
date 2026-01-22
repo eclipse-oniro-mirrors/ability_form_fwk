@@ -370,7 +370,7 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
 
     FormProviderData formProviderData;
     if (FormStatus::GetInstance().GetFormLastStatus(record.formId) != FormFsmStatus::RENDERED) {
-        formProviderData = record.formProviderInfo.GetFormData();
+        // use db cache to recover form
         (void)FormDataMgr::GetInstance().MergeFormData(record.formId, formProviderData);
     }
 
