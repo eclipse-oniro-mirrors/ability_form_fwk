@@ -387,7 +387,7 @@ ani_long EtsLiveFormExtensionContext::OnConnectServiceExtensionAbility(ani_env *
         return FAILED_CODE;
     }
     auto innerErrCode = context->ConnectAbility(want, connection);
-    double connectId = connection->GetConnectionId();
+    int64_t connectId = connection->GetConnectionId();
     if (innerErrCode != ERR_OK) {
         HILOG_ERROR("Faied to ConnectAbility, innerErrCode is %{public}d", innerErrCode);
         RemoveConnection(connectId);
@@ -438,6 +438,9 @@ void EtsLiveFormExtensionContext::OnDisconnectServiceExtensionAbility(ani_env *e
         ErrCode ret = context->DisconnectAbility(want, connection);
         if (ret == ERR_OK) {
             aniObject = EtsFormErrorUtil::CreateError(env, ret);
+            if (item->second) {
+                item->second->RemoveConnectionObject();
+            }
             g_connects.erase(item);
         } else {
             aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
