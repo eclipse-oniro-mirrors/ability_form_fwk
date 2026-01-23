@@ -358,15 +358,15 @@ int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &f
     HILOG_INFO("recover forms by config update");
     for (int64_t formId : formIds) {
         FormRecord formRecord;
-        if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord) || formRecord.isDynamic) {
+        if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+            HILOG_WARN("get formRecord failed! formId:%{public}" PRId64, formId);
             continue;
         }
-        HILOG_INFO("recover static form");
         FormProviderData formProviderData;
         formProviderData.EnableDbCache(true);
-        FormMgrAdapter::GetInstance().UpdateForm(formId, formRecord.uid, formProviderData);
+        FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, WantParams(), false);
     }
-    return FormMgrAdapter::GetInstance().RecoverForms(formIds, Want());
+    return ERR_OK;
 }
 
 int32_t FormSupplyCallback::OnNotifyRefreshForm(const int64_t formId)
