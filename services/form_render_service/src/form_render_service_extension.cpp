@@ -60,7 +60,7 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
             return;
         }
         auto &runtime = app->GetRuntime();
-        if (runtime == nullptr) {
+        if (!runtime) {
             HILOG_ERROR("null runtime");
             return;
         }
