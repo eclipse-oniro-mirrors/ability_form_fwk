@@ -38,8 +38,9 @@ constexpr const int FAILED_CODE = -1;
 constexpr const char *LIVE_FORM_EXTENSION_CONTEXT = "Lapplication/LiveFormExtensionContext/LiveFormExtensionContext;";
 constexpr const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "Lapplication/UIExtensionContext/Cleaner;";
 constexpr const char *SIGNATURE_CONNECT_SERVICE_EXTENSION =
-"L@ohos/app/ability/Want/Want;Lability/connectOptions/ConnectOptions;:J";
-constexpr const char *SIGNATURE_DISCONNECT_SERVICE_EXTENSION = "JLutils/AbilityUtils/AsyncCallbackWrapper;:V";
+    "L@ohos/app/ability/Want/Want;Lability/connectOptions/ConnectOptions;:J";
+constexpr const char *SIGNATURE_DISCONNECT_SERVICE_EXTENSION =
+    "JLapplication/LiveFormExtensionContext/AsyncCallbackWrapper;:V";
 
 void RemoveConnection(int64_t connectId)
 {
