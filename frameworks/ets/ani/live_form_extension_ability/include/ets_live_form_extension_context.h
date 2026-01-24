@@ -18,10 +18,11 @@
 
 #include "ani.h"
 #include "live_form_extension_context.h"
+#include "ets_ui_extension_context.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
-class EtsLiveFormExtensionContext {
+class EtsLiveFormExtensionContext final {
 public:
     explicit EtsLiveFormExtensionContext(const std::shared_ptr<LiveFormExtensionContext> &context)
         : context_(context)
@@ -34,10 +35,20 @@ public:
     static void Clean(ani_env *env, ani_object object);
     static void StartAbilityByLiveForm(ani_env *env, ani_object aniObj, ani_object aniWant,
         ani_string aniFormId, ani_object callback);
+    static ani_long ConnectServiceExtensionAbility(ani_env *env, ani_object aniObj, ani_object wantObj,
+        ani_object connectOptionsObj);
+    static void DisconnectServiceExtensionAbility(ani_env *env, ani_object aniObj, ani_long connectId,
+        ani_object callback);
 
 private:
     static EtsLiveFormExtensionContext* GetEtsLiveFormExtensionContext(ani_env *env, ani_object obj);
+    static bool CheckConnectionParam(ani_env *env, ani_object connectOptionsObj,
+        sptr<EtsUIExtensionConnection>& connection, AAFwk::Want& want);
     void OnStartAbilityByLiveForm(ani_env *env, ani_object aniWant, ani_string aniFormId, ani_object callback);
+    ani_long OnConnectServiceExtensionAbility(ani_env *env, ani_object aniObj, ani_object wantObj,
+        ani_object connectOptionsObj);
+    void OnDisconnectServiceExtensionAbility(ani_env *env, ani_object aniObj, ani_long connectId,
+        ani_object callback);
 
     std::weak_ptr<LiveFormExtensionContext> context_;
 };

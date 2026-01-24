@@ -1112,6 +1112,7 @@ ohos_shared_library("live_form_extension_ani") {
     "ability_runtime:runtime",
     "ability_runtime:ui_extension",
     "ability_runtime:ui_extension_ani",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
