@@ -378,6 +378,15 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             formMgrService_->MessageEvent(formId, want, callerToken);
             break;
         }
+        case IpcCode::REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE: {
+            const sptr<IRemoteObject> callerToken = formParallelizeUtil_->GetMockRemoteObject();
+            formMgrService_->RegisterTemplateFormDetailInfoChange(callerToken);
+            break;
+        }
+        case IpcCode::UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE: {
+            formMgrService_->UnregisterTemplateFormDetailInfoChange();
+            break;
+        }
         default: {
             break;
         }

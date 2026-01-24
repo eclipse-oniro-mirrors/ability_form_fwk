@@ -146,5 +146,18 @@ void FormParallelizeFuzzUtil::FillOverflowInfo(FuzzedDataProvider &provider, Ove
     overflowInfo.duration = provider.ConsumeIntegral<int32_t>();
     overflowInfo.useDefaultAnimation = provider.ConsumeBool();
 }
+
+void FormParallelizeFuzzUtil::FillTemplateFormDetailInfo(FuzzedDataProvider &provider,
+    TemplateFormDetailInfo& templateFormDetailInfo)
+{
+    templateFormDetailInfo.bundleName = provider.ConsumeRandomLengthString(NUMBER_64);
+    templateFormDetailInfo.moduleName = provider.ConsumeRandomLengthString(NUMBER_64);
+    templateFormDetailInfo.abilityName = provider.ConsumeRandomLengthString(NUMBER_64);
+    templateFormDetailInfo.formName = provider.ConsumeRandomLengthString(NUMBER_64);
+    templateFormDetailInfo.dimension = provider.ConsumeIntegral<int32_t>();
+    templateFormDetailInfo.detailId = provider.ConsumeRandomLengthString(NUMBER_64);
+    templateFormDetailInfo.displayName = provider.ConsumeRandomLengthString(NUMBER_64);
+    templateFormDetailInfo.description = provider.ConsumeRandomLengthString(NUMBER_64);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

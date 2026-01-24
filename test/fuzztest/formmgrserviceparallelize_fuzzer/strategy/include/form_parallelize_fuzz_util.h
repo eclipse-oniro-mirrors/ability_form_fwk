@@ -28,6 +28,7 @@
 #include "form_lock_info.h"
 #include "form_major_info.h"
 #include "form_instances_filter.h"
+#include "template_form_detail_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -122,6 +123,13 @@ public:
      * @param info form overflow info.
      */
     void FillOverflowInfo(FuzzedDataProvider &provider, OverflowInfo& overflowInfo);
+
+    /**
+     * @brief Fill OverflowInfo.
+     * @param provider data provider.
+     * @param templateFormDetailInfo form templateFormDetailInfo info.
+     */
+    void FillTemplateFormDetailInfo(FuzzedDataProvider &provider, TemplateFormDetailInfo &templateFormDetailInfo);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
