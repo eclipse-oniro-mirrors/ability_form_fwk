@@ -125,7 +125,7 @@ public:
     void FillOverflowInfo(FuzzedDataProvider &provider, OverflowInfo& overflowInfo);
 
     /**
-     * @brief Fill OverflowInfo.
+     * @brief Fill TemplateFormDetailInfo.
      * @param provider data provider.
      * @param templateFormDetailInfo form templateFormDetailInfo info.
      */
