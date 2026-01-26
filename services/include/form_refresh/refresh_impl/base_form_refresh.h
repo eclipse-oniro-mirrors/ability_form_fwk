@@ -38,7 +38,7 @@ public:
      * @brief Constructor
      * @param config Refresh configuration
      */
-    explicit BaseFormRefresh(RefreshConfig config);
+    explicit BaseFormRefresh(RefreshConfig&& config);
     virtual ~BaseFormRefresh() = default;
 
     /**
