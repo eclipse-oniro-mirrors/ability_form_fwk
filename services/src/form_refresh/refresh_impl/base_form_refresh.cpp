@@ -26,8 +26,6 @@
 namespace OHOS {
 namespace AppExecFwk {
 
-BaseFormRefresh::BaseFormRefresh() : config_(RefreshConfig{}) {}
-
 BaseFormRefresh::BaseFormRefresh(RefreshConfig config) : config_(std::move(config)) {}
 
 int BaseFormRefresh::RefreshFormRequest(RefreshData &data)
