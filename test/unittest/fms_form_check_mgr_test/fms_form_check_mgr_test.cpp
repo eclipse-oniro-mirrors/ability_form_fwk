@@ -471,36 +471,36 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_MultiActiveUsersChecker_001, T
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_MultiActiveUsersChecker_001 end";
 }
 
-HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_DoControlCheck_001, TestSize.Level1)
+HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_BaseFormRefresh_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_DoControlCheck_001 start";
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_BaseFormRefresh_001 start";
 
     RefreshData data;
     RefreshConfig config;
     config.controlCheckFlags = CONTROL_CHECK_SYSTEM_OVERLOAD | CONTROL_CHECK_HEALTHY_CONTROL |
         CONTROL_CHECK_INVISIBLE | CONTROL_CHECK_SCREEN_OFF | CONTROL_CHECK_NEED_TO_FRESH | CONTROL_CHECK_ADD_FINISH;
-    BaseFormRefresh baseFormRefresh(config);
+    BaseFormRefresh baseFormRefresh(std::move(config));
 
     MockIsAddFormFinish(true);
-    EXPECT_EQ(ERR_OK, baseFormRefresh.DoControlCheck(data));
+    EXPECT_EQ(ERR_OK, baseFormRefresh.RefreshFormRequest(data));
     MockIsAddFormFinish(false);
 
     MockIsHealthyControl(true);
-    EXPECT_EQ(ERR_OK, baseFormRefresh.DoControlCheck(data));
+    EXPECT_EQ(ERR_OK, baseFormRefresh.RefreshFormRequest(data));
     MockIsHealthyControl(false);
 
     MockIsSystemOverload(true);
-    EXPECT_EQ(ERR_OK, baseFormRefresh.DoControlCheck(data));
+    EXPECT_EQ(ERR_OK, baseFormRefresh.RefreshFormRequest(data));
     MockIsSystemOverload(false);
 
     MockIsFormInvisible(true);
-    EXPECT_EQ(ERR_OK, baseFormRefresh.DoControlCheck(data));
+    EXPECT_EQ(ERR_OK, baseFormRefresh.RefreshFormRequest(data));
     MockIsFormInvisible(false);
 
     MockIsNeedToFresh(false);
-    EXPECT_EQ(ERR_OK, baseFormRefresh.DoControlCheck(data));
+    EXPECT_EQ(ERR_OK, baseFormRefresh.RefreshFormRequest(data));
     MockIsNeedToFresh(true);
 
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_DoControlCheck_001 end";
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_BaseFormRefresh_001 end";
 }
 }
