@@ -38,7 +38,6 @@ public:
      * @brief Constructor
      * @param config Refresh configuration
      */
-    BaseFormRefresh();
     explicit BaseFormRefresh(RefreshConfig config);
     virtual ~BaseFormRefresh() = default;
 
@@ -47,7 +46,7 @@ public:
      * @param data Refresh data
      * @return Error code
      */
-    int RefreshFormRequest(RefreshData &data) override final;
+    int RefreshFormRequest(RefreshData &data) override;
 
 protected:
     /**
