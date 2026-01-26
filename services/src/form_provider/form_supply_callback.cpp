@@ -36,6 +36,7 @@
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "status_mgr_center/form_status_task_mgr.h"
+#include "int_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -355,16 +356,18 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
 
 int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("recover forms by config update");
+    HILOG_INFO("update forms by config update");
     for (int64_t formId : formIds) {
         FormRecord formRecord;
         if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-            HILOG_WARN("get formRecord failed! formId:%{public}" PRId64, formId);
+            HILOG_WARN("form record not exist, formId:%{public}" PRId64, formId);
             continue;
         }
         FormProviderData formProviderData;
         formProviderData.EnableDbCache(true);
-        FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, WantParams(), false);
+        WantParams wantParams;
+        wantParams.SetParam(Constants::FORM_UPDATE_TYPE_KEY, Integer::Box(Constants::ADD_FORM_UPDATE_FORM));
+        FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, false);
     }
     return ERR_OK;
 }
