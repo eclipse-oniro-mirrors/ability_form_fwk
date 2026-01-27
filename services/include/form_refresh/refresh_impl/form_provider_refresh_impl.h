@@ -30,8 +30,6 @@ class FormProviderRefreshImpl : public BaseFormRefresh, public DelayedRefSinglet
     DECLARE_DELAYED_REF_SINGLETON(FormProviderRefreshImpl);
 public:
     DISALLOW_COPY_AND_MOVE(FormProviderRefreshImpl);
-
-    int RefreshFormRequest(RefreshData &data);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
