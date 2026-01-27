@@ -368,6 +368,8 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleUnregisterTemplateFormDetailInfoChange(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO):
             return HandleUpdateTemplateFormDetailInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION):
+            return HandleGetFormIdsByFormLocation(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -2321,6 +2323,27 @@ ErrCode FormMgrStub::HandleUpdateTemplateFormDetailInfo(MessageParcel &data, Mes
         HILOG_ERROR("write request result failed.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleGetFormIdsByFormLocation(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    std::vector<std::string> formIds;
+    int32_t formLocation = data.ReadInt32();
+    ErrCode result = GetFormIdsByFormLocation(formLocation, formIds);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result == ERR_OK) {
+        HILOG_INFO("result is ok");
+        if (!reply.WriteStringVector(formIds)) {
+            HILOG_ERROR("WriteStringVector<formIds> failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+ 
     return ERR_OK;
 }
 }  // namespace AppExecFwk

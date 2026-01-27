@@ -1060,6 +1060,17 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Get formIds by form location.
+     * @param formLocation Indicate the location of the form.
+     * @param formIds [out] The formIds of the form location to be returned.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1179,6 +1190,7 @@ public:
         FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
         FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
         FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO,
+        FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION,
     };
 };
 }  // namespace AppExecFwk

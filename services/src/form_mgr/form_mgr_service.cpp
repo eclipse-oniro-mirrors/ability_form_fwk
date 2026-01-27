@@ -89,6 +89,7 @@
 #include "common/util/form_task_common.h"
 #include "scene_board_judgement.h"
 #include "form_provider/form_provider_mgr.h"
+#include "form_host/form_mgr_host_adapter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -2449,6 +2450,30 @@ ErrCode FormMgrService::UnregisterPublishFormCrossBundleControl()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().UnregisterPublishFormCrossBundleControl();
+}
+
+ErrCode FormMgrService::GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+ 
+    if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+        formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
+        HILOG_ERROR("formLocation not FormLocation enum, formLocation = %{public}d", formLocation);
+        return ERR_APPEXECFWK_FORM_LOCATION_INVALID;
+    }
+ 
+    const auto callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    FormMgrHostAdapter::GetInstance().GetFormIdsByFormLocation(
+        userId, static_cast<Constants::FormLocation>(formLocation), formIds);
+ 
+    return ERR_OK;
 }
 
 bool FormMgrService::PublishFormCrossBundleControl(const Want &want)

@@ -5317,4 +5317,80 @@ HWTEST_F(FormMgrTest, FormMgrTest_UnregisterPublishFormCrossBundleControl_001, T
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 test end";
 }
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_001
+ * @tc.desc: Verify GetFormIdsByFormLocation with DESKTOP location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_001 begin";
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_002
+ * @tc.desc: Verify GetFormIdsByFormLocation with service error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_002 begin";
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_002 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_003
+ * @tc.desc: Verify GetFormIdsByFormLocation returns empty vector
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_003 begin";
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<std::string>{}), Return(ERR_OK)));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_TRUE(formIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_003 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_004
+ * @tc.desc: Verify GetFormIdsByFormLocation returns form IDs
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_004 begin";
+    std::vector<std::string> expectedFormIds = {"formId1", "formId2", "formId3"};
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(expectedFormIds), Return(ERR_OK)));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(formIds.size(), expectedFormIds.size());
+    EXPECT_THAT(formIds, ContainerEq(expectedFormIds));
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_004 end";
+}
 } // namespace

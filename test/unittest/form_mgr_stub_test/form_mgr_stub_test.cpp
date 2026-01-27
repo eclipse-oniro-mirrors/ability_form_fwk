@@ -21,6 +21,7 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_service.h"
 #include "mock_form_token.h"
+#include "form_mgr_errors.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -3427,5 +3428,238 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReloadAllForms_001, TestSize.Lev
     auto result = mockFormMgrService->HandleReloadAllForms(data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadAllForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_001
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with DESKTOP location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with DESKTOP location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1", "formId2"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::DESKTOP));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), formIds.size());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_002
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with FORM_CENTER location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with FORM_CENTER location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds;
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::FORM_CENTER));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_TRUE(resultFormIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_003
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with FORM_MANAGER location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with FORM_MANAGER location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), 1);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_004
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with NEGATIVE_SCREEN location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with NEGATIVE_SCREEN location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_004 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds;
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::NEGATIVE_SCREEN));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_TRUE(resultFormIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_005
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with SCREEN_LOCK location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with SCREEN_LOCK location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_005 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1", "formId2", "formId3"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::SCREEN_LOCK));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), 3);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_005 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_006
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with AI_SUGGESTION location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with AI_SUGGESTION location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_006 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds;
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_TRUE(resultFormIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_006 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_007
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with STANDBY location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with STANDBY location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_007 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::STANDBY));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), 1);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_007 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_008
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with service error
+ * @tc.desc: test HandleGetFormIdsByFormLocation when service returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_008 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(formLocation, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    MessageParcel data;
+    data.WriteInt32(formLocation);
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_008 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_009
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with multiple form IDs
+ * @tc.desc: test HandleGetFormIdsByFormLocation returns multiple form IDs
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_009, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_009 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1", "formId2", "formId3", "formId4", "formId5"};
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(formLocation, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(formLocation);
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), formIds.size());
+    EXPECT_THAT(resultFormIds, ContainerEq(formIds));
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_009 ends";
 }
 }

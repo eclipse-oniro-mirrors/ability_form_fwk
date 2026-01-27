@@ -2651,5 +2651,27 @@ ErrCode FormMgr::UpdateTemplateFormDetailInfo(
     }
     return remoteProxy_->UpdateTemplateFormDetailInfo(templateFormInfo);
 }
+
+ErrCode FormMgr::GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
+{
+    HILOG_DEBUG("call");
+ 
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+ 
+    int resultCode = remoteProxy_->GetFormIdsByFormLocation(formLocation, formIds);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail GetFormIdsByFormLocation,errCode %{public}d", resultCode);
+    }
+ 
+    return resultCode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

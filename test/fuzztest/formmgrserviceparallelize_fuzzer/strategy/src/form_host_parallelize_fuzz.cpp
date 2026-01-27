@@ -387,6 +387,12 @@ void FormHostParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             formMgrService_->UnregisterTemplateFormDetailInfoChange();
             break;
         }
+        case IpcCode::GET_FORMIDS_BY_FORM_LOCATION: {
+            int32_t formLocation = provider.ConsumeIntegral<int32_t>();
+            std::vector<std::string> formIds;
+            formMgrService_->GetFormIdsByFormLocation(formLocation, formIds);
+            break;
+        }
         default: {
             break;
         }

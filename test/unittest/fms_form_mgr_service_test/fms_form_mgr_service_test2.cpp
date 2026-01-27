@@ -1547,4 +1547,93 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByModule_000
     EXPECT_EQ(1, formInfos.size());
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByModule_0001 end";
 }
+
+/**
+ * @tc.name: FormMgrService_GetFormIdsByFormLocation_001
+ * @tc.desc: Verify GetFormIdsByFormLocation with permission denied (system)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetFormIdsByFormLocation_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_001 start";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    FormMgrService formMgrService;
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormIdsByFormLocation(formLocation, formIds));
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_001 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetFormIdsByFormLocation_002
+ * @tc.desc: Verify GetFormIdsByFormLocation with permission denied (bundle)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetFormIdsByFormLocation_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_002 start";
+    MockIsSACall(true);
+    MockVerifyCallingPermission(false);
+    FormMgrService formMgrService;
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
+        formMgrService.GetFormIdsByFormLocation(formLocation, formIds));
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_002 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetFormIdsByFormLocation_003
+ * @tc.desc: Verify GetFormIdsByFormLocation with invalid location (< OTHER)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetFormIdsByFormLocation_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_003 start";
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    FormMgrService formMgrService;
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::OTHER) - 1;
+    std::vector<std::string> formIds;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_LOCATION_INVALID, formMgrService.GetFormIdsByFormLocation(formLocation, formIds));
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_003 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetFormIdsByFormLocation_004
+ * @tc.desc: Verify GetFormIdsByFormLocation with invalid location (FORM_LOCATION_END)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetFormIdsByFormLocation_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_004 start";
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    FormMgrService formMgrService;
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END);
+    std::vector<std::string> formIds;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_LOCATION_INVALID, formMgrService.GetFormIdsByFormLocation(formLocation, formIds));
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_004 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetFormIdsByFormLocation_005
+ * @tc.desc: Verify GetFormIdsByFormLocation with DESKTOP location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetFormIdsByFormLocation_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_005 start";
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    FormMgrService formMgrService;
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    EXPECT_EQ(ERR_OK, formMgrService.GetFormIdsByFormLocation(formLocation, formIds));
+    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_005 end";
+}
 }

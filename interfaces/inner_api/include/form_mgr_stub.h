@@ -901,6 +901,14 @@ private:
      */
     ErrCode HandleUpdateTemplateFormDetailInfo(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle get formIds by form location.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleGetFormIdsByFormLocation(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

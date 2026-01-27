@@ -3388,5 +3388,41 @@ ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
     }
     return reply.ReadInt32();
 }
+
+ErrCode FormMgrProxy::GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    if (!data.WriteInt32(formLocation)) {
+        HILOG_ERROR("write formLocation failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+ 
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("read reply result fail");
+        return error;
+    }
+    if (!reply.ReadStringVector(&formIds)) {
+        HILOG_ERROR("fail read string vector from reply");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

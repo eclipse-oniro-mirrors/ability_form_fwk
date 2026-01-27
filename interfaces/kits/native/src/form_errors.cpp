@@ -292,6 +292,10 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     {
         ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER,
         { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "exceed max forms per user" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_LOCATION_INVALID,
+        { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID, "The location of the widget is invalid." }
     }
 };
 
@@ -325,6 +329,7 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION,   "The system does not support the current operation."},
     { ERR_FORM_EXTERNAL_FORM_ABILITY_NOT_FOREGROUND,  "The app is not in the foreground." },
     { ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,     "Cannot close the widget editing page opened by other apps." },
+    { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID,        "The location of the widget is invalid." },
 };
 }
 
