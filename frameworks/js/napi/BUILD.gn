@@ -75,6 +75,7 @@ ohos_shared_library("formbindingdata") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:extensionkit_native",
+    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
@@ -608,6 +609,7 @@ ohos_shared_library("formutil_napi") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:extensionkit_native",
+    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
@@ -643,6 +645,7 @@ ohos_shared_library("formerror_napi") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:extensionkit_native",
+    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
@@ -1054,6 +1057,7 @@ ohos_shared_library("live_form_extension_module") {
     "ability_base:configuration",
     "ability_base:session_info",
     "ability_base:want",
+    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:abilitykit_native",
     "ability_runtime:appkit_native",
     "ability_runtime:extensionkit_native",

@@ -32,6 +32,7 @@ ohos_unittest("FmsFormProviderClientTest") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
     "ability_runtime:app_manager",
+    "ability_runtime:napi_common",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",

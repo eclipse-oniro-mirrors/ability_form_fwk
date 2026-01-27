@@ -34,6 +34,7 @@ ohos_unittest("FmsFormNapiUtilTest") {
     "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
+    "ability_runtime:napi_common",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
