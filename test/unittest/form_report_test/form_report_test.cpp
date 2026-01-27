@@ -497,4 +497,308 @@ HWTEST_F(FormReportTest, FormReport_034, TestSize.Level1)
     formReport.RemoveFormId(testFormId);
     EXPECT_FALSE(formReport.HasFormId(testFormId));
 }
+
+/**
+ * @tc.name: FormReport_035
+ * @tc.desc: test SetDurationEndTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_035, TestSize.Level1)
+{
+    int64_t endTime = 10 * 1000;
+    int64_t endTime1 = 0;
+    int64_t startTime = 1000;
+    formReport.SetStartAquireTime(testFormId, startTime);
+    formReport.SetEndAquireTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    formReport.GetEndAquireTime(testFormId, endTime1);
+    EXPECT_EQ(endTime1, endTime);
+}
+
+/**
+ * @tc.name: FormReport_036
+ * @tc.desc: test SetEndAquireTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_036, TestSize.Level1)
+{
+    int64_t startTime = 1000;
+    formReport.SetStartBindTime(testFormId, startTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.startBindTime_, startTime);
+}
+
+/**
+ * @tc.name: FormReport_037
+ * @tc.desc: test SetEndAquireTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_037, TestSize.Level1)
+{
+    int64_t endTime = 10 * 1000;
+    formReport.SetEndBindTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_038
+ * @tc.desc: test SetEndBindTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_038, TestSize.Level1)
+{
+    int64_t endTime = 10 * 1000;
+    int64_t startTime = 1000;
+    formReport.SetStartBindTime(testFormId, startTime);
+    formReport.SetEndBindTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.endBindTime_, endTime);
+}
+
+/**
+ * @tc.name: FormReport_039
+ * @tc.desc: test HandleAddFormStatistic function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_039, TestSize.Level1)
+{
+    formReport.SetFormRecordInfo(testFormId, want);
+    formReport.HandleAddFormStatistic(testFormId);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_040
+ * @tc.desc: test HandleAddFormStatistic function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_040, TestSize.Level1)
+{
+    formReport.SetFormRecordInfo(testFormId, want);
+    formReport.InsertFormId(testFormId);
+    formReport.HandleAddFormStatistic(testFormId);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_041
+ * @tc.desc: test SetFormRecordInfo function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_041, TestSize.Level1)
+{
+    formReport.SetFormRecordInfo(testFormId, want);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    ASSERT_NE(statisticIt, formReport.GetStatistic().end());
+    FormStatistic &statistic = statisticIt->second;
+    EXPECT_EQ(statistic.bundleName_, BUNDLE);
+    EXPECT_EQ(statistic.moduleName_, MODULENAME);
+    EXPECT_EQ(statistic.abilityName_, ABILITY);
+}
+
+/**
+ * @tc.name: FormReport_042
+ * @tc.desc: test SetStartGetTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_042, TestSize.Level1)
+{
+    int64_t startTime = 1000;
+    formReport.SetStartGetTime(testFormId, startTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.startGetTime_, startTime);
+}
+
+/**
+ * @tc.name: FormReport_043
+ * @tc.desc: test SetEndGetTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_043, TestSize.Level1)
+{
+    int64_t endTime = 2000;
+    formReport.SetEndGetTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_044
+ * @tc.desc: test SetStartGetTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_044, TestSize.Level1)
+{
+    int64_t endTime = 2000;
+    int64_t startTime = 1000;
+    formReport.SetStartGetTime(testFormId, startTime);
+    formReport.SetEndGetTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.endGetTime_, endTime);
+}
+
+/**
+ * @tc.name: FormReport_045
+ * @tc.desc: test SetStartGetTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_045, TestSize.Level1)
+{
+    int64_t endTime = 12 * 1000;
+    int64_t startTime = 1* 1000;
+    formReport.SetDurationStartTime(testFormId, startTime);
+    formReport.SetDurationEndTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_046
+ * @tc.desc: test SetDurationStartTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_046, TestSize.Level1)
+{
+    int64_t startTime = 1* 1000;
+    formReport.SetDurationStartTime(testFormId, startTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.durationStartTime_, startTime);
+}
+
+/**
+ * @tc.name: FormReport_047
+ * @tc.desc: test SetDurationEndTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_047, TestSize.Level1)
+{
+    int64_t endTime = 12 * 1000;
+    formReport.SetDurationEndTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_048
+ * @tc.desc: test SetStartAquireTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_048, TestSize.Level1)
+{
+    int64_t startTime = 1000;
+    formReport.SetStartAquireTime(testFormId, startTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.startAquireTime_, startTime);
+}
+
+/**
+ * @tc.name: FormReport_049
+ * @tc.desc: test SetEndAquireTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_049, TestSize.Level1)
+{
+    int64_t endTime = 1000;
+    formReport.SetEndAquireTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_050
+ * @tc.desc: test SetDurationEndTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_050, TestSize.Level1)
+{
+    int64_t endTime = 10 * 1000;
+    int64_t endTime1 = 0;
+    int64_t startTime = 1000;
+    formReport.SetStartAquireTime(testFormId, startTime);
+    formReport.SetEndAquireTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    formReport.GetEndAquireTime(testFormId, endTime1);
+    EXPECT_EQ(endTime1, endTime);
+}
+
+/**
+ * @tc.name: FormReport_051
+ * @tc.desc: test SetEndAquireTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_051, TestSize.Level1)
+{
+    int64_t startTime = 1000;
+    formReport.SetStartBindTime(testFormId, startTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.startBindTime_, startTime);
+}
+
+/**
+ * @tc.name: FormReport_052
+ * @tc.desc: test SetEndAquireTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_052, TestSize.Level1)
+{
+    int64_t endTime = 10 * 1000;
+    formReport.SetEndBindTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_053
+ * @tc.desc: test SetEndBindTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_053, TestSize.Level1)
+{
+    int64_t endTime = 10 * 1000;
+    int64_t startTime = 1000;
+    formReport.SetStartBindTime(testFormId, startTime);
+    formReport.SetEndBindTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    EXPECT_EQ(statisticIt->second.endBindTime_, endTime);
+}
+
+/**
+ * @tc.name: FormReport_054
+ * @tc.desc: test HandleAddFormStatistic function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_054, TestSize.Level1)
+{
+    formReport.SetFormRecordInfo(testFormId, want);
+    formReport.HandleAddFormStatistic(testFormId);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_055
+ * @tc.desc: test HandleAddFormStatistic function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_055, TestSize.Level1)
+{
+    formReport.SetFormRecordInfo(testFormId, want);
+    formReport.InsertFormId(testFormId);
+    formReport.HandleAddFormStatistic(testFormId);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+}
 } // namespace
