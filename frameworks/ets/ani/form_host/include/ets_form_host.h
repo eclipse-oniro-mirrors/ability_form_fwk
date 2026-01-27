@@ -138,6 +138,7 @@ private:
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     ani_env* GetAniEnv();
+    void SetAniVM(ani_vm* ani_vm);
     bool bindNativeMethod(ani_env* env, ani_class cls, LiveFormInterfaceParam *dataParam);
     void CallPromise(ani_env* env, ani_class cls, ani_object callbackObj, ani_object retObj,
         LiveFormInterfaceParam *params);

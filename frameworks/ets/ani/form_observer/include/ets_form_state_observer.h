@@ -107,6 +107,8 @@ public:
 
     static sptr<EtsFormStateObserver> GetInstance();
 
+    std::shared_ptr<AppExecFwk::EventHandler> GetMainEventRunner();
+
     bool RegisterFormAddCallback(ani_vm* ani_vm, const std::string &bundleName, const ani_object callback);
 
     bool RegisterFormRemoveCallback(ani_vm* ani_vm, const std::string &bundleName, const ani_object callback);
@@ -154,8 +156,8 @@ private:
     mutable std::mutex removeFormCallbackMutex_;
     mutable std::mutex formIsvisibleCallbackMutex_;
     mutable std::mutex formEventMapMutex_;
-    mutable std::mutex ani_vm_Mutex_;
-    mutable std::mutex handler_Mutex_;
+    mutable std::mutex ani_vm_mutex_;
+    mutable std::mutex handlerMutex_;
 
     std::map<std::string, std::vector<std::shared_ptr<EtsFormAddCallbackClient>>> formAddCallbackMap_;
     std::map<std::string, std::vector<std::shared_ptr<EtsFormRemoveCallbackClient>>> formRemoveCallbackMap_;

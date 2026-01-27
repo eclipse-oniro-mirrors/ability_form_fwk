@@ -1449,7 +1449,10 @@ void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
     napi_create_object(crossBundleControlEnv_, &requestObj);
     ConvertParamToNapiValue(dataParam, requestObj);
     napi_value callback = nullptr;
-    napi_get_reference_value(crossBundleControlEnv_, crossBundleControlCallback_, &callback);
+    {
+        std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+        napi_get_reference_value(crossBundleControlEnv_, crossBundleControlCallback_, &callback);
+    }
     napi_valuetype valueType;
     napi_typeof(crossBundleControlEnv_, callback, &valueType);
     if (valueType != napi_function) {

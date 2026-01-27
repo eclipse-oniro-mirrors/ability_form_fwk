@@ -1888,7 +1888,7 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             HILOG_WARN("Due disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
             return ERR_OK;
         }
-        int64_t dueDuration = (int64_t)duration * (int64_t)Constants::TIME_CONVERSION;
+        int64_t dueDuration = static_cast<int64_t>(duration) * static_cast<int64_t>(Constants::TIME_CONVERSION);
         updateDuration = std::max(updateDuration, dueDuration * Constants::TIME_CONVERSION);
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);

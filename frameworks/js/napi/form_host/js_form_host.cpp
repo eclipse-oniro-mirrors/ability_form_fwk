@@ -1424,7 +1424,7 @@ private:
         };
 
         NapiAsyncTask::CompleteCallback complete = CreateFormInfosCompleteCallback(errCodeVal, formInfoList);
- 
+
         auto callback = (argc == ARGS_ZERO) ? nullptr : argv[PARAM0];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetAllTemplateFormsInfo",
@@ -2038,7 +2038,7 @@ private:
         bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterOverflowListener(env, callbackRef);
         return CreateJsValue(env, ret);
     }
-    
+
     napi_value OffRegisterOverflowListener(napi_env env)
     {
         HILOG_INFO("call");
@@ -2203,7 +2203,7 @@ private:
             env, callbackRef);
         return CreateJsValue(env, ret);
     }
- 
+
     napi_value OffRegisterGetLiveFormStatusListener(napi_env env)
     {
         HILOG_INFO("call");
@@ -2291,7 +2291,7 @@ private:
             env, callbackRef);
         return CreateJsValue(env, ret);
     }
- 
+
     napi_value OnUnregisterTemplateFormDetailInfoChange(napi_env env)
     {
         HILOG_INFO("call");
@@ -2552,7 +2552,10 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     napi_set_named_property(overflowEnv_, requestObj, "overflowInfo", overflowInfoValue);
 
     napi_value myCallback = nullptr;
-    napi_get_reference_value(overflowEnv_, overflowRegisterCallback_, &myCallback);
+    {
+        std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
+        napi_get_reference_value(overflowEnv_, overflowRegisterCallback_, &myCallback);
+    }
 
     napi_valuetype valueType;
     napi_typeof(overflowEnv_, myCallback, &valueType);
@@ -2684,7 +2687,11 @@ void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(std::shared_ptr<LiveFo
         CreateJsValue(changeSceneAnimationStateEnv_, dataParam->state));
 
     napi_value myCallback = nullptr;
-    napi_get_reference_value(changeSceneAnimationStateEnv_, changeSceneAnimationStateRigisterCallback_, &myCallback);
+    {
+        std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
+        napi_get_reference_value(changeSceneAnimationStateEnv_,
+            changeSceneAnimationStateRigisterCallback_, &myCallback);
+    }
 
     napi_valuetype valueType;
     napi_typeof(changeSceneAnimationStateEnv_, myCallback, &valueType);
@@ -2752,13 +2759,13 @@ bool JsFormRouterProxyMgr::UnregisterGetFormRectListener()
     getFormRectEnv_ = nullptr;
     return true;
 }
- 
+
 ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect &rect)
 {
     HILOG_INFO("call");
     std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
     dataParam->formId = std::to_string(formId);
-    
+
     std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
     std::function<void()> executeGetFormRectFunc = [client = sptr<JsFormRouterProxyMgr>(this), dataParam]() {
         JsFormRouterProxyMgr::GetInstance()->GetFormRectInner(dataParam);
@@ -2780,7 +2787,7 @@ void CallBackReturn(const Rect &item, std::shared_ptr<LiveFormInterfaceParam> li
     liveFormInterfaceParam->formRect = item;
     HILOG_INFO("getFormRect end.");
 }
- 
+
 void JsFormRouterProxyMgr::GetFormRectInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
 {
     HILOG_INFO("call");
@@ -2793,9 +2800,12 @@ void JsFormRouterProxyMgr::GetFormRectInner(std::shared_ptr<LiveFormInterfacePar
     AbilityRuntime::HandleEscape handleEscape(getFormRectEnv_);
     napi_value callbackValue;
     napi_create_string_utf8(getFormRectEnv_, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &callbackValue);
- 
+
     napi_value myCallback = nullptr;
-    napi_get_reference_value(getFormRectEnv_, getFormRectCallbackRef_, &myCallback);
+    {
+        std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
+        napi_get_reference_value(getFormRectEnv_, getFormRectCallbackRef_, &myCallback);
+    }
     napi_valuetype valueType;
     napi_typeof(getFormRectEnv_, myCallback, &valueType);
 
@@ -2835,7 +2845,7 @@ void JsFormRouterProxyMgr::GetFormRectInner(std::shared_ptr<LiveFormInterfacePar
     CallPromise(funcResult, dataParam);
     napi_close_handle_scope(getFormRectEnv_, scope);
 }
- 
+
 void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, std::shared_ptr<LiveFormInterfaceParam> params)
 {
     HILOG_INFO("call");
@@ -2843,7 +2853,7 @@ void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, std::shared_ptr<Li
     napi_value promiseCatch = nullptr;
     napi_get_named_property(getFormRectEnv_, funcResult, "then", &promiseThen);
     napi_get_named_property(getFormRectEnv_, funcResult, "catch", &promiseCatch);
- 
+
     bool isCallable = false;
     napi_is_callable(getFormRectEnv_, promiseThen, &isCallable);
     if (!isCallable) {
@@ -2855,7 +2865,7 @@ void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, std::shared_ptr<Li
         HILOG_ERROR("property catch is not callable.");
         return;
     }
- 
+
     napi_value promiseCallback = nullptr;
     auto *callbackInfo = PromiseCallbackInfo::Create(params);
     if (callbackInfo == nullptr) {
@@ -2864,17 +2874,17 @@ void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, std::shared_ptr<Li
     }
     napi_create_function(getFormRectEnv_, "promiseCallback", strlen("promiseCallback"), PromiseCallback,
         callbackInfo, &promiseCallback);
- 
+
     napi_status status;
     napi_value argvPromise[1] = { promiseCallback };
- 
+
     status = napi_call_function(getFormRectEnv_, funcResult, promiseThen, ARGS_ONE, argvPromise, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR("Invoke pushCheck promise then error.");
         PromiseCallbackInfo::Destroy(callbackInfo);
         return;
     }
- 
+
     status = napi_call_function(getFormRectEnv_, funcResult, promiseCatch, ARGS_ONE, argvPromise, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR("Invoke pushCheck promise catch error.");
@@ -2882,7 +2892,7 @@ void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, std::shared_ptr<Li
         return;
     }
 }
- 
+
 napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("enter");
@@ -2890,11 +2900,11 @@ napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_inf
         HILOG_ERROR("PromiseCallback, invalid input info");
         return nullptr;
     }
- 
+
     size_t argc = 1;
     napi_value argv[1] = {nullptr};
     void *data = nullptr;
- 
+
     napi_get_cb_info(env, info, &argc, &argv[PARAM0], nullptr, &data);
     std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
     bool ret = ConvertFunctionResult(env, argv[PARAM0], *item);
@@ -2902,26 +2912,26 @@ napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_inf
         HILOG_ERROR("PromiseCallback, invalid data");
         return nullptr;
     }
- 
+
     auto *callbackInfo = static_cast<PromiseCallbackInfo *>(data);
     if (callbackInfo == nullptr) {
         HILOG_ERROR("PromiseCallback, invalid callbackInfo");
         return nullptr;
     }
     CallBackReturn(*item, callbackInfo->GetJsCallBackParam(), ret);
- 
+
     PromiseCallbackInfo::Destroy(callbackInfo);
     callbackInfo = nullptr;
     return nullptr;
 }
- 
+
 bool JsFormRouterProxyMgr::ConvertFunctionResult(napi_env env, napi_value funcResult, Rect &item)
 {
     if (funcResult == nullptr) {
         HILOG_ERROR("The funcResult is error.");
         return false;
     }
- 
+
     napi_valuetype rectType = napi_undefined;
     napi_typeof(env, funcResult, &rectType);
     if (rectType != napi_object) {
@@ -2933,7 +2943,7 @@ bool JsFormRouterProxyMgr::ConvertFunctionResult(napi_env env, napi_value funcRe
         HILOG_ERROR("create form rect error");
         return false;
     }
- 
+
     return true;
 }
 
@@ -2945,15 +2955,15 @@ bool JsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(napi_env env, napi_
         HILOG_ERROR("Invalid callback reference");
         return false;
     }
- 
+
     if (getLiveFormStatusCallbackRef_ != nullptr) {
         napi_delete_reference(env, getLiveFormStatusCallbackRef_);
         getLiveFormStatusCallbackRef_ = nullptr;
     }
- 
+
     getLiveFormStatusCallbackRef_ = callbackRef;
     getLiveFormStatusEnv_ = env;
- 
+
     napi_value callback;
     napi_get_reference_value(env, callbackRef, &callback);
     napi_valuetype valueType;
@@ -2962,11 +2972,11 @@ bool JsFormRouterProxyMgr::RegisterGetLiveFormStatusListener(napi_env env, napi_
         HILOG_ERROR("Callback is not a function");
         return false;
     }
- 
+
     HILOG_INFO("Listener registered successfully");
     return true;
 }
- 
+
 bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 {
     std::lock_guard<std::mutex> lock(registerGetLiveFormStatusProxyMutex_);
@@ -3014,10 +3024,13 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
         HILOG_ERROR("null scope");
         return;
     }
- 
+
     napi_value myCallback = nullptr;
-    napi_get_reference_value(getLiveFormStatusEnv_, getLiveFormStatusCallbackRef_, &myCallback);
-    
+    {
+        std::lock_guard<std::mutex> LiveFormStatusLock(registerGetLiveFormStatusProxyMutex_);
+        napi_get_reference_value(getLiveFormStatusEnv_, getLiveFormStatusCallbackRef_, &myCallback);
+    }
+
     napi_valuetype callbackType;
     napi_typeof(getLiveFormStatusEnv_, myCallback, &callbackType);
     if (callbackType != napi_function) {
@@ -3025,7 +3038,7 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
         napi_close_handle_scope(getLiveFormStatusEnv_, scope);
         return;
     }
- 
+
     napi_value callResult;
     napi_status status = napi_call_function(getLiveFormStatusEnv_, nullptr, myCallback, 0, nullptr, &callResult);
     if (status != napi_ok) {
@@ -3033,7 +3046,7 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
         napi_close_handle_scope(getLiveFormStatusEnv_, scope);
         return;
     }
- 
+
     napi_valuetype returnType;
     napi_typeof(getLiveFormStatusEnv_, callResult, &returnType);
     if (returnType == napi_undefined) {
@@ -3041,7 +3054,7 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
         napi_close_handle_scope(getLiveFormStatusEnv_, scope);
         return;
     }
- 
+
     HILOG_INFO("parse result");
     std::unordered_map<std::string, std::string> liveFormStatusMap;
     bool ret = ConvertNapiValueToMap(getLiveFormStatusEnv_, callResult, liveFormStatusMap);
@@ -3057,24 +3070,24 @@ bool JsFormRouterProxyMgr::ConvertNapiValueToMap(
         HILOG_ERROR("The value is error.");
         return false;
     }
- 
+
     napi_valuetype valueType;
     napi_typeof(env, value, &valueType);
     if (valueType != napi_object) {
         HILOG_ERROR("return type is not object");
         return false;
     }
- 
+
     napi_value propNames;
     napi_get_property_names(env, value, &propNames);
- 
+
     napi_valuetype propNamesType;
     napi_typeof(env, propNames, &propNamesType);
     if (propNamesType != napi_object) {
         HILOG_ERROR("propNamesType is not napi_object");
         return false;
     }
- 
+
     uint32_t length;
     napi_status status = napi_get_array_length(env, propNames, &length);
     if (status != napi_ok) {
@@ -3085,24 +3098,24 @@ bool JsFormRouterProxyMgr::ConvertNapiValueToMap(
     for (uint32_t i = 0; i < length; ++i) {
         napi_value key;
         napi_get_element(env, propNames, i, &key);
- 
+
         napi_valuetype keyType;
         napi_typeof(env, key, &keyType);
         if (keyType != napi_string) {
             HILOG_ERROR("keyType is not napi_string");
             continue;
         }
- 
+
         napi_value valueObj;
         napi_get_property(env, value, key, &valueObj);
- 
+
         napi_valuetype valType;
         napi_typeof(env, valueObj, &valType);
         if (valType != napi_string) {
             HILOG_ERROR("valType is not napi_string");
             continue;
         }
- 
+
         std::string mKey = GetStringFromNapi(env, key);
         std::string mValue = GetStringFromNapi(env, valueObj);
         uMap.insert({mKey, mValue});
@@ -3188,8 +3201,11 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
     }
 
     napi_value callbackFunction = nullptr;
-    napi_get_reference_value(templateFormDetailInfoChangeEnv_,
-        templateFormDetailInfoChangeCallbackRef_, &callbackFunction);
+    {
+        std::lock_guard<std::mutex> lock(registerTemplateFormDetailInfoChangeMutex_);
+        napi_get_reference_value(templateFormDetailInfoChangeEnv_,
+            templateFormDetailInfoChangeCallbackRef_, &callbackFunction);
+    }
 
     if (callbackFunction == nullptr) {
         HILOG_ERROR("callbackFunction is nullptr");

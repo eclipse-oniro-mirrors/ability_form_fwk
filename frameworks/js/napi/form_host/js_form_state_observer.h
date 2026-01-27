@@ -108,6 +108,8 @@ public:
 
     static sptr<JsFormStateObserver> GetInstance();
 
+    std::shared_ptr<AppExecFwk::EventHandler> GetMainEventRunner();
+
     bool RegisterFormAddCallback(const napi_env env, const std::string &bundleName, const napi_value callback);
 
     bool RegisterFormRemoveCallback(const napi_env env, const std::string &bundleName, const napi_value callback);
