@@ -18,7 +18,13 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormForceRefreshImpl::FormForceRefreshImpl() {}
+
+FormForceRefreshImpl::FormForceRefreshImpl() : BaseFormRefresh(RefreshConfig{}) {}
 FormForceRefreshImpl::~FormForceRefreshImpl() {}
+
+int FormForceRefreshImpl::RefreshFormRequest(RefreshData &data)
+{
+    return DoRefresh(data);
+}
 } // namespace AppExecFwk
 } // namespace OHOS
