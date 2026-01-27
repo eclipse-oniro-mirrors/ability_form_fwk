@@ -126,6 +126,28 @@ void FormProviderParallelizeFuzz::Execute(FuzzedDataProvider &provider)
             formMgrService_->ReloadAllForms(reloadNum);
             break;
         }
+        case IpcCode::UPDATE_TEMPLATE_FORM_DETAIL_INFO: {
+            std::vector<TemplateFormDetailInfo> templateFormInfo;
+            TemplateFormDetailInfo templateFormDetailInfo;
+            formParallelizeUtil_->FillTemplateFormDetailInfo(provider, templateFormDetailInfo);
+            templateFormInfo.push_back(templateFormDetailInfo);
+            formMgrService_->UpdateTemplateFormDetailInfo(templateFormInfo);
+            break;
+        }
+        case IpcCode::REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL: {
+            const sptr<IRemoteObject> callerToken = formParallelizeUtil_->GetMockRemoteObject();
+            formMgrService_->RegisterPublishFormCrossBundleControl(callerToken);
+            break;
+        }
+        case IpcCode::UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL: {
+            formMgrService_->UnregisterPublishFormCrossBundleControl();
+            break;
+        }
+        case IpcCode::CLOSE_FORM_EDIT_ABILITY: {
+            bool isMainPage = provider.ConsumeBool();
+            formMgrService_->CloseFormEditAbility(isMainPage);
+            break;
+        }
         default: {
             break;
         }

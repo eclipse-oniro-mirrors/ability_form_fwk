@@ -16,6 +16,7 @@
 import ExtensionContext from 'application.ExtensionContext';
 import { BusinessError, AsyncCallback } from '@ohos.base';
 import type Want from '@ohos.app.ability.Want';
+import { ConnectOptions } from 'ability.connectOptions';
 
 class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => {}
@@ -63,6 +64,8 @@ export default class LiveFormExtensionContext extends ExtensionContext {
   private cleaner: Cleaner | null = null;
 
   native nativeStartAbilityByLiveForm(want: Want, formId: string, callback: AsyncCallbackWrapper<void>): void;
+  native nativeConnectServiceExtensionAbility(want: Want, options: ConnectOptions): long;
+  native nativeDisconnectServiceExtensionAbility(connectionId: long, callback: AsyncCallbackWrapper<void>): void;
 
   startAbilityByLiveForm(want: Want): Promise<void> {
     let p: Promise<void> = new Promise<void>((
@@ -78,6 +81,32 @@ export default class LiveFormExtensionContext extends ExtensionContext {
         taskpool.execute((): void => {
           try {
             this.nativeStartAbilityByLiveForm(want, "", myCall);
+          } catch (err: BusinessError) {
+            reject(err);
+          }
+        });
+      });
+    return p;
+  }
+
+  connectServiceExtensionAbility(want: Want, options: ConnectOptions): long {
+    return this.nativeConnectServiceExtensionAbility(want, options);
+  }
+
+  disconnectServiceExtensionAbility(connectionId: long): Promise<void> {
+    let p : Promise<void> = new Promise<void>((
+      resolve: (data: undefined) => void,
+      reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
+          if (err == null || err.code == 0) {
+            resolve(undefined);
+          } else {
+            reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          try {
+            this.nativeDisconnectServiceExtensionAbility(connectionId, myCall);
           } catch (err: BusinessError) {
             reject(err);
           }

@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { RecordData } from '@ohos.base';
 
 export namespace formBindingData {
 
@@ -23,14 +24,14 @@ export namespace formBindingData {
   }
 
   export interface FormBindingData {
-    data: Object;
+    data: RecordData;
     proxies?: Array<ProxyData>;
   }
 
   class FormBindingDataInner implements FormBindingData {
-    data: Object;
+    data: RecordData;
     proxies?: Array<ProxyData>;
   }
 
-  native function createFormBindingData(obj?: Object | string): FormBindingData;
+  native function createFormBindingData(obj?: RecordData): FormBindingData;
 }

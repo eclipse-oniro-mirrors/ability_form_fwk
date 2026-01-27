@@ -110,7 +110,7 @@ void JsFormEditExtensionImpl::BindContext()
         TAG_LOGE(AAFwkTag::UI_EXT, "Fail to get context native object");
         return;
     }
-    auto workContext = new (std::nothrow) std::weak_ptr<FormEditExtensionContext>(context_);
+    auto workContext = new (std::nothrow) std::shared_ptr<FormEditExtensionContext>(context_);
     napi_coerce_to_native_binding_object(env, contextObj, DetachCallbackFunc, AttachUIExtensionContext, workContext,
                                          nullptr);
     context_->Bind(jsRuntime_, shellContextRef_.get());
