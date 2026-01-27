@@ -58,7 +58,7 @@ public:
     {
         return eventType_;
     }
- 
+
 private:
     std::string bindHostBundleName;
     std::string eventType_;

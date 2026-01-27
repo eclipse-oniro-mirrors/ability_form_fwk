@@ -927,7 +927,7 @@ void FormMgrAdapter::UpdateFormRenderParam(const int64_t formId, const sptr<IRem
     HILOG_INFO("FormId:%{public}" PRId64 " curTransparencyColor: %{public}s, cacheTransparencyColor: %{public}s",
         formId, curTransparencyColor.c_str(), cacheTransparencyColor.c_str());
     FormDataMgr::GetInstance().UpdateFormUpgradeInfo(formId, formUpgradeInfo);
- 
+
     // whether the transparencyColor matches the cached color; if not, refresh the FRS.
     if (hasRecord && hasTransparencyKey && curTransparencyColor != cacheTransparencyColor) {
         // update form render params
@@ -2950,7 +2950,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 
     SetFreeInstallFlag(record, want);
- 
+
     if (want.HasParameter(Constants::PARAM_OPEN_TYPE)) {
         int32_t openType = want.GetIntParam(Constants::PARAM_OPEN_TYPE, -1);
         HILOG_INFO("Router by OpenType:%{public}d", openType);
@@ -3016,7 +3016,7 @@ bool FormMgrAdapter::OpenByOpenType(const int32_t openType, const FormRecord &re
         openResult = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
         return true;
     }
- 
+
     if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_APP_LINKING)) {
         std::string bundleName;
         auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
@@ -5136,7 +5136,7 @@ ErrCode FormMgrAdapter::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteO
     SetTemplateFormDetailInfoCallerToken(callerToken);
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrAdapter::UnregisterTemplateFormDetailInfoChange()
 {
     HILOG_INFO("call");
@@ -5159,9 +5159,9 @@ ErrCode FormMgrAdapter::UpdateTemplateFormDetailInfo(
         HILOG_ERROR("failed, remoteFormHostDelegateProxy is nullptr!");
         return ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION;
     }
-    
+
     ErrCode result = remoteFormHostDelegateProxy->TemplateFormDetailInfoChange(templateFormInfo);
- 
+
     HILOG_DEBUG("update result:%{public}d", result);
     return result;
 }
@@ -5177,14 +5177,14 @@ void FormMgrAdapter::SetTemplateFormDetailInfoCallerToken(
     std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
     templateFormDetailInfoCallerToken_ = templateFormDetailInfoCallerToken;
 }
- 
+
 void FormMgrAdapter::ClearTemplateFormDetailInfoCallerToken()
 {
     HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(templateFormDetailInfoCallerTokenMutex_);
     templateFormDetailInfoCallerToken_ = nullptr;
 }
- 
+
 sptr<IRemoteObject> FormMgrAdapter::GetTemplateFormDetailInfoCallerToken()
 {
     HILOG_DEBUG("call");
@@ -5209,7 +5209,7 @@ void FormMgrAdapter::ClearFormRectCallerToken()
     std::lock_guard<std::mutex> lock(formRectCallerTokenMutex_);
     formRectCallerToken_ = nullptr;
 }
- 
+
 sptr<IRemoteObject> FormMgrAdapter::GetFormRectCallerToken()
 {
     HILOG_DEBUG("call");
@@ -5234,7 +5234,7 @@ void FormMgrAdapter::ClearLiveFormStatusCallerToken()
     std::lock_guard<std::mutex> lock(liveFormStatusCallerTokenMutex_);
     liveFormStatusCallerToken_ = nullptr;
 }
- 
+
 sptr<IRemoteObject> FormMgrAdapter::GetLiveFormStatusCallerToken()
 {
     HILOG_DEBUG("call");

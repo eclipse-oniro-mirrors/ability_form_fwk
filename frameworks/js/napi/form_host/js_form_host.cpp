@@ -1853,7 +1853,7 @@ private:
             Want want;
             *ret = FormMgr::GetInstance().RecoverForms(formIds, want);
         };
-        
+
         NapiAsyncTask::CompleteCallback complete =
             [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
             if (*ret == ERR_OK) {
