@@ -103,11 +103,11 @@ HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0002, TestSize
 }
 
 /**
- * @tc.name: FormEventNotifyConnection_0002
+ * @tc.name: FormEventNotifyConnection_0003
  * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
  * @tc.type: FUNC
  */
-HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0002, TestSize.Level0)
+HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0003, TestSize.Level0)
 {
     HILOG_INFO("FormEventNotifyConnection_0003 start");
     int64_t formId = 1;
@@ -124,17 +124,17 @@ HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0002, TestSize
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
     formEventNotifyConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
-    GTEST_LOG_(INFO) << "FormEventNotifyConnection_0002 end";
+    GTEST_LOG_(INFO) << "FormEventNotifyConnection_0003 end";
 }
 
 /**
- * @tc.name: FormEventNotifyConnection_0002
+ * @tc.name: FormEventNotifyConnection_0004
  * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
  * @tc.type: FUNC
  */
 HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0004, TestSize.Level0)
 {
-    HILOG_INFO("FormEventNotifyConnection_0002 start");
+    HILOG_INFO("FormEventNotifyConnection_0004 start");
     int64_t formId = 1;
     std::vector<int64_t> formEvents;
     formEvents.emplace_back(formId);
@@ -149,7 +149,7 @@ HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0004, TestSize
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
     formEventNotifyConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
-    GTEST_LOG_(INFO) << "FormEventNotifyConnection_0002 end";
+    GTEST_LOG_(INFO) << "FormEventNotifyConnection_0004 end";
 }
 
 
