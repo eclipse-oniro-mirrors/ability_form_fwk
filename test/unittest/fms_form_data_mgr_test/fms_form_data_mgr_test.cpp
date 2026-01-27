@@ -807,6 +807,29 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecord_002, TestSize.L
 }
 
 /**
+ * @tc.number: FmsFormDataMgrTest_UpdateFormRecord_003
+ * @tc.name: UpdateFormRecord
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       formRecords is found.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecord_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormRecord_003 start";
+    int64_t formId = 1;
+    FormRecord record;
+    record.bundleName = "XXX";
+
+    formDataMgr_.formRecords_.clear();
+    formDataMgr_.formRecords_[formId] = record;
+    formDataMgr_.UpdateFormRecord(formId, [](FormRecord &record) {
+        record.bundleName = "bundleName";
+    });
+    EXPECT_EQ(formDataMgr_.formRecords_[formId].bundleName, "bundleName");
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormRecord_003 end";
+}
+
+/**
  * @tc.number: FmsFormDataMgrTest_GetFormRecord_001
  * @tc.name: GetFormRecord
  * @tc.desc: Verify that the return value is correct.
@@ -6144,7 +6167,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_001
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetAddfinishAndSetUpdateFlag_001 end";
 }
- 
+
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetIsNeedUpdateOnAddFinish_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetIsNeedUpdateOnAddFinish_001 start";
