@@ -151,6 +151,13 @@ public:
      */
     bool UpdateFormRecord(const int64_t formId, const FormRecord &formRecord);
     /**
+     * @brief Update form record.
+     * @param formId The Id of the form.
+     * @param updateFunc A function that performs the update operation on the found record.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool UpdateFormRecord(const int64_t formId, std::function<void(FormRecord &)> updateFunc);
+    /**
      * @brief Get form record.
      * @param formId The Id of the form.
      * @param formRecord The form record.

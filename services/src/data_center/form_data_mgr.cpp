@@ -606,6 +606,29 @@ bool FormDataMgr::UpdateFormRecord(const int64_t formId, const FormRecord &formR
     }
     return false;
 }
+
+/**
+* @brief Update form record.
+* @param formId The Id of the form.
+* @param updateFunc A function that performs the update operation on the found record.
+* @return Returns true if this function is successfully called; returns false otherwise.
+*/
+bool FormDataMgr::UpdateFormRecord(const int64_t formId, std::function<void(FormRecord &)> updateFunc)
+{
+    HILOG_DEBUG("UpdateFormRecord");
+    if (!updateFunc) {
+        HILOG_WARN("updateFunc is null");
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto iter = formRecords_.find(formId);
+    if (iter == formRecords_.end()) {
+        return false;
+    }
+    updateFunc(iter->second);
+    return true;
+}
+
 /**
  * @brief Get form record.
  * @param formId The Id of the form.
