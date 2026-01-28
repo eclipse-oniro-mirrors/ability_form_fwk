@@ -18,20 +18,21 @@
 
 #include <singleton.h>
 
-#include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/refresh_impl/base_form_refresh.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class FormDataRefreshImpl
-* FormDataRefreshImpl is used to refresh form by provider data.
-*/
-class FormDataRefreshImpl : public IFormRefresh, public DelayedRefSingleton<FormDataRefreshImpl> {
+ * @class FormDataRefreshImpl
+ * FormDataRefreshImpl is used to refresh form by provider data.
+ */
+class FormDataRefreshImpl : public BaseFormRefresh, public DelayedRefSingleton<FormDataRefreshImpl> {
     DECLARE_DELAYED_REF_SINGLETON(FormDataRefreshImpl);
 public:
     DISALLOW_COPY_AND_MOVE(FormDataRefreshImpl);
 
-    int RefreshFormRequest(RefreshData &data) override;
+protected:
+    int DoRefresh(RefreshData &data) override;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

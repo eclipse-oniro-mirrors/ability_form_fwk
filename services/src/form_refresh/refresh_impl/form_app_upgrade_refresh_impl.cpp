@@ -15,60 +15,36 @@
 
 #include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 
-#include "form_refresh/strategy/refresh_check_mgr.h"
-#include "form_refresh/strategy/refresh_control_mgr.h"
-#include "form_refresh/strategy/refresh_exec_mgr.h"
-#include "form_refresh/strategy/refresh_cache_mgr.h"
-#include "data_center/form_data_mgr.h"
-#include "common/util/form_util.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_mgr/form_mgr_adapter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+// Configuration for form app upgrade refresh, check types and control checks
+static RefreshConfig CreateConfig()
+{
+    RefreshConfig config;
+    // Check types configuration
+    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    // Control checks configuration
+    config.controlCheckFlags = CONTROL_CHECK_HEALTHY_CONTROL | CONTROL_CHECK_NEED_TO_FRESH;
+    return config;
+}
+}
 
-FormAppUpgradeRefreshImpl::FormAppUpgradeRefreshImpl() {}
+FormAppUpgradeRefreshImpl::FormAppUpgradeRefreshImpl() : BaseFormRefresh(CreateConfig()) {}
 FormAppUpgradeRefreshImpl::~FormAppUpgradeRefreshImpl() {}
 
-int FormAppUpgradeRefreshImpl::RefreshFormRequest(RefreshData &data)
+int FormAppUpgradeRefreshImpl::DoRefresh(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
-    CheckValidFactor factor;
-    factor.formId = data.formId;
-    factor.record = data.record;
-    factor.callerToken = data.callerToken;
-    Want reqWant(data.want);
-    factor.want = reqWant;
-    int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
-    if (ret != ERR_OK) {
-        return ret;
-    }
-
-    if (RefreshControlMgr::GetInstance().IsHealthyControl(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(data.formId, true);
-        return ERR_OK;
-    }
-
-    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
-        FormDataMgr::GetInstance().SetNeedRefresh(data.formId, true);
-        return ERR_OK;
-    }
-
     if (!FormMgrAdapter::GetInstance().IsDeleteCacheInUpgradeScene(data.record)) {
         FormProviderData formProviderData;
         formProviderData.EnableDbCache(true);
         FormMgrAdapter::GetInstance().UpdateForm(data.formId, data.record.uid, formProviderData);
         HILOG_INFO("Upgrade APP data agent card update, formId: %{public}" PRId64, data.formId);
     }
-
-    FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
-    ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, reqWant);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("ask for provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
-        return ret;
-    }
-
-    return ERR_OK;
+    return BaseFormRefresh::DoRefresh(data);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

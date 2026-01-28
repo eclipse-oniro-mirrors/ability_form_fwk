@@ -23,16 +23,15 @@
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class FormHostRefreshImpl
-* FormHostRefreshImpl is used to deal form host refresh.
-*/
+ * @class FormHostRefreshImpl
+ * FormHostRefreshImpl is used to deal form host refresh.
+ */
 class FormHostRefreshImpl : public BaseFormRefresh, public DelayedRefSingleton<FormHostRefreshImpl> {
     DECLARE_DELAYED_REF_SINGLETON(FormHostRefreshImpl);
 public:
     DISALLOW_COPY_AND_MOVE(FormHostRefreshImpl);
 
 protected:
-    CheckValidFactor BuildCheckFactor(RefreshData &data) override;
     int DoControlCheck(RefreshData &data) override;
 };
 } // namespace AppExecFwk

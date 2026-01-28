@@ -4912,12 +4912,13 @@ int32_t FormMgrAdapter::GetCallingUserId()
 
 ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams)
 {
+    int64_t formId = info.GetFormId();
     HILOG_INFO("reconnect bundleName:%{public}s, formId:%{public}" PRId64, info.GetProviderBundleName().c_str(),
-        info.GetFormId());
+        formId);
     std::lock_guard<std::mutex> lock(reconnectMutex_);
-    auto iter = formReconnectMap_.find(info.GetFormId());
+    auto iter = formReconnectMap_.find(formId);
     if (iter == formReconnectMap_.end()) {
-        iter = formReconnectMap_.emplace(info.GetFormId(), 0).first;
+        iter = formReconnectMap_.emplace(formId, 0).first;
     }
     iter->second++;
     int32_t delayAcquireProviderFormInfoTime = 0;
@@ -4927,12 +4928,14 @@ ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info,
         // schedule a delayed retry after LAST_RECONNECT_RETRY_DELAY_TIME milliseconds
         delayAcquireProviderFormInfoTime = LAST_RECONNECT_RETRY_DELAY_TIME;
     } else {
+        formReconnectMap_.erase(formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     auto delayAcquireProviderFormInfo = [info, wantParams]() {
         FormMgrAdapter::GetInstance().AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
     };
-    HILOG_WARN("reconnect form, schedule retry after %{public}d ms", delayAcquireProviderFormInfoTime);
+    HILOG_WARN("reconnect formId:%{public}" PRId64 ", schedule retry after %{public}d ms", formId,
+        delayAcquireProviderFormInfoTime);
     FormMgrQueue::GetInstance().ScheduleTask(delayAcquireProviderFormInfoTime, delayAcquireProviderFormInfo);
     return ERR_OK;
 }

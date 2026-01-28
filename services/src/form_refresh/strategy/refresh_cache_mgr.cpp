@@ -94,6 +94,10 @@ void RefreshCacheMgr::AddFlagByInvisible(const int64_t formId, int refreshType)
     HILOG_WARN("add invisible form:%{public}" PRId64", refreshType:%{public}d", formId, refreshType);
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
     FormDataMgr::GetInstance().SetRefreshType(formId, refreshType);
+    if (refreshType == Constants::REFRESHTYPE_NETWORKCHANGED) {
+        // The visibility refresh of network refresh is processed in the same way as the timer refresh.
+        FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
+    }
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
 }
 

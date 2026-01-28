@@ -14,33 +14,34 @@
  */
 
 #include "form_refresh/refresh_impl/form_data_refresh_impl.h"
-
 #include "form_provider/form_provider_mgr.h"
-#include "form_refresh/strategy/refresh_check_mgr.h"
 #include "form_refresh/strategy/refresh_exec_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+// Configuration for form data refresh, check types and control checks
+static RefreshConfig CreateConfig()
+{
+    RefreshConfig config;
+    // Check types configuration
+    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_CALLING_USER, TYPE_MULTI_ACTIVE_USERS };
+    // Control checks configuration
+    config.controlCheckFlags = CONTROL_CHECK_NONE;
+    return config;
+}
+}
 
-FormDataRefreshImpl::FormDataRefreshImpl() {}
+FormDataRefreshImpl::FormDataRefreshImpl() : BaseFormRefresh(CreateConfig()) {}
 FormDataRefreshImpl::~FormDataRefreshImpl() {}
 
-int FormDataRefreshImpl::RefreshFormRequest(RefreshData &data)
+int FormDataRefreshImpl::DoRefresh(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_CALLING_USER, TYPE_MULTI_ACTIVE_USERS};
-    CheckValidFactor factor;
-    factor.formId = data.formId;
-    factor.record = data.record;
-    factor.callingUid = data.callingUid;
-    int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
-    if (ret != ERR_OK) {
-        return ret;
-    }
-
+    int ret = ERR_OK;
     FormType formType = data.record.uiSyntax;
     if (formType == FormType::JS) {
         ret = FormProviderMgr::GetInstance().UpdateForm(data.formId, data.record, data.providerData);
-        HILOG_INFO("update js form, ret:%{public}d", ret);
+        HILOG_INFO("update js form, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
         return ret;
     }
 

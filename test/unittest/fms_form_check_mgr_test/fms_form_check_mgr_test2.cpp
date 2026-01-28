@@ -144,7 +144,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshCacheMgr_005, TestSize
         iter->isTimerRefresh = true;
     }
 
-    RefreshCacheMgr::GetInstance().AddFlagByInvisible(FORM_ID_ONE, Constants::REFRESHTYPE_DEFAULT);
+    RefreshCacheMgr::GetInstance().AddFlagByInvisible(FORM_ID_ONE, Constants::REFRESHTYPE_NETWORKCHANGED);
     RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(FORM_ID_ONE, 0);
     RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(FORM_ID_ONE, 0);
 

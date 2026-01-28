@@ -15,67 +15,33 @@
 
 #include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
 
-#include "form_refresh/strategy/refresh_check_mgr.h"
-#include "form_refresh/strategy/refresh_control_mgr.h"
-#include "form_refresh/strategy/refresh_exec_mgr.h"
-#include "form_refresh/strategy/refresh_cache_mgr.h"
-#include "data_center/form_data_mgr.h"
-#include "common/util/form_util.h"
-
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+// Configuration for form network connection refresh, check types and control checks
+static RefreshConfig CreateConfig()
+{
+    RefreshConfig config;
+    // Check types configuration
+    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_SYSTEM_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_ADD_FINISH };
+    // Control checks configuration
+    config.controlCheckFlags = CONTROL_CHECK_HEALTHY_CONTROL | CONTROL_CHECK_INVISIBLE | CONTROL_CHECK_SCREEN_OFF |
+        CONTROL_CHECK_NEED_TO_FRESH;
+    config.refreshType = Constants::REFRESHTYPE_NETWORKCHANGED;
+    return config;
+}
+}
 
-FormNetConnRefreshImpl::FormNetConnRefreshImpl() {}
+FormNetConnRefreshImpl::FormNetConnRefreshImpl() : BaseFormRefresh(CreateConfig()) {}
 FormNetConnRefreshImpl::~FormNetConnRefreshImpl() {}
 
-int FormNetConnRefreshImpl::RefreshFormRequest(RefreshData &data)
+int FormNetConnRefreshImpl::DoRefresh(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_SYSTEM_APP, TYPE_MULTI_ACTIVE_USERS,
-        TYPE_ADD_FINISH };
-    CheckValidFactor factor;
-    factor.formId = data.formId;
-    factor.record = data.record;
-    Want reqWant;
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
-    factor.want = reqWant;
-    int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
-    if (ret != ERR_OK) {
-        return ret;
-    }
-
-    if (RefreshControlMgr::GetInstance().IsHealthyControl(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(data.formId, true);
-        return ERR_OK;
-    }
-
-    FormDataMgr::GetInstance().SetTimerRefresh(data.formId, true);
-    if (RefreshControlMgr::GetInstance().IsFormInvisible(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByInvisible(data.formId, Constants::REFRESHTYPE_NETWORKCHANGED);
-        return ERR_OK;
-    }
-
+    // System app set refresh type
     if (data.record.isSystemApp) {
-        reqWant.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_NETWORKCHANGED);
+        data.want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_NETWORKCHANGED);
     }
-
-    if (RefreshControlMgr::GetInstance().IsScreenOff(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByScreenOff(data.formId, data.want, data.record);
-        return ERR_OK;
-    }
-
-    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
-        FormDataMgr::GetInstance().SetNeedRefresh(data.formId, true);
-        return ERR_OK;
-    }
-
-    FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
-    ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, reqWant);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("ask for provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
-        return ret;
-    }
-
-    return ERR_OK;
+    return BaseFormRefresh::DoRefresh(data);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

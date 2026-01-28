@@ -15,20 +15,18 @@
 
 #include "form_refresh/refresh_impl/base_form_refresh.h"
 
-#include "form_refresh/strategy/refresh_check_mgr.h"
+#include "common/util/form_util.h"
+#include "data_center/form_data_mgr.h"
+#include "form_constants.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "form_refresh/strategy/refresh_exec_mgr.h"
-#include "data_center/form_data_mgr.h"
-#include "form_constants.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-BaseFormRefresh::BaseFormRefresh(RefreshConfig config) : config_(std::move(config))
-{
-}
+BaseFormRefresh::BaseFormRefresh(RefreshConfig&& config) : config_(std::move(config)) {}
 
 int BaseFormRefresh::RefreshFormRequest(RefreshData &data)
 {
@@ -70,6 +68,7 @@ CheckValidFactor BaseFormRefresh::BuildCheckFactor(RefreshData &data)
     factor.callerToken = data.callerToken;
     factor.want = data.want;
     factor.callingUid = data.callingUid;
+    factor.want.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
     return factor;
 }
 
@@ -88,6 +87,7 @@ int BaseFormRefresh::DoControlCheck(RefreshData &data)
     // 1. System overload check for timer refresh
     if (flags & CONTROL_CHECK_SYSTEM_OVERLOAD) {
         if (RefreshControlMgr::GetInstance().IsSystemOverload()) {
+            RefreshCacheMgr::GetInstance().AddToOverloadTaskQueue(data.formTimer);
             return ERR_OK;
         }
     }
@@ -103,9 +103,7 @@ int BaseFormRefresh::DoControlCheck(RefreshData &data)
     // 3. Invisible check
     if (flags & CONTROL_CHECK_INVISIBLE) {
         if (RefreshControlMgr::GetInstance().IsFormInvisible(data.record)) {
-            int32_t refreshType = data.want.GetIntParam(
-                Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_DEFAULT);
-            RefreshCacheMgr::GetInstance().AddFlagByInvisible(data.formId, refreshType);
+            RefreshCacheMgr::GetInstance().AddFlagByInvisible(data.formId, config_.refreshType);
             return ERR_OK;
         }
     }

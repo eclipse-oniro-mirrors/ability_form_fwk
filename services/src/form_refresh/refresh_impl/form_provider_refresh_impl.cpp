@@ -15,58 +15,22 @@
 
 #include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
 
-#include "data_center/form_data_mgr.h"
-#include "form_refresh/strategy/refresh_cache_mgr.h"
-#include "form_refresh/strategy/refresh_check_mgr.h"
-#include "form_refresh/strategy/refresh_control_mgr.h"
-#include "form_refresh/strategy/refresh_exec_mgr.h"
-
 namespace OHOS {
 namespace AppExecFwk {
-
-FormProviderRefreshImpl::FormProviderRefreshImpl() {}
-FormProviderRefreshImpl::~FormProviderRefreshImpl() {}
-
-int FormProviderRefreshImpl::RefreshFormRequest(RefreshData &data)
+namespace {
+// Configuration for form provider refresh, check types and control checks
+static RefreshConfig CreateConfig()
 {
-    HILOG_DEBUG("call");
-    int64_t formId = data.record.formId;
-    static const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_ADD_FINISH };
-    CheckValidFactor factor;
-    factor.formId = formId;
-    factor.record = data.record;
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    Want reqWant;
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-    factor.want = reqWant;
-    factor.callingUid = data.callingUid;
-    int ret = RefreshCheckMgr::GetInstance().IsBaseValidPass(checkTypes, factor);
-    if (ret != ERR_OK) {
-        return ret;
-    }
-
-    if (RefreshControlMgr::GetInstance().IsHealthyControl(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByHealthyControl(data.formId, true);
-        return ERR_OK;
-    }
-
-    if (RefreshControlMgr::GetInstance().IsScreenOff(data.record)) {
-        RefreshCacheMgr::GetInstance().AddFlagByScreenOff(data.formId, data.want, data.record);
-        return ERR_OK;
-    }
-
-    if (!RefreshControlMgr::GetInstance().IsNeedToFresh(data.record, true)) {
-        FormDataMgr::GetInstance().SetNeedRefresh(data.formId, true);
-        return ERR_OK;
-    }
-
-    ret = RefreshExecMgr::AskForProviderData(formId, data.record, reqWant);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("update form failed, ret:%{public}d, formId:%{public}" PRId64, ret, formId);
-        return ret;
-    }
-
-    return ERR_OK;
+    RefreshConfig config;
+    // Check types configuration
+    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_ADD_FINISH };
+    // Control checks configuration
+    config.controlCheckFlags = CONTROL_CHECK_HEALTHY_CONTROL | CONTROL_CHECK_SCREEN_OFF | CONTROL_CHECK_NEED_TO_FRESH;
+    return config;
 }
+}
+
+FormProviderRefreshImpl::FormProviderRefreshImpl() : BaseFormRefresh(CreateConfig()) {}
+FormProviderRefreshImpl::~FormProviderRefreshImpl() {}
 } // namespace AppExecFwk
 } // namespace OHOS
