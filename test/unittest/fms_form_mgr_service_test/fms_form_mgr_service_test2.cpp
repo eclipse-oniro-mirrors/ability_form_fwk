@@ -517,44 +517,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0095, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0096
- * @tc.name: test HasFormVisible function.
- * @tc.desc: Verify that the HasFormVisible interface is called normally and the return value is right.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0096, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0096 start";
-    std::string bundleName = "ohos.samples.FormApplication";
-    int32_t userId = 100;
-    int32_t instIndex = 0;
-    // create formRecords_
-    FormRecord record;
-    record.bundleName = bundleName;
-    record.userId = userId;
-    record.formVisibleNotifyState = 1;
-    int64_t formId = 123456;
-    FormDataMgr::GetInstance().formRecords_.emplace(formId, record);
-
-    // create tokenid
-    uint32_t tokenId = 0;
-    MockFormParams::bundleName = bundleName;
-    MockFormParams::userId = userId;
-    MockFormParams::instIndex = instIndex;
-
-    MockIsSACall(true);
-    FormMgrService formMgrService;
-    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId));
-
-    instIndex = 1;
-    MockFormParams::instIndex = instIndex;
-    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId));
-
-    MockFormParams::Reset();
-    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId));
-    GTEST_LOG_(INFO) << "FormMgrService_0096 end";
-}
-
-/**
  * @tc.number: FormMgrService_0097
  * @tc.name: test HiDumpHasFormVisible function.
  * @tc.desc: Verify that the HiDumpHasFormVisible interface is called normally

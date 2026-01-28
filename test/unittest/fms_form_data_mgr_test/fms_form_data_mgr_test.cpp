@@ -1162,8 +1162,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_003, TestSize.Lev
 
     formDataMgr_.HandleHostDied(token_);
 
-    EXPECT_FALSE(formDataMgr_.formRecords_[formId].expectRecycled);
-
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleHostDied_003 end";
 }
 

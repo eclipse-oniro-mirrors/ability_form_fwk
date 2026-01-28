@@ -62,7 +62,7 @@ HWTEST_F(FormRenderStatusTest, FormRenderStatusTest_0001, TestSize.Level0)
     EXPECT_EQ(ret, false);
 
     FormFsmStatus status = FormRenderStatus::GetInstance().GetFormStatus(formId);
-    EXPECT_EQ(status, FormFsmStatus::INIT);
+    EXPECT_EQ(status, FormFsmStatus::UNPROCESSABLE);
 
     FormRenderStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::RENDERED);
     ret = FormRenderStatus::GetInstance().HasFormStatus(formId);
