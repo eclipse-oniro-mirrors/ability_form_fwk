@@ -1063,7 +1063,8 @@ HWTEST_F(FmsFormHostRecordTest, FormFreeInstallOperator_0001, TestSize.Level0)
     std::string formShareInfoKey = "aa";
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = 1;
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = 100;
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     GTEST_LOG_(INFO) << "FormFreeInstallOperator_0001 end";
 }
 

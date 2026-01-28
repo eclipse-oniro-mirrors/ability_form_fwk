@@ -839,8 +839,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenOn_0001, TestSize.Level0)
     GTEST_LOG_(INFO) << "HandleScreenOn_0001 start";
     std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
     ASSERT_NE(nullptr, receiver);
-    const int32_t userId = -1;
-    receiver->HandleScreenOn(userId);
+    receiver->HandleScreenOn();
     GTEST_LOG_(INFO) << "HandleScreenOn_0001 end";
 }
 
@@ -859,26 +858,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, RecycleForms_0001, TestSize.Level0)
     GTEST_LOG_(INFO) << "RecycleForms_0001 end";
 }
 
-
-/**
- * @tc.number: HandleAbilityUpdate_0002
- * @tc.name: HandleAbilityUpdate
- * @tc.desc: Verify whether the HandleAbilityUpdate interface is called normally
- */
-HWTEST_F(FmsFormSysEventReceiverTest, HandleAbilityUpdate_0002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "HandleAbilityUpdate_0002 start";
-    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
-    ASSERT_NE(nullptr, receiver);
-    Want want;
-    want.SetParam(KEY_USER_ID, MAIN_USER_ID);
-    std::string bundleName = "testBundleName";
-    const std::string queueName = "queue";
-    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    receiver->HandleAbilityUpdate(want, bundleName);
-    GTEST_LOG_(INFO) << "HandleAbilityUpdate_0002 end";
-}
-
 /**
  * @tc.number: HandleUserUnlocked_0002
  * @tc.name: HandleUserUnlocked
@@ -891,22 +870,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserUnlocked_0002, TestSize.Level0)
     ASSERT_NE(nullptr, receiver);
     receiver->HandleUserUnlocked(-1);
     GTEST_LOG_(INFO) << "HandleUserUnlocked_0002 end";
-}
-
-/**
- * @tc.number: HandleUserUnlocked_0003
- * @tc.name: HandleUserUnlocked
- * @tc.desc: Verify whether the HandleUserUnlocked interface is called normally
- */
-HWTEST_F(FmsFormSysEventReceiverTest, HandleUserUnlocked_0003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "HandleUserUnlocked_0003 start";
-    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
-    ASSERT_NE(nullptr, receiver);
-    const std::string queueName = "queue";
-    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
-    receiver->HandleUserUnlocked(MAIN_USER_ID);
-    GTEST_LOG_(INFO) << "HandleUserUnlocked_0003 end";
 }
 
 /**
@@ -1190,5 +1153,33 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0003, TestSize.Level0)
     receiver->HandleUserSwitched(eventData);
     receiver->HandleUserSwitched(eventData1);
     GTEST_LOG_(INFO) << "HandleUserSwitched_0003 end";
+}
+
+/**
+ * @tc.number: HandleScreenUnlocked_0001
+ * @tc.name: HandleScreenUnlocked
+ * @tc.desc: Verify whether the HandleScreenUnlocked interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenUnlocked_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleScreenUnlocked_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    receiver->HandleScreenUnlocked(MAIN_USER_ID);
+    GTEST_LOG_(INFO) << "HandleScreenUnlocked_0001 end";
+}
+
+/**
+ * @tc.number: HandleUserStopped_0001
+ * @tc.name: HandleUserStopped
+ * @tc.desc: Verify whether the HandleUserStopped interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserStopped_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserStopped_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    receiver->HandleUserStopped(MAIN_USER_ID);
+    GTEST_LOG_(INFO) << "HandleUserStopped_0001 end";
 }
 }

@@ -255,8 +255,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
     std::string abilityName = "bb";
     std::string deviceId = "cc";
     int64_t formShareRequestCode = 2;
-    sptr<FormShareConnection> formShareConnection =
-        new (std::nothrow) FormShareConnection(formId, bundleName, abilityName, deviceId, formShareRequestCode);
+    int32_t userId = 100;
+    sptr<FormShareConnection> formShareConnection = new (std::nothrow) FormShareConnection(formId, bundleName,
+        abilityName, deviceId, formShareRequestCode, userId);
     ASSERT_NE(nullptr, formShareConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;

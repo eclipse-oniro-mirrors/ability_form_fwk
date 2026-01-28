@@ -378,17 +378,19 @@ void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRe
     }
 }
 
-ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
+ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId, const int32_t userId)
 {
     return g_mockCheckInvalidFormRet;
 }
 
-ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
+ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo,
+    const int32_t userId)
 {
     return g_mockGetRunningFormInfosByFormIdRet;
 }
 
-ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+    const int32_t userId)
 {
     return g_mockGetRunningFormInfosRet;
 }

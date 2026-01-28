@@ -2351,7 +2351,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
     EXPECT_EQ(0, runningFormInfos.size());
-    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude,
+        runningFormInfos, userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_001 end";
 }
@@ -2382,8 +2384,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
     EXPECT_EQ(0, runningFormInfos.size());
+    int32_t userId = 100;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
-        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
+        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos, userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_002 end";
 }
@@ -4132,7 +4135,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_NotifyFormsVisible_001, TestSize
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_NotifyFormsVisible_001 start";
     std::vector<int64_t> formIds;
     bool isVisible;
-    auto result = formDataMgr_.NotifyFormsVisible(formIds, true, nullptr);
+    int32_t userId = 100;
+    auto result = formDataMgr_.NotifyFormsVisible(formIds, true, nullptr, userId);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_NotifyFormsVisible_001 end";
 }
@@ -4149,7 +4153,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_NotifyFormsVisible_002, TestSize
     formIds.push_back(FORM_ID_ZERO);
     FormHostRecord record;
     formDataMgr_.clientRecords_.emplace_back(record);
-    auto result = formDataMgr_.NotifyFormsVisible(formIds, true, token_);
+    int32_t userId = 100;
+    auto result = formDataMgr_.NotifyFormsVisible(formIds, true, token_, userId);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_NotifyFormsVisible_002 end";
 }
@@ -6181,5 +6186,37 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetIsNeedUpdateOnAddFinish_001, 
     EXPECT_TRUE(formDataMgr->GetIsNeedUpdateOnAddFinish(FORM_ID_ZERO, formRecord1));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetIsNeedUpdateOnAddFinish_001 end";
+}
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleFormAddObserver_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleFormAddObserver_001 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    std::string hostBundleName = "testBundleName";
+    int64_t formId = -1;
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr->HandleFormAddObserver(hostBundleName, formId, userId));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleFormAddObserver_001 end";
+}
+
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleFormAddObserver_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleFormAddObserver_002 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    FormRecord formRecord;
+    formRecord.formId = FORM_ID_ONE;
+    formRecord.providerUserId = 100;
+    FormHostRecord formHostRecord;
+    formHostRecord.AddForm(FORM_ID_ONE);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+    formDataMgr->formRecords_.emplace(FORM_ID_ONE, formRecord);
+    std::string hostBundleName = "testBundleName";
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_OK, formDataMgr->HandleFormAddObserver(hostBundleName, FORM_ID_ONE, userId));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleFormAddObserver_002 end";
 }
 }

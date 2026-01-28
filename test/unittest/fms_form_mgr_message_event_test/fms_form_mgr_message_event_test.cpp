@@ -1051,12 +1051,13 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_020, TestSize.Level1)
     FormAbilityConnection formAbilityConnection;
     std::string bundleName = "aa";
     std::string abilityName = "";
-    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int32_t userId = 100;
+    formAbilityConnection.SetProviderKey(bundleName, abilityName, userId);
     EXPECT_EQ("", formAbilityConnection.GetProviderKey());
     std::string bundleName1 = "bb";
     std::string abilityName1 = "cc";
-    formAbilityConnection.SetProviderKey(bundleName1, abilityName1);
-    EXPECT_EQ("bb::cc", formAbilityConnection.GetProviderKey());
+    formAbilityConnection.SetProviderKey(bundleName1, abilityName1, userId);
+    EXPECT_EQ("bb::cc::100", formAbilityConnection.GetProviderKey());
     formAbilityConnection.GetHostToken();
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_020 end";
 }

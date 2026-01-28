@@ -35,7 +35,7 @@ FormDataMgr::FormDataMgr()
 FormDataMgr::~FormDataMgr()
 {}
 
-ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
+ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId, const int32_t userId)
 {
     return g_mockCheckInvalidFormRet;
 }

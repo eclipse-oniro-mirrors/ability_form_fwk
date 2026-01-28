@@ -46,7 +46,8 @@ void FormBundleLockMgrTest::TearDown()
 HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_001, TestSize.Level1)
 {
     formBundleLockMgr.SetBundleLockStatus(BUNDLE_NAME, false);
-    bool forbid = formBundleLockMgr.IsBundleLock(BUNDLE_NAME);
+    int32_t userId = DEFAULT_USER_ID;
+    bool forbid = formBundleLockMgr.IsBundleLock(BUNDLE_NAME, userId);
     EXPECT_EQ(forbid, false);
 }
 
@@ -58,7 +59,8 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_001, TestSize.Level1)
 HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_002, TestSize.Level1)
 {
     formBundleLockMgr.SetBundleLockStatus(BUNDLE_NAME, true);
-    bool forbid = formBundleLockMgr.IsBundleLock(BUNDLE_NAME);
+    int32_t userId = DEFAULT_USER_ID;
+    bool forbid = formBundleLockMgr.IsBundleLock(BUNDLE_NAME, userId);
     EXPECT_EQ(forbid, true);
     formBundleLockMgr.SetBundleLockStatus(BUNDLE_NAME, false);
 }
@@ -71,7 +73,8 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_002, TestSize.Level1)
 HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_003, TestSize.Level1)
 {
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, false);
-    bool forbid = formBundleLockMgr.IsBundleProtect(BUNDLE_NAME);
+    int32_t userId = DEFAULT_USER_ID;
+    bool forbid = formBundleLockMgr.IsBundleProtect(BUNDLE_NAME, userId);
     EXPECT_EQ(forbid, false);
 }
 
@@ -83,7 +86,8 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_003, TestSize.Level1)
 HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_004, TestSize.Level1)
 {
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, true);
-    bool forbid = formBundleLockMgr.IsBundleProtect(BUNDLE_NAME);
+    int32_t userId = DEFAULT_USER_ID;
+    bool forbid = formBundleLockMgr.IsBundleProtect(BUNDLE_NAME, userId);
     EXPECT_EQ(forbid, true);
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, false);
 }

@@ -85,7 +85,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formAbilityConnection.GetProviderKey();
     std::string bundleName = fdp->ConsumeRandomLengthString();
     std::string abilityName = fdp->ConsumeRandomLengthString();
-    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    formAbilityConnection.SetProviderKey(bundleName, abilityName, userId);
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
     formAbilityConnection.SetFormId(formId);
     formAbilityConnection.GetFormId();
