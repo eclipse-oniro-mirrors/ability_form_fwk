@@ -62,11 +62,6 @@ FormRenderMgrInner::~FormRenderMgrInner()
         std::lock_guard<std::mutex> lock(resourceMutex_);
         etsHosts_.clear();
     }
-    // {
-    //     std::lock_guard<std::shared_mutex> guard(renderRemoteObjMutex_);
-    //     renderDeathRecipient_ = nullptr;
-    //     renderRemoteObj_ = nullptr;
-    // }
 }
 
 

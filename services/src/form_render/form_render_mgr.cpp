@@ -53,7 +53,6 @@ void FormRenderMgr::GetFormRenderState(const int32_t userId)
 {
     // Check whether the account is authenticated.
     bool isVerified = false;
-    int32_t userId = FormUtil::GetCurrentAccountId();
     AccountSA::OsAccountManager::IsOsAccountVerified(userId, isVerified);
     HILOG_INFO("isVerified:%{public}d,isVerified_:%{public}d,mounted:%{public}d,screen:%{public}d,userId:%{public}d",
         isVerified, isVerified_, isSecondMounted_, isScreenUnlocked_, userId);
@@ -68,7 +67,7 @@ void FormRenderMgr::GetFormRenderState(const int32_t userId)
         return;
     }
     if (!isScreenUnlocked_) {
-        PostOnUnlockTask();
+        PostOnUnlockTask(userId);
     }
     if (isSecondMounted_) {
         ExecAcquireProviderTask(userId);

@@ -2948,7 +2948,6 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     ApplicationInfo appInfo;
     int32_t result;
     int32_t callerUserId = GetCallingUserId();
-    HILOG_INFO("luyangyi routerUserId %{public}d", callerUserId);
     if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, callerUserId, appInfo) != ERR_OK) {
         HILOG_ERROR("Get app info failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
