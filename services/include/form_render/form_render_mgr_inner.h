@@ -102,8 +102,6 @@ public:
 
     void DisconnectAllRenderConnections();
 
-    bool GetIsFRSDiedInLowMemory();
-
     void PostSetRenderGroupParamsTask(const int64_t formId, const Want &want);
 
 private:
@@ -115,7 +113,7 @@ private:
 
     void NotifyHostRenderServiceIsDead() const;
 
-    void FillBundleInfo(Want &want, const std::string &bundleName) const;
+    void FillBundleInfo(Want &want, const std::string &bundleName, const int32_t userId) const;
 
     void CheckIfFormRecycled(FormRecord &formRecord, Want& want) const;
 

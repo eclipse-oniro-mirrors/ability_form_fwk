@@ -31,7 +31,7 @@ using Want = OHOS::AAFwk::Want;
 class FormAcquireStateConnection : public FormAbilityConnection {
 public:
     FormAcquireStateConnection(const std::string &bundleName, const std::string &abilityName, const Want &want,
-                               std::string &provider);
+        std::string &provider, const int32_t userId);
 
     virtual ~FormAcquireStateConnection() = default;
 

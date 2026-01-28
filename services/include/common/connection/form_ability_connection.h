@@ -89,7 +89,7 @@ public:
      * @param bundleName bundleName
      * @param abilityName abilityName
      */
-    void SetProviderKey(const std::string &bundleName, const std::string &abilityName);
+    void SetProviderKey(const std::string &bundleName, const std::string &abilityName, const int32_t userId);
 
     /**
      * @brief Set free install true or false.
@@ -159,6 +159,7 @@ private:
     std::string bundleName_ = "";
     std::string abilityName_ = "";
     bool isFreeInstall_ = false;
+    int32_t userId_ = 0;
     int32_t connectId_ = 0;
     int32_t appFormPid_ = -1;
     sptr<IRemoteObject> hostToken_ = nullptr;

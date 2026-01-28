@@ -59,8 +59,13 @@ static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_
     HILOG_INFO("OnMemoryWatermarkChange, key: %{public}s, value: %{public}s", key, value);
     bool isLowMemory = (std::string(value) == "true");
     FormDataMgr::GetInstance().SetIsLowMemory(isLowMemory);
-    if (!isLowMemory) {
-        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(FormUtil::GetCurrentAccountId());
+    if (isLowMemory) {
+        return;
+    }
+    std::vector<int32_t> activeUsersList;
+    FormUtil::GetActiveUsers(activeUsersList);
+    for (const int32_t userId : activeUsersList) {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     }
 }
 
@@ -222,7 +227,6 @@ bool FormDataMgr::CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteO
 static void initFormRecord(FormRecord &newRecord, const FormItemInfo &formInfo)
 {
     newRecord.formId = formInfo.GetFormId();
-    newRecord.providerUserId = FormUtil::GetCurrentAccountId();
     newRecord.packageName = formInfo.GetPackageName();
     newRecord.bundleName = formInfo.GetProviderBundleName();
     newRecord.moduleName = formInfo.GetModuleName();
@@ -268,6 +272,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     HILOG_INFO("create formId: %{public}" PRId64 " userId: %{public}d", formInfo.GetFormId(), userId);
     FormRecord newRecord;
     initFormRecord(newRecord, formInfo);
+    newRecord.providerUserId = userId;
     newRecord.userId = userId;
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
@@ -475,10 +480,9 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
 
-    int32_t currentAccountId = FormUtil::GetCurrentAccountId();
-    int callingUidFormCounts = FormDbCache::GetInstance().GetFormCountsByCallingUid(currentAccountId, callingUid);
+    int callingUidFormCounts = FormDbCache::GetInstance().GetFormCountsByCallingUid(currentUserId, callingUid);
     if (callingUidFormCounts >= maxRecordPerApp) {
-        HILOG_WARN("already use %{public}d forms by userId==currentAccountId", maxRecordPerApp);
+        HILOG_WARN("already use %{public}d forms by userId==currentUserId", maxRecordPerApp);
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
@@ -1916,7 +1920,7 @@ ErrCode FormDataMgr::AcquireFormStateBack(AppExecFwk::FormState state, const std
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormDataMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
-                                        const sptr<IRemoteObject> &callerToken)
+                                        const sptr<IRemoteObject> &callerToken, const int32_t callerUserId)
 {
     if (formIds.empty() || callerToken == nullptr) {
         HILOG_ERROR("formIds empty");
@@ -1933,7 +1937,7 @@ ErrCode FormDataMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, boo
             }
             for (const int64_t formId : formIds) {
                 int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-                if (CheckInvalidForm(formId) != ERR_OK) {
+                if (CheckInvalidForm(formId, callerUserId) != ERR_OK) {
                     continue;
                 }
                 if (!record.Contains(matchedFormId)) {
@@ -2099,7 +2103,8 @@ void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormId
         std::set<int64_t> &formIdsSet = noHostTempForm.second;
         std::string bundleName = formIdKey.bundleName;
         std::string abilityName = formIdKey.abilityName;
-        FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIdsSet);
+        int32_t userId = FormUtil::GetCallerUserId(callingUid);
+        FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIdsSet, userId);
         for (int64_t formId: formIdsSet) {
             foundFormsMap.emplace(formId, true);
             StopRenderingForm(formId);
@@ -2341,7 +2346,7 @@ bool FormDataMgr::SetRecordNeedFreeInstall(int64_t formId, bool isNeedFreeInstal
     return true;
 }
 
-ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
+ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId, const int32_t callerUserId)
 {
     // Checks if the formid is valid.
     if (formId <= 0) {
@@ -2358,8 +2363,8 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
     }
 
     // Checks for cross-user operations.
-    if (formRecord.providerUserId != FormUtil::GetCurrentAccountId()) {
-        HILOG_ERROR("The form id corresponds to a card that is not for the currently active user");
+    if (formRecord.providerUserId != callerUserId) {
+        HILOG_ERROR("The form id corresponds to a card that is not for the currently caller user");
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     return ERR_OK;
@@ -2381,7 +2386,8 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.userId = formRecord.userId;
 }
 
-ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
+ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo,
+    const int32_t userId)
 {
     HILOG_DEBUG("start");
 
@@ -2398,7 +2404,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    if (formRecord.providerUserId != FormUtil::GetCurrentAccountId()) {
+    if (formRecord.providerUserId != userId) {
         HILOG_ERROR("The form id corresponds to a card that is not for the currently active user");
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
@@ -2417,11 +2423,12 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
     return ERR_OK;
 }
 
-ErrCode FormDataMgr::HandleFormAddObserver(const std::string hostBundleName, const int64_t formId)
+ErrCode FormDataMgr::HandleFormAddObserver(const std::string hostBundleName, const int64_t formId,
+    const int32_t userId)
 {
     HILOG_DEBUG("start");
     RunningFormInfo runningFormInfo;
-    ErrCode ret = GetRunningFormInfosByFormId(formId, runningFormInfo);
+    ErrCode ret = GetRunningFormInfosByFormId(formId, runningFormInfo, userId);
     if (ret != ERR_OK) {
         return ret;
     }
@@ -2709,13 +2716,14 @@ void FormDataMgr::GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormIn
     }
 }
 
-ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+    const int32_t userId)
 {
     HILOG_DEBUG("start");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto record : formRecords_) {
         if ((!record.second.formTempFlag) &&
-            ((FormUtil::GetCurrentAccountId() == record.second.providerUserId) ||
+            ((userId == record.second.providerUserId) ||
             (record.second.providerUserId == Constants::DEFAULT_USER_ID))) {
             RunningFormInfo info;
             info.formId = record.first;
@@ -2773,8 +2781,8 @@ void FormDataMgr::GetUnusedFormInfos(const std::string &bundleName, std::vector<
     }
 }
 
-ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
-    const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleName, bool isUnusedIncluded,
+    std::vector<RunningFormInfo> &runningFormInfos, const int32_t userId)
 {
     HILOG_DEBUG("start");
 
@@ -2793,7 +2801,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
         }
         auto hostBundleName = formHostRecords.begin()->GetHostBundleName();
         bool flag = (!record.second.formTempFlag) &&
-            ((FormUtil::GetCurrentAccountId() == record.second.providerUserId) ||
+            ((userId == record.second.providerUserId) ||
             (record.second.providerUserId == Constants::DEFAULT_USER_ID));
         if (hostBundleName == bundleName && flag) {
             RunningFormInfo info;

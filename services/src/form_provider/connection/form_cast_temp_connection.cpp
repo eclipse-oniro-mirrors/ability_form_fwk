@@ -26,10 +26,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormCastTempConnection::FormCastTempConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName)
+    const std::string &abilityName, const int32_t userId)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 /**
  * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.

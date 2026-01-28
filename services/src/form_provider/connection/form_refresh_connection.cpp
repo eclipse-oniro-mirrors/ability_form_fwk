@@ -27,13 +27,12 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want& want,
-    const std::string &bundleName, const std::string &abilityName, bool isFreeInstall)
-    : want_(want)
+FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want& want, const std::string &bundleName,
+    const std::string &abilityName, bool isFreeInstall, const int32_t userId) : want_(want)
 {
     SetFormId(formId);
     SetFreeInstall(isFreeInstall);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 
 /**

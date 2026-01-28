@@ -209,7 +209,7 @@ std::string FormAbilityConnection::GetProviderKey() const
     if (bundleName_.empty() || abilityName_.empty()) {
         return "";
     }
-    return bundleName_ + "::" + abilityName_;
+    return bundleName_ + "::" + abilityName_ + "::" + std::to_string(userId_);
 }
 
 /**
@@ -218,10 +218,12 @@ std::string FormAbilityConnection::GetProviderKey() const
  * @param bundleName bundleName
  * @param abilityName abilityName
  */
-void FormAbilityConnection::SetProviderKey(const std::string &bundleName, const std::string &abilityName)
+void FormAbilityConnection::SetProviderKey(const std::string &bundleName, const std::string &abilityName,
+    const int32_t userId)
 {
     bundleName_ = bundleName;
     abilityName_ = abilityName;
+    userId_ = userId;
 }
 
 void FormAbilityConnection::SetFreeInstall(bool isFreeInstall)

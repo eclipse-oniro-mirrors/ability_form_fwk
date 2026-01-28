@@ -39,7 +39,7 @@ FormRenderConnection::FormRenderConnection(
     const FormRecord &formRecord, const WantParams &wantParams) : formRecord_(formRecord), wantParams_(wantParams)
 {
     SetFormId(formRecord.formId);
-    SetProviderKey(formRecord.bundleName, formRecord.abilityName);
+    SetProviderKey(formRecord.bundleName, formRecord.abilityName, formRecord.providerUserId);
 }
 
 void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,

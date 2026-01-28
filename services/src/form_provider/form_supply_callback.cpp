@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "ipc_skeleton.h"
 #include "fms_log_wrapper.h"
 #include "ams_mgr/form_ams_helper.h"
 #include "form_constants.h"
@@ -94,7 +95,8 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
-    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId);
+    int32_t callerUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId, callerUserId);
     FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormRecordReport::GetInstance().SetFormRecordRecordInfo(formId, want);
     FormReport::GetInstance().SetFormRecordInfo(formId, want);
@@ -106,7 +108,8 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
         errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
             want.GetParams(), false);
-        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
+        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want,
+            callerUserId);
         return errCode;
     }
 
@@ -125,7 +128,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
             HILOG_WARN("onAcquired type:%{public}d", type);
     }
 
-    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
+    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want, callerUserId);
     HILOG_INFO("end");
     return ret;
 }

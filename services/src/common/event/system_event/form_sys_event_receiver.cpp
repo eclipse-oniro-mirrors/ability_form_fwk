@@ -70,6 +70,7 @@ void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int
 void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 {
     auto task = [userId]() {
+        FormRenderMgr::GetInstance().NotifyScreenOn(userId);
         FormRenderMgr::GetInstance().OnScreenUnlock(userId);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
@@ -106,7 +107,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
         HILOG_ERROR("invalid param, action:%{public}s, bundleName:%{public}s",
             action.c_str(), bundleName.c_str());
         return;
@@ -125,8 +127,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         HandlePackageDataCleared(bundleName, userId);
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
-        int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+        int userId = eventData.GetCode();
         // el2 path maybe not unlocked
         HandleScreenUnlocked(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED) {
@@ -135,6 +137,9 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         HandleUserUnlocked(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         HandleScreenOn();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
++        int32_t userId = eventData.GetCode();
++        HandleUserStopped(userId);
     } else {
         HILOG_WARN("invalid action");
     }
@@ -157,6 +162,9 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
         for (itRemoved = removedFormIds.begin(); itRemoved != removedFormIds.end(); ++itRemoved) {
             FormTimerMgr::GetInstance().RemoveFormTimer(*itRemoved);
         }
+
+        // delete formRenderInner
+        FormRenderMgr::GetInstance().DeleteRenderInner(userId);
     });
 }
 
@@ -206,10 +214,6 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         HILOG_INFO("switch to userId: (%{public}d)", userId);
     }
 
-    if (FormRenderMgr::GetInstance().GetFRSDiedInLowMemoryByUid(userId)) {
-        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
-    }
-
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
         if (userId != MAIN_USER_ID) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
@@ -224,7 +228,6 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
 void FormSysEventReceiver::HandleScreenOn()
 {
     FormMgrQueue::GetInstance().ScheduleTask(0, []() {
-        FormRenderMgr::GetInstance().NotifyScreenOn();
         RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
     });
 }
@@ -236,6 +239,15 @@ void FormSysEventReceiver::RecycleForms(int32_t userId)
     Want want;
     want.SetParam(Constants::RECYCLE_FORMS_USER_ID, userId);
     FormMgrAdapter::GetInstance().RecycleForms(formIds, want, false);
+}
+
+void FormSysEventReceiver::HandleUserStopped(const int32_t userId)
+{
+    HILOG_INFO("User Stopped userId: %{public}d", userId);
+    auto task = [userId]() {
+        FormRenderMgr::GetInstance().DisconnectAllRenderConnections(userId);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

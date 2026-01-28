@@ -26,7 +26,8 @@ namespace AppExecFwk {
  */
 class FormDeleteConnection : public FormAbilityConnection {
 public:
-    FormDeleteConnection(const int64_t formId, const std::string &bundleName, const std::string &abilityName);
+    FormDeleteConnection(const int64_t formId, const std::string &bundleName, const std::string &abilityName,
+        const int32_t userId);
     virtual ~FormDeleteConnection() = default;
 
     /**

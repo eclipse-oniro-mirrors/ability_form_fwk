@@ -28,8 +28,8 @@ using Want = OHOS::AAFwk::Want;
 */
 class FormLocationConnection : public FormAbilityConnection {
 public:
-    FormLocationConnection(const int64_t formId, const Want &want,
-        const std::string &bundleName, const std::string &abilityName);
+    FormLocationConnection(const int64_t formId, const Want &want, const std::string &bundleName,
+        const std::string &abilityName, const int32_t userId);
     virtual ~FormLocationConnection() = default;
 
     /**

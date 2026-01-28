@@ -73,7 +73,7 @@ public:
      * @param info Indicates form sharing information.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info);
+    int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info, const int32_t userId);
 
     /**
      * @brief Acquire share form data from form provider.
@@ -122,7 +122,7 @@ public:
      * @param formShareInfoKey Indicates the form share info key.
      */
     void OnInstallFinished(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator,
-        int32_t resultCode, const std::string &formShareInfoKey);
+        int32_t resultCode, const std::string &formShareInfoKey, const int32_t userId);
 
     /**
      * @brief Send form to share asyn result.
@@ -142,11 +142,11 @@ private:
     std::string MakeFormShareInfoKey(const Want &want);
     void RemoveFormShareInfo(const std::string &formShareInfoKey);
     void FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator);
-    bool IsExistFormPackage(const std::string &bundleName, const std::string &moduleName);
+    bool IsExistFormPackage(const std::string &bundleName, const std::string &moduleName, const int32_t userId);
     bool CheckFormShareInfo(const FormShareInfo &info);
-    void StartFormUser(const FormShareInfo &info);
-    int32_t HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo &info);
-    int32_t CheckFormPackage(const FormShareInfo &info, const std::string &formShareInfoKey);
+    void StartFormUser(const FormShareInfo &info, const int32_t userId);
+    int32_t HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo &info, const int32_t userId);
+    int32_t CheckFormPackage(const FormShareInfo &info, const std::string &formShareInfoKey, const int32_t userId);
     void OnEventTimeoutResponse(int64_t msg, int64_t eventId) override;
 private:
     DECLARE_DELAYED_SINGLETON(FormShareMgr);

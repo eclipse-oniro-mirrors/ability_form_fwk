@@ -35,8 +35,8 @@ FormFreeInstallOperator::~FormFreeInstallOperator()
     freeInstallStatusCallBack_ = nullptr;
 }
 
-int32_t FormFreeInstallOperator::StartFreeInstall(
-    const std::string &bundleName, const std::string &moduleName, const std::string &abilityName)
+int32_t FormFreeInstallOperator::StartFreeInstall(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const int32_t userId)
 {
     HILOG_DEBUG("bundleName:%{public}s,abilityName:%{public}s",
         bundleName.c_str(), abilityName.c_str());
@@ -58,23 +58,23 @@ int32_t FormFreeInstallOperator::StartFreeInstall(
     want.SetModuleName(moduleName);
     AbilityInfo abilityInfo = {};
     constexpr auto flag = AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_WITH_APPLICATION;
-    if (iBundleMgr->QueryAbilityInfo(
-        want, flag, FormUtil::GetCurrentAccountId(), abilityInfo, freeInstallStatusCallBack_)) {
+    if (iBundleMgr->QueryAbilityInfo(want, flag, userId, abilityInfo, freeInstallStatusCallBack_)) {
         HILOG_DEBUG("The app has installed");
     }
 
     return ERR_OK;
 }
 
-void FormFreeInstallOperator::OnInstallFinished(int32_t resultCode)
+void FormFreeInstallOperator::OnInstallFinished(int32_t resultCode, const int32_t userId)
 {
     HILOG_DEBUG("resultCode:%{public}d", resultCode);
     if (serialQueue_ == nullptr) {
         return;
     }
     auto self = shared_from_this();
-    auto task = [self, resultCode]() {
-        DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(self, resultCode, self->formShareInfoKey_);
+    auto task = [self, resultCode, userId]() {
+        DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(self, resultCode, self->formShareInfoKey_,
+            userId);
     };
     serialQueue_->ScheduleTask(0, task);
 }
@@ -94,7 +94,7 @@ void FreeInstallStatusCallBack::OnInstallFinished(int32_t resultCode, const Want
         HILOG_ERROR("null freeInstallOperator");
         return;
     }
-    freeInstallOperator->OnInstallFinished(resultCode);
+    freeInstallOperator->OnInstallFinished(resultCode, userId);
     HILOG_DEBUG("end");
 }
 } // namespace AppExecFwk

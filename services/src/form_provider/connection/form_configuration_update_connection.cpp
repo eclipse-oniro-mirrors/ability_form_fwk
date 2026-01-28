@@ -27,11 +27,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 ConfigurationUpdateConnection::ConfigurationUpdateConnection(const int64_t formId, const Want& want,
-    const std::string &bundleName, const std::string &abilityName,
-    AppExecFwk::Configuration configuration): want_(want), configuration_(configuration)
+    const std::string &bundleName, const std::string &abilityName, AppExecFwk::Configuration configuration,
+    const int32_t userId): want_(want), configuration_(configuration)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
  
 /**
