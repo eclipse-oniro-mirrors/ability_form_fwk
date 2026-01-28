@@ -221,7 +221,6 @@ public:
     static void OnRegisterGetLiveFormStatusListener(ani_env* env, ani_object callback)
     {
         HILOG_INFO("OnRegisterGetLiveFormStatusListener Call");
-        std::lock_guard<std::mutex> lock(ani_vm_Mutex_);
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -245,7 +244,6 @@ public:
     static void OffRegisterGetLiveFormStatusListener(ani_env* env, ani_object callback)
     {
         HILOG_INFO("OffRegisterGetLiveFormStatusListener Call");
-        std::lock_guard<std::mutex> lock(ani_vm_Mutex_);
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
