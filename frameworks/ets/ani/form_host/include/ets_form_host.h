@@ -121,7 +121,7 @@ private:
     mutable std::mutex FormRouterProxyCallbackMutex_;
     std::map<int64_t, std::shared_ptr<FormRouterProxyCallbackClient>> formRouterProxyCallbackMap_;
     ani_ref overflowRegisterCallback_ = nullptr;
-    mutable std::mutex ani_vm_Mutex_;
+    mutable std::mutex ani_vm_mutex_;
     ani_vm* ani_vm_ = nullptr;
     ani_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
     ani_ref getFormRectCallbackRef_ = nullptr;
