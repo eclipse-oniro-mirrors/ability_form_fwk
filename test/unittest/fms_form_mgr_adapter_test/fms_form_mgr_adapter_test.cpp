@@ -2603,24 +2603,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0123, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0123 end";
 }
 
-// /**
-//  * @tc.name: FormMgrAdapter_0124
-//  * @tc.desc: test AcquireProviderFormInfoAsync function.
-//  * @tc.type: FUNC
-//  */
-// HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0124, TestSize.Level0)
-// {
-//     GTEST_LOG_(INFO) << "FormMgrAdapter_0124 start";
-//     FormMgrAdapter formMgrAdapter;
-//     int64_t formId = 1;
-//     FormItemInfo info;
-//     WantParams wantParams;
-//     MockConnectServiceAbility(true);
-//     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
-//         formMgrAdapter.AcquireProviderFormInfoAsync(formId, info, wantParams));
-//     GTEST_LOG_(INFO) << "FormMgrAdapter_0124 end";
-// }
-
 /**
  * @tc.name: FormMgrAdapter_0125
  * @tc.desc: test GetFormItemInfo function.
@@ -3058,21 +3040,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0149, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0149 end";
 }
 
-// /**
-//  * @tc.name: FormMgrAdapter_0150
-//  * @tc.desc: test DeleteForm function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
-//  * @tc.type: FUNC
-//  */
-// HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0150, TestSize.Level0)
-// {
-//     GTEST_LOG_(INFO) << "FormMgrAdapter_0150 start";
-//     FormMgrAdapter formMgrAdapter;
-//     int64_t formId = 1;
-//     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-//     MockExistTempForm(false);
-//     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.DeleteForm(formId, callerToken));
-//     GTEST_LOG_(INFO) << "FormMgrAdapter_0150 end";
-// }
 /**
  * @tc.name: FormMgrAdapter_0151
  * @tc.desc: test AddForm function and the return value is ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS.
@@ -3127,22 +3094,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0153, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.HandleDeleteForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0153 end";
 }
-
-// /**
-//  * @tc.name: FormMgrAdapter_0154
-//  * @tc.desc: test HandleDeleteForm function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
-//  * @tc.type: FUNC
-//  */
-// HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0154, TestSize.Level0)
-// {
-//     GTEST_LOG_(INFO) << "FormMgrAdapter_0154 start";
-//     FormMgrAdapter formMgrAdapter;
-//     int64_t formId = 1;
-//     sptr<IRemoteObject> callerToken = nullptr;
-//     MockGetDBRecord(true);
-//     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.HandleDeleteForm(formId, callerToken));
-//     GTEST_LOG_(INFO) << "FormMgrAdapter_0154 end";
-// }
 
 /**
  * @tc.name: FormMgrAdapter_0155
