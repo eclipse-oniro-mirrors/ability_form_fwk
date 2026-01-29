@@ -386,7 +386,7 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
 {
     NativeRdb::AbsRdbPredicates absRdbPredicates(FORM_CACHE_TABLE);
     absRdbPredicates.EqualTo(FORM_ID, std::to_string(formId));
-    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryDataByStep(absRdbPredicates);
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("GetDataCacheFromDb failed");
         return false;
@@ -397,10 +397,6 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
             absSharedResultSet->Close();
         }
     });
-    if (!absSharedResultSet->HasBlock()) {
-        HILOG_ERROR("absSharedResultSet has no block");
-        return false;
-    }
 
     int ret = absSharedResultSet->GoToFirstRow();
     if (ret != NativeRdb::E_OK) {
