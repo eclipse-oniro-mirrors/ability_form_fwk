@@ -47,6 +47,10 @@ public:
         ani_object callback, ani_string aniHostBundleName)
     {
         HILOG_INFO("RegisterFormObserver Call");
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -81,6 +85,10 @@ public:
         ani_string aniHostBundleName, ani_object callback)
     {
         HILOG_INFO("UnregisterFormObserver Call");
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The application not system-app, can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -382,6 +390,10 @@ private:
     {
         HILOG_DEBUG("call");
         std::string bundleName = "";
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
         if (!IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName))) {
             if (!GetStdString(env, aniHostBundleName, bundleName) || bundleName.empty()) {
                 HILOG_ERROR("GetStdString failed");
@@ -424,6 +436,10 @@ private:
     static void OnUnregisterFormAddObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {
         HILOG_DEBUG("call");
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
         bool isCallbackUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(callback));
         if (isBundleNameUndefined && isCallbackUndefined) {
@@ -459,6 +475,10 @@ private:
     static void OnUnregisterFormRemoveObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {
         HILOG_DEBUG("call");
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
         bool isCallbackUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(callback));
         if (isBundleNameUndefined && isCallbackUndefined) {
@@ -495,9 +515,14 @@ private:
         ani_object callback, bool isVisibility)
     {
         HILOG_DEBUG("call");
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
         bool isCallbackUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(callback));
         sptr<EtsFormStateObserver> formObserver = EtsFormStateObserver::GetInstance();
+        
         if (isBundleNameUndefined && isCallbackUndefined) {
             EtsFormStateObserver::GetInstance()->ClearFormNotifyVisibleCallbackByBundle("",
                 isVisibility, formObserver);
@@ -536,6 +561,10 @@ private:
         ani_string aniHostBundleName, ani_object callback)
     {
         HILOG_DEBUG("call");
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
         bool isCallbackUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(callback));
         if (isBundleNameUndefined && isCallbackUndefined) {

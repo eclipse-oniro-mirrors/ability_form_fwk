@@ -67,6 +67,10 @@ ani_object CreateBoolean(ani_env *env, ani_boolean value)
 
 ani_object CreateAniObject(ani_env* env, const char* className)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_class cls = nullptr;
     ani_status status = env->FindClass(className, &cls);
     if (status != ANI_OK) {
