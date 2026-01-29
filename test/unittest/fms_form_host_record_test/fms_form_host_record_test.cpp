@@ -18,6 +18,7 @@
 #include "ams_mgr/form_ams_helper.h"
 #define private public
 #include "bms_mgr/form_bms_helper.h"
+#include "common/util/form_serial_queue.h"
 #include "data_center/form_info/form_info_mgr.h"
 #undef private
 #include "data_center/form_data_mgr.h"
@@ -1116,7 +1117,25 @@ HWTEST_F(FmsFormHostRecordTest, FormShareMgr_0001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormShareMgr_0001 start";
     FormShareMgr formShareMgr;
     FormShareInfo info;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formShareMgr.RecvFormShareInfoFromRemote(info));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formShareMgr.RecvFormShareInfoFromRemote(info, userId));
     GTEST_LOG_(INFO) << "FormShareMgr_0001 end";
+}
+
+/**
+ * @tc.name: FormShareMgr_0002
+ * @tc.desc: test RecvFormShareInfoFromRemote function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormShareMgr_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormShareMgr_0002 start";
+    FormShareMgr formShareMgr;
+    std::shared_ptr<FormSerialQueue> formSerialQueue = std::make_shared<FormSerialQueue>("queueName");
+    formShareMgr.SetSerialQueue(formSerialQueue);
+    FormShareInfo info;
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_OK, formShareMgr.RecvFormShareInfoFromRemote(info, userId));
+    GTEST_LOG_(INFO) << "FormShareMgr_0002 end";
 }
 }

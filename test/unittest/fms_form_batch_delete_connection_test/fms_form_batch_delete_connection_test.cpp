@@ -65,8 +65,9 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0001, Test
     formIds.insert(formId);
     std::string bundleName = "aa";
     std::string abilityName = "bb";
+    int32_t userId = 100;
     sptr<FormBatchDeleteConnection> formBatchDeleteConnection =
-        new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+        new FormBatchDeleteConnection(formIds, bundleName, abilityName, userId);
     formBatchDeleteConnection_ = formBatchDeleteConnection;
 
     // test OnAbilityConnectDone
@@ -91,8 +92,9 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0002, Test
     formIds.insert(formId);
     std::string bundleName = "aa";
     std::string abilityName = "bb";
+    int32_t userId = 100;
     sptr<FormBatchDeleteConnection> formBatchDeleteConnection =
-        new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+        new FormBatchDeleteConnection(formIds, bundleName, abilityName, userId);
     formBatchDeleteConnection_ = formBatchDeleteConnection;
 
     // test OnAbilityConnectDone

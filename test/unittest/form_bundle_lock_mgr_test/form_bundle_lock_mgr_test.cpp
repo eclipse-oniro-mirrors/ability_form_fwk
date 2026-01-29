@@ -20,6 +20,7 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 namespace {
 const std::string BUNDLE_NAME = "com.example.test";
+constexpr int32_t DEFAULT_USER_ID = 100;
 
 class FormBundleLockMgrTest : public testing::Test {
 public:

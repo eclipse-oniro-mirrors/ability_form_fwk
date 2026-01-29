@@ -1334,8 +1334,7 @@ HWTEST_F(FormRenderMgrTest, NotifyScreenOn_001, TestSize.Level0)
     auto formInner = std::make_shared<FormRenderMgrInner>();
     formInner->SetUserId(userId);
     formRenderMgr.renderInners_.emplace(userId, formInner);
-    MockGetCurrentAccountIdRet(userId);
-    formRenderMgr.NotifyScreenOn();
+    formRenderMgr.NotifyScreenOn(userId);
     GTEST_LOG_(INFO) << "NotifyScreenOn_001 end";
 }
 
@@ -2929,5 +2928,24 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_143, TestSize.Level0)
     sptr<IRemoteObject> hostToken = nullptr;
     EXPECT_EQ(ERR_OK, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_143 end";
+}
+
+/**
+ * @tc.name: DeleteRenderInner_001
+ * @tc.desc: test DeleteRenderInner function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, DeleteRenderInner_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "DeleteRenderInner_001 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    formRenderMgr.DeleteRenderInner(userId);
+    EXPECT_FALSE(formRenderMgr.GetFormRenderMgrInner(userId, renderInner));
+    GTEST_LOG_(INFO) << "DeleteRenderInner_001 end";
 }
 }

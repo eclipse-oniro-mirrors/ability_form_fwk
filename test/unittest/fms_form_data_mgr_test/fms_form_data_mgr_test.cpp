@@ -2285,7 +2285,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfos_001, TestSiz
     std::vector<RunningFormInfo> runningFormInfos;
     EXPECT_EQ(1, formDataMgr_.clientRecords_.size());
     bool isUnusedInclude = false;
-    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfos(isUnusedInclude, runningFormInfos));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfos(isUnusedInclude, runningFormInfos, userId));
     EXPECT_EQ(1, runningFormInfos.size());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_001 end";
@@ -2315,7 +2316,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfos_002, TestSiz
 
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
-    EXPECT_EQ(0, formDataMgr_.GetRunningFormInfos(isUnusedInclude, runningFormInfos));
+    int32_t userId = 100;
+    EXPECT_EQ(0, formDataMgr_.GetRunningFormInfos(isUnusedInclude, runningFormInfos, userId));
     EXPECT_EQ(0, runningFormInfos.size());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_002 end";
@@ -2416,9 +2418,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
 
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
+    int32_t userId = 100;
     EXPECT_EQ(0, runningFormInfos.size());
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
+        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos, userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_003 end";
 }
@@ -2454,7 +2457,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
 
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
-    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos,
+        userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004 end";
 }

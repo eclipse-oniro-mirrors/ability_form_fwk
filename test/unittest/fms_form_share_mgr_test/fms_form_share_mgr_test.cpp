@@ -216,7 +216,8 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
     FormShareInfo info;
-    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
+    int32_t userId = 100;
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info, userId);
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_001 end";
@@ -249,35 +250,36 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
     info.formTempFlag = false;
     info.deviceId = "device";
     info.providerShareData = wantParams;
-    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    int32_t userId = 100;
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
     EXPECT_NE(result, ERR_OK);
 
     info.formName = "form";
     info.bundleName = "";
-    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
     EXPECT_NE(result, ERR_OK);
 
     info.bundleName = "form_bundle";
     info.moduleName = "";
-    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
     EXPECT_NE(result, ERR_OK);
 
     info.moduleName = "form_module";
     info.abilityName = "";
-    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
     EXPECT_NE(result, ERR_OK);
 
     info.abilityName = "form_ability";
     info.dimensionId = -1;
-    DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
 
     info.dimensionId = 1;
     info.deviceId = "";
-    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
     EXPECT_NE(result, ERR_OK);
 
     info.deviceId = "device";
-    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
     EXPECT_NE(result, ERR_OK);
 
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
@@ -310,7 +312,8 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
 
-    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    int32_t userId = 100;
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info, userId);
     EXPECT_NE(result, ERR_OK);
 
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.erase(key);
@@ -2450,7 +2453,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0016, TestSize.Level0)
     bool isVisible = true;
     sptr<IRemoteObject> callerToken = nullptr;
     FormDataMgr formDataMgr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken,
+        userId));
     GTEST_LOG_(INFO) << "FormDataMgr_0016 end";
 }
 
@@ -2466,7 +2471,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0017, TestSize.Level0)
     bool isVisible = true;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     FormDataMgr formDataMgr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken,
+        userId));
     GTEST_LOG_(INFO) << "FormDataMgr_0017 end";
 }
 
@@ -2484,7 +2491,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0018, TestSize.Level0)
     bool isVisible = true;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     FormDataMgr formDataMgr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken,
+        userId));
     GTEST_LOG_(INFO) << "FormDataMgr_0018 end";
 }
 
@@ -2502,7 +2511,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0019, TestSize.Level0)
     bool isVisible = true;
     sptr<IRemoteObject> callerToken = nullptr;
     FormDataMgr formDataMgr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken,
+        userId));
     GTEST_LOG_(INFO) << "FormDataMgr_0019 end";
 }
 
@@ -2523,7 +2534,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0020, TestSize.Level0)
     FormHostRecord formHostRecord;
     formHostRecord.SetFormHostClient(nullptr);
     formDataMgr.clientRecords_.emplace_back(formHostRecord);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken,
+        userId));
     GTEST_LOG_(INFO) << "FormDataMgr_0020 end";
 }
 
@@ -2544,7 +2557,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0021, TestSize.Level0)
     FormHostRecord formHostRecord;
     formHostRecord.SetFormHostClient(callerToken);
     formDataMgr.clientRecords_.emplace_back(formHostRecord);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken,
+        userId));
     GTEST_LOG_(INFO) << "FormDataMgr_0021 end";
 }
 
@@ -3492,7 +3507,8 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_002 start";
     DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = nullptr;
     FormShareInfo info;
-    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
+    int32_t userId = 100;
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info, userId);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_002 end";
 }
@@ -3806,7 +3822,9 @@ HWTEST_F(FmsFormShareMgrTest, OnInstallFinished_001, TestSize.Level1)
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator;
     int32_t resultCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
     std::string formShareInfoKey = key;
-    DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    int32_t userId = 100;
+    DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(freeInstallOperator, resultCode,
+        formShareInfoKey, userId);
 
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     EXPECT_EQ(size, 0);
@@ -3839,7 +3857,9 @@ HWTEST_F(FmsFormShareMgrTest, OnInstallFinished_002, TestSize.Level1)
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator;
     int32_t resultCode = ERR_OK;
     std::string formShareInfoKey = "not_exist_form";
-    DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    int32_t userId = 100;
+    DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(freeInstallOperator, resultCode,
+        formShareInfoKey, userId);
 
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     EXPECT_EQ(size, 1);
@@ -3873,7 +3893,9 @@ HWTEST_F(FmsFormShareMgrTest, OnInstallFinished_003, TestSize.Level1)
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator;
     int32_t resultCode = ERR_OK;
     std::string formShareInfoKey = key;
-    DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    int32_t userId = 100;
+    DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(freeInstallOperator, resultCode,
+        formShareInfoKey, userId);
 
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     EXPECT_EQ(size, 1);

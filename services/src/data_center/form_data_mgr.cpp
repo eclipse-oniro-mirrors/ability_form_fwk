@@ -1920,7 +1920,7 @@ ErrCode FormDataMgr::AcquireFormStateBack(AppExecFwk::FormState state, const std
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormDataMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
-                                        const sptr<IRemoteObject> &callerToken, const int32_t callerUserId)
+    const sptr<IRemoteObject> &callerToken, const int32_t callerUserId)
 {
     if (formIds.empty() || callerToken == nullptr) {
         HILOG_ERROR("formIds empty");

@@ -113,8 +113,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_001, TestSize.Level0)
     FormShareMgr formShareMgr;
     std::string bundleName = "aa";
     std::string moduleName = "bb";
+    int32_t userId = 100;
     MockGetBundleInfo(false);
-    EXPECT_EQ(false, formShareMgr.IsExistFormPackage(bundleName, moduleName));
+    EXPECT_EQ(false, formShareMgr.IsExistFormPackage(bundleName, moduleName, userId));
     GTEST_LOG_(INFO) << "FormShareMgr_001 end";
 }
 
@@ -129,8 +130,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_002, TestSize.Level0)
     FormShareMgr formShareMgr;
     std::string bundleName = "aa";
     std::string moduleName = "bb";
+    int32_t userId = 100;
     MockGetBundleInfo(true);
-    EXPECT_EQ(false, formShareMgr.IsExistFormPackage(bundleName, moduleName));
+    EXPECT_EQ(false, formShareMgr.IsExistFormPackage(bundleName, moduleName, userId));
     GTEST_LOG_(INFO) << "FormShareMgr_002 end";
 }
 
@@ -149,8 +151,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_003, TestSize.Level0)
     info.abilityName = "cc";
     info.formName = "dd";
     info.deviceId = 1;
+    int32_t userId = 100;
     MockGetAbilityInfoByAction(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST, formShareMgr.HandleRecvFormShareInfoFromRemoteTask(info));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST, formShareMgr.HandleRecvFormShareInfoFromRemoteTask(info,
+        userId));
     GTEST_LOG_(INFO) << "FormShareMgr_003 end";
 }
 
@@ -169,8 +173,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_004, TestSize.Level0)
     info.abilityName = "cc";
     info.formName = "dd";
     info.deviceId = 1;
+    int32_t userId = 100;
     MockGetAbilityInfoByAction(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST, formShareMgr.HandleRecvFormShareInfoFromRemoteTask(info));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST, formShareMgr.HandleRecvFormShareInfoFromRemoteTask(info,
+        userId));
     GTEST_LOG_(INFO) << "FormShareMgr_004 end";
 }
 
@@ -185,7 +191,8 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_005, TestSize.Level0)
     FormShareMgr formShareMgr;
     FormShareInfo info;
     std::string formShareInfoKey = "aa";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formShareMgr.CheckFormPackage(info, formShareInfoKey));
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formShareMgr.CheckFormPackage(info, formShareInfoKey, userId));
     GTEST_LOG_(INFO) << "FormShareMgr_005 end";
 }
 
@@ -199,8 +206,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_006, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormShareMgr_006 start";
     FormShareMgr formShareMgr;
     FormShareInfo info;
+    int32_t userId = 100;
     MockGetAbilityInfoByAction(false);
-    formShareMgr.StartFormUser(info);
+    formShareMgr.StartFormUser(info, userId);
     GTEST_LOG_(INFO) << "FormShareMgr_006 end";
 }
 
@@ -214,8 +222,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_007, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormShareMgr_007 start";
     FormShareMgr formShareMgr;
     FormShareInfo info;
+    int32_t userId = 100;
     MockGetAbilityInfoByAction(true);
-    formShareMgr.StartFormUser(info);
+    formShareMgr.StartFormUser(info, userId);
     GTEST_LOG_(INFO) << "FormShareMgr_007 end";
 }
 
@@ -318,7 +327,8 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_013, TestSize.Level0)
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
     int32_t resultCode = 2;
     std::string formShareInfoKey = "aa";
-    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    int32_t userId = 100;
+    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey, userId);
     GTEST_LOG_(INFO) << "FormShareMgr_013 end";
 }
 
@@ -334,7 +344,8 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_014, TestSize.Level0)
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
     int32_t resultCode = ERR_OK;
     std::string formShareInfoKey = "aa";
-    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    int32_t userId = 100;
+    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey, userId);
     GTEST_LOG_(INFO) << "FormShareMgr_014 end";
 }
 
@@ -351,8 +362,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_015, TestSize.Level0)
     int32_t resultCode = ERR_OK;
     std::string formShareInfoKey = "aa";
     FormShareInfo formShareInfo;
+    int32_t userId = 100;
     formShareMgr.shareInfo_.emplace(formShareInfoKey, formShareInfo);
-    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey, userId);
     GTEST_LOG_(INFO) << "FormShareMgr_015 end";
 }
 
@@ -627,8 +639,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_005, TestSize.Level0)
     std::string bundleName = "";
     std::string abilityName = "";
     std::set<int64_t> formIds;
+    int32_t userId = 100;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds, userId));
     GTEST_LOG_(INFO) << "FormProviderMgr_005 end";
 }
 
@@ -644,8 +657,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_006, TestSize.Level0)
     std::string bundleName = "";
     std::string abilityName = "aa";
     std::set<int64_t> formIds;
+    int32_t userId = 100;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds, userId));
     GTEST_LOG_(INFO) << "FormProviderMgr_006 end";
 }
 
@@ -661,9 +675,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_007, TestSize.Level0)
     std::string bundleName = "bb";
     std::string abilityName = "aa";
     std::set<int64_t> formIds;
+    int32_t userId = 100;
     MockConnectServiceAbility(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
-        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds, userId));
     GTEST_LOG_(INFO) << "FormProviderMgr_007 end";
 }
 
@@ -884,8 +899,9 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_020, TestSize.Level1)
     std::string bundleName = "bb";
     std::string abilityName = "aa";
     std::set<int64_t> formIds;
+    int32_t userId = 100;
     MockConnectServiceAbility(true);
-    EXPECT_EQ(ERR_OK, formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+    EXPECT_EQ(ERR_OK, formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds, userId));
     GTEST_LOG_(INFO) << "FormProviderMgr_020 end";
 }
 

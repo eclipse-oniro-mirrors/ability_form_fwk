@@ -351,7 +351,8 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
     return g_getHostFormsCount;
 }
 
-ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+    const int32_t userId)
 {
     return g_getRunningFormInfos;
 }
