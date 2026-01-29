@@ -611,7 +611,7 @@ std::shared_ptr<NativeRdb::ResultSet> FormRdbDataMgr::QueryDataByStep(
         return nullptr;
     }
 
-    return rdbStore->QueryByStep(absRdbPredicates, std::vector<std::string>());
+    return rdbStore->QueryByStep(absRdbPredicates, std::vector<std::string>(), false);
 }
 
 std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QuerySql(const std::string &sql)
