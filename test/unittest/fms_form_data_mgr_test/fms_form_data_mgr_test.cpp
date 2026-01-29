@@ -1677,13 +1677,14 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CleanRemovedTempFormRecords_001,
     FormItemInfo formItemInfo;
     InitFormItemInfo(formId, formItemInfo);
     formItemInfo.SetProviderBundleName(bundleName);
-    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int32_t userId = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid, userId);
     formDataMgr_.formRecords_.emplace(formId, record);
 
     // create tempForms_
     formDataMgr_.tempForms_.emplace_back(formId);
 
-    formDataMgr_.CleanRemovedTempFormRecords(bundleName, FormUtil::GetCurrentAccountId(), removedForms);
+    formDataMgr_.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
     EXPECT_EQ(true, formDataMgr_.formRecords_.empty());
     EXPECT_EQ(true, formDataMgr_.tempForms_.empty());
 
@@ -6216,7 +6217,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleFormAddObserver_002, TestS
     formRecord.providerUserId = 100;
     FormHostRecord formHostRecord;
     formHostRecord.AddForm(FORM_ID_ONE);
-    formDataMgr_.clientRecords_.push_back(formHostRecord);
+    formDataMgr->clientRecords_.push_back(formHostRecord);
     formDataMgr->formRecords_.emplace(FORM_ID_ONE, formRecord);
     std::string hostBundleName = "testBundleName";
     int32_t userId = 100;

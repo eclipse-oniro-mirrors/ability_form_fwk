@@ -2423,7 +2423,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
     return ERR_OK;
 }
 
-ErrCode FormDataMgr::HandleFormAddObserver(const std::string hostBundleName, const int64_t formId,
+ErrCode FormDataMgr::HandleFormAddObserver(const std::string &hostBundleName, const int64_t formId,
     const int32_t userId)
 {
     HILOG_DEBUG("start");

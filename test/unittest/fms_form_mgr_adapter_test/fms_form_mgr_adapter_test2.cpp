@@ -1405,7 +1405,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0186, TestSize.Level0)
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
     auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
     auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
-    mockAmsMgr->startAbilityOnlyUIAbility_ = ERR_INVALID_VALUE;
+    mockAmsMgr->startAbility_ = ERR_INVALID_VALUE;
     FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
@@ -1432,7 +1432,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0187, TestSize.Level0)
     
     auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
     auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
-    mockAmsMgr->startAbilityOnlyUIAbility_ = ERR_INVALID_VALUE;
+    mockAmsMgr->startAbility_ = ERR_INVALID_VALUE;
     FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;

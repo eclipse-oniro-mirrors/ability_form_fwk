@@ -693,7 +693,7 @@ public:
     * @param formId Indicates the form ID.
     * @return Returns ERR_OK on success, others on failure.
     */
-    ErrCode HandleFormAddObserver(const std::string hostBundleName, const int64_t formId, const int32_t userId);
+    ErrCode HandleFormAddObserver(const std::string &hostBundleName, const int64_t formId, const int32_t userId);
 
     /**
     * @brief handle form add observer.

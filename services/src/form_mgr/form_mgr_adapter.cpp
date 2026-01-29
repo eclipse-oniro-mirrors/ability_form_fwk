@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cinttypes>
+#include <cstdint>
 #include <regex>
 #include <unordered_map>
 #include <unordered_set>
@@ -614,7 +615,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int callingUid = IPCSkeleton::GetCallingUid();
-    int callerUserId = FormUtil::GetCallerUserId(callingUid);
+    int32_t callerUserId = FormUtil::GetCallerUserId(callingUid);
     bool isSelfDbFormId = (callerUserId == dbRecord.providerUserId) &&
         ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), callingUid)
         != dbRecord.formUserUids.end()) ? true : false);

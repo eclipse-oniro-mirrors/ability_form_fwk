@@ -206,7 +206,7 @@ int32_t FormAbilityConnection::GetConnectId() const
  */
 std::string FormAbilityConnection::GetProviderKey() const
 {
-    if (bundleName_.empty() || abilityName_.empty()) {
+    if (bundleName_.empty() || abilityName_.empty() || userId_ < 0) {
         return "";
     }
     return bundleName_ + "::" + abilityName_ + "::" + std::to_string(userId_);
