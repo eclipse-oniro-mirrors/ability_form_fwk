@@ -111,7 +111,7 @@ public:
 
     void SetCriticalTrueOnFormActivity();
 
-    void SetMainRuntimeCb(std::function<const std::unique_ptr<Runtime> &()> &&cb);
+    void SetMainGcCb(std::function<void()> &&cb);
 
     void MainThreadForceFullGC();
 
@@ -155,7 +155,7 @@ private:
     bool isVerified_ = false;
     bool hasCachedConfig_ = false;
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> mainHandler_ = nullptr;
-    std::function<const std::unique_ptr<Runtime> &()> mainRuntimeCb_ = nullptr;
+    std::function<void()> mainGcCb_ = nullptr;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

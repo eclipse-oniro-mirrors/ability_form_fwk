@@ -860,9 +860,9 @@ void FormRenderServiceMgr::CacheAppliedConfig()
     HILOG_INFO("already applied config:%{public}s", appliedConfig_->GetName().c_str());
 }
 
-void FormRenderServiceMgr::SetMainRuntimeCb(std::function<const std::unique_ptr<Runtime> &()> &&cb)
+void FormRenderServiceMgr::SetMainGcCb(std::function<void()> &&cb)
 {
-    mainRuntimeCb_ = std::move(cb);
+    mainGcCb_ = std::move(cb);
 }
 
 void FormRenderServiceMgr::MainThreadForceFullGC()
@@ -874,12 +874,9 @@ void FormRenderServiceMgr::MainThreadForceFullGC()
     }
 
     auto task = []() {
-        if (FormRenderServiceMgr::GetInstance().mainRuntimeCb_ == nullptr ||
-            FormRenderServiceMgr::GetInstance().mainRuntimeCb_() == nullptr) {
-            HILOG_ERROR("null runtime");
-            return;
+        if (FormRenderServiceMgr::GetInstance().mainGcCb_  != nullptr) {
+            FormRenderServiceMgr::GetInstance().mainGcCb_();
         }
-        FormRenderServiceMgr::GetInstance().mainRuntimeCb_()->ForceFullGC(0);
     };
     mainHandler_->PostTask(task, "MainThreadForceFullGC");
 }
