@@ -101,6 +101,7 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "os_account:os_account_innerkits",
     "libxml2:libxml2",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

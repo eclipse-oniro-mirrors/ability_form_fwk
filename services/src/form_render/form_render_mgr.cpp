@@ -829,6 +829,17 @@ bool FormRenderMgr::GetFormSandboxMgrInner(int32_t userId, std::shared_ptr<FormS
     return false;
 }
 
+bool FormRenderMgr::GetFRSDiedInLowMemoryByUid(int32_t userId)
+{
+    HILOG_INFO("call");
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    if (GetFormRenderMgrInner(userId, renderInner)) {
+        return renderInner->GetIsFRSDiedInLowMemory();
+    }
+    HILOG_WARN("not find renderInner userId: %{public}d", userId);
+    return false;
+}
+
 void FormRenderMgr::SetRenderGroupParams(int64_t formId, const Want &want)
 {
     std::vector<int32_t> activeList;

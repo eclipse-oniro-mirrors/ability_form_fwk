@@ -102,6 +102,8 @@ public:
 
     void DisconnectAllRenderConnections();
 
+    bool GetIsFRSDiedInLowMemory();
+
     void PostSetRenderGroupParamsTask(const int64_t formId, const Want &want);
 
 private:

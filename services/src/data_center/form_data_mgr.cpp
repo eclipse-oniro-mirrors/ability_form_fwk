@@ -62,9 +62,9 @@ static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_
     if (isLowMemory) {
         return;
     }
-    std::vector<int32_t> activeUsersList;
-    FormUtil::GetActiveUsers(activeUsersList);
-    for (const int32_t userId : activeUsersList) {
+    std::vector<int32_t> foregroundList;
+    FormUtil::GetForegroundUsers(foregroundList);
+    for (const int32_t userId : foregroundList) {
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     }
 }

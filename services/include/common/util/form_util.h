@@ -128,6 +128,8 @@ public:
 
     static void GetActiveUsers(std::vector<int32_t> &activeList);
 
+    static void GetForegroundUsers(std::vector<int32_t> &foregroundList);
+
     /**
      * @brief Get caller user ID.
      * @param callingUid calling Uid.

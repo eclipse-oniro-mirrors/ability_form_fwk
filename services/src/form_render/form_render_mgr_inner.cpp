@@ -58,10 +58,6 @@ FormRenderMgrInner::FormRenderMgrInner()
 FormRenderMgrInner::~FormRenderMgrInner()
 {
     DisconnectAllRenderConnections();
-    {
-        std::lock_guard<std::mutex> lock(resourceMutex_);
-        etsHosts_.clear();
-    }
 }
 
 
@@ -968,6 +964,12 @@ void FormRenderMgrInner::RecoverFRSOnFormActivity()
     if (isFrsDiedInLowMemory_.exchange(false)) {
         NotifyHostRenderServiceIsDead();
     }
+}
+
+bool FormRenderMgrInner::GetIsFRSDiedInLowMemory()
+{
+    HILOG_INFO("call isFrsDiedInLowMemory_ %{public}d", isFrsDiedInLowMemory_.load());
+    return isFrsDiedInLowMemory_;
 }
 
 void FormRenderMgrInner::PostSetRenderGroupParamsTask(const int64_t formId, const Want &want)

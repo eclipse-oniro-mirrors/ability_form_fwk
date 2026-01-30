@@ -131,6 +131,8 @@ public:
 
     bool CheckMultiAppFormVersionCode(const FormRecord &formRecord);
 
+    bool GetFRSDiedInLowMemoryByUid(int32_t userId);
+
     bool GetFormRenderMgrInner(int32_t userId, std::shared_ptr<FormRenderMgrInner> &renderInner);
 
     bool GetFormSandboxMgrInner(int32_t userId,

@@ -75,7 +75,6 @@ void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
     }
 
     auto task = [userId]() {
-        FormRenderMgr::GetInstance().NotifyScreenOn(userId);
         FormRenderMgr::GetInstance().OnScreenUnlock(userId);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
@@ -222,6 +221,10 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         HILOG_INFO("switch to userId: (%{public}d)", userId);
     }
 
+    if (FormRenderMgr::GetInstance().GetFRSDiedInLowMemoryByUid(userId)) {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+    }
+
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
         if (userId != MAIN_USER_ID) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
@@ -236,6 +239,8 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
 void FormSysEventReceiver::HandleScreenOn()
 {
     FormMgrQueue::GetInstance().ScheduleTask(0, []() {
+        int32_t userId = FormUtil::GetCurrentAccountId(); 
+        FormRenderMgr::GetInstance().NotifyScreenOn(userId);
         RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
     });
 }
