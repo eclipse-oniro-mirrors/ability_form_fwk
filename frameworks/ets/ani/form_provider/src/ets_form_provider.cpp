@@ -57,6 +57,10 @@ enum class ActivationState : int32_t {
 
 bool CheckUIAbilityContext(ani_env *env, ani_object etsContext)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     auto context = OHOS::AbilityRuntime::GetStageModeContext(env, etsContext);
     if (context == nullptr) {
         HILOG_ERROR("Null context");
@@ -81,7 +85,10 @@ int ConvertStringToInt(const std::string &strInfo)
 void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, ani_int minute, ani_object callback)
 {
     HILOG_DEBUG("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
@@ -102,7 +109,10 @@ void UpdateForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string dat
     ani_object proxies)
 {
     HILOG_DEBUG("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     if (IsRefUndefined(env, formId) || IsRefUndefined(env, dataObjStr)) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
@@ -126,8 +136,10 @@ void UpdateForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string dat
 void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object filter)
 {
     HILOG_DEBUG("Call");
-
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     FormInfoFilter formInfoFilter;
     if (!IsRefUndefined(env, filter)) {
         ani_ref moduleName{};
@@ -171,13 +183,19 @@ void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
     ani_string formId, ani_boolean isMainPage)
 {
     HILOG_DEBUG("Call");
-
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     CheckIfRefValidOrThrow(env, abilityName);
     CheckIfRefValidOrThrow(env, formId);
 
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
     std::string stdAbilityName = ANIUtils_ANIStringToStdString(env, abilityName);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     if (stdAbilityName.empty()) {
         HILOG_ERROR("abilityName ANIUtils_ANIStringToStdString failed");
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
@@ -196,10 +214,11 @@ void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
 void CloseFormEditAbility(ani_env *env, ani_boolean isMainPage)
 {
     HILOG_DEBUG("Call");
-
-    CheckEnvOrThrow(env);
-
     auto ret = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     if (ret != ERR_OK) {
         HILOG_ERROR("CloseFormEditAbility failed, error code: %{public}d", ret);
         PrepareExceptionAndThrow(env, ret);
@@ -211,10 +230,12 @@ void CloseFormEditAbility(ani_env *env, ani_boolean isMainPage)
 void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
 {
     HILOG_DEBUG("Call");
-
-    CheckEnvOrThrow(env);
     CheckIfRefValidOrThrow(env, wantObj);
     Want want;
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     if (!AppExecFwk::UnwrapWant(env, wantObj, want)) {
         HILOG_ERROR("want parsing failed");
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
@@ -244,7 +265,10 @@ void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
 void IsRequestPublishFormSupported(ani_env *env, ani_object callback)
 {
     HILOG_INFO("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     bool supported = FormMgr::GetInstance().IsRequestPublishFormSupported();
     HILOG_INFO("IsRequestPublishFormSupported End, supported: %{public}d", supported);
     ani_object callbackArg = CreateBool(env, supported);
@@ -619,7 +643,10 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
     ani_string dataObjStr, ani_object proxies)
 {
     HILOG_DEBUG("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     if (IsRefUndefined(env, wantObj)) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
@@ -665,7 +692,10 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
 void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
 {
     HILOG_DEBUG("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
 
     std::vector<RunningFormInfo> formInfos;
     auto ret = FormMgr::GetInstance().GetPublishedFormInfos(formInfos);
@@ -697,7 +727,10 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
 void GetPublishedFormInfoById(ani_env* env, ani_string formId, ani_object callback)
 {
     HILOG_DEBUG("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
 
     if (IsRefUndefined(env, formId)) {
         InvokeAsyncWithBusinessError(env, callback,
@@ -726,7 +759,10 @@ void ReloadForms(ani_env* env, ani_object etsContext, ani_string moduleName, ani
     ani_string formName, ani_object callback)
 {
     HILOG_DEBUG("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
 
     if (!CheckUIAbilityContext(env, etsContext)) {
         return;
@@ -752,7 +788,10 @@ void ReloadForms(ani_env* env, ani_object etsContext, ani_string moduleName, ani
 void ReloadAllForms(ani_env* env, ani_object etsContext, ani_object callback)
 {
     HILOG_DEBUG("Call");
-    CheckEnvOrThrow(env);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
 
     if (!CheckUIAbilityContext(env, etsContext)) {
         return;

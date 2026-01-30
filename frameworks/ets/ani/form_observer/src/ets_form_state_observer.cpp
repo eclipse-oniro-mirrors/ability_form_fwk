@@ -35,6 +35,10 @@ constexpr ani_size REFERENCES_MAX_NUMBER = 16;
 
 EtsFormAddCallbackClient::EtsFormAddCallbackClient(ani_env* env, ani_ref callbackRef)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     env_ = env;
     callbackRef_ = callbackRef;
     handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
@@ -94,6 +98,10 @@ bool EtsFormAddCallbackClient::IsStrictEqual(ani_object callback)
 
 EtsFormRemoveCallbackClient::EtsFormRemoveCallbackClient(ani_env* env, ani_ref callbackRef)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     env_ = env;
     callbackRef_ = callbackRef;
     handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
