@@ -1534,24 +1534,28 @@ private:
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
 
     void SetTemplateFormDetailInfoCallerToken(const sptr<IRemoteObject> templateFormDetailInfoCallerToken);
- 
+
     void ClearTemplateFormDetailInfoCallerToken();
- 
+
     sptr<IRemoteObject> GetTemplateFormDetailInfoCallerToken();
 
     void SetFormRectCallerToken(const sptr<IRemoteObject> formRectCallerToken);
 
     void ClearFormRectCallerToken();
- 
+
     sptr<IRemoteObject> GetFormRectCallerToken();
 
     void SetLiveFormStatusCallerToken(const sptr<IRemoteObject> liveFormStatusCallerToken);
 
     void ClearLiveFormStatusCallerToken();
- 
+
     sptr<IRemoteObject> GetLiveFormStatusCallerToken();
 
     bool CheckUIAbilityContext(const pid_t pid);
+    /**
+     * @brief This function is used to remove dirty data from form_cache. It is executed only once.
+     */
+    void DeleteInvalidFormCacheIfNeed();
 
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;

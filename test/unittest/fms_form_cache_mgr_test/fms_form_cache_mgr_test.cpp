@@ -154,7 +154,7 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_004, TestSize.Level0)
             "b" : "2"
         }
     )"_json;
-    
+
     FormProviderData formProviderData;
     formProviderData.UpdateData(dataResult1);
     EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
@@ -311,5 +311,50 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_014, TestSize.Level0)
     rowId = "rowId";
     EXPECT_TRUE(formCacheMgr_.DeleteImgCacheInDb(rowId));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_014 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: IsDirtyDataCleaned
+ * FunctionPoints: FormCacheMgr IsDirtyDataCleaned interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_015, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_015 start");
+    std::string rowId;
+    NativeRdb::AbsRdbPredicates absRdbPredicates("form_cache");
+    absRdbPredicates.EqualTo("FORM_ID", "isDirtyDataCleaned");
+
+    FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
+    EXPECT_FALSE(formCacheMgr_.IsDirtyDataCleaned());
+    formCacheMgr_.SetIsDirtyDataCleaned();
+    EXPECT_TRUE(formCacheMgr_.IsDirtyDataCleaned());
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_015 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: GetFormCacheIds
+ * FunctionPoints: FormCacheMgr GetFormCacheIds interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_016, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_016 start");
+    FormProviderData formProviderData;
+    nlohmann::json dataResult = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    formProviderData.UpdateData(dataResult);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::unordered_set<int64_t> formIds;
+    formCacheMgr_.GetFormCacheIds(formIds);
+    EXPECT_NE(formIds.find(PARAM_FORM_ID_FIRST), formIds.end());
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_016 end";
 }
 }
