@@ -74,6 +74,7 @@ void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
         return;
     }
 
+    HILOG_INFO("handle screen unlocked, userId: %{public}d", userId);
     auto task = [userId]() {
         FormRenderMgr::GetInstance().OnScreenUnlock(userId);
     };
@@ -112,7 +113,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED,
         EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED,
         EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
-        EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED,
+        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
         EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED
     };
     if (bundleName.empty() && actionSet.find(action) == actionSet.end()) {
@@ -134,9 +135,9 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         HandlePackageDataCleared(bundleName, userId);
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
-        int userId = eventData.GetCode();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         // el2 path maybe not unlocked
+        int32_t userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         HandleScreenUnlocked(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED) {
         // el2 path is unlocked when receive SECOND_MOUNTED

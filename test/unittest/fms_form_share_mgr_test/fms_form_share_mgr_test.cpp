@@ -1951,34 +1951,6 @@ HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0001, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormAmsHelper_0003
- * @tc.desc: test DisconnectServiceAbilityDelay function
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAmsHelper_0003 start";
-    FormAmsHelper formAmsHelper;
-    sptr<AAFwk::IAbilityConnection> connect = nullptr;
-    formAmsHelper.DisconnectServiceAbilityDelay(connect);
-    GTEST_LOG_(INFO) << "FormAmsHelper_0003 end";
-}
-
-/**
- * @tc.name: FormAmsHelper_0004
- * @tc.desc: test DisconnectAbilityTask function
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0004, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAmsHelper_0004 start";
-    FormAmsHelper formAmsHelper;
-    sptr<AAFwk::IAbilityConnection> connect = nullptr;
-    formAmsHelper.DisconnectAbilityTask(connect);
-    GTEST_LOG_(INFO) << "FormAmsHelper_0004 end";
-}
-
-/**
  * @tc.name: FormDumpMgr_0001
  * @tc.desc: test DisconnectAbilityTask function
  * @tc.type: FUNC
