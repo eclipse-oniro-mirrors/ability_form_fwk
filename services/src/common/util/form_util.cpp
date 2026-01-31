@@ -352,7 +352,7 @@ void FormUtil::GetForegroundUsers(std::vector<int32_t> &foregroundList)
         HILOG_ERROR("Query foreground accounts failed");
         return;
     }
-    for (AccountSA::ForegroundOsAccount account : accounts) {
+    for (AccountSA::ForegroundOsAccount &account : accounts) {
         foregroundList.push_back(account.localId);
     }
 }

@@ -55,6 +55,7 @@ void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
     formAmsHelper.DisconnectAbilityTask(connect);
     int32_t userId = fdp->ConsumeIntegral<int32_t>();
     formAmsHelper.StartAbility(want, userId);
+    formAmsHelper.StartAbilityOnlyUIAbility(want, userId);
     std::set<int64_t> formIds;
     sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName, userId);
     batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);

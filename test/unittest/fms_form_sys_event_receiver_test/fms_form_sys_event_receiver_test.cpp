@@ -1007,7 +1007,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0022, TestSize.Level0)
 /**
  * @tc.number: OnReceiveEvent_0023
  * @tc.name: OnReceiveEvent
- * @tc.desc: When the action is COMMON_EVENT_USER_UNLOCKED, the program executes normally as expected
+ * @tc.desc: When the action is COMMON_EVENT_SCREEN_UNLOCKED, the program executes normally as expected
  */
 HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0023, TestSize.Level0)
 {
@@ -1016,7 +1016,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0023, TestSize.Level0)
     EXPECT_TRUE(testCase != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
-    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED;
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED;
     std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
     std::string abilityName = "abc";
     want.SetAction(action);

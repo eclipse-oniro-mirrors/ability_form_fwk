@@ -38,6 +38,7 @@
 #include "mock_bundle_mgr.h"
 #include "mock_form_provider_client.h"
 #include "mock_ipc_skeleton.h"
+#include "inner/mock_form_ams_helper.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1404,15 +1405,13 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0186, TestSize.Level0)
     sptr<IBundleMgr> bmsHelperBackup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
     auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
-    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
-    mockAmsMgr->startAbility_ = ERR_INVALID_VALUE;
-    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
     Want want;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockGetFormRecord(true);
-    EXPECT_EQ(ERR_INVALID_VALUE, formMgrAdapter.RouterEvent(formId, want, callerToken));
+    MockStartAbilityOnlyUIAbility(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RouterEvent(formId, want, callerToken));
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsHelperBackup;
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0186 end";
@@ -1431,16 +1430,15 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0187, TestSize.Level0)
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
     
     auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
-    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
-    mockAmsMgr->startAbility_ = ERR_INVALID_VALUE;
-    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
     Want want;
     want.SetBundle("bundle");
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockGetFormRecord(true);
-    EXPECT_EQ(ERR_INVALID_VALUE, formMgrAdapter.RouterEvent(formId, want, callerToken));
+    MockStartAbilityOnlyUIAbility(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formMgrAdapter.RouterEvent(formId, want, callerToken));
+    MockStartAbilityOnlyUIAbility(true);
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsHelperBackup;
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0187 end";

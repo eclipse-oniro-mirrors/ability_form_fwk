@@ -20,6 +20,7 @@
 namespace {
     bool g_mockConnectServiceAbilityRet = true;
     bool g_mockDisconnectServiceAbilityRet = true;
+    bool g_mockStartAbilityOnlyUIAbilityRet = true;
 }
 
 void MockConnectServiceAbility(bool mockRet)
@@ -30,6 +31,11 @@ void MockConnectServiceAbility(bool mockRet)
 void MockDisconnectServiceAbility(bool mockRet)
 {
     g_mockDisconnectServiceAbilityRet = mockRet;
+}
+
+void MockStartAbilityOnlyUIAbility(bool mockRet)
+{
+    g_mockStartAbilityOnlyUIAbilityRet = mockRet;
 }
 
 namespace OHOS {
@@ -61,6 +67,14 @@ ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
     const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
 {
     if (true == g_mockConnectServiceAbilityRet) {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const int32_t userId)
+{
+    if (!g_mockStartAbilityOnlyUIAbilityRet) {
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
