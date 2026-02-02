@@ -31,22 +31,24 @@ constexpr const char *JSON_NULL_STRING = "null";
 
 constexpr const char *FORM_CACHE_TABLE = "form_cache";
 constexpr const char *FORM_ID = "FORM_ID";
+constexpr int32_t FORM_ID_INDEX = 0;
 constexpr const char *DATA_CACHE = "DATA_CACHE";
-const int32_t DATA_CACHE_INDEX = 1;
+constexpr int32_t DATA_CACHE_INDEX = 1;
 constexpr const char *FORM_IMAGES = "FORM_IMAGES";
-const int32_t FORM_IMAGES_INDEX = 2;
+constexpr int32_t FORM_IMAGES_INDEX = 2;
 constexpr const char *CACHE_STATE = "CACHE_STATE";
-const int32_t CACHE_STATE_INDEX = 3;
+constexpr int32_t CACHE_STATE_INDEX = 3;
 
 constexpr const char *IMG_CACHE_TABLE = "img_cache";
 constexpr const char *IMAGE_ID = "IMAGE_ID";
-const int32_t IMAGE_ID_INDEX = 0;
+constexpr int32_t IMAGE_ID_INDEX = 0;
 constexpr const char *IMAGE_BIT = "IMAGE_BIT";
-const int32_t IMAGE_BIT_INDEX = 1;
+constexpr int32_t IMAGE_BIT_INDEX = 1;
 constexpr const char *IMAGE_SIZE = "IMAGE_SIZE";
-const int32_t IMAGE_SIZE_INDEX = 2;
+constexpr int32_t IMAGE_SIZE_INDEX = 2;
 
-const int32_t INVALID_INDEX = -1;
+constexpr int32_t INVALID_INDEX = -1;
+constexpr const char *IS_DIRTY_DATA_CLEANED = "isDirtyDataCleaned";
 
 inline bool HasContent(const std::string &str)
 {
@@ -69,16 +71,20 @@ void FormCacheMgr::CreateFormCacheTable()
 {
     FormRdbTableConfig formRdbCacheTableConfig;
     formRdbCacheTableConfig.tableName = FORM_CACHE_TABLE;
-    formRdbCacheTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbCacheTableConfig.tableName
-        + " (FORM_ID TEXT NOT NULL PRIMARY KEY, DATA_CACHE TEXT, FORM_IMAGES TEXT, CACHE_STATE INTEGER);";
+    std::stringstream sql;
+    sql << "CREATE TABLE IF NOT EXISTS " << FORM_CACHE_TABLE;
+    sql << " (FORM_ID TEXT NOT NULL PRIMARY KEY, DATA_CACHE TEXT, FORM_IMAGES TEXT, CACHE_STATE INTEGER);";
+    formRdbCacheTableConfig.createTableSql = sql.str();
     if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbCacheTableConfig) != ERR_OK) {
         HILOG_ERROR("Form cache mgr init form rdb cache table fail");
     }
 
     FormRdbTableConfig formRdbImgTableConfig;
     formRdbImgTableConfig.tableName = IMG_CACHE_TABLE;
-    formRdbImgTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbImgTableConfig.tableName
-        + " (IMAGE_ID INTEGER PRIMARY KEY AUTOINCREMENT, IMAGE_BIT BLOB, IMAGE_SIZE TEXT);";
+    sql.str("");
+    sql << "CREATE TABLE IF NOT EXISTS " << IMG_CACHE_TABLE;
+    sql << " (IMAGE_ID INTEGER PRIMARY KEY AUTOINCREMENT, IMAGE_BIT BLOB, IMAGE_SIZE TEXT);";
+    formRdbImgTableConfig.createTableSql = sql.str();
     if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbImgTableConfig) != ERR_OK) {
         HILOG_ERROR("Form cache mgr init form rdb img table fail");
     }
@@ -512,21 +518,102 @@ bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
         return false;
     }
     HILOG_INFO("size:%{public}zu", rowIds.size());
-    std::string sql = "DELETE FROM " + std::string(IMG_CACHE_TABLE) + " WHERE " + IMAGE_ID + " IN (";
+    std::stringstream sql;
+    sql << "DELETE FROM " << IMG_CACHE_TABLE << " WHERE " << IMAGE_ID << " IN (";
     for (auto iter = rowIds.begin(); iter != rowIds.end(); ++iter) {
-        sql += "\'";
-        sql += *iter;
-        sql += "\',";
+        sql << "\'" << *iter << "\',";
     }
-    sql.erase(sql.length() - 1);
-    sql += ");";
-    return FormRdbDataMgr::GetInstance().ExecuteSql(sql) == ERR_OK;
+    sql.seekp(-1, std::ios::end);
+    sql << ");";
+    return FormRdbDataMgr::GetInstance().ExecuteSql(sql.str()) == ERR_OK;
 }
 
 void FormCacheMgr::ResetCacheStateAfterReboot()
 {
-    std::string sql = "UPDATE " + std::string(FORM_CACHE_TABLE) + " SET " + CACHE_STATE + " = 1;";
-    FormRdbDataMgr::GetInstance().ExecuteSql(sql);
+    std::stringstream sql;
+    sql << "UPDATE " << FORM_CACHE_TABLE << " SET " << CACHE_STATE << " = 1;";
+    FormRdbDataMgr::GetInstance().ExecuteSql(sql.str());
+}
+
+bool FormCacheMgr::IsDirtyDataCleaned() const
+{
+    std::stringstream sql;
+    sql << "SELECT " << FORM_ID << " FROM " << FORM_CACHE_TABLE << " WHERE " << FORM_ID << " = \'";
+    sql << IS_DIRTY_DATA_CLEANED << "\'";
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QuerySql(sql.str());
+    if (absSharedResultSet == nullptr) {
+        HILOG_ERROR("GetFormCacheIds failed");
+        return false;
+    }
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
+    if (!absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet has no block");
+        return false;
+    }
+    int ret = absSharedResultSet->GoToFirstRow();
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("GoToFirstRow failed, ret:%{public}d", ret);
+        return false;
+    }
+    std::string isDirtyDataCleaned;
+    ret = absSharedResultSet->GetString(FORM_ID_INDEX, isDirtyDataCleaned);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_DEBUG("GetString isDirtyDataCleaned failed, ret:%{public}d", ret);
+        return false;
+    }
+    return true;
+}
+
+void FormCacheMgr::SetIsDirtyDataCleaned()
+{
+    NativeRdb::ValuesBucket valuesBucket;
+    valuesBucket.PutString(FORM_ID, IS_DIRTY_DATA_CLEANED);
+    valuesBucket.PutString(DATA_CACHE, "");
+    valuesBucket.PutString(FORM_IMAGES, "");
+    valuesBucket.PutInt(CACHE_STATE, 0);
+    int64_t rowId;
+    FormRdbDataMgr::GetInstance().InsertData(FORM_CACHE_TABLE, valuesBucket, rowId);
+}
+
+bool FormCacheMgr::GetFormCacheIds(std::unordered_set<int64_t> &formIds)
+{
+    std::stringstream sql;
+    sql << "SELECT " << FORM_ID << " FROM " << FORM_CACHE_TABLE;
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QuerySql(sql.str());
+    if (absSharedResultSet == nullptr) {
+        HILOG_ERROR("GetFormCacheIds failed");
+        return false;
+    }
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
+    if (!absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet has no block");
+        return false;
+    }
+    while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK) {
+        std::string formIdStr;
+        int ret = absSharedResultSet->GetString(FORM_ID_INDEX, formIdStr);
+        if (ret != NativeRdb::E_OK) {
+            HILOG_WARN("GetString formId failed,ret:%{public}d", ret);
+            continue;
+        }
+        int64_t formId;
+        if (FormUtil::ConvertStringToInt64(formIdStr, formId)) {
+            formIds.emplace(formId);
+        }
+    }
+    if (formIds.empty()) {
+        HILOG_ERROR("form_cache is empty");
+        return false;
+    }
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

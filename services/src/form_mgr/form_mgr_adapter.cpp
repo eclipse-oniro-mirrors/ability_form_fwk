@@ -140,6 +140,7 @@ void FormMgrAdapter::Init()
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("FormMgrAdapter Init fail, due to create serialQueue_ error");
     }
+    DeleteInvalidFormCacheIfNeed();
 }
 
 int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
@@ -5248,6 +5249,36 @@ sptr<IRemoteObject> FormMgrAdapter::GetLiveFormStatusCallerToken()
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(liveFormStatusCallerTokenMutex_);
     return liveFormStatusCallerToken_;
+}
+
+void FormMgrAdapter::DeleteInvalidFormCacheIfNeed()
+{
+    auto deleteInvalidFormCache = []() {
+        bool isDirtyDataCleaned = false;
+        if (FormCacheMgr::GetInstance().IsDirtyDataCleaned()) {
+            HILOG_INFO("no dirty data");
+            return;
+        }
+        FormCacheMgr::GetInstance().SetIsDirtyDataCleaned();
+        std::unordered_set<int64_t> invalidIds;
+        if (!FormCacheMgr::GetInstance().GetFormCacheIds(invalidIds)) {
+            HILOG_WARN("no find cache data");
+            return;
+        }
+        std::vector<FormDBInfo> formDBInfos;
+        FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+        for (const auto &validFormInfo : formDBInfos) {
+            auto iter = invalidIds.find(validFormInfo.formId);
+            if (iter != invalidIds.end()) {
+                invalidIds.erase(iter);
+            }
+        }
+        std::for_each(invalidIds.begin(), invalidIds.end(), [](const int64_t invalidId) {
+            HILOG_INFO("delete invalid formId: %{public}" PRId64, invalidId);
+            FormCacheMgr::GetInstance().DeleteData(invalidId);
+        });
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, deleteInvalidFormCache);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
