@@ -30,7 +30,6 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr size_t MAX_LENGTH = 5;
-constexpr int32_t MAIN_CALLING_USER_ID = 100 * 200000;
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
