@@ -93,7 +93,10 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         HILOG_ERROR("empty formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    int64_t formId = std::stoll(strFormId);
+    int64_t formId = 0;
+    if (!FormUtil::ConvertStringToInt64(strFormId, formId)) {
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId);
     FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormRecordReport::GetInstance().SetFormRecordRecordInfo(formId, want);
@@ -112,8 +115,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
 
     int32_t ret = ERR_APPEXECFWK_FORM_INVALID_PARAM;
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
-    HILOG_DEBUG("%{public}" PRId64 ",%{public}d,%{public}d",
-        formId, connectId, type);
+    HILOG_DEBUG("%{public}" PRId64 ",%{public}d,%{public}d", formId, connectId, type);
     switch (type) {
         case Constants::ACQUIRE_TYPE_CREATE_FORM:
             ret = FormProviderMgr::GetInstance().AcquireForm(formId, formProviderInfo);

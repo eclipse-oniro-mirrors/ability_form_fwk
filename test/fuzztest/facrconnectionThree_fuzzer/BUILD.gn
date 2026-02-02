@@ -1,0 +1,80 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("facrconnectionThreeFuzzTest") {
+  module_out_path = form_fuzz_test_path
+ 
+  fuzz_config_file =
+      "${form_fwk_path}/test/fuzztest/facrconnectionThree_fuzzer"
+ 
+  include_dirs = [
+    "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/services/form_render_service/include",
+    "${form_fwk_path}/services/include",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [
+    "${form_fwk_path}/services/src/data_center/form_basic_info_mgr.cpp",
+    "facrconnectionThree_fuzzer.cpp",
+  ]
+
+  deps = [
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}/services/form_render_service:formrender",
+    "${form_fwk_path}/services/form_render_service:formrender_service",
+  ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
+    "ace_engine:ace_form_render",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "common_event_service:cesfwk_core",
+    "common_event_service:cesfwk_innerkits",
+    "ffrt:libffrt",
+    "form_fwk:form_manager",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":facrconnectionThreeFuzzTest",
+  ]
+}
+###############################################################################

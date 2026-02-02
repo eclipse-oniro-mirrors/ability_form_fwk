@@ -15,6 +15,7 @@
 
 #include "form_xml_parser.h"
 
+#include <charconv>
 #include <string>
 
 #include "fms_log_wrapper.h"
@@ -100,7 +101,13 @@ bool FormXMLParser::ParseInternal(xmlNodePtr &node)
             continue;
         }
         std::string contentStr = reinterpret_cast<const char*>(content);
-        configMap_.emplace(std::make_pair(childNodeName, static_cast<int32_t>(std::stoi(contentStr))));
+        int32_t contentInt = 0;
+        auto result = std::from_chars(contentStr.data(), contentStr.data() + contentStr.size(), contentInt);
+        if (!(result.ec == std::errc() && (result.ptr == contentStr.data() + contentStr.size()))) {
+            HILOG_ERROR("convert formId failed");
+            return false;
+        }
+        configMap_.emplace(std::make_pair(childNodeName, contentInt));
         xmlFree(content);
     }
     return true;
