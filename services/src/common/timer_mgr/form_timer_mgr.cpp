@@ -722,8 +722,7 @@ bool FormTimerMgr::OnDynamicTimeTrigger(int64_t updateTime)
         std::lock_guard<std::mutex> lock(dynamicMutex_);
         auto timeInSec = FormTimerUtil::GetBootTimeMs();
         int64_t markedTime = timeInSec + Constants::ABS_REFRESH_MS;
-        std::list<DynamicRefreshItem>::iterator itItem;
-        for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
+        for (auto itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end(); ++itItem) {
             if (itItem->settedTime <= updateTime || itItem->settedTime <= markedTime) {
                 if (refreshLimiter_.IsEnableRefresh(itItem->formId)) {
                     FormTimer timerTask(itItem->formId, true, itItem->userId);

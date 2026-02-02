@@ -455,7 +455,13 @@ napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackI
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return NapiGetResult(env, 1);
 }
 
@@ -492,7 +498,13 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return promise;
 }
 
@@ -559,7 +571,13 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
     } else {
         result = AcquireFormStatePromise(env, asyncCallbackInfo);
     }
-    callbackPtr.release();
+    if (result != nullptr) {
+        callbackPtr.release();
+    } else {
+        if (asyncCallbackInfo->callback != nullptr) {
+            napi_delete_reference(env, asyncCallbackInfo->callback);
+        }
+    }
     return result;
 }
 
@@ -718,7 +736,13 @@ napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallb
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return NapiGetResult(env, 1);
 }
 
@@ -756,7 +780,13 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return promise;
 }
 
@@ -872,7 +902,13 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env,
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return NapiGetResult(env, 1);
 }
 
@@ -911,7 +947,13 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return promise;
 }
 

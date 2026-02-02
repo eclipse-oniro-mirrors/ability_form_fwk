@@ -77,8 +77,8 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetElementName(info_.GetDeviceId(), info_.GetProviderBundleName(),
         info_.GetAbilityName(), info_.GetModuleName());
-    HILOG_DEBUG("deviceId:%{public}s, bundleName:%{public}s, abilityName:%{public}s",
-        info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
+    HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s",
+        info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
 
     FormProviderTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
     FormReport::GetInstance().SetStartGetTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
