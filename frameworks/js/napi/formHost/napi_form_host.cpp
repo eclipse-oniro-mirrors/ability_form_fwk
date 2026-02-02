@@ -537,24 +537,17 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[1]));
     }
 
-    auto *asyncCallbackInfo = new (std::nothrow) AsyncAcquireFormStateCallbackInfo {
-        .env = env,
-        .asyncWork = nullptr,
-        .deferred = nullptr,
-        .callback = nullptr,
-        .want = {},
-        .stateInfo = {},
-        .callbackType = callbackType,
-        .result = ERR_OK,
-    };
-    if (asyncCallbackInfo == nullptr) {
+    auto asyncCallbackInfo = std::make_unique<AsyncAcquireFormStateCallbackInfo>();
+    if (!asyncCallbackInfo) {
         HILOG_ERROR("asyncCallbackInfo == nullptr.");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
-    std::unique_ptr<AsyncAcquireFormStateCallbackInfo> callbackPtr {asyncCallbackInfo};
 
-    bool parseResult = UnwrapWant(env, argv[0], asyncCallbackInfo->want);
-    if (!parseResult) {
+    asyncCallbackInfo->env = env;
+    asyncCallbackInfo->callbackType = callbackType;
+    asyncCallbackInfo->result = ERR_OK;
+
+    if (!UnwrapWant(env, argv[0], asyncCallbackInfo->want)) {
         HILOG_ERROR("%{public}s, failed to parse want.", __func__);
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[1]));
     }
@@ -567,16 +560,14 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         NAPI_ASSERT(env, valueType == napi_function,
             "The arguments[1] type of acquireFormState is incorrect, expected type is function.");
         napi_create_reference(env, argv[1], REF_COUNT, &asyncCallbackInfo->callback);
-        result = AcquireFormStateCallback(env, asyncCallbackInfo);
+        result = AcquireFormStateCallback(env, asyncCallbackInfo.get());
     } else {
-        result = AcquireFormStatePromise(env, asyncCallbackInfo);
+        result = AcquireFormStatePromise(env, asyncCallbackInfo.get());
     }
     if (result != nullptr) {
-        callbackPtr.release();
-    } else {
-        if (asyncCallbackInfo->callback != nullptr) {
-            napi_delete_reference(env, asyncCallbackInfo->callback);
-        }
+        asyncCallbackInfo.release();
+    } else if (asyncCallbackInfo->callback != nullptr) {
+        napi_delete_reference(env, asyncCallbackInfo->callback);
     }
     return result;
 }
