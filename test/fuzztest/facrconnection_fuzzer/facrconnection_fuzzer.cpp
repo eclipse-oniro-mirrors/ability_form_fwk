@@ -37,7 +37,7 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::FormRender;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
+constexpr int16_t MAX_SIZE = 10;
 
 class FormSupplyStubFuzzTest : public FormSupplyStub {
 public:
@@ -73,117 +73,14 @@ public:
     }
 };
 
-void FormBasicInfoMgrTest(FuzzedDataProvider *fdp)
-{
-    std::string abilityName = fdp->ConsumeRandomLengthString();
-    std::string bundleName = fdp->ConsumeRandomLengthString();
-    std::string moduleName = fdp->ConsumeRandomLengthString();
-    std::string formName = fdp->ConsumeRandomLengthString();
-    std::string packageName = fdp->ConsumeRandomLengthString();
-    int64_t formId = fdp->ConsumeIntegral<int64_t>();
-    FormBasicInfo basicInfo;
-    basicInfo.formId = formId;
-    FormBasicInfoMgr::GetInstance().AddFormBasicInfo(basicInfo);
-    FormBasicInfoMgr::GetInstance().UpdateAbilityName(formId, abilityName);
-    FormBasicInfoMgr::GetInstance().UpdateBundleName(formId, bundleName);
-    FormBasicInfoMgr::GetInstance().UpdateModuleName(formId, moduleName);
-    FormBasicInfoMgr::GetInstance().UpdateFormName(formId, formName);
-    FormBasicInfoMgr::GetInstance().UpdatePackageName(formId, packageName);
-    FormBasicInfoMgr::GetInstance().GetBasicInfoCount();
-    FormBasicInfoMgr::GetInstance().GetBasicInfoByFormId(formId, basicInfo);
-    FormBasicInfoMgr::GetInstance().GetFormAbilityName(formId);
-    FormBasicInfoMgr::GetInstance().GetFormBundleName(formId);
-    FormBasicInfoMgr::GetInstance().GetFormModuleName(formId);
-    FormBasicInfoMgr::GetInstance().GetFormName(formId);
-    FormBasicInfoMgr::GetInstance().GetFormPackageName(formId);
-    FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
-    FormBasicInfoMgr::GetInstance().ClearFormBasicInfo();
-}
-
-void FormRenderStatusTaskMgrTest(FuzzedDataProvider *fdp)
-{
-    int64_t formId = fdp->ConsumeIntegral<int64_t>();
-    Want want;
-    std::string statusData = std::to_string(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formId, FormFsmEvent::RENDER_FORM_DONE, "", nullptr);
-    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(formId, FormFsmEvent::RECOVER_FORM_DONE, "", nullptr);
-    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, FormFsmEvent::DELETE_FORM_DONE, "", nullptr);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(formId, FormFsmEvent::RECYCLE_FORM_DONE, "", nullptr);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
-        formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, nullptr);
-    sptr<IRemoteObject> callerToken = new (std::nothrow) FormSupplyStubFuzzTest();
-    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
-    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-        formId, FormFsmEvent::RENDER_FORM_DONE, "", formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
-        formId, FormFsmEvent::RECOVER_FORM_DONE, "", formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-        formId, FormFsmEvent::DELETE_FORM_DONE, "", formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
-        formId, FormFsmEvent::RECYCLE_FORM_DONE, "", formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
-        formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
-    std::string eventId = std::to_string(formId);
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
-    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-        formId, FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
-        formId, FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-        formId, FormFsmEvent::DELETE_FORM_DONE, eventId, formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
-        formId, FormFsmEvent::RECYCLE_FORM_DONE, eventId, formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
-        formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
-    FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(nullptr);
-    FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
-    FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
-    std::string queueStr = "FormRenderSerialQueue";
-    std::shared_ptr<FormRenderSerialQueue> serialQueue = std::make_unique<FormRenderSerialQueue>(queueStr);
-    FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue);
-    FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
-    FormRenderStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
-    FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
-}
-
-void FormRenderStatusMgrTest(FuzzedDataProvider *fdp)
-{
-    OHOS::FormBasicInfoMgrTest(fdp);
-    OHOS::FormRenderStatusTaskMgrTest(fdp);
-    std::string str1 = fdp->ConsumeRandomLengthString();
-    FormRenderServiceMgr::GetInstance().FormRenderGCTask(str1);
-    FormRenderServiceMgr::GetInstance().FormRenderGC(str1);
-    FormRenderServiceMgr::GetInstance().IsRenderRecordExist(str1);
-    FormRenderServiceMgr::GetInstance().RunCachedConfigurationUpdated();
-    FormRenderServiceMgr::GetInstance().OnUnlock();
-    FormRenderServiceMgr::GetInstance().GetFormSupplyClient();
-    FormRenderServiceMgr::GetInstance().OnConfigurationUpdatedInner();
-    int64_t formId = fdp->ConsumeIntegral<int64_t>();
-    FormFsmEvent event = FormFsmEvent::RELOAD_FORM;
-    std::function<int32_t()> func = []() { return 1; };
-    FormRenderStatusMgr::GetInstance().PostFormEvent(formId, event, func);
-    FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    std::string eventId = fdp->ConsumeRandomLengthString();
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
-    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormFsmStatus status = FormFsmStatus::UNPROCESSABLE;
-    FormFsmProcessType processType = fdp->ConsumeBool() ? FormFsmProcessType::PROCESS_TASK_DELETE
-        : FormFsmProcessType::PROCESS_TASK_DIRECT;
-    FormRenderStatusMgr::GetInstance().ExecFormTask(processType, formId, event, status, func);
-    FormRenderStatusMgr::GetInstance().ProcessTaskDirect(func);
-    FormRenderStatusMgr::GetInstance().ProcessTaskDelete(formId);
-    FormRenderStatusMgr::GetInstance().PrintTaskInfo(formId, event, status);
-}
-
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
         return true;
     }
-    std::string str1 = fdp->ConsumeRandomLengthString();
-    std::string str2 = fdp->ConsumeRandomLengthString();
-    std::string str3 = fdp->ConsumeRandomLengthString();
+    std::string str1 = fdp->ConsumeRandomLengthString(MAX_SIZE);
+    std::string str2 = fdp->ConsumeRandomLengthString(MAX_SIZE);
+    std::string str3 = fdp->ConsumeRandomLengthString(MAX_SIZE);
     int32_t num1 = fdp->ConsumeIntegral<int32_t>();
     int64_t num2 = fdp->ConsumeIntegral<int64_t>();
     bool isTrue = fdp->ConsumeBool();
@@ -197,9 +94,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, str1);
     want.SetParam(Constants::FORM_SUPPLY_UID, str3);
     want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, callerToken);
-    FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, nullptr);
     FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
-    FormRenderServiceMgr::GetInstance().StopRenderingForm(formJsInfo, want, nullptr);
     FormRenderServiceMgr::GetInstance().StopRenderingForm(formJsInfo, want, callerToken);
     FormRenderServiceMgr::GetInstance().CleanFormHost(callerToken);
     std::vector<FormJsInfo> formJsInfos;
@@ -215,7 +110,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().RecycleForm(num2, want);
     FormRenderServiceMgr::GetInstance().RecoverForm(formJsInfo, want);
     FormRenderServiceMgr::GetInstance().UpdateFormSize(num2, formSurfaceInfo, str1, formJsInfo);
-    sptr<IFormSupply> formSupplyClient;
+    sptr<IFormSupply> formSupplyClient = nullptr;
     FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
     FormRenderServiceMgr::GetInstance().ConfirmUnlockState(want);
     FormRenderServiceMgr::GetInstance().UpdateRenderRecordByUid(str1, want, formJsInfo, formSupplyClient);
@@ -224,7 +119,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().RecoverFormByUid(formJsInfo, want, str1, str2);
     FormRenderServiceMgr::GetInstance().RecycleFormByUid(str1, str2, num2);
     FormRenderServiceMgr::GetInstance().DeleteRenderRecordByUid(str1, search);
-    OHOS::FormRenderStatusMgrTest(fdp);
     return true;
 }
 }

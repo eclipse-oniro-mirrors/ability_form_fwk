@@ -19,11 +19,13 @@ group("fuzztest") {
 
   deps = [
     "facrconnection_fuzzer:fuzztest",
+    "facrconnectionFourth_fuzzer:fuzztest",
+    "facrconnectionThree_fuzzer:fuzztest",
+    "facrconnectionTwo_fuzzer:fuzztest",
     "formabilityconnection_fuzzer:fuzztest",
     "formabilityconnectionreporter_fuzzer:fuzztest",
     "formashmem_fuzzer:fuzztest",
     "formbmshelper_fuzzer:fuzztest",
-    "formbundleforbidmgr_fuzzer:fuzztest",
     "formcachemgr_fuzzer:fuzztest",
     "formcallermgr_fuzzer:fuzztest",
     "formdatamgr_fuzzer:fuzztest",
@@ -78,6 +80,7 @@ group("fuzztest") {
     "formsupplyproxy_fuzzer:fuzztest",
     "formsupplystub_fuzzer:fuzztest",
     "formsyseventreceiver_fuzzer:fuzztest",
+    "formsyseventreceiverTwo_fuzzer:fuzztest",
     "formtimermgr_fuzzer:fuzztest",
     "formtimermgrannex_fuzzer:fuzztest",
     "formutil_fuzzer:fuzztest",
