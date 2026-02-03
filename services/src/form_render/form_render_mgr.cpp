@@ -807,6 +807,17 @@ bool FormRenderMgr::CheckMultiAppFormVersionCode(const FormRecord &formRecord)
     return false;
 }
 
+bool FormRenderMgr::GetFRSDiedInLowMemoryByUid(int32_t userId)
+{
+    HILOG_INFO("call");
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    if (GetFormRenderMgrInner(userId, renderInner)) {
+        return renderInner->GetIsFRSDiedInLowMemory();
+    }
+    HILOG_WARN("not find renderInner userId: %{public}d", userId);
+    return false;
+}
+
 bool FormRenderMgr::GetFormRenderMgrInner(int32_t userId, std::shared_ptr<FormRenderMgrInner> &renderInner)
 {
     std::shared_lock<std::shared_mutex> sharedLock(renderInnerMutex_);
@@ -826,17 +837,6 @@ bool FormRenderMgr::GetFormSandboxMgrInner(int32_t userId, std::shared_ptr<FormS
         sandboxInner = sandboxIter->second;
         return true;
     }
-    return false;
-}
-
-bool FormRenderMgr::GetFRSDiedInLowMemoryByUid(int32_t userId)
-{
-    HILOG_INFO("call");
-    std::shared_ptr<FormRenderMgrInner> renderInner;
-    if (GetFormRenderMgrInner(userId, renderInner)) {
-        return renderInner->GetIsFRSDiedInLowMemory();
-    }
-    HILOG_WARN("not find renderInner userId: %{public}d", userId);
     return false;
 }
 
