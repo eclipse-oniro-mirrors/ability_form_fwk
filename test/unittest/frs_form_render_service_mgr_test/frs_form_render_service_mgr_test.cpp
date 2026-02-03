@@ -31,7 +31,6 @@
 #include "power_mgr_client.h"
 #endif
 #include "want.h"
-#include "ohos_application.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1225,21 +1224,19 @@ HWTEST_F(FormRenderServiceMgrTest, UpdateFormSize_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: SetMainGcCb_001
- * @tc.desc: Verify SetMainGcCb.
+ * @tc.name: SetApplication_001
+ * @tc.desc: Verify SetApplication.
  * @tc.type: FUNC
  */
-HWTEST_F(FormRenderServiceMgrTest, SetMainGcCb_001, TestSize.Level0)
+HWTEST_F(FormRenderServiceMgrTest, SetApplication_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "SetMainGcCb_001 start";
-    bool ret = false;
-    auto cb = [&ret]() {
-        ret = true;
-    };
-    FormRenderServiceMgr::GetInstance().SetMainGcCb(cb);
-    FormRenderServiceMgr::GetInstance().mainGcCb_();
-    EXPECT_TRUE(ret);
-    GTEST_LOG_(INFO) << "SetMainGcCb_001 end";
+    GTEST_LOG_(INFO) << "SetApplication_001 start";
+    FormRenderServiceMgr::GetInstance().SetApplication(nullptr);
+    EXPECT_EQ(FormRenderServiceMgr::GetInstance().application_.lock(), nullptr);
+    auto application = std::make_shared<AppExecFwk::OHOSApplication>();
+    FormRenderServiceMgr::GetInstance().SetApplication(application);
+    EXPECT_NE(FormRenderServiceMgr::GetInstance().application_.lock(), nullptr);
+    GTEST_LOG_(INFO) << "SetApplication_001 end";
 }
 
 /**
@@ -1275,4 +1272,32 @@ HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupParams_001, TestSize.Level0)
     EXPECT_EQ(ret, ERR_OK);
 
     GTEST_LOG_(INFO) << "SetRenderGroupParams_001 end";
+}
+
+/**
+ * @tc.name: AddRuntimeToHost_001
+ * @tc.desc: Verify AddRuntimeToHost.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, AddRuntimeToHost_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "AddRuntimeToHost_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.AddRuntimeToHost("", nullptr);
+    EXPECT_EQ(formRenderServiceMgr.mainHandler_, nullptr);
+    GTEST_LOG_(INFO) << "AddRuntimeToHost_001 end";
+}
+
+/**
+ * @tc.name: RemoveRuntimeToHost_001
+ * @tc.desc: Verify RemoveRuntimeToHost.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, RemoveRuntimeToHost_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RemoveRuntimeToHost_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.RemoveRuntimeToHost("", nullptr);
+    EXPECT_EQ(formRenderServiceMgr.mainHandler_, nullptr);
+    GTEST_LOG_(INFO) << "RemoveRuntimeToHost_001 end";
 }

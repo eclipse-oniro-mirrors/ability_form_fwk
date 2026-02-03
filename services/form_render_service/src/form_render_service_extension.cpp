@@ -43,7 +43,7 @@ void FormRenderServiceExtension::Init(const std::shared_ptr<AbilityLocalRecord> 
     const sptr<IRemoteObject> &token)
 {
     ServiceExtension::Init(record, application, handler, token);
-    application_ = application;
+    FormRenderServiceMgr::GetInstance().SetApplication(application);
 }
 
 void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
@@ -53,19 +53,6 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
     if (context) {
         FormRenderServiceMgr::GetInstance().SetConfiguration(context->GetConfiguration());
     }
-    FormRenderServiceMgr::GetInstance().SetMainGcCb([application = application_]() {
-        auto app = application.lock();
-        if (app == nullptr) {
-            HILOG_ERROR("application is null");
-            return;
-        }
-        auto &runtime = app->GetRuntime();
-        if (!runtime) {
-            HILOG_ERROR("null runtime");
-            return;
-        }
-        runtime->ForceFullGC(0);
-    });
     // Prevents FRS-processe from being frozen (Phone, WGR, PC only)
     OHOS::BackgroundTaskMgr::EfficiencyResourceInfo resourceInfo(
         OHOS::BackgroundTaskMgr::ResourceType::Type::CPU, true, 0, "", true);
