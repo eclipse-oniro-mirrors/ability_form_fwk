@@ -146,8 +146,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         HandleScreenOn();
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
-+        int32_t userId = eventData.GetCode();
-+        HandleUserStopped(userId);
+        int32_t userId = eventData.GetCode();
+        HandleUserStopped(userId);
     } else {
         HILOG_WARN("invalid action");
     }
