@@ -16,6 +16,6 @@
 #ifndef INNER_MOCK_FORM_AMS_HELPER_H
 #define INNER_MOCK_FORM_AMS_HELPER_H
 
-void MockGetAbilityManager(bool mockRet);
+void MockStartAbilityOnlyUIAbility(bool mockRet);
 
 #endif // INNER_MOCK_FORM_AMS_HELPER_H
