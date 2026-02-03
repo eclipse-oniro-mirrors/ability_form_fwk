@@ -564,10 +564,11 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
     } else {
         result = AcquireFormStatePromise(env, asyncCallbackInfo.get());
     }
+    if (asyncCallbackInfo->callback != nullptr) {
+        napi_delete_reference(env, asyncCallbackInfo->callback);
+    }
     if (result != nullptr) {
         asyncCallbackInfo.release();
-    } else if (asyncCallbackInfo->callback != nullptr) {
-        napi_delete_reference(env, asyncCallbackInfo->callback);
     }
     return result;
 }
