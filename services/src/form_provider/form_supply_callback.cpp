@@ -99,7 +99,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int32_t callerUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
-    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId);
+    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId, callerUserId);
     FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormRecordReport::GetInstance().SetFormRecordRecordInfo(formId, want);
     FormReport::GetInstance().SetFormRecordInfo(formId, want);
