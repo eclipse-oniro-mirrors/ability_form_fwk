@@ -870,14 +870,14 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
         return CreateJsUndefined(env);
     }
 
-    AppExecFwk::OverflowInfo* overflowInfo = new (std::nothrow) AppExecFwk::OverflowInfo {};
-    if (overflowInfo == nullptr) {
-        HILOG_ERROR("Failed to new overflowInfo");
-        return CreateJsUndefined(env);
-    }
     NapiAsyncTask::CompleteCallback complete =
-        [formId, overflowInfo](napi_env env, NapiAsyncTask &task, int32_t status) {
+        [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
             HILOG_INFO("complete");
+            AppExecFwk::OverflowInfo* overflowInfo = new (std::nothrow) AppExecFwk::OverflowInfo {};
+            if (overflowInfo == nullptr) {
+                HILOG_ERROR("Failed to new overflowInfo");
+                return CreateJsUndefined(env);
+            }
             bool ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, false);
             delete overflowInfo;
             if (!ret) {

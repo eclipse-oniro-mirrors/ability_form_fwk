@@ -1836,7 +1836,11 @@ ErrCode FormMgrStub::HandleRequestPublishFormWithSnapshot(MessageParcel &data, M
 
 ErrCode FormMgrStub::HandleBatchRefreshForms(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t formRefreshType = data.ReadInt32();
+    int32_t formRefreshType;
+    if (!data.ReadInt32(formRefreshType)) {
+        HILOG_ERROR("read formRefreshType failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = BatchRefreshForms(formRefreshType);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");

@@ -85,7 +85,9 @@ public:
     void ProcessShareFormResponse(int32_t result) override
     {
         if (handler_) {
-            handler_->PostSyncTask([client = shared_from_this(), result] () {
+            std::weak_ptr<ShareFormCallBackClient> thisWeakPtr(shared_from_this());
+            handler_->PostSyncTask([thisWeakPtr, result] () {
+                auto client = thisWeakPtr.lock();
                 client->task_(result);
             });
         }
@@ -193,7 +195,9 @@ public:
     void ProcessAcquireFormData(AAFwk::WantParams data) override
     {
         if (handler_) {
-            handler_->PostSyncTask([client = shared_from_this(), data] () {
+            std::weak_ptr<JsFormDataCallbackClient> thisWeakPtr(shared_from_this());
+            handler_->PostSyncTask([thisWeakPtr, data] () {
+                auto client = thisWeakPtr.lock();
                 client->task_(data);
             });
         }
