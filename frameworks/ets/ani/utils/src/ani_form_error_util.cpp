@@ -65,12 +65,20 @@ constexpr const char *ERROR_CLASS_NAME = "escompat.Error";
 
 bool EtsFormErrorUtil::ThrowParamError(ani_env *env, const std::string &extraMessage)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     std::string errorMessage = "Parameter error. " + extraMessage;
     return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
 }
 
 bool EtsFormErrorUtil::ThrowByInternalErrorCode(ani_env *env, int32_t internalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
@@ -79,12 +87,20 @@ bool EtsFormErrorUtil::ThrowByInternalErrorCode(ani_env *env, int32_t internalEr
 
 bool EtsFormErrorUtil::ThrowByExternalErrorCode(ani_env *env, int32_t externalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
     return Throw(env, externalErrorCode, externalErrorMessage);
 }
 
 bool EtsFormErrorUtil::ThrowParamTypeError(ani_env *env, const std::string &paramName, const std::string &type)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, CreateParamTypeErrorMessage(paramName, type));
 }
 
@@ -105,6 +121,10 @@ bool EtsFormErrorUtil::Throw(ani_env *env, int32_t errCode, const std::string &e
 
 ani_object EtsFormErrorUtil::CreateErrorByInternalErrorCode(ani_env *env, int32_t internalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);

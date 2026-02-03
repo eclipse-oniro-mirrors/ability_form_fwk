@@ -120,6 +120,10 @@ int64_t SystemTimeMillis() noexcept
 
 void PrepareExceptionAndThrow(ani_env *env, int32_t internalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     auto extErrCode = AppExecFwk::FormErrors::GetInstance().QueryExternalErrorCode(internalErrorCode);
     auto errMsg = AppExecFwk::FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(extErrCode);
     AbilityRuntime::EtsErrorUtil::ThrowError(env, extErrCode, errMsg);
@@ -129,6 +133,10 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
 {
     HILOG_INFO("Call ANIUtils_ANIStringToStdString");
     ani_size strSize;
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     if (env->String_GetUTF8Size(aniStr, &strSize) != ANI_OK) {
         HILOG_ERROR("String_GetUTF8Size failed");
         return "";
@@ -151,8 +159,13 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
 void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &formDataProxies,
     ani_ref proxiesArrayRef)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     size_t formDataProxiesArrayLen = 0;
     env->Array_GetLength(static_cast<ani_array>(proxiesArrayRef), &formDataProxiesArrayLen);
+
     for (size_t i = 0; i < formDataProxiesArrayLen; i++) {
         ani_ref element;
         if (ANI_OK != env->Object_CallMethodByName_Ref(
@@ -175,6 +188,10 @@ void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &fo
 
 int64_t FormIdAniStrtoInt64(ani_env *env, const ani_string &formId)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return INVALID_FORMID;
+    }
     HILOG_INFO("Call FormIdAniStrtoInt64");
     std::string stdFormId = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(formId));
     if (stdFormId.empty()) {
@@ -194,6 +211,10 @@ int64_t FormIdAniStrtoInt64(ani_env *env, const ani_string &formId)
 
 ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return ANI_ERROR;
+    }
     HILOG_INFO("Call GetEnumValueInt");
     ani_size enumIndex = 0;
     ani_status enumIndexStatus = env->EnumItem_GetIndex(static_cast<ani_enum_item>(obj),
@@ -234,6 +255,10 @@ ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
 
 void SetStringProperty(ani_env *env, ani_object obj, const char *propName, const std::string &value)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     ani_string anistr{};
     env->String_NewUTF8(value.c_str(), value.size(), &anistr);
     env->Object_SetPropertyByName_Ref(obj, propName, anistr);
@@ -260,6 +285,10 @@ bool AniParseInt32(ani_env *env, const ani_ref &aniInt, int32_t &out)
 
 bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t> &out)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     ani_size size;
     ani_status status = env->Array_GetLength(array, &size);
     if (status != ANI_OK) {
@@ -351,6 +380,11 @@ ani_array CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t
 {
     ani_array array = nullptr;
     ani_ref undefined_ref;
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
+
     if (env->GetUndefined(&undefined_ref) != ANI_OK) {
         HILOG_ERROR("GetUndefined failed");
         return array;
@@ -377,6 +411,10 @@ ani_array CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t
 
 void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::RunningFormInfo &formInfo)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     // Set basic integer properties
     env->Object_SetPropertyByName_Int(formInfoAni, "dimension", formInfo.dimension);
 
@@ -395,8 +433,38 @@ void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::
     env->Object_SetPropertyByName_Int(formInfoAni, "visibilityType", static_cast<int>(formInfo.formVisiblity));
 }
 
+void SetFormInfoArrayProperties(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo)
+{
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
+    // Set array properties
+    ani_array supportDimensionAni = CreateAniArrayIntFromStdVector(env, formInfo.supportDimensions);
+    if (supportDimensionAni != nullptr) {
+        env->Object_SetPropertyByName_Ref(formInfoAni, "supportDimensions", supportDimensionAni);
+    }
+    ani_array supportedShapesAni = CreateAniArrayIntFromStdVector(env, formInfo.supportShapes);
+    if (supportedShapesAni != nullptr) {
+        env->Object_SetPropertyByName_Ref(formInfoAni, "supportedShapes", supportedShapesAni);
+    }
+    std::vector<int32_t> formPreviewImagesIntAni(formInfo.formPreviewImages.begin(), formInfo.formPreviewImages.end());
+    ani_array formPreviewImagesAni = CreateAniArrayIntFromStdVector(env, formPreviewImagesIntAni);
+    if (formPreviewImagesAni != nullptr) {
+        env->Object_SetPropertyByName_Ref(formInfoAni, "previewImages", formPreviewImagesAni);
+    }
+    ani_object record{};
+    if (CreateFormCustomizeDataRecord(env, record, formInfo.customizeDatas)) {
+        env->Object_SetPropertyByName_Ref(formInfoAni, "customizeData", record);
+    }
+}
+
 void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     // Set boolean properties
     env->Object_SetPropertyByName_Boolean(formInfoAni, "isDefault", formInfo.defaultFlag);
     env->Object_SetPropertyByName_Boolean(formInfoAni, "formVisibleNotify", formInfo.formVisibleNotify);
@@ -430,25 +498,7 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
     SetStringProperty(env, formInfoAni, "scheduledUpdateTime", formInfo.scheduledUpdateTime);
     SetStringProperty(env, formInfoAni, "groupId", formInfo.groupId);
 
-    // Set array properties
-    ani_array supportDimensionAni = CreateAniArrayIntFromStdVector(env, formInfo.supportDimensions);
-    if (supportDimensionAni != nullptr) {
-        env->Object_SetPropertyByName_Ref(formInfoAni, "supportDimensions", supportDimensionAni);
-    }
-    ani_array supportedShapesAni = CreateAniArrayIntFromStdVector(env, formInfo.supportShapes);
-    if (supportedShapesAni != nullptr) {
-        env->Object_SetPropertyByName_Ref(formInfoAni, "supportedShapes", supportedShapesAni);
-    }
-    std::vector<int32_t> formPreviewImagesIntAni(formInfo.formPreviewImages.begin(), formInfo.formPreviewImages.end());
-    ani_array formPreviewImagesAni = CreateAniArrayIntFromStdVector(env, formPreviewImagesIntAni);
-    if (formPreviewImagesAni != nullptr) {
-        env->Object_SetPropertyByName_Ref(formInfoAni, "previewImages", formPreviewImagesAni);
-    }
-    ani_object record{};
-    if (CreateFormCustomizeDataRecord(env, record, formInfo.customizeDatas)) {
-        env->Object_SetPropertyByName_Ref(formInfoAni, "customizeData", record);
-    }
-
+    SetFormInfoArrayProperties(env, formInfoAni, formInfo);
     SetFormInfoFunInteractionParams(env, formInfoAni, formInfo.funInteractionParams);
     SetFormInfoSceneAnimationParams(env, formInfoAni, formInfo.sceneAnimationParams);
 }
@@ -456,6 +506,10 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
 void SetFormInfoFunInteractionParams(ani_env *env, ani_object formInfoAni,
     const AppExecFwk::FormFunInteractionParams &funInteractionParams)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     ani_object funInteractionParamsAni = CreateANIObject(env, FUNINTERACTION_PARAMS_INNER_CLASS_NAME);
     if (funInteractionParamsAni == nullptr) {
         HILOG_ERROR("Cannot create funInteractionParams object");
@@ -472,6 +526,10 @@ void SetFormInfoFunInteractionParams(ani_env *env, ani_object formInfoAni,
 void SetFormInfoSceneAnimationParams(ani_env *env, ani_object formInfoAni,
     const AppExecFwk::FormSceneAnimationParams &formSceneAnimationParams)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     ani_object sceneAnimationParamsAni = CreateANIObject(env, SCENE_ANIMATION_PARAMS_INNER_CLASS_NAME);
     if (sceneAnimationParamsAni == nullptr) {
         HILOG_ERROR("Cannot create sceneAnimationParams object");
@@ -485,6 +543,10 @@ void SetFormInfoSceneAnimationParams(ani_env *env, ani_object formInfoAni,
 
 ani_object CreateANIObject(ani_env *env, const char *className)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_class cls;
     ani_status status = env->FindClass(className, &cls);
     if (status != ANI_OK) {
@@ -511,8 +573,13 @@ ani_object CreateANIObject(ani_env *env, const char *className)
 
 void CheckIfRefValidOrThrow(ani_env *env, ani_object obj)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     ani_boolean isUndefined = false;
     env->Reference_IsUndefined(obj, &isUndefined);
+
     if (isUndefined) {
         HILOG_ERROR("Object reference is not valid");
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
@@ -569,6 +636,10 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
 
 ani_class GetANIClass(ani_env *env, const char *className)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_status status = ANI_OK;
     ani_class cls{};
     status = env->FindClass(className, &cls);
@@ -580,6 +651,10 @@ ani_class GetANIClass(ani_env *env, const char *className)
 
 ani_ref GetMemberRef(ani_env *env, ani_object object, const char *class_name, const std::string &member)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_class cls = GetANIClass(env, class_name);
     ani_method getter{};
     ani_status status = env->Class_FindMethod(cls, ("<get>" + member).c_str(), nullptr, &getter);
@@ -600,6 +675,10 @@ ani_ref GetMemberRef(ani_env *env, ani_object object, const char *class_name, co
 
 ani_object GetANIArray(ani_env *env, size_t array_size)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_class arrayCls = GetANIClass(env, "std.core.Array");
     ani_method arrayCtor;
     ani_status status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
@@ -620,11 +699,12 @@ ani_object GetANIArray(ani_env *env, size_t array_size)
 ani_object NewRecordClass(ani_env *env)
 {
     HILOG_INFO("Call");
-    CheckEnvOrThrow(env);
-
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_object recordObj = {};
     ani_class recordCls;
-
     ani_status status = env->FindClass("std.core.Record", &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass status = %{public}d", status);
@@ -653,6 +733,10 @@ ani_object NewRecordClass(ani_env *env)
 void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key, ani_object &value)
 {
     HILOG_DEBUG("Call");
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     ani_class recordCls;
     ani_status status = env->FindClass("std.core.Record", &recordCls);
     if (status != ANI_OK) {
@@ -688,8 +772,13 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
 
 ani_object CreateFormInfoAniArrayFromVec(ani_env *env, const std::vector<AppExecFwk::FormInfo> &formInfos)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_object array = GetANIArray(env, formInfos.size());
     ani_size index = 0;
+
     for (const auto &formInfo : formInfos) {
         ani_object formInfoAni = CreateANIObject(env, FORM_INFO_INNER_CLASS_NAME);
         CheckIfRefValidOrThrow(env, formInfoAni);
@@ -780,6 +869,11 @@ bool InvokeCallback(ani_env *env, ani_object obj, ani_object arg)
 ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
 {
     ani_object returnObject = CreateANIObject(env, FORM_STATE_INFO_INNER_CLASS_NAME);
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
+
     if (returnObject == nullptr) {
         HILOG_INFO("Cannot create FormStateInfoInner object");
         return nullptr;
@@ -831,6 +925,10 @@ ani_env *GetEnvFromVm(ani_vm *vm)
 
 void DeleteGlobalReference(ani_env *env, ani_ref globalReference)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     auto status = env->GlobalReference_Delete(globalReference);
     if (status != ANI_OK) {
         HILOG_ERROR("Cannot delete global reference");
@@ -920,10 +1018,14 @@ void InvokeAsyncWithBusinessError(ani_env *env, ani_object obj, int32_t internal
 {
     auto extErrCode = AppExecFwk::FormErrors::GetInstance().QueryExternalErrorCode(internalErrorCode);
     auto errMsg = AppExecFwk::FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(extErrCode);
-
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
     ani_boolean isUndefined;
     env->Reference_IsUndefined(obj, &isUndefined);
     auto callbackIsValid = (obj != nullptr) || (isUndefined != ANI_TRUE);
+    
     if ((internalErrorCode != ERR_OK) && !callbackIsValid) {
         AbilityRuntime::EtsErrorUtil::ThrowError(env, extErrCode, errMsg);
         return;
@@ -941,6 +1043,10 @@ void InvokeAsyncWithBusinessError(ani_env *env, ani_object obj, int32_t internal
 
 bool IsRefUndefined(ani_env *env, ani_object obj)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     ani_boolean isUndefined = false;
     env->Reference_IsUndefined(obj, &isUndefined);
     return isUndefined == ANI_TRUE;
@@ -948,6 +1054,10 @@ bool IsRefUndefined(ani_env *env, ani_object obj)
 
 ani_object CreateBool(ani_env *env, ani_boolean value)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_class cls;
     ani_status status = status = env->FindClass("std.core.Boolean", &cls);
     if (status != ANI_OK) {

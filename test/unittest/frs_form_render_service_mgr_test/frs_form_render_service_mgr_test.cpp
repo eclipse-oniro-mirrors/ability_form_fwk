@@ -31,6 +31,7 @@
 #include "power_mgr_client.h"
 #endif
 #include "want.h"
+#include "ohos_application.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1224,21 +1225,21 @@ HWTEST_F(FormRenderServiceMgrTest, UpdateFormSize_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: SetMainRuntimeCb_001
- * @tc.desc: Verify SetMainRuntimeCb.
+ * @tc.name: SetMainGcCb_001
+ * @tc.desc: Verify SetMainGcCb.
  * @tc.type: FUNC
  */
-HWTEST_F(FormRenderServiceMgrTest, SetMainRuntimeCb_001, TestSize.Level0)
+HWTEST_F(FormRenderServiceMgrTest, SetMainGcCb_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 start";
-    std::unique_ptr<Runtime> runtime = nullptr;
-    auto cb = [&runtime]() -> const std::unique_ptr<Runtime> & {
-        return runtime;
+    GTEST_LOG_(INFO) << "SetMainGcCb_001 start";
+    bool ret = false;
+    auto cb = [&ret]() {
+        ret = true;
     };
-    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb(cb);
-    EXPECT_EQ(FormRenderServiceMgr::GetInstance().mainRuntimeCb_(), nullptr);
-
-    GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 end";
+    FormRenderServiceMgr::GetInstance().SetMainGcCb(cb);
+    FormRenderServiceMgr::GetInstance().mainGcCb_();
+    EXPECT_TRUE(ret);
+    GTEST_LOG_(INFO) << "SetMainGcCb_001 end";
 }
 
 /**

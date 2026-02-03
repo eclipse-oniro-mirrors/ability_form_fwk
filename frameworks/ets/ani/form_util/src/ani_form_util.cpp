@@ -37,6 +37,10 @@ constexpr const char* DELEGATOR_RECORD_GET_NAME =
 ani_object CreateFunInteractionParamsDatas(ani_env* env,
     const OHOS::AppExecFwk::FormFunInteractionParams &funInteractionParamsDatas)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_object object = CreateAniObject(env, ETS_FUNINTERACTIONPARAMS_NAME);
     SetPropertyStringByName(env, object, "abilityName", funInteractionParamsDatas.abilityName);
     SetPropertyStringByName(env, object, "targetBundleName", funInteractionParamsDatas.targetBundleName);
@@ -48,6 +52,10 @@ ani_object CreateFunInteractionParamsDatas(ani_env* env,
 ani_object CreateSceneAnimationParamsDatas(ani_env* env,
     const AppExecFwk::FormSceneAnimationParams &sceneAnimationParamsDatas)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_object object = CreateAniObject(env, ETS_SCENEANIMATIONPARAMS_NAME);
     SetPropertyStringByName(env, object, "abilityName", sceneAnimationParamsDatas.abilityName);
     SetPropertyStringByName(env, object, "disabledDesktopBehaviors",
@@ -57,6 +65,10 @@ ani_object CreateSceneAnimationParamsDatas(ani_env* env,
 
 ani_object CreateFormInfo(ani_env* env, const OHOS::AppExecFwk::FormInfo &formInfo)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_object object = CreateAniObject(env, ETS_FORMINFO_NAME);
     SetPropertyByName(env, object, "funInteractionParams",
         CreateFunInteractionParamsDatas(env, formInfo.funInteractionParams));
@@ -69,6 +81,10 @@ ani_object CreateFormInfo(ani_env* env, const OHOS::AppExecFwk::FormInfo &formIn
 
 ani_object CreateFormInfos(ani_env* env, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_status status = ANI_OK;
     ani_object arrayObj = CreateArrayObject(env);
     ani_size index = 0;
@@ -177,6 +193,10 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
 bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, ani_ref &aniKey, ani_ref &aniValue)
 {
     ani_status status = ANI_ERROR;
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), DELEGATOR_RECORD_VALUE, &aniKey);
     if (ANI_OK != status) {
         HILOG_ERROR("Failed to get value status: %{public}d", status);
@@ -205,6 +225,10 @@ bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, 
 void SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
     std::unordered_map<std::string, std::string> &uMap)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return ;
+    }
     std::string mapKey = "";
     if (!GetStdString(env, aniKey, mapKey)) {
         HILOG_ERROR("GetStdString failed");
