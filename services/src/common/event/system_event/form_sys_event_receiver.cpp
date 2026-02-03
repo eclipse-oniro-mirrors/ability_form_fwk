@@ -116,15 +116,6 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         HILOG_ERROR("empty action");
         return;
     }
-    const std::unordered_set<std::string> actionSet {
-        EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
-        EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED
-    };
     if (bundleName.empty() && actionSet.find(action) == actionSet.end()) {
         HILOG_ERROR("invalid param, action:%{public}s, bundleName:%{public}s",
             action.c_str(), bundleName.c_str());
