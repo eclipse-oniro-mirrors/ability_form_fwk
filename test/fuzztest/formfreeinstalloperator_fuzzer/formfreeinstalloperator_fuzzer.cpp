@@ -66,12 +66,12 @@ bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));
@@ -88,7 +88,7 @@ bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
+    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 
 bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
@@ -96,12 +96,12 @@ bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));
@@ -118,7 +118,7 @@ bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
+    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 
 bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
@@ -126,12 +126,12 @@ bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));
@@ -148,7 +148,7 @@ bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
+    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 
 bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
@@ -156,12 +156,12 @@ bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));
@@ -178,7 +178,7 @@ bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
+    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 
 bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
@@ -186,12 +186,12 @@ bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));
@@ -208,7 +208,7 @@ bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
+    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 
 bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
@@ -216,12 +216,12 @@ bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));
@@ -238,7 +238,7 @@ bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
+    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 
 bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
@@ -246,12 +246,12 @@ bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));

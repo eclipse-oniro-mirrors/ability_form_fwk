@@ -124,7 +124,8 @@ bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
     int callingUid = static_cast<int>(GetU32Data(data));
     formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
     bool isVisible = *data % ENABLE;
-    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int32_t userId = static_cast<int>(GetU32Data(data));
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken, userId);
     int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
     formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
@@ -171,7 +172,8 @@ bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
     int callingUid = static_cast<int>(GetU32Data(data));
     formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
     bool isVisible = *data % ENABLE;
-    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int32_t userId = static_cast<int>(GetU32Data(data));
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken, userId);
     int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
     formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
@@ -218,7 +220,8 @@ bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
     int callingUid = static_cast<int>(GetU32Data(data));
     formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
     bool isVisible = *data % ENABLE;
-    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int32_t userId = static_cast<int>(GetU32Data(data));
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken, userId);
     int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
     formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
@@ -265,7 +268,8 @@ bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
     int callingUid = static_cast<int>(GetU32Data(data));
     formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
     bool isVisible = *data % ENABLE;
-    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int32_t userId = static_cast<int>(GetU32Data(data));
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken, userId);
     int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
     formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
@@ -312,7 +316,8 @@ bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
     int callingUid = static_cast<int>(GetU32Data(data));
     formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
     bool isVisible = *data % ENABLE;
-    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int32_t userId = static_cast<int>(GetU32Data(data));
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken, userId);
     int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
     formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
@@ -359,7 +364,8 @@ bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
     int callingUid = static_cast<int>(GetU32Data(data));
     formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
     bool isVisible = *data % ENABLE;
-    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int32_t userId = static_cast<int>(GetU32Data(data));
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken, userId);
     int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
     formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
@@ -406,7 +412,8 @@ bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
     int callingUid = static_cast<int>(GetU32Data(data));
     formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
     bool isVisible = *data % ENABLE;
-    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int32_t userId = static_cast<int>(GetU32Data(data));
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken, userId);
     int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
     formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
