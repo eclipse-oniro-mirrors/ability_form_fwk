@@ -61,6 +61,7 @@ ohos_fuzztest("FormRenderServiceMgrFuzzTest") {
     "graphic_2d:rosen_text",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "libxml2:libxml2",
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
