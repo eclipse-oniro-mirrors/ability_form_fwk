@@ -2147,14 +2147,11 @@ void FormRenderRecord::RegisterResolveBufferCallback()
         HILOG_ERROR("null runtime_");
         return;
     }
-
     auto vm = runtime_->GetEcmaVm();
-
     if (vm == nullptr) {
         HILOG_ERROR("failed to get vm");
         return;
     }
-
     auto resolveBufferCallback = [vm](
         std::string dirPath, uint8_t **buff, size_t *buffSize, std::string &errorMsg) {
         const std::string errStr = "get hsp buffer failed, not support to load hsp in FormRender";
