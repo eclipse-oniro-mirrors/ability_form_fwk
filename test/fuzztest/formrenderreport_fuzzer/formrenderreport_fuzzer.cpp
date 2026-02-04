@@ -36,6 +36,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     if (fdp == nullptr) {
         return true;
     }
+
     uint8_t status = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     FormRenderReport::GetInstance().RecordFRSStart();
     FormRenderReport::GetInstance().RecordFRSStatus(status);
