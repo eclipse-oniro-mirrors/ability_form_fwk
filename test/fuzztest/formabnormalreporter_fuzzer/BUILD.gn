@@ -58,6 +58,7 @@ ohos_fuzztest("FormAbnormalReporterFuzzTest") {
     "ffrt:libffrt",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "libxml2:libxml2",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
