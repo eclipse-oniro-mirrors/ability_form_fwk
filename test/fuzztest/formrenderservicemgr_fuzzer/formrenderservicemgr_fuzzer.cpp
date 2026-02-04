@@ -51,9 +51,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().SetRenderGroupEnableFlag(formId, flag, want);
 
     std::string statusDataOut = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    // FormRenderServiceMgr::GetInstance().ProcessRecycleForm(formId, want, statusDataOut);
-    // FormJsInfo formJsInfo = {};
-    // FormRenderServiceMgr::GetInstance().ProcessRecoverForm(formJsInfo, want);
+    FormRenderServiceMgr::GetInstance().ProcessRecycleForm(formId, want, statusDataOut);
+    FormJsInfo formJsInfo = {};
+    FormRenderServiceMgr::GetInstance().ProcessRecoverForm(formJsInfo, want);
 
     FormRenderServiceMgr::GetInstance().SetCriticalFalseOnAllFormInvisible();
     FormRenderServiceMgr::GetInstance().CacheAppliedConfig();
