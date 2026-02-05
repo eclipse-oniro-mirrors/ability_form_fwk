@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "ets_form_provider.h"
 
 #include <iostream>
 #include <vector>
@@ -49,6 +50,10 @@ constexpr const char* PROVIDER_FORMOVERFLOWINFO_DURATION = "duration";
 constexpr const char* PROVIDER_FORMOVERFLOWINFO_USEDEFAULTANIMATION = "useDefaultAnimation";
 constexpr const char* PROVIDER_CLASS_CONSTRUCTOR = "<ctor>";
 constexpr const char* PROVIDER_SIGNATURE_VOID_VOID = ":";
+constexpr const char* ETS_PUBLISHFORMCROSSBUNDLEINFO_NAME =
+    "@ohos.app.form.formInfo.formInfo.PublishFormCrossBundleInfoInner";
+constexpr const char* ETS_FORM_PUBLISH_FORM_CROSS_CALLBACK =
+    "@ohos.app.form.formProvider.formProvider.PublishFormCrossBundleControlCallbackWrapper";
 
 enum class ActivationState : int32_t {
     DEACTIVATED = 0,
@@ -811,6 +816,184 @@ void ReloadAllForms(ani_env* env, ani_object etsContext, ani_object callback)
     HILOG_DEBUG("End");
 }
 
+void RegisterPublishFormCrossBundleControl(ani_env* env, ani_object callback)
+{
+    HILOG_INFO("call.");
+    if (!FormAniHelpers::CheckCallerIsSystemApp()) {
+        HILOG_ERROR("The app not system-app,can't use system-api.");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+        return;
+    }
+    if (callback == nullptr) {
+        HILOG_ERROR("Invalid callback reference.");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_PARAM_INVALID);
+        return;
+    }
+    auto result = AppExecFwk::FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
+        EtsFormProviderProxyMgr::GetInstance());
+    if (result != ERR_OK) {
+        HILOG_ERROR("failed, retcode:%{public}d.", result);
+        if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+            result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+        }
+        EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
+        return;
+    }
+    EtsFormProviderProxyMgr::GetInstance()->RegisterPublishFormCrossBundleControl(env, callback);
+}
+
+void UnregisterPublishFormCrossBundleControl(ani_env* env, ani_object callback)
+{
+    HILOG_INFO("call.");
+    if (!FormAniHelpers::CheckCallerIsSystemApp()) {
+        HILOG_ERROR("The app not system-app,can't use system-api.");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+        return;
+    }
+    auto result = AppExecFwk::FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
+    if (result != ERR_OK) {
+        HILOG_ERROR("failed, retcode:%{public}d.", result);
+        if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
+            result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+        }
+        EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
+        return;
+    }
+    EtsFormProviderProxyMgr::GetInstance()->UnregisterPublishFormCrossBundleControl();
+}
+
+sptr<EtsFormProviderProxyMgr> EtsFormProviderProxyMgr::instance_ = nullptr;
+std::mutex EtsFormProviderProxyMgr::mutex_;
+sptr<EtsFormProviderProxyMgr> EtsFormProviderProxyMgr::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = new (std::nothrow) EtsFormProviderProxyMgr();
+            if (instance_ == nullptr) {
+                HILOG_ERROR("create EtsFormProviderProxyMgr failed");
+            }
+        }
+    }
+    return instance_;
+}
+
+void EtsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(ani_env *env, ani_object callback)
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+    HILOG_INFO("call.");
+    ani_status status = ANI_ERROR;
+    if (crossBundleControlCallback_ != nullptr) {
+        if ((status = env->GlobalReference_Delete(crossBundleControlCallback_)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d.", status);
+            return;
+        }
+        crossBundleControlCallback_ = nullptr;
+    }
+    if ((status = env->GlobalReference_Create(callback, &crossBundleControlCallback_)) != ANI_OK) {
+        HILOG_ERROR("GlobalReference_Create status: %{public}d.", status);
+        return;
+    }
+    ani_vm *aniVM = nullptr;
+    if (env->GetVM(&aniVM) != ANI_OK) {
+        HILOG_ERROR("get aniVM failed.");
+        return;
+    }
+    crossBundleControlVm_ = aniVM;
+}
+ 
+void EtsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+    HILOG_INFO("call.");
+    ani_env* env = GetCrossBundleControlEnv();
+    if (env == nullptr) {
+        HILOG_ERROR("env is null");
+        return;
+    }
+    ani_status status = ANI_ERROR;
+    if (crossBundleControlCallback_ != nullptr) {
+        if ((status = env->GlobalReference_Delete(crossBundleControlCallback_)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+            return;
+        }
+        crossBundleControlCallback_ = nullptr;
+    }
+    crossBundleControlVm_ = nullptr;
+}
+ 
+ErrCode EtsFormProviderProxyMgr::PublishFormCrossBundleControl(
+    const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen)
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+    HILOG_INFO("call");
+    std::shared_ptr<PublishFormCrossBundleControlParam> dataParam =
+        std::make_shared<PublishFormCrossBundleControlParam>();
+    dataParam->bundleInfo = bundleInfo;
+    dataParam->isCanOpen = isCanOpen;
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
+    std::function<void()> executeCrossBundleControlFunc = [client = sptr<EtsFormProviderProxyMgr>(this), dataParam]() {
+        EtsFormProviderProxyMgr::GetInstance()->PublishFormCrossBundleControlInner(dataParam);
+    };
+    mainHandler->PostSyncTask(executeCrossBundleControlFunc, "EtsFormProviderProxyMgr::PublishFormCrossBundleControl");
+    isCanOpen = dataParam->isCanOpen;
+    return ERR_OK;
+}
+
+void EtsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
+    std::shared_ptr<PublishFormCrossBundleControlParam> dataParam)
+{
+    HILOG_INFO("call.");
+    if (dataParam == nullptr) {
+        HILOG_ERROR("dataParam is null.");
+        return;
+    }
+    ani_env* env = GetCrossBundleControlEnv();
+    if (env == nullptr) {
+        HILOG_ERROR("env is null.");
+        return;
+    }
+    ani_class cls = nullptr;
+    ani_status status = ANI_ERROR;
+    if ((status = env->FindClass(ETS_FORM_PUBLISH_FORM_CROSS_CALLBACK, &cls)) != ANI_OK) {
+        HILOG_ERROR("findClass failed.");
+        return;
+    };
+    ani_object bundleInfo = CreateAniObject(env, ETS_PUBLISHFORMCROSSBUNDLEINFO_NAME);
+    if (bundleInfo == nullptr) {
+        HILOG_ERROR("bundleInfo is nullptr.");
+        return;
+    }
+    SetPropertyStringByName(env, bundleInfo, "callerBundleName", dataParam->bundleInfo.callerBundleName);
+    SetPropertyStringByName(env, bundleInfo, "targetBundleName", dataParam->bundleInfo.targetBundleName);
+    SetPropertyStringByName(env, bundleInfo, "targetTemplateFormDetailId",
+        dataParam->bundleInfo.targetTemplateFormDetailId);
+    ani_object callbackObj = reinterpret_cast<ani_object>(crossBundleControlCallback_);
+    ani_boolean result = ANI_FALSE;
+    if ((status = env->Object_CallMethodByName_Boolean(
+        callbackObj, "invoke", nullptr, &result, bundleInfo)) != ANI_OK) {
+        HILOG_ERROR("callMethod failed.");
+        return;
+    }
+    dataParam->isCanOpen = result;
+    return;
+}
+
+ani_env* EtsFormProviderProxyMgr::GetCrossBundleControlEnv()
+{
+    if (crossBundleControlVm_ == nullptr) {
+        HILOG_ERROR("ani_vm_ is null");
+        return nullptr;
+    }
+    ani_env* env = nullptr;
+    ani_status status = ANI_ERROR;
+    if ((status = crossBundleControlVm_->GetEnv(ANI_VERSION_1, &env)) != ANI_OK) {
+        HILOG_ERROR("GetEnv failed status: %{public}d", status);
+        return nullptr;
+    }
+    return env;
+}
+
 std::vector<ani_native_function> GetBindMethods()
 {
     std::vector methods = {
@@ -854,6 +1037,12 @@ std::vector<ani_native_function> GetBindMethods()
         ani_native_function{"checkOverflowInfoParam", nullptr, reinterpret_cast<void *>(CheckOverflowInfoParam)},
         ani_native_function{"nativeReloadForms", nullptr, reinterpret_cast<void *>(ReloadForms)},
         ani_native_function{"nativeReloadAllForms", nullptr, reinterpret_cast<void *>(ReloadAllForms)},
+        ani_native_function {
+            "nativeOnPublishFormCrossBundleControl", nullptr,
+            reinterpret_cast<void *>(RegisterPublishFormCrossBundleControl)},
+        ani_native_function {
+            "nativeOffPublishFormCrossBundleControl", nullptr,
+            reinterpret_cast<void *>(UnregisterPublishFormCrossBundleControl)},
     };
     return methods;
 }
