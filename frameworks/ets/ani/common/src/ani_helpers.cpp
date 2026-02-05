@@ -135,7 +135,7 @@ std::string ANIUtils_ANIStringToStdString(ani_env *env, ani_string aniStr)
     ani_size strSize;
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
-        return nullptr;
+        return "";
     }
     if (env->String_GetUTF8Size(aniStr, &strSize) != ANI_OK) {
         HILOG_ERROR("String_GetUTF8Size failed");
