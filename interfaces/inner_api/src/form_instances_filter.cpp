@@ -68,7 +68,7 @@ FormInstancesFilter* FormInstancesFilter::Unmarshalling(Parcel &parcel)
         object = nullptr;
         return nullptr;
     }
-    return object.release();
+    return object;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
