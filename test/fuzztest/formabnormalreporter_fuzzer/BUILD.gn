@@ -35,7 +35,6 @@ ohos_fuzztest("FormAbnormalReporterFuzzTest") {
   ]
   sources = [
     "${form_fwk_path}/services/src/feature/form_check/form_abnormal_reporter.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_control.cpp",
     "formabnormalreporter_fuzzer.cpp"
 
   ]
