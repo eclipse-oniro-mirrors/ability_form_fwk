@@ -965,7 +965,7 @@ void EtsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 
 void EtsFormRouterProxyMgr::SetAniVM(ani_vm* ani_vm)
 {
-    std::lock_guard<std::mutex> lock(ani_vm_mutex_);
+    std::lock_guard<std::mutex> lock(aniVmMutex_);
     ani_vm_ = ani_vm;
 }
 
