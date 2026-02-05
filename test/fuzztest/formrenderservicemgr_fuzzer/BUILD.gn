@@ -41,6 +41,7 @@ ohos_fuzztest("FormRenderServiceMgrFuzzTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
     "${form_fwk_path}:libfms",
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
