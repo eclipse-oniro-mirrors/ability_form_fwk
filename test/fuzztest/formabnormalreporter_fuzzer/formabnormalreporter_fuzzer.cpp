@@ -41,7 +41,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int64_t formId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     int64_t ratio = fdp->ConsumeIntegralInRange(MIN_NUM, MIN_RATIO_NUM);
     FormAbnormalReporter::GetInstance().AddRecord(formId, ratio);
-    FormAbnormalInfo formAbnormalInfo;
+    FormAbnormalInfo formAbnormalInfo {};
     FormAbnormalReporter::GetInstance().AddRecord(formId, formAbnormalInfo);
     FormAbnormalReporter::GetInstance().MarkUpdateRender(formId);
     FormAbnormalReporter::GetInstance().CheckForms();
