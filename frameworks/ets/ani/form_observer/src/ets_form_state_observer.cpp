@@ -541,56 +541,55 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
     }
     wptr<EtsFormStateObserver> weakObserver = this;
     handler->PostSyncTask([weakObserver, visibleType, formInstances, bundleName, aniVm = ani_vm_, this]() {
-            std::string specialFlag = "#";
-            bool isVisibleTypeFlag = false;
-            auto sharedThis = weakObserver.promote();
-            if (sharedThis == nullptr) {
-                HILOG_ERROR("null sharedThis");
-                return;
-            }
-            ani_env* env = GetAniEnv(aniVm);
-            if (env == nullptr) {
-                HILOG_ERROR("GetAniEnv failed");
-                return;
-            }
-            ani_size nr_refs = REFERENCES_MAX_NUMBER;
-            env->CreateLocalScope(nr_refs);
-            if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
-                isVisibleTypeFlag = true;
-                if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
-                    std::string bundleNameNew = std::regex_replace(bundleName,
-                        std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
-                    auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
-                    if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
-                        ani_ref res = visibleCallback->second->aniRef;
-                        ani_object aniValue = CreateFormInstances(env, formInstances);
-                        bool bRet = Callback(env, static_cast<ani_object>(res), aniValue, CLASSNAME_CALLBACK_WRAPPER);
-                        if (!bRet) {
-                            HILOG_ERROR("callback failed");
-                            return;
-                        }
-                    }
-                }
-            } else {
-                isVisibleTypeFlag = false;
-                if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
-                    std::string bundleNameNew =
-                        std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
-                    auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
-                    if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
-                        ani_ref res = invisibleCallback->second->aniRef;
-                        ani_object aniValue = CreateFormInstances(env, formInstances);
-                        bool bRet = Callback(env, static_cast<ani_object>(res), aniValue, CLASSNAME_CALLBACK_WRAPPER);
-                        if (!bRet) {
-                            HILOG_ERROR("callback failed");
-                            return;
-                        }
+        std::string specialFlag = "#";
+        bool isVisibleTypeFlag = false;
+        auto sharedThis = weakObserver.promote();
+        if (sharedThis == nullptr) {
+            HILOG_ERROR("null sharedThis");
+            return;
+        }
+        ani_env* env = GetAniEnv(aniVm);
+        if (env == nullptr) {
+            HILOG_ERROR("GetAniEnv failed");
+            return;
+        }
+        ani_size nr_refs = REFERENCES_MAX_NUMBER;
+        env->CreateLocalScope(nr_refs);
+        if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
+            isVisibleTypeFlag = true;
+            if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
+                std::string bundleNameNew = std::regex_replace(bundleName,
+                    std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
+                auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
+                if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
+                    ani_ref res = visibleCallback->second->aniRef;
+                    ani_object aniValue = CreateFormInstances(env, formInstances);
+                    bool bRet = Callback(env, static_cast<ani_object>(res), aniValue, CLASSNAME_CALLBACK_WRAPPER);
+                    if (!bRet) {
+                        HILOG_ERROR("callback failed");
+                        return;
                     }
                 }
             }
-            env->DestroyLocalScope();
-        });
-    }
+        } else {
+            isVisibleTypeFlag = false;
+            if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
+                std::string bundleNameNew =
+                    std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
+                auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
+                if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
+                    ani_ref res = invisibleCallback->second->aniRef;
+                    ani_object aniValue = CreateFormInstances(env, formInstances);
+                    bool bRet = Callback(env, static_cast<ani_object>(res), aniValue, CLASSNAME_CALLBACK_WRAPPER);
+                    if (!bRet) {
+                        HILOG_ERROR("callback failed");
+                        return;
+                    }
+                }
+            }
+        }
+        env->DestroyLocalScope();
+    });
     return ERR_OK;
 }
 
