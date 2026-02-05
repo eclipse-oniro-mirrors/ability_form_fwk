@@ -236,8 +236,12 @@ static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, boo
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-        napi_delete_reference(env, asyncCallbackInfo->callback);
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
+        if (asyncCallbackInfo->callback) {
+            napi_delete_reference(env, asyncCallbackInfo->callback);
+        }
         delete asyncCallbackInfo;
         return nullptr;
     }
@@ -307,7 +311,9 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
         delete asyncCallbackInfo;
         return nullptr;
     }

@@ -27,7 +27,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 
 struct AsyncDeleteInvalidFormsCallbackInfo {
-    napi_env env;
+    napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
@@ -48,23 +48,23 @@ struct AsyncAcquireFormStateCallbackInfo {
 };
 
 struct AsyncNotifyFormsVisibleCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    napi_deferred deferred = nullptr;
     napi_ref callback;
     std::vector<int64_t> formIds;
-    bool isVisible;
-    int result;
+    bool isVisible = false;
+    int result = OHOS::ERR_OK;
 };
 
 struct AsyncNotifyFormsEnableUpdateCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_ref callback = nullptr;
     std::vector<int64_t> formIds;
-    bool isEnableUpdate;
-    int result;
+    bool isEnableUpdate = false;
+    int result = OHOS::ERR_OK;
 };
 
 napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info);
