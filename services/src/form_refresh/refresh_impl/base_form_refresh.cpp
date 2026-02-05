@@ -68,7 +68,6 @@ CheckValidFactor BaseFormRefresh::BuildCheckFactor(RefreshData &data)
     factor.callerToken = data.callerToken;
     factor.want = data.want;
     factor.callingUid = data.callingUid;
-    factor.want.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
     return factor;
 }
 

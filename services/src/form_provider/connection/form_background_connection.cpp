@@ -24,11 +24,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormBackgroundConnection::FormBackgroundConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName, const std::string &funcName, const std::string &params)
-    : funcName_(funcName), params_(params)
+    const std::string &abilityName, const std::string &funcName, const std::string &params,
+    const int32_t userId) : funcName_(funcName), params_(params)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 /**
  * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.

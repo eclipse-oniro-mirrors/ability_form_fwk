@@ -31,7 +31,7 @@ class ConfigurationUpdateConnection : public FormAbilityConnection {
 public:
     ConfigurationUpdateConnection(const int64_t formId, const Want &want,
         const std::string &bundleName, const std::string &abilityName,
-        AppExecFwk::Configuration configuration);
+        AppExecFwk::Configuration configuration, const int32_t userId);
     virtual ~ConfigurationUpdateConnection() = default;
  
     /**

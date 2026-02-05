@@ -28,8 +28,8 @@ void MockNotifyProviderFormsBatchDelete(bool mockRet)
 
 namespace OHOS {
 namespace AppExecFwk {
-ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(
-    const std::string &bundleName, const std::string &abilityName, const std::set<int64_t> &formIds)
+ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(const std::string &bundleName, const std::string &abilityName,
+    const std::set<int64_t> &formIds, const int32_t userId)
 {
     if (g_mockNotifyProviderFormsBatchDelete) {
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

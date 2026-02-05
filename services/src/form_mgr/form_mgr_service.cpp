@@ -272,7 +272,7 @@ void FormMgrService::ReportAddFormEvent(const int64_t formId, const Want &want)
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
     eventInfo.formDimension = static_cast<int64_t>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
-    int32_t userId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     eventInfo.isDistributedForm = FormDistributedMgr::GetInstance().IsBundleDistributed(eventInfo.bundleName, userId);
     int ret = FormBmsHelper::GetInstance().GetCallerBundleName(eventInfo.hostBundleName);
     if (ret != ERR_OK || eventInfo.hostBundleName.empty()) {
@@ -340,7 +340,9 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
         return ret;
     }
 
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
@@ -549,7 +551,9 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
         HILOG_ERROR("cast temp form permission denied");
         return ret;
     }
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
@@ -654,7 +658,9 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
         HILOG_ERROR("request form permission denied");
         return ret;
     }
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
@@ -690,7 +696,9 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         HILOG_ERROR("request form permission denied");
         return ret;
     }
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
@@ -726,7 +734,9 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
         HILOG_ERROR("request form permission denied");
         return ret;
     }
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("the formId is not under currentActiveUser or invalid");
         return ret;
@@ -821,6 +831,7 @@ void FormMgrService::SubscribeSysEventReceiver()
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED);
         // init TimerReceiver
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
@@ -1473,7 +1484,9 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
         return ret;
     }
 
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
@@ -1493,7 +1506,9 @@ int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 
     InitFormShareMgrSerialQueue();
 
-    return DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    return DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info, userId);
 }
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
@@ -1745,7 +1760,7 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
 {
     // checks whether the current user is inactive
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t userId =  FormUtil::GetCallerUserId(callingUid);
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
     if (userId != currentActiveUserId) {
         HILOG_INFO("currentActiveUserId:%{public}d, userId:%{public}d", currentActiveUserId, userId);
@@ -1803,7 +1818,9 @@ ErrCode FormMgrService::GetRunningFormInfos(bool isUnusedIncluded, std::vector<R
         HILOG_ERROR("get running form infos permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    return FormMgrAdapter::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos, userId);
 }
 
 ErrCode FormMgrService::GetRunningFormInfosByBundleName(
@@ -2091,7 +2108,8 @@ bool FormMgrService::IsFormBundleProtected(const std::string &bundleName, int64_
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleProtected",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    bool result = FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, formId);
+    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    bool result = FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, userId, formId);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
 }
@@ -2105,7 +2123,7 @@ bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
         return false;
     }
     BundleInfo bundleInfo;
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO);
     bool ret = FormBmsHelper::GetInstance().GetBundleInfoByFlags(bundleName, flags, userId, bundleInfo);
     if (!ret) {
@@ -2182,7 +2200,8 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     }
 
     RunningFormInfo runningFormInfo;
-    ret = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(formId, runningFormInfo);
+    int32_t userId = FormUtil::GetCallerUserId(uid);
+    ret = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(formId, runningFormInfo, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("Get running form info by id failed");
         return ret;

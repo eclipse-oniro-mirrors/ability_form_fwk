@@ -39,7 +39,7 @@ public:
      * @param bundleName Bundle name to be check.
      * @return True for lock, false for not lock.
      */
-    bool IsBundleLock(const std::string &bundleName, int64_t formId = 0);
+    bool IsBundleLock(const std::string &bundleName, const int32_t userId, int64_t formId = 0);
 
     /**
      * @brief Set whether bundle is lock.
@@ -53,7 +53,7 @@ public:
      * @param bundleName Bundle name to be check.
      * @return True for protect, false for not protect.
      */
-    bool IsBundleProtect(const std::string &bundleName, int64_t formId = 0);
+    bool IsBundleProtect(const std::string &bundleName, const int32_t userId, int64_t formId = 0);
 
     /**
      * @brief Set whether bundle is protect.

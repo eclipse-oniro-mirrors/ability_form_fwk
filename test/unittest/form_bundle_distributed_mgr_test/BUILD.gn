@@ -51,6 +51,7 @@ ohos_unittest("FormBundleDistributedTest") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "samgr:samgr_proxy",
   ]

@@ -579,7 +579,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
-                               const sptr<IRemoteObject> &callerToken);
+                               const sptr<IRemoteObject> &callerToken, const int32_t callerUserId);
 
     /**
      * @brief set form record visible.
@@ -657,7 +657,7 @@ public:
      * @param formId Indicates the form ID.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode CheckInvalidForm(const int64_t formId);
+    ErrCode CheckInvalidForm(const int64_t formId, const int32_t callerUserId);
 
     /**
     * @brief get cast forms count.
@@ -693,7 +693,7 @@ public:
     * @param formId Indicates the form ID.
     * @return Returns ERR_OK on success, others on failure.
     */
-    ErrCode HandleFormAddObserver(const std::string hostBundleName, const int64_t formId);
+    ErrCode HandleFormAddObserver(const std::string &hostBundleName, const int64_t formId, const int32_t userId);
 
     /**
     * @brief handle form add observer.
@@ -709,7 +709,7 @@ public:
      * @param runningFormInfos Return the running forms' infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo);
+    ErrCode GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo, const int32_t userId);
 
     /**
      * @brief Get all running form infos.
@@ -717,7 +717,8 @@ public:
      * @param runningFormInfos Return the running forms' infos currently.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
+    ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+        const int32_t userId);
 
     /**
      * @brief Get the running form infos by bundle name.
@@ -726,8 +727,8 @@ public:
      * @param runningFormInfos Return the running forms' infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfosByBundleName(
-        const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName, bool isUnusedIncluded,
+        std::vector<RunningFormInfo> &runningFormInfos, const int32_t userId);
 
     /**
      * @brief Get form instances by filter info.

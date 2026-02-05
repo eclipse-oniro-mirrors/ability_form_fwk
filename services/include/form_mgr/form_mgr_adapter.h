@@ -489,7 +489,8 @@ public:
      * @param runningFormInfos Return the running form infos currently.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
+    ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+        const int32_t userId);
 
     /**
      * @brief Get the running form infos by bundle name.
@@ -1319,7 +1320,7 @@ private:
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
 
-    void NotifyFormClickEvent(int64_t formId, const std::string &formClickType);
+    void NotifyFormClickEvent(int64_t formId, const std::string &formClickType, const int32_t userId);
 
     /**
      * @brief Get caller type.
@@ -1494,7 +1495,7 @@ private:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
+    int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const int32_t userId);
 
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 

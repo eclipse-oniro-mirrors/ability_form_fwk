@@ -56,6 +56,7 @@ private:
     void HandleUserUnlocked(int32_t userId);
     void HandleScreenOn();
     void RecycleForms(int32_t userId);
+    void HandleUserStopped(const int32_t userId);
 private:
     int32_t lastUserId_ = 0;
     std::mutex lastUserIdMutex_;

@@ -207,10 +207,7 @@ void RefreshCacheMgr::CosumeRefreshByDueControl(const std::vector<FormRecord> &d
         RefreshData data;
         data.formId = formRecord.formId;
         data.record = formRecord;
-        Want reqWant;
-        reqWant.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
-        data.want = reqWant;
-        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_UNCONTROL);
+        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_PROVIDER);
     }
 }
 
@@ -247,7 +244,7 @@ Want RefreshCacheMgr::CreateWant(const std::vector<FormRecord>::iterator &record
     return want;
 }
 
-void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId)
+void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId, const int32_t userId)
 {
     FormRecord record;
     bool isNeedUpdate = FormDataMgr::GetInstance().GetIsNeedUpdateOnAddFinish(formId, record);
@@ -257,7 +254,7 @@ void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId)
 
     HILOG_INFO("formId:%{public}" PRId64", isHostRefresh:%{public}d", formId, record.isHostRefresh);
     Want want;
-    want.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
+    want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     if (record.isHostRefresh && record.wantCacheMap.find(formId) != record.wantCacheMap.end()) {
         FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], want);
     }

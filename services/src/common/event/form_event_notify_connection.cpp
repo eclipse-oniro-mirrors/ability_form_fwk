@@ -25,10 +25,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormEventNotifyConnection::FormEventNotifyConnection(const std::vector<int64_t> formEvents,
-    const int32_t formVisibleType, const std::string &bundleName, const std::string &abilityName)
+    const int32_t formVisibleType, const std::string &bundleName, const std::string &abilityName, const int32_t userId)
     : formEvents_(formEvents), formVisibleType_(formVisibleType)
 {
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 /**
  * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.

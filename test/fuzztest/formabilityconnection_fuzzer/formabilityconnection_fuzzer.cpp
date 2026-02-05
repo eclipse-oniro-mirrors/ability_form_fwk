@@ -55,11 +55,13 @@ void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
     formAmsHelper.DisconnectAbilityTask(connect);
     int32_t userId = fdp->ConsumeIntegral<int32_t>();
     formAmsHelper.StartAbility(want, userId);
+    formAmsHelper.StartAbilityOnlyUIAbility(want, userId);
     std::set<int64_t> formIds;
-    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName,
+        userId);
     batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
-    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName);
+    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName, userId);
     castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
 }
 
@@ -85,7 +87,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formAbilityConnection.GetProviderKey();
     std::string bundleName = fdp->ConsumeRandomLengthString();
     std::string abilityName = fdp->ConsumeRandomLengthString();
-    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    formAbilityConnection.SetProviderKey(bundleName, abilityName, userId);
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
     formAbilityConnection.SetFormId(formId);
     formAbilityConnection.GetFormId();

@@ -24,11 +24,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormAcquireStateConnection::FormAcquireStateConnection(const std::string &bundleName,
-    const std::string &abilityName, const Want &want, std::string &provider)
-    : want_(want), provider_(provider)
+FormAcquireStateConnection::FormAcquireStateConnection(const std::string &bundleName, const std::string &abilityName,
+    const Want &want, std::string &provider, const int32_t userId) : want_(want), provider_(provider)
 {
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 
 /**

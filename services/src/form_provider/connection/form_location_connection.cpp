@@ -26,11 +26,11 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormLocationConnection::FormLocationConnection(const int64_t formId, const Want& want,
-    const std::string &bundleName, const std::string &abilityName) : want_(want)
+FormLocationConnection::FormLocationConnection(const int64_t formId, const Want& want, const std::string &bundleName,
+    const std::string &abilityName, const int32_t userId) : want_(want)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 
 /**

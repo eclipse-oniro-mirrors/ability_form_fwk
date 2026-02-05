@@ -78,7 +78,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string abilityName(data, size);
     std::set<int64_t> formIds;
     formIds.insert(formId);
-    formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds);
+    int32_t userId = static_cast<uint32_t>(GetU32Data(data));
+    formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds, userId);
     formProviderMgr.UpdateForm(formId, formProviderInfo);
     FormProviderData formProviderData;
     formProviderMgr.UpdateForm(formId, record, formProviderData);

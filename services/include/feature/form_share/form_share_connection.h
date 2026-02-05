@@ -32,7 +32,7 @@ using Want = OHOS::AAFwk::Want;
 class FormShareConnection : public FormAbilityConnection {
 public:
     FormShareConnection(int64_t formId, const std::string &bundleName, const std::string &abilityName,
-        const std::string &deviceId, int64_t formShareRequestCode);
+        const std::string &deviceId, int64_t formShareRequestCode, const int32_t userId);
 
     virtual ~FormShareConnection() = default;
 

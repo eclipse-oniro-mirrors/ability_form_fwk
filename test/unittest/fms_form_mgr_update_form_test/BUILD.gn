@@ -25,6 +25,7 @@ ohos_unittest("FmsFormMgrUpdateFormTest") {
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/mock/src/remote_native_token.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_update_form_test/mock_ipc_skeleton.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_update_form_test/mock_form_refresh_mgr.cpp",
   ]
   sources += [ "fms_form_mgr_update_form_test.cpp" ]
 

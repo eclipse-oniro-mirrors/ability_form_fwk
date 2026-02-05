@@ -29,7 +29,7 @@ using Want = OHOS::AAFwk::Want;
 class FormEventNotifyConnection : public FormAbilityConnection {
 public:
     FormEventNotifyConnection(const std::vector<int64_t> formEvents, const int32_t formVisibleType,
-        const std::string &bundleName, const std::string &abilityName);
+        const std::string &bundleName, const std::string &abilityName, const int32_t userId);
     virtual ~FormEventNotifyConnection() = default;
 
     /**

@@ -85,8 +85,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_001, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
+    int32_t userId = 100;
     sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -108,8 +109,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
+    int32_t userId = 100;
     sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -133,8 +135,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
+    int32_t userId = 100;
     sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -158,8 +161,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
+    int32_t userId = 100;
     sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -255,8 +259,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
     std::string abilityName = "bb";
     std::string deviceId = "cc";
     int64_t formShareRequestCode = 2;
-    sptr<FormShareConnection> formShareConnection =
-        new (std::nothrow) FormShareConnection(formId, bundleName, abilityName, deviceId, formShareRequestCode);
+    int32_t userId = 100;
+    sptr<FormShareConnection> formShareConnection = new (std::nothrow) FormShareConnection(formId, bundleName,
+        abilityName, deviceId, formShareRequestCode, userId);
     ASSERT_NE(nullptr, formShareConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -490,8 +495,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_001, TestSize.Leve
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
+    int32_t userId = 100;
     sptr<FormCastTempConnection> formCastTempConnection =
-        new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName);
+        new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formCastTempConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -511,8 +517,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_001, TestSize.Level0
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
+    int32_t userId = 100;
     sptr<FormDeleteConnection> formDeleteConnection =
-        new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName);
+        new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formDeleteConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -1064,8 +1071,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0001, TestSize.Lev
     Want want;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
+    int32_t userId = 100;
     std::shared_ptr<FormMsgEventConnection> formMsgEventConnection =
-        std::make_shared<FormMsgEventConnection>(formId, want, bundleName, abilityName);
+        std::make_shared<FormMsgEventConnection>(formId, want, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formMsgEventConnection);
     // test OnAbilityConnectDone
     AppExecFwk::ElementName element;
@@ -1087,8 +1095,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireStateConnection_0001, TestSize
     std::string abilityName = "bb";
     Want want;
     std::string state = "cc";
+    int32_t userId = 100;
     std::shared_ptr<FormAcquireStateConnection> formAcquireStateConnection =
-        std::make_shared<FormAcquireStateConnection>(bundleName, abilityName, want, state);
+        std::make_shared<FormAcquireStateConnection>(bundleName, abilityName, want, state, userId);
     ASSERT_NE(nullptr, formAcquireStateConnection);
     // test OnAbilityConnectDone function
     AppExecFwk::ElementName element;
@@ -1193,7 +1202,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_005, TestSize.Level
 }
 
 /**
- * @tc.name: FormDeleteConnection
+ * @tc.name: FormDeleteConnection_002
  * @tc.desc: test OnAbilityConnectDone function.
  * @tc.type: FUNC
  */
@@ -1203,8 +1212,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_002, TestSize.Level0
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
+    int32_t userId = 100;
     sptr<FormDeleteConnection> formDeleteConnection =
-        new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName);
+        new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formDeleteConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -1224,8 +1234,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_002, TestSize.Leve
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
+    int32_t userId = 100;
     sptr<FormCastTempConnection> formCastTempConnection =
-        new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName);
+        new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formCastTempConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
