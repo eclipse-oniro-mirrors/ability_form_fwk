@@ -873,14 +873,13 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
     NapiAsyncTask::CompleteCallback complete =
         [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
             HILOG_INFO("complete");
-            AppExecFwk::OverflowInfo* overflowInfo = new (std::nothrow) AppExecFwk::OverflowInfo {};
+            std::shared_ptr<AppExecFwk::OverflowInfo> overflowInfo = std::make_shared<AppExecFwk::OverflowInfo>();
             if (overflowInfo == nullptr) {
                 HILOG_ERROR("Failed to new overflowInfo");
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
                 return;
             }
             bool ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, false);
-            delete overflowInfo;
             if (!ret) {
                 HILOG_INFO("complete ret false");
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
