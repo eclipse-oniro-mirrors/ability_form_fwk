@@ -47,7 +47,8 @@ const std::unordered_set<std::string> actionSet {
     EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED,
     EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
     EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
-    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STARTED
 };
 } // namespace
 /**

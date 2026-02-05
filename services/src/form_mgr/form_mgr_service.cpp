@@ -2510,5 +2510,19 @@ ErrCode FormMgrService::UpdateTemplateFormDetailInfo(
     }
     return FormMgrAdapter::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
 }
+
+void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
+{
+    if (userId < 0) {
+        HILOG_ERROR("invalid started userId:%{public}d", userId);
+        return;
+    }
+
+    HILOG_INFO("user started userId: %{public}d", userId);
+    auto task = [userId]() {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
