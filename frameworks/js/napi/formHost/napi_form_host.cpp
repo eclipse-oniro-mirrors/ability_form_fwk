@@ -427,15 +427,15 @@ static void InnerAcquireFormState(napi_env env, AsyncAcquireFormStateCallbackInf
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
-napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
+napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
+    AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
 {
     HILOG_INFO("asyncCallback.");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
     napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
+        env, nullptr, resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("napi_create_async_work running");
             auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
@@ -463,9 +463,7 @@ napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackI
                 napi_delete_async_work(env, asyncWork);
             }
             delete asyncCallbackInfo;
-        },
-        (void *) asyncCallbackInfo,
-        &asyncCallbackInfo->asyncWork);
+        }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
@@ -489,9 +487,7 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
+        env, nullptr, resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("runnning");
             auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
@@ -519,9 +515,7 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
                 napi_delete_async_work(env, asyncWork);
             }
             delete asyncCallbackInfo;
-        },
-        (void *) asyncCallbackInfo,
-        &asyncCallbackInfo->asyncWork);
+        }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
@@ -585,11 +579,7 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
         NAPI_ASSERT(env, valueType == napi_function,
             "The arguments[1] type of acquireFormState is incorrect, expected type is function.");
-        napi_create_reference(env, argv[1], REF_COUNT, &asyncCallbackInfoPtr->callback);
-        result = AcquireFormStateCallback(env, asyncCallbackInfoPtr.release());
-        if (asyncCallbackInfoPtr->callback != nullptr) {
-            napi_delete_reference(env, asyncCallbackInfoPtr->callback);
-        }
+        result = AcquireFormStateCallback(env, argv[1], asyncCallbackInfoPtr.release());
     } else {
         result = AcquireFormStatePromise(env, asyncCallbackInfoPtr.release());
     }
@@ -710,15 +700,15 @@ static void InnerNotifyFormsVisible(napi_env env, AsyncNotifyFormsVisibleCallbac
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
-napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
+napi_value NotifyFormsVisibleCallback(napi_env env, napi_value callbackFunc,
+    AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
 {
     HILOG_INFO("start");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
     napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
+        env, nullptr, resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("running");
             auto *asyncCallbackInfo = static_cast<AsyncNotifyFormsVisibleCallbackInfo*>(data);
@@ -758,16 +748,16 @@ napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallb
                 napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             }
             delete asyncCallbackInfo;
-        },
-        (void *) asyncCallbackInfo,
-        &asyncCallbackInfo->asyncWork);
+        }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
-        delete asyncCallbackInfo;
+        if (asyncCallbackInfo->callback != nullptr) {
+            napi_delete_reference(env, asyncCallbackInfo->callback);
+        }
         return nullptr;
     }
     return NapiGetResult(env, 1);
@@ -784,9 +774,7 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
+        env, nullptr, resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("promise runnning");
             auto *asyncCallbackInfo = static_cast<AsyncNotifyFormsVisibleCallbackInfo*>(data);
@@ -814,16 +802,13 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
                 napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             }
             delete asyncCallbackInfo;
-        },
-        (void *) asyncCallbackInfo,
-        &asyncCallbackInfo->asyncWork);
+        }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
         if (asyncCallbackInfo->asyncWork) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
-        delete asyncCallbackInfo;
         return nullptr;
     }
     return promise;
@@ -870,9 +855,9 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
         HILOG_ERROR("asyncCallbackInfo == nullptr.");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
-
     asyncCallbackInfoPtr->env = env;
     asyncCallbackInfoPtr->formIds = formIds;
+    asyncCallbackInfoPtr->isVisible = false;
 
     napi_get_value_bool(env, argv[1], &asyncCallbackInfoPtr->isVisible);
 
@@ -882,11 +867,7 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
         valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, argv[ARGS_SIZE_TWO], &valueType));
         NAPI_ASSERT(env, valueType == napi_function, "The type of arg 2 is incorrect, expected type is function.");
-        napi_create_reference(env, argv[ARGS_SIZE_TWO], REF_COUNT, &asyncCallbackInfoPtr->callback);
-        result = NotifyFormsVisibleCallback(env, asyncCallbackInfoPtr.release());
-        if (asyncCallbackInfoPtr->callback != nullptr) {
-            napi_delete_reference(env, asyncCallbackInfoPtr->callback);
-        }
+        result = NotifyFormsVisibleCallback(env, argv[ARGS_SIZE_TWO], asyncCallbackInfoPtr.release());
     } else {
         result = NotifyFormsVisiblePromise(env, asyncCallbackInfoPtr.release());
     }
@@ -909,10 +890,9 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env,
     HILOG_INFO("enter");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_reference(env, callback, REF_COUNT, &asyncCallbackInfo->callback);
     napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
+        env, nullptr, resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("running");
             auto *asyncCallbackInfo = static_cast<AsyncNotifyFormsEnableUpdateCallbackInfo*>(data);
@@ -944,14 +924,15 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env,
                 napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             }
             delete asyncCallbackInfo;
-        },
-        (void *) asyncCallbackInfo,
-        &asyncCallbackInfo->asyncWork);
+        }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
+        if (asyncCallbackInfo->callback != nullptr) {
+            napi_delete_reference(env, asyncCallbackInfo->callback);
         }
         delete asyncCallbackInfo;
         return nullptr;
@@ -991,9 +972,7 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
             }
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             delete asyncCallbackInfo;
-        },
-        (void *) asyncCallbackInfo,
-        &asyncCallbackInfo->asyncWork);
+        }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
@@ -1059,11 +1038,7 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
         valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, argv[ARGS_SIZE_TWO], &valueType));
         NAPI_ASSERT(env, valueType == napi_function, "The type of arg 2 is incorrect, expected type is function.");
-        napi_create_reference(env, argv[ARGS_SIZE_TWO], REF_COUNT, &asyncCallbackInfoPtr->callback);
-        result = NotifyFormsEnableUpdateCallback(env, asyncCallbackInfoPtr.release());
-        if (asyncCallbackInfoPtr->callback != nullptr) {
-            napi_delete_reference(env, asyncCallbackInfoPtr->callback);
-        }
+        result = NotifyFormsEnableUpdateCallback(env, argv[ARGS_SIZE_TWO], asyncCallbackInfoPtr.release());
     } else {
         result = NotifyFormsEnableUpdatePromise(env, asyncCallbackInfoPtr.release());
     }
