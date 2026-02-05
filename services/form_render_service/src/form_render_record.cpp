@@ -592,6 +592,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     }
     hapPath_ = formJsInfo.jsFormCodePath;
     runtime_->SetLocalFontCollectionMaxSize();
+    RegisterResolveBufferCallback();
     bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
@@ -2139,6 +2140,32 @@ void FormRenderRecord::RegisterUncatchableErrorHandler()
         }
     };
     panda::JSNApi::RegisterUncatchableErrorHandler(const_cast<EcmaVM *>(nativeEnginePtr->GetEcmaVm()), uncatchableTask);
+}
+
+void FormRenderRecord::RegisterResolveBufferCallback()
+{
+    if (runtime_ == nullptr) {
+        HILOG_ERROR("null runtime_");
+        return;
+    }
+    auto vm = runtime_->GetEcmaVm();
+    if (vm == nullptr) {
+        HILOG_ERROR("failed to get vm");
+        return;
+    }
+    auto resolveBufferCallback = [vm](
+        std::string dirPath, uint8_t **buff, size_t *buffSize, std::string &errorMsg) {
+        const std::string errStr = "get hsp buffer failed, not support to load hsp in FormRender";
+        HILOG_ERROR("%{public}s", errStr.c_str());
+        if (vm == nullptr) {
+            HILOG_ERROR("null vm");
+            return false;
+        }
+        auto error = panda::Exception::TypeError(vm, panda::StringRef::NewFromUtf8(vm, errStr.c_str()));
+        panda::JSNApi::ThrowException(vm, error);
+        return false;
+    };
+    panda::JSNApi::SetHostResolveBufferTracker(vm, resolveBufferCallback);
 }
 
 void FormRenderRecord::OnJsError(napi_value value)
