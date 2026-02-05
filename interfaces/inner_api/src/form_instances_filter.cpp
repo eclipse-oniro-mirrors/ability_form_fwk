@@ -63,7 +63,7 @@ bool FormInstancesFilter::Marshalling(Parcel &parcel) const
 
 FormInstancesFilter* FormInstancesFilter::Unmarshalling(Parcel &parcel)
 {
-    std::unique_ptr<FormInstancesFilter> object = std::make_unique<FormInstancesFilter>();
+    FormInstancesFilter* object = new (std::nothrow) FormInstancesFilter();
     if (object && !object->ReadFromParcel(parcel)) {
         object = nullptr;
         return nullptr;

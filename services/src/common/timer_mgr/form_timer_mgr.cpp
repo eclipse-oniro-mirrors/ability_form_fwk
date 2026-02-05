@@ -1745,7 +1745,11 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
             ClearUpdateAtTimerResource();
         }
         currentUpdateAtWantAgent_ = wantAgent;
-        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);// zg+=
+        if (updateAtTimerId_ == 0L) {
+            HILOG_ERROR("init update at timer task error");
+            return false;
+        }
         bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
             static_cast<uint64_t>(nextTime));
         if (!bRet) {

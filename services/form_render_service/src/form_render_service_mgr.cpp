@@ -100,7 +100,7 @@ int32_t FormRenderServiceMgr::ProcessRenderForm(const FormJsInfo &formJsInfo, co
         formJsInfo.abilityName.c_str(),
         formJsInfo.formName.c_str(),
         formJsInfo.moduleName.c_str(),
-        formJsInfo.jsFormCodePath.c_str(),
+        formJsInfo.jsFormCodePath.c_str(), // zg+= 需要脱敏
         formJsInfo.formSrc.c_str(),
         formJsInfo.formId);
     SetCriticalTrueOnFormActivity();
