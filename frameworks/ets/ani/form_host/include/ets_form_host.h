@@ -109,10 +109,15 @@ public:
     void RegisterGetLiveFormStatusListener(ani_vm *ani_vm, ani_object callback);
 
     void UnregisterGetLiveFormStatusListener();
+    
+    void RegisterTemplateFormDetailInfoChange(ani_vm* ani_vm, ani_object callback);
+
+    void UnregisterTemplateFormDetailInfoChange();
+
     void RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds);
 
     void AddFormRouterProxyCallback(ani_env* env, ani_object callback,
-    const std::vector<int64_t> &formIds);
+        const std::vector<int64_t> &formIds);
 
     ErrCode RouterEvent(const int64_t formId, const OHOS::AAFwk::Want &want);
 private:
@@ -142,11 +147,22 @@ private:
         LiveFormInterfaceParam *params);
     static void GetFormRectPromiseCallback(ani_env *env, ani_object aniObj, ani_object obj);
     static bool ConvertFunctionResult(ani_env* env, ani_object retObj, Rect &item);
-    ErrCode TemplateFormDetailInfoChange(
-        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
     mutable std::mutex registerGetFormRectProxyMutex_;
+
+    mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
+    ani_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
+    ani_vm* templateFormDetailInfoChangeVM;
+    ani_env* GetTemplateFormDetailInfoChangeEnv();
+    void SetTemplateFormDetailInfoChangeVM(ani_vm* ani_vm);
+
+    ErrCode TemplateFormDetailInfoChange(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
+    void TemplateFormDetailInfoChangeInner(
+        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
+    void GetTemplateFormInfoArray(ani_env* env,
+        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
+        ani_array &templateFormInfoArray);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

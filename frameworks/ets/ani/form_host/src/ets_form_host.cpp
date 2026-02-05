@@ -49,6 +49,7 @@ namespace {
 constexpr ani_size REFERENCES_MAX_NUMBER = 16;
 constexpr const char* ETS_FORM_HOST_NAME = "@ohos.app.form.formHost.formHost";
 constexpr const char* ETS_OVERFLOWREQUEST_NAME = "@ohos.app.form.formInfo.formInfo.OverflowRequestInner";
+constexpr const char* ETS_TEMPLATEFORMDETAILINFO_NAME = "@ohos.app.form.formInfo.formInfo.TemplateFormDetailInfoInner";
 constexpr const char* ETS_CHANGESCENEANIMATIONSTATEQUEST_NAME =
     "@ohos.app.form.formInfo.formInfo.ChangeSceneAnimationStateRequestInner";
 constexpr const char* ETS_RECT_NAME = "@ohos.app.form.formInfo.formInfo.RectInner";
@@ -142,6 +143,46 @@ public:
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterOverflowListener();
+    }
+    
+    static void OnRegisterTemplateFormDetailInfoChange(ani_env* env, ani_object callback)
+    {
+        HILOG_INFO("OnRegisterTemplateFormDetailInfoChange Call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("The app not system-app,can't use system-api");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return;
+        }
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(
+            EtsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
+            HILOG_ERROR("RegisterTemplateFormDetailInfoChange failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            return;
+        }
+        ani_vm *aniVM = nullptr;
+        if (env->GetVM(&aniVM) != ANI_OK) {
+            HILOG_ERROR("get aniVM failed");
+            return;
+        }
+        EtsFormRouterProxyMgr::GetInstance()->RegisterTemplateFormDetailInfoChange(aniVM, callback);
+    }
+
+    static void OffRegisterTemplateFormDetailInfoChange(ani_env* env, ani_object callback)
+    {
+        HILOG_INFO("OffRegisterTemplateFormDetailInfoChange Call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("The app not system-app,can't use system-api");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return;
+        }
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
+        if (result != ERR_OK) {
+            HILOG_ERROR("UnregisterTemplateFormDetailInfoChange failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            return;
+        }
+        EtsFormRouterProxyMgr::GetInstance()->UnregisterTemplateFormDetailInfoChange();
     }
 
     static void OnRegisterChangeSceneAnimationStateListener(ani_env* env, ani_object callback)
@@ -316,6 +357,14 @@ void EtsFormHostInit(ani_env* env)
         },
         ani_native_function {
             "nativeOffFormOverflow", nullptr, reinterpret_cast<void *>(EtsFormHost::OffRegisterOverflowListener)
+        },
+        ani_native_function {
+            "nativeOnTemplateFormDetailInfoChange", nullptr,
+            reinterpret_cast<void *>(EtsFormHost::OnRegisterTemplateFormDetailInfoChange)
+        },
+        ani_native_function {
+            "nativeOffTemplateFormDetailInfoChange", nullptr,
+            reinterpret_cast<void *>(EtsFormHost::OffRegisterTemplateFormDetailInfoChange)
         },
         ani_native_function {
             "nativeOnChangeSceneAnimationState", nullptr,
@@ -992,6 +1041,141 @@ ErrCode EtsFormRouterProxyMgr::TemplateFormDetailInfoChange(
     const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
 {
     return ERR_OK;
+}
+ErrCode EtsFormRouterProxyMgr::TemplateFormDetailInfoChange(
+    const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
+{
+    HILOG_DEBUG("call");
+    std::shared_ptr<AppExecFwk::EventHandler> mainHandler =
+        std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    bool result = false;
+    std::function<void()> executeFunc = [client = sptr<EtsFormRouterProxyMgr>(this), templateFormInfo, &result]() {
+        EtsFormRouterProxyMgr::GetInstance()->TemplateFormDetailInfoChangeInner(templateFormInfo);
+    };
+    mainHandler->PostSyncTask(executeFunc, "EtsFormRouterProxyMgr::TemplateFormDetailInfoChange");
+    HILOG_DEBUG("change successfully, result: %{public}d", result);
+    return result ? ERR_OK : ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+}
+
+void EtsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
+    const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
+{
+    HILOG_INFO("TemplateFormDetailInfoChangeInner Call");
+    ani_env* env = GetTemplateFormDetailInfoChangeEnv();
+    if (env == nullptr) {
+        HILOG_ERROR("env is null");
+        return;
+    }
+    ani_size nr_refs = REFERENCES_MAX_NUMBER;
+    env->CreateLocalScope(nr_refs);
+    ani_array templateFormInfoArray;
+    GetTemplateFormInfoArray(env, templateFormInfo, templateFormInfoArray);
+    ani_object call;
+    {
+        std::lock_guard<std::mutex> lock(registerTemplateFormDetailInfoChangeMutex_);
+        call = reinterpret_cast<ani_object>(templateFormDetailInfoChangeCallbackRef_);
+        if (call == nullptr) {
+            HILOG_ERROR("call is null");
+            return;
+        }
+    }
+    bool bRet = Callback(env, call, templateFormInfoArray, CLASSNAME_CALLBACK_WRAPPER);
+    if (!bRet) {
+        HILOG_ERROR("Callback failed");
+        return;
+    }
+    env->DestroyLocalScope();
+}
+
+void EtsFormRouterProxyMgr::GetTemplateFormInfoArray(ani_env* env,
+    const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
+    ani_array &templateFormInfoArray)
+{
+    for (size_t i = 0; i < templateFormInfo.size(); ++i) {
+        const auto &info = templateFormInfo[i];
+        ani_object object = CreateAniObject(env, ETS_TEMPLATEFORMDETAILINFO_NAME);
+        SetPropertyStringByName(env, object, "bundleName", info.bundleName);
+        SetPropertyStringByName(env, object, "moduleName", info.moduleName);
+        SetPropertyStringByName(env, object, "abilityName", info.abilityName);
+        SetPropertyStringByName(env, object, "formName", info.formName);
+        SetPropertyStringByName(env, object, "dimension", std::to_string(info.dimension));
+        SetPropertyStringByName(env, object, "detailId", info.detailId);
+        SetPropertyStringByName(env, object, "displayName", info.displayName);
+        SetPropertyStringByName(env, object, "description", info.description);
+        env->Array_Push(templateFormInfoArray, object);
+    }
+}
+
+void EtsFormRouterProxyMgr::RegisterTemplateFormDetailInfoChange(ani_vm* ani_vm, ani_object callback)
+{
+    std::lock_guard<std::mutex> lock(registerTemplateFormDetailInfoChangeMutex_);
+    HILOG_INFO("RegisterTemplateFormDetailInfoChange Call");
+    if (ani_vm == nullptr) {
+        HILOG_ERROR("ani_vm is null");
+        return;
+    }
+    ani_env* env = nullptr;
+    ani_status status = ANI_ERROR;
+    if ((status = ani_vm->GetEnv(ANI_VERSION_1, &env)) != ANI_OK) {
+        HILOG_ERROR("GetEnv failed status: %{public}d", status);
+        return;
+    }
+    if (callback == nullptr) {
+        HILOG_ERROR("Invalid callback reference");
+        return;
+    }
+    if (templateFormDetailInfoChangeCallbackRef_ != nullptr) {
+        if ((status = env->GlobalReference_Delete(templateFormDetailInfoChangeCallbackRef_)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+            return;
+        }
+        templateFormDetailInfoChangeCallbackRef_ = nullptr;
+    }
+    if ((status = env->GlobalReference_Create(callback, &templateFormDetailInfoChangeCallbackRef_)) != ANI_OK) {
+        HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+        return;
+    }
+    SetTemplateFormDetailInfoChangeVM(ani_vm);
+}
+
+void EtsFormRouterProxyMgr::UnregisterTemplateFormDetailInfoChange()
+{
+    std::lock_guard<std::mutex> lock(registerTemplateFormDetailInfoChangeMutex_);
+    HILOG_INFO("UnregisterTemplateFormDetailInfoChange Call");
+    ani_env* env = GetTemplateFormDetailInfoChangeEnv();
+    if (env == nullptr) {
+        HILOG_ERROR("env is null");
+        return;
+    }
+    ani_status status = ANI_ERROR;
+    if (templateFormDetailInfoChangeCallbackRef_ != nullptr) {
+        if ((status = env->GlobalReference_Delete(templateFormDetailInfoChangeCallbackRef_)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+            return;
+        }
+        templateFormDetailInfoChangeCallbackRef_ = nullptr;
+    }
+    SetTemplateFormDetailInfoChangeVM(nullptr);
+}
+
+ani_env* EtsFormRouterProxyMgr::GetTemplateFormDetailInfoChangeEnv()
+{
+    if (templateFormDetailInfoChangeVM == nullptr) {
+        HILOG_ERROR("ani_vm_ is null");
+        return nullptr;
+    }
+    ani_env* env = nullptr;
+    ani_status status = ANI_ERROR;
+    if ((status = templateFormDetailInfoChangeVM->GetEnv(ANI_VERSION_1, &env)) != ANI_OK) {
+        HILOG_ERROR("GetEnv failed status: %{public}d", status);
+        return nullptr;
+    }
+    return env;
+}
+
+void EtsFormRouterProxyMgr::SetTemplateFormDetailInfoChangeVM(ani_vm* ani_vm)
+{
+    templateFormDetailInfoChangeVM = ani_vm;
 }
 
 class EtsFormStateCallbackClient
