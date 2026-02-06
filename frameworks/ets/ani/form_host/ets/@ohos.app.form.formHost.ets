@@ -1025,12 +1025,12 @@ export default namespace formHost {
     formHost.nativeOffGetLiveFormStatus(myCall);
   }
 
-  function onGetLiveFormStatus(callback: formInfo.TemplateFormDetailInfoCallback): void {
+  function onTemplateFormDetailInfoChange(callback: formInfo.TemplateFormDetailInfoCallback): void {
     let myCall = new TemplateFormDetailInfoChangeCallbackWrapper(callback);
     formHost.nativeOnTemplateFormDetailInfoChange(myCall);
   }
 
-  function offGetLiveFormStatus(callback?: formInfo.TemplateFormDetailInfoCallback): void {
+  function offTemplateFormDetailInfoChange(callback?: formInfo.TemplateFormDetailInfoCallback): void {
     let myCall: TemplateFormDetailInfoChangeCallbackWrapper | undefined = undefined;
     if (callback) {
       myCall = new TemplateFormDetailInfoChangeCallbackWrapper(callback);
@@ -1093,8 +1093,8 @@ export default namespace formHost {
       this.templateFormDetailInfoCallback = callback;
     }
 
-    invoke(): Array<TemplateFormDetailInfo> {
-      return this.templateFormDetailInfoCallback();
+    invoke(info: Array<formInfo.TemplateFormDetailInfo>): void {
+      this.templateFormDetailInfoCallback(info);
     }
   }
 }
