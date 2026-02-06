@@ -32,7 +32,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 namespace {
 static std::mutex g_connectsMutex;
-uint32_t g_serialNumber = 0;
+int32_t g_serialNumber = 0;
 static std::map<EtsUIExtensionConnectionKey, sptr<EtsUIExtensionConnection>, Etskey_compare> g_connects;
 constexpr const int FAILED_CODE = -1;
 constexpr const char *LIVE_FORM_EXTENSION_CONTEXT = "Lapplication/LiveFormExtensionContext/LiveFormExtensionContext;";
