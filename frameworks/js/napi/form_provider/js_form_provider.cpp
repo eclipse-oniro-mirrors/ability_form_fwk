@@ -1420,7 +1420,6 @@ bool JsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
 ErrCode JsFormProviderProxyMgr::PublishFormCrossBundleControl(
     const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen)
 {
-    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
     HILOG_INFO("call");
     std::shared_ptr<PublishFormCrossBundleControlParam> dataParam =
         std::make_shared<PublishFormCrossBundleControlParam>();
