@@ -16,6 +16,8 @@
 #ifndef OHOS_FORM_FWK_ETS_FORM_PROVIDER_H
 #define OHOS_FORM_FWK_ETS_FORM_PROVIDER_H
 
+#include "ani.h"
+#include "ani_base_context.h"
 #include "form_instance.h"
 #include "form_provider_delegate_stub.h"
 

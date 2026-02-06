@@ -19,8 +19,6 @@
 #include <cinttypes>
 #include <regex>
 
-#include "ani.h"
-#include "ani_base_context.h"
 #include "ani_common_want.h"
 #include "js_runtime_utils.h"
 #include "ani_helpers.h"
