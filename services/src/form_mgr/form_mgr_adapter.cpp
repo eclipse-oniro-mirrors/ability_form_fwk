@@ -4279,6 +4279,7 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
     for (const auto &formRecord : forceRefreshForms) {
         RefreshData data;
         data.record = formRecord;
+        data.formId = formRecord.formId;
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_FORCE);
     }
     return ERR_OK;

@@ -30,6 +30,7 @@ ohos_unittest("FmsFormDataMgrTest") {
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
+    "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/inner",
   ]
 
   configs = []

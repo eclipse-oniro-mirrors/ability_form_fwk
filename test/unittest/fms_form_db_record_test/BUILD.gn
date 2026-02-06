@@ -19,10 +19,14 @@ module_output_path = "form_fwk/form_fwk/form_mgr_service"
 ohos_unittest("FmsFormDbRecordTest") {
   module_out_path = module_output_path
 
-  sources = [ "${form_fwk_path}/test/unittest/fms_form_db_record_test/fms_form_db_record_test.cpp" ]
+  sources = [
+    "${form_fwk_path}/test/unittest/fms_form_db_record_test/fms_form_db_record_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/mock_form_bms_helper.cpp",
+  ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/test/unittest/fms_form_db_record_test/inner",
   ]
 
   configs = []

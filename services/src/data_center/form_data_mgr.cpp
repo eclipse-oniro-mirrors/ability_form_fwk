@@ -442,48 +442,41 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
 {
     HILOG_INFO("callingUid:%{public}d, currentUserId:%{public}d", callingUid, currentUserId);
 
-    int32_t maxFormsSize = Constants::MAX_FORMS;
-    GetConfigParamFormMap(Constants::MAX_NORMAL_FORM_SIZE, maxFormsSize);
-    maxFormsSize = ((maxFormsSize > Constants::MAX_FORMS) || (maxFormsSize < 0)) ?
-        Constants::MAX_FORMS : maxFormsSize;
-    HILOG_DEBUG("maxFormsSize:%{public}d", maxFormsSize);
+    int32_t ret = CheckEnoughFormOnDevice(callingUid, currentUserId);
+    if (ret != ERR_OK) {
+        return ret;
+    }
 
-    int32_t maxRecordPerApp = Constants::MAX_RECORD_PER_APP;
-    GetConfigParamFormMap(Constants::HOST_MAX_FORM_SIZE, maxRecordPerApp);
-    maxRecordPerApp = ((maxRecordPerApp > Constants::MAX_RECORD_PER_APP) || (maxRecordPerApp < 0)) ?
-        Constants::MAX_RECORD_PER_APP : maxRecordPerApp;
-    HILOG_DEBUG("maxRecordPerApp:%{public}d", maxRecordPerApp);
-
-    if (maxRecordPerApp == 0) {
-        HILOG_ERROR("The maximum number of normal cards in pre host is 0");
+    int32_t maxRecordPerHost = Constants::MAX_RECORD_PER_HOST;
+    GetConfigParamFormMap(Constants::HOST_MAX_FORM_SIZE, maxRecordPerHost);
+    maxRecordPerHost = ((maxRecordPerHost > Constants::MAX_RECORD_PER_HOST) || (maxRecordPerHost < 0)) ?
+        Constants::MAX_RECORD_PER_HOST : maxRecordPerHost;
+    HILOG_DEBUG("maxRecordPerHost:%{public}d", maxRecordPerHost);
+    if (maxRecordPerHost == 0) {
+        HILOG_ERROR("The maximum number of normal cards in per host is 0");
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
+    }
+    std::string hostBundleName;
+    ret = FormBmsHelper::GetInstance().GetBundleNameByUid(callingUid, hostBundleName);
+    if (ret != ERR_OK) {
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
+    }
+    int32_t formCountsCurHost = FormDbCache::GetInstance().GetFormCountsByHostBundleName(hostBundleName);
+    HILOG_DEBUG("already use %{public}d forms by host:%{public}s", formCountsCurHost, hostBundleName.c_str());
+    if (formCountsCurHost >= maxRecordPerHost) {
+        HILOG_ERROR("The maximum number of form in per host is %{public}d", maxRecordPerHost);
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
-    const auto formDbInfoSize = FormDbCache::GetInstance().GetAllFormInfoSize();
-    HILOG_INFO("already use %{public}d forms by userId", formDbInfoSize);
-    if (formDbInfoSize >= maxFormsSize) {
-        std::map<Constants::FormLocation, int> locationMap;
-        FormDbCache::GetInstance().GetLocationMap(locationMap);
-        Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
-        int maxCount = 0;
-        for (const auto &location : locationMap) {
-            if (location.second > maxCount) {
-                maxCount = location.second;
-                maxLocation = location.first;
-            }
-        }
-        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}d, maxCount:%{public}d",
-            maxFormsSize, static_cast<int>(maxLocation), maxCount);
-        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
-            static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
-            ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS);
-        return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
-    }
-
-    int callingUidFormCounts = FormDbCache::GetInstance().GetFormCountsByCallingUid(currentUserId, callingUid);
-    if (callingUidFormCounts >= maxRecordPerApp) {
-        HILOG_WARN("already use %{public}d forms by userId==currentUserId", maxRecordPerApp);
-        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
+    int32_t maxRecordPerUser = Constants::MAX_RECORD_PER_USER;
+    GetConfigParamFormMap(Constants::MAX_FORM_SIZE_PER_USER, maxRecordPerUser);
+    maxRecordPerUser = ((maxRecordPerUser > Constants::MAX_RECORD_PER_USER) || (maxRecordPerUser < 0)) ?
+        Constants::MAX_RECORD_PER_USER : maxRecordPerUser;
+    int32_t formCountsCurUser = FormDbCache::GetInstance().GetFormCountsByUserId(currentUserId);
+    HILOG_DEBUG("current user:%{public}d has form count:%{public}d", currentUserId, formCountsCurUser);
+    if (formCountsCurUser >= maxRecordPerUser) {
+        HILOG_ERROR("The maximum number of form in per user is %{public}d", maxRecordPerUser);
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER;
     }
 
     return ERR_OK;
@@ -3450,28 +3443,6 @@ bool FormDataMgr::GetIsNeedUpdateOnAddFinish(const int64_t formId, FormRecord &f
     return isNeedUpdate;
 }
 
-/**
-* @brief Merges form data into the provider data.
-* @param formId The Id of the form.
-* @param formProviderData The target FormProviderData to receive the merged data.
-* @return Returns true if this function is successfully called; returns false otherwise.
-*/
-bool FormDataMgr::MergeFormData(const int64_t formId, FormProviderData &formProviderData)
-{
-    std::string stringData;
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    if (!FormCacheMgr::GetInstance().GetData(formId, stringData, imageDataMap)) {
-        HILOG_INFO("No cache data found for formId: %{public}" PRId64, formId);
-        return false;
-    }
-    FormProviderData formCacheData;
-    formCacheData.SetDataString(stringData);
-    formCacheData.SetImageDataMap(imageDataMap);
-    formCacheData.MergeData(formProviderData.GetData());
-    formProviderData = formCacheData;
-    return true;
-}
-
 void FormDataMgr::UpdateFormHostParams(const int64_t formId, const Want &want)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -3506,15 +3477,75 @@ void FormDataMgr::GetFormHostParams(const int64_t formId, Want &want)
     WantParams wantParams = want.GetParams();
     for (auto paramKey : FORM_HOST_PARAM_NAMES) {
         if (!formHostParams.HasParam(paramKey)) {
-            continue;
-        }
-        auto paramValue = formHostParams.GetParam(paramKey);
-        if (paramValue != nullptr) {
-            wantParams.SetParam(paramKey, paramValue);
+        continue;
+    }
+    auto paramValue = formHostParams.GetParam(paramKey);
+    if (paramValue != nullptr) {
+        wantParams.SetParam(paramKey, paramValue);
         }
     }
     want.SetParams(wantParams);
     HILOG_INFO(" end, formId:%{public}" PRId64 ", wantParams:%{public}s.", formId, wantParams.ToString().c_str());
+}
+
+/**
+ * @brief Merges form data into the provider data.
+ * @param formId The Id of the form.
+ * @param formProviderData The target FormProviderData to receive the merged data.
+ * @return Returns true if this function is successfully called; returns false otherwise.
+ */
+bool FormDataMgr::MergeFormData(const int64_t formId, FormProviderData &formProviderData)
+{
+    std::string stringData;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    if (!FormCacheMgr::GetInstance().GetData(formId, stringData, imageDataMap)) {
+        HILOG_INFO("No cache data found for formId: %{public}" PRId64, formId);
+        return false;
+    }
+    FormProviderData formCacheData;
+    formCacheData.SetDataString(stringData);
+    formCacheData.SetImageDataMap(imageDataMap);
+    formCacheData.MergeData(formProviderData.GetData());
+    formProviderData = formCacheData;
+    return true;
+}
+
+/**
+ * @brief Check form count is max on the device.
+ * @param currentUserId The current userId.
+ * @param callingUid The UID of the proxy.
+ * @return Returns ERR_OK if enough form; returns other error code otherwise.
+ */
+ErrCode FormDataMgr::CheckEnoughFormOnDevice(const int callingUid, const int32_t currentUserId) const
+{
+    int32_t maxFormsSize = Constants::MAX_FORMS;
+    GetConfigParamFormMap(Constants::MAX_NORMAL_FORM_SIZE, maxFormsSize);
+    maxFormsSize = ((maxFormsSize > Constants::MAX_FORMS) || (maxFormsSize < 0)) ?
+        Constants::MAX_FORMS : maxFormsSize;
+    HILOG_DEBUG("maxFormsSize:%{public}d", maxFormsSize);
+
+    const auto formDbInfoSize = FormDbCache::GetInstance().GetAllFormInfoSize();
+    HILOG_INFO("already use %{public}d forms by device", formDbInfoSize);
+    if (formDbInfoSize >= maxFormsSize) {
+        std::map<Constants::FormLocation, int> locationMap;
+        FormDbCache::GetInstance().GetLocationMap(locationMap);
+        Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
+        int maxCount = 0;
+        for (const auto &location : locationMap) {
+            if (location.second > maxCount) {
+                maxCount = location.second;
+                maxLocation = location.first;
+            }
+        }
+        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}d, maxCount:%{public}d",
+            maxFormsSize, static_cast<int>(maxLocation), maxCount);
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
+            static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
+            ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS);
+        return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
+    }
+
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

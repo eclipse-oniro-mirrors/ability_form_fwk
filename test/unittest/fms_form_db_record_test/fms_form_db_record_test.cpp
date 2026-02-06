@@ -23,6 +23,7 @@
 #include "data_center/form_record/form_record.h"
 #include "fms_log_wrapper.h"
 #include "want.h"
+#include "inner/mock_form_bms_helper.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -32,6 +33,7 @@ namespace {
 class FmsFormDbRecordTest : public testing::Test {
 public:
     void InitFormRecord();
+    void TearDown();
     FormRecord formRecord_;
     FormMgrAdapter formMgrAdapter_;
 };
@@ -58,6 +60,14 @@ void FmsFormDbRecordTest::InitFormRecord()
     formRecord_.formUserUids.emplace_back(1);
     formRecord_.formVisibleNotify = false;
     formRecord_.formVisibleNotifyState = 0;
+}
+
+void FmsFormDbRecordTest::TearDown()
+{
+    if (!FormDbCache::GetInstance().formDBInfos_.empty()) {
+        FormDbCache::GetInstance().formDBInfos_.clear();
+    }
+    MockGetBundleNameByUid(ERR_OK);
 }
 
 /**
@@ -527,7 +537,7 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_021, TestSize.Level0)
 /**
  * @tc.number: FmsFormDbRecordTest_022
  * @tc.name: GetLocationMap
-*/
+ */
 HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_022, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_022 start";
@@ -539,5 +549,107 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_022, TestSize.Level0)
     FormDbCache::GetInstance().GetLocationMap(locationMap);
     EXPECT_TRUE(locationMap.size() > 0);
     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_022 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_GetFormCountsByUserId_001
+ * @tc.name: GetFormCountsByUserId
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: userId matches.
+ */
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_GetFormCountsByUserId_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByUserId_001 start";
+
+    int32_t userId = 100;
+    FormDBInfo formDBInfo;
+    formDBInfo.userId = userId;
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDBInfo);
+
+    EXPECT_EQ(1, FormDbCache::GetInstance().GetFormCountsByUserId(userId));
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByUserId_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_GetFormCountsByUserId_002
+ * @tc.name: GetFormCountsByUserId
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: userId does not match.
+ */
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_GetFormCountsByUserId_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByUserId_002 start";
+
+    int32_t userId = 100;
+    int32_t queryUserId = 200;
+    FormDBInfo formDBInfo;
+    formDBInfo.userId = userId;
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDBInfo);
+
+    EXPECT_EQ(0, FormDbCache::GetInstance().GetFormCountsByUserId(queryUserId));
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByUserId_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_GetFormCountsByHostBundleName_001
+ * @tc.name: GetFormCountsByHostBundleName
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: hostBundleName matches.
+ */
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_GetFormCountsByHostBundleName_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByHostBundleName_001 start";
+
+    int32_t hostUid = 1000;
+    std::string hostBundleName = "com.test.bundle";
+    FormDBInfo formDBInfo;
+    formDBInfo.formUserUids.emplace_back(hostUid);
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDBInfo);
+    MockGetBundleNameByUid(ERR_OK, hostBundleName);
+
+    EXPECT_EQ(1, FormDbCache::GetInstance().GetFormCountsByHostBundleName(hostBundleName));
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByHostBundleName_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_GetFormCountsByHostBundleName_002
+ * @tc.name: GetFormCountsByHostBundleName
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: GetBundleNameByUid failed.
+ */
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_GetFormCountsByHostBundleName_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByHostBundleName_002 start";
+
+    int32_t hostUid = 1000;
+    std::string hostBundleName = "com.test.bundle";
+    FormDBInfo formDBInfo;
+    formDBInfo.formUserUids.emplace_back(hostUid);
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDBInfo);
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    EXPECT_EQ(0, FormDbCache::GetInstance().GetFormCountsByHostBundleName(hostBundleName));
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByHostBundleName_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDbRecordTest_GetFormCountsByHostBundleName_003
+ * @tc.name: GetFormCountsByHostBundleName
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: hostBundleName does not match.
+ */
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_GetFormCountsByHostBundleName_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByHostBundleName_003 start";
+
+    int32_t hostUid = 1000;
+    std::string hostBundleName = "com.test.bundle";
+    FormDBInfo formDBInfo;
+    formDBInfo.formUserUids.emplace_back(hostUid);
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDBInfo);
+    MockGetBundleNameByUid(ERR_OK, "com.other.bundle");
+
+    EXPECT_EQ(0, FormDbCache::GetInstance().GetFormCountsByHostBundleName(hostBundleName));
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByHostBundleName_003 end";
 }
 }

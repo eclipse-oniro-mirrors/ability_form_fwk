@@ -34,6 +34,9 @@
 #include "running_form_info.h"
 #include "mock_form_provider_client.h"
 
+#include "inner/mock_form_bms_helper.h"
+#include "inner/mock_fms_form_db_cache.h"
+
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
@@ -45,9 +48,6 @@ const std::string FORM_BUNDLE_NAME = "formBundleName";
 const int64_t FORM_ID_ONE = 1;
 const int64_t FORM_ID_ZERO = 0;
 const int64_t FORM_USER_UIDS_ZERO = 0;
-
-extern void MockGetBundleNameByUid(ErrCode mockRet);
-extern void MockGetAllFormInfo(int32_t mockRet);
 
 namespace {
 class FmsFormDataMgrTest : public testing::Test {
@@ -505,9 +505,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckTempEnoughForm_002, TestSiz
 /**
  * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_001
  * @tc.name: CheckEnoughForm
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *      formDBInfos_'s size is over 512.
+ * @tc.desc: Verify that the return value is error.
+ * @tc.details: formDBInfos_'s size is over 512.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_001, TestSize.Level0)
 {
@@ -515,21 +514,18 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_001, TestSize.Le
 
     int callingUid = 0;
     int32_t checkAllDBFormMaxSize = 2;
-
     // set formDbInfos size is over 512
     MockGetAllFormInfoSize(checkAllDBFormMaxSize, callingUid);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, formDataMgr_.CheckEnoughForm(callingUid));
-
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_001 end";
 }
 
 /**
  * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_002
  * @tc.name: CheckEnoughForm
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *      there is no formRecords.
+ * @tc.desc: Verify that the return value is error.
+ * @tc.details: maxRecordPerHost is zero.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Level0)
 {
@@ -537,34 +533,94 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Le
 
     int callingUid = 0;
     int32_t checkAllDBFormPreAPPSize = 1;
-
     MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
+    formDataMgr_.formConfigMap_[Constants::HOST_MAX_FORM_SIZE] = 0;
 
-    EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughForm(callingUid));
-
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_002 end";
 }
 
 /**
  * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_003
  * @tc.name: CheckEnoughForm
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *      there is 256 formDBInfos_ and their callingUid is -1.
+ * @tc.desc: Verify that the return value is error.
+ * @tc.details: formCountsCurHost exceeds maxRecordPerHost.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_003 start";
 
-    int callingUid = -1;
+    int callingUid = 0;
     int32_t checkAllDBFormPreAPPSize = 1;
-
-    // set formDbInfos size is over 256
     MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
+    MockGetBundleNameByUid(ERR_OK);
+    MockGetFormCountsByHostBundleName(Constants::MAX_RECORD_PER_HOST);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
-
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_004
+ * @tc.name: CheckEnoughForm
+ * @tc.desc: Verify that the return value is error.
+ * @tc.details: maxRecordPerUser is zero.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_004 start";
+
+    int callingUid = 0;
+    int32_t checkAllDBFormPreAPPSize = 1;
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
+    MockGetBundleNameByUid(ERR_OK);
+    MockGetFormCountsByHostBundleName(0);
+    formDataMgr_.formConfigMap_[Constants::MAX_FORM_SIZE_PER_USER] = 0;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER, formDataMgr_.CheckEnoughForm(callingUid));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_005
+ * @tc.name: CheckEnoughForm
+ * @tc.desc: Verify that the return value is error.
+ * @tc.details: formCountsCurUser exceeds maxRecordPerUser.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_005 start";
+
+    int callingUid = 0;
+    int32_t checkAllDBFormPreAPPSize = 1;
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
+    MockGetBundleNameByUid(ERR_OK);
+    MockGetFormCountsByHostBundleName(0);
+    MockGetFormCountsByUserId(Constants::MAX_RECORD_PER_USER);
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER, formDataMgr_.CheckEnoughForm(callingUid));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_005 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_006
+ * @tc.name: CheckEnoughForm
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: all checks passed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_006 start";
+
+    int callingUid = 0;
+    int32_t checkAllDBFormPreAPPSize = 1;
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
+    MockGetBundleNameByUid(ERR_OK);
+    MockGetFormCountsByHostBundleName(0);
+    MockGetFormCountsByUserId(0);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughForm(callingUid));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_006 end";
 }
 
 /**
@@ -6224,5 +6280,44 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleFormAddObserver_002, TestS
     EXPECT_EQ(ERR_OK, formDataMgr->HandleFormAddObserver(hostBundleName, FORM_ID_ONE, userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleFormAddObserver_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckEnoughFormOnDevice_001
+ * @tc.name: CheckEnoughFormOnDevice
+ * @tc.desc: Verify that the return value is error.
+ * @tc.details: formDBInfos_'s size is over 512.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughFormOnDevice_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_001 start";
+
+    int callingUid = 0;
+    int32_t checkAllDBFormMaxSize = 2;
+    formDataMgr_.formConfigMap_[Constants::MAX_NORMAL_FORM_SIZE] = Constants::MAX_FORMS;
+    // set formDbInfos size is over 512
+    MockGetAllFormInfoSize(checkAllDBFormMaxSize, callingUid);
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, formDataMgr_.CheckEnoughFormOnDevice(callingUid));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckEnoughFormOnDevice_002
+ * @tc.name: CheckEnoughFormOnDevice
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: there is no formRecords.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughFormOnDevice_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_002 start";
+
+    int callingUid = 0;
+    int32_t checkAllDBFormPreAPPSize = 1;
+    formDataMgr_.formConfigMap_[Constants::MAX_NORMAL_FORM_SIZE] = -1;
+    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughFormOnDevice(callingUid));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_002 end";
 }
 }

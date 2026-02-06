@@ -107,7 +107,7 @@ public:
      * @brief Check form count is max.
      * @param currentUserId The current userId.
      * @param callingUid The UID of the proxy.
-     * @return Returns true if this function is successfully called; returns false otherwise.
+     * @return Returns ERR_OK if enough form; returns other error code otherwise.
      */
     int CheckEnoughForm(const int callingUid, const int32_t currentUserId = Constants::DEFAULT_USER_ID) const;
     /**
@@ -1242,6 +1242,14 @@ private:
     void GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
     void GetUnusedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos);
     void DeleteRecordTempForms(const std::vector<int64_t> &recordTempForms);
+    /**
+     * @brief Check form count is max on the device.
+     * @param currentUserId The current userId.
+     * @param callingUid The UID of the proxy.
+     * @return Returns ERR_OK if enough form; returns other error code otherwise.
+     */
+    ErrCode CheckEnoughFormOnDevice(const int callingUid,
+        const int32_t currentUserId = Constants::DEFAULT_USER_ID) const;
 
     mutable std::mutex formRecordMutex_;
     mutable std::mutex formHostRecordMutex_;
