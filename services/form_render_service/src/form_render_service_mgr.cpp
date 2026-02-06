@@ -95,12 +95,12 @@ int32_t FormRenderServiceMgr::RenderForm(
 int32_t FormRenderServiceMgr::ProcessRenderForm(const FormJsInfo &formJsInfo, const Want &want)
 {
     HILOG_INFO("Render form,bundleName=%{public}s,abilityName=%{public}s,formName=%{public}s,"
-               "moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{public}s,formId=%{public}" PRId64,
+               "moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{private}s,formId=%{public}" PRId64,
         formJsInfo.bundleName.c_str(),
         formJsInfo.abilityName.c_str(),
         formJsInfo.formName.c_str(),
         formJsInfo.moduleName.c_str(),
-        formJsInfo.jsFormCodePath.c_str(), // zg+= 需要脱敏
+        formJsInfo.jsFormCodePath.c_str(),
         formJsInfo.formSrc.c_str(),
         formJsInfo.formId);
     SetCriticalTrueOnFormActivity();

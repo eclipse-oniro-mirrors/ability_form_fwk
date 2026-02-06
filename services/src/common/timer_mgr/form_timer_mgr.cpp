@@ -1745,7 +1745,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
             ClearUpdateAtTimerResource();
         }
         currentUpdateAtWantAgent_ = wantAgent;
-        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);// zg+=
+        updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
         if (updateAtTimerId_ == 0L) {
             HILOG_ERROR("init update at timer task error");
             return false;

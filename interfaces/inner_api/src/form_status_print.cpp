@@ -20,44 +20,55 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const static std::unordered_map<FormFsmStatus, std::string> FORM_STATUS_STRING_MAP = {
-    { FormFsmStatus::INIT, "[INIT]" },
-    { FormFsmStatus::RENDERED, "[RENDERED]" },
-    { FormFsmStatus::RECYCLED, "[RECYCLED]" },
-    { FormFsmStatus::RENDERING, "[RENDERING]" },
-    { FormFsmStatus::RECYCLING_DATA, "[RECYCLING_DATA]" },
-    { FormFsmStatus::RECYCLING, "[RECYCLING]" },
-    { FormFsmStatus::RECOVERING, "[RECOVERING]" },
-    { FormFsmStatus::DELETING, "[DELETING]" },
-    { FormFsmStatus::UNPROCESSABLE, "[UNPROCESSABLE]" },
+
+class FormMapInfoTable {
+public:
+    std::unordered_map<FormFsmStatus, std::string> FORM_STATUS_STRING_MAP;
+    std::unordered_map<FormFsmEvent, std::string> FORM_EVENT_STRING_MAP;
+
+    FormMapInfoTable() {
+        this->FORM_STATUS_STRING_MAP = {
+            { FormFsmStatus::INIT, "[INIT]" },
+            { FormFsmStatus::RENDERED, "[RENDERED]" },
+            { FormFsmStatus::RECYCLED, "[RECYCLED]" },
+            { FormFsmStatus::RENDERING, "[RENDERING]" },
+            { FormFsmStatus::RECYCLING_DATA, "[RECYCLING_DATA]" },
+            { FormFsmStatus::RECYCLING, "[RECYCLING]" },
+            { FormFsmStatus::RECOVERING, "[RECOVERING]" },
+            { FormFsmStatus::DELETING, "[DELETING]" },
+            { FormFsmStatus::UNPROCESSABLE, "[UNPROCESSABLE]" },
+        };
+        this->FORM_EVENT_STRING_MAP = {
+            { FormFsmEvent::RENDER_FORM, "[RENDER_FORM]" },
+            { FormFsmEvent::RENDER_FORM_DONE, "[RENDER_FORM_DONE]" },
+            { FormFsmEvent::RENDER_FORM_FAIL, "[RENDER_FORM_FAIL]" },
+            { FormFsmEvent::RECYCLE_DATA, "[RECYCLE_DATA]" },
+            { FormFsmEvent::RECYCLE_DATA_DONE, "[RECYCLE_DATA_DONE]" },
+            { FormFsmEvent::RECYCLE_DATA_FAIL, "[RECYCLE_DATA_FAIL]" },
+            { FormFsmEvent::RECYCLE_FORM, "[RECYCLE_FORM]" },
+            { FormFsmEvent::RECYCLE_FORM_DONE, "[RECYCLE_FORM_DONE]" },
+            { FormFsmEvent::RECYCLE_FORM_FAIL, "[RECYCLE_FORM_FAIL]" },
+            { FormFsmEvent::RECOVER_FORM, "[RECOVER_FORM]" },
+            { FormFsmEvent::RECOVER_FORM_DONE, "[RECOVER_FORM_DONE]" },
+            { FormFsmEvent::RECOVER_FORM_FAIL, "[RECOVER_FORM_FAIL]" },
+            { FormFsmEvent::DELETE_FORM, "[DELETE_FORM]" },
+            { FormFsmEvent::DELETE_FORM_DONE, "[DELETE_FORM_DONE]" },
+            { FormFsmEvent::DELETE_FORM_FAIL, "[DELETE_FORM_FAIL]" },
+            { FormFsmEvent::DELETE_FORM_FINISH, "[DELETE_FORM_FINISH]" },
+            { FormFsmEvent::EXECUTION_TIMEOUT, "[EXECUTION_TIMEOUT]" },
+            { FormFsmEvent::RELOAD_FORM, "[RELOAD_FORM]" },
+        };
+    }
 };
-const static std::unordered_map<FormFsmEvent, std::string> FORM_EVENT_STRING_MAP = {
-    { FormFsmEvent::RENDER_FORM, "[RENDER_FORM]" },
-    { FormFsmEvent::RENDER_FORM_DONE, "[RENDER_FORM_DONE]" },
-    { FormFsmEvent::RENDER_FORM_FAIL, "[RENDER_FORM_FAIL]" },
-    { FormFsmEvent::RECYCLE_DATA, "[RECYCLE_DATA]" },
-    { FormFsmEvent::RECYCLE_DATA_DONE, "[RECYCLE_DATA_DONE]" },
-    { FormFsmEvent::RECYCLE_DATA_FAIL, "[RECYCLE_DATA_FAIL]" },
-    { FormFsmEvent::RECYCLE_FORM, "[RECYCLE_FORM]" },
-    { FormFsmEvent::RECYCLE_FORM_DONE, "[RECYCLE_FORM_DONE]" },
-    { FormFsmEvent::RECYCLE_FORM_FAIL, "[RECYCLE_FORM_FAIL]" },
-    { FormFsmEvent::RECOVER_FORM, "[RECOVER_FORM]" },
-    { FormFsmEvent::RECOVER_FORM_DONE, "[RECOVER_FORM_DONE]" },
-    { FormFsmEvent::RECOVER_FORM_FAIL, "[RECOVER_FORM_FAIL]" },
-    { FormFsmEvent::DELETE_FORM, "[DELETE_FORM]" },
-    { FormFsmEvent::DELETE_FORM_DONE, "[DELETE_FORM_DONE]" },
-    { FormFsmEvent::DELETE_FORM_FAIL, "[DELETE_FORM_FAIL]" },
-    { FormFsmEvent::DELETE_FORM_FINISH, "[DELETE_FORM_FINISH]" },
-    { FormFsmEvent::EXECUTION_TIMEOUT, "[EXECUTION_TIMEOUT]" },
-    { FormFsmEvent::RELOAD_FORM, "[RELOAD_FORM]" },
-};
+
+const static FormMapInfoTable FormMapInfoTbl;
 }
 
 std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 {
     std::string value = std::to_string(static_cast<int>(status));
-    const auto iter = FORM_STATUS_STRING_MAP.find(status);
-    if (iter != FORM_STATUS_STRING_MAP.end()) {
+    const auto iter = FormMapInfo.FORM_STATUS_STRING_MAP.find(status);
+    if (iter != FormMapInfo.FORM_STATUS_STRING_MAP.end()) {
         value = iter->second;
     }
     return value;
@@ -66,8 +77,8 @@ std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 std::string FormStatusPrint::FormEventToString(const FormFsmEvent event)
 {
     std::string value = std::to_string(static_cast<int>(event));
-    const auto iter = FORM_EVENT_STRING_MAP.find(event);
-    if (iter != FORM_EVENT_STRING_MAP.end()) {
+    const auto iter = FormMapInfoTbl.FORM_EVENT_STRING_MAP.find(event);
+    if (iter != FormMapInfoTbl.FORM_EVENT_STRING_MAP.end()) {
         value = iter->second;
     }
     return value;
