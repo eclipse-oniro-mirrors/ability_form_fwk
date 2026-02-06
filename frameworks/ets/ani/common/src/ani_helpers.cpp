@@ -16,6 +16,8 @@
 #include <charconv>
 #include "ani_helpers.h"
 #include "form_mgr_errors.h"
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -1085,6 +1087,12 @@ bool VectorHasNegativeValue(const std::vector<int>& vec)
     return std::any_of(vec.begin(), vec.end(), [](int v) {
         return v < 0;
     });
+}
+
+bool CheckCallerIsSystemApp()
+{
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
 }
 
 }  // namespace FormAniHelpers

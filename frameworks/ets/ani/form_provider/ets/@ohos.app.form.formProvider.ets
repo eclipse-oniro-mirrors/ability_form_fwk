@@ -55,6 +55,8 @@ export namespace formProvider {
   native function checkOverflowInfoParam(overflowInfo: formInfo.OverflowInfo): void;
   native function nativeReloadForms(context: UIAbilityContext, moduleName: string, abilityName: string, formName: string, callback: AsyncCallbackWrapper<int>): void;
   native function nativeReloadAllForms(context: UIAbilityContext, callback: AsyncCallbackWrapper<int>): void;
+  native function nativeOnPublishFormCrossBundleControl(callback: PublishFormCrossBundleControlCallbackWrapper): void;
+  native function nativeOffPublishFormCrossBundleControl(callback?: PublishFormCrossBundleControlCallbackWrapper): void;
 
   const ERR_OK = 0;
   const INVALID_PARAM_ERROR_CODE = 401;
@@ -440,5 +442,30 @@ export namespace formProvider {
         });
       });
     return reloadAllFormsPromise;
+  }
+
+  function onPublishFormCrossBundleControl(callback: formInfo.PublishFormCrossBundleControlCallback): void {
+    let myCall = new PublishFormCrossBundleControlCallbackWrapper(callback);
+    nativeOnPublishFormCrossBundleControl(myCall);
+  }
+
+  function offPublishFormCrossBundleControl(callback?: formInfo.PublishFormCrossBundleControlCallback): void {
+    let myCall: PublishFormCrossBundleControlCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new PublishFormCrossBundleControlCallbackWrapper(callback);
+    }
+    nativeOffPublishFormCrossBundleControl(myCall);
+  }
+
+  class PublishFormCrossBundleControlCallbackWrapper {
+    private publishFormCrossBundleControlCallback: formInfo.PublishFormCrossBundleControlCallback = (info: formInfo.PublishFormCrossBundleInfo): boolean => { }
+
+    constructor(callback: formInfo.PublishFormCrossBundleControlCallback) {
+      this.publishFormCrossBundleControlCallback = callback;
+    }
+
+    invoke(info: formInfo.PublishFormCrossBundleInfo): boolean {
+      return this.publishFormCrossBundleControlCallback(info);
+    }
   }
 }

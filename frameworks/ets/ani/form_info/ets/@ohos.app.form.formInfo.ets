@@ -333,4 +333,18 @@ export default namespace formInfo {
   }
 
   type GetFormRectInfoCallback = (formId: string) => Promise<Rect>;
+
+  interface PublishFormCrossBundleInfo {
+    callerBundleName: string;
+    targetBundleName: string;
+    targetTemplateFormDetailId: string;
+  }
+
+  class PublishFormCrossBundleInfoInner implements PublishFormCrossBundleInfo {
+    callerBundleName: string;
+    targetBundleName: string;
+    targetTemplateFormDetailId: string;
+  }
+
+  type PublishFormCrossBundleControlCallback = (info: PublishFormCrossBundleInfo) => boolean;
 }
