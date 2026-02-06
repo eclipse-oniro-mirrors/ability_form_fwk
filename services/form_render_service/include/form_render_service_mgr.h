@@ -31,6 +31,7 @@
 #include "runtime.h"
 #include "want.h"
 #include "status_mgr_center/form_status_common.h"
+#include "ohos_application.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -111,11 +112,19 @@ public:
 
     void SetCriticalTrueOnFormActivity();
 
-    void SetMainGcCb(std::function<void()> &&cb);
-
     void MainThreadForceFullGC();
 
     int32_t SetRenderGroupParams(const int64_t formId, const Want &want);
+
+    void AddRuntimeToHost(const std::string &bundleName, const std::shared_ptr<AbilityRuntime::JsRuntime> &runtime);
+    void RemoveRuntimeToHost(const std::string &bundleName, const std::shared_ptr<AbilityRuntime::JsRuntime> &runtime);
+
+    inline void SetApplication(const std::shared_ptr<AppExecFwk::OHOSApplication> &application)
+    {
+        if (application_.lock() == nullptr && application != nullptr) {
+            application_ = application;
+        }
+    }
 
 private:
     void SetCriticalFalseOnAllFormInvisible();
@@ -139,7 +148,7 @@ private:
     int32_t ProcessReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid, const Want &want);
     int32_t ProcessRecoverForm(const FormJsInfo &formJsInfo, const Want &want);
     int32_t ProcessStopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, bool &isRenderGroupEmptyOut);
-
+    void UpdateRuntimeAssociation(const std::shared_ptr<AbilityRuntime::JsRuntime> &runtime, bool shouldAssociate);
 private:
     std::mutex renderRecordMutex_;
     // <uid(userId + bundleName), renderRecord>
@@ -155,7 +164,7 @@ private:
     bool isVerified_ = false;
     bool hasCachedConfig_ = false;
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> mainHandler_ = nullptr;
-    std::function<void()> mainGcCb_ = nullptr;
+    std::weak_ptr<AppExecFwk::OHOSApplication> application_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

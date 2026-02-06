@@ -609,6 +609,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     }
     runtime_->SetTemplateFormImperativeFwk(target);
     RegisterUncatchableErrorHandler();
+    FormRenderServiceMgr::GetInstance().AddRuntimeToHost(bundleName_, runtime_);
     return true;
 }
 
@@ -1232,6 +1233,7 @@ void FormRenderRecord::Release()
 void FormRenderRecord::HandleReleaseInJsThread()
 {
     if (runtime_) {
+        FormRenderServiceMgr::GetInstance().RemoveRuntimeToHost(bundleName_, runtime_);
         runtime_.reset();
     }
     ReleaseHapFileHandle();
