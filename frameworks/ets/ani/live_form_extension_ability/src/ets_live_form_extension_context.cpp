@@ -117,7 +117,7 @@ bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object 
         key.want = want;
         connection->SetConnectionId(key.id);
         g_connects.emplace(key, connection);
-        if (g_serialNumber < UINT32_MAX) {
+        if (g_serialNumber < INT32_MAX) {
             g_serialNumber++;
         } else {
             g_serialNumber = 0;
