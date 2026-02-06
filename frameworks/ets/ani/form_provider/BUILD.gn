@@ -37,7 +37,7 @@ ohos_shared_library("formProvider_ani") {
     "${form_fwk_ani_path}/utils:util_ani",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-    "${form_fwk_path}:form_host_delegate_stub",
+    "${form_fwk_path}:form_provider_delegate_stub",
   ]
 
   external_deps = [
