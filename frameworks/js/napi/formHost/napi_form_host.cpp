@@ -566,11 +566,11 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
 
-    asyncCallbackInfo->env = env;
-    asyncCallbackInfo->callbackType = callbackType;
-    asyncCallbackInfo->result = ERR_OK;
+    asyncCallbackInfoPtr->env = env;
+    asyncCallbackInfoPtr->callbackType = callbackType;
+    asyncCallbackInfoPtr->result = ERR_OK;
 
-    if (!UnwrapWant(env, argv[0], asyncCallbackInfo->want)) {
+    if (!UnwrapWant(env, argv[0], asyncCallbackInfoPtr->want)) {
         HILOG_ERROR("%{public}s, failed to parse want.", __func__);
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[1]));
     }
