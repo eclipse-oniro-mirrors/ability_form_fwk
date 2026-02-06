@@ -17,6 +17,7 @@
 #include "ani_form_common_util.h"
 #include "ani_form_error_util.h"
 #include "ani_form_util.h"
+#include "ani_helpers.h"
 #include "ets_form_state_observer.h"
 #include "ets_runtime.h"
 #include "fms_log_wrapper.h"
@@ -311,12 +312,6 @@ public:
         }
     }
 private:
-
-    static bool FormAniHelpers::CheckCallerIsSystemApp()
-    {
-        auto selfToken = IPCSkeleton::GetSelfTokenID();
-        return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
-    }
 
     static void OnRegisterFormAddObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {
