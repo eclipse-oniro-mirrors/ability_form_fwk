@@ -351,11 +351,11 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
 void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    std::lock_guard<std::mutex> lock(callbackMutex_);
     HILOG_ERROR("Receive error form FMS, errorCode:%{public}d, errorMsg:%{public}s, etsFormIds_ size:%{public}zu",
         errorCode,
         errorMsg.c_str(),
         etsFormIds_.size());
-    std::lock_guard<std::mutex> lock(callbackMutex_);
     for (auto formIdIter = etsFormIds_.begin(); formIdIter != etsFormIds_.end();) {
         int64_t formId = *formIdIter;
         auto callbackMapIter = formCallbackMap_.find(formId);

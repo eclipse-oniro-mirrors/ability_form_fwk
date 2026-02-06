@@ -121,6 +121,7 @@ private:
     mutable std::mutex FormRouterProxyCallbackMutex_;
     std::map<int64_t, std::shared_ptr<FormRouterProxyCallbackClient>> formRouterProxyCallbackMap_;
     ani_ref overflowRegisterCallback_ = nullptr;
+    mutable std::mutex aniVmMutex_;
     ani_vm* ani_vm_ = nullptr;
     ani_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
     ani_ref getFormRectCallbackRef_ = nullptr;
@@ -137,6 +138,7 @@ private:
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     ani_env* GetAniEnv();
+    void SetAniVM(ani_vm* ani_vm);
     bool bindNativeMethod(ani_env* env, ani_class cls, LiveFormInterfaceParam *dataParam);
     void CallPromise(ani_env* env, ani_class cls, ani_object callbackObj, ani_object retObj,
         LiveFormInterfaceParam *params);
