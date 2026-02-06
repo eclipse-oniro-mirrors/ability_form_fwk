@@ -870,9 +870,6 @@ sptr<EtsFormProviderProxyMgr> EtsFormProviderProxyMgr::GetInstance()
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = new (std::nothrow) EtsFormProviderProxyMgr();
-            if (instance_ == nullptr) {
-                HILOG_ERROR("create EtsFormProviderProxyMgr failed");
-            }
         }
     }
     return instance_;
@@ -976,7 +973,6 @@ void EtsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
         return;
     }
     dataParam->isCanOpen = result;
-    return;
 }
 
 ani_env* EtsFormProviderProxyMgr::GetCrossBundleControlEnv()
