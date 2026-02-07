@@ -194,7 +194,11 @@ int FormProviderStub::HandleEventNotify(MessageParcel &data, MessageParcel &repl
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (ret) {
-        int32_t formVisibleType = data.ReadInt32();
+        int32_t formVisibleType;
+        if (!data.ReadInt32(formVisibleType)) {
+            HILOG_ERROR("read formVisibleType failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
 
         std::unique_ptr<Want> want(data.ReadParcelable<Want>());
         if (!want) {
