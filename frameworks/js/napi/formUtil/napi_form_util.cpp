@@ -138,18 +138,10 @@ bool NapiFormUtil::ThrowByExternalErrorCode(napi_env env, int32_t externalErrorC
 
 napi_value NapiFormUtil::CreateErrorByInternalErrorCode(napi_env env, int32_t internalErrorCode)
 {
-    int32_t externalErrorCode = 0;
-    std::string externalErrorMessage;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        HILOG_ERROR("null scope");
-        return nullptr;
-    }
-    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
-    napi_value error = CreateJsError(env, externalErrorCode, externalErrorMessage);
-    napi_close_handle_scope(env, scope);
-    return error;
+    int32_t externalErrorCode = 0;	 
+    std::string externalErrorMessage;	 
+    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);	 
+    return CreateJsError(env, externalErrorCode, externalErrorMessage);
 }
 
 napi_value NapiFormUtil::CreateErrorByExternalErrorCode(napi_env env, int32_t externalErrorCode)
