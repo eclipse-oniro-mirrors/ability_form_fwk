@@ -1069,6 +1069,7 @@ private:
 
         JsFormStateCallbackClient::AcquireFormStateTask task = [env, asyncTask](int32_t state, Want want) {
             HILOG_DEBUG("task complete state:%{public}d", state);
+            HandleScope(jsRuntime_);
             napi_value objValue = nullptr;
             napi_create_object(env, &objValue);
             napi_set_named_property(env, objValue, "want", CreateJsWant(env, want));

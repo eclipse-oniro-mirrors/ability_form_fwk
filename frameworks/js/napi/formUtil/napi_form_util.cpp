@@ -140,6 +140,7 @@ napi_value NapiFormUtil::CreateErrorByInternalErrorCode(napi_env env, int32_t in
 {
     int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
+    HandleScope(jsRuntime_);
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
     return CreateJsError(env, externalErrorCode, externalErrorMessage);
 }
