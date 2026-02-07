@@ -1060,7 +1060,7 @@ export default namespace formHost {
   }
 
   class GetLiveFormStatusCallbackWrapper {
-    private liveFormStatusCallback: formInfo.GetLiveFormStatusCallback = (): Record<string, string> => { return {} }
+    private liveFormStatusCallback: formInfo.GetLiveFormStatusCallback = (): Record<string, string> => { }
 
     constructor(callback: formInfo.GetLiveFormStatusCallback) {
       this.liveFormStatusCallback = callback;
