@@ -171,17 +171,22 @@ public:
     bool DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredicates);
 
 private:
-    bool IsFormRdbLoaded();
-
     ErrCode CheckAndRebuildRdbStore(int32_t rdbOperateRet);
 
     std::shared_ptr<NativeRdb::RdbStore> LoadRdbStore();
 
     std::shared_ptr<NativeRdb::RdbStore> GetRdbStore();
 
+    void SetFormRdbTableCfg(const FormRdbTableConfig &formRdbTableCfg);
+
+    bool CheckFormRdbTable(const std::string &tableName);
+
+    void CreateFormRdbTables();
+
     std::map<std::string, FormRdbTableConfig> formRdbTableCfgMap_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
     std::shared_mutex rdbStoreMutex_;
+    std::shared_mutex formRdbTableCfgMapMutex_;
     int64_t lastRdbBuildTime_ = 0;
 };
 } // namespace AppExecFwk
