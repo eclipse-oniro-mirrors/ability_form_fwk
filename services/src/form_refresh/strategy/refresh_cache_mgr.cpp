@@ -228,16 +228,13 @@ Want RefreshCacheMgr::CreateWant(const std::vector<FormRecord>::iterator &record
     }
     WantParams cacheWantParams = it->second.GetParams();
     WantParams wantParams = want.GetParams();
-    if (cacheWantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
-        auto paramValue = cacheWantParams.GetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY);
-        if (paramValue != nullptr) {
-            wantParams.SetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY, paramValue);
+    for (auto paramKey : Constants::FORM_HOST_PARAM_NAMES) {
+        if (!cacheWantParams.HasParam(paramKey)) {
+            continue;
         }
-    }
-    if (cacheWantParams.HasParam(Constants::PARAM_VISUAL_EFFECT_TYPE_KEY)) {
-        auto paramValue = cacheWantParams.GetParam(Constants::PARAM_VISUAL_EFFECT_TYPE_KEY);
+        auto paramValue = cacheWantParams.GetParam(paramKey);
         if (paramValue != nullptr) {
-            wantParams.SetParam(Constants::PARAM_VISUAL_EFFECT_TYPE_KEY, paramValue);
+            wantParams.SetParam(paramKey, paramValue);
         }
     }
     want.SetParams(wantParams);
