@@ -123,11 +123,6 @@ ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableC
 
 ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
 {
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
         HILOG_ERROR("null FormInfoRdbStore");
