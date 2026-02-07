@@ -61,9 +61,12 @@ export default namespace formHost {
   native function isSystemReadyInner(callback: AsyncCallbackWrapper<void>): void;
   native function getAllFormsInfoInner(callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
   native function getFormsInfoByFilterInner(filter: formInfo.FormInfoFilter,
-      callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+    callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
   native function getFormsInfoInner(bundleName: string, moduleName: string,
-        callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+    callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+  native function getAllTemplateFormsInfoInner(callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+  native function getTemplateFormsInfoInner(bundleName: string, moduleName: string,
+    callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
   native function notifyFormsEnableUpdateInner(formIds: Array<string>, isEnableUpdate: boolean, callback: AsyncCallbackWrapper<void>): void;
   native function notifyFormsVisibleInner(formIds: Array<string>, isVisible: boolean, callback: AsyncCallbackWrapper<void>): void;
   native function releaseFormInner(formId: string, isReleaseCache: boolean, callback: AsyncCallbackWrapper<void>): void;
@@ -440,6 +443,48 @@ export default namespace formHost {
     taskpool.execute((): void => {
       getFormsInfoInner(bundleName, emptyString, call);
     })
+  }
+
+  export function getAllTemplateFormsInfo(): Promise<Array<formInfo.FormInfo>> {
+    return new Promise<Array<formInfo.FormInfo>>(
+      (resolve: (data: Array<formInfo.FormInfo>) => void,
+        reject: (err: BusinessError) => void): void => {
+        let call = new AsyncCallbackWrapper<Array<formInfo.FormInfo>>(
+          (err: BusinessError | null, data: Array<formInfo.FormInfo> | undefined) => {
+            if (err == null || err.code == ERR_OK) {
+              resolve(data as Array<formInfo.FormInfo>);
+            } else {
+              reject(err);
+            }
+          });
+        taskpool.execute((): void => {
+          getAllTemplateFormsInfoInner(call);
+        });
+      });
+  }
+
+  export function getTemplateFormsInfo(bundleName: string, moduleName?: string): Promise<Array<formInfo.FormInfo>> {
+    let targetModule: string = moduleName ?? "";
+
+    return new Promise<Array<formInfo.FormInfo>>(
+      (resolve: (data: Array<formInfo.FormInfo>) => void,
+        reject: (err: BusinessError) => void): void => {
+        if (bundleName === "") {
+          reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+          return;
+        }
+        let call = new AsyncCallbackWrapper<Array<formInfo.FormInfo>>(
+          (err: BusinessError | null, data: Array<formInfo.FormInfo> | undefined) => {
+            if (err == null || err.code == ERR_OK) {
+              resolve(data as Array<formInfo.FormInfo>);
+            } else {
+              reject(err);
+            }
+          });
+        taskpool.execute((): void => {
+          getTemplateFormsInfoInner(bundleName, targetModule, call);
+        });
+      });
   }
 
   export function isSystemReady(): Promise<void> {

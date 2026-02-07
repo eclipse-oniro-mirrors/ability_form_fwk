@@ -1666,6 +1666,61 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_string bundleNameStr, ani_s
     HILOG_DEBUG("End");
 }
 
+void GetAllTemplateFormsInfo([[maybe_unused]] ani_env *env, ani_object callback)
+{
+    HILOG_DEBUG("Call");
+    std::vector<FormInfo> allInfos;
+    auto ret = FormMgr::GetInstance().GetAllTemplateFormsInfo(allInfos);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Error when get allformInfos");
+        InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        return;
+    }
+
+    auto result = CreateFormInfoAniArrayFromVec(env, allInfos);
+    if (result == nullptr) {
+        HILOG_ERROR("Cannot convert formInfos to ani object");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
+
+    InvokeAsyncWithBusinessError(env, callback, ERR_OK, result);
+    HILOG_DEBUG("End");
+}
+
+void GetTemplateFormsInfo([[maybe_unused]] ani_env *env, ani_string bundleNameStr, ani_string moduleNameStr,
+    ani_object callback)
+{
+    HILOG_DEBUG("Call");
+    std::string bundleName = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(bundleNameStr));
+    std::string moduleName = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(moduleNameStr));
+    std::vector<FormInfo> formInfos;
+    int retCode;
+    if (moduleName.empty()) {
+        retCode = FormMgr::GetInstance().GetTemplateFormsInfoByApp(bundleName, formInfos);
+    } else {
+        retCode = FormMgr::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
+    }
+
+    if (retCode != ERR_OK) {
+        HILOG_ERROR("call error when get allformInfos");
+        InvokeAsyncWithBusinessError(env, callback, retCode, nullptr);
+        return;
+    }
+
+    auto result = CreateFormInfoAniArrayFromVec(env, formInfos);
+    if (result == nullptr) {
+        HILOG_ERROR("Cannot convert formInfos to ani object");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
+
+    InvokeAsyncWithBusinessError(env, callback, ERR_OK, result);
+    HILOG_DEBUG("End");
+}
+
 void IsSystemReady([[maybe_unused]] ani_env *env, ani_object callback)
 {
     HILOG_DEBUG("Call");
@@ -2575,6 +2630,13 @@ std::vector<ani_native_function> GetBindMethods()
             "getFormsInfoByFilterInner",
             "C{@ohos.app.form.formInfo.formInfo.FormInfoFilter}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(GetFormsInfoByFilter)},
+        ani_native_function {
+            "getAllTemplateFormsInfoInner", "C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            reinterpret_cast<void *>(GetAllTemplateFormsInfo)},
+        ani_native_function {
+            "getTemplateFormsInfoInner",
+            "C{std.core.String}C{std.core.String}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            reinterpret_cast<void *>(GetTemplateFormsInfo)},
         ani_native_function {"isSystemReadyInner",
             "C{@ohos.app.form.formHost.AsyncCallbackWrapper}:", reinterpret_cast<void *>(IsSystemReady)},
         ani_native_function {"releaseFormInner",
