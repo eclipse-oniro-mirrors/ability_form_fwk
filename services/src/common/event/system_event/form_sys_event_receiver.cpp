@@ -47,7 +47,8 @@ const std::unordered_set<std::string> actionSet {
     EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED,
     EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
     EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
-    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STARTED
 };
 } // namespace
 /**
@@ -148,6 +149,9 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
         int32_t userId = eventData.GetCode();
         HandleUserStopped(userId);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STARTED) {
+        int32_t userId = eventData.GetCode();
+        HandleUserStarted(userId);
     } else {
         HILOG_WARN("invalid action");
     }
@@ -265,6 +269,20 @@ void FormSysEventReceiver::HandleUserStopped(const int32_t userId)
     HILOG_INFO("user stopped userId: %{public}d", userId);
     auto task = [userId]() {
         FormRenderMgr::GetInstance().DisconnectAllRenderConnections(userId);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
+}
+
+void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
+{
+    if (userId < 0) {
+        HILOG_ERROR("invalid started userId:%{public}d", userId);
+        return;
+    }
+
+    HILOG_INFO("user started userId: %{public}d", userId);
+    auto task = [userId]() {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }

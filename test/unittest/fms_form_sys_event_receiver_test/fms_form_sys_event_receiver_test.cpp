@@ -1188,4 +1188,19 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserStopped_0001, TestSize.Level0)
     receiver->HandleUserStopped(MAIN_USER_ID);
     GTEST_LOG_(INFO) << "HandleUserStopped_0001 end";
 }
+
+/**
+ * @tc.number: HandleUserStarted_0001
+ * @tc.name: HandleUserStarted
+ * @tc.desc: Verify whether the HandleUserStarted interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserStarted_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserStarted_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    receiver->HandleUserStarted(-1);
+    receiver->HandleUserStarted(MAIN_USER_ID);
+    GTEST_LOG_(INFO) << "HandleUserStarted_0001 end";
+}
 }
