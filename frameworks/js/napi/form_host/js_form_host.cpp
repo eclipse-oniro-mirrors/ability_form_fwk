@@ -1069,12 +1069,18 @@ private:
 
         JsFormStateCallbackClient::AcquireFormStateTask task = [env, asyncTask](int32_t state, Want want) {
             HILOG_DEBUG("task complete state:%{public}d", state);
-            HandleScope(jsRuntime_);
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(env, &scope);
+            if (scope == nullptr) {
+                HILOG_ERROR("null scope");
+                return;
+            }
             napi_value objValue = nullptr;
             napi_create_object(env, &objValue);
             napi_set_named_property(env, objValue, "want", CreateJsWant(env, want));
             napi_set_named_property(env, objValue, "formState", CreateJsValue(env, state));
             asyncTask->ResolveWithNoError(env, objValue);
+            napi_close_handle_scope(env, scope);
         };
 
         InnerAcquireFormState(env, asyncTask, std::move(task), want);
