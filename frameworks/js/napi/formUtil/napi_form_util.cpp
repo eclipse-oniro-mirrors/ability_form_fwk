@@ -144,7 +144,7 @@ napi_value NapiFormUtil::CreateErrorByInternalErrorCode(napi_env env, int32_t in
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
-        return;
+        return nullptr;
     }
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
     napi_value error = CreateJsError(env, externalErrorCode, externalErrorMessage);
