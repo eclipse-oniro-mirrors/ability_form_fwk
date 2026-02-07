@@ -76,7 +76,7 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
-        napi_close_handle_scope(sharedThis->env_, &scope);
+        napi_close_handle_scope(sharedThis->env_, scope);
     });
 }
 
@@ -130,7 +130,7 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
-        napi_close_handle_scope(sharedThis->env_, &scope);
+        napi_close_handle_scope(sharedThis->env_, scope);
     });
 }
 
@@ -746,7 +746,7 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
             napi_call_function(env_, nullptr, callbackfun, ARGS_ONE, &formInfo, &callResult);
         }
     }
-    napi_close_handle_scope(env_, &scope);
+    napi_close_handle_scope(env_, scope);
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS
