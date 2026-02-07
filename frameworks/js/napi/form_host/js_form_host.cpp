@@ -1702,11 +1702,18 @@ private:
 
         ShareFormCallBackClient::ShareFormTask task = [env, asyncTask](int32_t code) {
             HILOG_DEBUG("task complete code:%{public}d", code);
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(env, &scope);
+            if (scope == nullptr) {
+                HILOG_ERROR("null scope");
+                return;
+            }
             if (code == ERR_OK) {
                 asyncTask->ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
                 asyncTask->Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, code));
             }
+            napi_close_handle_scope(env, scope);
         };
 
         InnerShareForm(env, asyncTask, std::move(task), formId, devicedId);

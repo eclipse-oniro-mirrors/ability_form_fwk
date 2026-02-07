@@ -138,9 +138,9 @@ bool NapiFormUtil::ThrowByExternalErrorCode(napi_env env, int32_t externalErrorC
 
 napi_value NapiFormUtil::CreateErrorByInternalErrorCode(napi_env env, int32_t internalErrorCode)
 {
-    int32_t externalErrorCode = 0;	 
-    std::string externalErrorMessage;	 
-    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);	 
+    int32_t externalErrorCode = 0;
+    std::string externalErrorMessage;
+    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
     return CreateJsError(env, externalErrorCode, externalErrorMessage);
 }
 
