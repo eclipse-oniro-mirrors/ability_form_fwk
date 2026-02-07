@@ -198,7 +198,7 @@ protected:
 
     /**
      * @brief This function will check uid is same.
-     */ 
+     */
     bool IsCallBySelfBundle();
 
 private:

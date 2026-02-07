@@ -26,7 +26,8 @@ public:
     std::unordered_map<FormFsmStatus, std::string> FORM_STATUS_STRING_MAP;
     std::unordered_map<FormFsmEvent, std::string> FORM_EVENT_STRING_MAP;
 
-    FormMapInfoTable() {
+    FormMapInfoTable()
+    {
         this->FORM_STATUS_STRING_MAP = {
             { FormFsmStatus::INIT, "[INIT]" },
             { FormFsmStatus::RENDERED, "[RENDERED]" },
@@ -61,14 +62,14 @@ public:
     }
 };
 
-const static FormMapInfoTable FormMapInfoTbl;
+const static FormMapInfoTable FORM_MAP_INFO_TBL;
 }
 
 std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 {
     std::string value = std::to_string(static_cast<int>(status));
-    const auto iter = FormMapInfo.FORM_STATUS_STRING_MAP.find(status);
-    if (iter != FormMapInfo.FORM_STATUS_STRING_MAP.end()) {
+    const auto iter = FORM_MAP_INFO_TBL.FORM_STATUS_STRING_MAP.find(status);
+    if (iter != FORM_MAP_INFO_TBL.FORM_STATUS_STRING_MAP.end()) {
         value = iter->second;
     }
     return value;
@@ -77,8 +78,8 @@ std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 std::string FormStatusPrint::FormEventToString(const FormFsmEvent event)
 {
     std::string value = std::to_string(static_cast<int>(event));
-    const auto iter = FormMapInfoTbl.FORM_EVENT_STRING_MAP.find(event);
-    if (iter != FormMapInfoTbl.FORM_EVENT_STRING_MAP.end()) {
+    const auto iter = FORM_MAP_INFO_TBL.FORM_EVENT_STRING_MAP.find(event);
+    if (iter != FORM_MAP_INFO_TBL.FORM_EVENT_STRING_MAP.end()) {
         value = iter->second;
     }
     return value;
