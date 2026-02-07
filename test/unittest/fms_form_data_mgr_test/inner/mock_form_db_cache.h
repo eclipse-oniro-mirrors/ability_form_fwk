@@ -22,4 +22,8 @@ void MockGetAllFormInfo(int32_t mockRet);
 
 void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
 
+void MockGetFormCountsByUserId(int32_t mockRet);
+
+void MockGetFormCountsByHostBundleName(int32_t mockRet);
+
 #endif // INNER_MOCK_FORM_DB_CACHE_H

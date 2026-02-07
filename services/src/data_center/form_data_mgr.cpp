@@ -3477,11 +3477,11 @@ void FormDataMgr::GetFormHostParams(const int64_t formId, Want &want)
     WantParams wantParams = want.GetParams();
     for (auto paramKey : FORM_HOST_PARAM_NAMES) {
         if (!formHostParams.HasParam(paramKey)) {
-        continue;
-    }
-    auto paramValue = formHostParams.GetParam(paramKey);
-    if (paramValue != nullptr) {
-        wantParams.SetParam(paramKey, paramValue);
+            continue;
+        }
+        auto paramValue = formHostParams.GetParam(paramKey);
+        if (paramValue != nullptr) {
+            wantParams.SetParam(paramKey, paramValue);
         }
     }
     want.SetParams(wantParams);

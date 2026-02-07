@@ -894,7 +894,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_012, TestSize.Level0)
     FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfoV9(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(4).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     MockGetCallingUid(DEFAULT_CALLING_UID);
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));

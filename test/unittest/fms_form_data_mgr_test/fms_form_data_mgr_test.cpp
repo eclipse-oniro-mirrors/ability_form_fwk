@@ -18,7 +18,6 @@
 #include <string>
 #include <thread>
 
-#include "mock_form_db_cache.h"
 #include "appexecfwk_errors.h"
 #define private public
 #include "data_center/database/form_db_cache.h"
@@ -35,7 +34,7 @@
 #include "mock_form_provider_client.h"
 
 #include "inner/mock_form_bms_helper.h"
-#include "inner/mock_fms_form_db_cache.h"
+#include "inner/mock_form_db_cache.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -534,9 +533,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Le
     int callingUid = 0;
     int32_t checkAllDBFormPreAPPSize = 1;
     MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
-    formDataMgr_.formConfigMap_[Constants::HOST_MAX_FORM_SIZE] = 0;
 
+    formDataMgr_.formConfigMap_[Constants::HOST_MAX_FORM_SIZE] = 0;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
+    formDataMgr_.formConfigMap_[Constants::HOST_MAX_FORM_SIZE] = Constants::MAX_RECORD_PER_HOST;
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_002 end";
 }
 
@@ -553,10 +553,11 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_003, TestSize.Le
     int callingUid = 0;
     int32_t checkAllDBFormPreAPPSize = 1;
     MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
-    MockGetBundleNameByUid(ERR_OK);
-    MockGetFormCountsByHostBundleName(Constants::MAX_RECORD_PER_HOST);
+    formDataMgr_.formConfigMap_[Constants::HOST_MAX_FORM_SIZE] = 0;
 
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
+    MockGetBundleNameByUid(ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_003 end";
 }
 
@@ -574,8 +575,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_004, TestSize.Le
     int32_t checkAllDBFormPreAPPSize = 1;
     MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
     MockGetBundleNameByUid(ERR_OK);
-    MockGetFormCountsByHostBundleName(0);
-    formDataMgr_.formConfigMap_[Constants::MAX_FORM_SIZE_PER_USER] = 0;
+    MockGetFormCountsByHostBundleName(Constants::MAX_RECORD_PER_HOST);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER, formDataMgr_.CheckEnoughForm(callingUid));
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_004 end";
@@ -617,6 +617,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_006, TestSize.Le
     MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
     MockGetBundleNameByUid(ERR_OK);
     MockGetFormCountsByHostBundleName(0);
+    formDataMgr_.formConfigMap_[Constants::MAX_FORM_SIZE_PER_USER] = -1;
     MockGetFormCountsByUserId(0);
 
     EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughForm(callingUid));
@@ -6293,10 +6294,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughFormOnDevice_001, Tes
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_001 start";
 
     int callingUid = 0;
-    int32_t checkAllDBFormMaxSize = 2;
+    int32_t formInfoMaxSizeType = 2;
     formDataMgr_.formConfigMap_[Constants::MAX_NORMAL_FORM_SIZE] = Constants::MAX_FORMS;
     // set formDbInfos size is over 512
-    MockGetAllFormInfoSize(checkAllDBFormMaxSize, callingUid);
+    MockGetAllFormInfoSize(formInfoMaxSizeType, callingUid);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, formDataMgr_.CheckEnoughFormOnDevice(callingUid));
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_001 end";
@@ -6313,9 +6314,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughFormOnDevice_002, Tes
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_002 start";
 
     int callingUid = 0;
-    int32_t checkAllDBFormPreAPPSize = 1;
+    int32_t formInfoPerAppSize = 1;
     formDataMgr_.formConfigMap_[Constants::MAX_NORMAL_FORM_SIZE] = -1;
-    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
+    MockGetAllFormInfoSize(formInfoPerAppSize, callingUid);
 
     EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughFormOnDevice(callingUid));
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_002 end";

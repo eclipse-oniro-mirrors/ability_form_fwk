@@ -67,7 +67,7 @@ public:
      * @param hostBundleName host bundle name.
      * @return Returns form counts.
      */
-    int32_t GetFormCountsByHostBundleName(const std::string hostBundleName);
+    int32_t GetFormCountsByHostBundleName(const std::string &hostBundleName);
 
     /**
      * @brief Get all form data in DbCache and DB by bundleName.

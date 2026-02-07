@@ -497,7 +497,7 @@ int FormDbCache::GetFormCountsByUserId(const int32_t userId)
 {
     int userIdFormCounts = 0;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    for (const auto& record : formDBInfos_) {
+    for (const auto &record : formDBInfos_) {
         if (record.userId != userId) {
             continue;
         }
@@ -511,7 +511,7 @@ int FormDbCache::GetFormCountsByUserId(const int32_t userId)
  * @param hostBundleName host bundle name.
  * @return Returns form counts.
  */
-int32_t FormDbCache::GetFormCountsByHostBundleName(const std::string hostBundleName)
+int32_t FormDbCache::GetFormCountsByHostBundleName(const std::string &hostBundleName)
 {
     int32_t formCounts = 0;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
