@@ -21,7 +21,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 
-std::unordered_map<FormFsmStatus, std::string> getFormStatusStringMap()
+const std::unordered_map<FormFsmStatus, std::string> *getFormStatusStringMap()
 {
     const static std::unordered_map<FormFsmStatus, std::string> formStatusStringMap = {
         { FormFsmStatus::INIT, "[INIT]" },
@@ -34,10 +34,10 @@ std::unordered_map<FormFsmStatus, std::string> getFormStatusStringMap()
         { FormFsmStatus::DELETING, "[DELETING]" },
         { FormFsmStatus::UNPROCESSABLE, "[UNPROCESSABLE]" },
     };
-    return formStatusStringMap;
+    return &formStatusStringMap;
 }
 
-std::unordered_map<FormFsmEvent, std::string> getFormEventStringMap()
+const std::unordered_map<FormFsmEvent, std::string> *getFormEventStringMap()
 {
     const static std::unordered_map<FormFsmEvent, std::string> formEventStringMap = {
         { FormFsmEvent::RENDER_FORM, "[RENDER_FORM]" },
@@ -59,15 +59,15 @@ std::unordered_map<FormFsmEvent, std::string> getFormEventStringMap()
         { FormFsmEvent::EXECUTION_TIMEOUT, "[EXECUTION_TIMEOUT]" },
         { FormFsmEvent::RELOAD_FORM, "[RELOAD_FORM]" },
     };
-    return formEventStringMap;
+    return &formEventStringMap;
 }
 }
 
 std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 {
     std::string value = std::to_string(static_cast<int>(status));
-    const auto iter = getFormStatusStringMap().find(status);
-    if (iter != getFormStatusStringMap().end()) {
+    const auto iter = getFormStatusStringMap()->find(status);
+    if (iter != getFormStatusStringMap()->end()) {
         value = iter->second;
     }
     return value;
@@ -76,8 +76,8 @@ std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 std::string FormStatusPrint::FormEventToString(const FormFsmEvent event)
 {
     std::string value = std::to_string(static_cast<int>(event));
-    const auto iter = getFormEventStringMap().find(event);
-    if (iter != getFormEventStringMap().end()) {
+    const auto iter = getFormEventStringMap()->find(event);
+    if (iter != getFormEventStringMap()->end()) {
         value = iter->second;
     }
     return value;

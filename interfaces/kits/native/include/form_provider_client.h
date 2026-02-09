@@ -197,7 +197,7 @@ protected:
         const Want &want, const sptr<IRemoteObject> &token);
 
     /**
-     * @brief This function will check uid is same.
+     * @brief This function will check whether uid is same.
      */
     bool IsCallBySelfBundle();
 
