@@ -106,7 +106,8 @@ public:
      * @param userId Designation User ID.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode StartAbilityOnlyUIAbility(Want &want, const int32_t userId);
+    ErrCode StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject> &callerToken,
+        const int32_t userId);
 private:
     /**
      * @brief Disconnect ability task, disconnect session with service ability.

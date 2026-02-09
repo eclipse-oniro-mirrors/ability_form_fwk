@@ -2968,7 +2968,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
 
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
-        int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerUserId);
+        int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken, callerUserId);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
             HILOG_ERROR("fail StartAbility, result:%{public}d", result);
             return result;
@@ -2976,7 +2976,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
         return ERR_OK;
     }
-    result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerUserId);
+    result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken, callerUserId);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("fail StartAbility, result:%{public}d", result);
         return result;
