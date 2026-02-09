@@ -53,7 +53,6 @@ ohos_unittest("FrsFormRenderServiceMgrTest") {
     "ability_runtime:app_manager",
     "ability_runtime:service_extension",
     "ability_runtime:wantagent_innerkits",
-    "ability_runtime:appkit_native",
     "ace_engine:ace_form_render",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
