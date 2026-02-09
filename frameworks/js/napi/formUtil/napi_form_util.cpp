@@ -400,7 +400,9 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
                 napi_delete_reference(env, asyncCallbackInfo->callback);
             }
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            if (asyncCallbackInfo->asyncWork != nullptr) {
+                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            }
             delete asyncCallbackInfo;
         },
         (void *)asyncCallbackInfo,
@@ -408,7 +410,9 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
         delete asyncCallbackInfo;
         return nullptr;
     }
@@ -438,7 +442,9 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
             napi_value result;
             InnerCreatePromiseRetMsg(env, asyncCallbackInfo->code, &result);
             napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            if (asyncCallbackInfo->asyncWork != nullptr) {
+                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            }
             delete asyncCallbackInfo;
         },
         (void *)asyncCallbackInfo,
@@ -446,7 +452,9 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
         delete asyncCallbackInfo;
         return nullptr;
     }

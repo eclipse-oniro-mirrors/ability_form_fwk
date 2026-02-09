@@ -720,7 +720,9 @@ static void NotifyFormsVisibleCallbackComplete(napi_env env, napi_status, void *
             napi_delete_reference(env, asyncCallbackInfo->callback);
             napi_close_handle_scope(env, scope);
         }
-        if (asyncCallbackInfo->asyncWork) napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        if (asyncCallbackInfo->asyncWork) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
         delete asyncCallbackInfo;
     }
 }
