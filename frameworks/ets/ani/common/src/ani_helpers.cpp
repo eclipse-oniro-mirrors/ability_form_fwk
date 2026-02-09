@@ -1089,7 +1089,7 @@ bool VectorHasNegativeValue(const std::vector<int>& vec)
     });
 }
 
-bool CheckCallerIsSystemApp()()
+bool CheckCallerIsSystemApp()
 {
     auto selfToken = IPCSkeleton::GetSelfTokenID();
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);

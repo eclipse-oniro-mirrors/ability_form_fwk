@@ -50,7 +50,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -88,7 +88,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The application not system-app, can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;

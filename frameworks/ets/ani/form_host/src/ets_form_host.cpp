@@ -101,7 +101,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -128,7 +128,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -149,7 +149,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -177,7 +177,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -198,7 +198,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -226,7 +226,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -247,7 +247,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -274,7 +274,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -1714,7 +1714,7 @@ void IsSystemReady([[maybe_unused]] ani_env *env, ani_object callback)
         HILOG_ERROR("env is nullptr");
         return;
     }
-    if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+    if (!FormAniHelpers::CheckCallerIsSystemApp()) {
         HILOG_ERROR("caller is not system-app");
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS), nullptr);
@@ -2429,7 +2429,7 @@ void RegisterFormObserver(ani_env* env, ani_object callback)
         HILOG_ERROR("env is nullptr");
         return;
     }
-    if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+    if (!FormAniHelpers::CheckCallerIsSystemApp()) {
         HILOG_ERROR("caller is not system-app");
         PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
         return;
@@ -2447,7 +2447,7 @@ void UnRegisterFormObserver(ani_env* env, ani_object callback)
         HILOG_ERROR("env is nullptr");
         return;
     }
-    if (!FormAniHelpers::CheckCallerIsSystemApp()()) {
+    if (!FormAniHelpers::CheckCallerIsSystemApp()) {
         HILOG_ERROR("caller is not system-app");
         PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
         return;
