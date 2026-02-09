@@ -52,6 +52,8 @@ constexpr const char* ETS_OVERFLOWREQUEST_NAME = "@ohos.app.form.formInfo.formIn
 constexpr const char* ETS_TEMPLATEFORMDETAILINFO_NAME = "@ohos.app.form.formInfo.formInfo.TemplateFormDetailInfoInner";
 constexpr const char* ETS_CHANGESCENEANIMATIONSTATEQUEST_NAME =
     "@ohos.app.form.formInfo.formInfo.ChangeSceneAnimationStateRequestInner";
+constexpr const char* ETS_TEMPLATEFORMDETAILINFO_CALLBACK =
+    "@ohos.app.form.formHost.formHost.TemplateFormDetailInfoChangeCallbackWrapper";
 constexpr const char* ETS_RECT_NAME = "@ohos.app.form.formInfo.formInfo.RectInner";
 constexpr const char* ETS_OVERFLOWINFO_NAME = "@ohos.app.form.formInfo.formInfo.OverflowInfoInner";
 constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "@ohos.app.form.formHost.CallbackWrapper";
@@ -1066,10 +1068,15 @@ void EtsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
         HILOG_ERROR("env is null");
         return;
     }
-    ani_size nr_refs = REFERENCES_MAX_NUMBER;
-    env->CreateLocalScope(nr_refs);
-    ani_array templateFormInfoArray;
-    GetTemplateFormInfoArray(env, templateFormInfo, templateFormInfoArray);
+
+ 
+    ani_class cls = nullptr;
+    ani_status status = ANI_ERROR;
+    if ((status = env->FindClass(ETS_TEMPLATEFORMDETAILINFO_CALLBACK, &cls)) != ANI_OK) {
+        HILOG_ERROR("findClass failed");
+        return;
+    }
+
     ani_object call;
     {
         std::lock_guard<std::mutex> lock(registerTemplateFormDetailInfoChangeMutex_);
@@ -1079,12 +1086,21 @@ void EtsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
             return;
         }
     }
-    bool bRet = Callback(env, call, templateFormInfoArray, CLASSNAME_CALLBACK_WRAPPER);
-    if (!bRet) {
-        HILOG_ERROR("Callback failed");
+ 
+    ani_array templateFormInfoArray = nullptr;
+    ani_ref aniRef;
+    env->GetUndefined(&aniRef);
+    if ((status = env->Array_New(templateFormInfo.size(),
+        static_cast<ani_object>(aniRef), &templateFormInfoArray)) != ANI_OK) {
+        HILOG_ERROR("Array_New failed %{public}d", static_cast<int>(status));
         return;
     }
-    env->DestroyLocalScope();
+    GetTemplateFormInfoArray(env, templateFormInfo, templateFormInfoArray);
+ 
+    if ((status = env->Object_CallMethodByName_Void(call, FORM_HOST_INVOKE, nullptr,
+        reinterpret_cast<ani_object>(templateFormInfoArray))) != ANI_OK) {
+        HILOG_ERROR("callMethod failed %{public}d", static_cast<int>(status));
+    }
 }
 
 void EtsFormRouterProxyMgr::GetTemplateFormInfoArray(ani_env* env,
@@ -1102,7 +1118,10 @@ void EtsFormRouterProxyMgr::GetTemplateFormInfoArray(ani_env* env,
         SetPropertyStringByName(env, object, "detailId", info.detailId);
         SetPropertyStringByName(env, object, "displayName", info.displayName);
         SetPropertyStringByName(env, object, "description", info.description);
-        env->Array_Push(templateFormInfoArray, object);
+        ani_status status = ANI_ERROR;
+        if ((status = env->Array_Set(templateFormInfoArray, i, object)) != ANI_OK) {
+            HILOG_ERROR("Array_Set failed %{public}d", static_cast<int>(status));
+        }
     }
 }
 
