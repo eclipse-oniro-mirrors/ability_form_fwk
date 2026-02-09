@@ -405,7 +405,13 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return NapiGetResult(env, 1);
 }
 
@@ -437,7 +443,13 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return promise;
 }
 

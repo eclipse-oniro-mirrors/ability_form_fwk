@@ -847,8 +847,7 @@ bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicIte
     HILOG_INFO("start");
     {
         std::lock_guard<std::mutex> lock(dynamicMutex_);
-        std::list<DynamicRefreshItem>::iterator itItem;
-        for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
+        for (auto itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end(); ++itItem) {
             if (itItem->formId == formId) {
                 dynamicItem.formId = itItem->formId;
                 dynamicItem.settedTime = itItem->settedTime;

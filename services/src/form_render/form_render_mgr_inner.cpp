@@ -91,7 +91,8 @@ ErrCode FormRenderMgrInner::RenderForm(
         return RenderConnectedForm(formRecord, want, connection);
     }
 
-    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
+    sptr<FormRenderConnection> formRenderConnection = new (std::nothrow) FormRenderConnection(
+        formRecord, want.GetParams());
     if (formRenderConnection == nullptr) {
         HILOG_ERROR("null formRenderConnection");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
