@@ -441,15 +441,24 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
     }
 }
 
+std::shared_ptr<AppExecFwk::EventHandler> JsFormStateObserver::GetMainEventRunner()
+{
+    std::lock_guard<std::mutex> handlerLock(handlerMutex_);
+    if (handler_ == nullptr) {
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    }
+    return handler_;
+}
+
 int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
     const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &formInstances)
 {
-    handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     HILOG_DEBUG("call");
+    std::shared_ptr<AppExecFwk::EventHandler> handler = GetMainEventRunner();
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    if (handler_) {
+    if (handler) {
         wptr<JsFormStateObserver> weakObserver = this;
-        handler_->PostSyncTask([weakObserver, visibleType, formInstances, bundleName]() {
+        handler->PostSyncTask([weakObserver, visibleType, formInstances, bundleName]() {
             std::string specialFlag = "#";
             bool isVisibleTypeFlag = false;
             auto sharedThis = weakObserver.promote();
@@ -502,12 +511,11 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
         HILOG_ERROR("empty Calltype");
         return ERR_INVALID_VALUE;
     }
-    if (handler_ == nullptr) {
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
-        if (handler_ == nullptr) {
-            HILOG_ERROR("null Handler");
-            return ERR_INVALID_VALUE;
-        }
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = GetMainEventRunner();
+    if (handler == nullptr) {
+        HILOG_ERROR("null Handler");
+        return ERR_INVALID_VALUE;
     }
 
     wptr<JsFormStateObserver> weakObserver = this;
@@ -533,7 +541,7 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
         }
     };
 
-    handler_->PostSyncTask(notify);
+    handler->PostSyncTask(notify);
     return ERR_OK;
 }
 

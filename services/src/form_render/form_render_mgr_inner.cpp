@@ -57,7 +57,9 @@ FormRenderMgrInner::FormRenderMgrInner()
 }
 FormRenderMgrInner::~FormRenderMgrInner()
 {
+    DisconnectAllRenderConnections();
 }
+
 
 ErrCode FormRenderMgrInner::RenderForm(
     const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &hostToken)
@@ -77,7 +79,7 @@ ErrCode FormRenderMgrInner::RenderForm(
         HILOG_WARN("isActiveUser is false, return");
         return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
     }
-    FillBundleInfo(want, formRecord.bundleName);
+    FillBundleInfo(want, formRecord.bundleName, formRecord.userId);
 
     sptr<FormRenderConnection> connection = nullptr;
     bool connectionExisted = GetRenderFormConnection(connection, formRecord.formId);
@@ -216,7 +218,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     }
     Want want;
     want.SetParams(wantParams);
-    FillBundleInfo(want, formRecord.bundleName);
+    FillBundleInfo(want, formRecord.bundleName, formRecord.userId);
     if (wantParams.IsEmpty()) {
         want.SetParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADAPTER_UPDATE_FORM);
     }
@@ -238,7 +240,7 @@ ErrCode FormRenderMgrInner::ReloadForm(
         return ret;
     }
     Want want;
-    FillBundleInfo(want, bundleName);
+    FillBundleInfo(want, bundleName, userId);
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
     want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
     FormRenderTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords),
@@ -246,11 +248,11 @@ ErrCode FormRenderMgrInner::ReloadForm(
     return ERR_OK;
 }
 
-void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleName) const
+void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleName, const int32_t userId) const
 {
     BundleInfo bundleInfo;
     if (!FormBmsHelper::GetInstance().GetBundleInfoDefault(
-        bundleName, FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        bundleName, userId, bundleInfo)) {
         HILOG_ERROR("get bundle info failed. %{public}s", bundleName.c_str());
         return;
     }

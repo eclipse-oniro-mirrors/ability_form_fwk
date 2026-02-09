@@ -44,26 +44,28 @@ void EtsFormEditExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRe
     const sptr<IRemoteObject> &token)
 {
     HILOG_DEBUG("Begin init form edit extension");
+    if (record == nullptr) {
+        HILOG_ERROR("null record");
+        return;
+    }
+
     if (impl_ == nullptr) {
         HILOG_ERROR("null impl_");
         return;
     }
 
-    std::shared_ptr<FormEditExtensionContext> context = std::make_shared<FormEditExtensionContext>();
-    context->SetToken(token);
     auto appContext = Context::GetApplicationContext();
     if (appContext == nullptr) {
         HILOG_ERROR("null appContext");
         return;
     }
+
+    std::shared_ptr<FormEditExtensionContext> context = std::make_shared<FormEditExtensionContext>();
+    context->SetToken(token);
     context->SetApplicationInfo(appContext->GetApplicationInfo());
     context->SetResourceManager(appContext->GetResourceManager());
     context->SetParentContext(appContext);
 
-    if (record == nullptr) {
-        HILOG_ERROR("null record");
-        return;
-    }
     auto abilityInfo = record->GetAbilityInfo();
     if (abilityInfo == nullptr) {
         HILOG_ERROR("null abilityInfo");

@@ -27,6 +27,7 @@
 #include "form_constants.h"
 #include "ipc_skeleton.h"
 #include "os_account_manager_wrapper.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -341,6 +342,19 @@ int32_t FormUtil::GetCallerUserId(const int callingUid)
     int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     (void)DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->GetOsAccountLocalIdFromUid(callingUid, userId);
     return userId;
+}
+
+void FormUtil::GetForegroundUsers(std::vector<int32_t> &foregroundList)
+{
+    std::vector<AccountSA::ForegroundOsAccount> accounts;
+    ErrCode errCode = AccountSA::OsAccountManager::GetForegroundOsAccounts(accounts);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Query foreground accounts failed");
+        return;
+    }
+    for (AccountSA::ForegroundOsAccount &account : accounts) {
+        foregroundList.push_back(account.localId);
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

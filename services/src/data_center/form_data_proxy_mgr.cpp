@@ -38,7 +38,7 @@ FormDataProxyMgr::~FormDataProxyMgr()
 {}
 
 ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
-    const AAFwk::Want &want)
+    const AAFwk::Want &want, const int32_t userId)
 {
     HILOG_INFO("subscribe form data. formId:%{public} " PRId64 ", proxy data size:%{public}zu",
         formId, formDataProxies.size());
@@ -61,8 +61,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     UnsubscribeFormDataById(formId);
 
     ApplicationInfo appInfo;
-    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
-        appInfo) != ERR_OK) {
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, userId, appInfo) != ERR_OK) {
         HILOG_ERROR("get app info failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }

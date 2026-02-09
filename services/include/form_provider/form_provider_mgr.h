@@ -118,7 +118,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode NotifyProviderFormsBatchDelete(const std::string &bundleName, const std::string &abilityName,
-        const std::set<int64_t> &formIds);
+        const std::set<int64_t> &formIds, const int32_t userId);
     /**
      * @brief Acquire form state.
      * @param state form state.

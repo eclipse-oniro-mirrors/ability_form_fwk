@@ -49,11 +49,10 @@ FormRenderMgr::~FormRenderMgr()
 {
 }
 
-void FormRenderMgr::GetFormRenderState()
+void FormRenderMgr::GetFormRenderState(const int32_t userId)
 {
     // Check whether the account is authenticated.
     bool isVerified = false;
-    int32_t userId = FormUtil::GetCurrentAccountId();
     AccountSA::OsAccountManager::IsOsAccountVerified(userId, isVerified);
     HILOG_INFO("isVerified:%{public}d,isVerified_:%{public}d,mounted:%{public}d,screen:%{public}d,userId:%{public}d",
         isVerified, isVerified_, isSecondMounted_, isScreenUnlocked_, userId);
@@ -68,7 +67,7 @@ void FormRenderMgr::GetFormRenderState()
         return;
     }
     if (!isScreenUnlocked_) {
-        PostOnUnlockTask();
+        PostOnUnlockTask(userId);
     }
     if (isSecondMounted_) {
         ExecAcquireProviderTask(userId);
@@ -86,7 +85,7 @@ ErrCode FormRenderMgr::RenderForm(
     const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken)
 {
     HILOG_INFO("formId:%{public}" PRId64 ", formUserId:%{public}d", formRecord.formId, formRecord.userId);
-    GetFormRenderState();
+    GetFormRenderState(formRecord.userId);
     HILOG_INFO("the current user authentication status:%{public}d,%{public}d", isVerified_, isScreenUnlocked_);
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
@@ -187,9 +186,8 @@ ErrCode FormRenderMgr::ReloadForm(
     return ret;
 }
 
-void FormRenderMgr::PostOnUnlockTask()
+void FormRenderMgr::PostOnUnlockTask(const int32_t userId)
 {
-    int32_t userId = FormUtil::GetCurrentAccountId();
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(userId, renderInner)) {
         renderInner->PostOnUnlockTask();
@@ -365,9 +363,8 @@ void FormRenderMgr::DeletePostRenderFormTask(int64_t formId)
     }
 }
 
-void FormRenderMgr::NotifyScreenOn()
+void FormRenderMgr::NotifyScreenOn(const int32_t userId)
 {
-    int32_t userId = FormUtil::GetCurrentAccountId();
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(userId, renderInner)) {
         renderInner->NotifyScreenOn();
@@ -378,7 +375,7 @@ void FormRenderMgr::NotifyScreenOn()
     }
 }
 
-void FormRenderMgr::OnScreenUnlock(int32_t userId)
+void FormRenderMgr::OnScreenUnlock(const int32_t userId)
 {
     // Check whether the account is authenticated.
     bool isVerified = false;
@@ -397,7 +394,7 @@ void FormRenderMgr::OnScreenUnlock(int32_t userId)
     // el2 path maybe not unlocked, should not acquire data
     isScreenUnlocked_ = true;
     if (!isVerified_) {
-        PostOnUnlockTask();
+        PostOnUnlockTask(userId);
     }
 }
 
@@ -413,7 +410,7 @@ void FormRenderMgr::OnUnlock(int32_t userId)
         std::lock_guard<std::mutex> lock(isVerifiedMutex_);
         isSecondMounted_ = true;
         if (!isScreenUnlocked_) {
-            PostOnUnlockTask();
+            PostOnUnlockTask(userId);
         }
     }
     ExecAcquireProviderTask(userId);
@@ -858,6 +855,14 @@ void FormRenderMgr::SetRenderGroupParams(int64_t formId, const Want &want)
             sandboxInner->PostSetRenderGroupParamsTask(formId, want);
         }
     }
+}
+
+void FormRenderMgr::DeleteRenderInner(int32_t userId)
+{
+    HILOG_INFO("Delete renderIneer userId: %{public}d.", userId);
+    std::unique_lock<std::shared_mutex> lock(renderInnerMutex_);
+    renderInners_.erase(userId);
+    sandboxInners_.erase(userId);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -30,9 +30,8 @@ using Want = OHOS::AAFwk::Want;
  */
 class FormUpdateSizeConnection : public FormAbilityConnection {
 public:
-    FormUpdateSizeConnection(const int64_t formId,
-        const std::string &bundleName, const std::string &abilityName,
-        const int32_t newDimension, const Rect &newRect);
+    FormUpdateSizeConnection(const int64_t formId, const std::string &bundleName, const std::string &abilityName,
+        const int32_t newDimension, const Rect &newRect, const int32_t userId);
     virtual ~FormUpdateSizeConnection() = default;
 
     /**

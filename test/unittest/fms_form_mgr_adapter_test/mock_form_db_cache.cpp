@@ -71,10 +71,9 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormRecord &record) const
     if (true == g_mockGetDBRecordRet) {
         if (g_mockGetDBRecordParam) {
             int32_t callingUid = IPCSkeleton::GetCallingUid();
-            constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
-            record.userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+            record.userId = FormUtil::GetCallerUserId(callingUid);
             record.formUserUids.push_back(callingUid);
-            record.providerUserId = FormUtil::GetCurrentAccountId();
+            record.providerUserId = record.userId;
         }
         return ERR_OK;
     }

@@ -481,7 +481,7 @@ ErrCode FormMgrAdapter::HandleFormAddObserver(const int64_t formId)
     }
 
     // Checks if there is a observer on the current host.
-    return FormDataMgr::GetInstance().HandleFormAddObserver(hostBundleName, formId);
+    return FormDataMgr::GetInstance().HandleFormAddObserver(hostBundleName, formId, GetCallingUserId());
 }
 
 ErrCode FormMgrAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFormInfo)
@@ -507,6 +507,7 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    int32_t userId = GetCallingUserId();
     FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(formId);
     RefreshCacheMgr::GetInstance().DelRenderTask(formId);
     FormDataMgr::GetInstance().DeleteFormVisible(formId);
@@ -523,7 +524,7 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         return ret;
     }
 #endif
-    return DeleteCommonForm(formId, callerToken);
+    return DeleteCommonForm(formId, callerToken, userId);
 }
 
 #ifdef THEME_MGR_ENABLE
@@ -546,14 +547,14 @@ int FormMgrAdapter::DeleteThemeForm(const int64_t formId)
 }
 #endif
 
-int FormMgrAdapter::DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
+int FormMgrAdapter::DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const int32_t userId)
 {
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     // remove connection for in application form
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     FormDataProxyMgr::GetInstance().UnsubscribeFormData(matchedFormId);
     RunningFormInfo runningFormInfo;
-    FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo, userId);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive delete form call
         int ret = HandleDeleteTempForm(matchedFormId, callerToken);
@@ -614,7 +615,8 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int callingUid = IPCSkeleton::GetCallingUid();
-    bool isSelfDbFormId = (FormUtil::GetCurrentAccountId() == dbRecord.providerUserId) &&
+    int32_t callerUserId = FormUtil::GetCallerUserId(callingUid);
+    bool isSelfDbFormId = (callerUserId == dbRecord.providerUserId) &&
         ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), callingUid)
         != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
@@ -690,7 +692,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
         record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
 #endif
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
         dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
@@ -723,7 +725,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     bool isSelfTempFormId = false;
     if (isFormRecExist && record.formTempFlag) {
-        isSelfTempFormId = (FormUtil::GetCurrentAccountId() == record.providerUserId) &&
+        isSelfTempFormId = (FormUtil::GetCallerUserId(uid) == record.providerUserId) &&
             ((std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) !=
             record.formUserUids.end()) ? true : false);
     }
@@ -878,6 +880,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     }
 
     RefreshData data;
+    data.callingUid = IPCSkeleton::GetCallingUid();
     data.formId = matchedFormId;
     data.record = record;
     data.callerToken = callerToken;
@@ -1009,7 +1012,8 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     }
 
     int64_t matchedFormId = 0;
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     std::map<std::string, std::vector<int64_t>> eventMaps = {};
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
     std::vector<int64_t> checkFormIds;
@@ -1149,7 +1153,7 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
         FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
     }
 
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t userId = GetCallingUserId();
     std::vector<int64_t> needConFormIds;
     if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
         FormRenderMgr::GetInstance().checkConnectionsFormIds(formIds, userId, needConFormIds);
@@ -1368,7 +1372,7 @@ ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecor
     HILOG_DEBUG("cast temp form to normal form, notify supplier, package:%{public}s, class:%{public}s",
         record.bundleName.c_str(), record.abilityName.c_str());
     sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId,
-        record.bundleName, record.abilityName);
+        record.bundleName, record.abilityName, GetCallingUserId());
 
     Want want;
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
@@ -1538,7 +1542,8 @@ int FormMgrAdapter::DumpFormRunningFormInfos(std::string &runningFormInfosResult
 {
     HILOG_INFO("call");
     std::vector<RunningFormInfo> runningFormInfos;
-    auto ret = FormMgrAdapter::GetInstance().GetRunningFormInfos(true, runningFormInfos);
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    auto ret = FormMgrAdapter::GetInstance().GetRunningFormInfos(true, runningFormInfos, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("GetRunningFormInfos error");
         return ret;
@@ -1623,7 +1628,8 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
         return;
     }
 
-    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formConfigInfo.GetProviderBundleName(), 0);
+    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formConfigInfo.GetProviderBundleName(),
+        GetCallingUserId());
     // Use DBCache to set lockForm first
     FormRecord record;
     if (formId > 0 && FormDbCache::GetInstance().GetDBRecord(formId, record) == ERR_OK) {
@@ -1889,7 +1895,7 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             HILOG_WARN("Due disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
             return ERR_OK;
         }
-        int64_t dueDuration = duration * Constants::TIME_CONVERSION;
+        int64_t dueDuration = static_cast<int64_t>(duration) * static_cast<int64_t>(Constants::TIME_CONVERSION);
         updateDuration = std::max(updateDuration, dueDuration * Constants::TIME_CONVERSION);
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
@@ -1920,7 +1926,7 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
     std::string bundleName = providerKey.substr(0, position);
     std::string abilityName = providerKey.substr(position + strlen(Constants::NAME_DELIMITER));
     sptr<IAbilityConnection> formEventNotifyConnection = new (std::nothrow) FormEventNotifyConnection(formIdsByProvider,
-        formVisibleType, bundleName, abilityName);
+        formVisibleType, bundleName, abilityName, GetCallingUserId());
     if (formEventNotifyConnection == nullptr) {
         HILOG_ERROR("create FormEventNotifyConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -2290,6 +2296,7 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     }
 
     RefreshData data;
+    data.callingUid = IPCSkeleton::GetCallingUid();
     data.formId = matchedFormId;
     data.record = formRecord;
     data.nextTime = nextTime;
@@ -2521,8 +2528,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
         return errCode;
     }
 
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    int32_t userId = GetCallingUserId();
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetAction(Constants::FORM_PUBLISH_ACTION);
 
@@ -2573,8 +2579,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
 ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
 {
     Want wantToHost(want);
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    int32_t userId = GetCallingUserId();
     wantToHost.SetParam(Constants::PARAM_FORM_USER_ID, userId);
 
     int32_t pageRouterServiceCode = want.GetIntParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, -1);
@@ -2794,7 +2799,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     }
     std::vector<FormDataProxy> formDataProxies;
     if (FormDataProxyMgr::GetInstance().ConsumeFormDataProxies(formId, formDataProxies)) {
-        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies, want);
+        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies, want, currentUserId);
     }
     // start update timer
     return AddFormTimer(formRecord);
@@ -2886,14 +2891,13 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
     }
     HILOG_INFO("find target client formId: %{public}" PRId64, formId);
 
-    NotifyFormClickEvent(formId, FORM_CLICK_MESSAGE);
+    int32_t callerUserId = GetCallingUserId();
+    NotifyFormClickEvent(formId, FORM_CLICK_MESSAGE, callerUserId);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
-        int callingUid = IPCSkeleton::GetCallingUid();
-        int32_t userId = FormUtil::GetCallerUserId(callingUid);
         DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
             record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_CLICKED);
-        DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
+        DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, callerUserId);
     }
 #endif
     return ERR_OK;
@@ -2944,8 +2948,8 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
     ApplicationInfo appInfo;
     int32_t result;
-    if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, FormUtil::GetCurrentAccountId(),
-        appInfo) != ERR_OK) {
+    int32_t callerUserId = GetCallingUserId();
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, callerUserId, appInfo) != ERR_OK) {
         HILOG_ERROR("Get app info failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
@@ -2964,31 +2968,26 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
 
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
-        int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityOnlyUIAbility(
-            want, callerToken, appInfo.accessTokenId));
+        int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerUserId);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
             HILOG_ERROR("fail StartAbility, result:%{public}d", result);
             return result;
         }
-        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
+        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
         return ERR_OK;
     }
-
-    result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityOnlyUIAbility(
-        want, callerToken, appInfo.accessTokenId));
+    result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerUserId);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("fail StartAbility, result:%{public}d", result);
         return result;
     }
 
-    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
+    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
-        int32_t callingUid = IPCSkeleton::GetCallingUid();
-        int32_t userId = FormUtil::GetCallerUserId(callingUid);
         DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
             record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_CLICKED);
-        DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
+        DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, callerUserId);
     }
 #endif
     return ERR_OK;
@@ -3035,7 +3034,7 @@ bool FormMgrAdapter::OpenByOpenType(const int32_t openType, const FormRecord &re
             return true;
         }
         openResult = ERR_OK;
-        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER);
+        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER, GetCallingUserId());
         return true;
     }
     if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_ATOMIC_SERVICE)) {
@@ -3049,7 +3048,7 @@ bool FormMgrAdapter::OpenByOpenType(const int32_t openType, const FormRecord &re
             return true;
         }
         openResult = ERR_OK;
-        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER);
+        NotifyFormClickEvent(record.formId, FORM_CLICK_ROUTER, GetCallingUserId());
         return true;
     }
     if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::START_ABILITY)) {
@@ -3103,7 +3102,7 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
     }
     sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(
         formId, want.GetBundle(), want.GetElement().GetAbilityName(),
-        jsonObject[Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY].get<std::string>(), params);
+        jsonObject[Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY].get<std::string>(), params, record.providerUserId);
     if (formBackgroundConnection == nullptr) {
         HILOG_ERROR("null formBackgroundConnection");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -3111,15 +3110,15 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
 
     want.SetParam(Constants::PARAM_FORM_ID, formId);
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
-    bool flag = want.GetBoolParam(Constants::PARAM_FORM_MANUAL_CLICK_KEY, false);
-    HILOG_INFO("StartAbilityByCall, MANUAL_CLICK:%{public}d", flag);
+    bool isManuallyClick = want.GetBoolParam(Constants::PARAM_FORM_MANUAL_CLICK_KEY, false);
+    HILOG_INFO("StartAbilityByCall, MANUAL_CLICK:%{public}d", isManuallyClick);
     int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
-        formBackgroundConnection, callerToken, -1, true, flag));
+        formBackgroundConnection, callerToken, record.providerUserId, true, isManuallyClick));
     if (result != ERR_OK) {
         HILOG_ERROR("fail StartAbilityByCall, result:%{public}d", result);
         return result;
     }
-    NotifyFormClickEvent(formId, FORM_CLICK_CALL);
+    NotifyFormClickEvent(formId, FORM_CLICK_CALL, GetCallingUserId());
     return ERR_OK;
 }
 
@@ -3135,7 +3134,7 @@ ErrCode FormMgrAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds
     int errCode = FormDataMgr::GetInstance().UpdateHostFormFlag(formIds, callerToken,
         flag, isOnlyEnableUpdate, refreshForms);
     if (errCode == ERR_OK && !refreshForms.empty()) {
-        int32_t userId = FormUtil::GetCurrentAccountId();
+        int32_t userId = GetCallingUserId();
         for (const int64_t id : refreshForms) {
             HILOG_DEBUG("formRecord need refresh:%{public}" PRId64 "", id);
             Want want;
@@ -3260,7 +3259,7 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
 bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
     const std::string &bundleName, const Want &want, bool needCheckFormPermission)
 {
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t userId = GetCallingUserId();
     if (needCheckFormPermission && !CheckIsSystemAppByBundleName(iBundleMgr, userId, bundleName)) {
         HILOG_ERROR("Only system app can request publish form");
         return false;
@@ -3274,7 +3273,7 @@ bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr>
 {
     BundleInfo bundleInfo;
     if (FormBmsHelper::GetInstance().GetBundleInfoWithPermission(bundleName,
-        FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        GetCallingUserId(), bundleInfo)) {
         HILOG_DEBUG("get bundleInfo success");
         auto item = find(bundleInfo.reqPermissions.begin(), bundleInfo.reqPermissions.end(),
             Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
@@ -3305,7 +3304,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     }
     std::map<int64_t, bool> removedFormsMap {};
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     HILOG_WARN("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
     // delete invalid DB form record
     FormDbCache::GetInstance().DeleteInvalidDBForms(userId, callingUid, matchedFormIds, removedFormsMap);
@@ -3404,8 +3403,9 @@ int FormMgrAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObject>
     FormDataMgr::GetInstance().CreateFormStateRecord(provider, info, callerToken, callingUid);
 
     HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s", bundleName.c_str(), abilityName.c_str());
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     sptr<IAbilityConnection> connection =
-        new (std::nothrow) FormAcquireStateConnection(bundleName, abilityName, want, provider);
+        new (std::nothrow) FormAcquireStateConnection(bundleName, abilityName, want, provider, userId);
     if (connection == nullptr) {
         HILOG_ERROR("create FormAcquireStateConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -3436,10 +3436,11 @@ int FormMgrAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const s
 
     HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s", bundleName.c_str(), abilityName.c_str());
     int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
     FormItemInfo info;
     FormDataMgr::GetInstance().CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
     sptr<IAbilityConnection> connection =
-        new (std::nothrow) FormAcquireDataConnection(formId, bundleName, abilityName, requestCode);
+        new (std::nothrow) FormAcquireDataConnection(formId, bundleName, abilityName, requestCode, userId);
     if (connection == nullptr) {
         HILOG_ERROR("create FormAcquireDataConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -3459,7 +3460,7 @@ int FormMgrAdapter::NotifyFormsVisible(const std::vector<int64_t> &formIds,
     bool isVisible, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("isVisible:%{public}d", isVisible);
-    return FormDataMgr::GetInstance().NotifyFormsVisible(formIds, isVisible, callerToken);
+    return FormDataMgr::GetInstance().NotifyFormsVisible(formIds, isVisible, callerToken, GetCallingUserId());
 }
 
 int FormMgrAdapter::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
@@ -3537,7 +3538,7 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
     }
 
     auto action = Constants::FORM_PUBLISH_ACTION;
-    auto userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    int32_t userId = GetCallingUserId();
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo)) {
@@ -3587,17 +3588,19 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
     return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 
-ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+    const int32_t userId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormDataMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
+    return FormDataMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos, userId);
 }
 
 ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(
     const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedIncluded, runningFormInfos);
+    return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedIncluded, runningFormInfos,
+        GetCallingUserId());
 }
 
 ErrCode FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
@@ -3678,6 +3681,7 @@ ErrCode FormMgrAdapter::RegisterFormRouterProxy(
     std::vector<int64_t> matchedFormIds {};
     std::vector<int64_t> hostOwnFormIds {};
     auto uid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(uid);
     FormRecord record;
     for (int64_t formId : formIds) {
         if (formId <= 0) {
@@ -3691,7 +3695,7 @@ ErrCode FormMgrAdapter::RegisterFormRouterProxy(
         }
         matchedFormIds.push_back(formId);
 
-        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+        if (record.providerUserId != userId) {
             // Checks for cross-user operations.
             HILOG_ERROR("The formId:%{public}" PRId64
                         " corresponds to a card that is not for the currently active user.", formId);
@@ -3728,6 +3732,7 @@ ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& fo
     std::vector<int64_t> matchedFormIds {};
     std::vector<int64_t> hostOwnFormIds {};
     auto uid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(uid);
     FormRecord record;
     for (int64_t formId : formIds) {
         if (formId <= 0) {
@@ -3741,7 +3746,7 @@ ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& fo
         }
         matchedFormIds.push_back(formId);
 
-        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+        if (record.providerUserId != userId) {
             // Checks for cross-user operations.
             HILOG_ERROR("The formId:%{public}" PRId64
                         " corresponds to a card that is not for the currently active user.",
@@ -3890,13 +3895,12 @@ ErrCode FormMgrAdapter::UnregisterClickEventObserver(
     return FormObserverRecord::GetInstance().RemoveFormEventObserver(bundleName, formEventType, observer);
 }
 
-void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType)
+void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType, const int32_t userId)
 {
     HILOG_DEBUG("call");
-    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
 
     RunningFormInfo runningFormInfo;
-    auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(formId, runningFormInfo, userId);
     if (ref != ERR_OK) {
         HILOG_ERROR("Get Running info error");
         return;
@@ -3918,7 +3922,7 @@ bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &u
     }
 
     ApplicationInfo appInfo;
-    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, formRecord.providerUserId,
         appInfo) != ERR_OK) {
         HILOG_ERROR("Get app info failed");
         return false;
@@ -3999,7 +4003,7 @@ int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
 
     AppExecFwk::ApplicationInfo callerAppInfo;
     auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
-    auto userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    int32_t userId = GetCallingUserId();
     bool getCallerResult = IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName, flag, userId, callerAppInfo));
     if (!getCallerResult) {
         HILOG_ERROR("Get callerAppInfo failed");
@@ -4351,7 +4355,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const int32_t 
 ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
     HILOG_INFO("SwitchLockForms entry");
-    if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName) == lock) {
+    if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, userId) == lock) {
         HILOG_INFO("No need to change lock status, bundleName = %{public}s, lock = %{public}d",
             bundleName.c_str(), lock);
         return ERR_OK;
@@ -4395,7 +4399,7 @@ ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
 ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
 {
     HILOG_INFO("ProtectLockForms entry");
-    if (FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName) == protect) {
+    if (FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, userId) == protect) {
         HILOG_INFO("No need to change protect status, bundleName = %{public}s, protect = %{public}d",
             bundleName.c_str(), protect);
         return ERR_OK;
@@ -4438,7 +4442,8 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    bool isBundleProtected = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, 0);
+    int32_t userId = GetCallingUserId();
+    bool isBundleProtected = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, userId);
     if (!isBundleProtected && isLocked) {
         HILOG_ERROR("can't lock form when bundle unprotected, formId %{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -4456,10 +4461,6 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
     std::vector<FormRecord> formRecords;
     formRecords.push_back(formRecord);
     FormDataMgr::GetInstance().LockForms(std::move(formRecords), isLocked);
-    if (!isLocked) {
-        int32_t userId = FormUtil::GetCurrentAccountId();
-        auto iter = formRecords.begin();
-    }
 
     return ERR_OK;
 }
@@ -4496,7 +4497,7 @@ int32_t FormMgrAdapter::OnNotifyRefreshForm(const int64_t &formId)
             return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
         }
         HILOG_INFO("RefreshForm");
-        int32_t userId = FormUtil::GetCurrentAccountId();
+        int32_t userId = GetCallingUserId();
         Want want;
         want.SetElementName(formInfo.bundleName, formInfo.abilityName);
         want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
@@ -4740,7 +4741,8 @@ ErrCode FormMgrAdapter::SceneAnimationCheck(const int64_t formId, const int32_t 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     // check whether application is locked
-    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, formId);
+    int userId = FormUtil::GetCallerUserId(callingUid);
+    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, userId, formId);
     if (isBundleProtect) {
         HILOG_ERROR("Failed, application is locked");
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
@@ -4849,7 +4851,7 @@ ErrCode FormMgrAdapter::GetFormInfoByFormRecord(const FormRecord &record, FormIn
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::vector<FormInfo> formInfos {};
-    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    int32_t userId = GetCallingUserId();
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(record.bundleName, record.moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
@@ -4908,7 +4910,7 @@ void FormMgrAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &r
 int32_t FormMgrAdapter::GetCallingUserId()
 {
     int callingUid = IPCSkeleton::GetCallingUid();
-    return callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    return FormUtil::GetCallerUserId(callingUid);
 }
 
 ErrCode FormMgrAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams)

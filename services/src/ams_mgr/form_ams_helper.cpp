@@ -228,5 +228,20 @@ void FormAmsHelper::UnRegisterConfigurationObserver()
     HILOG_INFO("end");
 }
 
+ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const int32_t userId)
+{
+    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("ability service not connect");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    InsightIntentExecuteParam::RemoveInsightIntent(want);
+    auto flags = want.GetFlags();
+    if ((flags & Want::FLAG_ABILITY_CONTINUATION) == Want::FLAG_ABILITY_CONTINUATION) {
+        HILOG_ERROR("StartAbility not allowed:%{public}d", ERR_APPEXECFWK_FORM_INVALID_PARAM);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return IN_PROCESS_CALL(ams->StartAbility(want, userId));
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -62,7 +62,7 @@ int FormNextTimeRefreshImpl::DoRefresh(RefreshData &data)
     }
 
     int64_t safeNextTime = static_cast<int64_t>(data.nextTime) * Constants::SEC_PER_MIN;
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t userId = FormUtil::GetCallerUserId(data.callingUid);
     if (!FormTimerMgr::GetInstance().SetNextRefreshTime(data.formId, safeNextTime, userId)) {
         HILOG_ERROR("set next time refresh failed, formId:%{public}" PRId64, data.formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

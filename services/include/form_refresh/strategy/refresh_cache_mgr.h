@@ -115,7 +115,7 @@ public:
      * @param formId The formId.
      * @param userId Current active userId.
      */
-    void ConsumeAddUnfinishFlag(const int64_t formId);
+    void ConsumeAddUnfinishFlag(const int64_t formId, const int32_t userId);
 
 private:
     Want CreateWant(const std::vector<FormRecord>::iterator &record, const int32_t userId);

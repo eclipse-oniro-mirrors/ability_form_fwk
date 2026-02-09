@@ -319,6 +319,8 @@ private:
     void DeleteAndUpdateRecycledFormCompIds(int64_t formId,
         const std::pair<std::vector<std::string>, std::string>& compIds, const bool needUpdate);
 
+    void RegisterResolveBufferCallback();
+
     void RegisterUncatchableErrorHandler();
     void OnJsError(napi_value value);
     std::string GetNativeStrFromJsTaggedObj(napi_value obj, const char* key);

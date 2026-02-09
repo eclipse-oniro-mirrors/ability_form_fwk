@@ -113,7 +113,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     sptr<IFormSupply> formSupplyClient = nullptr;
     FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
     FormRenderServiceMgr::GetInstance().ConfirmUnlockState(want);
-    FormRenderServiceMgr::GetInstance().UpdateRenderRecordByUid(str1, want, formJsInfo, formSupplyClient);
     std::shared_ptr<FormRenderRecord> search;
     FormRenderServiceMgr::GetInstance().GetRenderRecordById(search, str1);
     FormRenderServiceMgr::GetInstance().RecoverFormByUid(formJsInfo, want, str1, str2);

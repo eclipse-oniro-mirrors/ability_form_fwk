@@ -27,10 +27,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormAcquireDataConnection::FormAcquireDataConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName, int64_t formRequestCode) : formRequestCode_(formRequestCode)
+    const std::string &abilityName, int64_t formRequestCode, const int32_t userId) : formRequestCode_(formRequestCode)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 
 void FormAcquireDataConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,

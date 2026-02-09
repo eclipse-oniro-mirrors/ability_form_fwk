@@ -254,10 +254,10 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
 {
     if (g_mockGetFormRecordRet && g_mockGetFormRecordParams) {
         int32_t callingUid = IPCSkeleton::GetCallingUid();
-        constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
+        int32_t callerUserId = FormUtil::GetCallerUserId(callingUid);
         constexpr int32_t SYSTEM_UID = 1000;
         if (g_mockGetFormRecordParamsUid) {
-            formRecord.userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+            formRecord.userId = callerUserId;
         } else {
             formRecord.userId = 0;
         }
@@ -265,7 +265,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         if (g_mockGetFormRecordParamsSysUid) {
             formRecord.formUserUids.push_back(SYSTEM_UID);
         }
-        formRecord.providerUserId = FormUtil::GetCurrentAccountId();
+        formRecord.providerUserId = callerUserId;
         formRecord.formTempFlag = g_mockGetFormRecordParamsTemp;
         formRecord.bundleName = "bundleName";
         formRecord.moduleName = "moduleName";
@@ -378,17 +378,19 @@ void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRe
     }
 }
 
-ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
+ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId, const int32_t userId)
 {
     return g_mockCheckInvalidFormRet;
 }
 
-ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
+ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo,
+    const int32_t userId)
 {
     return g_mockGetRunningFormInfosByFormIdRet;
 }
 
-ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+    const int32_t userId)
 {
     return g_mockGetRunningFormInfosRet;
 }

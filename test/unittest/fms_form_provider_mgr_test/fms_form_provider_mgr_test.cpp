@@ -271,10 +271,10 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_006 start";
     int64_t formId = 0x114514aa00000000;
     Want want;
-    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    int callingUid {0};
+    int32_t currentActiveUserId = FormUtil::GetCallerUserId(callingUid);
     want.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
     want.SetParam(Constants::KEY_IS_TIMER, false);
-    int callingUid {0};
     FormItemInfo record;
     record.SetFormId(formId);
     record.SetModuleName(PARAM_FORM_NAME);

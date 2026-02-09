@@ -2949,16 +2949,16 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_GetConfiguration, TestSize.L
 }
 
 /**
- * @tc.name: FormRenderRecordTest_ResetFormConfiguration
+ * @tc.name: FormRenderRecordTest_ResetFormConfiguration_001
  * @tc.desc: Verify ResetFormConfiguration
  * @tc.type: FUNC
  */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration, TestSize.Level1)
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration start";
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_001 start";
 
     std::shared_ptr<FormRenderRecord> formRenderRecordPtr =
-        FormRenderRecord::Create("FormRenderRecordTest_ResetFormConfiguration", "uid");
+        FormRenderRecord::Create("FormRenderRecordTest_ResetFormConfiguration_001", "uid");
     formRenderRecordPtr->configuration_ = nullptr;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<AppExecFwk::Configuration>();
 
@@ -2967,17 +2967,91 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration, Test
     std::string colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
     EXPECT_TRUE(colorModeTag.empty());
 
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_001 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ResetFormConfiguration_002
+ * @tc.desc: Verify ResetFormConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_002 start";
+
+    std::shared_ptr<FormRenderRecord> formRenderRecordPtr =
+        FormRenderRecord::Create("FormRenderRecordTest_ResetFormConfiguration_002", "uid");
+    formRenderRecordPtr->configuration_ = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<AppExecFwk::Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configNew = std::make_shared<Configuration>();
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, "en");
+    formRenderRecordPtr->configuration_ = configNew;
+
+    Want want;
+    formRenderRecordPtr->ResetFormConfiguration(config, want);
+    std::string colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_EQ(colorModeTag, "0");
+    std::string languageTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE);
+    EXPECT_EQ(languageTag, "en");
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_002 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ResetFormConfiguration_003
+ * @tc.desc: Verify ResetFormConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_003 start";
+
+    std::shared_ptr<FormRenderRecord> formRenderRecordPtr =
+        FormRenderRecord::Create("FormRenderRecordTest_ResetFormConfiguration_003", "uid");
+    formRenderRecordPtr->configuration_ = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<AppExecFwk::Configuration>();
+
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configNew = std::make_shared<Configuration>();
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, "en");
+    formRenderRecordPtr->configuration_ = configNew;
+
+    Want want;
     want.SetParam(Constants::PARAM_FORM_COLOR_MODE_KEY, OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET);
     formRenderRecordPtr->ResetFormConfiguration(config, want);
-    colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
-    EXPECT_TRUE(colorModeTag.empty());
+    std::string colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    EXPECT_EQ(colorModeTag, "0");
 
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_003 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ResetFormConfiguration_004
+ * @tc.desc: Verify ResetFormConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ResetFormConfiguration_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_004 start";
+
+    std::shared_ptr<FormRenderRecord> formRenderRecordPtr =
+        FormRenderRecord::Create("FormRenderRecordTest_ResetFormConfiguration_004", "uid");
+    formRenderRecordPtr->configuration_ = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<AppExecFwk::Configuration>();
+
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configNew = std::make_shared<Configuration>();
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    configNew->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, "en");
+    formRenderRecordPtr->configuration_ = configNew;
+
+    Want want;
     want.SetParam(Constants::PARAM_FORM_COLOR_MODE_KEY, OHOS::Global::Resource::ColorMode::DARK);
     formRenderRecordPtr->ResetFormConfiguration(config, want);
-    colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
+    std::string colorModeTag = config->GetItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
     EXPECT_EQ(colorModeTag, "dark");
 
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration end";
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ResetFormConfiguration_004 end";
 }
 
 /**

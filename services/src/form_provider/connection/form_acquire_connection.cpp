@@ -37,7 +37,8 @@ FormAcquireConnection::FormAcquireConnection(const int64_t formId, const FormIte
     const WantParams &wantParams, const sptr<IRemoteObject> hostToken) : info_(info), wantParams_(wantParams)
 {
     SetFormId(formId);
-    SetProviderKey(info.GetProviderBundleName(), info.GetAbilityName());
+    int32_t userId = FormUtil::GetCallerUserId(info.GetProviderUid());
+    SetProviderKey(info.GetProviderBundleName(), info.GetAbilityName(), userId);
     SetHostToken(hostToken);
 }
 /**

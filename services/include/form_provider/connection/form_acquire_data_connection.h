@@ -32,7 +32,7 @@ using Want = OHOS::AAFwk::Want;
 class FormAcquireDataConnection : public FormAbilityConnection {
 public:
     FormAcquireDataConnection(int64_t formId, const std::string &bundleName, const std::string &abilityName,
-       int64_t formRequestCode);
+       int64_t formRequestCode, const int32_t userId);
 
     virtual ~FormAcquireDataConnection() = default;
 
