@@ -860,6 +860,11 @@ void FormRenderServiceMgr::CacheAppliedConfig()
     HILOG_INFO("already applied config:%{public}s", appliedConfig_->GetName().c_str());
 }
 
+void FormRenderServiceMgr::SetMainGcCb(std::function<void()> &&cb)
+{
+    mainGcCb_ = std::move(cb);
+}
+
 void FormRenderServiceMgr::MainThreadForceFullGC()
 {
     HILOG_INFO("call");
@@ -868,18 +873,10 @@ void FormRenderServiceMgr::MainThreadForceFullGC()
         return;
     }
 
-    auto task = [application = application_]() {
-        auto app = application.lock();
-        if (app == nullptr) {
-            HILOG_ERROR("application is null");
-            return;
+    auto task = []() {
+        if (FormRenderServiceMgr::GetInstance().mainGcCb_  != nullptr) {
+            FormRenderServiceMgr::GetInstance().mainGcCb_();
         }
-        auto &runtime = app->GetRuntime();
-        if (!runtime) {
-            HILOG_ERROR("null runtime");
-            return;
-        }
-        runtime->ForceFullGC(0);
     };
     mainHandler_->PostTask(task, "MainThreadForceFullGC");
 }
@@ -913,54 +910,6 @@ int32_t FormRenderServiceMgr::SetRenderGroupParams(const int64_t formId, const W
         return RENDER_FORM_FAILED;
     }
     return ERR_OK;
-}
-
-void FormRenderServiceMgr::AddRuntimeToHost(const std::string &bundleName,
-    const std::shared_ptr<AbilityRuntime::JsRuntime> &runtime)
-{
-    HILOG_INFO("add runtime, bundle name: %{public}s", bundleName.c_str());
-    UpdateRuntimeAssociation(runtime, true);
-}
-
-void FormRenderServiceMgr::RemoveRuntimeToHost(const std::string &bundleName,
-    const std::shared_ptr<AbilityRuntime::JsRuntime> &runtime)
-{
-    HILOG_INFO("remove runtime, bundle name: %{public}s", bundleName.c_str());
-    UpdateRuntimeAssociation(runtime, false);
-}
-
-void FormRenderServiceMgr::UpdateRuntimeAssociation(const std::shared_ptr<AbilityRuntime::JsRuntime> &runtime,
-    bool shouldAssociate)
-{
-    if (mainHandler_ == nullptr) {
-        HILOG_ERROR("null mainHandler");
-        return;
-    }
-
-    auto task = [runtime, shouldAssociate, application = application_]() {
-        auto app = application.lock();
-        if (app == nullptr) {
-            HILOG_ERROR("application is null");
-            return;
-        }
-        auto &hostRuntime = app->GetRuntime();
-        if (hostRuntime == nullptr || runtime == nullptr) {
-            HILOG_ERROR("null runtime");
-            return;
-        }
-        auto hostVm = (static_cast<AbilityRuntime::JsRuntime&>(*hostRuntime)).GetEcmaVm();
-        auto childVm = runtime->GetEcmaVm();
-        if (hostVm == nullptr || childVm == nullptr) {
-            HILOG_ERROR("hostVm or workerVm is null");
-            return;
-        }
-        if (shouldAssociate) {
-            panda::JSNApi::AddWorker(hostVm, childVm);
-        } else {
-            panda::JSNApi::DeleteWorker(hostVm, childVm);
-        }
-    };
-    mainHandler_->PostSyncTask(task, "UpdateRuntimeAssociation");
 }
 }  // namespace FormRender
 }  // namespace AppExecFwk

@@ -19,6 +19,7 @@
 #include "configuration.h"
 #include "service_extension.h"
 #include "runtime.h"
+#include "ohos_application.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -136,6 +137,7 @@ private:
     void GetSrcPath(std::string &srcPath);
 
     const std::unique_ptr<Runtime> &runtime_;
+    std::weak_ptr<AppExecFwk::OHOSApplication> application_;
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
