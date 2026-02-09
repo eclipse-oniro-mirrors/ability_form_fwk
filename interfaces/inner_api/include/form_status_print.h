@@ -29,6 +29,7 @@ public:
     std::unordered_map<FormFsmEvent, std::string> formEventStringMap;
 
     FormMapInfoTable();
+};
 }
 
 class FormStatusPrint {
