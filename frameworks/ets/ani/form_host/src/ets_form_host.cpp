@@ -146,7 +146,6 @@ public:
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterOverflowListener();
     }
-    
     static void OnRegisterTemplateFormDetailInfoChange(ani_env* env, ani_object callback)
     {
         HILOG_INFO("OnRegisterTemplateFormDetailInfoChange Call");
@@ -835,7 +834,6 @@ void EtsFormRouterProxyMgr::RegisterOverflowListener(ani_vm* ani_vm, ani_object 
 {
     std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
     HILOG_INFO("RegisterOverflowListener Call");
-    
     if (ani_vm == nullptr) {
         HILOG_ERROR("ani_vm is null");
         return;
@@ -972,7 +970,6 @@ void EtsFormRouterProxyMgr::UnregisterChangeSceneAnimationStateListener()
 {
     std::lock_guard<std::mutex> lock(registerChangeSceneAnimationStateProxyMutex_);
     HILOG_INFO("UnregisterChangeSceneAnimationStateListener Call");
-    
     ani_env* env = GetAniEnv();
     if (env == nullptr) {
         HILOG_ERROR("env is null");
@@ -1068,15 +1065,12 @@ void EtsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
         HILOG_ERROR("env is null");
         return;
     }
-
- 
     ani_class cls = nullptr;
     ani_status status = ANI_ERROR;
     if ((status = env->FindClass(ETS_TEMPLATEFORMDETAILINFO_CALLBACK, &cls)) != ANI_OK) {
         HILOG_ERROR("findClass failed");
         return;
     }
-
     ani_object call;
     {
         std::lock_guard<std::mutex> lock(registerTemplateFormDetailInfoChangeMutex_);
@@ -1086,7 +1080,6 @@ void EtsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
             return;
         }
     }
- 
     ani_array templateFormInfoArray = nullptr;
     ani_ref aniRef;
     env->GetUndefined(&aniRef);
@@ -1096,7 +1089,6 @@ void EtsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
         return;
     }
     GetTemplateFormInfoArray(env, templateFormInfo, templateFormInfoArray);
- 
     if ((status = env->Object_CallMethodByName_Void(call, FORM_HOST_INVOKE, nullptr,
         reinterpret_cast<ani_object>(templateFormInfoArray))) != ANI_OK) {
         HILOG_ERROR("callMethod failed %{public}d", static_cast<int>(status));
@@ -2710,7 +2702,6 @@ void UpdateFormSize(ani_env *env, ani_string aniFormId, ani_object aniNewDimensi
         EtsErrorUtil::ThrowInvalidParamError(env, "The newRect is invalid");
         return;
     }
-    
     auto ret = FormMgr::GetInstance().UpdateFormSize(formId, newDimension, *newRect);
     if (ret == ERR_OK) {
         return;
