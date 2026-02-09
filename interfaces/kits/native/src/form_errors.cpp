@@ -288,6 +288,10 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     {
         ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_PARAMS_ERROR,
         { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form overflow request parameter is invalid." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER,
+        { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "exceed max forms per user" }
     }
 };
 

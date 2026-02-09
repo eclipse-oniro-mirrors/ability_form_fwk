@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,16 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MOCK_FORM_DB_CACHE_H
-#define OHOS_MOCK_FORM_DB_CACHE_H
+#ifndef INNER_MOCK_FORM_DB_CACHE_H
+#define INNER_MOCK_FORM_DB_CACHE_H
 
-#include <gtest/gtest.h>
+#include <cstdint>
 
-#include "fms_log_wrapper.h"
-#include "form_mgr_errors.h"
-#include "common/util/form_util.h"
+void MockGetAllFormInfo(int32_t mockRet);
 
-namespace OHOS {
-    void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
-}
-#endif // OHOS_MOCK_FORM_DB_CACHE_H
+void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
+
+void MockGetFormCountsByUserId(int32_t mockRet);
+
+void MockGetFormCountsByHostBundleName(int32_t mockRet);
+
+#endif // INNER_MOCK_FORM_DB_CACHE_H

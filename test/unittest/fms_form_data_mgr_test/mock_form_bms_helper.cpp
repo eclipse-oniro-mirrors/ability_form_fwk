@@ -20,11 +20,18 @@
 
 namespace {
     OHOS::ErrCode g_mockGetBundleNameByUidRet = OHOS::ERR_OK;
+    std::string g_mockBundleName = "A";
 }
 
 void MockGetBundleNameByUid(OHOS::ErrCode mockRet)
 {
     g_mockGetBundleNameByUidRet = mockRet;
+}
+
+void MockGetBundleNameByUid(OHOS::ErrCode mockRet, const std::string &bundleName)
+{
+    g_mockGetBundleNameByUidRet = mockRet;
+    g_mockBundleName = bundleName;
 }
 
 namespace OHOS {
@@ -37,7 +44,7 @@ FormBmsHelper::~FormBmsHelper()
 
 ErrCode FormBmsHelper::GetBundleNameByUid(const int32_t uid, std::string &bundleName)
 {
-    bundleName = "A";
+    bundleName = g_mockBundleName;
     return g_mockGetBundleNameByUidRet;
 }
 } // namespace AppExecFwk

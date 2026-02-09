@@ -56,12 +56,18 @@ public:
     int32_t GetAllFormInfoSize();
 
     /**
-     * @brief Get form counts from DbCache by calling user id.
-     * @param currentAccountId current account ID.
-     * @param callingUid calling user ID.
+     * @brief Get form counts from DbCache by caller user Id.
+     * @param userId caller user Id.
      * @return Returns form counts.
      */
-    int GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid);
+    int32_t GetFormCountsByUserId(const int32_t userId);
+
+    /**
+     * @brief Get form counts from DbCache by host bundle name.
+     * @param hostBundleName host bundle name.
+     * @return Returns form counts.
+     */
+    int32_t GetFormCountsByHostBundleName(const std::string &hostBundleName);
 
     /**
      * @brief Get all form data in DbCache and DB by bundleName.

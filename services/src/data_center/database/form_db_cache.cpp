@@ -489,27 +489,46 @@ ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t form
 }
 
 /**
- * @brief Get form counts from DbCache by calling user id.
- * @param currentAccountId current account ID.
- * @param callingUid calling user ID.
+ * @brief Get form counts from DbCache by caller user Id.
+ * @param userId caller user Id.
  * @return Returns form counts.
  */
-int FormDbCache::GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid)
+int FormDbCache::GetFormCountsByUserId(const int32_t userId)
 {
-    int callingUidFormCounts = 0;
+    int userIdFormCounts = 0;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (const auto &record : formDBInfos_) {
-        if (record.providerUserId != currentAccountId) {
+        if (record.userId != userId) {
             continue;
         }
-        for (const auto &userUid : record.formUserUids) {
-            if (userUid != callingUid) {
+        userIdFormCounts++;
+    }
+    return userIdFormCounts;
+}
+
+/**
+ * @brief Get form counts from DbCache by host bundle name.
+ * @param hostBundleName host bundle name.
+ * @return Returns form counts.
+ */
+int32_t FormDbCache::GetFormCountsByHostBundleName(const std::string &hostBundleName)
+{
+    int32_t formCounts = 0;
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (const auto& record : formDBInfos_) {
+        for (const auto &hostUid : record.formUserUids) {
+            std::string recordHostBundleName;
+            int32_t ret = FormBmsHelper::GetInstance().GetBundleNameByUid(hostUid, recordHostBundleName);
+            if (ret != ERR_OK) {
                 continue;
             }
-            callingUidFormCounts++;
+            if (recordHostBundleName != hostBundleName) {
+                continue;
+            }
+            formCounts++;
         }
     }
-    return callingUidFormCounts;
+    return formCounts;
 }
 
 /**
