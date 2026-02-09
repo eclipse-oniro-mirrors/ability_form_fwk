@@ -50,9 +50,6 @@ namespace AppExecFwk {
 namespace {
 constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.watermark";
 constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
-constexpr const char *FORM_HOST_PARAM_NAMES[] = {Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY,
-    Constants::PARAM_VISUAL_EFFECT_TYPE_KEY, Constants::PARAM_FORM_DISABLE_UIFIRST_KEY,
-    Constants::FORM_ENABLE_MATERIAL_BACKGROUND_KEY};
 
 static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
 {
@@ -3481,7 +3478,7 @@ void FormDataMgr::UpdateFormHostParams(const int64_t formId, const Want &want)
         return;
     }
     WantParams wantParams = want.GetParams();
-    for (auto paramKey : FORM_HOST_PARAM_NAMES) {
+    for (auto paramKey : Constants::FORM_HOST_PARAM_NAMES) {
         if (!wantParams.HasParam(paramKey)) {
             continue;
         }
@@ -3504,7 +3501,7 @@ void FormDataMgr::GetFormHostParams(const int64_t formId, Want &want)
     }
     WantParams formHostParams = formRecord->second.formHostParams;
     WantParams wantParams = want.GetParams();
-    for (auto paramKey : FORM_HOST_PARAM_NAMES) {
+    for (auto paramKey : Constants::FORM_HOST_PARAM_NAMES) {
         if (!formHostParams.HasParam(paramKey)) {
             continue;
         }

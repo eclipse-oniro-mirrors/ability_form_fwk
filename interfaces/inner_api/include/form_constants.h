@@ -490,6 +490,14 @@ namespace Constants {
     constexpr const char* ORIGINAL_FORM_KEY = "ohos.extra.param.key.original_form_id";
 
     constexpr const char* FORM_ENABLE_MATERIAL_BACKGROUND_KEY = "ohos.extra.param.key.form_enable_material_background";
+
+    constexpr const char* FORM_STYLE_PARAMETERS_KEY = "STYLE_PARAMETERS";
+
+    constexpr const char* FORM_ONE_MIRROR_CHANGE_KEY = "ONE_MIRROR_CHANGE";
+
+    constexpr const char *FORM_HOST_PARAM_NAMES[] = {PARAM_HOST_BG_INVERSE_COLOR_KEY, PARAM_VISUAL_EFFECT_TYPE_KEY,
+        PARAM_FORM_DISABLE_UIFIRST_KEY, FORM_ENABLE_MATERIAL_BACKGROUND_KEY, FORM_STYLE_PARAMETERS_KEY,
+        FORM_ONE_MIRROR_CHANGE_KEY};
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
