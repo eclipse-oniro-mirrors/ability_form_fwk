@@ -22,11 +22,15 @@ ohos_shared_library("formobserver_ani") {
     debug = false
   }
 
-  include_dirs = [ "./include" ]
+  include_dirs = [
+    "./include",
+    "../common/include",
+  ]
 
   sources = [
     "src/ets_form_observer.cpp",
     "src/ets_form_state_observer.cpp",
+    "${form_fwk_path}/frameworks/ets/ani/common/src/ani_helpers.cpp",
   ]
 
   deps = [

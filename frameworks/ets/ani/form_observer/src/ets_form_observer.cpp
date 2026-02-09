@@ -17,6 +17,7 @@
 #include "ani_form_common_util.h"
 #include "ani_form_error_util.h"
 #include "ani_form_util.h"
+#include "ani_helpers.h"
 #include "ets_form_state_observer.h"
 #include "ets_runtime.h"
 #include "fms_log_wrapper.h"
@@ -27,9 +28,7 @@
 #include "form_instances_filter.h"
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
-#include "ipc_skeleton.h"
 #include "runtime.h"
-#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -51,7 +50,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!CheckCallerIsSystemApp()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -89,7 +88,7 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
-        if (!CheckCallerIsSystemApp()) {
+        if (!FormAniHelpers::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The application not system-app, can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
@@ -313,12 +312,6 @@ public:
         }
     }
 private:
-
-    static bool CheckCallerIsSystemApp()
-    {
-        auto selfToken = IPCSkeleton::GetSelfTokenID();
-        return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
-    }
 
     static void OnRegisterFormAddObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {

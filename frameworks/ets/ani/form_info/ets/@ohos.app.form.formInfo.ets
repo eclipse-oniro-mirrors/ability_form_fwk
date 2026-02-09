@@ -62,12 +62,6 @@ export default namespace formInfo {
     eTS = 2
   }
 
-  enum ColorMode {
-    MODE_AUTO = -1,
-    MODE_DARK = 0,
-    MODE_LIGHT = 1
-  }
-
   export interface FormStateInfo {
     formState: FormState;
     want: Want;
@@ -99,6 +93,12 @@ export default namespace formInfo {
     FORM_PERMISSION_NAME_KEY = 'ohos.extra.param.key.permission_name',
     FORM_PERMISSION_GRANTED_KEY = 'ohos.extra.param.key.permission_granted',
     ORIGINAL_FORM_KEY = 'ohos.extra.param.key.original_form_id',
+    EDIT_FORM_KEY = 'ohos.extra.param.key.edit_form_id',
+    FORM_MANAGER_SHOW_SINGLE_FORM = 'ohos.extra.param.key.form_manager_show_single_form',
+    TEMPLATE_FORM_DETAIL_ID = 'ohos.extra.param.key.template_form_detail_id',
+    TEMPLATE_FORM_DATA = 'ohos.extra.param.key.template_form_data',
+    TEMPLATE_FORM_DISPLAY_NAME = 'ohos.extra.param.key.template_form_display_name',
+    TEMPLATE_FORM_DESCRIPTION = 'ohos.extra.param.key.template_form_description'
   }
 
   export interface FormInfoFilter {
@@ -333,4 +333,18 @@ export default namespace formInfo {
   }
 
   type GetFormRectInfoCallback = (formId: string) => Promise<Rect>;
+
+  interface PublishFormCrossBundleInfo {
+    callerBundleName: string;
+    targetBundleName: string;
+    targetTemplateFormDetailId: string;
+  }
+
+  class PublishFormCrossBundleInfoInner implements PublishFormCrossBundleInfo {
+    callerBundleName: string;
+    targetBundleName: string;
+    targetTemplateFormDetailId: string;
+  }
+
+  type PublishFormCrossBundleControlCallback = (info: PublishFormCrossBundleInfo) => boolean;
 }
