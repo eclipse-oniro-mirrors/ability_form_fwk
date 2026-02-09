@@ -21,6 +21,16 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+
+namespace {
+class FormMapInfoTable {
+public:
+    std::unordered_map<FormFsmStatus, std::string> formStatusStringMap;
+    std::unordered_map<FormFsmEvent, std::string> formEventStringMap;
+
+    FormMapInfoTable();
+}
+
 class FormStatusPrint {
 public:
     /**
