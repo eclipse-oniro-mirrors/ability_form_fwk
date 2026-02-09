@@ -21,9 +21,9 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 
-FormMapInfoTable::FormMapInfoTable()
+std::unordered_map<FormFsmStatus, std::string> getFormStatusStringMap()
 {
-    formStatusStringMap = {
+    const static std::unordered_map<FormFsmStatus, std::string> formStatusStringMap = {
         { FormFsmStatus::INIT, "[INIT]" },
         { FormFsmStatus::RENDERED, "[RENDERED]" },
         { FormFsmStatus::RECYCLED, "[RECYCLED]" },
@@ -34,7 +34,12 @@ FormMapInfoTable::FormMapInfoTable()
         { FormFsmStatus::DELETING, "[DELETING]" },
         { FormFsmStatus::UNPROCESSABLE, "[UNPROCESSABLE]" },
     };
-    formEventStringMap = {
+    return formStatusStringMap;
+}
+
+std::unordered_map<FormFsmEvent, std::string> getFormEventStringMap()
+{
+    const static std::unordered_map<FormFsmEvent, std::string> formEventStringMap = {
         { FormFsmEvent::RENDER_FORM, "[RENDER_FORM]" },
         { FormFsmEvent::RENDER_FORM_DONE, "[RENDER_FORM_DONE]" },
         { FormFsmEvent::RENDER_FORM_FAIL, "[RENDER_FORM_FAIL]" },
@@ -54,16 +59,15 @@ FormMapInfoTable::FormMapInfoTable()
         { FormFsmEvent::EXECUTION_TIMEOUT, "[EXECUTION_TIMEOUT]" },
         { FormFsmEvent::RELOAD_FORM, "[RELOAD_FORM]" },
     };
+    return formEventStringMap;
 }
-
-const static FormMapInfoTable FORM_MAP_INFO_TBL;
 }
 
 std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 {
     std::string value = std::to_string(static_cast<int>(status));
-    const auto iter = FORM_MAP_INFO_TBL.formStatusStringMap.find(status);
-    if (iter != FORM_MAP_INFO_TBL.formStatusStringMap.end()) {
+    const auto iter = getFormStatusStringMap().find(status);
+    if (iter != getFormStatusStringMap().end()) {
         value = iter->second;
     }
     return value;
@@ -72,8 +76,8 @@ std::string FormStatusPrint::FormStatusToString(const FormFsmStatus status)
 std::string FormStatusPrint::FormEventToString(const FormFsmEvent event)
 {
     std::string value = std::to_string(static_cast<int>(event));
-    const auto iter = FORM_MAP_INFO_TBL.formEventStringMap.find(event);
-    if (iter != FORM_MAP_INFO_TBL.formEventStringMap.end()) {
+    const auto iter = getFormEventStringMap().find(event);
+    if (iter != getFormEventStringMap().end()) {
         value = iter->second;
     }
     return value;

@@ -65,8 +65,8 @@ FormInstancesFilter* FormInstancesFilter::Unmarshalling(Parcel &parcel)
 {
     FormInstancesFilter* object = new (std::nothrow) FormInstancesFilter();
     if (object && !object->ReadFromParcel(parcel)) {
+        delete object;
         object = nullptr;
-        return nullptr;
     }
     return object;
 }
