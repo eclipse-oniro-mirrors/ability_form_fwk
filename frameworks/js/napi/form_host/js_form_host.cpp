@@ -1759,10 +1759,17 @@ private:
 
         JsFormDataCallbackClient::AcquireFormDataTask task = [env, asyncTask](AAFwk::WantParams data) {
             HILOG_DEBUG("task complete form data");
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(env, &scope);
+            if (scope == nullptr) {
+                HILOG_ERROR("scope is null.");
+                return;
+            }
             napi_value objValue = nullptr;
             napi_create_object(env, &objValue);
             napi_set_named_property(env, objValue, "formData", CreateJsWantParams(env, data));
             asyncTask->ResolveWithNoError(env, objValue);
+            napi_close_handle_scope(env, scope);
         };
 
         InnerAcquireFormData(env, asyncTask, std::move(task), formId);
