@@ -2525,7 +2525,7 @@ public:
             HILOG_INFO("null handler");
             return;
         }
-       
+
         m_handler->PostSyncTask([thisWeakPtr = weak_from_this(), formId]() {
             auto sharedThis = thisWeakPtr.lock();
             if (sharedThis == nullptr) {
@@ -2543,7 +2543,7 @@ public:
             ani_string formIdAniStr {};
             ani_status newString_status = env->String_NewUTF8(formIdString.c_str(), formIdString.size(), &formIdAniStr);
             HILOG_INFO("String_NewUTF8 status: %{public}d", newString_status);
-           
+
             auto res = InvokeCallback(env, static_cast<ani_object>(sharedThis->m_callback), formIdAniStr);
             if (!res) {
                 HILOG_ERROR("Cannot call callback");

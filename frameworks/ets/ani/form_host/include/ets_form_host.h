@@ -109,7 +109,7 @@ public:
     void RegisterGetLiveFormStatusListener(ani_vm *ani_vm, ani_object callback);
 
     void UnregisterGetLiveFormStatusListener();
-    
+
     void RegisterTemplateFormDetailInfoChange(ani_vm* ani_vm, ani_object callback);
 
     void UnregisterTemplateFormDetailInfoChange();

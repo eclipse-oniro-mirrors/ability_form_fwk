@@ -254,7 +254,7 @@ export default namespace formInfo {
     public formDescription: string = '';
     public extraData?: Record<string, Object> = {};
   }
-  
+
   export class FormStateInfoInner implements FormStateInfo {
     formState: FormState;
     want: Want;
@@ -307,7 +307,7 @@ export default namespace formInfo {
     displayName: string;
     description: string;
   }
-  
+
   type TemplateFormDetailInfoCallback = (info: Array<TemplateFormDetailInfo>) => void;
 
   export interface Rect {
@@ -329,7 +329,7 @@ export default namespace formInfo {
     duration: int;
     useDefaultAnimation?: boolean;
   }
-  
+
   class OverflowInfoInner implements OverflowInfo {
     area: Rect;
     duration: int;

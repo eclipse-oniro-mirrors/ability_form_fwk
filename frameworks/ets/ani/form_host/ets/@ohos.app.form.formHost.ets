@@ -1132,7 +1132,7 @@ export default namespace formHost {
   }
 
   class TemplateFormDetailInfoChangeCallbackWrapper {
-    private templateFormDetailInfoCallback: formInfo.TemplateFormDetailInfoCallback = (info: Array<TemplateFormDetailInfo>) => { }
+    private templateFormDetailInfoCallback: formInfo.TemplateFormDetailInfoCallback = (info: Array<formInfo.TemplateFormDetailInfo>) => { }
 
     constructor(callback: formInfo.TemplateFormDetailInfoCallback) {
       this.templateFormDetailInfoCallback = callback;
