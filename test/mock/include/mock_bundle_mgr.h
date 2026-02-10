@@ -54,6 +54,7 @@ public:
     MOCK_METHOD3(QueryExtensionAbilityInfos, bool(const ExtensionAbilityType &, const int32_t &,
         std::vector<ExtensionAbilityInfo> &));
     MOCK_METHOD3(GetBundleInfos, bool(const BundleFlag, std::vector<BundleInfo> &, int32_t));
+    MOCK_METHOD3(GetAppProvisionInfo, ErrCode(const std::string &, int32_t, AppProvisionInfo &));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

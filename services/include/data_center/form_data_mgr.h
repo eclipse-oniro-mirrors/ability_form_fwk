@@ -1042,6 +1042,12 @@ public:
     const std::string& GetTransparencyFormCapabilityKey();
 
     /**
+     * @brief Get formStandbyCapabilityKey value.
+     * @return Returns formStandbyCapabilityKey value.
+     */
+    const std::string& GetFormStandbyCapabilityKey();
+
+    /**
      * @brief Get form upgrade info from formRecord.
      * @return Returns true on success, false on failure.
      */
@@ -1230,9 +1236,9 @@ private:
     void InitLowMemoryStatus();
 
     /**
-     * @brief Init transparencyFormCapbilityKey.
+     * @brief Init formCapabilityKey.
      */
-    void InitTransparencyFormCapabilityKey();
+    void InitFormCapabilityKey();
 
 private:
     void GetUnusedFormInstancesByFilter(
@@ -1266,6 +1272,7 @@ private:
     std::unordered_map<int64_t, bool> formVisibleMap_;
     std::atomic_bool isLowMemory_ = false;
     std::string transparencyFormCapabilityKey_ = "";
+    std::string formStandbyCapabilityKey_ = "";
 };
 } // namespace AppExecFwk
 } // namespace OHOS
