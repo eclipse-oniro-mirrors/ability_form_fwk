@@ -1636,6 +1636,20 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_OpenByOpenType_0005, TestSize.Le
 }
 
 /**
+ * @tc.name: FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001
+ * @tc.desc: test UpdateFormRenderParamsAfterReload function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    formMgrAdapter.UpdateFormRenderParamsAfterReload(formId);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 end";
+}
+
+/**
  * @tc.name: FormMgrAdapter_IsDeleteCacheInUpgradeScene_0001
  * @tc.desc: test IsDeleteCacheInUpgradeScene function.
  * @tc.type: FUNC
@@ -1671,16 +1685,21 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_IsDeleteCacheInUpgradeScene_0002
 }
 
 /**
- * @tc.name: FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001
- * @tc.desc: test UpdateFormRenderParamsAfterReload function.
+ * @tc.name: FormMgrAdapter_CheckIsAddFormByHost_0001
+ * @tc.desc: test CheckIsAddFormByHost function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001, TestSize.Level1)
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_CheckIsAddFormByHost_0001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_CheckIsAddFormByHost_0001 start";
     FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    formMgrAdapter.UpdateFormRenderParamsAfterReload(formId);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateFormRenderParamsAfterReload_0001 end";
+    FormRecord record;
+    Want want;
+    formMgrAdapter.CheckIsAddFormByHost(record, want);
+
+    want.setParam(Constants::IS_ADD_FORM_BY_HOST, true);
+    MockGetFormsInfoByRecord(true);
+    formMgrAdapter.CheckIsAddFormByHost(record, want);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_CheckIsAddFormByHost_0001 end";
 }
 }

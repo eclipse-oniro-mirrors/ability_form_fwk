@@ -1558,6 +1558,8 @@ private:
      */
     void DeleteInvalidFormCacheIfNeed();
 
+    void CheckIsAddFormByHost(const FormRecord &formRecord, Want &allotFormWant);
+
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 
