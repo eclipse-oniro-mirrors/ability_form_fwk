@@ -1070,11 +1070,6 @@ void EtsFormRouterProxyMgr::SetAniVM(ani_vm* ani_vm)
 ErrCode EtsFormRouterProxyMgr::TemplateFormDetailInfoChange(
     const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
 {
-    return ERR_OK;
-}
-ErrCode EtsFormRouterProxyMgr::TemplateFormDetailInfoChange(
-    const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
-{
     HILOG_DEBUG("call");
     std::shared_ptr<AppExecFwk::EventHandler> mainHandler =
         std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
