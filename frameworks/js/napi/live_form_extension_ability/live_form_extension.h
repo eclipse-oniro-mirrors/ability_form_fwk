@@ -38,6 +38,7 @@ public:
      *
      * @param runtime The runtime.
      * @return The LiveForm Extension instance.
+     * To avoid memory leaks, it is necessary to release this pointers.
      */
     static LiveFormExtension *Create(const std::unique_ptr<Runtime> &runtime);
 };
