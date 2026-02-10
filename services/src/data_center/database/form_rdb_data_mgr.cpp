@@ -100,12 +100,7 @@ ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableC
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    auto formRdbTableCfgIter = formRdbTableCfgMap_.find(formRdbTableConfig.tableName);
-    if (formRdbTableCfgIter != formRdbTableCfgMap_.end()) {
-        formRdbTableCfgMap_[formRdbTableConfig.tableName] = formRdbTableConfig;
-    } else {
-        formRdbTableCfgMap_.emplace(formRdbTableConfig.tableName, formRdbTableConfig);
-    }
+    SetFormRdbTableCfg(formRdbTableConfig);
 
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
@@ -128,11 +123,6 @@ ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableC
 
 ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
 {
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
         HILOG_ERROR("null FormInfoRdbStore");
@@ -168,13 +158,8 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
 ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::string &key)
 {
     HILOG_DEBUG("InsertData start");
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -219,13 +204,8 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
 ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::string &key, const std::string &value)
 {
     HILOG_DEBUG("InsertData start");
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -272,13 +252,8 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
 ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::string &key)
 {
     HILOG_DEBUG("DeleteData start");
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -324,13 +299,8 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
     std::string &value)
 {
     HILOG_DEBUG("QueryData start");
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -380,13 +350,8 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
 ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::string &key,
     std::unordered_map<std::string, std::string> &values)
 {
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -451,13 +416,8 @@ ErrCode FormRdbDataMgr::QueryAllData(const std::string &tableName,
     std::unordered_map<std::string, std::string> &datas)
 {
     HILOG_DEBUG("QueryAllData start");
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -520,13 +480,8 @@ ErrCode FormRdbDataMgr::QueryAllData(const std::string &tableName,
 ErrCode FormRdbDataMgr::QueryAllKeys(const std::string &tableName, std::set<std::string> &datas)
 {
     HILOG_DEBUG("QueryAllKeys start");
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -582,10 +537,6 @@ std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QueryData(
     const NativeRdb::AbsRdbPredicates &absRdbPredicates)
 {
     HILOG_DEBUG("QueryData start");
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
-        return nullptr;
-    }
 
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
@@ -600,10 +551,6 @@ std::shared_ptr<NativeRdb::ResultSet> FormRdbDataMgr::QueryDataByStep(
     const NativeRdb::AbsRdbPredicates &absRdbPredicates)
 {
     HILOG_DEBUG("QueryDataByStep start");
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
-        return nullptr;
-    }
 
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
@@ -617,10 +564,6 @@ std::shared_ptr<NativeRdb::ResultSet> FormRdbDataMgr::QueryDataByStep(
 std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QuerySql(const std::string &sql)
 {
     HILOG_DEBUG("QuerySql start");
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
-        return nullptr;
-    }
 
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
@@ -635,13 +578,8 @@ bool FormRdbDataMgr::InsertData(
     const std::string &tableName, const NativeRdb::ValuesBucket &valuesBucket, int64_t &rowId)
 {
     HILOG_DEBUG("InsertData start");
-    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+    if (!CheckFormRdbTable(tableName)) {
         HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
-        return false;
-    }
-
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
         return false;
     }
 
@@ -682,11 +620,6 @@ bool FormRdbDataMgr::InsertData(
 
 bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredicates)
 {
-    if (!IsFormRdbLoaded()) {
-        HILOG_ERROR("null FormInfoRdbStore");
-        return false;
-    }
-
     auto rdbStore = GetRdbStore();
     if (rdbStore == nullptr) {
         HILOG_ERROR("null FormInfoRdbStore");
@@ -722,29 +655,6 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
     return false;
 }
 
-bool FormRdbDataMgr::IsFormRdbLoaded()
-{
-    auto rdbStore = GetRdbStore();
-
-    if (rdbStore != nullptr) {
-        return true;
-    } else {
-        return false;
-    }
-
-    for (auto iter = formRdbTableCfgMap_.begin(); iter != formRdbTableCfgMap_.end(); iter++) {
-        std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
-            : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
-            + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-        int32_t ret = rdbStore->ExecuteSql(createTableSql);
-        if (ret != NativeRdb::E_OK) {
-            HILOG_ERROR("Recreate form rdb table failed, ret:%{public}" PRId32 ", name is %{public}s",
-                ret, iter->first.c_str());
-        }
-    }
-    return true;
-}
-
 ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
 {
     if (rdbOperateRet != NativeRdb::E_SQLITE_CORRUPT) {
@@ -771,6 +681,7 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         if (restoreRet == NativeRdb::E_SQLITE_CORRUPT) {
             // 删库，避免拿到缓存的开库信息
             HILOG_WARN("Need rdb clear cache, delete db");
+            std::unique_lock<std::shared_mutex> lock(rdbStoreMutex_);
             std::string rdbPath = Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME;
             NativeRdb::RdbHelper::DeleteRdbStore(rdbPath);
         }
@@ -785,16 +696,7 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
 
     if (restoreRet != NativeRdb::E_OK) {
         //fallback restoration if Restore() did not work
-        for (auto iter = formRdbTableCfgMap_.begin(); iter != formRdbTableCfgMap_.end(); iter++) {
-            std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
-                : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
-                + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-            int32_t result = rdbStore->ExecuteSql(createTableSql);
-            if (result != NativeRdb::E_OK) {
-                HILOG_ERROR("Recreate form rdb table failed, ret:%{public}" PRId32 ", name is %{public}s",
-                    result, iter->first.c_str());
-            }
-        }
+        CreateFormRdbTables();
     }
     return ERR_OK;
 }
@@ -840,6 +742,53 @@ std::shared_ptr<NativeRdb::RdbStore> FormRdbDataMgr::GetRdbStore()
         return LoadRdbStore();
     }
     return rdbStore;
+}
+
+void FormRdbDataMgr::SetFormRdbTableCfg(const FormRdbTableConfig &formRdbTableConfig)
+{
+    std::unique_lock<std::shared_mutex> lock(formRdbTableCfgMapMutex_);
+    auto formRdbTableCfgIter = formRdbTableCfgMap_.find(formRdbTableConfig.tableName);
+    if (formRdbTableCfgIter != formRdbTableCfgMap_.end()) {
+        formRdbTableCfgMap_[formRdbTableConfig.tableName] = formRdbTableConfig;
+    } else {
+        formRdbTableCfgMap_.emplace(formRdbTableConfig.tableName, formRdbTableConfig);
+    }
+}
+
+bool FormRdbDataMgr::CheckFormRdbTable(const std::string &tableName)
+{
+    std::shared_lock<std::shared_mutex> lock(formRdbTableCfgMapMutex_);
+    if (formRdbTableCfgMap_.find(tableName) == formRdbTableCfgMap_.end()) {
+        HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
+        return false;
+    }
+    return true;
+}
+
+void FormRdbDataMgr::CreateFormRdbTables()
+{
+    std::map<std::string, std::string> createTableSqls;
+    {
+        std::shared_lock<std::shared_mutex> lock(formRdbTableCfgMapMutex_);
+        for (auto iter = formRdbTableCfgMap_.begin(); iter != formRdbTableCfgMap_.end(); iter++) {
+            std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
+                : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
+                + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
+            createTableSqls[iter->second.tableName] = createTableSql;
+        }
+    }
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return;
+    }
+    for (auto iter = createTableSqls.begin(); iter != createTableSqls.end(); iter++) {
+        int32_t result = rdbStore->ExecuteSql(iter->second);
+        if (result != NativeRdb::E_OK) {
+            HILOG_ERROR("Recreate form rdb table failed, ret:%{public}" PRId32 ", name is %{public}s",
+                result, iter->first.c_str());
+        }
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS
