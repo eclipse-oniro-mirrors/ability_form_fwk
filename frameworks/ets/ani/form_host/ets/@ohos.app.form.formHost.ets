@@ -95,6 +95,8 @@ export default namespace formHost {
   export native function nativeOffGetFormRect(callback?: GetFormRectInfoCallbackWrapper): void;
   export native function nativeOnGetLiveFormStatus(callback: GetLiveFormStatusCallbackWrapper): void;
   export native function nativeOffGetLiveFormStatus(callback?: GetLiveFormStatusCallbackWrapper): void;
+  export native function nativeOnTemplateFormDetailInfoChange(callback: TemplateFormDetailInfoChangeCallbackWrapper): void;
+  export native function nativeOffTemplateFormDetailInfoChange(callback?: TemplateFormDetailInfoChangeCallbackWrapper): void;
   export native function nativeUpdateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void;
 
   const ERR_OK = 0;
@@ -1068,6 +1070,19 @@ export default namespace formHost {
     formHost.nativeOffGetLiveFormStatus(myCall);
   }
 
+  function onTemplateFormDetailInfoChange(callback: formInfo.TemplateFormDetailInfoCallback): void {
+    let myCall = new TemplateFormDetailInfoChangeCallbackWrapper(callback);
+    formHost.nativeOnTemplateFormDetailInfoChange(myCall);
+  }
+
+  function offTemplateFormDetailInfoChange(callback?: formInfo.TemplateFormDetailInfoCallback): void {
+    let myCall: TemplateFormDetailInfoChangeCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new TemplateFormDetailInfoChangeCallbackWrapper(callback);
+    }
+    formHost.nativeOffTemplateFormDetailInfoChange(myCall);
+  }
+
   function updateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void {
     formHost.nativeUpdateFormSize(formId, newDimension, newRect);
   }
@@ -1113,6 +1128,18 @@ export default namespace formHost {
 
     invoke(): Record<string, string> {
       return this.liveFormStatusCallback();
+    }
+  }
+
+  class TemplateFormDetailInfoChangeCallbackWrapper {
+    private templateFormDetailInfoCallback: formInfo.TemplateFormDetailInfoCallback = (info: Array<formInfo.TemplateFormDetailInfo>) => { }
+
+    constructor(callback: formInfo.TemplateFormDetailInfoCallback) {
+      this.templateFormDetailInfoCallback = callback;
+    }
+
+    invoke(info: Array<formInfo.TemplateFormDetailInfo>): void {
+      this.templateFormDetailInfoCallback(info);
     }
   }
 }

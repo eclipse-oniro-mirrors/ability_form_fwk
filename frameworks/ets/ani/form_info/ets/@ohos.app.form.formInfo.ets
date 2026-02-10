@@ -254,7 +254,7 @@ export default namespace formInfo {
     public formDescription: string = '';
     public extraData?: Record<string, Object> = {};
   }
-  
+
   export class FormStateInfoInner implements FormStateInfo {
     formState: FormState;
     want: Want;
@@ -286,6 +286,30 @@ export default namespace formInfo {
     overflowInfo?: OverflowInfo;
   }
 
+  interface TemplateFormDetailInfo {
+    bundleName: string;
+    moduleName: string;
+    abilityName: string;
+    formName: string;
+    dimension: FormDimension;
+    detailId: string;
+    displayName: string;
+    description: string;
+  }
+
+  class TemplateFormDetailInfoInner implements TemplateFormDetailInfo {
+    bundleName: string;
+    moduleName: string;
+    abilityName: string;
+    formName: string;
+    dimension: FormDimension;
+    detailId: string;
+    displayName: string;
+    description: string;
+  }
+
+  type TemplateFormDetailInfoCallback = (info: Array<TemplateFormDetailInfo>) => void;
+
   export interface Rect {
     left: double;
     top: double;
@@ -305,7 +329,7 @@ export default namespace formInfo {
     duration: int;
     useDefaultAnimation?: boolean;
   }
-  
+
   class OverflowInfoInner implements OverflowInfo {
     area: Rect;
     duration: int;
