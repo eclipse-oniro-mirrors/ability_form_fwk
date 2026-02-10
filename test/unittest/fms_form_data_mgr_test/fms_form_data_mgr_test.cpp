@@ -6379,4 +6379,70 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetTempFormCountByUserId_002, Te
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormCountByUserId_002 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormStandbyCapabilityKey_001
+ * @tc.name: GetFormStandbyCapabilityKey
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: Get formStandbyCapabilityKey value.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormStandbyCapabilityKey_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormStandbyCapabilityKey_001 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(formDataMgr, nullptr);
+
+    const std::string &standbyCapabilityKey = formDataMgr->GetFormStandbyCapabilityKey();
+    EXPECT_EQ(standbyCapabilityKey, formDataMgr->formStandbyCapabilityKey_);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormStandbyCapabilityKey_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormStandbyCapabilityKey_002
+ * @tc.name: GetFormStandbyCapabilityKey
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: Set formStandbyCapabilityKey value and get it.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormStandbyCapabilityKey_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormStandbyCapabilityKey_002 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(formDataMgr, nullptr);
+
+    std::string testValue = "test_standby_capability";
+    formDataMgr->formStandbyCapabilityKey_ = testValue;
+
+    const std::string &standbyCapabilityKey = formDataMgr->GetFormStandbyCapabilityKey();
+    EXPECT_EQ(standbyCapabilityKey, testValue);
+    EXPECT_EQ(standbyCapabilityKey, formDataMgr->formStandbyCapabilityKey_);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormStandbyCapabilityKey_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_InitFormCapabilityKey_001
+ * @tc.name: InitFormCapabilityKey
+ * @tc.desc: Verify that the initialization is correct.
+ * @tc.details: Init formCapabilityKey including transparency and standby capability keys.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_InitFormCapabilityKey_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_InitFormCapabilityKey_001 start";
+
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(formDataMgr, nullptr);
+
+    // Verify that the transparency and standby capability keys are initialized
+    const std::string &transparencyKey = formDataMgr->GetTransparencyFormCapabilityKey();
+    const std::string &standbyKey = formDataMgr->GetFormStandbyCapabilityKey();
+
+    // Both keys should be accessible and non-null references
+    EXPECT_EQ(transparencyKey, formDataMgr->transparencyFormCapabilityKey_);
+    EXPECT_EQ(standbyKey, formDataMgr->formStandbyCapabilityKey_);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_InitFormCapabilityKey_001 end";
+}
 }

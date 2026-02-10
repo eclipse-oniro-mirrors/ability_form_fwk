@@ -95,12 +95,12 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     // Test SendLoadStageFormConfigEvent
     FormInfoHelper::SendLoadStageFormConfigEvent(formInfo);
 
-    // Test GetBundleTransparencyEnabled
-    std::string bundleName(data, size);
-    FormInfoHelper::GetBundleTransparencyEnabled(bundleName, userId);
-
-    // Test UpdateBundleTransparencyEnabled
-    FormInfoHelper::UpdateBundleTransparencyEnabled(bundleName, userId, formInfos);
+    // Test SendLoadStageFormConUpdateFormInfoByAppServicesCapabilityfigEvent
+    FormInfoHelper::UpdateFormInfoByAppServicesCapability(bundleInfo, userId, formInfos);
+    // Test UpdateFormInfoTransparencyEnabled
+    FormInfoHelper::UpdateFormInfoTransparencyEnabled(bundleInfo, userId, formInfos);
+    // Test UpdateFormInfoFormStandby
+    FormInfoHelper::UpdateFormInfoFormStandby(bundleInfo, userId, formInfos);
 
     // Test LoadProfileFormInfos
     std::vector<std::string> profileInfos;

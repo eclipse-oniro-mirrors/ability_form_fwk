@@ -141,9 +141,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
         }
     }
 
-    if (!bundleInfo.applicationInfo.isSystemApp) {
-        UpdateBundleTransparencyEnabled(bundleInfo.name, userId, formInfos);
-    }
+    UpdateFormInfoByAppServicesCapability(bundleInfo, userId, formInfos);
 
     return ERR_OK;
 }
@@ -283,39 +281,72 @@ ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource:
     return ERR_OK;
 }
 
-void FormInfoHelper::UpdateBundleTransparencyEnabled(const std::string &bundleName, int32_t userId,
+void FormInfoHelper::UpdateFormInfoByAppServicesCapability(const BundleInfo &bundleInfo, int32_t userId,
     std::vector<FormInfo> &formInfos)
 {
-    bool isAGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleName, userId);
+    UpdateFormInfoTransparencyEnabled(bundleInfo, userId, formInfos);
+    UpdateFormInfoFormStandby(bundleInfo, userId, formInfos);
+}
+
+void FormInfoHelper::UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo, int32_t userId,
+    std::vector<FormInfo> &formInfos)
+{
+    if (bundleInfo.applicationInfo.isSystemApp) {
+        return;
+    }
+
+    bool isTransparencyEnabled = false;
+    const std::string &transparencyFormCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
+    if (!transparencyFormCapabilityKey.empty()) {
+        isTransparencyEnabled = CheckAppServicesCapability(userId, bundleInfo.applicationInfo.bundleName,
+            transparencyFormCapabilityKey);
+    }
+    HILOG_DEBUG("isTransparencyEnabled: %{public}d", isTransparencyEnabled);
+    if (isTransparencyEnabled) {
+        return;
+    }
+
     for (auto &formInfo: formInfos) {
-        // Only when configured as true will the AGC audit results be set.
-        if (formInfo.transparencyEnabled) {
-            formInfo.transparencyEnabled = isAGCTransparencyEnabled;
-        }
+        formInfo.transparencyEnabled = false;
     }
 }
 
-bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId)
+void FormInfoHelper::UpdateFormInfoFormStandby(const BundleInfo &bundleInfo, int32_t userId,
+    std::vector<FormInfo> &formInfos)
+{
+    bool isStandbyEnabled = false;
+    const std::string &standbyCapabilityKey = FormDataMgr::GetInstance().GetFormStandbyCapabilityKey();
+    if (!standbyCapabilityKey.empty()) {
+        isStandbyEnabled = CheckAppServicesCapability(userId, bundleInfo.applicationInfo.bundleName,
+            standbyCapabilityKey);
+    }
+    HILOG_DEBUG("isStandbyEnabled: %{public}d", isStandbyEnabled);
+    if (isStandbyEnabled) {
+        return;
+    }
+
+    for (auto &formInfo: formInfos) {
+        formInfo.standby.isSupported = false;
+        formInfo.standby.isAdapted = false;
+    }
+}
+
+bool FormInfoHelper::CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
+    const std::string &capabilityKey)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("get IBundleMgr failed");
         return false;
     }
-    const std::string &transparencyFormCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
-    if (transparencyFormCapabilityKey.empty()) {
-        HILOG_ERROR("get transparencyFormCapabilityKey is empty");
-        return false;
-    }
+
     AppProvisionInfo appProvisionInfo;
-    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId,
-        appProvisionInfo));
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId, appProvisionInfo));
     if (ret != ERR_OK) {
         HILOG_ERROR("get AppProvisionInfo failed");
         return false;
     } else {
-        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities,
-            nullptr, false);
+        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities, nullptr, false);
         if (jsonObject.is_discarded()) {
             HILOG_ERROR("fail parse appServiceCapabilities");
             return false;
@@ -324,7 +355,7 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
             HILOG_ERROR("appServiceCapabilities is not object");
             return false;
         }
-        return jsonObject.contains(transparencyFormCapabilityKey);
+        return jsonObject.contains(capabilityKey);
     }
 }
 
