@@ -1697,7 +1697,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_CheckIsAddFormByHost_0001, TestS
     Want want;
     formMgrAdapter.CheckIsAddFormByHost(record, want);
 
-    want.setParam(Constants::IS_ADD_FORM_BY_HOST, true);
+    want.SetParam(Constants::IS_ADD_FORM_BY_HOST, true);
     MockGetFormsInfoByRecord(true);
     formMgrAdapter.CheckIsAddFormByHost(record, want);
     GTEST_LOG_(INFO) << "FormMgrAdapter_CheckIsAddFormByHost_0001 end";
