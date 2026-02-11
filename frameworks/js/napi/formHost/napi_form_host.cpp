@@ -465,7 +465,6 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
             if (asyncWork != nullptr) {
                 napi_delete_async_work(env, asyncWork);
             }
-            delete asyncCallbackInfo;
         }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
@@ -517,7 +516,6 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
             if (asyncWork != nullptr) {
                 napi_delete_async_work(env, asyncWork);
             }
-            delete asyncCallbackInfo;
         }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
