@@ -28,7 +28,7 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr int32_t MAX_NUM = 15;
+constexpr int32_t MAX_NUM = 15; // max
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
