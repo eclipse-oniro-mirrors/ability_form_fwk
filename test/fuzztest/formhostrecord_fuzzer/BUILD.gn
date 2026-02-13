@@ -36,6 +36,7 @@ ohos_fuzztest("FormHostRecordFuzzTest") {
   sources = [ "formhostrecord_fuzzer.cpp" ]
 
   deps = [
+    "${form_fwk_path}:form_manager",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
   ]
@@ -51,7 +52,6 @@ ohos_fuzztest("FormHostRecordFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
