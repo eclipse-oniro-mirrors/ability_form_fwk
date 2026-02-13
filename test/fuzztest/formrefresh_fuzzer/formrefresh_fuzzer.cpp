@@ -57,7 +57,7 @@ FormRecord GenerateFuzzedFormRecord(FuzzedDataProvider *fdp)
 {
     FormRecord record;
     if (fdp == nullptr) {
-        return formRecord;
+        return record;
     }
     record.formId = fdp->ConsumeIntegral<int64_t>();
     record.bundleName = fdp->ConsumeRandomLengthString(MAX_STRING_SIZE);
