@@ -65,6 +65,18 @@ void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formTaskMgr.LockFormsTaskToHost(formIds, false, remoteObject);
     formTaskMgr.FrsDiedTaskToHost(remoteObject);
     formTaskMgr.HostDied(remoteHost);
+
+    int32_t errorCode = static_cast<int32_t>(GetU32Data(data));
+    formTaskMgr.PostConnectFRSFailedTaskToHost(formId, errorCode);
+    formTaskMgr.ConnectFRSFailedTaskToHost(formId, errorCode);
+
+    bool isDisablePolicy = (formId % 2 == 0);
+    bool isControl = (formId % 3 == 0);
+    formTaskMgr.PostDueControlFormsTaskToHost(formIds, isDisablePolicy, isControl, remoteObject);
+    formTaskMgr.DueControlFormsTaskToHost(formIds, isDisablePolicy, isControl, remoteObject);
+
+    formTaskMgr.PostCheckFormsTaskToHost(formIds, remoteObject);
+    formTaskMgr.CheckFormsTaskToHost(formIds, remoteObject);
 }
 }
 

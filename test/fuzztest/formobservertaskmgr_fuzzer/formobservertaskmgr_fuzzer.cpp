@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
@@ -28,54 +29,59 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+void DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
-void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
-    FormObserverTaskMgr formTaskMgr;
-    std::string bundleName(data, size);
+    if (fdp == nullptr) {
+        return;
+    }
+
+    // Test with random bundle name
+    std::string bundleName = fdp->ConsumeRandomLengthString();
     sptr<IRemoteObject> remoteObject = nullptr;
     RunningFormInfo runningFormInfo;
-    formTaskMgr.PostAddTaskToHost(bundleName, remoteObject, runningFormInfo);
-    formTaskMgr.PostRemoveTaskToHost(bundleName, remoteObject, runningFormInfo);
-    std::string formEventType(data, size);
-    formTaskMgr.PostFormClickEventToHost(bundleName, formEventType, remoteObject, runningFormInfo);
-    int32_t formRefreshType = 0;
-    formTaskMgr.PostBatchRefreshForms(formRefreshType);
+
+    // Test PostAddTaskToHost with fuzzed data
+    runningFormInfo.formId = fdp->ConsumeIntegral<int64_t>();
+    runningFormInfo.dimension = fdp->ConsumeIntegral<int32_t>();
+    runningFormInfo.formLocation = static_cast<Constants::FormLocation>(fdp->ConsumeIntegral<int32_t>());
+    runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(fdp->ConsumeIntegral<int32_t>());
+    runningFormInfo.formUsageState = static_cast<FormUsageState>(fdp->ConsumeIntegral<int32_t>());
+    runningFormInfo.lowMemoryRecycleStatus = static_cast<LowMemoryRecycleStatus>(fdp->ConsumeIntegral<int32_t>());
+    runningFormInfo.formBundleType = static_cast<BundleType>(fdp->ConsumeIntegral<int32_t>());
+    runningFormInfo.appIndex = fdp->ConsumeIntegral<int32_t>();
+    runningFormInfo.userId = fdp->ConsumeIntegral<int32_t>();
+    FormObserverTaskMgr::GetInstance().PostAddTaskToHost(bundleName, remoteObject, runningFormInfo);
+
+    // Test PostRemoveTaskToHost with fuzzed data
+    FormObserverTaskMgr::GetInstance().PostRemoveTaskToHost(bundleName, remoteObject, runningFormInfo);
+
+    // Test PostFormClickEventToHost with fuzzed data
+    std::string formEventType = fdp->ConsumeRandomLengthString();
+    FormObserverTaskMgr::GetInstance().PostFormClickEventToHost(bundleName, formEventType, remoteObject,
+        runningFormInfo);
+
+    // Test PostBatchRefreshForms with fuzzed refresh type
+    int32_t formRefreshType = fdp->ConsumeIntegral<int32_t>();
+    FormObserverTaskMgr::GetInstance().PostBatchRefreshForms(formRefreshType);
+
+    // Test PostBatchConfigurationUpdateForms with fuzzed configuration
+    AppExecFwk::Configuration configuration;
+    FormObserverTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
+
+    // Test direct private method calls with fuzzed data
+    FormObserverTaskMgr::GetInstance().FormAdd(bundleName, remoteObject, runningFormInfo);
+    FormObserverTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);
+    FormObserverTaskMgr::GetInstance().FormClickEvent(bundleName, formEventType, remoteObject, runningFormInfo);
 }
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
+    // Use FuzzedDataProvider for more comprehensive testing
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
 
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
     return 0;
 }
 

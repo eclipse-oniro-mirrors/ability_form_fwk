@@ -58,6 +58,27 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
+
+    // Add missing fuzz test cases for FormHostCallback
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = static_cast<int64_t>(GetU32Data(data));
+    formHostCallback.OnAcquireFormData(wantParams, requestCode, callerToken);
+
+    AAFwk::Want recycleWant;
+    formHostCallback.OnRecycleForms(formIds, recycleWant, callerToken);
+
+    bool enable = (formId % 2 == 0);
+    formHostCallback.OnEnableForms(formIds, enable, callerToken);
+
+    bool lock = (formId % 3 == 0);
+    formHostCallback.OnLockForms(formIds, lock, callerToken);
+
+    bool isDisablePolicy = (formId % 2 == 0);
+    bool isControl = (formId % 3 == 0);
+    formHostCallback.OnDueControlForms(formIds, isDisablePolicy, isControl, callerToken);
+
+    formHostCallback.OnCheckForms(formIds, callerToken);
+
     return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 }

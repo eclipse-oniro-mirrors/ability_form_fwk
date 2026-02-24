@@ -59,12 +59,21 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     EventFwk::CommonEventData eventData;
     formBundleEventCallback.OnReceiveEvent(eventData);
     Want want;
-    std::vector<std::string> actions = {EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED,
-        EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED, BMS_EVENT_ADDITIONAL_INFO_CHANGED};
-    std::string action = actions.at(fdp->ConsumeIntegralInRange<size_t>(0, actions.size() - 1));
-    want.SetAction(action);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED);
     eventData.SetWant(want);
     formBundleEventCallback.OnReceiveEvent(eventData);
+
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    eventData.SetWant(want);
+    formBundleEventCallback.OnReceiveEvent(eventData);
+
+    want.SetAction(BMS_EVENT_ADDITIONAL_INFO_CHANGED);
+    eventData.SetWant(want);
+    formBundleEventCallback.OnReceiveEvent(eventData);
+
+    std::string bundleName = fdp->ConsumeRandomLengthString();
+    bool flag = fdp->ConsumeBool();
+    formBundleEventCallback.HandleBundleChange(bundleName, userId, flag);
     return true;
 }
 }

@@ -40,6 +40,7 @@ ohos_fuzztest("FormObserverTaskMgrFuzzTest") {
   ]
 
   deps = [
+    "${form_fwk_path}:form_manager",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
   ]
@@ -70,7 +71,6 @@ ohos_fuzztest("FormObserverTaskMgrFuzzTest") {
     "faultloggerd:libbacktrace_local",
     "faultloggerd:libdfx_dumpcatcher",
     "ffrt:libffrt",
-    "form_fwk:form_manager",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",

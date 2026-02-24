@@ -75,6 +75,7 @@ ohos_fuzztest("formrefreshFuzzTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
   ]
@@ -97,7 +98,6 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "data_share:datashare_consumer",
     "data_share:datashare_provider",
     "ffrt:libffrt",
-    "form_fwk:form_manager",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
