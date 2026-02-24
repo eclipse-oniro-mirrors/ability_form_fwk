@@ -67,7 +67,7 @@ void FmsFormAshmemTest::TearDown()
 */
 HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormAshmemTest_001 start";
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_001 start ";
     Parcel parcel;
     int32_t fd = -1;
     int32_t size = -1;
