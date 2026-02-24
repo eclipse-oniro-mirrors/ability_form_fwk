@@ -100,16 +100,27 @@ public:
         const int64_t formId, const int callingUid);
     /**
      * @brief Check temp form count is max.
+     * @param currentUserId The current userId.
      * @return Returns ERR_OK if the temp form not reached; returns ERR_MAX_SYSTEM_TEMP_FORMS is reached.
      */
-    int CheckTempEnoughForm() const;
+    int CheckTempEnoughForm(const int32_t currentUserId) const;
     /**
      * @brief Check form count is max.
      * @param currentUserId The current userId.
      * @param callingUid The UID of the proxy.
+     * @param isCastTempForm Is cast temp form to normal form.
      * @return Returns ERR_OK if enough form; returns other error code otherwise.
      */
-    int CheckEnoughForm(const int callingUid, const int32_t currentUserId = Constants::DEFAULT_USER_ID) const;
+    int CheckEnoughForm(const int callingUid, const int32_t currentUserId = Constants::DEFAULT_USER_ID,
+        const bool isCastTempForm = false) const;
+
+    /**
+     * @brief Check user form count is max.
+     * @param currentUserId The current userId.
+     * @param isCastTempForm Is cast temp form to normal form.
+     * @return Returns ERR_OK if enough form; returns other error code otherwise.
+     */
+    int CheckEnoughFormForUser(const int32_t currentUserId, const bool isCastTempForm) const;
     /**
      * @brief Delete temp form.
      * @param formId The Id of the form.
@@ -667,10 +678,17 @@ public:
     int32_t GetCastFormsCount(int32_t &formCount);
 
     /**
-    * @brief get temp forms count.
-    * @return Return the temp forms number.
-    */
+     * @brief get temp forms count.
+     * @return Return the temp forms number.
+     */
     int32_t GetTempFormCount() const;
+
+    /**
+     * @brief get temp forms count by userId.
+     * @param userId User ID.
+     * @return Return the temp forms number for the specified user.
+     */
+    int32_t GetTempFormCountByUserId(const int32_t userId) const;
 
     /**
     * @brief get temp forms count.

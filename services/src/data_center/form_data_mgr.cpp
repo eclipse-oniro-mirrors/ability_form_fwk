@@ -411,7 +411,7 @@ void FormDataMgr::RecycleForms(const std::vector<int64_t> &formIds, const int &c
  * @brief Check temp form count is max.
  * @return Returns ERR_OK if the temp form not reached; returns ERR_MAX_SYSTEM_TEMP_FORMS is reached.
  */
-int FormDataMgr::CheckTempEnoughForm() const
+int FormDataMgr::CheckTempEnoughForm(const int32_t currentUserId) const
 {
     int32_t maxTempSize = Constants::MAX_TEMP_FORMS;
     GetConfigParamFormMap(Constants::MAX_TEMP_FORM_SIZE, maxTempSize);
@@ -426,6 +426,32 @@ int FormDataMgr::CheckTempEnoughForm() const
             ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
     }
+
+    return CheckEnoughFormForUser(currentUserId, false);
+}
+
+/**
+ * @brief Check user form count is max.
+ * @param currentUserId The current userId.
+ * @return Returns ERR_OK if enough form; returns other error code otherwise.
+ */
+int FormDataMgr::CheckEnoughFormForUser(const int32_t currentUserId, const bool isCastTempForm) const
+{
+    HILOG_INFO("currentUserId:%{public}d", currentUserId);
+
+    int32_t maxRecordPerUser = Constants::MAX_RECORD_PER_USER;
+    GetConfigParamFormMap(Constants::MAX_FORM_SIZE_PER_USER, maxRecordPerUser);
+    maxRecordPerUser = ((maxRecordPerUser > Constants::MAX_RECORD_PER_USER) || (maxRecordPerUser < 0)) ?
+        Constants::MAX_RECORD_PER_USER : maxRecordPerUser;
+    int32_t formCountsCurUser = FormDbCache::GetInstance().GetFormCountsByUserId(currentUserId) +
+        GetTempFormCountByUserId(currentUserId);
+    HILOG_DEBUG("current user:%{public}d has form count:%{public}d", currentUserId, formCountsCurUser);
+
+    if (!isCastTempForm && formCountsCurUser >= maxRecordPerUser) {
+        HILOG_ERROR("The maximum number of form in per user is %{public}d", maxRecordPerUser);
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER;
+    }
+
     return ERR_OK;
 }
 
@@ -435,7 +461,7 @@ int FormDataMgr::CheckTempEnoughForm() const
  * @param currentUserId The current userId.
  * @return Returns true if this function is successfully called; returns false otherwise.
  */
-int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUserId) const
+int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUserId, const bool isCastTempForm) const
 {
     HILOG_INFO("callingUid:%{public}d, currentUserId:%{public}d", callingUid, currentUserId);
 
@@ -465,18 +491,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
-    int32_t maxRecordPerUser = Constants::MAX_RECORD_PER_USER;
-    GetConfigParamFormMap(Constants::MAX_FORM_SIZE_PER_USER, maxRecordPerUser);
-    maxRecordPerUser = ((maxRecordPerUser > Constants::MAX_RECORD_PER_USER) || (maxRecordPerUser < 0)) ?
-        Constants::MAX_RECORD_PER_USER : maxRecordPerUser;
-    int32_t formCountsCurUser = FormDbCache::GetInstance().GetFormCountsByUserId(currentUserId);
-    HILOG_DEBUG("current user:%{public}d has form count:%{public}d", currentUserId, formCountsCurUser);
-    if (formCountsCurUser >= maxRecordPerUser) {
-        HILOG_ERROR("The maximum number of form in per user is %{public}d", maxRecordPerUser);
-        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER;
-    }
-
-    return ERR_OK;
+    return CheckEnoughFormForUser(currentUserId, isCastTempForm);
 }
 
 /**
@@ -3147,6 +3162,21 @@ int32_t FormDataMgr::GetTempFormCount() const
 {
     std::lock_guard<std::mutex> lock(formTempMutex_);
     return static_cast<int32_t>(tempForms_.size());
+}
+
+int32_t FormDataMgr::GetTempFormCountByUserId(const int32_t userId) const
+{
+    std::lock(formTempMutex_, formRecordMutex_);
+    std::lock_guard<std::mutex> lock(formTempMutex_, std::adopt_lock);
+    std::lock_guard<std::mutex> lockRecord(formRecordMutex_, std::adopt_lock);
+    int32_t count = 0;
+    for (const int64_t formId : tempForms_) {
+        auto it = formRecords_.find(formId);
+        if (it != formRecords_.end() && it->second.userId == userId) {
+            count++;
+        }
+    }
+    return count;
 }
 
 /**

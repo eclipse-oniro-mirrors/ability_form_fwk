@@ -304,17 +304,16 @@ ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &wa
 {
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
     ErrCode checkCode = 0;
     if (tempFormFlag && ((formId == 0) || !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId))) {
         if (formId > 0) {
             HILOG_ERROR("invalid tempFormId, formId:%{public}" PRId64 "", formId);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        checkCode = FormDataMgr::GetInstance().CheckTempEnoughForm();
+        checkCode = FormDataMgr::GetInstance().CheckTempEnoughForm(currentUserId);
     } else {
         if (formId == 0) {
-            // get current userId
-            int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
             checkCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, currentUserId);
         }
     }
@@ -1317,7 +1316,7 @@ int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
 
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    int checkCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, userId);
+    int checkCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, userId, true);
     if (checkCode != 0) {
         HILOG_ERROR("%{public}" PRId64 " failed,because if too mush forms", matchedFormId);
         return checkCode;
@@ -2732,11 +2731,11 @@ ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want 
     }
 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
     ErrCode errCode = ERR_OK;
     if (isTemporary) {
-        errCode = FormDataMgr::GetInstance().CheckTempEnoughForm();
+        errCode = FormDataMgr::GetInstance().CheckTempEnoughForm(currentUserId);
     } else {
-        int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
         errCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, currentUserId);
     }
     if (errCode != ERR_OK) {

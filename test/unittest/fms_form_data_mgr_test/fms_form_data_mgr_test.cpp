@@ -477,7 +477,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckTempEnoughForm_001, TestSiz
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckTempEnoughForm_001 start";
 
-    EXPECT_EQ(ERR_OK, formDataMgr_.CheckTempEnoughForm());
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_OK, formDataMgr_.CheckTempEnoughForm(userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckTempEnoughForm_001 end";
 }
@@ -496,7 +497,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckTempEnoughForm_002, TestSiz
     for (int index = 0; index < Constants::MAX_TEMP_FORMS; index++) {
         formDataMgr_.tempForms_.emplace_back(index);
     }
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, formDataMgr_.CheckTempEnoughForm());
+    int32_t userId = 100;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, formDataMgr_.CheckTempEnoughForm(userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckTempEnoughForm_002 end";
 }
@@ -6320,5 +6322,61 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughFormOnDevice_002, Tes
 
     EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughFormOnDevice(callingUid));
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughFormOnDevice_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetTempFormCountByUserId_001
+ * @tc.name: GetTempFormCountByUserId
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: tempForms_ is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetTempFormCountByUserId_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormCountByUserId_001 start";
+
+    int32_t userId = 100;
+    EXPECT_EQ(0, formDataMgr_.GetTempFormCountByUserId(userId));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormCountByUserId_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetTempFormCountByUserId_002
+ * @tc.name: GetTempFormCountByUserId
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: tempForms_ has forms and some match the userId.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetTempFormCountByUserId_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormCountByUserId_002 start";
+
+    int32_t userId = 100;
+    int32_t otherUserId = 101;
+    int64_t formId1 = 1;
+    int64_t formId2 = 2;
+    int64_t formId3 = 3;
+
+    formDataMgr_.tempForms_.emplace_back(formId1);
+    formDataMgr_.tempForms_.emplace_back(formId2);
+    formDataMgr_.tempForms_.emplace_back(formId3);
+
+    FormItemInfo formItemInfo1;
+    InitFormItemInfo(formId1, formItemInfo1);
+    FormRecord record1 = formDataMgr_.CreateFormRecord(formItemInfo1, 0, userId);
+    formDataMgr_.formRecords_.emplace(formId1, record1);
+
+    FormItemInfo formItemInfo2;
+    InitFormItemInfo(formId2, formItemInfo2);
+    FormRecord record2 = formDataMgr_.CreateFormRecord(formItemInfo2, 0, otherUserId);
+    formDataMgr_.formRecords_.emplace(formId2, record2);
+
+    FormItemInfo formItemInfo3;
+    InitFormItemInfo(formId3, formItemInfo3);
+    FormRecord record3 = formDataMgr_.CreateFormRecord(formItemInfo3, 0, userId);
+    formDataMgr_.formRecords_.emplace(formId3, record3);
+
+    EXPECT_EQ(2, formDataMgr_.GetTempFormCountByUserId(userId));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormCountByUserId_002 end";
 }
 }
