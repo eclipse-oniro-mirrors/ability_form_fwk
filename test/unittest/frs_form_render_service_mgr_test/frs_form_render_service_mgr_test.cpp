@@ -1276,3 +1276,72 @@ HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupParams_001, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "SetRenderGroupParams_001 end";
 }
+
+/**
+ * @tc.name: SetConfiguration_001
+ * @tc.desc: Verify SetConfiguration returns false when configuration is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetConfiguration_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration;
+    bool ret = formRenderServiceMgr.SetConfiguration(configuration);
+    EXPECT_FALSE(ret);
+    GTEST_LOG_(INFO) << "SetConfiguration_001 end";
+}
+
+/**
+ * @tc.name: SetConfiguration_002
+ * @tc.desc: Verify SetConfiguration returns true when new config has valid values.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetConfiguration_002 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "dark");
+    bool ret = formRenderServiceMgr.SetConfiguration(configuration);
+    EXPECT_TRUE(ret);
+    GTEST_LOG_(INFO) << "SetConfiguration_002 end";
+}
+
+/**
+ * @tc.name: SetConfiguration_003
+ * @tc.desc: Verify SetConfiguration returns false when new config values are empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetConfiguration_003 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    formRenderServiceMgr.configuration_->AddItem("ohos.system.colorMode", "dark");
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "");
+    bool ret = formRenderServiceMgr.SetConfiguration(configuration);
+    EXPECT_FALSE(ret);
+    GTEST_LOG_(INFO) << "SetConfiguration_003 end";
+}
+
+/**
+ * @tc.name: OnConfigurationUpdated_001
+ * @tc.desc: Verify OnConfigurationUpdated when SetConfiguration returns false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, OnConfigurationUpdated_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnConfigurationUpdated_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    formRenderServiceMgr.configuration_->AddItem("ohos.system.colorMode", "dark");
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "");
+    formRenderServiceMgr.configUpdateTime_ = std::chrono::steady_clock::now();
+    formRenderServiceMgr.OnConfigurationUpdated(configuration);
+    EXPECT_EQ(formRenderServiceMgr.configuration_->GetItem("ohos.system.colorMode"), "dark");
+    GTEST_LOG_(INFO) << "OnConfigurationUpdated_001 end";
+}
