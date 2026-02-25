@@ -501,7 +501,6 @@ bool FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecF
         if (!needUpdateConfig) {
             return false;
         }
-
     }
     configuration_ = config;
     HILOG_INFO("current configuration_:%{public}s", configuration_->GetName().c_str());
