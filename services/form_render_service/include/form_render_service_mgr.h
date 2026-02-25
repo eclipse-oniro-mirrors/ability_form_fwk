@@ -85,8 +85,9 @@ public:
     /**
      * @brief Called when the system start.
      * @param config Indicates the updated configuration information.
+     * @return bool Returns true on success, false on failure.
      */
-    void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config);
+    bool SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config);
 
     void RunCachedConfigurationUpdated();
 

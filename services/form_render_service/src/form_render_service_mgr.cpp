@@ -420,7 +420,10 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
         return;
     }
     SetCriticalTrueOnFormActivity();
-    SetConfiguration(configuration);
+    if (!SetConfiguration(configuration)) {
+        HILOG_INFO("no need to update the configuration");
+        return;
+    }
 
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
@@ -479,24 +482,30 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
     FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
 }
 
-void FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config)
+bool FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config)
 {
     std::lock_guard<std::mutex> lock(configMutex_);
     if (config != nullptr && configuration_ != nullptr) {
+        bool needUpdateConfig = false;
         for (const auto &item : configItemList_) {
             std::string newValue = config->GetItem(item);
             std::string oldValue = configuration_->GetItem(item);
+            if (!needUpdateConfig && !newValue.empty()) {
+                HILOG_INFO("configuration update item:%{public}s, value:%{public}s", item.c_str(), newValue.c_str());
+                needUpdateConfig = true;
+            }
             if (newValue.empty() && !oldValue.empty()) {
                 config->AddItem(item, oldValue);
             }
         }
+        if (!needUpdateConfig) {
+            return false;
+        }
 
-        configuration_ = config;
-        HILOG_INFO("current configuration_:%{public}s", configuration_->GetName().c_str());
-        return;
     }
-
     configuration_ = config;
+    HILOG_INFO("current configuration_:%{public}s", configuration_->GetName().c_str());
+    return true;
 }
 
 void FormRenderServiceMgr::RunCachedConfigurationUpdated()
