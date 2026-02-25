@@ -110,6 +110,7 @@ bool FormInfoMgr::CheckBundlePermission()
 
 ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo)
 {
+    formInfo.enableBlurBackground = g_mockGetFormsInfoByRecordRet;
     if (g_mockGetFormsInfoByRecordRet) {
         return ERR_OK;
     }

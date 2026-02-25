@@ -1690,9 +1690,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
             HILOG_ERROR("addForm can't acquire tempForm when select formId");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
-        if (!allotFormWant.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false)) {
-            FormDataMgr::GetInstance().GetFormHostParams(formId, allotFormWant);
-        }
+        CheckIsAddFormByHost(record, allotFormWant);
     }
     const WantParams wholeWantParams = allotFormWant.GetParams();
     record.formLocation = info.GetFormLocation();
@@ -5282,6 +5280,22 @@ void FormMgrAdapter::DeleteInvalidFormCacheIfNeed()
         });
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, deleteInvalidFormCache);
+}
+
+void FormMgrAdapter::CheckIsAddFormByHost(const FormRecord &formRecord, Want &allotFormWant)
+{
+    bool isAddFormByHost = allotFormWant.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false);
+    if (isAddFormByHost) {
+        return;
+    }
+    int64_t formId = formRecord.formId;
+    HILOG_INFO("formId: %{public}" PRId64 " is not add form by host, update want.", formId);
+    FormDataMgr::GetInstance().GetFormHostParams(formId, allotFormWant);
+    FormInfo formInfo;
+    FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
+    if (formInfo.enableBlurBackground) {
+        allotFormWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, true);
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS
