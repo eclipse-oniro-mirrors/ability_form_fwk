@@ -30,6 +30,10 @@ ohos_unittest("FmsFormMgrProxyTempTest") {
   deps = [
     "${form_fwk_path}:form_manager",
     "//third_party/googletest:gmock_main",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

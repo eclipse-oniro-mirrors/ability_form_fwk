@@ -31,7 +31,12 @@ ohos_unittest("FormBundleDistributedTest") {
     "form_bundle_distributed_mgr_test.cpp",
   ]
 
-  deps = [ "${form_fwk_path}:fmskit_native" ]
+  deps = [
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
 
   external_deps = [
     "ability_base:want",
