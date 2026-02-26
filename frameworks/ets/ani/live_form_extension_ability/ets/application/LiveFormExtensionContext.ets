@@ -18,7 +18,7 @@ import { BusinessError, AsyncCallback } from '@ohos.base';
 import type Want from '@ohos.app.ability.Want';
 import { ConnectOptions } from 'ability.connectOptions';
 
-class AsyncCallbackWrapper<T, E = void> {
+export class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => {}
 
   constructor(myFun: AsyncCallback<T, E>) {
@@ -30,7 +30,7 @@ class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
-class Cleaner {
+export class Cleaner {
   public ptr: long = 0;
   constructor(ptr: long) {
     this.ptr = ptr;
