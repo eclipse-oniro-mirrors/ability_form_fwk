@@ -50,8 +50,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRecord records;
     FormJsInfo formInfos;
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, records, formInfos);
-    FormDataMgr::GetInstance().CheckTempEnoughForm();
     int32_t currentUserId = fdp->ConsumeIntegral<int32_t>();
+    FormDataMgr::GetInstance().CheckTempEnoughForm(currentUserId);
     FormDataMgr::GetInstance().CheckEnoughForm(callingUid, currentUserId);
     FormDataMgr::GetInstance().DeleteTempForm(formId);
     FormDataMgr::GetInstance().ExistTempForm(formId);

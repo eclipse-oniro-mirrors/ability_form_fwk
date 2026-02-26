@@ -311,7 +311,7 @@ ErrCode FormDataMgr::GetRequestPublishFormInfo(int64_t formId, Want &want,
     return ERR_OK;
 }
 
-int FormDataMgr::CheckTempEnoughForm() const
+int FormDataMgr::CheckTempEnoughForm(const int32_t currentUserId) const
 {
     if (true == g_mockCheckTempEnoughFormRet) {
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
@@ -347,7 +347,7 @@ bool FormDataMgr::UpdateFormRecord(const int64_t formId, const FormRecord &formR
     return g_mockUpdateFormRecord;
 }
 
-int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUserId) const
+int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUserId, const bool isCastTempForm) const
 {
     if (!g_mockCheckEnoughForm) {
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
