@@ -2672,7 +2672,7 @@ ErrCode FormMgrAdapter::AcquireAddFormResult(const int64_t formId)
                 return true;
             } else {
                 HILOG_INFO("Add form result state is unknown");
-                return false;
+                return true;
             }
         }
         HILOG_ERROR("The formid hasn't find");
