@@ -1408,12 +1408,13 @@ void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::se
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     std::map<int64_t, FormRecord>::iterator itFormRecord;
     for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
-        auto itForm = std::find(removedForms.begin(), removedForms.end(), itFormRecord->first);
+        int64_t formId = itFormRecord->first;
+        auto itForm = std::find(removedForms.begin(), removedForms.end(), formId);
         if (itForm != removedForms.end()) {
-            FormCacheMgr::GetInstance().DeleteData(itFormRecord->first);
-            FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
+            FormCacheMgr::GetInstance().DeleteData(formId);
+            FormRenderMgr::GetInstance().StopRenderingForm(formId, itFormRecord->second);
             itFormRecord = formRecords_.erase(itFormRecord);
-            FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(itFormRecord->first);
+            FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
         } else {
             itFormRecord++;
         }
@@ -1433,12 +1434,13 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         std::map<int64_t, FormRecord>::iterator itFormRecord;
         for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
+            int64_t formId = itFormRecord->first;
             if ((itFormRecord->second.formTempFlag) && (bundleName == itFormRecord->second.bundleName)
                 && (userId == itFormRecord->second.providerUserId)) {
-                removedTempForms.emplace(itFormRecord->second.formId);
-                FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
+                removedTempForms.emplace(formId);
+                FormRenderMgr::GetInstance().StopRenderingForm(formId, itFormRecord->second);
                 itFormRecord = formRecords_.erase(itFormRecord);
-                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(itFormRecord->first);
+                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
             } else {
                 itFormRecord++;
             }
@@ -2002,13 +2004,14 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         auto itFormRecord = formRecords_.begin();
         while (itFormRecord != formRecords_.end()) {
+            int64_t formId = itFormRecord->first;
             if (userId == itFormRecord->second.providerUserId) {
                 if (itFormRecord->second.formTempFlag) {
-                    removedTempForms.emplace_back(itFormRecord->second.formId);
+                    removedTempForms.emplace_back(formId);
                 }
-                removedFormIds.emplace_back(itFormRecord->second.formId);
+                removedFormIds.emplace_back(formId);
                 itFormRecord = formRecords_.erase(itFormRecord);
-                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(itFormRecord->second.formId);
+                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
             } else {
                 ++itFormRecord;
             }
