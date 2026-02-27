@@ -26,9 +26,9 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-constexpr const char* CLASSNAME_CALLBACK_WRAPPER = "@ohos.app.form.formObserver.CallbackWrapper";
-constexpr const char* FORM_STATE_OBSERVER_FORMADD = "formAdd";
-constexpr const char* FORM_STATE_OBSERVER_FORMREMOVE = "formRemove";
+constexpr const char *CLASSNAME_CALLBACK_WRAPPER = "@ohos.app.form.formObserver.CallbackWrapper";
+constexpr const char *FORM_STATE_OBSERVER_FORMADD = "formAdd";
+constexpr const char *FORM_STATE_OBSERVER_FORMREMOVE = "formRemove";
 constexpr uint KEY_LIMIT = 16;
 constexpr ani_size REFERENCES_MAX_NUMBER = 16;
 }
@@ -70,12 +70,12 @@ void EtsFormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
-        ani_object callbackValues = CreateRunningFormInfo(sharedThis->env_, runningFormInfo);
+        ani_object callbackValues = FormAniUtil::CreateRunningFormInfo(sharedThis->env_, runningFormInfo);
         if (callbackValues == nullptr) {
             HILOG_ERROR("null callbackValues");
             return;
         }
-        bool bRet = Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
+        bool bRet = FormAniUtil::Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
             callbackValues, CLASSNAME_CALLBACK_WRAPPER);
         if (!bRet) {
             HILOG_ERROR("callback failed");
@@ -133,12 +133,12 @@ void EtsFormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleNam
             HILOG_ERROR("null sharedThis");
             return;
         }
-        ani_object callbackValues = CreateRunningFormInfo(sharedThis->env_, runningFormInfo);
+        ani_object callbackValues = FormAniUtil::CreateRunningFormInfo(sharedThis->env_, runningFormInfo);
         if (callbackValues == nullptr) {
             HILOG_ERROR("null callbackValues");
             return;
         }
-        bool bRet = Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
+        bool bRet = FormAniUtil::Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
             callbackValues, CLASSNAME_CALLBACK_WRAPPER);
         if (!bRet) {
             HILOG_ERROR("callback failed");
@@ -571,8 +571,9 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
                 auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
                 if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
                     ani_ref res = visibleCallback->second->aniRef;
-                    ani_object aniValue = CreateFormInstances(env, formInstances);
-                    bool bRet = Callback(env, static_cast<ani_object>(res), aniValue, CLASSNAME_CALLBACK_WRAPPER);
+                    ani_object aniValue = FormAniUtil::CreateFormInstances(env, formInstances);
+                    bool bRet = FormAniUtil::Callback(env, static_cast<ani_object>(res), aniValue,
+                        CLASSNAME_CALLBACK_WRAPPER);
                     if (!bRet) {
                         HILOG_ERROR("callback failed");
                         return;
@@ -587,8 +588,9 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
                 auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
                 if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
                     ani_ref res = invisibleCallback->second->aniRef;
-                    ani_object aniValue = CreateFormInstances(env, formInstances);
-                    bool bRet = Callback(env, static_cast<ani_object>(res), aniValue, CLASSNAME_CALLBACK_WRAPPER);
+                    ani_object aniValue = FormAniUtil::CreateFormInstances(env, formInstances);
+                    bool bRet = FormAniUtil::Callback(env, static_cast<ani_object>(res), aniValue,
+                        CLASSNAME_CALLBACK_WRAPPER);
                     if (!bRet) {
                         HILOG_ERROR("callback failed");
                         return;
@@ -828,13 +830,13 @@ void EtsFormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo
         return;
     }
 
-    ani_object formInfo = CreateRunningFormInfo(env_, runningFormInfo);
+    ani_object formInfo = FormAniUtil::CreateRunningFormInfo(env_, runningFormInfo);
     if (formInfo == nullptr) {
         HILOG_ERROR("null callbackValues");
         return;
     }
     for (auto &iter : callbacks_) {
-        bool bRet = Callback(env_, static_cast<ani_object>(iter), formInfo, CLASSNAME_CALLBACK_WRAPPER);
+        bool bRet = FormAniUtil::Callback(env_, static_cast<ani_object>(iter), formInfo, CLASSNAME_CALLBACK_WRAPPER);
         if (!bRet) {
             HILOG_ERROR("callback failed");
             continue;

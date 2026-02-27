@@ -17,11 +17,9 @@
 #define OHOS_FORM_FWK_ETS_FORM_HOST_H
 
 #include "ani.h"
-#include "ani_common_want.h"
 #include "ani_form_common_util.h"
 #include "ani_form_error_util.h"
 #include "ani_form_util.h"
-#include "ani_helpers.h"
 #include "event_handler.h"
 #include "form_host_delegate_stub.h"
 #include "form_instance.h"
@@ -31,7 +29,6 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-using namespace OHOS::AbilityRuntime::FormAniHelpers;
 
 class FormRouterProxyCallbackClient : public std::enable_shared_from_this<FormRouterProxyCallbackClient> {
 public:
@@ -42,12 +39,12 @@ public:
 
     ~FormRouterProxyCallbackClient()
     {
-        ani_env *env = GetEnvFromVm(m_vm);
+        ani_env *env = FormAniUtil::GetEnvFromVm(m_vm);
         if (env == nullptr) {
             HILOG_ERROR("Env is null");
             return;
         }
-        env->Reference_Delete(m_callback);
+        env->GlobalReference_Delete(m_callback);
     }
 
     void ProcessFormRouterProxy(const Want &want)
@@ -65,14 +62,14 @@ public:
                 return;
             }
 
-            ani_env *env = GetEnvFromVm(sharedThis->m_vm);
+            ani_env *env = FormAniUtil::GetEnvFromVm(sharedThis->m_vm);
             if (env == nullptr) {
                 HILOG_ERROR("Env is null");
                 return;
             }
 
             ani_object aniWant = AppExecFwk::WrapWant(env, want);
-            auto res = InvokeCallback(env, static_cast<ani_object>(sharedThis->m_callback), aniWant);
+            auto res = FormAniUtil::InvokeCallback(env, static_cast<ani_object>(sharedThis->m_callback), aniWant);
             if (!res) {
                 HILOG_ERROR("Cannot call callback");
                 return;

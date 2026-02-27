@@ -31,7 +31,6 @@ ohos_shared_library("formHost_ani") {
   ]
 
   sources = [
-    "${form_fwk_path}/frameworks/ets/ani/common/src/ani_helpers.cpp",
     "src/ets_form_host.cpp",
   ]
 

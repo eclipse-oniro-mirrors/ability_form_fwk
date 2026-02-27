@@ -50,11 +50,13 @@ ohos_shared_library("util_ani") {
   ]
 
   external_deps = [
-    "ability_runtime:abilitykit_native",
-    "ability_runtime:runtime",
+    "ability_runtime:ability_business_error",
+    "ability_runtime:ani_common",
+    "access_token:libtokenid_sdk",
     "hilog:libhilog",
-    "eventhandler:libeventhandler",
     "runtime_core:ani",
+    "ipc:ipc_single",
+    "c_utils:utils",
   ]
 
   innerapi_tags = [ "platformsdk" ]

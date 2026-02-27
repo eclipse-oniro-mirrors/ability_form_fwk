@@ -21,32 +21,30 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-const int32_t ERR_COMMON = 1;
-const int32_t ERR_PERMISSION_DENY = 2;
-const int32_t ERR_GET_INFO_FAILED = 4;
-const int32_t ERR_GET_BUNDLE_FAILED = 5;
-const int32_t ERR_GET_LAYOUT_FAILED = 6;
-const int32_t ERR_ADD_INVALID_PARAM = 7;
-const int32_t ERR_CFG_NOT_MATCH_ID = 8;
-const int32_t ERR_NOT_EXIST_ID = 9;
-const int32_t ERR_BIND_PROVIDER_FAILED = 10;
-const int32_t ERR_MAX_SYSTEM_FORMS = 11;
-const int32_t ERR_MAX_INSTANCES_PER_FORM = 12;
-const int32_t ERR_OPERATION_FORM_NOT_SELF = 13;
-const int32_t ERR_PROVIDER_DEL_FAIL = 14;
-const int32_t ERR_MAX_FORMS_PER_CLIENT = 15;
-const int32_t ERR_MAX_SYSTEM_TEMP_FORMS = 16;
-const int32_t ERR_FORM_NO_SUCH_MODULE = 17;
-const int32_t ERR_FORM_NO_SUCH_ABILITY = 18;
-const int32_t ERR_FORM_NO_SUCH_DIMENSION = 19;
-const int32_t ERR_FORM_FA_NOT_INSTALLED = 20;
-const int32_t ERR_SYSTEM_RESPONSES_FAILED = 30;
-const int32_t ERR_FORM_DUPLICATE_ADDED = 31;
-const int32_t ERR_IN_RECOVERY = 36;
-const int32_t ERR_DISTRIBUTED_SCHEDULE_FAILED = 37;
-
-const int32_t CALLBACK_RETURN_MSG_SIZE = 2;
-constexpr int BASE_REQUEST_CODE_NUM = 10;
+constexpr int32_t ERR_COMMON = 1;
+constexpr int32_t ERR_PERMISSION_DENY = 2;
+constexpr int32_t ERR_GET_INFO_FAILED = 4;
+constexpr int32_t ERR_GET_BUNDLE_FAILED = 5;
+constexpr int32_t ERR_GET_LAYOUT_FAILED = 6;
+constexpr int32_t ERR_ADD_INVALID_PARAM = 7;
+constexpr int32_t ERR_CFG_NOT_MATCH_ID = 8;
+constexpr int32_t ERR_NOT_EXIST_ID = 9;
+constexpr int32_t ERR_BIND_PROVIDER_FAILED = 10;
+constexpr int32_t ERR_MAX_SYSTEM_FORMS = 11;
+constexpr int32_t ERR_MAX_INSTANCES_PER_FORM = 12;
+constexpr int32_t ERR_OPERATION_FORM_NOT_SELF = 13;
+constexpr int32_t ERR_PROVIDER_DEL_FAIL = 14;
+constexpr int32_t ERR_MAX_FORMS_PER_CLIENT = 15;
+constexpr int32_t ERR_MAX_SYSTEM_TEMP_FORMS = 16;
+constexpr int32_t ERR_FORM_NO_SUCH_MODULE = 17;
+constexpr int32_t ERR_FORM_NO_SUCH_ABILITY = 18;
+constexpr int32_t ERR_FORM_NO_SUCH_DIMENSION = 19;
+constexpr int32_t ERR_FORM_FA_NOT_INSTALLED = 20;
+constexpr int32_t ERR_SYSTEM_RESPONSES_FAILED = 30;
+constexpr int32_t ERR_FORM_DUPLICATE_ADDED = 31;
+constexpr int32_t ERR_IN_RECOVERY = 36;
+constexpr int32_t ERR_DISTRIBUTED_SCHEDULE_FAILED = 37;
+constexpr int32_t CALLBACK_RETURN_MSG_SIZE = 2;
 
 class EtsFormErrorUtil {
 public:
@@ -60,9 +58,6 @@ public:
     static ani_object WrapError(ani_env *env, const std::string &msg);
     static ani_object CreateErrorByInternalErrorCode(ani_env *env, int32_t internalErrorCode);
     static std::string QueryRetMsg(int32_t errorCode);
-
-private:
-    static std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

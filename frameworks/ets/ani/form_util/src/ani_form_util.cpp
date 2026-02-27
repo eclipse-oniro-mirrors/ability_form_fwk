@@ -21,88 +21,14 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-constexpr const char* ETS_FUNINTERACTIONPARAMS_NAME = "@ohos.app.form.formInfo.formInfo.FunInteractionParamsInner";
-constexpr const char* ETS_FORMINFO_NAME = "@ohos.app.form.formInfo.formInfo.FormInfoInner";
-constexpr const char* ETS_SCENEANIMATIONPARAMS_NAME = "@ohos.app.form.formInfo.formInfo.SceneAnimationParamsInner";
-constexpr const char* DELEGATOR_RECORD_KEY = "keys";
-constexpr const char* DELEGATOR_RECORD_NEXT = "next";
-constexpr const char* DELEGATOR_RECORD_DONE = "done";
-constexpr const char* DELEGATOR_RECORD_VALUE = "value";
-constexpr const char* DELEGATOR_RECORD_CLASS_NAME = "std.core.Record";
-constexpr const char* DELEGATOR_RECORD_GET = "$_get";
-constexpr const char* DELEGATOR_RECORD_GET_NAME =
+constexpr const char *DELEGATOR_RECORD_KEY = "keys";
+constexpr const char *DELEGATOR_RECORD_NEXT = "next";
+constexpr const char *DELEGATOR_RECORD_DONE = "done";
+constexpr const char *DELEGATOR_RECORD_VALUE = "value";
+constexpr const char *DELEGATOR_RECORD_CLASS_NAME = "std.core.Record";
+constexpr const char *DELEGATOR_RECORD_GET = "$_get";
+constexpr const char *DELEGATOR_RECORD_GET_NAME =
     "X{C{std.core.BaseEnum}C{std.core.Numeric}C{std.core.String}}:Y";
-}
-
-ani_object CreateFunInteractionParamsDatas(ani_env* env,
-    const OHOS::AppExecFwk::FormFunInteractionParams &funInteractionParamsDatas)
-{
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
-        return nullptr;
-    }
-    ani_object object = CreateAniObject(env, ETS_FUNINTERACTIONPARAMS_NAME);
-    SetPropertyStringByName(env, object, "abilityName", funInteractionParamsDatas.abilityName);
-    SetPropertyStringByName(env, object, "targetBundleName", funInteractionParamsDatas.targetBundleName);
-    SetPropertyStringByName(env, object, "subBundleName", funInteractionParamsDatas.subBundleName);
-    SetPropertyIntByName(env, object, "keepStateDuration", funInteractionParamsDatas.keepStateDuration);
-    return object;
-}
-
-ani_object CreateSceneAnimationParamsDatas(ani_env* env,
-    const AppExecFwk::FormSceneAnimationParams &sceneAnimationParamsDatas)
-{
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
-        return nullptr;
-    }
-    ani_object object = CreateAniObject(env, ETS_SCENEANIMATIONPARAMS_NAME);
-    SetPropertyStringByName(env, object, "abilityName", sceneAnimationParamsDatas.abilityName);
-    SetPropertyStringByName(env, object, "disabledDesktopBehaviors",
-        sceneAnimationParamsDatas.disabledDesktopBehaviors);
-    return object;
-}
-
-ani_object CreateFormInfo(ani_env* env, const OHOS::AppExecFwk::FormInfo &formInfo)
-{
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
-        return nullptr;
-    }
-    ani_object object = CreateAniObject(env, ETS_FORMINFO_NAME);
-    SetPropertyByName(env, object, "funInteractionParams",
-        CreateFunInteractionParamsDatas(env, formInfo.funInteractionParams));
-    SetPropertyByName(env, object, "sceneAnimationParams",
-        CreateSceneAnimationParamsDatas(env, formInfo.sceneAnimationParams));
-    SetPropertyStringByName(env, object, "groupId", formInfo.groupId);
-    SetPropertyBoolByName(env, object, "resizable", formInfo.resizable);
-    return object;
-}
-
-ani_object CreateFormInfos(ani_env* env, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos)
-{
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
-        return nullptr;
-    }
-    ani_status status = ANI_OK;
-    ani_object arrayObj = CreateArrayObject(env);
-    ani_size index = 0;
-    for (auto &info : formInfos) {
-        ani_object aniInfo = CreateFormInfo(env, info);
-        if (aniInfo == nullptr) {
-            HILOG_ERROR("null aniInfo");
-            break;
-        }
-        status = env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index, aniInfo);
-        if (status != ANI_OK) {
-            HILOG_ERROR("Object_CallMethodByName_Void failed status: %{public}d", status);
-            break;
-        }
-        index++;
-    }
-    return arrayObj;
-}
 
 bool GetPropertyDoubleByName(ani_env *env, ani_object object, const char *name, ani_double& value)
 {
@@ -118,6 +44,62 @@ bool GetPropertyDoubleByName(ani_env *env, ani_object object, const char *name, 
     }
     return true;
 }
+
+void SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
+    std::unordered_map<std::string, std::string> &uMap)
+{
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
+    std::string mapKey = "";
+    if (!FormAniUtil::GetStdString(env, aniKey, mapKey)) {
+        HILOG_ERROR("GetStdString failed");
+        return;
+    }
+    std::string mapValue = "";
+    if (!FormAniUtil::GetStdString(env, aniValue, mapValue)) {
+        HILOG_ERROR("GetStdString failed");
+        return;
+    }
+    uMap.emplace(mapKey, mapValue);
+}
+
+bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, ani_ref &aniKey, ani_ref &aniValue)
+{
+    ani_status status = ANI_ERROR;
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
+    status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), DELEGATOR_RECORD_VALUE, &aniKey);
+    if (ANI_OK != status) {
+        HILOG_ERROR("Failed to get value status: %{public}d", status);
+        return false;
+    }
+    ani_class recordCls = nullptr;
+    status = env->FindClass(DELEGATOR_RECORD_CLASS_NAME, &recordCls);
+    if (status != ANI_OK) {
+        HILOG_ERROR("FindClass failed status: %{public}d", status);
+        return false;
+    }
+    ani_method recordGetMethod = nullptr;
+    status = env->Class_FindMethod(recordCls, DELEGATOR_RECORD_GET, DELEGATOR_RECORD_GET_NAME, &recordGetMethod);
+    if (status != ANI_OK) {
+        HILOG_ERROR("Class_FindMethod failed status: %{public}d", status);
+        return false;
+    }
+    status = env->Object_CallMethod_Ref(aniMockList, recordGetMethod, &aniValue, static_cast<ani_string>(aniKey));
+    if (status != ANI_OK) {
+        HILOG_ERROR("Object_CallMethod_Void failed status: %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+}  // anonymous namespace
+
+namespace FormAniUtil {
 
 bool UnwrapFormRect(ani_env *env, ani_object rectobject, AppExecFwk::Rect &rect)
 {
@@ -190,56 +172,6 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
     return true;
 }
 
-bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, ani_ref &aniKey, ani_ref &aniValue)
-{
-    ani_status status = ANI_ERROR;
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
-        return false;
-    }
-    status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), DELEGATOR_RECORD_VALUE, &aniKey);
-    if (ANI_OK != status) {
-        HILOG_ERROR("Failed to get value status: %{public}d", status);
-        return false;
-    }
-    ani_class recordCls = nullptr;
-    status = env->FindClass(DELEGATOR_RECORD_CLASS_NAME, &recordCls);
-    if (status != ANI_OK) {
-        HILOG_ERROR("FindClass failed status: %{public}d", status);
-        return false;
-    }
-    ani_method recordGetMethod = nullptr;
-    status = env->Class_FindMethod(recordCls, DELEGATOR_RECORD_GET, DELEGATOR_RECORD_GET_NAME, &recordGetMethod);
-    if (status != ANI_OK) {
-        HILOG_ERROR("Class_FindMethod failed status: %{public}d", status);
-        return false;
-    }
-    status = env->Object_CallMethod_Ref(aniMockList, recordGetMethod, &aniValue, static_cast<ani_string>(aniKey));
-    if (status != ANI_OK) {
-        HILOG_ERROR("Object_CallMethod_Void failed status: %{public}d", status);
-        return false;
-    }
-    return true;
-}
-
-void SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
-    std::unordered_map<std::string, std::string> &uMap)
-{
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
-        return ;
-    }
-    std::string mapKey = "";
-    if (!GetStdString(env, aniKey, mapKey)) {
-        HILOG_ERROR("GetStdString failed");
-        return;
-    }
-    std::string mapValue = "";
-    if (!GetStdString(env, aniValue, mapValue)) {
-        HILOG_ERROR("GetStdString failed");
-        return;
-    }
-    uMap.emplace(mapKey, mapValue);
-}
+} // namespace FormAniUtil
 } // namespace AbilityRuntime
 } // namespace OHOS

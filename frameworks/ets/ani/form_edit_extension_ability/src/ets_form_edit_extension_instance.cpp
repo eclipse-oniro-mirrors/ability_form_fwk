@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-const char *ETS_ANI_LIBNAME = "libform_edit_extension_ani.z.so";
-const char *ETS_ANI_CREATE_FUNC = "OHOS_ETS_Form_Edit_Extension_Create";
+constexpr const char *ETS_ANI_LIBNAME = "libform_edit_extension_ani.z.so";
+constexpr const char *ETS_ANI_CREATE_FUNC = "OHOS_ETS_Form_Edit_Extension_Create";
 using CreateETSFormEditExtensionFunc = FormEditExtension*(*)(const std::unique_ptr<Runtime>&);
 CreateETSFormEditExtensionFunc g_etsCreateFunc = nullptr;
 }

@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-const char *ETS_ANI_LIBNAME = "liblive_form_extension_ani.z.so";
-const char *ETS_ANI_CREATE_FUNC = "OHOS_ETS_Live_Form_Extension_Create";
+constexpr const char *ETS_ANI_LIBNAME = "liblive_form_extension_ani.z.so";
+constexpr const char *ETS_ANI_CREATE_FUNC = "OHOS_ETS_Live_Form_Extension_Create";
 using CreateCreateETSLiveFormExtensionFunc = LiveFormExtension*(*)(const std::unique_ptr<Runtime>&);
 CreateCreateETSLiveFormExtensionFunc g_etsCreateFunc = nullptr;
 }
