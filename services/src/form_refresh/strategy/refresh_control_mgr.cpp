@@ -37,12 +37,11 @@ RefreshControlMgr::~RefreshControlMgr() {}
 void RefreshControlMgr::SetSystemOverloadFlag(bool flag)
 {
     bool isSystemOverload = isSystemOverload_.load();
+    HILOG_INFO("isSystemOverload_ old: %{public}d, new: %{public}d", isSystemOverload, flag);
+    isSystemOverload_.store(flag);
     if (isSystemOverload && !flag) {
         RefreshCacheMgr::GetInstance().ConsumeOverloadTaskQueue();
     }
-
-    HILOG_INFO("isSystemOverload_ old: %{public}d, new: %{public}d", isSystemOverload, flag);
-    isSystemOverload_.store(flag);
 }
 #endif
 
