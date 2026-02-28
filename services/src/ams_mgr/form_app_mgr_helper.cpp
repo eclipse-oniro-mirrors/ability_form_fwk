@@ -72,7 +72,7 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
             return true;
         }
     }
-    HILOG_WARN("ability not foreground, foreground apps size:%{public}u", list.size());
+    HILOG_WARN("ability not foreground, foreground apps size:%{public}zu", list.size());
     return false;
 }
 
