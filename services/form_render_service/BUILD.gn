@@ -92,7 +92,12 @@ ohos_shared_library("formrender") {
     }
   }
 
-  deps = [ "${form_fwk_path}:form_manager" ]
+  deps = [
+    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
 
   external_deps = [
     "ability_base:configuration",
@@ -160,6 +165,9 @@ ohos_shared_library("formrender_service") {
   deps = [
     ":formrender",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

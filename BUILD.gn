@@ -156,7 +156,12 @@ ohos_shared_library("libfms") {
       [ "${form_fwk_napi_path}/form_host/form_state_observer/include" ]
 
   sources = [
+    "interfaces/inner_api/src/form_publish_interceptor_proxy.cpp",
+    "interfaces/inner_api/src/js_form_state_observer_proxy.cpp",
     "interfaces/inner_api/src/theme_manager_service_param.cpp",
+    "interfaces/inner_api/src/provider_connect_stub.cpp",
+    "interfaces/inner_api/src/form_provider_proxy.cpp",
+    "interfaces/inner_api/src/form_host_proxy.cpp",
     "services/config/form_resource_param.cpp",
     "services/config/form_xml_parser.cpp",
     "services/src/ams_mgr/form_ams_helper.cpp",
@@ -297,7 +302,11 @@ ohos_shared_library("libfms") {
 
   deps = [
     ":form_config",
+    ":form_host_delegate_proxy",
     ":form_manager",
+    ":form_render_info",
+    ":form_common_info",
+    ":form_utils",
   ]
 
   external_deps = [
@@ -422,7 +431,12 @@ ohos_shared_library("fmskit_native") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [ ":form_manager" ]
+  deps = [
+    ":form_manager",
+    ":form_render_info",
+    ":form_common_info",
+    ":form_utils",
+  ]
 
   external_deps = [
     "ability_base:want",
@@ -486,6 +500,9 @@ ohos_shared_library("fmskit_provider_client") {
   deps = [
     ":fmskit_native",
     ":form_manager",
+    ":form_render_info",
+    ":form_common_info",
+    ":form_utils",
   ]
 
   external_deps = [
@@ -528,38 +545,17 @@ ohos_shared_library("form_manager") {
   }
 
   sources = [
-    "interfaces/inner_api/src/form_ashmem.cpp",
-    "interfaces/inner_api/src/form_ecological_rule_param.cpp",
-    "interfaces/inner_api/src/form_event_report.cpp",
-    "interfaces/inner_api/src/form_file_util.cpp",
-    "interfaces/inner_api/src/form_host_proxy.cpp",
     "interfaces/inner_api/src/form_host_stub.cpp",
-    "interfaces/inner_api/src/form_info_filter.cpp",
-    "interfaces/inner_api/src/form_instance.cpp",
-    "interfaces/inner_api/src/form_instances_filter.cpp",
-    "interfaces/inner_api/src/form_js_info.cpp",
-    "interfaces/inner_api/src/form_lock_info.cpp",
-    "interfaces/inner_api/src/form_major_info.cpp",
     "interfaces/inner_api/src/form_mgr_proxy.cpp",
     "interfaces/inner_api/src/form_mgr_stub.cpp",
-    "interfaces/inner_api/src/form_provider_data.cpp",
-    "interfaces/inner_api/src/form_provider_info.cpp",
-    "interfaces/inner_api/src/form_provider_proxy.cpp",
     "interfaces/inner_api/src/form_provider_stub.cpp",
-    "interfaces/inner_api/src/form_publish_interceptor_proxy.cpp",
     "interfaces/inner_api/src/form_publish_interceptor_stub.cpp",
     "interfaces/inner_api/src/form_render_proxy.cpp",
     "interfaces/inner_api/src/form_render_stub.cpp",
-    "interfaces/inner_api/src/form_share_info.cpp",
-    "interfaces/inner_api/src/form_status_print.cpp",
     "interfaces/inner_api/src/form_supply_proxy.cpp",
     "interfaces/inner_api/src/form_supply_stub.cpp",
-    "interfaces/inner_api/src/form_surface_info.cpp",
-    "interfaces/inner_api/src/js_form_state_observer_proxy.cpp",
     "interfaces/inner_api/src/js_form_state_observer_stub.cpp",
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
-    "interfaces/inner_api/src/provider_connect_stub.cpp",
-    "interfaces/inner_api/src/running_form_info.cpp",
     "interfaces/inner_api/src/template_form_detail_info.cpp",
   ]
 
@@ -575,6 +571,9 @@ ohos_shared_library("form_manager") {
     ":form_host_delegate_stub",
     ":form_provider_delegate_proxy",
     ":form_provider_delegate_stub",
+    ":form_render_info",
+    ":form_common_info",
+    ":form_utils",
   ]
 
   external_deps = [
@@ -595,7 +594,134 @@ ohos_shared_library("form_manager") {
     "os_account:os_account_innerkits",
     "samgr:samgr_proxy",
   ]
+  subsystem_name = "ability"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "form_fwk"
+}
+ 
+################################### form_utils ########################################
+ohos_shared_library("form_utils") {
+  branch_protector_ret = "pac_ret"
+ 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  cflags = []
+  include_dirs = [
+    "services/include",
+  ]
+  sources = [
+    "interfaces/inner_api/src/form_event_report.cpp",
+    "interfaces/inner_api/src/form_file_util.cpp",
+    "interfaces/inner_api/src/form_status_print.cpp",
+  ]
+ 
+  public_configs = [
+    ":formmgr_sdk_config",
+  ]
+ 
+  deps = [
+    ":form_config",
+  ]
+ 
+  external_deps = [
+    "ability_base:want",
+    "c_utils:utils",
+    "ipc:ipc_single",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+  ]
+ 
+  subsystem_name = "ability"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "form_fwk"
+}
+ 
+################################### form_common_info ########################################
+ohos_shared_library("form_common_info") {
+  branch_protector_ret = "pac_ret"
+ 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  cflags = []
+  include_dirs = [
+    "services/include",
+  ]
+  sources = [
+    "interfaces/inner_api/src/form_major_info.cpp",
+    "interfaces/inner_api/src/form_share_info.cpp",
+    "interfaces/inner_api/src/form_info_filter.cpp",
+    "interfaces/inner_api/src/running_form_info.cpp",
+    "interfaces/inner_api/src/form_ecological_rule_param.cpp",
+    "interfaces/inner_api/src/form_lock_info.cpp",
+    "interfaces/inner_api/src/form_instance.cpp",
+    "interfaces/inner_api/src/form_instances_filter.cpp",
+  ]
+ 
+  public_configs = [
+    ":formmgr_sdk_config",
+  ]
+ 
+  deps = [
+    ":form_config",
+  ]
+ 
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:app_manager",
+    "c_utils:utils",
+    "ipc:ipc_core",
+    "hilog:libhilog",
+    "samgr:samgr_proxy",
+    "hisysevent:libhisysevent",
+  ]
+ 
+  subsystem_name = "ability"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "form_fwk"
+}
 
+################################### form_render_info ########################################
+ohos_shared_library("form_render_info") {
+  branch_protector_ret = "pac_ret"
+ 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  cflags = []
+  include_dirs = []
+  sources = [
+    "interfaces/inner_api/src/form_surface_info.cpp",
+    "interfaces/inner_api/src/form_js_info.cpp",
+    "interfaces/inner_api/src/form_ashmem.cpp",
+    "interfaces/inner_api/src/form_provider_info.cpp",
+    "interfaces/inner_api/src/form_provider_data.cpp",
+  ]
+ 
+  public_configs = [
+    ":formmgr_sdk_config",
+  ]
+ 
+  deps = [
+    ":form_config",
+  ]
+ 
+  external_deps = [
+    "ability_runtime:app_manager",
+    "os_account:os_account_innerkits",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "ipc:ipc_single",
+    "hilog:libhilog",
+  ]
+ 
   subsystem_name = "ability"
   innerapi_tags = [ "platformsdk" ]
   part_name = "form_fwk"
@@ -668,7 +794,12 @@ group("form_ani_packages") {
 
 group("fms_innerkits_target") {
   if (ability_runtime_graphics) {
-    deps = [ ":form_manager" ]
+    deps = [ 
+      ":form_manager",
+      ":form_render_info",
+      ":form_utils",
+      ":form_common_info",
+      ]
   }
 }
 

@@ -112,7 +112,6 @@
                     "form_js_info.h",
                     "form_mgr_interface.h",
                     "form_mgr_stub.h",
-                    "form_provider_data.h",
                     "form_provider_interface.h",
                     "form_provider_stub.h",
                     "form_publish_interceptor_interface.h",
@@ -170,6 +169,48 @@
                   ]
                 },
                 "name": "//foundation/ability/form_fwk/frameworks/js/napi:formutil_napi"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include/",
+                  "header_files": [
+                    "form_event_report.h",
+                    "form_file_util.h",
+                    "form_status_print.h",
+                    "form_constants.h"
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk:form_utils"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include/",
+                  "header_files": [
+                    "form_constants.h",
+                    "form_major_info.h",
+                    "form_share_info.h",
+                    "form_info_filter.h",
+                    "running_form_info.h",
+                    "form_ecological_rule_param.h",
+                    "form_lock_info.h",
+                    "form_instance.h",
+                    "form_instances_filter.h"
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk:form_common_info"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include/",
+                  "header_files": [
+                    "form_constants.h",
+                    "form_js_info.h",
+                    "form_ashmem.h",
+                    "form_provider_info.h",
+                    "form_provider_data.h"
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk:form_render_info"
               }
           ],
           "test": [

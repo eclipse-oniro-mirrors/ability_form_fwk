@@ -36,7 +36,9 @@ ohos_shared_library("formbindingdata_napi") {
 
   configs = [ ":fmskit_config" ]
 
-  deps = [ "${form_fwk_path}:form_manager" ]
+  deps = [
+    "${form_fwk_path}:form_render_info",
+  ]
 
   external_deps = [
     "ability_runtime:runtime",
@@ -69,7 +71,9 @@ ohos_shared_library("formbindingdata") {
 
   deps = [
     ":formutil_napi",
-    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -368,6 +372,7 @@ ohos_shared_library("formhost") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_host_delegate_stub",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -424,6 +429,9 @@ ohos_shared_library("formobserver") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_host_delegate_stub",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -468,6 +476,9 @@ ohos_shared_library("formprovider_napi") {
     ":formutil_napi",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -511,6 +522,9 @@ ohos_shared_library("formprovider") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_provider_delegate_stub",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -562,6 +576,9 @@ ohos_shared_library("formagent") {
     ":formutil_napi",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -779,6 +796,9 @@ ohos_shared_library("form_edit_extension") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:fmskit_provider_client",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -834,7 +854,12 @@ ohos_shared_library("form_edit_extension_module") {
   ]
 
   if (ability_runtime_graphics) {
-    deps += [ "${form_fwk_path}:form_manager" ]
+    deps += [
+      "${form_fwk_path}:form_manager",
+      "${form_fwk_path}:form_render_info",
+      "${form_fwk_path}:form_utils",
+      "${form_fwk_path}:form_common_info",
+    ]
   }
 
   relative_install_dir = "extensionability"
@@ -868,6 +893,9 @@ ohos_shared_library("form_edit_extension_ani") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:fmskit_provider_client",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -1012,6 +1040,9 @@ ohos_shared_library("live_form_extension") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:fmskit_provider_client",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -1070,7 +1101,12 @@ ohos_shared_library("live_form_extension_module") {
   ]
 
   if (ability_runtime_graphics) {
-    deps += [ "${form_fwk_path}:form_manager" ]
+    deps += [
+      "${form_fwk_path}:form_manager",
+      "${form_fwk_path}:form_render_info",
+      "${form_fwk_path}:form_utils",
+      "${form_fwk_path}:form_common_info",
+    ]
   }
 
   relative_install_dir = "extensionability"
@@ -1104,6 +1140,9 @@ ohos_shared_library("live_form_extension_ani") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:fmskit_provider_client",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

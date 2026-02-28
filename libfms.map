@@ -70,6 +70,14 @@
         *OHOS::AppExecFwk::InnerFormInfo*;
         *OHOS::AppExecFwk::KvStoreDeathRecipientCallbackFormInfoStorage*;
         *OHOS::AppExecFwk::FormSystemloadListener*;
+        *OHOS::AppExecFwk::FormSupplyStub*;
+        *OHOS::AppExecFwk::FormPublishInterceptorProxy*;
+        *OHOS::AppExecFwk::FormMgrStub*;
+        *OHOS::AppExecFwk::FormProviderProxy*;
+        *OHOS::AppExecFwk::ProviderConnectStub*;
+        *OHOS::AppExecFwk::ThemeManagerThemeFormInfoByParcel*;
+        *OHOS::AppExecFwk::FormHostProxy*;
+        *OHOS::AbilityRuntime::JsFormStateObserverProxy*;
     };
   local:
     *;

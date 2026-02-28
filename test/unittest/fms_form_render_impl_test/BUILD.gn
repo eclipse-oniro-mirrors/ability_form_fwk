@@ -40,6 +40,10 @@ ohos_unittest("FrsFormRenderImplTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
