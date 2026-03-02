@@ -252,7 +252,7 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
     }
 
     search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
-    HILOG_INFO("end,isRenderGroupEmpty:%{public}d", isRenderGroupEmpty);
+    HILOG_INFO("end,formId:%{public}" PRId64 ", isRenderGroupEmpty:%{public}d", formId, isRenderGroupEmpty);
     FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     if (isRenderGroupEmpty) {
         search->second->Release();
