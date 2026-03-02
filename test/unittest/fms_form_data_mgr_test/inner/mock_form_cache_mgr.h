@@ -13,18 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef INNER_MOCK_FORM_DB_CACHE_H
-#define INNER_MOCK_FORM_DB_CACHE_H
+#ifndef MOCK_FORM_CACHE_MGR_H
+#define MOCK_FORM_CACHE_MGR_H
 
-#include <cstdint>
-#include <vector>
+#include <string>
+#include <map>
 
-void MockGetAllFormInfo(int32_t mockRet);
+void MockGetData(int64_t formId, bool ret);
 
-void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
+void MockGetData(int64_t formId, bool ret, const std::string &data);
 
-void MockGetFormCountsByUserId(int32_t mockRet);
-
-void MockGetFormCountsByHostBundleName(int32_t mockRet);
-
-#endif // INNER_MOCK_FORM_DB_CACHE_H
+#endif // MOCK_FORM_CACHE_MGR_H

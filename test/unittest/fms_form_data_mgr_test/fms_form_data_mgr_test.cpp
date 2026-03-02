@@ -35,6 +35,8 @@
 
 #include "inner/mock_form_bms_helper.h"
 #include "inner/mock_form_db_cache.h"
+#include "data_center/database/form_db_info.h"
+#include "inner/mock_form_cache_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -6444,5 +6446,1061 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_InitFormCapabilityKey_001, TestS
     EXPECT_EQ(standbyKey, formDataMgr->formStandbyCapabilityKey_);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_InitFormCapabilityKey_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetHostFormsCount_001
+ * @tc.name: GetHostFormsCount
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: bundleName is empty, return ERR_OK.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetHostFormsCount_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetHostFormsCount_001 start";
+
+    std::string bundleName = "";
+    int32_t formCount = 0;
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetHostFormsCount(bundleName, formCount));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetHostFormsCount_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetHostFormsCount_002
+ * @tc.name: GetHostFormsCount
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: clientRecords_ contains matching bundleName, formCount is set correctly.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetHostFormsCount_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetHostFormsCount_002 start";
+
+    std::string bundleName = "com.test.bundle";
+    int32_t formCount = 0;
+
+    // create clientRecords_
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.SetHostBundleName(bundleName);
+    formHostRecord.AddForm(1);
+    formHostRecord.AddForm(2);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetHostFormsCount(bundleName, formCount));
+    EXPECT_EQ(2, formCount);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetHostFormsCount_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetHostFormsCount_003
+ * @tc.name: GetHostFormsCount
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: clientRecords_ does not contain matching bundleName, formCount remains default.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetHostFormsCount_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetHostFormsCount_003 start";
+
+    std::string bundleName = "com.test.bundle";
+    int32_t formCount = 0;
+
+    // create clientRecords_ with different bundleName
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.SetHostBundleName("com.other.bundle");
+    formHostRecord.AddForm(1);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetHostFormsCount(bundleName, formCount));
+    EXPECT_EQ(0, formCount);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetHostFormsCount_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos_001
+ * @tc.name: GetUnusedFormInfos
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formDBInfos is empty, no info added.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos_001 start";
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    FormDbCache::GetInstance().formDBInfos_.clear();
+
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetFormLock_001
+ * @tc.name: SetFormLock
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId not found, return ERR_APPEXECFWK_FORM_INVALID_FORM_ID.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormLock_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormLock_001 start";
+
+    int64_t formId = 1;
+    bool lock = true;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr_.SetFormLock(formId, lock));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormLock_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetFormLock_002
+ * @tc.name: SetFormLock
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId found, successfully set lockForm.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormLock_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormLock_002 start";
+
+    int64_t formId = 1;
+    bool lock = true;
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.SetFormLock(formId, lock));
+    EXPECT_EQ(true, formDataMgr_.formRecords_[formId].lockForm);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormLock_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormLock_001
+ * @tc.name: GetFormLock
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId not found, return ERR_APPEXECFWK_FORM_INVALID_FORM_ID.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormLock_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormLock_001 start";
+
+    int64_t formId = 1;
+    bool lock = false;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr_.GetFormLock(formId, lock));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormLock_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormLock_002
+ * @tc.name: GetFormLock
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId found, successfully get lockForm.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormLock_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormLock_002 start";
+
+    int64_t formId = 1;
+    bool lock = false;
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    record.lockForm = true;
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetFormLock(formId, lock));
+    EXPECT_EQ(true, lock);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormLock_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetFormProtect_001
+ * @tc.name: SetFormProtect
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId not found, return ERR_APPEXECFWK_FORM_INVALID_FORM_ID.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormProtect_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormProtect_001 start";
+
+    int64_t formId = 1;
+    bool protect = true;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr_.SetFormProtect(formId, protect));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormProtect_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetFormProtect_002
+ * @tc.name: SetFormProtect
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId found, successfully set protectForm.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormProtect_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormProtect_002 start";
+
+    int64_t formId = 1;
+    bool protect = true;
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.SetFormProtect(formId, protect));
+    EXPECT_EQ(true, formDataMgr_.formRecords_[formId].protectForm);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormProtect_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormProtect_001
+ * @tc.name: GetFormProtect
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId not found, return ERR_APPEXECFWK_FORM_INVALID_FORM_ID.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormProtect_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormProtect_001 start";
+
+    int64_t formId = 1;
+    bool protect = false;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr_.GetFormProtect(formId, protect));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormProtect_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormProtect_002
+ * @tc.name: GetFormProtect
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId found, successfully get protectForm.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormProtect_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormProtect_002 start";
+
+    int64_t formId = 1;
+    bool protect = false;
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    record.protectForm = true;
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetFormProtect(formId, protect));
+    EXPECT_EQ(true, protect);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormProtect_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetFormEnable_001
+ * @tc.name: SetFormEnable
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId not found, return ERR_APPEXECFWK_FORM_INVALID_FORM_ID.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormEnable_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormEnable_001 start";
+
+    int64_t formId = 1;
+    bool enable = true;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr_.SetFormEnable(formId, enable));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormEnable_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetFormEnable_002
+ * @tc.name: SetFormEnable
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId found, successfully set enableForm.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormEnable_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormEnable_002 start";
+
+    int64_t formId = 1;
+    bool enable = true;
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.SetFormEnable(formId, enable));
+    EXPECT_EQ(true, formDataMgr_.formRecords_[formId].enableForm);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormEnable_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_LockForms_001
+ * @tc.name: LockForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: clientRecords_ is empty, no operation performed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_LockForms_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_001 start";
+
+    std::vector<FormRecord> formRecords;
+    bool lock = true;
+
+    formDataMgr_.LockForms(std::move(formRecords), lock);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_LockForms_002
+ * @tc.name: LockForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: formRecords is empty, matchedFormIds is empty, OnLockForms not called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_LockForms_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_002 start";
+
+    std::vector<FormRecord> formRecords;
+    bool lock = true;
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.LockForms(std::move(formRecords), lock);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_LockForms_003
+ * @tc.name: LockForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: Contains returns false, matchedFormIds is empty, OnLockForms not called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_LockForms_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_003 start";
+
+    int callingUid =1;
+    int64_t formId = 1;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+
+    std::vector<FormRecord> formRecords;
+    formRecords.emplace_back(record);
+    bool lock = true;
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.LockForms(std::move(formRecords), lock);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_LockForms_004
+ * @tc.name: LockForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: Contains returns true, matchedFormIds is not empty, OnLockForms called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_LockForms_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_004 start";
+
+    int callingUid = 0;
+    int64_t formId = 1;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+
+    std::vector<FormRecord> formRecords;
+    formRecords.emplace_back(record);
+    bool lock = true;
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.AddForm(formId);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.LockForms(std::move(formRecords), lock);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_LockForms_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckForms_001
+ * @tc.name: CheckForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: clientRecords_ is empty, no operation performed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckForms_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_001 start";
+
+    std::vector<int64_t> formIds;
+
+    formDataMgr_.CheckForms(formIds);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckForms_002
+ * @tc.name: CheckForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: formIds is empty, matchedFormIds is empty, OnCheckForms not called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckForms_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_002 start";
+
+    std::vector<int64_t> formIds;
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.CheckForms(formIds);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckForms_003
+ * @tc.name: CheckForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: Contains returns false, matchedFormIds is empty, OnCheckForms not called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckForms_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_003 start";
+
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.CheckForms(formIds);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckForms_004
+ * @tc.name: CheckForms
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: Contains returns true, matchedFormIds is not empty, OnCheckForms called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckForms_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_004 start";
+
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.AddForm(formId);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.CheckForms(formIds);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckForms_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetSpecification_001
+ * @tc.name: SetSpecification
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: specification < DIMENSION_MIN, return ERR_APPEXECFWK_FORM_DIMENSION_ERROR.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetSpecification_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_001 start";
+
+    int64_t formId = 1;
+    int32_t specification = 0;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_DIMENSION_ERROR, formDataMgr_.SetSpecification(formId, specification));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetSpecification_002
+ * @tc.name: SetSpecification
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: specification > DIMENSION_MAX, return ERR_APPEXECFWK_FORM_DIMENSION_ERROR.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetSpecification_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_002 start";
+
+    int64_t formId = 1;
+    int32_t specification = INT_MAX;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_DIMENSION_ERROR, formDataMgr_.SetSpecification(formId, specification));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetSpecification_003
+ * @tc.name: SetSpecification
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId not found, return ERR_APPEXECFWK_FORM_INVALID_FORM_ID.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetSpecification_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_003 start";
+
+    int64_t formId = 1;
+    int32_t specification = 2;
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr_.SetSpecification(formId, specification));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetSpecification_004
+ * @tc.name: SetSpecification
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId found, successfully set specification.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetSpecification_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_004 start";
+
+    int64_t formId = 1;
+    int32_t specification = 2;
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    EXPECT_EQ(ERR_OK, formDataMgr_.SetSpecification(formId, specification));
+    EXPECT_EQ(2, formDataMgr_.formRecords_[formId].specification);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetHostTransparentFormColor_001
+ * @tc.name: SetHostTransparentFormColor
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: clientRecords_ is empty, no operation performed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetHostTransparentFormColor_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostTransparentFormColor_001 start";
+
+    int64_t formId = 1;
+    std::string transparencyColor = "#FF000000";
+
+    formDataMgr_.SetHostTransparentFormColor(formId, transparencyColor);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostTransparentFormColor_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetHostTransparentFormColor_002
+ * @tc.name: SetHostTransparentFormColor
+ * @tc.desc: Verify that the function works correctly.
+ * @tc.details: Contains returns false, SetTransparentFormColor not called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetHostTransparentFormColor_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostTransparentFormColor_002 start";
+
+    int64_t formId = 1;
+    std::string transparencyColor = "#FF000000";
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.SetHostTransparentFormColor(formId, transparencyColor);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostTransparentFormColor_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetHostTransparentFormColor_003
+ * @tc.name: SetHostTransparentFormColor
+ * @tc.desc: (tc.desc: Verify that the function works correctly.
+ * @tc.details: Contains returns true, SetTransparentFormColor called.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetHostTransparentFormColor_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostTransparentFormColor_003 start";
+
+    int64_t formId = 1;
+    std::string transparencyColor = "#FF000000";
+
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.AddForm(formId);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+
+    formDataMgr_.SetHostTransparentFormColor(formId, transparencyColor);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetHostTransparentFormColor_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_MergeFormData_001
+ * @tc.name: MergeFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: GetData failed, return false.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeFormData_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeFormData_001 start";
+
+    int64_t formId = 1;
+    FormProviderData formProviderData;
+
+    EXPECT_EQ(false, formDataMgr_.MergeFormData(formId, formProviderData));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeFormData_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_MergeFormData_002
+ * @tc.name: MergeFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: Successfully merge data.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeFormData_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeFormData_002 start";
+
+    int64_t formId = 1;
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    FormProviderData formProviderData;
+    formProviderData.formData = "test data";
+
+    MockGetData(formId, true, "test data");
+
+    EXPECT_EQ(true, formDataMgr_.MergeFormData(formId, formProviderData));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeFormData_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_001
+ * @tc.name: GetUnusedFormInfos1
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formDBInfos is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_001 start";
+
+    std::vector<FormDBInfo> emptyFormDBInfos;
+    MockGetAllFormInfo(emptyFormDBInfos);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_001 end";
+}
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_002
+ * @tc.name: GetUnusedFormInfos1
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formId already exists in runningFormInfos.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_002 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    MockGetDBRecord(1, formRecord, ERR_OK);
+
+    RunningFormInfo existingInfo;
+    existingInfo.formId = 1;
+    std::vector<RunningFormInfo> runningFormInfos;
+    runningFormInfos.emplace_back(existingInfo);
+
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+
+    EXPECT_EQ(1, runningFormInfos.size());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_003
+ * @tc.name: GetUnusedFormInfos1
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: GetDBRecord failed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_003 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    MockGetDBRecord(1, formRecord, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_004
+ * @tc.name: GetUnusedFormInfos1
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formUserUids is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_004 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_005
+ * @tc.name: GetUnusedFormInfos1
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: GetBundleNameByUid failed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_005 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    MockGetDBRecord(1, formRecord, ERR_OK);
+
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_005 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_006
+ * @tc.name: GetUnusedFormInfos (no param)
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       Normal branch, successfully add form.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_006 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.bundleName = "testBundle";
+    MockGetDBRecord(1, formRecord, ERR_OK);
+
+    MockGetBundleNameByUid(ERR_OK, "testBundle");
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+
+    EXPECT_EQ(1, runningFormInfos.size());
+    EXPECT_EQ(1, runningFormInfos[0].formId);
+    EXPECT_EQ(FormUsageState::UNUSED, runningFormInfos[0].formUsageState);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_006 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_001
+ * @tc.name: GetUnusedFormInfos2
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: formDBInfos is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_001 start";
+
+    std::vector<FormDBInfo> emptyFormDBInfos;
+    MockGetAllFormInfo(emptyFormDBInfos);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataDataMgrTest_GetUnusedFormInfos2_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_002
+ * @tc.name: GetUnusedFormInfos (with param)
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       formId already exists in runningFormInfos.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_002 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    MockGetDBRecord(1, formRecord, ERR_OK);
+
+    RunningFormInfo existingInfo;
+    existingInfo.formId = 1;
+    std::vector<RunningFormInfo> runningFormInfos;
+    runningFormInfos.emplace_back(existingInfo);
+
+    formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
+
+    EXPECT_EQ(1, runningFormInfos.size());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_003
+ * @tc.name: GetUnusedFormInfos (with param)
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       formUserUids is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_003 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_004
+ * @tc.name: GetUnusedFormInfos (with param)
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       GetBundleNameByUid failed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_004 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_005
+ * @tc.name: GetUnusedFormInfos (with param)
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       hostBundleName not match.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_005 start";
+
+    FormDBInfo dbInfo;
+    dbInfo = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    MockGetBundleNameByUid(ERR_OK, "otherBundle");
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_005 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_006
+ * @tc.name: GetUnusedFormInfos (with param)
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       GetDBRecord failed.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_006 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    MockGetBundleNameByUid(ERR_OK, "testBundle");
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    MockGetDBRecord(1, formRecord, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
+
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_006 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_007
+ * @tc.name: GetUnusedFormInfos (with param)
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       Normal branch, successfully add form.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_007 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    MockGetBundleNameByUid(ERR_OK, "testBundle");
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.bundleName = "testBundle";
+    MockGetDBRecord(1, formRecord, ERR_OK);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
+
+    EXPECT_EQ(1, runningFormInfos.size());
+    EXPECT_EQ(1, runningFormInfos[0].formId);
+    EXPECT_EQ(FormUsageState::UNUSED, runningFormInfos[0].formUsageState);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_007 end";
 }
 }
