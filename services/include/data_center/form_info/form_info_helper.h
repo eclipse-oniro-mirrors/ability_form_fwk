@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -65,14 +65,21 @@ private:
 
     static void SendLoadStageFormConfigEvent(const FormInfo& formInfo);
 
-    static bool GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId);
-
-    static void UpdateBundleTransparencyEnabled(const std::string &bundleName, int32_t userId,
-        std::vector<FormInfo> &formInfos);
-
     static void LoadProfileFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
         const ExtensionAbilityInfo &extensionInfo, const std::vector<std::string> &profileInfos,
         const ExtraFormInfo &extraFormInfo);
+
+    static void UpdateFormInfoByAppServicesCapability(const BundleInfo &bundleInfo, int32_t userId,
+        std::vector<FormInfo> &formInfos);
+
+    static void UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo, int32_t userId,
+        std::vector<FormInfo> &formInfos);
+
+    static void UpdateFormInfoFormStandby(const BundleInfo &bundleInfo, int32_t userId,
+        std::vector<FormInfo> &formInfos);
+
+    static bool CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
+        const std::string &capabilityKey);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

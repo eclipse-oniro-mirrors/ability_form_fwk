@@ -245,36 +245,6 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.L
 }
 
 /**
- * @tc.name: FormInfoHelper_GetBundleTransparencyEnabled_0100
- * @tc.number: GetBundleTransparencyEnabled
- * @tc.desc: call GetBundleTransparencyEnabled success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetBundleTransparencyEnabled_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 start";
-    bool isAGCTransparencyEnabled = formInfoHelper_->GetBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID);
-    EXPECT_FALSE(isAGCTransparencyEnabled);
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 end";
-}
-
-/**
- * @tc.name: FormInfoHelper_UpdateBundleTransparencyEnabled_0100
- * @tc.number: UpdateBundleTransparencyEnabled
- * @tc.desc: call UpdateBundleTransparencyEnabled success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateBundleTransparencyEnabled_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 start";
-    std::vector<FormInfo> formInfos;
-    FormInfo formInfo = GetTestFormInfo();
-    formInfo.transparencyEnabled = true;
-    formInfos.emplace_back(formInfo);
-    formInfoHelper_->UpdateBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID, formInfos);
-    EXPECT_FALSE(formInfos[0].transparencyEnabled);
-    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 end";
-}
-
-/**
  * @tc.name: BundleFormInfo_InitFromJson_0100
  * @tc.number: InitFromJson
  * @tc.desc: call InitFromJson with bad profile
@@ -1481,4 +1451,231 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001, Test
     ret = formInfoMgr_.IsDeleteCacheInUpgradeScene(info);
     EXPECT_FALSE(ret);
     GTEST_LOG_(INFO) << "FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100
+ * @tc.desc: test UpdateFormInfoByAppServicesCapability function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfo.standby.isSupported = true;
+    formInfo.standby.isAdapted = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = false;
+
+    // Call UpdateFormInfoByAppServicesCapability, should set transparencyEnabled and standby to false
+    // when no capability is configured
+    formInfoHelper_->UpdateFormInfoByAppServicesCapability(bundleInfo, USER_ID, formInfos);
+
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200
+ * @tc.desc: test UpdateFormInfoByAppServicesCapability with system app.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = true;
+
+    // System app should not have transparencyEnabled modified
+    formInfoHelper_->UpdateFormInfoByAppServicesCapability(bundleInfo, USER_ID, formInfos);
+
+    // For system apps, transparencyEnabled should remain unchanged
+    // standby should be set to false when no capability is configured
+    EXPECT_TRUE(formInfos[0].transparencyEnabled);
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100
+ * @tc.desc: test UpdateFormInfoTransparencyEnabled function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = false;
+
+    // Call UpdateFormInfoTransparencyEnabled with no capability configured
+    formInfoHelper_->UpdateFormInfoTransparencyEnabled(bundleInfo, USER_ID, formInfos);
+
+    // Should set transparencyEnabled to false when no capability is configured
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200
+ * @tc.desc: test UpdateFormInfoTransparencyEnabled with system app.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = true;
+
+    // System app should return early, transparencyEnabled should remain unchanged
+    formInfoHelper_->UpdateFormInfoTransparencyEnabled(bundleInfo, USER_ID, formInfos);
+
+    EXPECT_TRUE(formInfos[0].transparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoFormStandby_0100
+ * @tc.desc: test UpdateFormInfoFormStandby function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoFormStandby_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoFormStandby_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.standby.isSupported = true;
+    formInfo.standby.isAdapted = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+
+    // Call UpdateFormInfoFormStandby with no capability configured
+    formInfoHelper_->UpdateFormInfoFormStandby(bundleInfo, USER_ID, formInfos);
+
+    // Should set standby to false when no capability is configured
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoFormStandby_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_CheckAppServicesCapability_0100
+ * @tc.desc: test CheckAppServicesCapability with null bundle manager.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_CheckAppServicesCapability_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0100 start";
+
+    // Set bundle manager to null
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = nullptr;
+
+    std::string capabilityKey = "test.capability";
+    bool result = formInfoHelper_->CheckAppServicesCapability(USER_ID, FORM_BUNDLE_NAME_TEST, capabilityKey);
+
+    // Should return false when bundle manager is null
+    EXPECT_FALSE(result);
+
+    // Restore bundle manager
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_CheckAppServicesCapability_0200
+ * @tc.desc: test CheckAppServicesCapability with mock bundle manager.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_CheckAppServicesCapability_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0200 start";
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+
+    // Mock GetAppProvisionInfo to return error
+    auto bmsTask = [] (const std::string &bundleName, const int32_t userId, AppProvisionInfo &appProvisionInfo) {
+        GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0200 bmsTask called";
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    };
+    EXPECT_CALL(*bmsProxy, GetAppProvisionInfo(_, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+
+    std::string capabilityKey = "test.capability";
+    bool result = formInfoHelper_->CheckAppServicesCapability(USER_ID, FORM_BUNDLE_NAME_TEST, capabilityKey);
+
+    // Should return false when GetAppProvisionInfo fails
+    EXPECT_FALSE(result);
+
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300
+ * @tc.desc: test UpdateFormInfoByAppServicesCapability with multiple forms.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo1 = GetTestFormInfo();
+    formInfo1.transparencyEnabled = true;
+    formInfo1.standby.isSupported = true;
+    formInfos.emplace_back(formInfo1);
+
+    FormInfo formInfo2 = GetTestFormInfo();
+    formInfo2.name = "form2";
+    formInfo2.transparencyEnabled = true;
+    formInfo2.standby.isAdapted = true;
+    formInfos.emplace_back(formInfo2);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = false;
+
+    // Call UpdateFormInfoByAppServicesCapability with multiple forms
+    formInfoHelper_->UpdateFormInfoByAppServicesCapability(bundleInfo, USER_ID, formInfos);
+
+    // Both forms should be updated
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+
+    EXPECT_FALSE(formInfos[1].transparencyEnabled);
+    EXPECT_FALSE(formInfos[1].standby.isSupported);
+    EXPECT_FALSE(formInfos[1].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300 end";
 }

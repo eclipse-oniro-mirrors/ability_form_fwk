@@ -50,6 +50,7 @@ namespace AppExecFwk {
 namespace {
 constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.watermark";
 constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
+constexpr const char *FORM_STANDBY_CAPABILITY_PARAM_NAME = "const.form.standby.capability";
 
 static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
 {
@@ -87,7 +88,7 @@ FormDataMgr::FormDataMgr()
 {
     HILOG_INFO("create");
     InitLowMemoryStatus();
-    InitTransparencyFormCapabilityKey();
+    InitFormCapabilityKey();
 }
 FormDataMgr::~FormDataMgr()
 {
@@ -3363,14 +3364,20 @@ void FormDataMgr::DueControlForms(
     }
 }
 
-void FormDataMgr::InitTransparencyFormCapabilityKey()
+void FormDataMgr::InitFormCapabilityKey()
 {
     transparencyFormCapabilityKey_ = OHOS::system::GetParameter(TRANSPARENT_FORM_CAPABILITY_PARAM_NAME, "");
+    formStandbyCapabilityKey_ = OHOS::system::GetParameter(FORM_STANDBY_CAPABILITY_PARAM_NAME, "");
 }
 
 const std::string& FormDataMgr::GetTransparencyFormCapabilityKey()
 {
     return transparencyFormCapabilityKey_;
+}
+
+const std::string& FormDataMgr::GetFormStandbyCapabilityKey()
+{
+    return formStandbyCapabilityKey_;
 }
 
 /**
