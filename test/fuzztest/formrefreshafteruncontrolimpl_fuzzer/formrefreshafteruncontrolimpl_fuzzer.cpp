@@ -34,20 +34,12 @@ uint32_t GetU32Data(const char* ptr)
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
 
-int64_t GetI64Data(const char* ptr)
-{
-    return ((int64_t)ptr[0] << 56) | ((int64_t)ptr[1] << 48) |
-           ((int64_t)ptr[2] << 40) | ((int64_t)ptr[3] << 32) |
-           ((int64_t)ptr[4] << 24) | ((int64_t)ptr[5] << 16) |
-           ((int64_t)ptr[6] << 8) | (int64_t)ptr[7];
-}
-
 void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormRefreshAfterUncontrolImpl formRefreshAfterUncontrol;
 
     RefreshData refreshData;
-    refreshData.formId = GetI64Data(data);
+    refreshData.formId = static_cast<int64_t>(GetU32Data(data));
     refreshData.callingUid = static_cast<int32_t>(GetU32Data(data));
     refreshData.nextTime = static_cast<int32_t>(GetU32Data(data));
 
