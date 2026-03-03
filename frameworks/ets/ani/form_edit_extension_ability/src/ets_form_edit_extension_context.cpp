@@ -31,9 +31,9 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-const char *FORM_EDIT_EXTENSION_CONTEXT = "application.FormEditExtensionContext.FormEditExtensionContext";
-const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "application.UIExtensionContext.Cleaner";
-constexpr const char* AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER =
+constexpr const char *FORM_EDIT_EXTENSION_CONTEXT = "application.FormEditExtensionContext.FormEditExtensionContext";
+constexpr const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "application.UIExtensionContext.Cleaner";
+constexpr const char *AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER =
     "application.FormEditExtensionContext.AsyncCallbackWrapper";
 constexpr const char *ERR_MSG_INTERNAL_ERROR = "Internal error";
 } // namespace
@@ -210,7 +210,7 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
         HILOG_ERROR("Context is released");
         EtsErrorUtil::ThrowError(env,
             static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
-        return ;
+        return;
     }
     AAFwk::Want want;
     AppExecFwk::UnwrapWant(env, aniWant, want);
@@ -267,7 +267,7 @@ void EtsFormEditExtensionContext::OnStartUIAbility(ani_env *env, ani_object aniW
         HILOG_ERROR("Context is released");
         EtsErrorUtil::ThrowError(env,
             static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
-        return ;
+        return;
     }
     AAFwk::Want want;
     AppExecFwk::UnwrapWant(env, aniWant, want);
@@ -297,36 +297,8 @@ void EtsFormEditExtensionContext::OnStartUIAbility(ani_env *env, ani_object aniW
 
 bool EtsFormEditExtensionContext::AsyncCallback(ani_env *env, ani_object call, ani_object error, ani_object result)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("null env");
-        return false;
-    }
-    ani_class clsCall = nullptr;
-    ani_status status = env->FindClass(AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, &clsCall);
-    if (status!= ANI_OK || clsCall == nullptr) {
-        HILOG_ERROR("FindClass status: %{public}d, or null clsCall", status);
-        return false;
-    }
-    ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method)) != ANI_OK || method == nullptr) {
-        HILOG_ERROR("Class_FindMethod status: %{public}d, or null method", status);
-        return false;
-    }
-    if (error == nullptr) {
-        ani_ref nullRef = nullptr;
-        env->GetNull(&nullRef);
-        error = reinterpret_cast<ani_object>(nullRef);
-    }
-    if (result == nullptr) {
-        ani_ref undefinedRef = nullptr;
-        env->GetUndefined(&undefinedRef);
-        result = reinterpret_cast<ani_object>(undefinedRef);
-    }
-    if ((status = env->Object_CallMethod_Void(call, method, error, result)) != ANI_OK) {
-        HILOG_ERROR("Object_CallMethod_Void status: %{public}d", status);
-        return false;
-    }
-    return true;
+    // Use the unified implementation from EtsFormErrorUtil
+    return FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, call, error, result);
 }
 } // namespace AbilityRuntime
 } // namespace OHOS
