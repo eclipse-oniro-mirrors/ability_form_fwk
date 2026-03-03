@@ -130,6 +130,7 @@ public:
     MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
     MOCK_METHOD1(RegisterPublishFormCrossBundleControl, ErrCode(const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(UnregisterPublishFormCrossBundleControl, ErrCode());
+    MOCK_METHOD2(GetFormIdsByFormLocation, ErrCode(int32_t formLocation, std::vector<std::string> &formIds));
 
     sptr<IRemoteObject> AsObject()
     {

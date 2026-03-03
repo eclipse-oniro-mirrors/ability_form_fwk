@@ -142,6 +142,7 @@ public:
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
     MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
     MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
+    MOCK_METHOD2(GetFormIdsByFormLocation, ErrCode(int32_t formLocation, std::vector<std::string> &formIds));
 };
 }
 }

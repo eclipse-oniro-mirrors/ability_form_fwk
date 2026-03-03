@@ -889,6 +889,14 @@ public:
     ErrCode UpdateTemplateFormDetailInfo(
         const std::vector<TemplateFormDetailInfo> &templateFormInfo) override;
 
+    /**
+     * @brief Get formIds by form location.
+     * @param formLocation Indicate the location of the form.
+     * @param formIds [out] The formIds of the form location to be returned.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds) override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

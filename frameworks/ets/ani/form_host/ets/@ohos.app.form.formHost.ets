@@ -87,6 +87,8 @@ export default namespace formHost {
   native function unRegisterFormObserverInner(callback?: CallbackWrapper<string>): void;
   native function setRouterProxyInner(formIds: Array<string>, proxy: CallbackWrapper<Want>, callback: AsyncCallbackWrapper<void>): void;
   native function clearRouterProxyInner(formIds: Array<string>, callback: AsyncCallbackWrapper<void>): void;
+  native function getFormIdsByFormLocationInner(location: formInfo.FormLocation,
+    callback: AsyncCallbackWrapper<Array<string>>): void;
   export native function nativeOnFormOverflow(callback: CallbackWrapper<formInfo.OverflowRequest>): void;
   export native function nativeOffFormOverflow(callback?: CallbackWrapper<formInfo.OverflowRequest>): void;
   export native function nativeOnChangeSceneAnimationState(callback: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
@@ -1006,6 +1008,25 @@ export default namespace formHost {
       }
     });
     return findIndex;
+  }
+
+  export function getFormIdsByFormLocation(location: formInfo.FormLocation): Promise<Array<string>> {
+    return new Promise<Array<string>>(
+      (resolve: (data: Array<string>) => void,
+        reject: (err: BusinessError) => void): void => {
+ 
+        let call = new AsyncCallbackWrapper<Array<string>>(
+          (err: BusinessError | null, data: Array<string> | undefined) => {
+            if (err == null || err.code == ERR_OK) {
+              resolve(data as Array<string>);
+            } else {
+              reject(err);
+            }
+          });
+        taskpool.execute((): void => {
+          getFormIdsByFormLocationInner(location, call);
+        });
+      });
   }
 
   function createCallbackWrapper(callback: Callback<string>): CallbackWrapper<string> {

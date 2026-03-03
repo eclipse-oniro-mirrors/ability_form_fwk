@@ -71,6 +71,8 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
         for (int formId_index = 0; formId_index < Constants::MAX_RECORD_PER_HOST; formId_index++) {
             formDBInfo.formUserUids.emplace_back(userUid);
             formDBInfo.providerUserId = FormUtil::GetCurrentAccountId();
+            formDBInfo.userId = g_callingUid;
+            formDBInfo.formLocation = Constants::FormLocation::DESKTOP;
             formDBInfos.emplace_back(formDBInfo);
         }
     } else {

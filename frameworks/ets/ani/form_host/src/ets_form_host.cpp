@@ -2775,6 +2775,97 @@ void UpdateFormSize(ani_env *env, ani_string aniFormId, ani_object aniNewDimensi
     EtsErrorUtil::ThrowError(env, ret, FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ret));
 }
 
+ani_array CreateFormsIdArrayFromVec(ani_env *env, const std::vector<std::string> &formIds)
+{
+    ani_ref undefinedRef = nullptr;
+    auto status = env->GetUndefined(&undefinedRef);
+    if (status != ANI_OK) {
+        HILOG_ERROR("formIds getUndefined failed, status: %{public}d", status);
+        return nullptr;
+    }
+ 
+    ani_array arrayObj = nullptr;
+    status = env->Array_New(formIds.size(), undefinedRef, &arrayObj);
+    if (status != ANI_OK) {
+        HILOG_ERROR("formIds ani_array create failed, status: %{public}d", status);
+        return nullptr;
+    }
+ 
+    ani_size index = 0;
+    for (const auto &formId : formIds) {
+        ani_string formIdAniStr{};
+        if (env->String_NewUTF8(formId.c_str(), formId.size(), &formIdAniStr) != ANI_OK) {
+            HILOG_ERROR("formId std::string to ani_string failed");
+            return nullptr;
+        }
+ 
+        ani_status status = env->Array_Set(arrayObj, index, formIdAniStr);
+        if (status != ANI_OK) {
+            HILOG_ERROR("formId ani_string set failed, status: %{public}d", status);
+            return nullptr;
+        }
+        index++;
+    }
+ 
+    return arrayObj;
+}
+ 
+void GetFormIdsByFormLocation(ani_env *env, ani_object location, ani_object asyncCallback)
+{
+    HILOG_DEBUG("Call");
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
+
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("the app not system-app, can't use system-api");
+        InvokeAsyncWithBusinessError(
+            env, asyncCallback, static_cast<int32_t>(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS), nullptr);
+        return;
+    }
+
+    if (IsRefUndefined(env, location)) {
+        InvokeAsyncWithBusinessError(
+            env, asyncCallback, static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+
+    ani_int locationValue = 0;
+    ani_status locationValueStatus = GetEnumValueInt(env, location, locationValue);
+    if (locationValueStatus != ANI_OK) {
+        HILOG_ERROR("enum value could not received %{public}d", locationValueStatus);
+        InvokeAsyncWithBusinessError(
+            env, asyncCallback, static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+    if (locationValue < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+        locationValue >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
+        HILOG_ERROR("locationValue not FormLocation enum");
+        InvokeAsyncWithBusinessError(
+            env, asyncCallback, static_cast<int32_t>(ERR_APPEXECFWK_FORM_LOCATION_INVALID), nullptr);
+        return;
+    }
+    HILOG_INFO("formLocation:%{public}s", std::to_string(locationValue).c_str());
+
+    std::vector<std::string> formIds;
+    auto retCode = FormMgr::GetInstance().GetFormIdsByFormLocation(locationValue, formIds);
+    if (retCode != ERR_OK) {
+        HILOG_ERROR("get formIds by form location failed");
+        InvokeAsyncWithBusinessError(env, asyncCallback, retCode, nullptr);
+        return;
+    }
+
+    auto result = CreateFormsIdArrayFromVec(env, formIds);
+    if (result == nullptr) {
+        HILOG_ERROR("cannot convert formIds to ani object");
+        InvokeAsyncWithBusinessError(env, asyncCallback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
+    InvokeAsyncWithBusinessError(env, asyncCallback, ERR_OK, result);
+}
+
 std::vector<ani_native_function> GetBindMethods()
 {
     std::vector methods = {
@@ -2880,6 +2971,10 @@ std::vector<ani_native_function> GetBindMethods()
             "nativeUpdateFormSize",
             FORM_HOST_UPDATEFORMSIZE,
             reinterpret_cast<void *>(UpdateFormSize)},
+        ani_native_function {
+            "getFormIdsByFormLocationInner",
+            "C{@ohos.app.form.formInfo.formInfo.FormLocation}C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
+            reinterpret_cast<void *>(GetFormIdsByFormLocation)},
     };
     return methods;
 }

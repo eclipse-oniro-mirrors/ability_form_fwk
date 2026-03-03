@@ -461,6 +461,11 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterTemplateFormDetailInfoObserver);
     }
 
+    static napi_value GetFormIdsByFormLocation(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormIdsByFormLocation);
+    }
+
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -2339,6 +2344,80 @@ private:
         bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterTemplateFormDetailInfoChange();
         return CreateJsValue(env, ret);
     }
+
+    napi_value OnGetFormIdsByFormLocation(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_DEBUG("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+ 
+        if (argc != ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+            return CreateJsUndefined(env);
+        }
+ 
+        int32_t formLocation = INVALID_FORM_LOCATION;
+        if (napi_get_value_int32(env, argv[PARAM0], &formLocation) == napi_ok) {
+            if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+                formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
+                HILOG_ERROR("formLocation not FormLocation enum");
+                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID);
+                return CreateJsUndefined(env);
+            }
+        } else {
+            HILOG_ERROR("formLocation not number");
+            NapiFormUtil::ThrowParamTypeError(env, "formLocation", "number");
+            return CreateJsUndefined(env);
+        }
+        HILOG_INFO("formLocation:%{public}s", std::to_string(formLocation).c_str());
+ 
+        auto errCodeVal = std::make_shared<int32_t>(0);
+        auto formIdList = std::make_shared<std::vector<std::string>>();
+        NapiAsyncTask::ExecuteCallback execute = [formLocation, formIds = formIdList, errCode = errCodeVal]() {
+            if (formIds == nullptr || errCode == nullptr) {
+                HILOG_ERROR("invalid param");
+                return;
+            }
+            *errCode = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, *formIds);
+        };
+        NapiAsyncTask::CompleteCallback complete = CreateFormIdsCompleteCallback(errCodeVal, formIdList);
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::GetFormIdsByFormLocation",
+            env,
+            CreateAsyncTaskWithLastParam(env, nullptr, std::move(execute), std::move(complete), &result));
+        return result;
+    }
+ 
+    NapiAsyncTask::CompleteCallback CreateFormIdsCompleteCallback(
+        std::shared_ptr<int32_t> errCodeVal, std::shared_ptr<std::vector<std::string>> formIdList)
+    {
+        return [errCode = errCodeVal, formIds = formIdList](napi_env env, NapiAsyncTask &task, int32_t status) {
+            if (errCode == nullptr || formIds == nullptr) {
+                HILOG_ERROR("invalid param");
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
+                return;
+            }
+            if (*errCode != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *errCode));
+                return;
+            }
+ 
+            napi_value arrayValue = nullptr;
+            napi_create_array_with_length(env, (*formIds).size(), &arrayValue);
+            uint32_t index = 0;
+            for (const auto &formId : *formIds) {
+                napi_value formIdStr;
+                napi_create_string_utf8(env, formId.c_str(), NAPI_AUTO_LENGTH, &formIdStr);
+                napi_set_element(env, arrayValue, index++, formIdStr);
+            }
+ 
+            task.ResolveWithNoError(env, arrayValue);
+        };
+    }
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -2388,6 +2467,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
         JsFormHost::RegisterTemplateFormDetailInfoObserver);
     BindNativeFunction(env, exportObj, "offTemplateFormDetailInfoChange", moduleName,
         JsFormHost::UnregisterTemplateFormDetailInfoObserver);
+    BindNativeFunction(env, exportObj, "getFormIdsByFormLocation", moduleName, JsFormHost::GetFormIdsByFormLocation);
 
     return CreateJsUndefined(env);
 }
