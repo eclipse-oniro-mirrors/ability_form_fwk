@@ -190,6 +190,7 @@ FormRenderRecord::~FormRenderRecord()
             return;
         }
         renderRecord->HandleDestroyInJsThread();
+        // Release need rectification
     };
     eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
     Release();
