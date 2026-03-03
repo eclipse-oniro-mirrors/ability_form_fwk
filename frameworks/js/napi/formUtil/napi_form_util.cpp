@@ -580,6 +580,8 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "isStandbyAdapted", CreateJsValue(env, formInfo.standby.isAdapted));
     napi_set_named_property(
         env, objContext, "isPrivacySensitive", CreateJsValue(env, formInfo.standby.isPrivacySensitive));
+    napi_set_named_property(
+        env, objContext, "isTemplateForm", CreateJsValue(env, formInfo.isTemplateForm));
 
     return objContext;
 }
