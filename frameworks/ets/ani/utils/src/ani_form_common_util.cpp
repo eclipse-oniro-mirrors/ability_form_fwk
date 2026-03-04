@@ -1098,7 +1098,7 @@ ani_object CreateFormInfoAniArrayFromVec(ani_env *env, const std::vector<AppExec
             return nullptr;
         }
         SetFormInfoFields(env, formInfoAni, formInfo);
-        ani_status status = env->Object_CallMethodByName_Void(array, ANI_SETTER_MARKER, "iC{std.core.Object}:",
+        ani_status status = env->Object_CallMethodByName_Void(array, ANI_SETTER_MARKER, "iY:",
             index, formInfoAni);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void $_set Failed. status code: %{public}d", status);
