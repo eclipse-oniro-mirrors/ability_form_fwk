@@ -103,7 +103,6 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 
 /**
  * @brief Get all form data size from DbCache.
- * @param formDBInfos Storage all DbCache.
  * @return int32_t.
  */
 int32_t FormDbCache::GetAllFormInfoSize()
