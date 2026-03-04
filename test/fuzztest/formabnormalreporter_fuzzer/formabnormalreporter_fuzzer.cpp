@@ -72,7 +72,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     params.nonTransparencyRateList.emplace_back(50);
     ClearEventParams(params);
     
-    return params.bundleNames.empty() && params.moduleNames.empty() && 
+    return params.bundleNames.empty() && params.moduleNames.empty() &&
            params.abilityNames.empty() && params.formNames.empty() &&
            params.formDimensions.empty() && params.formLocations.empty() &&
            params.appVersions.empty() && params.nonTransparencyRateList.empty();
