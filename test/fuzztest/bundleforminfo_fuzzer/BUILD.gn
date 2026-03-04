@@ -18,10 +18,10 @@ import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("SignToolsFuzzTest") {
+ohos_fuzztest("BundleFormInfoFuzzTest") {
   module_out_path = form_fuzz_test_path
 
-  fuzz_config_file = "${form_fwk_path}/test/fuzztest/signtools_fuzzer"
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/bundleforminfo_fuzzer"
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
@@ -35,8 +35,7 @@ ohos_fuzztest("SignToolsFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "${form_fwk_path}/services/src/feature/param_update/sign_tools.cpp",
-    "signtools_fuzzer.cpp",
+    "bundleforminfo_fuzzer.cpp"
   ]
 
   deps = [
@@ -52,11 +51,11 @@ ohos_fuzztest("SignToolsFuzzTest") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
     "samgr:samgr_proxy",
   ]
 }
@@ -67,7 +66,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":SignToolsFuzzTest",
+    ":BundleFormInfoFuzzTest",
   ]
 }
 ###############################################################################
