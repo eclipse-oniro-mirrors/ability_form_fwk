@@ -16,14 +16,11 @@
 #include "data_center/database/form_db_cache.h"
 
 #include <cinttypes>
-#include <map>
-#include <vector>
 
-#include "data_center/database/form_db_info.h"
 #include "form_mgr_errors.h"
 #include "common/util/form_util.h"
-#include "data_center/form_record/form_record.h"
 
+using namespace OHOS::AppExecFwk;
 namespace {
     int32_t g_mockAllDBFormMaxSize = 2;
     int32_t g_mockCheckAllDbFormPreAppSize = 1;
@@ -31,8 +28,8 @@ namespace {
     int32_t g_mockFormCountsByUserIdRet = 1;
     int32_t g_mockFormCountsByHostBundleNameRet = 1;
     int g_callingUid = 0;
-    std::vector<OHOS::AppExecFwk::FormDBInfo> g_mockFormDBInfos;
-    std::map<int64_t, OHOS::AppExecFwk::FormRecord> g_mockFormRecords;
+    std::vector<FormDBInfo> g_mockFormDBInfos;
+    std::map<int64_t, FormRecord> g_mockFormRecords;
     int32_t g_mockGetDBRecordRet = 0;
 }
 
@@ -57,12 +54,12 @@ void MockGetFormCountsByHostBundleName(int32_t mockRet)
     g_mockFormCountsByHostBundleNameRet = mockRet;
 }
 
-void MockGetAllFormInfo(const std::vector<OHOS::AppExecFwk::FormDBInfo> &formDBInfos)
+void MockGetAllFormInfo(const std::vector<FormDBInfo> &formDBInfos)
 {
     g_mockFormDBInfos = formDBInfos;
 }
 
-void MockGetDBRecord(int64_t formId, const OHOS::AppExecFwk::FormRecord &formRecord, int32_t ret)
+void MockGetDBRecord(int64_t formId, const FormRecord &formRecord, int32_t ret)
 {
     g_mockFormRecords[formId] = formRecord;
     g_mockGetDBRecordRet = ret;
@@ -140,6 +137,5 @@ ErrCode FormDbCache::GetDBRecord(int64_t formId, FormRecord &formRecord) const
     }
     return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
-
 } // namespace AppExecFwk
 } // namespace OHOS

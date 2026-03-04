@@ -16,7 +16,8 @@
 #ifndef INNER_MOCK_FORM_DB_CACHE_H
 #define INNER_MOCK_FORM_DB_CACHE_H
 
-#include <cstdint>
+#include "data_center/database/form_db_info.h"
+#include "data_center/form_record/form_record.h"
 
 void MockGetAllFormInfo(int32_t mockRet);
 

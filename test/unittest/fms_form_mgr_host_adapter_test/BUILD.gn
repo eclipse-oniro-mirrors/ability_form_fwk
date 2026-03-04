@@ -23,6 +23,7 @@ ohos_unittest("FmsFormMgrHostAdapterTest") {
     "${form_fwk_path}/test/unittest/fms_form_mgr_host_adapter_test/fms_form_mgr_host_adapter_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/mock_form_db_cache.cpp",
     "${form_fwk_path}/services/src/form_host/form_mgr_host_adapter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_provider_info.cpp",
   ]
 
   include_dirs = [
@@ -42,6 +43,7 @@ ohos_unittest("FmsFormMgrHostAdapterTest") {
     "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:form_render_info",
   ]
 
   external_deps = [
