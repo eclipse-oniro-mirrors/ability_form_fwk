@@ -16,8 +16,6 @@
 #ifndef MOCK_FORM_CACHE_MGR_H
 #define MOCK_FORM_CACHE_MGR_H
 
-#include <string>
-
 void MockGetData(bool ret);
 
 void MockGetData(bool ret, const std::string &data);
