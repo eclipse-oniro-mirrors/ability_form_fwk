@@ -19,11 +19,8 @@
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
 
-#include "form_constants.h"
 #define private public
 #define protected public
-#include "feature/free_install/free_install_status_callback_proxy.h"
-#include "feature/free_install/free_install_status_callback_stub.h"
 #include "common/util/form_util.h"
 #undef private
 #undef protected
@@ -32,60 +29,81 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-class FreeInstallStatusCallBackStubFuzzTest : public FreeInstallStatusCallBackStub {
-public:
-    FreeInstallStatusCallBackStubFuzzTest() = default;
-    virtual ~FreeInstallStatusCallBackStubFuzzTest() = default;
-    void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) override
-    {}
-};
+constexpr int32_t MAX_LENGTH = 256;
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
         return true;
     }
-    FormUtil formUtil;
-    std::string formName = fdp->ConsumeRandomLengthString();
-    int32_t specificationId = fdp->ConsumeIntegral<int32_t>();
-    bool isTemporaryForm = fdp->ConsumeBool();
-    Want want;
-    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formName);
-    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, specificationId);
-    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, isTemporaryForm);
-    std::string uri = fdp->ConsumeRandomLengthString();
-    int32_t connectId = fdp->ConsumeIntegral<int32_t>();
-    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
-    want.SetParam(Constants::FORM_SUPPLY_INFO, uri);
+
     int64_t udidHash = fdp->ConsumeIntegral<int64_t>();
-    formUtil.GenerateFormId(udidHash);
-    uint64_t formId = fdp->ConsumeIntegral<uint64_t>();
-    uint64_t udidHashs = fdp->ConsumeIntegral<uint64_t>();
-    formUtil.PaddingUdidHash(formId, udidHashs);
-    formUtil.GetCurrentNanosecond();
-    formUtil.GetCurrentMillisecond();
-    formUtil.GetCurrentAccountId();
-    formUtil.GetNowMillisecond();
-    formUtil.DeleteFormId(udidHash);
-    int radix = fdp->ConsumeIntegral<int>();
-    formUtil.ConvertStringToInt(formName, radix);
-    formUtil.ConvertStringToLongLong(formName, radix);
-    std::string strInfo = fdp->ConsumeRandomLengthString();
-    int64_t convertValue = fdp->ConsumeIntegral<int64_t>();
-    formUtil.ConvertStringToInt64(strInfo, convertValue);
-    sptr<IRemoteObject> impl = nullptr;
-    FreeInstallStatusCallBackProxy freeInstallStatusCallBackProxy(impl);
-    FreeInstallStatusCallBackStubFuzzTest freeInstallStatusCallBackStubFuzzTest;
-    MessageParcel datas;
-    MessageParcel reply;
-    freeInstallStatusCallBackStubFuzzTest.OnInstallFinishedInner(datas, reply);
-    uint32_t code = fdp->ConsumeIntegral<uint32_t>();
-    MessageOption option;
-    freeInstallStatusCallBackStubFuzzTest.OnRemoteRequest(code, datas, reply, option);
-    return formUtil.GenerateUdidHash(udidHash);
+    int64_t formId = FormUtil::GenerateFormId(udidHash);
+    FormUtil::DeleteFormId(formId);
+
+    int64_t formId2 = fdp->ConsumeIntegral<int64_t>();
+    uint64_t udidHash2 = fdp->ConsumeIntegral<uint64_t>();
+    FormUtil::PaddingUdidHash(formId2, udidHash2);
+    
+    int64_t &udidHashRef = udidHash;
+    FormUtil::GenerateUdidHash(udidHashRef);
+
+    FormUtil::GetCurrentNanosecond();
+    FormUtil::GetCurrentMillisecond();
+    FormUtil::GetCurrentSteadyClockMillseconds();
+    FormUtil::GetNowMillisecond();
+
+    struct tm timeStruct;
+    timeStruct.tm_year = fdp->ConsumeIntegralInRange(0, 100);
+    timeStruct.tm_mon = fdp->ConsumeIntegralInRange(0, 12);
+    timeStruct.tm_mday = fdp->ConsumeIntegralInRange(0, 31);
+    timeStruct.tm_hour = fdp->ConsumeIntegralInRange(0, 23);
+    timeStruct.tm_min = fdp->ConsumeIntegralInRange(0, 59);
+    timeStruct.tm_sec = fdp->ConsumeIntegralInRange(0, 59);
+    FormUtil::GetMillisecondFromTm(timeStruct);
+
+    FormUtil::GetCurrentAccountId();
+    FormUtil::IsSACall();
+
+    std::string permissionName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    FormUtil::VerifyCallingPermission(permissionName);
+
+    std::string strInfo = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    int64_t int64Value = fdp->ConsumeIntegral<int64_t>();
+    FormUtil::ConvertStringToInt64(strInfo, int64Value);
+
+    std::string strInfo2 = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    int radix = fdp->ConsumeIntegralInRange(2, 36);
+    FormUtil::ConvertStringToInt(strInfo2, radix);
+
+    std::string strInfo3 = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    int radix2 = fdp->ConsumeIntegralInRange(2, 36);
+    FormUtil::ConvertStringToLongLong(strInfo3, radix2);
+
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    FormUtil::IsActiveUser(userId);
+
+    std::vector<int32_t> activeList;
+    int32_t numActive = fdp->ConsumeIntegralInRange(0, 10);
+    for (int32_t i = 0; i < numActive; i++) {
+        activeList.push_back(fdp->ConsumeIntegral<int32_t>());
+    }
+    FormUtil::GetActiveUsers(activeList);
+
+    std::vector<int32_t> foregroundList;
+    int32_t numForeground = fdp->ConsumeIntegralInRange(0, 10);
+    for (int32_t i = 0; i < numForeground; i++) {
+        foregroundList.push_back(fdp->ConsumeIntegral<int32_t>());
+    }
+    FormUtil::GetForegroundUsers(foregroundList);
+
+    int32_t callingUid = fdp->ConsumeIntegral<int32_t>();
+    FormUtil::GetCallerUserId(callingUid);
+
+    return true;
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);
