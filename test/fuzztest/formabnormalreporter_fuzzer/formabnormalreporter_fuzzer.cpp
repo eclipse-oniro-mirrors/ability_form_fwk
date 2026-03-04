@@ -23,6 +23,7 @@
 #define protected public
 #include "feature/form_check/form_abnormal_info.h"
 #include "feature/form_check/form_abnormal_reporter.h"
+#include "form_event_report_define.h"
 #undef private
 #undef protected
 
@@ -32,6 +33,18 @@ namespace OHOS {
 constexpr int32_t MAX_NUM = 1000;
 constexpr int32_t MIN_RATIO_NUM = 10;
 constexpr int32_t MIN_NUM = 0;
+
+inline void ClearEventParams(FormAbnormalReportParams &params)
+{
+    params.bundleNames.clear();
+    params.moduleNames.clear();
+    params.abilityNames.clear();
+    params.formNames.clear();
+    params.formDimensions.clear();
+    params.formLocations.clear();
+    params.appVersions.clear();
+    params.nonTransparencyRateList.clear();
+}
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
@@ -47,7 +60,22 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormAbnormalReporter::GetInstance().CheckForms();
     FormAbnormalReporter::GetInstance().ReportAbnormalForms();
     FormAbnormalReporter::GetInstance().ClearRecords();
-    return true;
+    
+    FormAbnormalReportParams params;
+    params.bundleNames.emplace_back("testBundle");
+    params.moduleNames.emplace_back("testModule");
+    params.abilityNames.emplace_back("testAbility");
+    params.formNames.emplace_back("testForm");
+    params.formDimensions.emplace_back(1);
+    params.formLocations.emplace_back(0);
+    params.appVersions.emplace_back("1.0");
+    params.nonTransparencyRateList.emplace_back(50);
+    ClearEventParams(params);
+    
+    return params.bundleNames.empty() && params.moduleNames.empty() && 
+           params.abilityNames.empty() && params.formNames.empty() &&
+           params.formDimensions.empty() && params.formLocations.empty() &&
+           params.appVersions.empty() && params.nonTransparencyRateList.empty();
 }
 }
 

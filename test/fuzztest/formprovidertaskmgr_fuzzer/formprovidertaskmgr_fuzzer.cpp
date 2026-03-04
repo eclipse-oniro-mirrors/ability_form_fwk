@@ -91,6 +91,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formTaskMgr.NotifyFormLocationUpdate(formId, want, remoteObject);
     formTaskMgr.NotifySizeChanged(formId, newDimension, newRect, want, remoteObject);
     formTaskMgr.RemoveConnection(formId);
+    int32_t connectId = fdp->ConsumeIntegral<int32_t>();
+    formTaskMgr.DelayedFormExitDetect(connectId);
     OHOS::FormProviderQueueTest(fdp);
     return true;
 }
