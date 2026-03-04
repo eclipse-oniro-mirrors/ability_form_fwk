@@ -18,6 +18,7 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "baseformrefresh_fuzzer:fuzztest",
     "bundleforminfo_fuzzer:fuzztest",
     "facrconnection_fuzzer:fuzztest",
     "facrconnectionFourth_fuzzer:fuzztest",
@@ -109,6 +110,7 @@ group("fuzztest") {
     "formutil_fuzzer:fuzztest",
     "geterrormsg_fuzzer:fuzztest",
     "paramcontrol_fuzzer:fuzztest",
+    "parammanager_fuzzer:fuzztest",
     "paramreader_fuzzer:fuzztest",
     "signtools_fuzzer:fuzztest",
     "providerconnectproxy_fuzzer:fuzztest",
