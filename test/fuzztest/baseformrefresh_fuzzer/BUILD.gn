@@ -18,13 +18,14 @@ import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("FormAppUpgradeRefreshImplFuzzTest") {
+ohos_fuzztest("BaseFormRefreshFuzzTest") {
   module_out_path = form_fuzz_test_path
 
-  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formappupgraderefreshimpl_fuzzer"
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/baseformrefresh_fuzzer"
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
   ]
   cflags = [
@@ -33,7 +34,6 @@ ohos_fuzztest("FormAppUpgradeRefreshImplFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-
   sources = [
     "${form_fwk_path}/services/src/common/util/form_trust_mgr.cpp",
     "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
@@ -52,13 +52,14 @@ ohos_fuzztest("FormAppUpgradeRefreshImplFuzzTest") {
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_control_mgr.cpp",
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_check_mgr.cpp",
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_exec_mgr.cpp",
-    "formappupgraderefreshimpl_fuzzer.cpp"
+    "baseformrefresh_fuzzer.cpp",
   ]
 
   deps = [
-    "${form_fwk_path}:form_manager",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -67,21 +68,14 @@ ohos_fuzztest("FormAppUpgradeRefreshImplFuzzTest") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
-    "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
-    "ability_runtime:app_manager",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "common_event_service:cesfwk_core",
-    "common_event_service:cesfwk_innerkits",
     "ffrt:libffrt",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
-    "kv_store:distributeddata_inner",
-    "libxml2:libxml2",
-    "safwk:system_ability_fwk",
+    "relational_store:native_rdb",
     "samgr:samgr_proxy",
   ]
 }
@@ -91,8 +85,7 @@ group("fuzztest") {
   testonly = true
   deps = []
   deps += [
-    # deps file
-    ":FormAppUpgradeRefreshImplFuzzTest",
+    ":BaseFormRefreshFuzzTest",
   ]
 }
 ###############################################################################
