@@ -20,12 +20,12 @@ namespace {
     std::string g_mockDataString = "";
 }
 
-void MockGetData(int64_t formId, bool ret)
+void MockGetData(bool ret)
 {
     g_mockGetDataRet = ret;
 }
 
-void MockGetData(int64_t formId, bool ret, const std::string &data)
+void MockGetData(bool ret, const std::string &data)
 {
     g_mockGetDataRet = ret;
     g_mockDataString = data;

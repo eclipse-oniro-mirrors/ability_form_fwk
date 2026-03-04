@@ -17,10 +17,9 @@
 #define MOCK_FORM_CACHE_MGR_H
 
 #include <string>
-#include <map>
 
-void MockGetData(int64_t formId, bool ret);
+void MockGetData(bool ret);
 
-void MockGetData(int64_t formId, bool ret, const std::string &data);
+void MockGetData(bool ret, const std::string &data);
 
 #endif // MOCK_FORM_CACHE_MGR_H

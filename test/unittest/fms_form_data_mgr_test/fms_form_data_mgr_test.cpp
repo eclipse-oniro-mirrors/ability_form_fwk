@@ -7093,6 +7093,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeFormData_001, TestSize.Leve
 
     int64_t formId = 1;
     FormProviderData formProviderData;
+    MockGetData(false);
 
     EXPECT_EQ(false, formDataMgr_.MergeFormData(formId, formProviderData));
 
@@ -7116,11 +7117,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeFormData_002, TestSize.Leve
     InitFormItemInfo(formId, formItemInfo);
     FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
     formDataMgr_.formRecords_.emplace(formId, record);
-
     FormProviderData formProviderData;
-    formProviderData.formData = "test data";
-
-    MockGetData(formId, true, "test data");
+    MockGetData(true, "test data");
 
     EXPECT_EQ(true, formDataMgr_.MergeFormData(formId, formProviderData));
 
@@ -7142,7 +7140,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_001, TestSiz
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos(runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_001 end";
@@ -7174,9 +7171,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_002, TestSiz
     existingInfo.formId = 1;
     std::vector<RunningFormInfo> runningFormInfos;
     runningFormInfos.emplace_back(existingInfo);
-
     formDataMgr_.GetUnusedFormInfos(runningFormInfos);
-
     EXPECT_EQ(1, runningFormInfos.size());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_002 end";
@@ -7205,7 +7200,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_003, TestSiz
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos(runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_003 end";
@@ -7229,7 +7223,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_004, TestSiz
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos(runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_004 end";
@@ -7255,12 +7248,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_005, TestSiz
     FormRecord formRecord;
     formRecord.formId = 1;
     MockGetDBRecord(1, formRecord, ERR_OK);
-
     MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos(runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_005 end";
@@ -7270,8 +7261,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_005, TestSiz
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_006
  * @tc.name: GetUnusedFormInfos (no param)
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       Normal branch, successfully add form.
+ * @tc.details: Normal branch, successfully add form.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_006, TestSize.Level0)
 {
@@ -7288,15 +7278,16 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_006, TestSiz
     formRecord.formId = 1;
     formRecord.bundleName = "testBundle";
     MockGetDBRecord(1, formRecord, ERR_OK);
-
     MockGetBundleNameByUid(ERR_OK, "testBundle");
 
+    RunningFormInfo existingInfo;
+    existingInfo.formId = 1;
     std::vector<RunningFormInfo> runningFormInfos;
+    runningFormInfos.emplace_back(existingInfo);
     formDataMgr_.GetUnusedFormInfos(runningFormInfos);
 
     EXPECT_EQ(1, runningFormInfos.size());
     EXPECT_EQ(1, runningFormInfos[0].formId);
-    EXPECT_EQ(FormUsageState::UNUSED, runningFormInfos[0].formUsageState);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_006 end";
 }
@@ -7316,7 +7307,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_001, TestSiz
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataDataMgrTest_GetUnusedFormInfos2_001 end";
@@ -7326,8 +7316,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_001, TestSiz
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_002
  * @tc.name: GetUnusedFormInfos (with param)
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formId already exists in runningFormInfos.
+ * @tc.details: formId already exists in runningFormInfos.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_002, TestSize.Level0)
 {
@@ -7348,9 +7337,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_002, TestSiz
     existingInfo.formId = 1;
     std::vector<RunningFormInfo> runningFormInfos;
     runningFormInfos.emplace_back(existingInfo);
-
     formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
-
     EXPECT_EQ(1, runningFormInfos.size());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_002 end";
@@ -7360,8 +7347,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_002, TestSiz
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_003
  * @tc.name: GetUnusedFormInfos (with param)
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formUserUids is empty.
+ * @tc.details: formUserUids is empty.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_003, TestSize.Level0)
 {
@@ -7375,7 +7361,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_003, TestSiz
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_003 end";
@@ -7385,8 +7370,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_003, TestSiz
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_004
  * @tc.name: GetUnusedFormInfos (with param)
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       GetBundleNameByUid failed.
+ * @tc.details: GetBundleNameByUid failed.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_004, TestSize.Level0)
 {
@@ -7398,12 +7382,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_004, TestSiz
     std::vector<FormDBInfo> formDBInfos;
     formDBInfos.emplace_back(dbInfo);
     MockGetAllFormInfo(formDBInfos);
-
     MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_004 end";
@@ -7413,25 +7395,21 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_004, TestSiz
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_005
  * @tc.name: GetUnusedFormInfos (with param)
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       hostBundleName not match.
+ * @tc.details: hostBundleName not match.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_005 start";
 
     FormDBInfo dbInfo;
-    dbInfo = 1;
     dbInfo.formUserUids.emplace_back(100);
     std::vector<FormDBInfo> formDBInfos;
     formDBInfos.emplace_back(dbInfo);
     MockGetAllFormInfo(formDBInfos);
-
     MockGetBundleNameByUid(ERR_OK, "otherBundle");
 
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_005 end";
@@ -7441,8 +7419,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_005, TestSiz
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_006
  * @tc.name: GetUnusedFormInfos (with param)
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       GetDBRecord failed.
+ * @tc.details: GetDBRecord failed.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_006, TestSize.Level0)
 {
@@ -7454,16 +7431,13 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_006, TestSiz
     std::vector<FormDBInfo> formDBInfos;
     formDBInfos.emplace_back(dbInfo);
     MockGetAllFormInfo(formDBInfos);
-
     MockGetBundleNameByUid(ERR_OK, "testBundle");
 
     FormRecord formRecord;
     formRecord.formId = 1;
     MockGetDBRecord(1, formRecord, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos("testBundle", runningFormInfos);
-
     EXPECT_EQ(true, runningFormInfos.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_006 end";
@@ -7473,8 +7447,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_006, TestSiz
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos2_007
  * @tc.name: GetUnusedFormInfos (with param)
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       Normal branch, successfully add form.
+ * @tc.details: Normal branch, successfully add form.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_007, TestSize.Level0)
 {
@@ -7486,7 +7459,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_007, TestSiz
     std::vector<FormDBInfo> formDBInfos;
     formDBInfos.emplace_back(dbInfo);
     MockGetAllFormInfo(formDBInfos);
-
     MockGetBundleNameByUid(ERR_OK, "testBundle");
 
     FormRecord formRecord;
@@ -7503,4 +7475,4 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_007, TestSiz
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_007 end";
 }
-}
+

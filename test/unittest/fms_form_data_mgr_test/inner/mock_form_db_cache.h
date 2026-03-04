@@ -17,7 +17,6 @@
 #define INNER_MOCK_FORM_DB_CACHE_H
 
 #include <cstdint>
-#include <vector>
 
 void MockGetAllFormInfo(int32_t mockRet);
 
@@ -26,5 +25,9 @@ void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
 void MockGetFormCountsByUserId(int32_t mockRet);
 
 void MockGetFormCountsByHostBundleName(int32_t mockRet);
+
+void MockGetAllFormInfo(const std::vector<OHOS::AppExecFwk::FormDBInfo> &formDBInfos);
+
+void MockGetDBRecord(int64_t formId, const OHOS::AppExecFwk::FormRecord &formRecord, int32_t ret);
 
 #endif // INNER_MOCK_FORM_DB_CACHE_H

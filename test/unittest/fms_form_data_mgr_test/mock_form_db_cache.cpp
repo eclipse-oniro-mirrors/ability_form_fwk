@@ -31,9 +31,9 @@ namespace {
     int32_t g_mockFormCountsByUserIdRet = 1;
     int32_t g_mockFormCountsByHostBundleNameRet = 1;
     int g_callingUid = 0;
-    std::vector<FormDBInfo> g_mockFormDBInfos;
-    std::map<int64_t, FormRecord> g_mockFormRecords;
-    int32_t g_mockGetDBRecordRet = ERR_OK;
+    std::vector<OHOS::AppExecFwk::FormDBInfo> g_mockFormDBInfos;
+    std::map<int64_t, OHOS::AppExecFwk::FormRecord> g_mockFormRecords;
+    int32_t g_mockGetDBRecordRet = 0;
 }
 
 void MockGetAllFormInfoSize(int32_t mockRet, int callingUid)
@@ -57,12 +57,12 @@ void MockGetFormCountsByHostBundleName(int32_t mockRet)
     g_mockFormCountsByHostBundleNameRet = mockRet;
 }
 
-void MockGetAllFormInfo(const std::vector<FormDBInfo> &formDBInfos)
+void MockGetAllFormInfo(const std::vector<OHOS::AppExecFwk::FormDBInfo> &formDBInfos)
 {
     g_mockFormDBInfos = formDBInfos;
 }
 
-void MockGetDBRecord(int64_t formId, const FormRecord &formRecord, int32_t ret)
+void MockGetDBRecord(int64_t formId, const OHOS::AppExecFwk::FormRecord &formRecord, int32_t ret)
 {
     g_mockFormRecords[formId] = formRecord;
     g_mockGetDBRecordRet = ret;
@@ -102,7 +102,8 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 }
 
 /**
- * @brief Get all form data size.
+ * @brief Get all form data size from DbCache.
+ * @param formDBInfos Storage all DbCache.
  * @return int32_t.
  */
 int32_t FormDbCache::GetAllFormInfoSize()
@@ -131,7 +132,7 @@ int32_t FormDbCache::GetFormCountsByHostBundleName(const std::string &hostBundle
     return g_mockFormCountsByHostBundleNameRet;
 }
 
-ErrCode FormDbCache::GetDBRecord(int64_t formId, FormRecord &formRecord)
+ErrCode FormDbCache::GetDBRecord(int64_t formId, FormRecord &formRecord) const
 {
     auto it = g_mockFormRecords.find(formId);
     if (it != g_mockFormRecords.end()) {
