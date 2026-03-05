@@ -252,7 +252,7 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
     }
 
     search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
-    HILOG_INFO("end,isRenderGroupEmpty:%{public}d", isRenderGroupEmpty);
+    HILOG_INFO("end,formId:%{public}" PRId64 ", isRenderGroupEmpty:%{public}d", formId, isRenderGroupEmpty);
     FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     if (isRenderGroupEmpty) {
         search->second->Release();
@@ -275,6 +275,7 @@ int32_t FormRenderServiceMgr::CleanFormHost(const sptr<IRemoteObject> &hostToken
         auto renderRecord = iter->second;
         if (renderRecord && renderRecord->HandleHostDied(hostToken)) {
             HILOG_DEBUG("empty renderRecord,remove");
+            renderRecord->Release();
             iter = renderRecordMap_.erase(iter);
         } else {
             ++iter;
@@ -439,9 +440,9 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
     auto duration = std::chrono::steady_clock::now() - configUpdateTime_;
     if (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() < MIN_DURATION_MS) {
         HILOG_INFO("OnConfigurationUpdated ignored");
-        auto configUpdateFunc = [this]() {
+        auto configUpdateFunc = []() {
             HILOG_INFO("OnConfigurationUpdated task run");
-            this->OnConfigurationUpdatedInner();
+            FormRenderServiceMgr::GetInstance().OnConfigurationUpdatedInner();
         };
         serialQueue_->ScheduleDelayTask(TASK_ONCONFIGURATIONUPDATED,
             TASK_ONCONFIGURATIONUPDATED_DELAY_MS, configUpdateFunc);
@@ -795,6 +796,7 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
             HILOG_ERROR("fail.");
             return RENDER_FORM_FAILED;
         }
+        search->Release();
         renderRecordMap_.erase(iterator);
         HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
     }

@@ -190,6 +190,7 @@ FormRenderRecord::~FormRenderRecord()
             return;
         }
         renderRecord->HandleDestroyInJsThread();
+        // Release need rectification
     };
     eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
     Release();
@@ -1210,7 +1211,8 @@ void FormRenderRecord::Release()
         eventHandler_ = nullptr;
         eventRunner_ = nullptr;
     }
-    auto syncTask = [renderRecord = this]() {
+    auto syncTask = [weak = weak_from_this()]() {
+        auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("null renderRecord");
             return;
