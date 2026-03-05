@@ -154,7 +154,11 @@ public:
         }
         ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(
             EtsFormRouterProxyMgr::GetInstance());
-        if (result != ERR_OK) {
+        if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+            HILOG_ERROR("RegisterTemplateFormDetailInfoChange failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_PERMISSION_DENIED);
+            return;
+        } else if (result != ERR_OK) {
             HILOG_ERROR("RegisterTemplateFormDetailInfoChange failed");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
@@ -176,7 +180,11 @@ public:
             return;
         }
         ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
-        if (result != ERR_OK) {
+        if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+            HILOG_ERROR("RegisterTemplateFormDetailInfoChange failed");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_PERMISSION_DENIED);
+            return;
+        } else if (result != ERR_OK) {
             HILOG_ERROR("UnregisterTemplateFormDetailInfoChange failed");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
             return;
