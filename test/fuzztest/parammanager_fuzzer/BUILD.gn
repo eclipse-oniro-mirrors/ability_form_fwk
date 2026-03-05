@@ -61,6 +61,7 @@ ohos_fuzztest("ParamManagerFuzzTest") {
     "c_utils:utils",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "libxml2:libxml2",
     "ipc:ipc_core",
     "openssl:libcrypto_shared",
     "relational_store:native_rdb",
