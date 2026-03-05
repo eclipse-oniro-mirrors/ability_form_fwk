@@ -76,7 +76,8 @@
               "openssl",
               "window_manager",
               "graphic_2d",
-              "qos_manager"
+              "qos_manager",
+              "input"
 
           ],
           "third_party": [
