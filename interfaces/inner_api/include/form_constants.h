@@ -134,6 +134,7 @@ namespace Constants {
     constexpr const char* PARAM_LIVE_FORM_SUPPORT_KEY = "persist.sys.fms.support.liveForm";
     constexpr const char* PARAM_GAME_CARD_KEY = "gameType";
     constexpr const char* PARAM_GAME_CARD_TYPE = "quick";
+    constexpr const char* UPDATE_FORM_REASON_KEY = "ohos.extra.param.key.update_form_reason";
     // live form support type
     constexpr const char* LIVE_FORM_NONE = "0";
     constexpr const char* FUN_INTERACTION = "1";
@@ -350,6 +351,11 @@ namespace Constants {
         INTERNAL_ERROR,
     };
  
+    enum FormUpdateReason : int8_t {
+        REASON_UNKNOWN = -1,
+        FORM_NODE_REUSE = 0
+    };
+
     // templateFormImperativeFwk range
     constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_NONE = "none";
     constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_LITE = "lite";

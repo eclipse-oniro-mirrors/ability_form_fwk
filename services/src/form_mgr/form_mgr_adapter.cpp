@@ -868,6 +868,10 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    if (isNeedAddForm) {
+        updateFormWant.SetParam(Constants::UPDATE_FORM_REASON_KEY, Constants::FormUpdateReason::FORM_NODE_REUSE);
+    }
+
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     UpdateFormRenderParam(matchedFormId, callerToken, want);
     FormDataMgr::GetInstance().UpdateFormHostParams(formId, want);
