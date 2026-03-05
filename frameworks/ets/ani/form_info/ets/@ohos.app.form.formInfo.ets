@@ -49,6 +49,7 @@ export default namespace formInfo {
     readonly isStandbySupported?: boolean;
     readonly isStandbyAdapted?: boolean;
     readonly isPrivacySensitive?: boolean;
+    readonly isTemplateForm?: boolean;
   }
 
   enum RenderingMode {
@@ -238,6 +239,7 @@ export default namespace formInfo {
     public isStandbySupported?: boolean = true;
     public isStandbyAdapted?: boolean = false;
     public isPrivacySensitive?: boolean = false;
+    public isTemplateForm?: boolean = false;
   }
 
   export class runningFormInfoInner implements RunningFormInfo {

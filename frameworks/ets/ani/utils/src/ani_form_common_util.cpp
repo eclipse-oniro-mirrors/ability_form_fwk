@@ -1435,27 +1435,28 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
         HILOG_ERROR("env is nullptr");
         return;
     }
+    // Set nullable boolean properties
+    SetPropertyBoolByName(env, formInfoAni, "enableBlurBackground", formInfo.enableBlurBackground);
+    SetPropertyBoolByName(env, formInfoAni, "resizable", formInfo.resizable);
+    SetPropertyBoolByName(env, formInfoAni, "isStandbySupported", formInfo.standby.isSupported);
+    SetPropertyBoolByName(env, formInfoAni, "isStandbyAdapted", formInfo.standby.isAdapted);
+    SetPropertyBoolByName(env, formInfoAni, "isPrivacySensitive", formInfo.standby.isPrivacySensitive);
+    SetPropertyBoolByName(env, formInfoAni, "isTemplateForm", formInfo.isTemplateForm);
     // Set boolean properties
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "isDefault", formInfo.defaultFlag);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "formVisibleNotify", formInfo.formVisibleNotify);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "updateEnabled", formInfo.updateEnabled);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "isStatic", formInfo.isStatic);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "isDynamic", formInfo.isDynamic);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "transparencyEnabled", formInfo.transparencyEnabled);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "enableBlurBackground", formInfo.enableBlurBackground);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "resizable", formInfo.resizable);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "isStandbySupported", formInfo.standby.isSupported);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "isStandbyAdapted", formInfo.standby.isAdapted);
-    env->Object_SetPropertyByName_Boolean(formInfoAni, "isPrivacySensitive", formInfo.standby.isPrivacySensitive);
+    SetPropertyBoolByNameValue(env, formInfoAni, "isDefault", formInfo.defaultFlag);
+    SetPropertyBoolByNameValue(env, formInfoAni, "formVisibleNotify", formInfo.formVisibleNotify);
+    SetPropertyBoolByNameValue(env, formInfoAni, "updateEnabled", formInfo.updateEnabled);
+    SetPropertyBoolByNameValue(env, formInfoAni, "isDynamic", formInfo.isDynamic);
+    SetPropertyBoolByNameValue(env, formInfoAni, "transparencyEnabled", formInfo.transparencyEnabled);
     // Set enum properties
-    env->Object_SetPropertyByName_Int(formInfoAni, "renderingMode", static_cast<int>(formInfo.renderingMode));
-    env->Object_SetPropertyByName_Int(formInfoAni, "type", static_cast<int>(formInfo.type));
+    SetPropertyIntByName(env, formInfoAni, "renderingMode", static_cast<int>(formInfo.renderingMode));
+    SetPropertyIntByName(env, formInfoAni, "type", static_cast<int>(formInfo.type));
     // Set unsigned integer properties
-    env->Object_SetPropertyByName_Int(formInfoAni, "displayNameId", formInfo.displayNameId);
-    env->Object_SetPropertyByName_Int(formInfoAni, "descriptionId", formInfo.descriptionId);
+    SetPropertyIntByName(env, formInfoAni, "displayNameId", formInfo.displayNameId);
+    SetPropertyIntByName(env, formInfoAni, "descriptionId", formInfo.descriptionId);
     // Set integer properties
-    env->Object_SetPropertyByName_Int(formInfoAni, "updateDuration", formInfo.updateDuration);
-    env->Object_SetPropertyByName_Int(formInfoAni, "defaultDimension", formInfo.defaultDimension);
+    SetPropertyIntByName(env, formInfoAni, "updateDuration", formInfo.updateDuration);
+    SetPropertyIntByName(env, formInfoAni, "defaultDimension", formInfo.defaultDimension);
     // Set string properties
     SetStringProperty(env, formInfoAni, "bundleName", formInfo.bundleName);
     SetStringProperty(env, formInfoAni, "moduleName", formInfo.moduleName);
