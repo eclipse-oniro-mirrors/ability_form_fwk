@@ -117,6 +117,7 @@ FIRST_UPDATE_FORM_DURATION:
 UPDATE_FORM_REFRESH_TIMES:
   __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
   FORM_ID: {type: INT64, desc: formId}
+  ABILITY_NAME: {type: STRING, desc: ability name}
   BUNDLE_NAME: {type: STRING, desc: bundle name}
   MODULE_NAME: {type: STRING, desc: module name}
   FORM_NAME: {type: STRING, desc: form name}
@@ -130,6 +131,8 @@ UPDATE_FORM_REFRESH_TIMES:
   HF_RECOVER_REFRESH_TIMES: {type: INT32, desc: hf recover refresh times}
   OFFLOAD_RECOVER_REFRESH_TIMES: {type: INT32, desc: offload recover refresh times}
   DISABLE_REFRESH_TIMES: {type: INT32, desc: disable refresh times}
+  FORM_LOCATION: {type: INT8, desc: form location}
+  ACTUAL_PROXY_REFRESH_TIMES: {type: INT32, desc: form actual proxy refresh times}
 
 PROXY_UPDATE_FORM:
   __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}

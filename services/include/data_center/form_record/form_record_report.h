@@ -35,6 +35,7 @@ enum HiSysEventPointType {
     TYPE_HF_RECOVER_UPDATE,
     TYPE_OFFLOAD_RECOVER_UPDATE,
     TYPE_DISABLE_FORM_INTERCEPT,
+    TYPE_ACTUAL_PROXY_REFRESH,
 };
 
 struct FormRecordReportInfo {
@@ -48,6 +49,7 @@ struct FormRecordReportInfo {
     int32_t hfRecoverRefreshTimes;
     int32_t offloadRecoverRefreshTimes;
     int32_t disableFormRefreshTimes;
+    int32_t actualProxyRefreshTimes = 0;
 };
 
 class FormRecordReport final : public DelayedRefSingleton<FormRecordReport> {
