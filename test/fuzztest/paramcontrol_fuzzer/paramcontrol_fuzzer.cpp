@@ -150,6 +150,32 @@ void TestParamControlPrivateMethods(FuzzedDataProvider *fdp)
     FormRecord formRecord = GenerateFuzzedFormRecord(fdp);
     bool isNewVersion = fdp->ConsumeBool();
     paramControl.IsFormInfoMatch(formRecord, paramCtrl, isNewVersion);
+     
+    // Test IsSameUpdateDuration
+    std::vector<ParamCtrl> compareCtrls;
+    size_t ctrlSize = fdp->ConsumeIntegralInRange<size_t>(0, 3);
+    for (size_t i = 0; i < ctrlSize; i++) {
+        ParamCtrl ctrl;
+        ctrl.bundleName = fdp->ConsumeRandomLengthString(MAX_NUM);
+        ctrl.moduleName = fdp->ConsumeRandomLengthString(MAX_NUM);
+        ctrl.updateDuration = fdp->ConsumeIntegral<int32_t>();
+        compareCtrls.push_back(ctrl);
+    }
+    paramControl.IsSameUpdateDuration(formRecord, paramCtrl, compareCtrls);
+ 
+    // Test IsSamePolicy
+    paramControl.IsSamePolicy(formRecord, paramCtrl, compareCtrls);
+ 
+    // Test ExecUpdateDurationCtrl
+    bool isApply = fdp->ConsumeBool();
+    bool isAppUpgrade = fdp->ConsumeBool();
+    paramControl.ExecUpdateDurationCtrl(isApply, compareCtrls, isAppUpgrade);
+ 
+    // Test ExecDisableCtrl
+    paramControl.ExecDisableCtrl(isApply, compareCtrls, isAppUpgrade);
+ 
+    // Test ShouldProcessForm
+    paramControl.ShouldProcessForm(formRecord, paramCtrl, isApply, isAppUpgrade);
 }
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
