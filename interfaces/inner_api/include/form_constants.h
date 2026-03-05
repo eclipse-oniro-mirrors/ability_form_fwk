@@ -442,7 +442,7 @@ namespace Constants {
     // Form info max num
     constexpr const int32_t FORM_INFO_MAX_NUM = 16;
     // Form version code
-    constexpr const int32_t FORM_VERSION_CODE = 100002;
+    constexpr const int32_t FORM_VERSION_CODE = 100003;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
     // Is delete cache in upgrade scene
