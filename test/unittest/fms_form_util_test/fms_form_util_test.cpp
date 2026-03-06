@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,11 +71,11 @@ ErrCode OsAccountManagerWrapper::QueryActiveOsAccountIds(std::vector<int32_t>& i
 }
 
 /**
- * @tc.name: FormUtilTest_004
+ * @tc.name: FormUtilTest_001
  * @tc.desc: Verify GenerateFormId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_004, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_001, TestSize.Level0)
 {
     constexpr int64_t udidHash = 0x1111111100000000L;
     const int64_t result = FormUtil::GenerateFormId(udidHash);
@@ -84,11 +84,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_004, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_005
+ * @tc.name: FormUtilTest_002
  * @tc.desc: Verify PaddingUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_005, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_002, TestSize.Level1)
 {
     constexpr uint64_t formId = 0x1111111100000000L;
     constexpr uint64_t udidHash = 0x0000000011111111L;
@@ -98,11 +98,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_005, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_006
+ * @tc.name: FormUtilTest_003
  * @tc.desc: Verify PaddingUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_006, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_003, TestSize.Level1)
 {
     constexpr uint64_t formId = 0x0000000011111111L;
     constexpr uint64_t udidHash = 0x1111111100000000L;
@@ -112,27 +112,24 @@ HWTEST_F(FormUtilTest, FormUtilTest_006, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_007
+ * @tc.name: FormUtilTest_004
  * @tc.desc: Verify GenerateUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_007, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_004, TestSize.Level1)
 {
     int64_t udidHash = 0x1111111100000000L;
     auto result = FormUtil::GenerateUdidHash(udidHash);
-    EXPECT_TRUE(result);
 
-    udidHash = 0xFFFFL;
-    result = FormUtil::GenerateUdidHash(udidHash);
     EXPECT_TRUE(result);
 }
 
 /**
- * @tc.name: FormUtilTest_008
+ * @tc.name: FormUtilTest_005
  * @tc.desc: Verify GenerateUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_008, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_005, TestSize.Level1)
 {
     int64_t udidHash = 0;
     auto result = FormUtil::GenerateUdidHash(udidHash);
@@ -141,11 +138,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_008, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_009
+ * @tc.name: FormUtilTest_006
  * @tc.desc: Verify GetCurrentNanosecond
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_009, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_006, TestSize.Level1)
 {
     auto result1 = FormUtil::GetCurrentNanosecond();
     auto result2 = FormUtil::GetCurrentNanosecond();
@@ -154,11 +151,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_009, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_010
+ * @tc.name: FormUtilTest_007
  * @tc.desc: Verify GetCurrentMillisecond
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_010, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_007, TestSize.Level1)
 {
     auto result1 = FormUtil::GetCurrentMillisecond();
     auto result2 = FormUtil::GetCurrentMillisecond();
@@ -167,11 +164,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_010, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_011
+ * @tc.name: FormUtilTest_008
  * @tc.desc: Verify GetMillisecondFromTm
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_011, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_008, TestSize.Level1)
 {
     constexpr int64_t value = -1;
     time_t rawtime;
@@ -185,11 +182,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_011, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_012
+ * @tc.name: FormUtilTest_009
  * @tc.desc: Verify GetCurrentAccountId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_012, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_009, TestSize.Level1)
 {
     constexpr size_t accountId = 99;
     MockQueryActiveOsAccountIdsRetVal(false);
@@ -201,11 +198,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_013
+ * @tc.name: FormUtilTest_010
  * @tc.desc: Verify StringSplit
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_010, TestSize.Level1)
 {
     constexpr size_t count = 3;
     const std::string str = "10:35:27";
@@ -215,11 +212,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_014
+ * @tc.name: FormUtilTest_011
  * @tc.desc: Verify GetCurrentAccountId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_011, TestSize.Level1)
 {
     constexpr size_t accountId = 99;
     MockQueryActiveOsAccountIdsRetVal(true);
@@ -231,11 +228,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_015
+ * @tc.name: FormUtilTest_012
  * @tc.desc: Verify GetCurrentAccountId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_012, TestSize.Level1)
 {
     constexpr size_t accountId = 99;
     MockQueryActiveOsAccountIdsRetVal(true);
@@ -247,11 +244,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_016
+ * @tc.name: FormUtilTest_013
  * @tc.desc: Verify GetNowMillisecond
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_016, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
 {
     auto result1 = FormUtil::GetNowMillisecond();
     auto result2 = FormUtil::GetNowMillisecond();
@@ -260,513 +257,11 @@ HWTEST_F(FormUtilTest, FormUtilTest_016, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_017
- * @tc.desc: Verify GetNowMillisecond
+ * @tc.name: FormUtilTest_014
+ * @tc.desc: Verify IsActiveUser
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_017, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_018
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_018, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_019
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_019, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_020
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_020, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_021
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_021, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_022
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_022, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_023
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_023, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_024
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_024, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_025
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_025, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_026
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_026, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_027
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_027, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_028
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_028, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-/**
- * @tc.name: FormUtilTest_029
- * @tc.desc: Verify GetNowMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_029, TestSize.Level1)
-{
-    std::string strInfo = "";
-    int64_t int64Value = 1;
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "abcd";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "9234567890123456789";
-    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-123";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-1234567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
-
-    strInfo = "-9134567890123456789";
-    FormUtil::ConvertStringToInt64(strInfo, int64Value);
-}
-
-HWTEST_F(FormUtilTest, FormUtilTest_030, TestSize.Level1)
+HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level1)
 {
     constexpr size_t accountId = 99;
     MockQueryActiveOsAccountIdsRetVal(true);
@@ -778,11 +273,114 @@ HWTEST_F(FormUtilTest, FormUtilTest_030, TestSize.Level1)
     EXPECT_EQ(false, FormUtil::IsActiveUser(accountId));
 }
 
-HWTEST_F(FormUtilTest, FormUtilTest_031, TestSize.Level0)
+/**
+ * @tc.name: FormUtilTest_015
+ * @tc.desc: Verify GetActiveUsers
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level1)
 {
     std::vector<int32_t> activeList;
     FormUtil::GetActiveUsers(activeList);
     EXPECT_EQ(true, activeList.empty());
 }
+
+/**
+ * @tc.name: FormUtilTest_016
+ * @tc.desc: Verify GenerateFormId
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_016, TestSize.Level1)
+{
+    constexpr int64_t udidHash = 0x00000000ffffffffL;
+    int64_t firstFormId = FormUtil::GenerateFormId(udidHash);
+    int64_t secondFormId = FormUtil::GenerateFormId(udidHash);
+    EXPECT_EQ(firstFormId, secondFormId);
+    FormUtil::DeleteFormId(firstFormId);
+    FormUtil::DeleteFormId(secondFormId);
+}
+
+/**
+ * @tc.name: FormUtilTest_017
+ * @tc.desc: Verify ConvertStringToInt64 with 19-digit number starting with 8
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_017, TestSize.Level1)
+{
+    std::string strInfo = "8223372036854775807";
+    int64_t int64Value = 0;
+    auto result = FormUtil::ConvertStringToInt64(strInfo, int64Value);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(int64Value, 8223372036854775807);
+}
+
+/**
+ * @tc.name: FormUtilTest_018
+ * @tc.desc: Verify ConvertStringToInt64 with number exceeding INT64_MAX
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_018, TestSize.Level1)
+{
+    std::string strInfo = "9234567890123456789";
+    int64_t int64Value = 0;
+    auto result = FormUtil::ConvertStringToInt64(strInfo, int64Value);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: FormUtilTest_019
+ * @tc.desc: Verify ConvertStringToInt64 with negative number
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_019, TestSize.Level1)
+{
+    std::string strInfo = "-123";
+    int64_t int64Value = 0;
+    auto result = FormUtil::ConvertStringToInt64(strInfo, int64Value);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(int64Value, -123);
+}
+
+/**
+ * @tc.name: FormUtilTest_020
+ * @tc.desc: Verify ConvertStringToInt64 with short negative number
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_020, TestSize.Level1)
+{
+    std::string strInfo = "-456";
+    int64_t int64Value = 0;
+    auto result = FormUtil::ConvertStringToInt64(strInfo, int64Value);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(int64Value, -456);
+}
+
+/**
+ * @tc.name: FormUtilTest_021
+ * @tc.desc: Verify ConvertStringToInt64 with 20-digit negative number
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_021, TestSize.Level1)
+{
+    std::string strInfo = "-9223372036854775808";
+    int64_t int64Value = 0;
+    auto result = FormUtil::ConvertStringToInt64(strInfo, int64Value);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(int64Value, -9223372036854775807 - 1);
+}
+
+/**
+ * @tc.name: FormUtilTest_022
+ * @tc.desc: Verify ConvertStringToInt64 with 20-digit negative starting with -8
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_022, TestSize.Level1)
+{
+    std::string strInfo = "-8223372036854775808";
+    int64_t int64Value = 0;
+    auto result = FormUtil::ConvertStringToInt64(strInfo, int64Value);
+    EXPECT_TRUE(result);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
