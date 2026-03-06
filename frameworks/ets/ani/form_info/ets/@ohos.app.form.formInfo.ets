@@ -126,6 +126,11 @@ export default namespace formInfo {
     CIRCLE = 2
   }
 
+  enum FormUpdateReason {
+    UNKNOWN = -1,
+    FORM_NODE_REUSE = 0
+  }
+
   enum VisibilityType {
     UNKNOWN = 0,
     FORM_VISIBLE = 1,
