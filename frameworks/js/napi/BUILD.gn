@@ -624,16 +624,29 @@ ohos_shared_library("formutil_napi") {
   deps = [ "${form_fwk_path}:fmskit_native" ]
 
   external_deps = [
+    "ability_base:configuration",
+    "ability_base:session_info",
     "ability_runtime:abilitykit_native",
     "ability_runtime:extensionkit_native",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
+    "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "input:libmmi-client",
     "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
     "napi:ace_napi",
+    "resource_management:global_resmgr",
   ]
+
+  if (ability_runtime_graphics) {
+    external_deps += [
+      "window_manager:libdm",
+      "window_manager:libwm",
+    ]
+  }
 
   subsystem_name = "ability"
   innerapi_tags = [ "platformsdk" ]
