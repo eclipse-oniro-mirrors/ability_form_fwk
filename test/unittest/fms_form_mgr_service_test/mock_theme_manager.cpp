@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#ifdef THEME_MGR_ENABLE
 #include "mock_theme_form_client.h"
 #include "theme_manager_client.h"
 #include "theme_manager_common.h"
@@ -28,7 +27,6 @@ void MockSetThemeManagerAddFormResult(int mockRet)
     g_themeManagerAddFormResult = mockRet;
 }
 
-#ifdef THEME_MGR_ENABLE
 namespace OHOS {
 namespace ThemeManager {
 ErrorCode ThemeManagerClient::AddForm(ThemeFormInfo themeFormInfo)
@@ -38,4 +36,3 @@ ErrorCode ThemeManagerClient::AddForm(ThemeFormInfo themeFormInfo)
 }
 }  // namespace ThemeManager
 }  // namespace OHOS
-#endif
