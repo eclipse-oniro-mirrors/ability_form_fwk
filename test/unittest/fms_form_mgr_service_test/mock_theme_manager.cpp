@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #ifdef THEME_MGR_ENABLE
+#include "mock_theme_form_client.h"
 #include "theme_manager_client.h"
 #include "theme_manager_common.h"
 
@@ -26,14 +27,15 @@ void MockSetThemeManagerAddFormResult(int mockRet)
 {
     g_themeManagerAddFormResult = mockRet;
 }
+
+#ifdef THEME_MGR_ENABLE
 namespace OHOS {
 namespace ThemeManager {
 ErrorCode ThemeManagerClient::AddForm(ThemeFormInfo themeFormInfo)
 {
-    GTEST_LOG_(INFO) << "ThemeManagerClient::AddForm called " << g_themeManagerAddFormResult;
+    GTEST_LOG_(INFO) << "ThemeManagerClient::AddForm called, result: " << g_themeManagerAddFormResult;
     return static_cast<ErrorCode>(g_themeManagerAddFormResult);
 }
-
-} // namespace ThemeManager
-} // namespace OHOS
+}  // namespace ThemeManager
+}  // namespace OHOS
 #endif
