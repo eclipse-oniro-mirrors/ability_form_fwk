@@ -113,7 +113,7 @@ public:
         ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterOverflowProxy(EtsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
             HILOG_ERROR("RegisterOverflowProxy failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         ani_vm *aniVM = nullptr;
@@ -139,7 +139,7 @@ public:
         ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterOverflowProxy();
         if (result != ERR_OK) {
             HILOG_ERROR("UnregisterOverflowProxy failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterOverflowListener();
@@ -156,7 +156,7 @@ public:
             EtsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
             HILOG_ERROR("RegisterTemplateFormDetailInfoChange failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         ani_vm *aniVM = nullptr;
@@ -178,7 +178,7 @@ public:
         ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
         if (result != ERR_OK) {
             HILOG_ERROR("UnregisterTemplateFormDetailInfoChange failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterTemplateFormDetailInfoChange();
@@ -201,7 +201,7 @@ public:
             EtsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
             HILOG_ERROR("RegisterOverflowProxy failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         ani_vm *aniVM = nullptr;
@@ -227,7 +227,7 @@ public:
         ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterChangeSceneAnimationStateProxy();
         if (result != ERR_OK) {
             HILOG_ERROR("UnregisterOverflowProxy failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
@@ -250,7 +250,7 @@ public:
             EtsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
             HILOG_ERROR("RegisterGetFormRectListener failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         ani_vm *aniVM = nullptr;
@@ -276,7 +276,7 @@ public:
         ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterGetFormRectProxy();
         if (result != ERR_OK) {
             HILOG_ERROR("UnRegisterGetFormRectListener failed");
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env, result);
+            EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
             return;
         }
         EtsFormRouterProxyMgr::GetInstance()->UnregisterChangeSceneAnimationStateListener();
