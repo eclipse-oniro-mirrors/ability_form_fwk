@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1172,5 +1172,297 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_059, TestSize.Level0)
     EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo));
     EXPECT_EQ(1, formRecord.versionCode);
     GTEST_LOG_(INFO) << "FormEventUtil_059 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_060
+ * @tc.desc: test HandleFormReload needReload false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_060, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_060 start";
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    std::vector<FormRecord> updatedForms;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    updatedForms.emplace_back(formRecord);
+    FormEventUtil::HandleFormReload(bundleName, userId, false, updatedForms);
+    EXPECT_EQ(bundleName, FORM_HOST_BUNDLE_NAME);
+    EXPECT_EQ(userId, 1);
+    EXPECT_EQ(updatedForms.size(), 1);
+    EXPECT_EQ(updatedForms[0].formId, 1);
+    GTEST_LOG_(INFO) << "FormEventUtil_060 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_061
+ * @tc.desc: test ProviderFormUpdated IsDeleteCacheInUpgradeScene true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_061, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_061 start";
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.versionCode = 1;
+    formRecord.formName = "testForm";
+    formRecord.bundleName = FORM_HOST_BUNDLE_NAME;
+    formRecord.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formRecord.providerUserId = 0;
+
+    std::vector<FormInfo> targetForms;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_HOST_BUNDLE_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.name = "testForm";
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    targetForms.emplace_back(formInfo);
+    BundleInfo bundleInfo;
+    bundleInfo.versionCode = 2;
+    bundleInfo.name = FORM_HOST_BUNDLE_NAME;
+    MockGetUpdatedForm(true);
+    EXPECT_EQ(true, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo));
+    EXPECT_EQ(formRecord.versionCode, 2);
+    EXPECT_EQ(formRecord.formId, formId);
+    GTEST_LOG_(INFO) << "FormEventUtil_061 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_062
+ * @tc.desc: test SetTimerCfgByMultUpdate empty config
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_062, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_062 start";
+    const std::string configMultUpdateAt = "";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate(configMultUpdateAt, cfg);
+    EXPECT_FALSE(cfg.enableUpdate);
+    EXPECT_TRUE(cfg.updateAtTimes.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_062 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_063
+ * @tc.desc: test SetTimerCfgByMultUpdate invalid size
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_063, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_063 start";
+    const std::string configMultUpdateAt = "00:00,01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,"
+        "10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00,19:00,20:00,21:00,22:00,23:00,24:00";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate(configMultUpdateAt, cfg);
+    EXPECT_FALSE(cfg.enableUpdate);
+    EXPECT_TRUE(cfg.updateAtTimes.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_063 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_064
+ * @tc.desc: test SetTimerCfgByMultUpdate invalid time format
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_064, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_064 start";
+    const std::string configMultUpdateAt = "10:00:00";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate(configMultUpdateAt, cfg);
+    EXPECT_FALSE(cfg.enableUpdate);
+    EXPECT_TRUE(cfg.updateAtTimes.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_064 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_065
+ * @tc.desc: test SetTimerCfgByMultUpdate invalid hour
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_065, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_065 start";
+    const std::string configMultUpdateAt = "25:00";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate(configMultUpdateAt, cfg);
+    EXPECT_FALSE(cfg.enableUpdate);
+    EXPECT_TRUE(cfg.updateAtTimes.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_065 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_066
+ * @tc.desc: test SetTimerCfgByMultUpdate invalid minute
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_066, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_066 start";
+    const std::string configMultUpdateAt = "10:61";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate(configMultUpdateAt, cfg);
+    EXPECT_FALSE(cfg.enableUpdate);
+    EXPECT_TRUE(cfg.updateAtTimes.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_066 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_067
+ * @tc.desc: test SetTimerCfgByMultUpdate valid config
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_067, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_067 start";
+    const std::string configMultUpdateAt = "10:00,14:30";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate(configMultUpdateAt, cfg);
+    EXPECT_TRUE(cfg.enableUpdate);
+    EXPECT_EQ(2, (int)cfg.updateAtTimes.size());
+    EXPECT_EQ(10, cfg.updateAtTimes[0][0]);
+    EXPECT_EQ(0, cfg.updateAtTimes[0][1]);
+    EXPECT_EQ(14, cfg.updateAtTimes[1][0]);
+    EXPECT_EQ(30, cfg.updateAtTimes[1][1]);
+    GTEST_LOG_(INFO) << "FormEventUtil_067 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_068
+ * @tc.desc: test GetUpdateType interval no change
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_068, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_068 start";
+    FormRecord record = {};
+    record.updateDuration = 1000;
+    FormTimerCfg timerCfg = {};
+    timerCfg.updateDuration = 1000;
+    UpdateType type = FormEventUtil::GetUpdateType(record, timerCfg);
+    EXPECT_EQ(TYPE_NO_CHANGE, type);
+    GTEST_LOG_(INFO) << "FormEventUtil_068 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_069
+ * @tc.desc: test GetUpdateType interval change
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_069, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_069 start";
+    FormRecord record = {};
+    record.updateDuration = 1000;
+    FormTimerCfg timerCfg = {};
+    timerCfg.updateDuration = 2000;
+    UpdateType type = FormEventUtil::GetUpdateType(record, timerCfg);
+    EXPECT_EQ(TYPE_INTERVAL_CHANGE, type);
+    GTEST_LOG_(INFO) << "FormEventUtil_069 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_070
+ * @tc.desc: test GetUpdateType interval to atTime
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_070, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_070 start";
+    FormRecord record = {};
+    record.updateDuration = 1000;
+    FormTimerCfg timerCfg = {};
+    timerCfg.updateDuration = 0;
+    UpdateType type = FormEventUtil::GetUpdateType(record, timerCfg);
+    EXPECT_EQ(TYPE_INTERVAL_TO_ATTIME, type);
+    GTEST_LOG_(INFO) << "FormEventUtil_070 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_071
+ * @tc.desc: test GetUpdateType atTime to interval
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_071, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_071 start";
+    FormRecord record = {};
+    record.updateDuration = 0;
+    FormTimerCfg timerCfg = {};
+    timerCfg.updateDuration = 1000;
+    UpdateType type = FormEventUtil::GetUpdateType(record, timerCfg);
+    EXPECT_EQ(TYPE_ATTIME_TO_INTERVAL, type);
+    GTEST_LOG_(INFO) << "FormEventUtil_071 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_072
+ * @tc.desc: test GetUpdateType atTime no change
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_072, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_072 start";
+    FormRecord record = {};
+    record.updateDuration = 0;
+    record.updateAtHour = 10;
+    record.updateAtMin = 0;
+    FormTimerCfg timerCfg = {};
+    timerCfg.updateDuration = 0;
+    timerCfg.updateAtHour = 10;
+    timerCfg.updateAtMin = 0;
+    UpdateType type = FormEventUtil::GetUpdateType(record, timerCfg);
+    EXPECT_EQ(TYPE_NO_CHANGE, type);
+    GTEST_LOG_(INFO) << "FormEventUtil_072 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_073
+ * @tc.desc: test GetUpdateType atTime change
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_073, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_073 start";
+    FormRecord record = {};
+    record.updateDuration = 0;
+    record.updateAtHour = 10;
+    record.updateAtMin = 0;
+    FormTimerCfg timerCfg = {};
+    timerCfg.updateDuration = 0;
+    timerCfg.updateAtHour = 14;
+    timerCfg.updateAtMin = 30;
+    UpdateType type = FormEventUtil::GetUpdateType(record, timerCfg);
+    EXPECT_EQ(TYPE_ATTIME_CHANGE, type);
+    GTEST_LOG_(INFO) << "FormEventUtil_073 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_074
+ * @tc.desc: test HandleProviderUpdatedDetail removedForms empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_074, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_074 start";
+    std::vector<int64_t> removedForms;
+    std::vector<FormRecord> updatedForms;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    updatedForms.emplace_back(formRecord);
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    bool needReload = true;
+    FormEventUtil::HandleProviderUpdatedDetail(removedForms, updatedForms, bundleName, userId, needReload);
+    EXPECT_TRUE(removedForms.empty());
+    EXPECT_EQ(updatedForms.size(), 1);
+    EXPECT_EQ(updatedForms[0].formId, 1);
+    GTEST_LOG_(INFO) << "FormEventUtil_074 end";
 }
 }
