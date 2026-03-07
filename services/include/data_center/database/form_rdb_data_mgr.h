@@ -21,6 +21,7 @@
 #include <shared_mutex>
 #include <singleton.h>
 #include <string>
+#include <atomic>
 #include "form_constants.h"
 #include "rdb_errno.h"
 #include "rdb_helper.h"
@@ -183,11 +184,25 @@ private:
 
     void CreateFormRdbTables();
 
+    void InitStatisticsTimer();
+
+    void RemoveStatisticsTimer();
+
+    void UpdateReadCount();
+
+    void UpdateWriteCount(size_t dataSize);
+
+    void PrintStatistics();
+
     std::map<std::string, FormRdbTableConfig> formRdbTableCfgMap_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
     std::shared_mutex rdbStoreMutex_;
     std::shared_mutex formRdbTableCfgMapMutex_;
     int64_t lastRdbBuildTime_ = 0;
+    std::atomic<int64_t> readCount_ = 0;
+    std::atomic<int64_t> writeCount_ = 0;
+    std::atomic<int64_t> writeSize_ = 0;
+    std::atomic<bool> timerInitialized_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -61,6 +61,7 @@ ohos_unittest("FmsFormRdbDataMgrTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "googletest:gmock_main",
+    "hicollie:libhicollie",
   ]
 }
 

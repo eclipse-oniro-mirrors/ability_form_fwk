@@ -26,12 +26,14 @@
 #include "common/util/form_util.h"
 #include "common/util/scope_guard.h"
 #include "form_event_report.h"
+#include "xcollie/watchdog.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr const char *FORM_KEY = "KEY";
 constexpr const char *FORM_VALUE = "VALUE";
+constexpr const char *FORM_DB_STATICS_MONITOR = "FormRdbStatisticsMonitor";
 const int32_t FORM_KEY_INDEX = 0;
 const int32_t FORM_VALUE_INDEX = 1;
 const int64_t MIN_FORM_RDB_REBUILD_INTERVAL = 10000; // 10s
@@ -85,11 +87,13 @@ int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFi
 FormRdbDataMgr::FormRdbDataMgr()
 {
     HILOG_INFO("Create");
+    InitStatisticsTimer();
 }
 
 FormRdbDataMgr::~FormRdbDataMgr()
 {
     HILOG_INFO("Destruct");
+    RemoveStatisticsTimer();
 }
 
 ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableConfig)
@@ -195,6 +199,7 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     }
 
     if (ret == NativeRdb::E_OK) {
+        UpdateWriteCount(key.size());
         return ERR_OK;
     }
     HILOG_WARN("Insert operation failed, key=%{public}s, ret=%{public}" PRId32, key.c_str(), ret);
@@ -242,6 +247,7 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     }
 
     if (ret == NativeRdb::E_OK) {
+        UpdateWriteCount(key.size() + value.size());
         return ERR_OK;
     }
 
@@ -337,6 +343,7 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
     absSharedResultSet->Close();
 
     if (ret == NativeRdb::E_OK) {
+        UpdateReadCount();
         return ERR_OK;
     }
 
@@ -402,6 +409,7 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
     }
     absSharedResultSet->Close();
     if (ret == NativeRdb::E_OK) {
+        UpdateReadCount();
         return ERR_OK;
     }
 
@@ -467,6 +475,7 @@ ErrCode FormRdbDataMgr::QueryAllData(const std::string &tableName,
     absSharedResultSet->Close();
 
     if (ret == NativeRdb::E_OK) {
+        UpdateReadCount();
         return ERR_OK;
     }
 
@@ -523,6 +532,7 @@ ErrCode FormRdbDataMgr::QueryAllKeys(const std::string &tableName, std::set<std:
     absSharedResultSet->Close();
 
     if (ret == NativeRdb::E_OK) {
+        UpdateReadCount();
         return ERR_OK;
     }
 
@@ -789,6 +799,48 @@ void FormRdbDataMgr::CreateFormRdbTables()
                 result, iter->first.c_str());
         }
     }
+}
+
+void FormRdbDataMgr::InitStatisticsTimer()
+{
+    bool expected = false;
+    if (!timerInitialized_.compare_exchange_strong(expected, true)) {
+        return;
+    }
+
+    auto statisticsTask = []() {
+        FormRdbDataMgr::GetInstance().PrintStatistics();
+    };
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(FORM_DB_STATICS_MONITOR, statisticsTask,
+        Constants::MS_PER_DAY);
+}
+
+void FormRdbDataMgr::RemoveStatisticsTimer()
+{
+    OHOS::HiviewDFX::Watchdog::GetInstance().RemovePeriodicalTask(FORM_DB_STATICS_MONITOR);
+    timerInitialized_.exchange(false, std::memory_order_acq_rel);
+}
+
+void FormRdbDataMgr::UpdateReadCount()
+{
+    readCount_.fetch_add(1, std::memory_order_relaxed);
+}
+
+void FormRdbDataMgr::UpdateWriteCount(size_t dataSize)
+{
+    writeCount_.fetch_add(1, std::memory_order_relaxed);
+    writeSize_.fetch_add(dataSize, std::memory_order_relaxed);
+}
+
+void FormRdbDataMgr::PrintStatistics()
+{
+    int64_t readCount = readCount_.exchange(0, std::memory_order_acq_rel);
+    int64_t writeCount = writeCount_.exchange(0, std::memory_order_acq_rel);
+    int64_t writeSize = writeSize_.exchange(0, std::memory_order_acq_rel);
+
+    HILOG_INFO("Database statistics in last 24 hours: read count=%{public}" PRId64
+        ", write count=%{public}" PRId64 ", total write size=%{public}" PRId64 " bytes",
+        readCount, writeCount, writeSize);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

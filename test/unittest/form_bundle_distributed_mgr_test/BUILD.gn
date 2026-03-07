@@ -59,6 +59,7 @@ ohos_unittest("FormBundleDistributedTest") {
     "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "samgr:samgr_proxy",
+    "hicollie:libhicollie",
   ]
 }
 
