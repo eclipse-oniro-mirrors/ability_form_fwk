@@ -41,7 +41,7 @@ constexpr int64_t WAIT_RELEASE_RENDERER_MSG = 1;
 constexpr int64_t RELEASE_RENDER_DELAY_TIME = 40;
 constexpr int64_t RELEASE_RENDER_DELAY_MSG = 2;
 // Prevent screenshot fail, delay form recycling for 500 ms.
-constexpr uint64_t RESTORE_ECYCLED_DELAY_MS = 500;
+constexpr uint64_t RESTORE_ECYCLED_DELAY_MS = 3000;
 constexpr const char *EMPTY_STATUS_DATA = "empty_status_data";
 
 void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, FormJsInfo &formJsInfo)
