@@ -109,6 +109,8 @@ public:
     virtual bool GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfo) override;
 
+    void SetBundleInfo(std::string bundleName, int32_t userId, BundleInfo bundleInfo);
+    
     virtual bool ImplicitQueryInfoByPriority(const Want &want, int32_t flags, int32_t userId,
         AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionInfo) override
     {
