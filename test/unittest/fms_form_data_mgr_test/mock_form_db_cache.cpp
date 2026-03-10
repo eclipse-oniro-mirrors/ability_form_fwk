@@ -17,10 +17,10 @@
 
 #include <cinttypes>
 
-#include "data_center/database/form_db_info.h"
 #include "form_mgr_errors.h"
 #include "common/util/form_util.h"
 
+using namespace OHOS::AppExecFwk;
 namespace {
     int32_t g_mockAllDBFormMaxSize = 2;
     int32_t g_mockCheckAllDbFormPreAppSize = 1;
@@ -28,6 +28,9 @@ namespace {
     int32_t g_mockFormCountsByUserIdRet = 1;
     int32_t g_mockFormCountsByHostBundleNameRet = 1;
     int g_callingUid = 0;
+    std::vector<FormDBInfo> g_mockFormDBInfos;
+    std::map<int64_t, FormRecord> g_mockFormRecords;
+    int32_t g_mockGetDBRecordRet = 0;
 }
 
 void MockGetAllFormInfoSize(int32_t mockRet, int callingUid)
@@ -51,6 +54,17 @@ void MockGetFormCountsByHostBundleName(int32_t mockRet)
     g_mockFormCountsByHostBundleNameRet = mockRet;
 }
 
+void MockGetAllFormInfo(const std::vector<FormDBInfo> &formDBInfos)
+{
+    g_mockFormDBInfos = formDBInfos;
+}
+
+void MockGetDBRecord(int64_t formId, const FormRecord &formRecord, int32_t ret)
+{
+    g_mockFormRecords[formId] = formRecord;
+    g_mockGetDBRecordRet = ret;
+}
+
 namespace OHOS {
 namespace AppExecFwk {
 /**
@@ -60,6 +74,10 @@ namespace AppExecFwk {
  */
 void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 {
+    if (!g_mockFormDBInfos.empty()) {
+        formDBInfos = g_mockFormDBInfos;
+        return;
+    }
     FormDBInfo formDBInfo;
     int userUid = -1;
     if (g_mockCheckType == g_mockAllDBFormMaxSize) {
@@ -81,7 +99,7 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 }
 
 /**
- * @brief Get all form data size.
+ * @brief Get all form data size from DbCache.
  * @return int32_t.
  */
 int32_t FormDbCache::GetAllFormInfoSize()
@@ -108,6 +126,16 @@ int32_t FormDbCache::GetFormCountsByUserId(const int32_t userId)
 int32_t FormDbCache::GetFormCountsByHostBundleName(const std::string &hostBundleName)
 {
     return g_mockFormCountsByHostBundleNameRet;
+}
+
+ErrCode FormDbCache::GetDBRecord(int64_t formId, FormRecord &formRecord) const
+{
+    auto it = g_mockFormRecords.find(formId);
+    if (it != g_mockFormRecords.end()) {
+        formRecord = it->second;
+        return g_mockGetDBRecordRet;
+    }
+    return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

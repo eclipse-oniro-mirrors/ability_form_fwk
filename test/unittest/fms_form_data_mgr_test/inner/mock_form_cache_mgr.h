@@ -13,22 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef INNER_MOCK_FORM_DB_CACHE_H
-#define INNER_MOCK_FORM_DB_CACHE_H
+#ifndef MOCK_FORM_CACHE_MGR_H
+#define MOCK_FORM_CACHE_MGR_H
 
-#include "data_center/database/form_db_info.h"
-#include "data_center/form_record/form_record.h"
+void MockGetData(bool ret);
 
-void MockGetAllFormInfo(int32_t mockRet);
+void MockGetData(bool ret, const std::string &data);
 
-void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
-
-void MockGetFormCountsByUserId(int32_t mockRet);
-
-void MockGetFormCountsByHostBundleName(int32_t mockRet);
-
-void MockGetAllFormInfo(const std::vector<OHOS::AppExecFwk::FormDBInfo> &formDBInfos);
-
-void MockGetDBRecord(int64_t formId, const OHOS::AppExecFwk::FormRecord &formRecord, int32_t ret);
-
-#endif // INNER_MOCK_FORM_DB_CACHE_H
+#endif // MOCK_FORM_CACHE_MGR_H

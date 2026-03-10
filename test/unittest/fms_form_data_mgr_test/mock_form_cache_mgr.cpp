@@ -13,22 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef INNER_MOCK_FORM_DB_CACHE_H
-#define INNER_MOCK_FORM_DB_CACHE_H
+#include "data_center/form_cache_mgr.h"
 
-#include "data_center/database/form_db_info.h"
-#include "data_center/form_record/form_record.h"
+namespace {
+    bool g_mockGetDataRet = true;
+    std::string g_mockDataString = "";
+}
 
-void MockGetAllFormInfo(int32_t mockRet);
+void MockGetData(bool ret)
+{
+    g_mockGetDataRet = ret;
+}
 
-void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
+void MockGetData(bool ret, const std::string &data)
+{
+    g_mockGetDataRet = ret;
+    g_mockDataString = data;
+}
 
-void MockGetFormCountsByUserId(int32_t mockRet);
-
-void MockGetFormCountsByHostBundleName(int32_t mockRet);
-
-void MockGetAllFormInfo(const std::vector<OHOS::AppExecFwk::FormDBInfo> &formDBInfos);
-
-void MockGetDBRecord(int64_t formId, const OHOS::AppExecFwk::FormRecord &formRecord, int32_t ret);
-
-#endif // INNER_MOCK_FORM_DB_CACHE_H
+namespace OHOS {
+namespace AppExecFwk {
+bool FormCacheMgr::GetData(int64_t formId, std::string &data,
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const
+{
+    data = g_mockDataString;
+    return g_mockGetDataRet;
+}
+} // namespace AppExecFwk
+} // namespace OHOS
