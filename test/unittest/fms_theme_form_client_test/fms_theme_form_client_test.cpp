@@ -65,13 +65,13 @@ void FmsThemeFormClientTest::TearDown()
 }
 
 /**
- * @tc.name: FmsThemeFormClientTest_AddForm_003
+ * @tc.name: FmsThemeFormClientTest_AddForm_001
  * @tc.desc: Test AddForm without mock object.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_AddForm_003, TestSize.Level1)
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_AddForm_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_AddForm_003 start";
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_AddForm_001 start";
     
     MockThemeFormClient::obj = nullptr;
     
@@ -85,7 +85,7 @@ HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_AddForm_003, TestSize.Le
     auto result = ThemeFormClient::GetInstance().AddForm(info);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     
-    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_AddForm_003 end";
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_AddForm_001 end";
 }
 
 /**
