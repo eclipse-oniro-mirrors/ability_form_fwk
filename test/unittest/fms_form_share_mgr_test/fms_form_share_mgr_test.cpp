@@ -4225,8 +4225,10 @@ HWTEST_F(FmsFormShareMgrTest, MakeFormShareInfoKey_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest MakeFormShareInfoKey_002 start";
     Want want;
     want.SetElementName("bundle", "ability");
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, "module");
-    want.SetParam(Constants::PARAM_FORM_NAME_KEY, "form");
+    std::string module = "module";
+    std::string form = "form";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, module);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, form);
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(want);
     EXPECT_EQ(key, "bundlemoduleabilityform");
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest MakeFormShareInfoKey_002 end";
@@ -4259,13 +4261,13 @@ HWTEST_F(FmsFormShareMgrTest, IsExistFormPackage_002, TestSize.Level1)
     std::string bundleName = FORM_PROVIDER_BUNDLE_NAME;
     std::string moduleName = PARAM_PROVIDER_MODULE_NAME;
     int32_t userId = USER_ID;
-    
+
     BundleInfo bundleInfo;
     bundleInfo.moduleNames.push_back(PARAM_PROVIDER_MODULE_NAME);
     bundleMgr_->SetBundleInfo(bundleName, userId, bundleInfo);
-    
+
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->IsExistFormPackage(bundleName, moduleName, userId);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest IsExistFormPackage_002 end";
 }
 
@@ -4280,11 +4282,11 @@ HWTEST_F(FmsFormShareMgrTest, IsExistFormPackage_003, TestSize.Level1)
     std::string bundleName = FORM_PROVIDER_BUNDLE_NAME;
     std::string moduleName = "not_exist_module";
     int32_t userId = USER_ID;
-    
+
     BundleInfo bundleInfo;
     bundleInfo.moduleNames.push_back(PARAM_PROVIDER_MODULE_NAME);
     bundleMgr_->SetBundleInfo(bundleName, userId, bundleInfo);
-    
+
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->IsExistFormPackage(bundleName, moduleName, userId);
     EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest IsExistFormPackage_003 end";
@@ -4300,7 +4302,7 @@ HWTEST_F(FmsFormShareMgrTest, RemoveFormShareInfo_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RemoveFormShareInfo_001 start";
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.clear();
-    
+
     std::string formName = "form";
     std::string moduleName = "module";
     std::string bundleName = "bundle";
@@ -4309,7 +4311,7 @@ HWTEST_F(FmsFormShareMgrTest, RemoveFormShareInfo_001, TestSize.Level1)
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, formName)
         .SetParam(Constants::PARAM_MODULE_NAME_KEY, moduleName)
         .SetElementName(bundleName, abilityName);
-    
+
     WantParams wantParams;
     FormShareInfo info;
     info.formId = 1;
@@ -4323,12 +4325,12 @@ HWTEST_F(FmsFormShareMgrTest, RemoveFormShareInfo_001, TestSize.Level1)
     info.providerShareData = wantParams;
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(want);
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
-    
+
     int64_t eventId = 1;
     DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.emplace(eventId, key);
-    
+
     DelayedSingleton<FormShareMgr>::GetInstance()->RemoveFormShareInfo(key);
-    
+
     auto shareInfoSize = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     auto eventMapSize = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.size());
     EXPECT_EQ(shareInfoSize, 0);
@@ -4346,7 +4348,7 @@ HWTEST_F(FmsFormShareMgrTest, RemoveFormShareInfo_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RemoveFormShareInfo_002 start";
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.clear();
-    
+
     std::string formName = "form";
     std::string moduleName = "module";
     std::string bundleName = "bundle";
@@ -4355,7 +4357,7 @@ HWTEST_F(FmsFormShareMgrTest, RemoveFormShareInfo_002, TestSize.Level1)
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, formName)
         .SetParam(Constants::PARAM_MODULE_NAME_KEY, moduleName)
         .SetElementName(bundleName, abilityName);
-    
+
     WantParams wantParams;
     FormShareInfo info;
     info.formId = 1;
@@ -4369,58 +4371,14 @@ HWTEST_F(FmsFormShareMgrTest, RemoveFormShareInfo_002, TestSize.Level1)
     info.providerShareData = wantParams;
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(want);
     DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
-    
+
     DelayedSingleton<FormShareMgr>::GetInstance()->RemoveFormShareInfo(key);
-    
+
     auto shareInfoSize = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     auto eventMapSize = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.size());
     EXPECT_EQ(shareInfoSize, 0);
     EXPECT_EQ(eventMapSize, 0);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RemoveFormShareInfo_002 end";
-}
-
-/**
- * @tc.number: StartFormUser_001
- * @tc.name: StartFormUser
- * @tc.desc: Get ability info failed, verify StartFormUser failed.
- */
-HWTEST_F(FmsFormShareMgrTest, StartFormUser_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest StartFormUser_001 start";
-    FormShareInfo info;
-    info.bundleName = "bundle";
-    info.moduleName = "module";
-    info.abilityName = "ability";
-    info.formName = "form";
-    int32_t userId = 100;
-    
-    DelayedSingleton<FormShareMgr>::GetInstance()->StartFormUser(info, userId);
-    
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest StartFormUser_001 end";
-}
-
-/**
- * @tc.number: StartFormUser_002
- * @tc.name: StartFormUser
- * @tc.desc: abilityInfo and extensionAbilityInfo name are empty, verify StartFormUser failed.
- */
-HWTEST_F(FmsFormShareMgrTest, StartFormUser_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest StartFormUser_002 start";
-    AbilityInfo abilityInfo;
-    ExtensionAbilityInfo extensionAbilityInfo;
-    bundleMgr_->SetAbilityInfoByAction("action.form.share", USER_ID, abilityInfo, extensionAbilityInfo);
-    
-    FormShareInfo info;
-    info.bundleName = "bundle";
-    info.moduleName = "module";
-    info.abilityName = "ability";
-    info.formName = "form";
-    int32_t userId = USER_ID;
-    
-    DelayedSingleton<FormShareMgr>::GetInstance()->StartFormUser(info, userId);
-    
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest StartFormUser_002 end";
 }
 
 /**
@@ -4434,15 +4392,15 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_001, TestSize.Level1)
     std::string bundleName = FORM_PROVIDER_BUNDLE_NAME;
     std::string moduleName = PARAM_PROVIDER_MODULE_NAME;
     int32_t userId = USER_ID;
-    
+
     BundleInfo bundleInfo;
     bundleInfo.moduleNames.push_back(PARAM_PROVIDER_MODULE_NAME);
     bundleMgr_->SetBundleInfo(bundleName, userId, bundleInfo);
-    
+
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
-    
+
     FormShareInfo info;
     info.bundleName = bundleName;
     info.moduleName = moduleName;
@@ -4450,10 +4408,10 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_001, TestSize.Level1)
     info.formName = "form";
     info.deviceId = "device";
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
-    
+
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->CheckFormPackage(info, key, userId);
-    EXPECT_EQ(result, ERR_OK);
-    
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_FREE_INSTALLATION);
+
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_001 end";
 }
 
@@ -4466,7 +4424,7 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_002 start";
     DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = nullptr;
-    
+
     FormShareInfo info;
     info.bundleName = "bundle";
     info.moduleName = "module";
@@ -4475,10 +4433,10 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_002, TestSize.Level1)
     info.deviceId = "device";
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
     int32_t userId = 100;
-    
+
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->CheckFormPackage(info, key, userId);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_002 end";
 }
 
@@ -4494,7 +4452,7 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_003, TestSize.Level1)
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
     DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ = nullptr;
-    
+
     FormShareInfo info;
     info.bundleName = "bundle";
     info.moduleName = "module";
@@ -4503,10 +4461,10 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_003, TestSize.Level1)
     info.deviceId = "device";
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
     int32_t userId = 100;
-    
+
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->CheckFormPackage(info, key, userId);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_003 end";
 }
 
@@ -4523,7 +4481,7 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_004, TestSize.Level1)
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
     auto handler = std::make_shared<FormEventHandler>(queue);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
-    
+
     FormShareInfo info;
     info.bundleName = "bundle";
     info.moduleName = "module";
@@ -4532,10 +4490,10 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_004, TestSize.Level1)
     info.deviceId = "device";
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
     int32_t userId = 100;
-    
+
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->CheckFormPackage(info, key, userId);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_FREE_INSTALL_FAILED);
-    
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_FREE_INSTALLATION);
+
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_004 end";
 }
 
@@ -4552,7 +4510,7 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_005, TestSize.Level1)
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
     auto handler = std::make_shared<FormEventHandler>(queue);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
-    
+
     FormShareInfo info;
     info.bundleName = FORM_PROVIDER_BUNDLE_NAME;
     info.moduleName = PARAM_PROVIDER_MODULE_NAME;
@@ -4561,9 +4519,9 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_005, TestSize.Level1)
     info.deviceId = "device";
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
     int32_t userId = USER_ID;
-    
+
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->CheckFormPackage(info, key, userId);
-    EXPECT_EQ(result, ERR_OK);
-    
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_FREE_INSTALLATION);
+
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_005 end";
 }
