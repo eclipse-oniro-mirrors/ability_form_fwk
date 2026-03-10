@@ -174,6 +174,8 @@ public:
 
     void UpdateContextConfiguration();
 
+    void GetRuntimeMemory(std::string &bundleNames, uint64_t &runtimeSize, std::vector<std::string> &formNames,
+        std::vector<uint32_t> &formLocations);
 private:
     class RemoteObjHash {
     public:
@@ -330,7 +332,6 @@ private:
     void RecordFormLocation(int64_t formId, const FormLocationInfo &formLocation);
     void DeleteFormLocation(int64_t formId);
     void ParseFormLocationMap(std::vector<std::string> &formName, std::vector<uint32_t> &formLocation);
-    void RuntimeMemoryMonitor();
     void PostReAddRecycledForms(const FormJsInfo &formJsInfo, const Want &want);
     void ReAddStaticRecycledForms(const int64_t formId, const FormJsInfo &formJsInfo);
     void HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,

@@ -2815,19 +2815,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_152, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_153
- * @tc.desc: Verify RuntimeMemoryMonitor
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_153, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_153 start";
-    EXPECT_TRUE(formRenderRecordPtr_);
-    formRenderRecordPtr_->RuntimeMemoryMonitor();
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_153 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_154
  * @tc.desc: Verify AddWatchDogThreadMonitor
  * @tc.type: FUNC

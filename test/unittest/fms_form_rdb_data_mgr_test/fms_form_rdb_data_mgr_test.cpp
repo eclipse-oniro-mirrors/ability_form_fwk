@@ -305,7 +305,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_012, Function | SmallTest 
     formRdbTableConfig.tableName = FORM_CACHE_TABLE;
     auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
     EXPECT_EQ(result, ERR_OK);
-    
+
     int64_t formId = 1;
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_ID, std::to_string(formId));
@@ -333,7 +333,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_012, Function | SmallTest 
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_013, Function | SmallTest | Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_013 start";
-    
+
     std::set<std::string> datas;
     auto result = FormRdbDataMgr::GetInstance().QueryAllKeys(Constants::FORM_RDB_TABLE_NAME, datas);
     EXPECT_EQ(result, ERR_OK);
@@ -350,7 +350,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_013, Function | SmallTest 
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_014, Function | SmallTest | Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_014 start";
-    
+
     std::string key = "testKey";
     auto result = FormRdbDataMgr::GetInstance().QuerySql(key);
     EXPECT_NE(result, nullptr);
@@ -707,7 +707,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_027, Function | SmallTest 
     formRdbTableConfig.tableName = FORM_CACHE_TABLE;
     auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
     EXPECT_EQ(result, ERR_OK);
-    
+
     int64_t formId = 1;
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_ID, std::to_string(formId));
@@ -723,6 +723,198 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_027, Function | SmallTest 
     auto resultSet = FormRdbDataMgr::GetInstance().QueryDataByStep(absRdbPredicates);
     EXPECT_NE(resultSet, nullptr);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_027 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_028
+ * @tc.desc: Test UpdateReadCount increments read count correctly.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_028, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_028 start";
+
+    int64_t initialReadCount = FormRdbDataMgr::GetInstance().readCount_.load();
+
+    FormRdbDataMgr::GetInstance().UpdateReadCount();
+
+    int64_t updatedReadCount = FormRdbDataMgr::GetInstance().readCount_.load();
+    EXPECT_EQ(updatedReadCount, initialReadCount + 1);
+
+    FormRdbDataMgr::GetInstance().UpdateReadCount();
+    FormRdbDataMgr::GetInstance().UpdateReadCount();
+
+    updatedReadCount = FormRdbDataMgr::GetInstance().readCount_.load();
+    EXPECT_EQ(updatedReadCount, initialReadCount + 3);
+
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_028 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_029
+ * @tc.desc: Test UpdateWriteCount increments write count and write size correctly.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_029, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_029 start";
+
+    int64_t initialWriteCount = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t initialWriteSize = FormRdbDataMgr::GetInstance().writeSize_.load();
+
+    size_t dataSize1 = 100;
+    FormRdbDataMgr::GetInstance().UpdateWriteCount(dataSize1);
+
+    int64_t updatedWriteCount = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t updatedWriteSize = FormRdbDataMgr::GetInstance().writeSize_.load();
+    EXPECT_EQ(updatedWriteCount, initialWriteCount + 1);
+    EXPECT_EQ(updatedWriteSize, initialWriteSize + dataSize1);
+
+    size_t dataSize2 = 200;
+    FormRdbDataMgr::GetInstance().UpdateWriteCount(dataSize2);
+
+    updatedWriteCount = FormRdbDataMgr::GetInstance().writeCount_.load();
+    updatedWriteSize = FormRdbDataMgr::GetInstance().writeSize_.load();
+    EXPECT_EQ(updatedWriteCount, initialWriteCount + 2);
+    EXPECT_EQ(updatedWriteSize, initialWriteSize + dataSize1 + dataSize2);
+
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_029 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_030
+ * @tc.desc: Test PrintStatistics resets counters after printing.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_030, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_030 start";
+
+    FormRdbDataMgr::GetInstance().UpdateReadCount();
+    FormRdbDataMgr::GetInstance().UpdateReadCount();
+    FormRdbDataMgr::GetInstance().UpdateWriteCount(100);
+    FormRdbDataMgr::GetInstance().UpdateWriteCount(200);
+
+    int64_t readCountBefore = FormRdbDataMgr::GetInstance().readCount_.load();
+    int64_t writeCountBefore = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t writeSizeBefore = FormRdbDataMgr::GetInstance().writeSize_.load();
+
+    EXPECT_GT(readCountBefore, 0);
+    EXPECT_GT(writeCountBefore, 0);
+    EXPECT_GT(writeSizeBefore, 0);
+
+    FormRdbDataMgr::GetInstance().PrintStatistics();
+
+    int64_t readCountAfter = FormRdbDataMgr::GetInstance().readCount_.load();
+    int64_t writeCountAfter = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t writeSizeAfter = FormRdbDataMgr::GetInstance().writeSize_.load();
+
+    EXPECT_EQ(readCountAfter, 0);
+    EXPECT_EQ(writeCountAfter, 0);
+    EXPECT_EQ(writeSizeAfter, 0);
+
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_030 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_031
+ * @tc.desc: Test RemoveStatisticsTimer removes periodic task.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_031, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_031 start";
+
+    FormRdbDataMgr::GetInstance().InitStatisticsTimer();
+    EXPECT_TRUE(FormRdbDataMgr::GetInstance().timerInitialized_.load());
+    FormRdbDataMgr::GetInstance().RemoveStatisticsTimer();
+    EXPECT_FALSE(FormRdbDataMgr::GetInstance().timerInitialized_.load());
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_031 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_032
+ * @tc.desc: Test statistics counters are thread-safe with concurrent operations.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_032, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_032 start";
+
+    const int threadCount = 10;
+    const int operationsPerThread = 100;
+    std::vector<std::thread> threads;
+
+    for (int i = 0; i < threadCount; ++i) {
+        threads.emplace_back([&]() {
+            for (int j = 0; j < operationsPerThread; ++j) {
+                FormRdbDataMgr::GetInstance().UpdateReadCount();
+                FormRdbDataMgr::GetInstance().UpdateWriteCount(50);
+            }
+        });
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    int64_t finalReadCount = FormRdbDataMgr::GetInstance().readCount_.load();
+    int64_t finalWriteCount = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t finalWriteSize = FormRdbDataMgr::GetInstance().writeSize_.load();
+
+    EXPECT_EQ(finalReadCount, threadCount * operationsPerThread);
+    EXPECT_EQ(finalWriteCount, threadCount * operationsPerThread);
+    EXPECT_EQ(finalWriteSize, threadCount * operationsPerThread * 50);
+
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_032 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_033
+ * @tc.desc: Test UpdateWriteCount with zero data size.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_033, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_033 start";
+
+    int64_t initialWriteCount = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t initialWriteSize = FormRdbDataMgr::GetInstance().writeSize_.load();
+
+    FormRdbDataMgr::GetInstance().UpdateWriteCount(0);
+
+    int64_t updatedWriteCount = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t updatedWriteSize = FormRdbDataMgr::GetInstance().writeSize_.load();
+    EXPECT_EQ(updatedWriteCount, initialWriteCount + 1);
+    EXPECT_EQ(updatedWriteSize, initialWriteSize);
+
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_033 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_034
+ * @tc.desc: Test PrintStatistics with zero counters.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_034, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_034 start";
+
+    FormRdbDataMgr::GetInstance().readCount_.store(100);
+    FormRdbDataMgr::GetInstance().writeCount_.store(100);
+    FormRdbDataMgr::GetInstance().writeSize_.store(100);
+
+    FormRdbDataMgr::GetInstance().PrintStatistics();
+
+    int64_t readCountAfter = FormRdbDataMgr::GetInstance().readCount_.load();
+    int64_t writeCountAfter = FormRdbDataMgr::GetInstance().writeCount_.load();
+    int64_t writeSizeAfter = FormRdbDataMgr::GetInstance().writeSize_.load();
+
+    EXPECT_EQ(readCountAfter, 0);
+    EXPECT_EQ(writeCountAfter, 0);
+    EXPECT_EQ(writeSizeAfter, 0);
+
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_034 end";
 }
 }
 }

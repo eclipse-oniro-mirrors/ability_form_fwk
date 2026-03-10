@@ -140,6 +140,9 @@ private:
     int32_t ProcessReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid, const Want &want);
     int32_t ProcessRecoverForm(const FormJsInfo &formJsInfo, const Want &want);
     int32_t ProcessStopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, bool &isRenderGroupEmptyOut);
+    void InitMemoryMonitor();
+    void RemoveMemoryMonitor();
+    void ReportProcessMemory();
 
 private:
     std::mutex renderRecordMutex_;

@@ -1345,3 +1345,87 @@ HWTEST_F(FormRenderServiceMgrTest, OnConfigurationUpdated_001, TestSize.Level0)
     EXPECT_EQ(formRenderServiceMgr.configuration_->GetItem("ohos.system.colorMode"), "dark");
     GTEST_LOG_(INFO) << "OnConfigurationUpdated_001 end";
 }
+
+/**
+ * @tc.name: InitMemoryMonitor_001
+ * @tc.desc: Verify InitMemoryMonitor initializes memory monitoring task.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, InitMemoryMonitor_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InitMemoryMonitor_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    // InitMemoryMonitor is called in constructor, verify it doesn't crash
+    // The actual task registration is done through Watchdog, which is external dependency
+    EXPECT_TRUE(formRenderServiceMgr.serialQueue_ != nullptr);
+    GTEST_LOG_(INFO) << "InitMemoryMonitor_001 end";
+}
+
+/**
+ * @tc.name: RemoveMemoryMonitor_001
+ * @tc.desc: Verify RemoveMemoryMonitor removes memory monitoring task.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, RemoveMemoryMonitor_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RemoveMemoryMonitor_001 start";
+    {
+        FormRenderServiceMgr formRenderServiceMgr;
+        // RemoveMemoryMonitor is called in destructor, verify it doesn't crash
+        EXPECT_TRUE(formRenderServiceMgr.serialQueue_ != nullptr);
+    }
+    // Destructor called here, RemoveMemoryMonitor should execute without crash
+    GTEST_LOG_(INFO) << "RemoveMemoryMonitor_001 end";
+}
+
+/**
+ * @tc.name: ReportProcessMemory_001
+ * @tc.desc: Verify ReportProcessMemory with empty render record map.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, ReportProcessMemory_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReportProcessMemory_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.renderRecordMap_.clear();
+    // ReportProcessMemory should handle empty map without crash
+    formRenderServiceMgr.ReportProcessMemory();
+    EXPECT_TRUE(formRenderServiceMgr.renderRecordMap_.empty());
+    GTEST_LOG_(INFO) << "ReportProcessMemory_001 end";
+}
+
+/**
+ * @tc.name: ReportProcessMemory_002
+ * @tc.desc: Verify ReportProcessMemory with valid render record.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, ReportProcessMemory_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReportProcessMemory_002 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::string uid{"202410101010"};
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    EXPECT_TRUE(formRenderRecord);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
+    // ReportProcessMemory should handle valid record without crash
+    formRenderServiceMgr.ReportProcessMemory();
+    EXPECT_FALSE(formRenderServiceMgr.renderRecordMap_.empty());
+    GTEST_LOG_(INFO) << "ReportProcessMemory_002 end";
+}
+
+/**
+ * @tc.name: ReportProcessMemory_003
+ * @tc.desc: Verify ReportProcessMemory with null render record.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, ReportProcessMemory_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReportProcessMemory_003 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::string uid{"202410101010"};
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
+    // ReportProcessMemory should handle null record without crash
+    formRenderServiceMgr.ReportProcessMemory();
+    EXPECT_EQ(formRenderServiceMgr.renderRecordMap_.size(), 1);
+    GTEST_LOG_(INFO) << "ReportProcessMemory_003 end";
+}

@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <memory>
+#include <fstream>
+#include <sstream>
 
 #include "event_handler.h"
 #include "fms_log_wrapper.h"
@@ -32,6 +34,7 @@
 #endif
 #include "status_mgr_center/form_render_status_task_mgr.h"
 #include "status_mgr_center/form_render_status_mgr.h"
+#include "xcollie/watchdog.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,8 +48,40 @@ constexpr int32_t ENABLE_FORM_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
 constexpr int64_t MIN_DURATION_MS = 1500;
 constexpr int64_t TASK_ONCONFIGURATIONUPDATED_DELAY_MS = 1000;
+constexpr int32_t MEMORY_MONITOR_INTERVAL = Constants::MS_PER_DAY * 2;
+constexpr uint64_t MEMORY_LEAK_THRESHOLD = 300 * 1024 * 1024;
 constexpr const char *FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
 constexpr const char *TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
+constexpr const char *FRS_MEMORY_MONITOR = "FormRenderMemoryMonitor";
+
+uint64_t GetPss()
+{
+    pid_t pid = getprocpid();
+    std::string filePath = "/proc/" + std::to_string(pid) + "/smaps_rollup";
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        HILOG_ERROR("pid:%{public}d get pss failed", pid);
+        return 0;
+    }
+    std::string line;
+    int64_t pss = 0;
+    int64_t swapPss = 0;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string key;
+        int64_t value;
+        std::string unit;
+        if (iss >> key >> value >> unit) {
+            if (key == "Pss:") {
+                pss = value;
+            } else if (key == "SwapPss:") {
+                swapPss = value;
+            }
+        }
+    }
+    file.close();
+    return pss + swapPss;
+}
 }  // namespace
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -61,9 +96,13 @@ FormRenderServiceMgr::FormRenderServiceMgr()
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
     appliedConfig_ = std::make_shared<AppExecFwk::Configuration>();
     mainHandler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    InitMemoryMonitor();
 }
 
-FormRenderServiceMgr::~FormRenderServiceMgr() = default;
+FormRenderServiceMgr::~FormRenderServiceMgr()
+{
+    RemoveMemoryMonitor();
+}
 
 int32_t FormRenderServiceMgr::RenderForm(
     const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken)
@@ -920,6 +959,51 @@ int32_t FormRenderServiceMgr::SetRenderGroupParams(const int64_t formId, const W
         return RENDER_FORM_FAILED;
     }
     return ERR_OK;
+}
+
+void FormRenderServiceMgr::InitMemoryMonitor()
+{
+    auto memoryMonitorTask = []() {
+        FormRenderServiceMgr::GetInstance().ReportProcessMemory();
+    };
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(FRS_MEMORY_MONITOR, memoryMonitorTask,
+        MEMORY_MONITOR_INTERVAL);
+}
+
+void FormRenderServiceMgr::RemoveMemoryMonitor()
+{
+    OHOS::HiviewDFX::Watchdog::GetInstance().RemovePeriodicalTask(FRS_MEMORY_MONITOR);
+}
+
+void FormRenderServiceMgr::ReportProcessMemory()
+{
+    uint64_t processMemory = GetPss();
+    if (processMemory < MEMORY_LEAK_THRESHOLD) {
+        return;
+    }
+    HILOG_WARN("FRS memory exceeds threshold: %{public}" PRIu64 " bytes", processMemory);
+
+    std::stringstream memoryInfos;
+    uint64_t totalSizes = 0;
+    std::vector<std::string> formNames;
+    std::vector<uint32_t> formLocations;
+    {
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        for (const auto &iter : renderRecordMap_) {
+            if (iter.second) {
+                std::string bundleName;
+                uint64_t runtimeMemory;
+                iter.second->GetRuntimeMemory(bundleName, runtimeMemory, formNames, formLocations);
+                memoryInfos << bundleName << ":" << runtimeMemory << ";";
+                totalSizes += runtimeMemory;
+            }
+        }
+    }
+
+    if (totalSizes > 0) {
+        FormRenderEventReport::SendRuntimeMemoryLeakEvent(memoryInfos.str(), processMemory, totalSizes, formNames,
+            formLocations);
+    }
 }
 }  // namespace FormRender
 }  // namespace AppExecFwk

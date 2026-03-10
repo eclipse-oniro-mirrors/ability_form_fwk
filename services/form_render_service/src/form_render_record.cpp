@@ -56,8 +56,6 @@ constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr size_t THREAD_BLOCK_TIMEOUT = 10 * 1000;
-constexpr int32_t MEMORY_MONITOR_INTERVAL = Constants::MS_PER_DAY * 3;
-constexpr size_t RUNTIME_MEMORY_LIMIT = 16 * 1024 * 1024;
 constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
@@ -77,35 +75,6 @@ inline std::string GetThreadNameByBundle(const std::string &bundleName)
         return bundleName;
     }
     return bundleName.substr(bundleName.length() - THREAD_NAME_LEN);
-}
-
-uint64_t GetPss()
-{
-    pid_t pid = getprocpid();
-    std::string filePath = "/proc/" + std::to_string(pid) + "/smaps_rollup";
-    std::ifstream file(filePath);
-    if (!file.is_open()) {
-        HILOG_ERROR("pid:%{public}d get pss failed", pid);
-        return 0;
-    }
-    std::string line;
-    int64_t pss = 0;
-    int64_t swapPss = 0;
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string key;
-        int64_t value;
-        std::string unit;
-        if (iss >> key >> value >> unit) {
-            if (key == "Pss:") {
-                pss = value;
-            } else if (key == "SwapPss:") {
-                swapPss = value;
-            }
-        }
-    }
-    file.close();
-    return pss + swapPss;
 }
 }
 
@@ -300,15 +269,6 @@ void FormRenderRecord::AddWatchDogThreadMonitor()
     };
     OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(RENDERING_BLOCK_MONITOR_PREFIX + bundleName_,
         threadBlockMonitorTask, THREAD_BLOCK_TIMEOUT);
-
-    auto memoryMonitorTask = [weak = weak_from_this()]() {
-        auto renderRecord = weak.lock();
-        if (renderRecord) {
-            renderRecord->RuntimeMemoryMonitor();
-        }
-    };
-    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(MEMORY_MONITOR_PREFIX + bundleName_, memoryMonitorTask,
-        MEMORY_MONITOR_INTERVAL);
 }
 
 void FormRenderRecord::RemoveWatchDogThreadMonitor()
@@ -2266,7 +2226,8 @@ void FormRenderRecord::ParseFormLocationMap(std::vector<std::string> &formName, 
     }
 }
 
-void FormRenderRecord::RuntimeMemoryMonitor()
+void FormRenderRecord::GetRuntimeMemory(std::string &bundleName, uint64_t &runtimeSize,
+    std::vector<std::string> &formNames, std::vector<uint32_t> &formLocations)
 {
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
@@ -2295,19 +2256,11 @@ void FormRenderRecord::RuntimeMemoryMonitor()
         objSize = nativeEnginePtr->GetHeapObjectSize();
         limitSize = nativeEnginePtr->GetHeapLimitSize();
     };
-    eventHandler->PostSyncTask(task, "RuntimeMemoryMonitorTask");
+    eventHandler->PostSyncTask(task, "GetRuntimeMemory");
 
-    uint64_t processMemory = GetPss();
-    HILOG_INFO("processMemory: %{public}" PRIu64 ", bundleName: %{public}s, totalSize: %{public}zu, "
-        "usedSize: %{public}zu, objSize: %{public}zu, limitSize: %{public}zu", processMemory, bundleName_.c_str(),
-        totalSize, usedSize, objSize, limitSize);
-    if (totalSize > RUNTIME_MEMORY_LIMIT) {
-        std::vector<std::string> formName;
-        std::vector<uint32_t> formLocation;
-        ParseFormLocationMap(formName, formLocation);
-        FormRenderEventReport::SendRuntimeMemoryLeakEvent(bundleName_, processMemory,
-            static_cast<uint64_t>(totalSize), formName, formLocation);
-    }
+    bundleName = bundleName_;
+    runtimeSize = totalSize;
+    ParseFormLocationMap(formNames, formLocations);
 }
 
 int32_t FormRenderRecord::SetRenderGroupParams(const int64_t formId, const Want &want)
