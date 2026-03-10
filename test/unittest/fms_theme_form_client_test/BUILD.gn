@@ -42,13 +42,13 @@ ohos_unittest("FmsThemeFormClientTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
   ]
   
   external_deps = [
     "ability_runtime:app_manager",
     "c_utils:utils",
     "ffrt:libffrt",
-    "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
