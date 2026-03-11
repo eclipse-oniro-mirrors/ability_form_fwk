@@ -64,6 +64,7 @@ void FmsThemeFormClientTest::TearDown()
     GTEST_LOG_(INFO) << "FmsThemeFormClientTest TearDown";
 }
 
+#ifdef THEME_MGR_ENABLE
 /**
  * @tc.name: FmsThemeFormClientTest_AddForm_001
  * @tc.desc: Test AddForm without mock object.
@@ -106,3 +107,4 @@ HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_DeleteForms_001, TestSiz
     
     GTEST_LOG_(INFO) << "FmsThemeFormClientTest_DeleteForms_001 end";
 }
+#endif
