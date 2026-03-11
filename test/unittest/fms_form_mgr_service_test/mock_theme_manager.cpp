@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#ifdef THEME_MGR_ENABLE
 #include "mock_theme_form_client.h"
 #include "theme_manager_client.h"
 #include "theme_manager_common.h"
@@ -36,3 +37,4 @@ ErrorCode ThemeManagerClient::AddForm(ThemeFormInfo themeFormInfo)
 }
 }  // namespace ThemeManager
 }  // namespace OHOS
+#endif
