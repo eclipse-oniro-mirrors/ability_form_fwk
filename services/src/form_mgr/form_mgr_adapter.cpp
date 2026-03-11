@@ -4184,6 +4184,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         }
 
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        FormDataMgr::GetInstance().SetExpectRecycledStatus(matchedFormId, false);
         matchedFormIds.emplace_back(matchedFormId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
             HILOG_WARN("form %{public}" PRId64 " not exist", formId);
@@ -4210,9 +4211,6 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
         HILOG_INFO("formId:%{public}" PRId64 " non-recyclable", formId);
-    }
-    if (!matchedFormIds.empty()) {
-        FormDataMgr::GetInstance().SetExpectRecycledStatus(matchedFormIds, false);
     }
     if (validFormIds.empty()) {
         HILOG_WARN("empty validFormIds");
