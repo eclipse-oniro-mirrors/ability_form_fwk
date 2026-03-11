@@ -30,9 +30,12 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 1000;
 constexpr int32_t MIN_RATIO_NUM = 10;
 constexpr int32_t MIN_NUM = 0;
+constexpr int32_t MAX_LOOP_COUNT = 10;
+constexpr int32_t MAX_RATIO = 100;
 
 inline void ClearEventParams(FormAbnormalReportParams &params)
 {
@@ -51,35 +54,58 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     if (fdp == nullptr) {
         return true;
     }
+
     int64_t formId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     int64_t ratio = fdp->ConsumeIntegralInRange(MIN_NUM, MIN_RATIO_NUM);
+    
     FormAbnormalReporter::GetInstance().AddRecord(formId, ratio);
+    
     FormAbnormalInfo formAbnormalInfo {};
+    formAbnormalInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formAbnormalInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formAbnormalInfo.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formAbnormalInfo.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formAbnormalInfo.formDimension = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formAbnormalInfo.formLocation = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formAbnormalInfo.appVersion = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formAbnormalInfo.nonTransparentRatio = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_RATIO);
     FormAbnormalReporter::GetInstance().AddRecord(formId, formAbnormalInfo);
+    
     FormAbnormalReporter::GetInstance().MarkUpdateRender(formId);
-    FormAbnormalReporter::GetInstance().CheckForms();
-    FormAbnormalReporter::GetInstance().ReportAbnormalForms();
-    FormAbnormalReporter::GetInstance().ClearRecords();
+    
+    bool shouldCheck = fdp->ConsumeBool();
+    if (shouldCheck) {
+        FormAbnormalReporter::GetInstance().CheckForms();
+    }
+    
+    bool shouldReport = fdp->ConsumeBool();
+    if (shouldReport) {
+        FormAbnormalReporter::GetInstance().ReportAbnormalForms();
+    }
+    
+    bool shouldClear = fdp->ConsumeBool();
+    if (shouldClear) {
+        FormAbnormalReporter::GetInstance().ClearRecords();
+    }
     
     FormAbnormalReportParams params;
-    params.bundleNames.emplace_back("testBundle");
-    params.moduleNames.emplace_back("testModule");
-    params.abilityNames.emplace_back("testAbility");
-    params.formNames.emplace_back("testForm");
-    params.formDimensions.emplace_back(1);
-    params.formLocations.emplace_back(0);
-    params.appVersions.emplace_back("1.0");
-    params.nonTransparencyRateList.emplace_back(50);
+    int32_t numItems = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < numItems; i++) {
+        params.bundleNames.emplace_back(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+        params.moduleNames.emplace_back(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+        params.abilityNames.emplace_back(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+        params.formNames.emplace_back(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+        params.formDimensions.emplace_back(fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM));
+        params.formLocations.emplace_back(fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM));
+        params.appVersions.emplace_back(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+        params.nonTransparencyRateList.emplace_back(fdp->ConsumeIntegralInRange(MIN_NUM, MAX_RATIO));
+    }
     ClearEventParams(params);
     
-    return params.bundleNames.empty() && params.moduleNames.empty() &&
-           params.abilityNames.empty() && params.formNames.empty() &&
-           params.formDimensions.empty() && params.formLocations.empty() &&
-           params.appVersions.empty() && params.nonTransparencyRateList.empty();
+    return true;
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);

@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <vector>
+#include <string>
 #include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
@@ -30,27 +32,70 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+constexpr int32_t MAX_LENGTH = 256;
+constexpr int32_t MAX_NUM = 10000;
+constexpr int32_t MIN_NUM = 0;
+constexpr int32_t MAX_LOOP_COUNT = 10;
+constexpr int32_t MAX_SCENE_TYPE = 1;
+constexpr int32_t MAX_EVENT_NAME = 10;
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
         return true;
     }
+
     FormRenderEventReport::GetNowMillisecond();
+    
     PerformanceEventInfo eventInfo;
-    FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
-    std::string bundleName = fdp->ConsumeRandomLengthString();
-    std::string errorName = fdp->ConsumeRandomLengthString();
-    std::string errorMsg = fdp->ConsumeRandomLengthString();
+    eventInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    eventInfo.sceneId = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    eventInfo.timeStamp = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+    
+    SceneType sceneType = static_cast<SceneType>(fdp->ConsumeIntegralInRange(MIN_NUM, MAX_SCENE_TYPE));
+    FormRenderEventReport::SendPerformanceEvent(sceneType, eventInfo);
+    
+    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::string errorName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::string errorMsg = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     FormRenderEventReport::SendBlockFaultEvent(bundleName, errorName, errorMsg);
-    int64_t formId = fdp->ConsumeIntegral<int64_t>();
-    std::string uid = fdp->ConsumeRandomLengthString();
+    
+    int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+    std::string formBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::string formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    int32_t errorType = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    int32_t errorCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    
+    FormEventName eventName = static_cast<FormEventName>(fdp->ConsumeIntegralInRange(MIN_NUM, MAX_EVENT_NAME));
+    FormRenderEventReport::SendFormFailedEvent(eventName, formId, formBundleName, formName, errorType, errorCode);
+    
+    std::string uid = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     FormRenderEventReport::StartReleaseTimeoutReportTimer(formId, uid);
     FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
+    
+    std::string bundleName2 = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    uint64_t processMemory = fdp->ConsumeIntegralInRange<uint64_t>(MIN_NUM, MAX_NUM);
+    uint64_t runtimeMemory = fdp->ConsumeIntegralInRange<uint64_t>(MIN_NUM, MAX_NUM);
+    
+    std::vector<std::string> formNames;
+    int32_t numFormNames = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < numFormNames; i++) {
+        formNames.emplace_back(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+    }
+    
+    std::vector<uint32_t> formLocations;
+    int32_t numFormLocations = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < numFormLocations; i++) {
+        formLocations.emplace_back(fdp->ConsumeIntegralInRange<uint32_t>(MIN_NUM, MAX_NUM));
+    }
+    
+    FormRenderEventReport::SendRuntimeMemoryLeakEvent(bundleName2, processMemory, runtimeMemory, formNames,
+        formLocations);
+    
     return true;
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);

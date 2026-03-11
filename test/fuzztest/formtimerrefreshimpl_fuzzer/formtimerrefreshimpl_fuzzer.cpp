@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
@@ -24,67 +25,79 @@
 #include "form_refresh/strategy/refresh_config.h"
 #undef private
 #undef protected
-#include "securec.h"
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
-{
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
+constexpr int32_t MAX_LENGTH = 256;
+constexpr int32_t MAX_NUM = 10000;
+constexpr int32_t MIN_NUM = 0;
+constexpr int32_t REFRESHTYPE_DEFAULT = 0;
+constexpr int32_t REFRESHTYPE_INTERVAL = 1;
+constexpr int32_t REFRESHTYPE_UPDATETIMES = 2;
+constexpr int32_t REFRESHTYPE_UPDATENEXTTIME = 3;
+constexpr int32_t MAX_REFRESH_TYPE = 4;
 
-void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
+    if (fdp == nullptr) {
+        return true;
+    }
+
     FormTimerRefreshImpl formTimerRefresh;
 
     RefreshData refreshData;
-    refreshData.formId = static_cast<int64_t>(GetU32Data(data));
-    refreshData.callingUid = static_cast<int32_t>(GetU32Data(data));
-    refreshData.nextTime = static_cast<int32_t>(GetU32Data(data));
+    refreshData.formId = fdp->ConsumeIntegral<int64_t>();
+    refreshData.callingUid = fdp->ConsumeIntegral<int32_t>();
+    refreshData.nextTime = fdp->ConsumeIntegral<int64_t>();
 
     FormRecord record;
     record.formId = refreshData.formId;
-    record.bundleName = std::string(data, size);
+    record.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    record.isSystemApp = fdp->ConsumeBool();
+    record.isVisible = fdp->ConsumeBool();
+    record.isCountTimerRefresh = fdp->ConsumeBool();
+    record.isTimerRefresh = fdp->ConsumeBool();
+    record.userId = fdp->ConsumeIntegral<int32_t>();
+    record.uid = fdp->ConsumeIntegral<int32_t>();
     refreshData.record = record;
 
+    FormTimer formTimer;
+    formTimer.formId = refreshData.formId;
+    formTimer.userId = fdp->ConsumeIntegral<int32_t>();
+    formTimer.isCountTimer = fdp->ConsumeBool();
+    formTimer.isUpdateAt = fdp->ConsumeBool();
+    formTimer.refreshType = static_cast<RefreshType>(fdp->ConsumeIntegralInRange(MIN_NUM, MAX_REFRESH_TYPE));
+    refreshData.formTimer = formTimer;
+
     Want want;
-    want.SetParam("test_param", std::string(data, size));
+    want.SetParam(Constants::KEY_IS_TIMER, fdp->ConsumeBool());
+    want.SetParam(Constants::KEY_TIMER_REFRESH, fdp->ConsumeBool());
+
+    int32_t refreshType = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_REFRESH_TYPE);
+    want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, refreshType);
+
     refreshData.want = want;
 
     FormProviderData providerData;
     refreshData.providerData = providerData;
 
-    formTimerRefresh.RefreshFormRequest(refreshData);
-}
+    FormTimerRefreshImpl::GetInstance().RefreshFormRequest(refreshData);
 
+    bool isCountTimerRefresh = fdp->ConsumeBool();
+    bool isTimerRefresh = fdp->ConsumeBool();
+    FormTimerRefreshImpl::GetInstance().DetectControlPoint(refreshData, isCountTimerRefresh, isTimerRefresh);
+
+    Want timerWant;
+    FormTimerRefreshImpl::GetInstance().BuildTimerWant(formTimer, timerWant);
+
+    return true;
+}
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }

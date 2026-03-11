@@ -32,17 +32,25 @@
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+constexpr int32_t MAX_LENGTH = 256;
+constexpr int32_t MAX_NUM = 10000;
+constexpr int32_t MIN_NUM = 0;
+constexpr int32_t MAX_LOOP_COUNT = 10;
+
 void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
 {
     FormAmsHelper formAmsHelper;
-    std::string bundleName = fdp->ConsumeRandomLengthString();
-    std::string abilityName = fdp->ConsumeRandomLengthString();
+    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::string abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     AppExecFwk::ElementName element;
+    element.SetBundleName(bundleName);
+    element.SetAbilityName(abilityName);
     sptr<IRemoteObject> providerToken = nullptr;
     sptr<IRemoteObject> remoteObjects = nullptr;
-    int resultCode = fdp->ConsumeIntegral<int>();
+    int resultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     Want want;
     sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    
     formAmsHelper.GetAbilityManager();
     formAmsHelper.ConnectServiceAbility(want, connect);
     formAmsHelper.DisconnectServiceAbility(connect);
@@ -53,15 +61,20 @@ void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
     sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
     formAmsHelper.SetAbilityManager(abilityManager);
     formAmsHelper.DisconnectAbilityTask(connect);
-    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formAmsHelper.StartAbility(want, userId);
-    sptr<IRemoteObject> callerToken;
+    sptr<IRemoteObject> callerToken = nullptr;
     formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken, userId);
     std::set<int64_t> formIds;
+    int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+    int32_t numFormIds = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < numFormIds; i++) {
+        formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+        formIds.insert(formId);
+    }
     sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName,
         userId);
     batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
-    int64_t formId = fdp->ConsumeIntegral<int64_t>();
     sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName, userId);
     castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
 }
@@ -71,35 +84,37 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     if (fdp == nullptr) {
         return true;
     }
+
     FormAbilityConnection formAbilityConnection;
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObjects = nullptr;
-    int resultCode = fdp->ConsumeIntegral<int>();
+    int resultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     bool isFreeInstall = fdp->ConsumeBool();
     formAbilityConnection.SetFreeInstall(isFreeInstall);
-    int32_t connectId = fdp->ConsumeIntegral<int32_t>();
+    
+    int32_t connectId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formAbilityConnection.SetConnectId(connectId);
-    formAbilityConnection.formId_ = fdp->ConsumeIntegral<int64_t>();
-    formAbilityConnection.bundleName_ = fdp->ConsumeRandomLengthString();
-    formAbilityConnection.abilityName_ = fdp->ConsumeRandomLengthString();
-    formAbilityConnection.isFreeInstall_ = fdp->ConsumeBool();
-    formAbilityConnection.connectId_ = fdp->ConsumeIntegral<int32_t>();
-    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
-    formAbilityConnection.GetProviderKey();
-    std::string bundleName = fdp->ConsumeRandomLengthString();
-    std::string abilityName = fdp->ConsumeRandomLengthString();
-    int32_t userId = fdp->ConsumeIntegral<int32_t>();
-    formAbilityConnection.SetProviderKey(bundleName, abilityName, userId);
-    int64_t formId = fdp->ConsumeIntegral<int64_t>();
+    formAbilityConnection.GetConnectId();
+    
+    int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
     formAbilityConnection.SetFormId(formId);
     formAbilityConnection.GetFormId();
+    
+    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::string abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName, userId);
+    formAbilityConnection.GetProviderKey();
+    
     sptr<IRemoteObject> hostToken = nullptr;
     formAbilityConnection.SetHostToken(hostToken);
     formAbilityConnection.GetHostToken();
+    
     sptr<IRemoteObject> providerToken = nullptr;
     formAbilityConnection.SetProviderToken(providerToken);
     formAbilityConnection.GetProviderToken();
-    formAbilityConnection.GetAppMgr();
+    
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
     formAbilityConnection.onFormAppConnect();
     formAbilityConnection.ReportFormAppUnbindEvent();
     formAbilityConnection.GetBundleName();
@@ -107,12 +122,13 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
     wptr<IRemoteObject> remoteObject1;
     formAbilityConnection.OnConnectDied(remoteObject1);
+    
     DoSomethingInterestingPart2(fdp);
-    return formAbilityConnection.GetConnectId();
+    
+    return true;
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);
