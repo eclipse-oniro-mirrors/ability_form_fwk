@@ -45,6 +45,7 @@ constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t ERR_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
+constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 }  // namespace
 
 class FormRenderServiceMgrTest : public testing::Test {
