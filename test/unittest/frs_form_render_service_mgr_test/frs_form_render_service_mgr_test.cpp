@@ -1429,3 +1429,130 @@ HWTEST_F(FormRenderServiceMgrTest, ReportProcessMemory_003, TestSize.Level0)
     EXPECT_EQ(formRenderServiceMgr.renderRecordMap_.size(), 1);
     GTEST_LOG_(INFO) << "ReportProcessMemory_003 end";
 }
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_001
+ * @tc.desc: Verify SetRenderGroupEnableFlag with invalid formId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{0};
+    bool isEnable{true};
+    Want want;
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_001 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_002
+ * @tc.desc: Verify SetRenderGroupEnableFlag with empty uid.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_002 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    Want want;
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_002 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_003
+ * @tc.desc: Verify SetRenderGroupEnableFlag when render record not found.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_003 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_003 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_004
+ * @tc.desc: Verify SetRenderGroupEnableFlag when render record is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_004 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_004 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_005
+ * @tc.desc: Verify SetRenderGroupEnableFlag with valid parameters.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_005 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_005 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_006
+ * @tc.desc: Verify SetRenderGroupEnableFlag with isEnable set to false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlagFlag_006 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{false};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_006 end";
+}
