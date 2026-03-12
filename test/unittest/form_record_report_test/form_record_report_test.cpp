@@ -100,6 +100,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_004, TestSize.Level1)
     HiSysEventPointType type = TYPE_INVISIBLE_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().invisibleRefreshTimes, 1);
 }
 
@@ -119,6 +120,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_005, TestSize.Level1)
     HiSysEventPointType type = TYPE_HIGH_FREQUENCY;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().hfRefreshBlockTimes, 1);
 }
 
@@ -138,6 +140,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_006, TestSize.Level1)
     HiSysEventPointType type = TYPE_INVISIBLE_INTERCEPT;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().invisibleRefreshBlockTimes, 1);
 }
 
@@ -157,6 +160,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_007, TestSize.Level1)
     HiSysEventPointType type = TYPE_HIGH_LOAD;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().highLoadRefreshBlockTimes, 0);
 }
 
@@ -176,6 +180,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_008, TestSize.Level1)
     HiSysEventPointType type = TYPE_ACTIVE_RECVOER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().activeRecoverRefreshTimes, 0);
 }
 
@@ -195,6 +200,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_009, TestSize.Level1)
     HiSysEventPointType type = TYPE_PASSIVE_RECOVER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().passiveRecoverRefreshTimes, 1);
 }
 
@@ -214,6 +220,7 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_010, TestSize.Level1)
     HiSysEventPointType type = TYPE_HF_RECOVER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().hfRecoverRefreshTimes, 1);
 }
 
@@ -233,6 +240,27 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_011, TestSize.Level1)
     HiSysEventPointType type = TYPE_OFFLOAD_RECOVER_UPDATE;
     formRecordReport.IncreaseUpdateTimes(formId, type);
     auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
     EXPECT_EQ(iter->second.back().offloadRecoverRefreshTimes, 0);
+}
+
+/**
+ * @tc.name: FormRecordReport_012
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_012, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.actualProxyRefreshTimes = 0;
+    int64_t formId = 1;
+    std::queue<FormRecordReportInfo> queue;
+    queue.push(formRecordReportInfo);
+    formRecordReport.formRecordReportMap_[formId] = queue;
+    HiSysEventPointType type = TYPE_ACTUAL_PROXY_REFRESH;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    ASSERT_FALSE(iter->second.empty());
+    EXPECT_EQ(iter->second.back().actualProxyRefreshTimes, 1);
 }
 } // namespace

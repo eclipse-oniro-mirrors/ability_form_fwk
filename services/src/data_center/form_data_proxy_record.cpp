@@ -22,6 +22,7 @@
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
+#include "data_center/form_record/form_record_report.h"
 #include "form_mgr/form_mgr_adapter.h"
 #include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
@@ -499,6 +500,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
     FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
     FormRecord formRecord;
     (void)FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord);
+    FormRecordReport::GetInstance().IncreaseUpdateTimes(formId_, HiSysEventPointType::TYPE_ACTUAL_PROXY_REFRESH);
     auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     NewFormEventInfo eventInfo;
     eventInfo.formId = formId_;
@@ -532,6 +534,7 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     formProviderData.SetDataString(formDataStr);
 
     FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
+    FormRecordReport::GetInstance().IncreaseUpdateTimes(formId_, HiSysEventPointType::TYPE_ACTUAL_PROXY_REFRESH);
     auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {
         receivedDataCount_ += 1;
