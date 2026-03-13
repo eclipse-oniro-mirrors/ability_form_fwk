@@ -16,8 +16,10 @@
 #include <gtest/gtest.h>
 
 #include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_edit_service.h"
 #include "form_mgr_errors.h"
 #include "fms_log_wrapper.h"
+#include "form_instance.h"
 
 namespace {
     int g_enableUpdateForm = OHOS::ERR_OK;
@@ -59,11 +61,26 @@ namespace {
     int g_handleFormAddObserver = OHOS::ERR_OK;
     int g_registerAddObserver = OHOS::ERR_OK;
     int g_registerRemoveObserver = OHOS::ERR_OK;
+    int g_registerClickFormEventObserver = OHOS::ERR_OK;
     int g_registerClickEventObserver = OHOS::ERR_OK;
     int g_unregisterClickEventObserver = OHOS::ERR_OK;
     int g_requestoverflow = OHOS::ERR_OK;
     int g_changesceneanimationstate = OHOS::ERR_OK;
     int g_getformrect = OHOS::ERR_OK;
+    int g_startAbilityByFms = OHOS::ERR_OK;
+    int g_registerChangeSceneAnimationStateProxy = OHOS::ERR_OK;
+    int g_registerOverflowProxy = OHOS::ERR_OK;
+    int g_registerGetFormRectProxy = OHOS::ERR_OK;
+    int g_registerGetLiveFormStatusProxy = OHOS::ERR_OK;
+    int g_unregisterGetLiveFormStatusProxy = OHOS::ERR_OK;
+    int g_updateFormSizeFloat = OHOS::ERR_OK;
+    int g_registerTemplateFormDetailInfoChange = OHOS::ERR_OK;
+    int g_unregisterTemplateFormDetailInfoChange = OHOS::ERR_OK;
+    int g_updateTemplateFormDetailInfo = OHOS::ERR_OK;
+    int g_unregisterPublishFormCrossBundleControl = OHOS::ERR_OK;
+    bool g_publishFormCrossBundleControl = true;
+    bool g_hasFormVisible = true;
+    int g_enableForms = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -158,6 +175,76 @@ void MockStopRenderingForm(int mockRet)
 
 namespace OHOS {
 namespace AppExecFwk {
+void MockFormMgrAdapterStartAbilityByFms(int mockRet)
+{
+    g_startAbilityByFms = mockRet;
+}
+
+void MockFormMgrAdapterRegisterChangeSceneAnimationStateProxy(int mockRet)
+{
+    g_registerChangeSceneAnimationStateProxy = mockRet;
+}
+
+void MockFormMgrAdapterRegisterOverflowProxy(int mockRet)
+{
+    g_registerOverflowProxy = mockRet;
+}
+
+void MockFormMgrAdapterRegisterGetFormRectProxy(int mockRet)
+{
+    g_registerGetFormRectProxy = mockRet;
+}
+
+void MockFormMgrAdapterRegisterGetLiveFormStatusProxy(int mockRet)
+{
+    g_registerGetLiveFormStatusProxy = mockRet;
+}
+
+void MockFormMgrAdapterUnregisterGetLiveFormStatusProxy(int mockRet)
+{
+    g_unregisterGetLiveFormStatusProxy = mockRet;
+}
+
+void MockFormMgrAdapterUpdateFormSizeFloat(int mockRet)
+{
+    g_updateFormSizeFloat = mockRet;
+}
+
+void MockFormMgrAdapterRegisterTemplateFormDetailInfoChange(int mockRet)
+{
+    g_registerTemplateFormDetailInfoChange = mockRet;
+}
+
+void MockFormMgrAdapterUnregisterTemplateFormDetailInfoChange(int mockRet)
+{
+    g_unregisterTemplateFormDetailInfoChange = mockRet;
+}
+
+void MockFormMgrAdapterUpdateTemplateFormDetailInfo(int mockRet)
+{
+    g_updateTemplateFormDetailInfo = mockRet;
+}
+
+void MockFormMgrAdapterUnregisterPublishFormCrossBundleControl(int mockRet)
+{
+    g_unregisterPublishFormCrossBundleControl = mockRet;
+}
+
+void MockFormMgrAdapterPublishFormCrossBundleControl(bool mockRet)
+{
+    g_publishFormCrossBundleControl = mockRet;
+}
+
+void MockHasFormVisible(bool mockRet)
+{
+    g_hasFormVisible = mockRet;
+}
+
+void MockEnableForms(int mockRet)
+{
+    g_enableForms = mockRet;
+}
+
 int FormMgrAdapter::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
     GTEST_LOG_(INFO) << "EnableUpdateForm called " << g_enableUpdateForm;
@@ -404,6 +491,77 @@ ErrCode FormMgrAdapter::ChangeSceneAnimationState(const int64_t formId, const in
 ErrCode FormMgrAdapter::GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)
 {
     return g_getformrect;
+}
+
+ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
+{
+    return g_startAbilityByFms;
+}
+
+ErrCode FormMgrAdapter::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerChangeSceneAnimationStateProxy;
+}
+
+ErrCode FormMgrAdapter::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerOverflowProxy;
+}
+
+ErrCode FormMgrAdapter::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerGetFormRectProxy;
+}
+
+ErrCode FormMgrAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerGetLiveFormStatusProxy;
+}
+
+ErrCode FormMgrAdapter::UnregisterGetLiveFormStatusProxy()
+{
+    return g_unregisterGetLiveFormStatusProxy;
+}
+
+ErrCode FormMgrAdapter::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    float formViewScale)
+{
+    return g_updateFormSizeFloat;
+}
+
+ErrCode FormMgrAdapter::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerTemplateFormDetailInfoChange;
+}
+
+ErrCode FormMgrAdapter::UnregisterTemplateFormDetailInfoChange()
+{
+    return g_unregisterTemplateFormDetailInfoChange;
+}
+
+ErrCode FormMgrAdapter::UpdateTemplateFormDetailInfo(const std::vector<TemplateFormDetailInfo> &templateFormInfo)
+{
+    return g_updateTemplateFormDetailInfo;
+}
+
+ErrCode FormMgrAdapter::UnregisterPublishFormCrossBundleControl()
+{
+    return g_unregisterPublishFormCrossBundleControl;
+}
+
+bool FormMgrAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo)
+{
+    return g_publishFormCrossBundleControl;
+}
+
+bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
+{
+    return g_hasFormVisible;
+}
+
+int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const int32_t userId, const bool enable)
+{
+    return g_enableForms;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
