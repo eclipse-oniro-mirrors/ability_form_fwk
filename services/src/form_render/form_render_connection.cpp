@@ -17,19 +17,21 @@
 
 #include <cinttypes>
 
-#include "fms_log_wrapper.h"
+#include "ipc_skeleton.h"
+#include "want.h"
+
+#include "common/util/form_task_common.h"
+#include "common/util/form_util.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_cache_mgr.h"
+#include "feature/memory_mgr/form_render_report.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_provider/form_supply_callback.h"
 #include "form_render/form_render_mgr.h"
-#include "status_mgr_center/form_status_task_mgr.h"
 #include "form_host/form_host_task_mgr.h"
-#include "common/util/form_util.h"
-#include "ipc_skeleton.h"
-#include "want.h"
-#include "feature/memory_mgr/form_render_report.h"
+#include "status_mgr_center/form_status_task_mgr.h"
 
 const int32_t MAX_FAILED_TIMES = 5;
 
@@ -57,7 +59,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
             GetFormId(), failedTimes);
         if (failedTimes <= MAX_FAILED_TIMES) {
             FormHostTaskMgr::GetInstance().PostConnectFRSFailedTaskToHost(
-                GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED);
+                GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, FORM_FRS_DIED_TASK_DELAY_TIME);
         }
         return;
     }
@@ -91,11 +93,15 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
-        GetFormId(), resultCode, connectState_);
-    // If connectState_ is CONNECTING, it means connect failed and host will try again, don't need to notify host
     if (resultCode && connectState_ == ConnectState::CONNECTING) {
+        HILOG_WARN("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+            GetFormId(), resultCode, connectState_);
         FormRenderMgr::GetInstance().RemoveConnection(GetFormId(), formRecord_);
+        FormHostTaskMgr::GetInstance().PostConnectFRSFailedTaskToHost(
+            GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, FORM_RECONNECT_DELAY_TIME);
+    } else {
+        HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+            GetFormId(), resultCode, connectState_);
     }
     connectState_ = ConnectState::DISCONNECTED;
     failedTimes = 0;

@@ -27,6 +27,7 @@ enum class TaskType : int64_t {
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t FORM_FRS_DIED_TASK_DELAY_TIME = 100; // ms
+constexpr int32_t FORM_RECONNECT_DELAY_TIME = 1000; // ms
 constexpr int32_t FORM_BUILD_DELAY_TIME = 2000; // ms
 constexpr int32_t ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME = 5000; // ms
 constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms

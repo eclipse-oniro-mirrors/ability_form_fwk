@@ -67,7 +67,8 @@ void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formTaskMgr.HostDied(remoteHost);
 
     int32_t errorCode = static_cast<int32_t>(GetU32Data(data));
-    formTaskMgr.PostConnectFRSFailedTaskToHost(formId, errorCode);
+    uint32_t ms32 = GetU32Data(data);
+    formTaskMgr.PostConnectFRSFailedTaskToHost(formId, errorCode, ms32);
     formTaskMgr.ConnectFRSFailedTaskToHost(formId, errorCode);
 
     bool isDisablePolicy = (formId % 2 == 0);
