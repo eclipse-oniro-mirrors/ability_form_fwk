@@ -131,6 +131,7 @@ UPDATE_FORM_REFRESH_TIMES:
   HF_RECOVER_REFRESH_TIMES: {type: INT32, desc: hf recover refresh times}
   OFFLOAD_RECOVER_REFRESH_TIMES: {type: INT32, desc: offload recover refresh times}
   DISABLE_REFRESH_TIMES: {type: INT32, desc: disable refresh times}
+  FORM_DIMENSION: {type: INT64, desc: form dimension}
   FORM_LOCATION: {type: INT8, desc: form location}
   ACTUAL_PROXY_REFRESH_TIMES: {type: INT32, desc: form actual proxy refresh times}
 
