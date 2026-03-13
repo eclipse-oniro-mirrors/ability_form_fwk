@@ -1542,7 +1542,7 @@ HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_005, TestSize.Level0
  */
 HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_006, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlagFlag_006 start";
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_006 start";
     FormRenderServiceMgr formRenderServiceMgr;
     int64_t formId{1};
     bool isEnable{false};
