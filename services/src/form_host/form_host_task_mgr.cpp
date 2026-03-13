@@ -168,15 +168,16 @@ void FormHostTaskMgr::PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObj
  * @brief Post re-add form task to form host when FormRenderService is died.
  * @param formId The Id of the form.
  * @param errorCode Indicates error-code of the form.
+ * @param delayTime Milliseconds to delay posting an event.
  */
-void FormHostTaskMgr::PostConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode)
+void FormHostTaskMgr::PostConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode, uint32_t delayTime)
 {
     auto task = [formId, errorCode]() {
         FormHostTaskMgr::GetInstance().ConnectFRSFailedTaskToHost(formId, errorCode);
     };
     const std::pair<int64_t, int64_t> eventMsg = std::make_pair((int64_t)TaskType::RENDER_FORM, formId);
     FormHostQueue::GetInstance().CancelDelayTask(eventMsg);
-    FormHostQueue::GetInstance().ScheduleDelayTask(eventMsg, FORM_FRS_DIED_TASK_DELAY_TIME, task);
+    FormHostQueue::GetInstance().ScheduleDelayTask(eventMsg, delayTime, task);
 }
 
 /**

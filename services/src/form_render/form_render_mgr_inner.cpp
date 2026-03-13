@@ -99,7 +99,7 @@ ErrCode FormRenderMgrInner::RenderForm(
     }
     ErrCode errorCode = ConnectRenderService(formRenderConnection, formRecord.privacyLevel);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
         FormRenderMgr::GetInstance().HandleConnectFailed(formRecord.formId, errorCode);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
             formRecord.formId,
