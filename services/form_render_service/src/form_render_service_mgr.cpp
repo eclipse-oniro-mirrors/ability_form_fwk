@@ -90,6 +90,8 @@ const static std::unordered_set<std::string> configItemList_ = {
     SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE
 };
 
+const static std::unordered_set<std::string> CONFIG_ITEM_BLACK_LIST = { SYSTEM_MCC, SYSTEM_MNC };
+
 FormRenderServiceMgr::FormRenderServiceMgr()
 {
     serialQueue_ = std::make_unique<FormRenderSerialQueue>(FORM_RENDER_SERIAL_QUEUE);
@@ -524,22 +526,27 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
 
 bool FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config)
 {
+    if (config == nullptr) {
+        HILOG_WARN("config item is nullptr.");
+        return false;
+    }
+    for (const auto &item : CONFIG_ITEM_BLACK_LIST) {
+        if (!config->GetItem(item).empty()) {
+            config->RemoveItem(item);
+        }
+    }
+    if (config->GetItemSize() == 0) {
+        HILOG_WARN("config item is empty.");
+        return false;
+    }
     std::lock_guard<std::mutex> lock(configMutex_);
-    if (config != nullptr && configuration_ != nullptr) {
-        bool needUpdateConfig = false;
+    if (configuration_ != nullptr) {
         for (const auto &item : configItemList_) {
             std::string newValue = config->GetItem(item);
             std::string oldValue = configuration_->GetItem(item);
-            if (!needUpdateConfig && !newValue.empty()) {
-                HILOG_INFO("configuration update item:%{public}s, value:%{public}s", item.c_str(), newValue.c_str());
-                needUpdateConfig = true;
-            }
             if (newValue.empty() && !oldValue.empty()) {
                 config->AddItem(item, oldValue);
             }
-        }
-        if (!needUpdateConfig) {
-            return false;
         }
     }
     configuration_ = config;
