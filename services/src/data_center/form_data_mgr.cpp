@@ -83,7 +83,7 @@ static void ReportDistributedFormEvent(const FormEventName &eventName, const For
     FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
 }
 
-inline void PrintFormsExceedsInfo()
+static void PrintFormsExceedsInfo()
 {
     std::map<Constants::FormLocation, int> locationMap;
     FormDbCache::GetInstance().GetLocationMap(locationMap);
