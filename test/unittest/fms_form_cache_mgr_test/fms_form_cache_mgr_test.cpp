@@ -357,4 +357,19 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_016, TestSize.Level0)
     EXPECT_NE(formIds.find(PARAM_FORM_ID_FIRST), formIds.end());
     GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_016 end";
 }
+
+/*
+ * Feature: FormCacheMgr
+ * Function: NeedAcquireProviderData
+ * FunctionPoints: FormCacheMgr NeedAcquireProviderData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_017, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_017 start");
+    int64_t formId = 0;
+    bool result = formCacheMgr_.NeedAcquireProviderData(formId);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_017 end";
+}
 }
