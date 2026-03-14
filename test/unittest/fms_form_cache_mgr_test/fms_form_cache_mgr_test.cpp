@@ -50,7 +50,9 @@ void FmsFormCacheMgrTest::SetUp()
 {}
 
 void FmsFormCacheMgrTest::TearDown()
-{}
+{
+    formCacheMgr_.DeleteData(0);
+}
 
 /*
  * Feature: FormCacheMgr
