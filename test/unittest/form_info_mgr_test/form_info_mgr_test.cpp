@@ -2089,7 +2089,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_0
     GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_002 start";
     formInfoMgr_.bundleFormInfoMap_.clear();
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
         formInfoMgr_.GetTemplateFormsInfoByModuleWithoutCheck(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST,
         formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_002 end";
