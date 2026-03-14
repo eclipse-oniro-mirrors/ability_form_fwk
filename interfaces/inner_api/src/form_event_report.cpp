@@ -45,7 +45,7 @@ constexpr const char *EVENT_KEY_ACQUIRE_DURATION = "ACQUIRE_DURATION";
 constexpr const char *EVENT_KEY_DURATION = "DURATION";
 constexpr const char *EVENT_KEY_DURATION_TYPE = "DURATION_TYPE";
 constexpr const char *EVENT_KEY_DAILY_REFRESH_TIMES = "DAILY_REFRESH_TIMES";
-constexpr const char *EVENT_KEY_ACTUAL_PROXY_REFRESH_TIMES = "DAILY_ACTUAL_PROXY_REFRESH_TIMES";
+constexpr const char *EVENT_KEY_ACTUAL_PROXY_REFRESH_TIMES = "ACTUAL_PROXY_REFRESH_TIMES";
 constexpr const char *EVENT_KEY_INVISIBLE_REFRESH_TIMES = "INVISIBLE_REFRESH_TIMES";
 constexpr const char *EVENT_KEY_HF_REFRESH_BLOCK_TIMES = "HF_REFRESH_BLOCK_TIMES";
 constexpr const char *EVENT_KEY_INVISIBLE_REFRESH_BLOCK_TIMES = "INVISIBLE_REFRESH_BLOCK_TIMES";
@@ -279,6 +279,7 @@ void FormEventReport::SendFormRefreshCountEvent(const FormEventName &eventName, 
             EVENT_KEY_OFFLOAD_RECOVER_REFRESH_TIMES, static_cast<int32_t>(eventInfo.offloadRecoverRefreshTimes),
             EVENT_KEY_DISABLE_FORM_REFRESH_TIMES, static_cast<int32_t>(eventInfo.disableFormRefreshTimes),
             EVENT_KEY_IS_DISTRIBUTED_FORM, eventInfo.isDistributedForm,
+            EVENT_KEY_ABILITY_NAME, eventInfo.abilityName,
             EVENT_KEY_FORM_DIMENSION, static_cast<int64_t>(eventInfo.formDimension),
             EVENT_KEY_FORM_LOCATION, static_cast<int8_t>(eventInfo.formLocation),
             EVENT_KEY_ACTUAL_PROXY_REFRESH_TIMES, static_cast<int32_t>(eventInfo.actualProxyRefreshTimes)
