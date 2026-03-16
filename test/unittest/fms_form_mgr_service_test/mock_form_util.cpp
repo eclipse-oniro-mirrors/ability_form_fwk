@@ -24,7 +24,16 @@ namespace {
 int32_t getCurrentAccountId = OHOS::AppExecFwk::Constants::ANY_USERID;
 bool g_isSACall = true;
 bool g_verifyCallingPermission = true;
+int32_t g_getCallerUserId = OHOS::AppExecFwk::Constants::ANY_USERID;
 }
+
+void MockVerifyCallingPermission(bool mockRet)
+{
+    g_verifyCallingPermission = mockRet;
+}
+
+namespace OHOS {
+namespace AppExecFwk {
 
 void MockGetCurrentAccountIdRet(int32_t userId)
 {
@@ -36,13 +45,11 @@ void MockIsSACall(bool mockRet)
     g_isSACall = mockRet;
 }
 
-void MockVerifyCallingPermission(bool mockRet)
+void MockGetCallerUserId(int32_t userId)
 {
-    g_verifyCallingPermission = mockRet;
+    g_getCallerUserId = userId;
 }
 
-namespace OHOS {
-namespace AppExecFwk {
 int FormUtil::GetCurrentAccountId()
 {
     GTEST_LOG_(INFO) << "GetCurrentAccountId called " << getCurrentAccountId;
@@ -59,6 +66,11 @@ bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
 {
     GTEST_LOG_(INFO) << "VerifyCallingPermission called " << g_verifyCallingPermission;
     return g_verifyCallingPermission;
+}
+
+int32_t FormUtil::GetCallerUserId(const int callingUid)
+{
+    return g_getCallerUserId;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
