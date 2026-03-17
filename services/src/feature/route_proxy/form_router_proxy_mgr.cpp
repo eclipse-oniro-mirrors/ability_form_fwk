@@ -54,12 +54,13 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
         }
         formRouterProxyMap_.emplace(formId, callerToken);
     }
-    auto dealthRecipient = new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
-    if (dealthRecipient == nullptr) {
-        HILOG_ERROR("create ClientDealthRecipient failed");
+    sptr<IRemoteObject::DeathRecipient> deathRecipient =
+        new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
+    if (deathRecipient == nullptr) {
+        HILOG_ERROR("create ClientDeathRecipient failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    SetDeathRecipient(callerToken, dealthRecipient);
+    SetDeathRecipient(callerToken, deathRecipient);
     return ERR_OK;
 #else
     return ERR_OK;
