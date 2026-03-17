@@ -234,6 +234,8 @@ ohos_shared_library("libfms") {
     "services/src/form_observer/form_observer_record.cpp",
     "services/src/form_observer/form_observer_task_mgr.cpp",
     "services/src/form_observer/form_resource_observer.cpp",
+    "services/src/form_observer/net_conn_callback_manager.cpp",
+    "services/src/form_observer/net_conn_callback_observer.cpp",
     "services/src/form_provider/connection/form_acquire_connection.cpp",
     "services/src/form_provider/connection/form_acquire_data_connection.cpp",
     "services/src/form_provider/connection/form_acquire_state_connection.cpp",

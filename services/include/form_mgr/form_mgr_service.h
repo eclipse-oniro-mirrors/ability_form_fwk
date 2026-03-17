@@ -774,8 +774,6 @@ public:
     ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
         float formViewScale) override;
 
-    void SubscribeNetConn();
-
     /**
      * @brief Handle open form edit ability.
      * @param abilityName The form edit ability name.
@@ -791,8 +789,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode CloseFormEditAbility(bool isMainPage) override;
-
-    friend class NetConnCallbackObserver;
 
     /**
      * @brief Register overflow proxy
@@ -989,8 +985,6 @@ private:
 
     void InitFormShareMgrSerialQueue();
 
-    void PostConnectNetWork();
-
     void Dump(const std::vector<std::u16string> &args, std::string &result);
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
     void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
@@ -1004,8 +998,6 @@ private:
     void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
-    void SetNetConnect();
-    void SetDisConnectTypeTime();
     bool PublishFormCrossBundleControl(const Want &want);
 
 private:
@@ -1021,8 +1013,6 @@ private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
     uint32_t NetSceneCallbackId_ = 0;
-    int32_t netConTime = 0;
-    int64_t lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
     std::set<int64_t> requestPublishFormWithSnapshotSet_;
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);
