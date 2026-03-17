@@ -18,7 +18,7 @@ import UIExtensionContext from 'application.UIExtensionContext';
 import type Want from '@ohos.app.ability.Want';
 import type { AbilityResult } from 'ability.abilityResult';
 
-class AsyncCallbackWrapper<T, E = void> {
+export class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => {}
 
   constructor(myFun: AsyncCallback<T, E>) {
