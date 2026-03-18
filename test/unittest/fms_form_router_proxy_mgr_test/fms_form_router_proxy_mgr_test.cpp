@@ -32,6 +32,7 @@
 #include "mock_i_remote_object.h"
 #undef public
 #undef protected
+using namespace testing;
 using namespace testing::ext;
 
 namespace OHOS {
@@ -73,8 +74,7 @@ HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_001, TestSize.Level1)
     formIds.emplace_back(formId);
     sptr<MockIRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
     auto dealthRecipient = new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
-    EXPECT_CALL(*callerToken, AddDeathRecipient(_))
-        .WillOnce(Return(true));
+    EXPECT_CALL(*callerToken, AddDeathRecipient(_)).WillOnce(Return(true));
     formRouterProxyMgr.SetDeathRecipient(callerToken, dealthRecipient);
     EXPECT_EQ(1, formRouterProxyMgr.deathRecipients_.size());
     GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_001 end";
