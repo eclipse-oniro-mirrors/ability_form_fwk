@@ -29,6 +29,7 @@
 #include "iremote_broker.h"
 #include "message_parcel.h"
 #include "mock_form_provider_client.h"
+#include "mock_i_remote_object.h"
 #undef public
 #undef protected
 using namespace testing::ext;
@@ -56,6 +57,28 @@ void FormRouterProxyMgrTest::SetUp()
 
 void FormRouterProxyMgrTest::TearDown()
 {}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_001
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the SetDeathRecipient interface is called normally
+ * and the formRouterProxyMap size is 1.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_001 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<MockIRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
+    auto dealthRecipient = new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
+    EXPECT_CALL(*callerToken, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+    formRouterProxyMgr.SetDeathRecipient(callerToken, dealthRecipient);
+    EXPECT_EQ(1, formRouterProxyMgr.deathRecipients_.size());
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_001 end";
+}
 
 /**
  * @tc.number: FormRouterProxyMgrTest_002
