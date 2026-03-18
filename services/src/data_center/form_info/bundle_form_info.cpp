@@ -69,12 +69,18 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
         return errCode;
     }
 
+    return UpdateStaticFormInfosWithData(formInfos, userId);
+}
+
+ErrCode BundleFormInfo::UpdateStaticFormInfosWithData(const std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    HILOG_INFO("userId is %{public}d", userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     if (!formInfos.empty()) {
         std::vector<FormDBInfo> formDBInfos;
         std::vector<FormInfo> finalFormInfos;
         FormDbCache::GetInstance().GetAllFormDBInfoByBundleName(bundleName_, userId, formDBInfos);
-        HandleFormInfosMaxLimit(formInfos, finalFormInfos, formDBInfos);
+        HandleFormInfosMaxLimit(const_cast<std::vector<FormInfo>&>(formInfos), finalFormInfos, formDBInfos);
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
             // Update all user's formInfos

@@ -20,6 +20,7 @@
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/database/form_db_cache.h"
+#include "data_center/form_info/form_info_helper.h"
 #include "data_center/form_info/form_info_storage.h"
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
@@ -497,15 +498,27 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     hasReloadedFormInfosState_ = false;
     UpdateBundleFormInfos(bundleVersionMap, userId);
-    for (auto const &bundleVersionPair : bundleVersionMap) {
-        std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleVersionPair.first);
-        ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfos(userId);
-        if (errCode != ERR_OK || bundleFormInfoPtr->Empty()) {
-            continue;
+    if (!bundleVersionMap.empty()) {
+        std::vector<std::string> bundleNames;
+        for (const auto &bundleVersionPair : bundleVersionMap) {
+            bundleNames.push_back(bundleVersionPair.first);
         }
-        bundleFormInfoMap_[bundleVersionPair.first] = bundleFormInfoPtr;
-        HILOG_INFO("add forms info success, bundleName=%{public}s, versionCode:%{public}d",
-            bundleVersionPair.first.c_str(), bundleVersionPair.second);
+        std::map<std::string, std::vector<FormInfo>> formInfosMap;
+        ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleNames(bundleNames, formInfosMap, userId);
+        if (errCode == ERR_OK) {
+            for (auto const &formInfoPair : formInfosMap) {
+                const std::string &bundleName = formInfoPair.first;
+                const std::vector<FormInfo> &formInfos = formInfoPair.second;
+
+                std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleName);
+                errCode = bundleFormInfoPtr->UpdateStaticFormInfosWithData(formInfos, userId);
+                if (errCode != ERR_OK || bundleFormInfoPtr->Empty()) {
+                    continue;
+                }
+                bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
+                HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
+            }
+        }
     }
     hasReloadedFormInfosState_ = true;
     bool publishRet = PublishFmsReadyEvent();
@@ -576,6 +589,7 @@ void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bu
         Constants::FORM_VERSION_CODE != FormUtil::ConvertStringToInt(versionCode);
     HILOG_INFO("bundle number:%{public}zu, old versionCode:%{public}s, new versionCode:%{public}d",
         bundleVersionMap.size(), versionCode.c_str(), Constants::FORM_VERSION_CODE);
+    std::vector<std::string> needUpdateBundleNames;
     for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string &bundleName = bundleFormInfoPair.first;
         auto bundleVersionPair = bundleVersionMap.find(bundleName);
@@ -595,8 +609,22 @@ void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bu
             }
         }
         bundleVersionMap.erase(bundleVersionPair);
-        bundleFormInfoPair.second->UpdateStaticFormInfos(userId);
-        HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
+        needUpdateBundleNames.push_back(bundleName);
+    }
+    if (!needUpdateBundleNames.empty()) {
+        std::map<std::string, std::vector<FormInfo>> formInfosMap;
+        ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleNames(needUpdateBundleNames, formInfosMap, userId);
+        if (errCode == ERR_OK) {
+            for (auto const &formInfoPair : formInfosMap) {
+                const std::string &bundleName = formInfoPair.first;
+                const std::vector<FormInfo> &formInfos = formInfoPair.second;
+                auto bundleFormInfoIter = bundleFormInfoMap_.find(bundleName);
+                if (bundleFormInfoIter != bundleFormInfoMap_.end()) {
+                    bundleFormInfoIter->second->UpdateStaticFormInfosWithData(formInfos, userId);
+                    HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
+                }
+            }
+        }
     }
     if (isNeedUpdateAll) {
         FormInfoRdbStorageMgr::GetInstance().UpdateFormVersionCode();

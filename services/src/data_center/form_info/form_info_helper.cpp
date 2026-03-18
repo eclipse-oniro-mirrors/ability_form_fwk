@@ -98,6 +98,47 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
     return ERR_OK;
 }
 
+ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames,
+    std::map<std::string, std::vector<FormInfo>> &formInfosMap, int32_t userId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (bundleNames.empty()) {
+        HILOG_ERROR("invalid bundleNames");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("get IBundleMgr failed");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
+    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES;
+    std::vector<BundleInfo> bundleInfos;
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(bundleNames, flag, bundleInfos, userId));
+    if (ret != ERR_OK) {
+        HILOG_ERROR("batch get bundleInfo failed");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+
+    for (const auto &bundleInfo : bundleInfos) {
+        std::vector<FormInfo> formInfos;
+        if (bundleInfo.abilityInfos.empty()) {
+            HILOG_WARN("empty abilityInfos");
+            // Check if current bundle contains FA forms.
+            LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+            // Check if current bundle contains Stage forms.
+            LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+        } else if (bundleInfo.abilityInfos[0].isStageBasedModel) {
+            LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+        } else {
+            LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+        }
+        formInfosMap[bundleInfo.name] = formInfos;
+    }
+    return ERR_OK;
+}
+
 ErrCode FormInfoHelper::LoadStageFormConfigInfo(
     const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos, int32_t userId)
 {
