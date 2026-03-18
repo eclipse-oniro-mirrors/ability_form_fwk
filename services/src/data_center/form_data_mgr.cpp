@@ -88,7 +88,7 @@ static void PrintFormsExceedsInfo()
     std::map<Constants::FormLocation, int> locationMap;
     FormDbCache::GetInstance().GetLocationMap(locationMap);
     Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
-    int maxCount = 0;
+    int32_t maxCount = 0;
     for (const auto &location : locationMap) {
         if (location.second > maxCount) {
             maxCount = location.second;
