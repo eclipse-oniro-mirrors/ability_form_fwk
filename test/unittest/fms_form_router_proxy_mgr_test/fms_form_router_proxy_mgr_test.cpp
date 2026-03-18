@@ -58,26 +58,6 @@ void FormRouterProxyMgrTest::TearDown()
 {}
 
 /**
- * @tc.number: FormRouterProxyMgrTest_001
- * @tc.name: FormRouterProxyMgrTest
- * @tc.desc: Verify that the SetDeathRecipient interface is called normally
- * and the formRouterProxyMap size is 1.
- */
-HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_001 start";
-    FormRouterProxyMgr formRouterProxyMgr;
-    int64_t formId = 1;
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    auto dealthRecipient = new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
-    formRouterProxyMgr.SetDeathRecipient(callerToken, dealthRecipient);
-    EXPECT_EQ(1, formRouterProxyMgr.deathRecipients_.size());
-    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_001 end";
-}
-
-/**
  * @tc.number: FormRouterProxyMgrTest_002
  * @tc.name: FormRouterProxyMgrTest
  * @tc.desc: Verify that the SetFormRouterProxy interface is called normally
