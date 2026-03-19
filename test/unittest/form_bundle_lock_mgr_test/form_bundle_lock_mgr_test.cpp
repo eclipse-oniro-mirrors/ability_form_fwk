@@ -158,16 +158,25 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_IsBundleProtect_003, TestSize.
 
 /**
  * @tc.name: formBundleLockMgr_InitLockService_001
- * @tc.desc: test InitLockService function.
+ * @tc.desc: test InitLockService function, when isLockServiceInitialized_ is false.
  * @tc.type: FUNC
  */
 HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_InitLockService_001, TestSize.Level1)
 {
     formBundleLockMgr.isLockServiceInitialized_.store(false);
     formBundleLockMgr.InitLockService();
-    // test isLockServiceInitialized_ is false
     EXPECT_TRUE(formBundleLockMgr.isLockServiceInitialized_.load());
-    // test isLockServiceInitialized_ is true
+}
+
+/**
+ * @tc.name: formBundleLockMgr_InitLockService_002
+ * @tc.desc: test InitLockService function, when isLockServiceInitialized_ is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_InitLockService_002, TestSize.Level1)
+{
+    formBundleLockMgr.isLockServiceInitialized_.store(true);
+    formBundleLockMgr.InitLockService();
     EXPECT_TRUE(formBundleLockMgr.isLockServiceInitialized_.load());
 }
 } // namespace
