@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
+#define private public
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
-
+#undef private
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
@@ -33,6 +34,7 @@ void FormBundleLockMgrTest::SetUp()
 {
     OHOS::AppExecFwk::ElementName element;
     element.SetBundleName(BUNDLE_NAME);
+    formBundleLockMgr.isLockServiceInitialized_.store(true);
 }
 
 void FormBundleLockMgrTest::TearDown()
@@ -67,11 +69,11 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: formBundleLockMgr_003
- * @tc.desc: test IsBundleProtect function.
+ * @tc.name: formBundleLockMgr_IsBundleProtect_001
+ * @tc.desc: test IsBundleProtect function, when bundleName is not protected.
  * @tc.type: FUNC
  */
-HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_003, TestSize.Level1)
+HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_IsBundleProtect_001, TestSize.Level1)
 {
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, false);
     int32_t userId = DEFAULT_USER_ID;
@@ -80,16 +82,47 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: formBundleLockMgr_004
- * @tc.desc: test SetBundleProtectStatus function.
+ * @tc.name: formBundleLockMgr_IsBundleProtect_002
+ * @tc.desc: test IsBundleProtect function, when bundleName is protected.
  * @tc.type: FUNC
  */
-HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_004, TestSize.Level1)
+HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_IsBundleProtect_002, TestSize.Level1)
 {
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, true);
     int32_t userId = DEFAULT_USER_ID;
     bool forbid = formBundleLockMgr.IsBundleProtect(BUNDLE_NAME, userId);
     EXPECT_EQ(forbid, true);
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, false);
+}
+
+/**
+ * @tc.name: formBundleLockMgr_IsBundleProtect_003
+ * @tc.desc: test IsBundleProtect function, when isLockServiceInitialized_ is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_IsBundleProtect_003, TestSize.Level1)
+{
+    formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, true);
+    int32_t userId = DEFAULT_USER_ID;
+    formBundleLockMgr.isLockServiceInitialized_.store(false);
+    bool forbid = formBundleLockMgr.IsBundleProtect(BUNDLE_NAME, userId);
+    formBundleLockMgr.isLockServiceInitialized_.store(true);
+    EXPECT_EQ(forbid, false);
+    formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, false);
+}
+
+/**
+ * @tc.name: formBundleLockMgr_InitLockService_001
+ * @tc.desc: test InitLockService function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_InitLockService_001, TestSize.Level1)
+{
+    formBundleLockMgr.isLockServiceInitialized_.store(false);
+    formBundleLockMgr.InitLockService();
+    // test isLockServiceInitialized_ is false
+    EXPECT_TRUE(formBundleLockMgr.isLockServiceInitialized_.load());
+    // test isLockServiceInitialized_ is true
+    EXPECT_TRUE(formBundleLockMgr.isLockServiceInitialized_.load());
 }
 } // namespace

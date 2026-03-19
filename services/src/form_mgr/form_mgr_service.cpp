@@ -2081,6 +2081,7 @@ int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos
         return ret;
     }
 
+    FormBundleLockMgr::GetInstance().InitLockService();
     int32_t retErrCode = ERR_OK;
     for (const auto &info : formLockInfos) {
         if (type == LockChangeType::SWITCH_CHANGE) {

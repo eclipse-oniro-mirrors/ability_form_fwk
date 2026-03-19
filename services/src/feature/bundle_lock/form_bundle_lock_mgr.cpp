@@ -123,6 +123,12 @@ bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, const int
         return false;
     }
 
+    if (!isLockServiceInitialized_.load()) {
+        HILOG_WARN("The app lock service has not been initialized; returning bundle lock Info, bundleName:%{public}s.",
+            bundleName.c_str());
+        return IsBundleLock(bundleName, userId, formId);
+    }
+
     std::shared_lock<std::shared_mutex> lock(bundleProtectSetMutex_);
     auto iter = formBundleProtectSet_.find(bundleName);
     return iter != formBundleProtectSet_.end();
@@ -143,6 +149,13 @@ void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bo
         formBundleProtectSet_.erase(bundleName);
     } else {
         HILOG_ERROR("set bundle protect status failed");
+    }
+}
+
+void FormBundleLockMgr::InitLockService() {
+    if (!isLockServiceInitialized_.load()) {
+        HILOG_INFO("App lock service initialization.");
+        isLockServiceInitialized_.store(true);
     }
 }
 }  // namespace AppExecFwk
