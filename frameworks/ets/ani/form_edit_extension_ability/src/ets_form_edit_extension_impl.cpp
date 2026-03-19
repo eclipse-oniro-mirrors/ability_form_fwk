@@ -47,9 +47,9 @@ void EtsFormEditExtensionImpl::BindContext()
         return;
     }
     ani_field contextField;
-    auto status = env->Class_FindField(etsObj_->aniCls, "context", &contextField);
+    auto status = env->Class_FindField(etsObj_->aniCls, "formEditorContext", &contextField);
     if (status != ANI_OK) {
-        HILOG_ERROR("Class_GetField context failed");
+        HILOG_ERROR("Class_GetField formEditorContext failed");
         return;
     }
     ani_ref contextRef = nullptr;

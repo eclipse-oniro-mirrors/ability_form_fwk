@@ -28,7 +28,7 @@ export interface LiveFormInfo {
 }
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
-  public context: LiveFormExtensionContext = {};
+  public liveFormContext: LiveFormExtensionContext = {};
 
   private native nativeSetWindowBackgroundColor(): void;
 
