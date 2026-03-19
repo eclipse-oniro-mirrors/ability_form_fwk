@@ -152,7 +152,8 @@ void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bo
     }
 }
 
-void FormBundleLockMgr::InitLockService() {
+void FormBundleLockMgr::InitLockService()
+{
     if (!isLockServiceInitialized_.load()) {
         HILOG_INFO("App lock service initialization.");
         isLockServiceInitialized_.store(true);
