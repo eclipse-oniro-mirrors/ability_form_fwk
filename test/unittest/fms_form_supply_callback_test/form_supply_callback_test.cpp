@@ -34,6 +34,7 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
 #include "mock_form_token.h"
+#include "inner/mock_form_render_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -698,10 +699,32 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormOnDeleteFormDoneTest_0001, TestSize.Leve
 HWTEST_F(FmsFormSupplyCallbackTest, FormOnNotifyRefreshFormTest_0001, TestSize.Level0)
 {
     HILOG_INFO("FormOnNotifyRefreshFormTest_0001 start");
-    
+
     FormSupplyCallback formSupplyCallback;
     EXPECT_EQ(formSupplyCallback.OnNotifyRefreshForm(123), ERR_OK);
 
     GTEST_LOG_(INFO) << "FormOnNotifyRefreshFormTest_0001 end";
+}
+
+/**
+ * @tc.name: HandleRenderFormTest_0001
+ * @tc.desc: Verify HandleRenderForm returns ERR_OK when UpdateRenderingForm succeeds
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, HandleRenderFormTest_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_0001 start";
+
+    int64_t formId = 100;
+    FormProviderInfo formProviderInfo;
+    Want want;
+    int32_t callerUserId = 0;
+
+    MockUpdateRenderingForm(ERR_OK);
+    FormSupplyCallback formSupplyCallback;
+    int32_t ret = formSupplyCallback.HandleRenderForm(formId, formProviderInfo, want, callerUserId);
+    EXPECT_EQ(ret, ERR_OK);
+
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_0001 end";
 }
 }
