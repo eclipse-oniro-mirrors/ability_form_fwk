@@ -109,11 +109,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     }
 
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
-        errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
-            want.GetParams(), false);
-        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want,
-            callerUserId);
-        return errCode;
+        return HandleRenderForm(formId, formProviderInfo, want, callerUserId);
     }
 
     int32_t ret = ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -401,6 +397,22 @@ int32_t FormSupplyCallback::OnRecycleFormDone(const int64_t formId, const Want &
 int32_t FormSupplyCallback::OnDeleteFormDone(const int64_t formId, const Want &want)
 {
     return FormStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, want);
+}
+
+int32_t FormSupplyCallback::HandleRenderForm(const int64_t formId, const FormProviderInfo &formProviderInfo,
+    const Want &want, int32_t callerUserId)
+{
+    FormRecord formRecord;
+    FormProviderData formProviderData = formProviderInfo.GetFormData();
+    bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    if (hasRecord && !FormMgrAdapter::GetInstance().IsDeleteCacheInUpgradeScene(formRecord)) {
+        HILOG_INFO("To use the DB cahed data when formProviderData is empty, formId: %{public}" PRId64, formId);
+        formProviderData.EnableDbCache(true);
+    }
+    int32_t errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, want.GetParams(), false);
+    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want,
+        callerUserId);
+    return errCode;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
