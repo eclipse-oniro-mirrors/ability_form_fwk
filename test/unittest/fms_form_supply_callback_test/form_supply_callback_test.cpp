@@ -34,8 +34,11 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
 #include "mock_form_token.h"
-#include "inner/mock_form_render_mgr.h"
+#include "mock_form_mgr_adapter.h"
+#include "mock_form_render_mgr.h"
+#include "mock_form_data_mgr.h"
 
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
@@ -707,24 +710,80 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormOnNotifyRefreshFormTest_0001, TestSize.L
 }
 
 /**
- * @tc.name: HandleRenderFormTest_0001
- * @tc.desc: Verify HandleRenderForm returns ERR_OK when UpdateRenderingForm succeeds
+ * @tc.name: HandleRenderFormTest_001
+ * @tc.desc: Test HandleRenderForm with hasRecord=false, DB cache not enabled
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormSupplyCallbackTest, HandleRenderFormTest_0001, TestSize.Level0)
+HWTEST_F(FmsFormSupplyCallbackTest, HandleRenderFormTest_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "HandleRenderFormTest_0001 start";
-
-    int64_t formId = 100;
-    FormProviderInfo formProviderInfo;
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_001 start";
+    
+    int64_t formId = 1001;
+    int32_t callerUserId = 100;
     Want want;
-    int32_t callerUserId = 0;
-
-    MockUpdateRenderingForm(ERR_OK);
+    WantParams wantParams;
+    FormProviderInfo formProviderInfo;
+    FormProviderData formProviderData;
+    formProviderInfo.SetFormData(formProviderData);
+    
+    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+    MockFormMgrAdapter::obj = std::make_shared<MockFormMgrAdapter>();
+    MockFormRenderMgr::obj = std::make_shared<MockFormRenderMgr>();
+    
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).WillOnce(Return(false));
+    EXPECT_CALL(*MockFormRenderMgr::obj, UpdateRenderingForm(_, _, _, _)).WillOnce(Return(ERR_OK));
+    
     FormSupplyCallback formSupplyCallback;
     int32_t ret = formSupplyCallback.HandleRenderForm(formId, formProviderInfo, want, callerUserId);
+    
     EXPECT_EQ(ret, ERR_OK);
+    
+    MockFormDataMgr::obj = nullptr;
+    MockFormMgrAdapter::obj = nullptr;
+    MockFormRenderMgr::obj = nullptr;
+    
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_001 end";
+}
 
-    GTEST_LOG_(INFO) << "HandleRenderFormTest_0001 end";
+/**
+ * @tc.name: HandleRenderFormTest_002
+ * @tc.desc: Test HandleRenderForm with hasRecord=true and not in upgrade scene, DB cache enabled
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, HandleRenderFormTest_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_002 start";
+    
+    int64_t formId = 1002;
+    int32_t callerUserId = 100;
+    Want want;
+    WantParams wantParams;
+    FormProviderInfo formProviderInfo;
+    FormProviderData formProviderData;
+    formProviderInfo.SetFormData(formProviderData);
+    
+    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+    MockFormMgrAdapter::obj = std::make_shared<MockFormMgrAdapter>();
+    MockFormRenderMgr::obj = std::make_shared<MockFormRenderMgr>();
+    
+    FormRecord formRecord;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll([&](int64_t, FormRecord &record) {
+            record = formRecord;
+            return true;
+        }));
+    EXPECT_CALL(*MockFormMgrAdapter::obj, IsDeleteCacheInUpgradeScene(_)).WillOnce(Return(false));
+    EXPECT_CALL(*MockFormRenderMgr::obj, UpdateRenderingForm(_, _, _, _)).WillOnce(Return(ERR_OK));
+    
+    FormSupplyCallback formSupplyCallback;
+    int32_t ret = formSupplyCallback.HandleRenderForm(formId, formProviderInfo, want, callerUserId);
+    
+    EXPECT_EQ(ret, ERR_OK);
+    
+    MockFormDataMgr::obj = nullptr;
+    MockFormMgrAdapter::obj = nullptr;
+    MockFormRenderMgr::obj = nullptr;
+    
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_002 end";
 }
 }

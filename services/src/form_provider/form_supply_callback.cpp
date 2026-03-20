@@ -409,7 +409,8 @@ int32_t FormSupplyCallback::HandleRenderForm(const int64_t formId, const FormPro
         HILOG_INFO("To use the DB cahed data when formProviderData is empty, formId: %{public}" PRId64, formId);
         formProviderData.EnableDbCache(true);
     }
-    int32_t errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, want.GetParams(), false);
+    int32_t errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData,
+        want.GetParams(), false);
     FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want,
         callerUserId);
     return errCode;
