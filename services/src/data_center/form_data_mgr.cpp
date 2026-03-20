@@ -82,6 +82,21 @@ static void ReportDistributedFormEvent(const FormEventName &eventName, const For
 
     FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
 }
+
+static void PrintFormsExceedsInfo()
+{
+    std::map<Constants::FormLocation, int> locationMap;
+    FormDbCache::GetInstance().GetLocationMap(locationMap);
+    Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
+    int32_t maxCount = 0;
+    for (const auto &location : locationMap) {
+        if (location.second > maxCount) {
+            maxCount = location.second;
+            maxLocation = location.first;
+        }
+    }
+    HILOG_WARN("maxLocation:%{public}d, maxCount:%{public}d", static_cast<int>(maxLocation), maxCount);
+}
 }
 
 FormDataMgr::FormDataMgr()
@@ -449,7 +464,8 @@ int FormDataMgr::CheckEnoughFormForUser(const int32_t currentUserId, const bool 
     HILOG_DEBUG("current user:%{public}d has form count:%{public}d", currentUserId, formCountsCurUser);
 
     if (!isCastTempForm && formCountsCurUser >= maxRecordPerUser) {
-        HILOG_ERROR("The maximum number of form in per user is %{public}d", maxRecordPerUser);
+        HILOG_WARN("exceeds max form number %{public}d per user %{public}d", maxRecordPerUser, currentUserId);
+        PrintFormsExceedsInfo();
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER;
     }
 
@@ -488,7 +504,8 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     int32_t formCountsCurHost = FormDbCache::GetInstance().GetFormCountsByHostBundleName(hostBundleName);
     HILOG_DEBUG("already use %{public}d forms by host:%{public}s", formCountsCurHost, hostBundleName.c_str());
     if (formCountsCurHost >= maxRecordPerHost) {
-        HILOG_ERROR("The maximum number of form in per host is %{public}d", maxRecordPerHost);
+        HILOG_WARN("exceeds max form number %{public}d per app %{public}s", maxRecordPerHost, hostBundleName.c_str());
+        PrintFormsExceedsInfo();
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
@@ -3564,18 +3581,8 @@ ErrCode FormDataMgr::CheckEnoughFormOnDevice(const int callingUid, const int32_t
     const auto formDbInfoSize = FormDbCache::GetInstance().GetAllFormInfoSize();
     HILOG_INFO("already use %{public}d forms by device", formDbInfoSize);
     if (formDbInfoSize >= maxFormsSize) {
-        std::map<Constants::FormLocation, int> locationMap;
-        FormDbCache::GetInstance().GetLocationMap(locationMap);
-        Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
-        int maxCount = 0;
-        for (const auto &location : locationMap) {
-            if (location.second > maxCount) {
-                maxCount = location.second;
-                maxLocation = location.first;
-            }
-        }
-        HILOG_WARN("exceeds max form number %{public}d, maxLocation:%{public}d, maxCount:%{public}d",
-            maxFormsSize, static_cast<int>(maxLocation), maxCount);
+        HILOG_WARN("exceeds max form number %{public}d", maxFormsSize);
+        PrintFormsExceedsInfo();
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, 0, "", "",
             static_cast<int32_t>(AddFormFailedErrorType::NUMBER_EXCEEDING_LIMIT),
             ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS);
