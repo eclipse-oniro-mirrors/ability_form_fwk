@@ -20,5 +20,6 @@
 #include "form_mgr_errors.h"
 
 void MockCallerCheck(OHOS::ErrCode mockRet);
+void MockCheckUIAbilityContext(bool mockRet);
 
 #endif // INNER_MOCK_FORM_MGR_ADAPTER_H

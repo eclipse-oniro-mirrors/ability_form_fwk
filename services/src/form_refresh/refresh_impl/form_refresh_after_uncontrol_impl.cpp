@@ -30,7 +30,12 @@ FormRefreshAfterUncontrolImpl::~FormRefreshAfterUncontrolImpl() {}
 
 int FormRefreshAfterUncontrolImpl::RefreshFormRequest(RefreshData &data)
 {
-    const std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    std::vector<int32_t> checkTypes = { TYPE_UNTRUST_APP, TYPE_ACTIVE_USER, TYPE_ADD_FINISH };
+    int32_t cachedRefreshType = Constants::REFRESHTYPE_DEFAULT;
+    FormDataMgr::GetInstance().GetRefreshType(data.formId, cachedRefreshType);
+    if (cachedRefreshType == Constants::REFRESHTYPE_NETWORKCHANGED) {
+        checkTypes.push_back(TYPE_NETWORK_PERMISSION);
+    }
     CheckValidFactor factor;
     factor.formId = data.formId;
     factor.record = data.record;
@@ -87,7 +92,7 @@ bool FormRefreshAfterUncontrolImpl::DetectControlPoint(
     if (refreshType == Constants::REFRESHTYPE_VISIABLE) {
         FormDataMgr::GetInstance().GetRefreshType(data.formId, refreshType);
         HILOG_INFO("refreshType:%{public}d, formId:%{public}" PRId64, refreshType, data.formId);
-        if (refreshType == Constants::REFRESHTYPE_NETWORKCHANGED) {
+        if (Constants::CONDITION_REFRESHTYPE_SET.find(refreshType) != Constants::CONDITION_REFRESHTYPE_SET.end()) {
             isCountTimerRefresh = false;
         }
     }

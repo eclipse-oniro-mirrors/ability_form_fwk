@@ -87,7 +87,6 @@
 #include "scene_board_judgement.h"
 #include "form_provider/form_provider_mgr.h"
 #include "form_host/form_mgr_host_adapter.h"
-#include "form_observer/net_conn_callback_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -894,7 +893,6 @@ ErrCode FormMgrService::Init()
     }
     FormMgrAdapter::GetInstance().Init();
     FormAmsHelper::GetInstance().RegisterConfigurationObserver();
-    NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
     ParamManager::GetInstance().InitParam();
     ParamCommonEvent::GetInstance().SubscriberEvent();
     return ERR_OK;

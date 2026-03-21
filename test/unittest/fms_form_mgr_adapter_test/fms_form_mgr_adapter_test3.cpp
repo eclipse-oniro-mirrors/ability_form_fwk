@@ -42,6 +42,7 @@
 #include "inner/mock_form_info_mgr.h"
 #include "inner/mock_form_mgr_adapter.h"
 #include "inner/mock_want.h"
+#include "inner/mock_form_refresh_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1704,5 +1705,163 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_CheckIsAddFormByHost_0001, TestS
     MockGetFormsInfoByRecord(true);
     formMgrAdapter.CheckIsAddFormByHost(record, want);
     GTEST_LOG_(INFO) << "FormMgrAdapter_CheckIsAddFormByHost_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ReloadForms_001
+ * @tc.desc: Verify ReloadForms returns error when CheckUIAbilityContext fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ReloadForms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_001 start";
+
+    MockCheckUIAbilityContext(false);
+
+    FormMgrAdapter adapter;
+    int32_t reloadNum = 0;
+    std::vector<FormRecord> refreshForms;
+    FormRecord record;
+    record.formId = 1;
+    refreshForms.push_back(record);
+
+    ErrCode ret = adapter.ReloadForms(reloadNum, refreshForms);
+
+    EXPECT_EQ(ret, ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY);
+    EXPECT_EQ(reloadNum, 0);
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ReloadForms_002
+ * @tc.desc: Verify ReloadForms handles empty refreshForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ReloadForms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_002 start";
+
+    MockCheckUIAbilityContext(true);
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillOnce(testing::Return(10001));
+
+    FormMgrAdapter adapter;
+    int32_t reloadNum = 0;
+    std::vector<FormRecord> refreshForms;
+
+    ErrCode ret = adapter.ReloadForms(reloadNum, refreshForms);
+
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(reloadNum, 0);
+
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ReloadForms_003
+ * @tc.desc: Verify ReloadForms increments reloadNum when all refreshes succeed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ReloadForms_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_003 start";
+
+    MockCheckUIAbilityContext(true);
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillOnce(testing::Return(10001));
+
+    std::vector<int32_t> errorCodes = {ERR_OK, ERR_OK, ERR_OK};
+    MockBatchRequestRefresh(errorCodes);
+
+    FormMgrAdapter adapter;
+    int32_t reloadNum = 0;
+    std::vector<FormRecord> refreshForms;
+    for (int i = 0; i < 3; i++) {
+        FormRecord record;
+        record.formId = i + 1;
+        refreshForms.push_back(record);
+    }
+
+    ErrCode ret = adapter.ReloadForms(reloadNum, refreshForms);
+
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(reloadNum, 3);
+
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ReloadForms_004
+ * @tc.desc: Verify ReloadForms increments reloadNum only for successful refreshes
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ReloadForms_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_004 start";
+
+    MockCheckUIAbilityContext(true);
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillOnce(testing::Return(10001));
+
+    std::vector<int32_t> errorCodes = {ERR_OK, ERR_APPEXECFWK_FORM_INVALID_PARAM, ERR_OK};
+    MockBatchRequestRefresh(errorCodes);
+
+    FormMgrAdapter adapter;
+    int32_t reloadNum = 0;
+    std::vector<FormRecord> refreshForms;
+    for (int i = 0; i < 3; i++) {
+        FormRecord record;
+        record.formId = i + 1;
+        refreshForms.push_back(record);
+    }
+
+    ErrCode ret = adapter.ReloadForms(reloadNum, refreshForms);
+
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(reloadNum, 2);
+
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_004 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ReloadForms_005
+ * @tc.desc: Verify ReloadForms returns OK when all refreshes fail
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ReloadForms_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_005 start";
+
+    MockCheckUIAbilityContext(true);
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillOnce(testing::Return(10001));
+
+    std::vector<int32_t> errorCodes = {ERR_APPEXECFWK_FORM_INVALID_PARAM, ERR_APPEXECFWK_FORM_INVALID_PARAM};
+    MockBatchRequestRefresh(errorCodes);
+
+    FormMgrAdapter adapter;
+    int32_t reloadNum = 0;
+    std::vector<FormRecord> refreshForms;
+    for (int i = 0; i < 2; i++) {
+        FormRecord record;
+        record.formId = i + 1;
+        refreshForms.push_back(record);
+    }
+
+    ErrCode ret = adapter.ReloadForms(reloadNum, refreshForms);
+
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(reloadNum, 0);
+
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_005 end";
 }
 }

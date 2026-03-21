@@ -187,7 +187,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (refreshType == Constants::REFRESHTYPE_VISIABLE) {
         FormDataMgr::GetInstance().GetRefreshType(formId, refreshType);
         HILOG_INFO("refreshType:%{public}d", refreshType);
-        if (refreshType == Constants::REFRESHTYPE_NETWORKCHANGED) {
+        if (Constants::CONDITION_REFRESHTYPE_SET.find(refreshType) != Constants::CONDITION_REFRESHTYPE_SET.end()) {
             isCountTimerRefresh = false;
         }
     }

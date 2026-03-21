@@ -32,6 +32,7 @@ enum CheckValidType {
     TYPE_ADD_FINISH,
     TYPE_UNTRUST_APP,
     TYPE_MULTI_ACTIVE_USERS,
+    TYPE_NETWORK_PERMISSION,
 };
 
 /**

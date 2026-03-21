@@ -18,6 +18,7 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_event_report.h"
+#include "form_refresh/batch_refresh/batch_refresh_mgr.h"
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
@@ -60,6 +61,7 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
     auto it = refreshMap.find(refreshType);
     if (it != refreshMap.end()) {
         int ret = it->second->RefreshFormRequest(data);
+        data.errorCode = ret;
         if (ERROR_CODE_WHITE_LIST.find(ret) == ERROR_CODE_WHITE_LIST.end()) {
             FormEventReport::SendFormFailedEvent(FormEventName::UPDATE_FORM_FAILED,
                 data.formId,
@@ -72,8 +74,22 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
     }
 
     HILOG_ERROR("invalid refreshType");
+    data.errorCode = ERR_APPEXECFWK_FORM_INVALID_PARAM;
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
+int32_t FormRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
+    const StaggerStrategyType strategyType, std::vector<RefreshData> &batch)
+{
+    HILOG_INFO("BatchRequestRefresh: batch size = %{public}zu, refreshType = %{public}d, strategyType = %{public}d",
+        batch.size(), refreshType, static_cast<int>(strategyType));
+
+    if (batch.empty()) {
+        return ERR_OK;
+    }
+
+    static BatchRefreshMgr batchRefreshMgr;
+    return batchRefreshMgr.BatchRequestRefresh(refreshType, strategyType, batch);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

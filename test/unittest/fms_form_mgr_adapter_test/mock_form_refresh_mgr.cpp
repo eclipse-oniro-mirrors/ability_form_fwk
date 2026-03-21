@@ -14,16 +14,23 @@
  */
 #include "inner/mock_form_refresh_mgr.h"
 
+#include <gtest/gtest.h>
 #include "form_refresh/form_refresh_mgr.h"
 #include "form_mgr_errors.h"
 
 namespace {
     bool g_mockRequestRefreshRet = true;
+    std::vector<int32_t> g_mockBatchRequestRefreshErrorCodes;
 }
 
 void MockRequestRefreshRet(bool mockRet)
 {
     g_mockRequestRefreshRet = mockRet;
+}
+
+void MockBatchRequestRefresh(const std::vector<int32_t> &errorCodes)
+{
+    g_mockBatchRequestRefreshErrorCodes = errorCodes;
 }
 
 namespace OHOS {
@@ -37,6 +44,16 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
         return ERR_OK;
     }
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
+int32_t FormRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
+    const StaggerStrategyType strategyType, std::vector<RefreshData> &batch)
+{
+    GTEST_LOG_(INFO) << "FormRefreshMgr::BatchRequestRefresh called, batch size: " << batch.size();
+    for (size_t i = 0; i < batch.size() && i < g_mockBatchRequestRefreshErrorCodes.size(); ++i) {
+        batch[i].errorCode = g_mockBatchRequestRefreshErrorCodes[i];
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

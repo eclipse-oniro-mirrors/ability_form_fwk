@@ -226,6 +226,17 @@ public:
      */
     bool GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const;
     /**
+     * @brief Check if a form record has network condition in its conditionUpdate.
+     * @param record The form record to check.
+     * @return Returns true if the form needs network monitoring.
+     */
+    static bool IsNetworkConditionForm(const FormRecord &record);
+    /**
+     * @brief Check if any form record has network condition.
+     * @return Returns true if at least one form needs network monitoring.
+     */
+    bool HasNetworkConditionForm() const;
+    /**
      * @brief Get temporary form record.
      * @param formTempRecords The temp form record.
      * @return Returns true if this function is successfully called; returns false otherwise.
