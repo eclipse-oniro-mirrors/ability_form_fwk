@@ -61,12 +61,12 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
     return true;
 }
 
-ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
-    int32_t userId)
+ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames,
+    std::map<std::string, std::vector<FormInfo>> &formInfosMap, int32_t userId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    if (bundleName.empty()) {
-        HILOG_ERROR("invalid bundleName");
+    if (bundleNames.empty()) {
+        HILOG_ERROR("invalid bundleNames");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -76,24 +76,40 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    BundleInfo bundleInfo;
-    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES;
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flag, bundleInfo, userId))) {
-        HILOG_ERROR("get bundleInfo failed");
+    int32_t flag = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_ABILITY) |
+        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY) |
+        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) |
+        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_METADATA);
+    std::vector<BundleInfo> bundleInfos;
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(bundleNames, flag, bundleInfos, userId));
+    if (ret != ERR_OK) {
+        HILOG_ERROR("batch get bundleInfo failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
-    if (bundleInfo.abilityInfos.empty()) {
-        HILOG_WARN("empty abilityInfos");
-        // Check if current bundle contains FA forms.
-        LoadAbilityFormConfigInfo(bundleInfo, formInfos);
-        // Check if current bundle contains Stage forms.
-        LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
-        return ERR_OK;
-    }
-    if (bundleInfo.abilityInfos[0].isStageBasedModel) {
-        LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
-    } else {
-        LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+    for (const auto &bundleInfo : bundleInfos) {
+        std::vector<FormInfo> formInfos;
+        if (!bundleInfo.hapModuleInfos.empty()) {
+            bool hasAbilityInfos = false;
+            bool isStageBasedModel = false;
+            for (auto &moduleInfo : bundleInfo.hapModuleInfos) {
+                if (!moduleInfo.abilityInfos.empty()) {
+                    hasAbilityInfos = true;
+                    isStageBasedModel = moduleInfo.abilityInfos[0].isStageBasedModel;
+                }
+            }
+            if (!hasAbilityInfos) {
+                HILOG_WARN("empty abilityInfos, %{public}s", bundleInfo.name.c_str());
+                // Check if current bundle contains FA forms.
+                LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+                // Check if current bundle contains Stage forms.
+                LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+            } else if (isStageBasedModel) {
+                LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+            } else {
+                LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+            }
+            formInfosMap[bundleInfo.name] = formInfos;
+        }
     }
     return ERR_OK;
 }
@@ -148,6 +164,8 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
         HILOG_ERROR("fail get BundleMgrClient");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
+    std::vector<ExtensionAbilityInfo> extensionInfos;
+    LoadExtensionInfos(bundleInfo, extensionInfos);
     for (auto const &extensionInfo: bundleInfo.extensionInfos) {
         if (extensionInfo.type != ExtensionAbilityType::FORM) {
             continue;
@@ -406,6 +424,18 @@ void FormInfoHelper::LoadProfileFormInfos(std::vector<FormInfo> &formInfos, cons
 {
     for (const auto &profileInfo: profileInfos) {
         LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, extraFormInfo);
+    }
+}
+
+void FormInfoHelper::LoadExtensionInfos(const BundleInfo &bundleInfo, std::vector<ExtensionAbilityInfo> &extensionInfos)
+{
+    extensionInfos = bundleInfo.extensionInfos;
+    if (extensionInfos.empty()) {
+        for (const auto &moduleInfo: bundleInfo.hapModuleInfos) {
+            for (auto const &extensionInfo: moduleInfo.extensionInfos) {
+                extensionInfos.push_back(extensionInfo);
+            }
+        }
     }
 }
 }  // namespace AppExecFwk

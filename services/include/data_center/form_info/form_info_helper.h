@@ -83,6 +83,8 @@ private:
 
     static bool CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
         const std::string &capabilityKey);
+
+    static void LoadExtensionInfos(const BundleInfo &bundleInfo, std::vector<ExtensionAbilityInfo> &extensionInfos);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
