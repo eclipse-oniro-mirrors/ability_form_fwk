@@ -55,7 +55,11 @@ using namespace OHOS::AppExecFwk::ConfigurationInner;
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
+#ifdef VERIFY_PLAT_FPGA
+constexpr size_t THREAD_BLOCK_TIMEOUT = 200 * 1000;
+#else
 constexpr size_t THREAD_BLOCK_TIMEOUT = 10 * 1000;
+#endif
 constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
