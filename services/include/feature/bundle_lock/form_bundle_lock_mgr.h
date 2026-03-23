@@ -62,6 +62,11 @@ public:
      */
     void SetBundleProtectStatus(const std::string &bundleName, bool isProtect);
 
+    /**
+     * @brief Initializing the app lock service.
+     */
+    void InitLockService();
+
 private:
     /**
      * @brief Init form bundle lock mgr.
@@ -71,6 +76,7 @@ private:
 
 private:
     bool isInitialized_ = false;
+    std::atomic<bool> isLockServiceInitialized_{false};
     std::set<std::string> formBundleLockSet_;
     mutable std::shared_mutex bundleLockSetMutex_;
     std::set<std::string> formBundleProtectSet_;
