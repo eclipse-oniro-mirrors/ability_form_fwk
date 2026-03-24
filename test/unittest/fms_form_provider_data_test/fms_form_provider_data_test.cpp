@@ -58,7 +58,7 @@ void FmsFormProviderDataTest::SetUp()
     DIR *dirptr = opendir(FORM_DB_DATA_BASE_FILE_DIR.c_str());
     if (dirptr == nullptr) {
         HILOG_WARN("%{public}s, opendir is fail", __func__);
-        if (-1 == mkdir(FORM_DB_DATA_BASE_FILE_DIR.c_str(), S_IRWXU)) {
+        if (mkdir(FORM_DB_DATA_BASE_FILE_DIR.c_str(), S_IRWXU) == -1) {
             HILOG_ERROR("%{public}s, dir create fail", __func__);
             return;
         }
@@ -950,9 +950,8 @@ HWTEST_F(FmsFormProviderDataTest, WriteAshmem_LargeData_001, TestSize.Level1)
     FormProviderData formProviderData("");
     Parcel parcel;
     std::string largeData(1024 * 100, 'a');
-    const char* dataPtr = largeData.c_str();
     size_t size = largeData.length();
-    bool result = formProviderData.WriteAshmemDataToParcel(parcel, size, dataPtr);
+    bool result = formProviderData.WriteAshmemDataToParcel(parcel, size, largeData.c_str());
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "WriteAshmem_LargeData_001 end";
 }
@@ -967,8 +966,8 @@ HWTEST_F(FmsFormProviderDataTest, ConvertRawImage_MultiImages_001, TestSize.Leve
     GTEST_LOG_(INFO) << "ConvertRawImage_MultiImages_001 start";
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
-    std::shared_ptr<char> data1 = std::shared_ptr<char>(new char[10], std::default_delete<char[]>());
-    std::shared_ptr<char> data2 = std::shared_ptr<char>(new char[20], std::default_delete<char[]>());
+    std::shared_ptr<char[]> data1 = std::make_unique<char[]>(10);
+    std::shared_ptr<char[]> data2 = std::make_unique<char[]>(20);
     formProviderData.AddImageData("image1", data1, 10);
     formProviderData.AddImageData("image2", data2, 20);
     EXPECT_TRUE(formProviderData.ConvertRawImageData());
@@ -989,7 +988,7 @@ HWTEST_F(FmsFormProviderDataTest, WriteImageData_EmptyData_001, TestSize.Level1)
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
     std::string picName = "emptyImage";
-    std::shared_ptr<char> data = std::shared_ptr<char>(new char[1], std::default_delete<char[]>());
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(1);
     data.get()[0] = '\0';
     bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 1);
     EXPECT_TRUE(result);
@@ -1008,8 +1007,8 @@ HWTEST_F(FmsFormProviderDataTest, WriteImageData_ValidData_001, TestSize.Level1)
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
     std::string picName = "validDataImage";
-    std::shared_ptr<char> data = std::shared_ptr<char>(new char[100], std::default_delete<char[]>());
-    memset(data.get(), 'A', 100);
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(100);
+    std::fill(data.get(), data.get() + 100, 'A');
     bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 100);
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "WriteImageData_ValidData_001 end";
@@ -1085,8 +1084,8 @@ HWTEST_F(FmsFormProviderDataTest, MarshallingUnmarshalling_WithImage_001, TestSi
     GTEST_LOG_(INFO) << "MarshallingUnmarshalling_WithImage_001 start";
     EXPECT_EQ(true, InitJsonData());
     FormProviderData writeProviderData(jsonData_);
-    std::shared_ptr<char> data = std::shared_ptr<char>(new char[10], std::default_delete<char[]>());
-    memset(data.get(), 'B', 10);
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(10);
+    std::fill(data.get(), data.get() + 10, 'B');
     writeProviderData.AddImageData("marshTest", data, 10);
     writeProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_ADDED;
     
@@ -1183,7 +1182,7 @@ HWTEST_F(FmsFormProviderDataTest, AddImageData_StateUpdate_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "AddImageData_StateUpdate_001 start";
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
-    std::shared_ptr<char> data = std::shared_ptr<char>(new char[10], std::default_delete<char[]>());
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(10);
     formProviderData.AddImageData("stateTest", data, 10);
     EXPECT_EQ(formProviderData.GetImageDataState(), FormProviderData::IMAGE_DATA_STATE_ADDED);
     GTEST_LOG_(INFO) << "AddImageData_StateUpdate_001 end";
@@ -1199,8 +1198,8 @@ HWTEST_F(FmsFormProviderDataTest, Marshalling_MultiImages_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "Marshalling_MultiImages_001 start";
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
-    std::shared_ptr<char> data1 = std::shared_ptr<char>(new char[20], std::default_delete<char[]>());
-    std::shared_ptr<char> data2 = std::shared_ptr<char>(new char[30], std::default_delete<char[]>());
+    std::shared_ptr<char[]> data1 = std::make_unique<char[]>(20);
+    std::shared_ptr<char[]> data2 = std::make_unique<char[]>(30);
     formProviderData.AddImageData("multi1", data1, 20);
     formProviderData.AddImageData("multi2", data2, 30);
     formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_ADDED;
@@ -1558,9 +1557,8 @@ HWTEST_F(FmsFormProviderDataTest, WriteAshmemDataToParcel_LargeData_001, TestSiz
     FormProviderData formProviderData("");
     Parcel parcel;
     std::string largeData(100 * 1024, 'B');
-    const char* dataPtr = largeData.c_str();
     size_t size = largeData.length();
-    bool result = formProviderData.WriteAshmemDataToParcel(parcel, size, dataPtr);
+    bool result = formProviderData.WriteAshmemDataToParcel(parcel, size, largeData.c_str());
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "WriteAshmemDataToParcel_LargeData_001 end";
 }
@@ -1617,8 +1615,8 @@ HWTEST_F(FmsFormProviderDataTest, ConvertRawImageData_MultiImages_001, TestSize.
 {
     GTEST_LOG_(INFO) << "ConvertRawImageData_MultiImages_001 start";
     FormProviderData formProviderData("");
-    std::shared_ptr<char> data1 = std::shared_ptr<char>(new char[10], std::default_delete<char[]>());
-    std::shared_ptr<char> data2 = std::shared_ptr<char>(new char[20], std::default_delete<char[]>());
+    std::shared_ptr<char[]> data1 = std::make_unique<char[]>(10);
+    std::shared_ptr<char[]> data2 = std::make_unique<char[]>(20);
     formProviderData.AddImageData("image1", data1, 10);
     formProviderData.AddImageData("image2", data2, 20);
     EXPECT_EQ(2, static_cast<int>(formProviderData.rawImageBytesMap_.size()));
@@ -1721,8 +1719,8 @@ HWTEST_F(FmsFormProviderDataTest, WriteImageDataToParcel_ValidData_001, TestSize
     FormProviderData formProviderData("");
     Parcel parcel;
     std::string picName = "validImage";
-    std::shared_ptr<char> data = std::shared_ptr<char>(new char[100], std::default_delete<char[]>());
-    memset(data.get(), 'A', 100);
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(100);
+    std::fill(data.get(), data.get() + 100, 'A');
     bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 100);
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "WriteImageDataToParcel_ValidData_001 end";
@@ -1739,7 +1737,7 @@ HWTEST_F(FmsFormProviderDataTest, WriteImageDataToParcel_EmptyData_001, TestSize
     FormProviderData formProviderData("");
     Parcel parcel;
     std::string picName = "emptyImage";
-    std::shared_ptr<char> data = std::shared_ptr<char>(new char[1], std::default_delete<char[]>());
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(1);
     data.get()[0] = '\0';
     bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 1);
     EXPECT_TRUE(result);
