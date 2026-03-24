@@ -125,28 +125,29 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
     }
     for (const auto &bundleInfo : bundleInfos) {
         std::vector<FormInfo> formInfos;
-        if (!bundleInfo.hapModuleInfos.empty()) {
-            bool hasAbilityInfos = false;
-            bool isStageBasedModel = false;
-            for (auto &moduleInfo : bundleInfo.hapModuleInfos) {
-                if (!moduleInfo.abilityInfos.empty()) {
-                    hasAbilityInfos = true;
-                    isStageBasedModel = moduleInfo.abilityInfos[0].isStageBasedModel;
-                }
-            }
-            if (!hasAbilityInfos) {
-                HILOG_WARN("empty abilityInfos, %{public}s", bundleInfo.name.c_str());
-                // Check if current bundle contains FA forms.
-                LoadAbilityFormConfigInfo(bundleInfo, formInfos);
-                // Check if current bundle contains Stage forms.
-                LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
-            } else if (isStageBasedModel) {
-                LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
-            } else {
-                LoadAbilityFormConfigInfo(bundleInfo, formInfos);
-            }
-            formInfosMap[bundleInfo.name] = formInfos;
+        if (bundleInfo.hapModuleInfos.empty()) {
+            continue;
         }
+        bool hasAbilityInfos = false;
+        bool isStageBasedModel = false;
+        for (auto &moduleInfo : bundleInfo.hapModuleInfos) {
+            if (!moduleInfo.abilityInfos.empty()) {
+                hasAbilityInfos = true;
+                isStageBasedModel = moduleInfo.abilityInfos[0].isStageBasedModel;
+            }
+        }
+        if (!hasAbilityInfos) {
+            HILOG_WARN("empty abilityInfos, %{public}s", bundleInfo.name.c_str());
+            // Check if current bundle contains FA forms.
+            LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+            // Check if current bundle contains Stage forms.
+            LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+        } else if (isStageBasedModel) {
+            LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+        } else {
+            LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+        }
+        formInfosMap[bundleInfo.name] = formInfos;
     }
     return ERR_OK;
 }
