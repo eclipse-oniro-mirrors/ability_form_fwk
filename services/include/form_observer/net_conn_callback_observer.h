@@ -29,7 +29,6 @@ namespace AppExecFwk {
  * Observes network state changes and manages form updates based on network status.
  */
 class NetConnCallbackObserver : public NetManagerStandard::NetConnCallbackStub {
-
 public:
     explicit NetConnCallbackObserver();
     ~NetConnCallbackObserver() override = default;
