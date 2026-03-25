@@ -16,16 +16,21 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 #define private public
-#include "form_observer/net_conn_callback_impl.h.h"
+#include "form_observer/net_conn_callback_observer.h"
 #undef private
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
-class NetConnCallbackImplTest : public testing::Test {
+namespace {
+constexpr long FORM_DISCON_NETWORK_CHECK_TIME = 600000; // ms
+}
+
+class NetConnCallbackObserverTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -33,186 +38,111 @@ public:
     void TearDown();
 };
 
-void NetConnCallbackImplTest::SetUpTestCase()
+void NetConnCallbackObserverTest::SetUpTestCase()
 {
-    HILOG_INFO("NetConnCallbackImplTest::SetUpTestCase");
+    HILOG_INFO("NetConnCallbackObserverTest::SetUpTestCase");
 }
 
-void NetConnCallbackImplTest::TearDownTestCase()
+void NetConnCallbackObserverTest::TearDownTestCase()
 {
-    HILOG_INFO("NetConnCallbackImplTest::TearDownTestCase");
+    HILOG_INFO("NetConnCallbackObserverTest::TearDownTestCase");
 }
 
-void NetConnCallbackImplTest::SetUp()
+void NetConnCallbackObserverTest::SetUp()
 {
-    HILOG_INFO("NetConnCallbackImplTest::SetUp");
+    HILOG_INFO("NetConnCallbackObserverTest::SetUp");
 }
 
-void NetConnCallbackImplTest::TearDown()
+void NetConnCallbackObserverTest::TearDown()
 {
-    HILOG_INFO("NetConnCallbackImplTest::TearDown");
-}
-
-/**
- * @tc.name: NetConnCallbackImpl_001
- * @tc.desc: Test constructor and destructor
- * @tc.type: FUNC
- */
-HWTEST_F(NetConnCallbackImplTest, NetConnCallbackImpl_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_001 start";
-
-    auto callback = new (std::nothrow) NetConnCallbackImpl();
-    ASSERT_NE(callback, nullptr);
-    
-    // Verify lastNetLostTime_ is initialized
-    EXPECT_NE(callback->lastNetLostTime_.load(), 0);
-
-    delete callback;
-
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_001 end";
+    HILOG_INFO("NetConnCallbackObserverTest::TearDown");
 }
 
 /**
- * @tc.name: NetConnCallbackImpl_002
- * @tc.desc: Test NetAvailable callback
+ * @tc.name: NetConnCallbackObserver_001
+ * @tc.desc: Test NetAvailable
  * @tc.type: FUNC
  */
-HWTEST_F(NetConnCallbackImplTest, NetConnCallbackImpl_002, TestSize.Level1)
+HWTEST_F(NetConnCallbackObserverTest, NetConnCallbackObserver_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_002 start";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_001 start";
 
-    auto callback = new (std::nothrow) NetConnCallbackImpl();
-    ASSERT_NE(callback, nullptr);
+    auto observer = std::make_shared<NetConnCallbackObserver>();
+    ASSERT_NE(observer, nullptr);
+    EXPECT_NE(observer->lastNetLostTime_.load(), 0);
 
+    observer->lastNetLostTime_.store(0);
     sptr<NetManagerStandard::NetHandle> netHandle = new (std::nothrow) NetManagerStandard::NetHandle();
     ASSERT_NE(netHandle, nullptr);
-
-    // Test NetAvailable returns ERR_OK
-    int32_t result = callback->NetAvailable(netHandle);
+    int32_t result = observer->NetAvailable(netHandle);
     EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(observer->lastNetLostTime_.load(), 0);
 
-    delete callback;
-
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_002 end";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_001 end";
 }
 
 /**
- * @tc.name: NetConnCallbackImpl_003
- * @tc.desc: Test NetLost callback
+ * @tc.name: NetConnCallbackObserver_002
+ * @tc.desc: Test NetAvailable
  * @tc.type: FUNC
  */
-HWTEST_F(NetConnCallbackImplTest, NetConnCallbackImpl_003, TestSize.Level1)
+HWTEST_F(NetConnCallbackObserverTest, NetConnCallbackObserver_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_003 start";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_002 start";
 
-    auto callback = new (std::nothrow) NetConnCallbackImpl();
-    ASSERT_NE(callback, nullptr);
+    auto observer = std::make_shared<NetConnCallbackObserver>();
+    ASSERT_NE(observer, nullptr);
 
+    observer->lastNetLostTime_.store(FormUtil::GetCurrentMillisecond());
     sptr<NetManagerStandard::NetHandle> netHandle = new (std::nothrow) NetManagerStandard::NetHandle();
     ASSERT_NE(netHandle, nullptr);
-
-    int64_t beforeTime = callback->lastNetLostTime_.load();
-
-    // Test NetLost updates lastNetLostTime_
-    int32_t result = callback->NetLost(netHandle);
+    int32_t result = observer->NetAvailable(netHandle);
     EXPECT_EQ(result, ERR_OK);
-    EXPECT_NE(callback->lastNetLostTime_.load(), beforeTime);
+    EXPECT_NE(observer->lastNetLostTime_.load(), 0);
 
-    delete callback;
-
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_003 end";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_002 end";
 }
 
 /**
- * @tc.name: NetConnCallbackImpl_004
- * @tc.desc: Test NetUnavailable callback
+ * @tc.name: NetConnCallbackObserver_003
+ * @tc.desc: Test NetAvailable
  * @tc.type: FUNC
  */
-HWTEST_F(NetConnCallbackImplTest, NetConnCallbackImpl_004, TestSize.Level1)
+HWTEST_F(NetConnCallbackObserverTest, NetConnCallbackObserver_003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_004 start";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_003 start";
 
-    auto callback = new (std::nothrow) NetConnCallbackImpl();
-    ASSERT_NE(callback, nullptr);
+    auto observer = std::make_shared<NetConnCallbackObserver>();
+    ASSERT_NE(observer, nullptr);
 
-    int32_t result = callback->NetUnavailable();
-    EXPECT_EQ(result, ERR_OK);
-
-    delete callback;
-
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_004 end";
-}
-
-/**
- * @tc.name: NetConnCallbackImpl_005
- * @tc.desc: Test NetCapabilitiesChange callback
- * @tc.type: FUNC
- */
-HWTEST_F(NetConnCallbackImplTest, NetConnCallbackImpl_005, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_005 start";
-
-    auto callback = new (std::nothrow) NetConnCallbackImpl();
-    ASSERT_NE(callback, nullptr);
-
+    observer->lastNetLostTime_.store(FormUtil::GetCurrentMillisecond() - FORM_DISCON_NETWORK_CHECK_TIME);
     sptr<NetManagerStandard::NetHandle> netHandle = new (std::nothrow) NetManagerStandard::NetHandle();
     ASSERT_NE(netHandle, nullptr);
-    sptr<NetManagerStandard::NetAllCapabilities> netAllCap = new (std::nothrow) NetManagerStandard::NetAllCapabilities();
-    ASSERT_NE(netAllCap, nullptr);
-
-    int32_t result = callback->NetCapabilitiesChange(netHandle, netAllCap);
+    int32_t result = observer->NetAvailable(netHandle);
     EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(observer->lastNetLostTime_.load(), 0);
 
-    delete callback;
-
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_005 end";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_003 end";
 }
 
 /**
- * @tc.name: NetConnCallbackImpl_006
- * @tc.desc: Test NetConnectionPropertiesChange callback
+ * @tc.name: NetConnCallbackObserver_004
+ * @tc.desc: Test NetLost
  * @tc.type: FUNC
  */
-HWTEST_F(NetConnCallbackImplTest, NetConnCallbackImpl_006, TestSize.Level1)
+HWTEST_F(NetConnCallbackObserverTest, NetConnCallbackObserver_004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_006 start";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_004 start";
 
-    auto callback = new (std::nothrow) NetConnCallbackImpl();
-    ASSERT_NE(callback, nullptr);
+    auto observer = std::make_shared<NetConnCallbackObserver>();
+    ASSERT_NE(observer, nullptr);
 
+    observer->lastNetLostTime_.store(0);
     sptr<NetManagerStandard::NetHandle> netHandle = new (std::nothrow) NetManagerStandard::NetHandle();
     ASSERT_NE(netHandle, nullptr);
-    sptr<NetManagerStandard::NetLinkInfo> info = new (std::nothrow) NetManagerStandard::NetLinkInfo();
-    ASSERT_NE(info, nullptr);
-
-    int32_t result = callback->NetConnectionPropertiesChange(netHandle, info);
+    int32_t result = observer->NetLost(netHandle);
     EXPECT_EQ(result, ERR_OK);
+    EXPECT_NE(observer->lastNetLostTime_.load(), 0);
 
-    delete callback;
-
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_006 end";
-}
-
-/**
- * @tc.name: NetConnCallbackImpl_007
- * @tc.desc: Test NetBlockStatusChange callback
- * @tc.type: FUNC
- */
-HWTEST_F(NetConnCallbackImplTest, NetConnCallbackImpl_007, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_007 start";
-
-    auto callback = new (std::nothrow) NetConnCallbackImpl();
-    ASSERT_NE(callback, nullptr);
-
-    sptr<NetManagerStandard::NetHandle> netHandle = new (std::nothrow) NetManagerStandard::NetHandle();
-    ASSERT_NE(netHandle, nullptr);
-
-    int32_t result = callback->NetBlockStatusChange(netHandle, true);
-    EXPECT_EQ(result, ERR_OK);
-
-    delete callback;
-
-    GTEST_LOG_(INFO) << "NetConnCallbackImpl_007 end";
+    GTEST_LOG_(INFO) << "NetConnCallbackObserver_004 end";
 }
