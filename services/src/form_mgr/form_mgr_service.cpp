@@ -887,7 +887,7 @@ ErrCode FormMgrService::Init()
     }
     FormMgrAdapter::GetInstance().Init();
     FormAmsHelper::GetInstance().RegisterConfigurationObserver();
-    DelayedSingleton<NetConnCallbackManager>::GetInstance()->RegisterNetConnCallback();
+    NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
     ParamManager::GetInstance().InitParam();
     ParamCommonEvent::GetInstance().SubscriberEvent();
     return ERR_OK;
