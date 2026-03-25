@@ -1,20 +1,23 @@
 /*
  * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_NET_CONN_CALLBACK_IMPL_H
-#define OHOS_FORM_FWK_NET_CONN_CALLBACK_IMPL_H
+#ifndef OHOS_FORM_FWK_NET_CONN_CALLBACK_OBSERVER_H
+#define OHOS_FORM_FWK_NET_CONN_CALLBACK_OBSERVER_H
+
+#include <memory>
+#include <singleton.h>
 
 #include "net_conn_callback_stub.h"
 #include "net_handle.h"
@@ -22,16 +25,19 @@
 namespace OHOS {
 namespace AppExecFwk {
 /**
- * @brief Network connection callback implementation.
- * Handles network state change callbacks and updates forms based on network status.
+ * @brief Network connection callback observer for FormMgrService.
+ * Observes network state changes and manages form updates based on network status.
  */
-class NetConnCallbackImpl : public NetManagerStandard::NetConnCallbackStub {
-public:
-    NetConnCallbackImpl();
-    virtual ~NetConnCallbackImpl() = default;
+class NetConnCallbackObserver : public NetManagerStandard::NetConnCallbackStub {
 
-private:
-    std::atomic<int64_t> lastNetLostTime_;
+public:
+    explicit NetConnCallbackObserver();
+    ~NetConnCallbackObserver() override = default;
+
+    /**
+     * @brief Set network connect status and update forms if needed
+     */
+    void SetNetConnect();
 
     /**
      * @brief Called when network is available
@@ -78,7 +84,15 @@ private:
      * @return Returns ERR_OK on success, error code on failure
      */
     int32_t NetBlockStatusChange(sptr<NetManagerStandard::NetHandle> &netHandle, bool blocked) override;
+
+private:
+    /**
+     * @brief Set disconnect time for tracking network loss duration
+     */
+    void SetDisConnectTypeTime();
+
+    std::atomic<int64_t> lastNetLostTime_;
 };
 } // AppExecFwk
 } // OHOS
-#endif // OHOS_FORM_FWK_NET_CONN_CALLBACK_IMPL_H
+#endif // OHOS_FORM_FWK_NET_CONN_CALLBACK_OBSERVER_H
