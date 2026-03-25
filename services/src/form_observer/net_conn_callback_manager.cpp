@@ -50,7 +50,7 @@ int32_t NetConnCallbackManager::RegisterNetConnCallback()
         return ERR_OK;
     }
 
-    sptr<NetConnCallbackObserver> observer_ = new (std::nothrow)NetConnCallbackObserver();
+    observer_ = new (std::nothrow)NetConnCallbackObserver();
     if (observer_ == nullptr) {
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
