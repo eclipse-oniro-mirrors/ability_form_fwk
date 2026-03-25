@@ -16,12 +16,14 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/form_fwk/form_mgr_service"
 
-ohos_unittest("FmsNetConnCallbackImplTest") {
+ohos_unittest("FmsNetConnCallbackObserverTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/form_observer/net_conn_callback_impl.cpp",
-    "${form_fwk_path}/test/unittest/fms_net_conn_callback_impl_test/fms_net_conn_callback_impl_test.cpp",
+    "${form_fwk_path}/services/src/common/util/form_util.cpp",
+    "${form_fwk_path}/services/src/form_observer/net_conn_callback_observer.cpp",
+    "${form_fwk_path}/services/src/form_mgr/form_mgr_queue.cpp",
+    "${form_fwk_path}/test/unittest/fms_net_conn_callback_observer_test/fms_net_conn_callback_observer_test.cpp",
   ]
 
   include_dirs = [
@@ -34,7 +36,6 @@ ohos_unittest("FmsNetConnCallbackImplTest") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
-
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:libfms",
@@ -68,5 +69,5 @@ ohos_unittest("FmsNetConnCallbackImplTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsNetConnCallbackImplTest" ]
+  deps = [ ":FmsNetConnCallbackObserverTest" ]
 }
