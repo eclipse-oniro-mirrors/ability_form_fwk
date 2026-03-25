@@ -85,7 +85,7 @@ int32_t NetConnCallbackManager::UnregisterNetConnCallback()
     int ret = ERR_OK;
     if (isRegistered_.load()) {
         if (observer_ != nullptr) {
-            NetConnClient::GetInstance().UnregisterNetConnCallback(observer_);
+            ret = NetConnClient::GetInstance().UnregisterNetConnCallback(observer_);
         }
         isRegistered_.store(false);
     }
