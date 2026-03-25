@@ -15,18 +15,20 @@
 
 #include "form_observer/net_conn_callback_manager.h"
 
-#include "fms_log_wrapper.h"
+#include "common/util/form_util.h"
 #include "common/util/form_task_common.h"
+#include "fms_log_wrapper.h"
+#include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "net_conn_client.h"
-#include "form_observer/net_conn_callback_impl.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t FORM_CON_NET_MAX = 100;
+constexpr int32_t CONDITION_NETWORK = 1;
 }
-using namespace OHOS::NetManagerStandardization;
+using namespace OHOS::NetManagerStandard;
 
 NetConnCallbackManager::NetConnCallbackManager()
 {
@@ -42,38 +44,32 @@ NetConnCallbackManager::~NetConnCallbackManager()
 int32_t NetConnCallbackManager::RegisterNetConnCallback()
 {
     HILOG_INFO("Register NetConn begin");
-    
-    // Avoid duplicate registration
+
     if (isRegistered_.load()) {
-        HILOG_WARN("NetConnCallbackManager already registered");
+        HILOG_WARN("NetConnCallbackObserver already registered");
         return ERR_OK;
     }
 
-    // Create a new callback implementation instance
-    // This is safe because NetConnCallbackImpl is a separate class created for each registration
-    sptr<NetConnCallbackImpl> callback = new (std::nothrow) NetConnCallbackImpl();
-    if (callback == nullptr) {
-        HILOG_ERROR("Failed to create NetConnCallbackImpl");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    sptr<NetConnCallbackObserver> observer_ = new (std::nothrow)NetConnCallbackObserver();
+    if (observer_ == nullptr) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    
-    int result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    int result = NetConnClient::GetInstance().RegisterNetConnCallback(observer_);
     if (result == ERR_OK) {
-        HILOG_INFO("Register NetConnCallback successful");
+        HILOG_INFO("Register NetConnCallbackObserver successful");
         isRegistered_.store(true);
         netConTime_.store(0); // Reset retry count on success
-        
+
         std::list<sptr<NetHandle>> netList;
         NetConnClient::GetInstance().GetAllNets(netList);
         if (netList.size() > 0) {
-            // Network is already available, trigger update
-            HILOG_INFO("network is available for form update");
+            observer_->SetNetConnect();
         }
     } else {
-        HILOG_ERROR("Register NetConnCallback failed, netConTime:%{public}d", netConTime_.load());
+        HILOG_ERROR("Register NetConnCallbackObserver failed, netConTime:%{public}d", netConTime_.load());
         netConTime_.fetch_add(1);
         if (netConTime_.load() >= FORM_CON_NET_MAX) {
-            HILOG_ERROR("Register NetConnCallback failed FORM_CON_NET_MAX times");
+            HILOG_ERROR("Register NetConnCallbackObserver failed FORM_CON_NET_MAX times");
             return result;
         }
         PostConnectNetWork();
@@ -88,15 +84,9 @@ int32_t NetConnCallbackManager::UnregisterNetConnCallback()
 
     int ret = ERR_OK;
     if (isRegistered_.load()) {
-        // Create a new callback implementation instance for unregister
-        sptr<NetConnCallbackImpl> callback = new (std::nothrow) NetConnCallbackImpl();
-        if (callback == nullptr) {
-            HILOG_ERROR("Failed to create NetConnCallbackImpl");
-            isRegistered_.store(false);
-            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        if (observer_ != nullptr) {
+            NetConnClient::GetInstance().UnregisterNetConnCallback(observer_);
         }
-        
-        ret = NetConnClient::GetInstance().RegisterNetConnCallback(callback);
         isRegistered_.store(false);
     }
 
@@ -108,10 +98,7 @@ void NetConnCallbackManager::PostConnectNetWork()
     HILOG_DEBUG("start");
 
     auto connectNetWork = []() {
-        auto manager = DelayedSingleton<NetConnCallbackManager>::GetInstance();
-        if (manager != nullptr) {
-            manager->RegisterNetConnCallback();
-        }
+        NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
     HILOG_DEBUG("end");
