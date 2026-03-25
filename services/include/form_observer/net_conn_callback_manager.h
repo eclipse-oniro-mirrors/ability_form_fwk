@@ -19,17 +19,20 @@
 #include <memory>
 #include <singleton.h>
 
+#include "form_observer/net_conn_callback_observer.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 /**
  * @brief Network connection callback manager for FormMgrService.
- * Manages network callback registration and unregistration.
+ * Manager network callback registration and unregistration.
  */
-class NetConnCallbackManager {
-    DECLARE_DELAYED_SINGLETON(NetConnCallbackManager);
-    DISALLOW_COPY_AND_MOVE(NetConnCallbackManager);
+class NetConnCallbackManager  final : public DelayedRefSingleton<NetConnCallbackManager> {
+    DECLARE_DELAYED_REF_SINGLETON(NetConnCallbackManager);
 
 public:
+    DISALLOW_COPY_AND_MOVE(NetConnCallbackManager);
+
     /**
      * @brief Register network connection callback
      * @return Returns ERR_OK on success, error code on failure
@@ -43,7 +46,6 @@ public:
     int32_t UnregisterNetConnCallback();
 
 private:
-private:
     /**
      * @brief Post delayed network connection task
      */
@@ -51,6 +53,7 @@ private:
 
     std::atomic<int32_t> netConTime_;
     std::atomic<bool> isRegistered_;
+    sptr<NetConnCallbackObserver> observer_;
 };
 } // AppExecFwk
 } // OHOS
