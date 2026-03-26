@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,23 +15,26 @@
 
 #include <chrono>
 #include <dirent.h>
+#include <fcntl.h>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <string>
+#include <sys/mman.h>
 #include <thread>
+#include <unistd.h>
 
+#include "ipc_file_descriptor.h"
+#include "nlohmann/json.hpp"
+#include "string_ex.h"
+
+#include "fms_log_wrapper.h"
 #define private public
 #include "form_provider_data.h"
 #undef private
-#include "string_ex.h"
-#include "fms_log_wrapper.h"
-#include "nlohmann/json.hpp"
 
 using namespace testing::ext;
-using namespace OHOS;
-using namespace OHOS::AppExecFwk;
 
-namespace {
+namespace OHOS::AppExecFwk {
 const std::string FORM_DB_DATA_BASE_FILE_DIR = "/data/formmgr";
 const int32_t FOUR = 4;
 const int32_t TEN = 10;
@@ -55,7 +58,7 @@ void FmsFormProviderDataTest::SetUp()
     DIR *dirptr = opendir(FORM_DB_DATA_BASE_FILE_DIR.c_str());
     if (dirptr == nullptr) {
         HILOG_WARN("%{public}s, opendir is fail", __func__);
-        if (-1 == mkdir(FORM_DB_DATA_BASE_FILE_DIR.c_str(), S_IRWXU)) {
+        if (mkdir(FORM_DB_DATA_BASE_FILE_DIR.c_str(), S_IRWXU) == -1) {
             HILOG_ERROR("%{public}s, dir create fail", __func__);
             return;
         }
@@ -844,161 +847,1174 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_042, TestSize.Level0)
 }
 
 /**
- * @tc.name: FmsFormProviderDataTest_043
- * @tc.desc: Verify the CreateJsonFileByJsonData2 function.
+ * @tc.name: AddImageData_FD_ValidFile_001
  * @tc.type: FUNC
+ * @tc.desc: Verify AddImageData with fd, when file is a valid small image.
  */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_043, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, AddImageData_FD_ValidFile_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_043 start";
+    GTEST_LOG_(INFO) << "AddImageData_FD_ValidFile_001 start";
     EXPECT_EQ(true, InitJsonData());
-    FormProviderData formProviderData(jsonData_.dump());
-    EXPECT_EQ(true, CreateJsonFileByJsonData2(formProviderData.jsonFormProviderData_));
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_043 end";
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "validImage";
+    std::string testData = "test image data content";
+    std::string testFile = "/data/formmgr/test_valid_image.tmp";
+    std::ofstream file(testFile);
+    file << testData;
+    file.close();
+    int fd = open(testFile.c_str(), O_RDONLY);
+    ASSERT_GE(fd, 0);
+    formProviderData.AddImageData(picName, fd);
+    close(fd);
+    unlink(testFile.c_str());
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(picName) != formProviderData.rawImageBytesMap_.end());
+    EXPECT_EQ(formProviderData.rawImageBytesMap_[picName].second, static_cast<int32_t>(testData.length()));
+    GTEST_LOG_(INFO) << "AddImageData_FD_ValidFile_001 end";
 }
 
 /**
- * @tc.name: FmsFormProviderDataTest_044
- * @tc.desc: Verify the GetDataString function.
+ * @tc.name: ReadAshmem_BufferSizeExceed_001
  * @tc.type: FUNC
+ * @tc.desc: Verify ReadAshmemDataFromParcel with bufferSize exceeds MAX_BUFFER_SIZE.
  */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_044, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, ReadAshmem_BufferSizeExceed_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_044 start";
-    EXPECT_EQ(true, InitJsonData());
-    FormProviderData formProviderData(jsonData_);
-    GTEST_LOG_(INFO) << "print:" <<formProviderData.GetDataString();
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_044 end";
-}
-
-/**
- * @tc.name: FmsFormProviderDataTest_045
- * @tc.desc: Verify the MergeData function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_045, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_045 start";
-    EXPECT_EQ(true, InitJsonData());
-    FormProviderData formProviderData(jsonData_);
-    EXPECT_EQ(true, InitJsonData2());
-    formProviderData.MergeData(jsonData_);
-    EXPECT_EQ(true, CreateMergeJsonFileByJsonData3(formProviderData.jsonFormProviderData_));
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_045 end";
-}
-
-/**
- * @tc.name: FmsFormProviderDataTest_046
- * @tc.desc: Verify the ConvertRawImageData function.
- * @tc.type: FUNC
- * @tc.require: issueI5KIZC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_046, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_046 start";
-    EXPECT_EQ(true, InitJsonData());
-    FormProviderData formProviderData(jsonData_);
-    std::string picName = "image";
-    std::shared_ptr<char> data = std::make_shared<char>('a');
-    formProviderData.AddImageData(picName, data, 1);
-    EXPECT_TRUE(formProviderData.ConvertRawImageData());
-    EXPECT_EQ(1, formProviderData.GetImageDataMap().size());
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_046 end";
-}
-
-/**
- * @tc.name: FmsFormProviderDataTest_047
- * @tc.desc: Verify the AddImageData and WriteImageDataToParcel function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_047, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_047 start";
-    FormProviderData formProviderData(jsonData_);
-    std::string picName = "image";
-    formProviderData.AddImageData(picName, 1);
+    GTEST_LOG_(INFO) << "ReadAshmem_BufferSizeExceed_001 start";
+    FormProviderData formProviderData("");
     Parcel parcel;
-    std::shared_ptr<char> data = std::make_shared<char>('a');
-    EXPECT_EQ(true, formProviderData.WriteImageDataToParcel(parcel, picName, data, 1));
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_047 end";
-}
-/**
- * @tc.name: FmsFormProviderDataTest_048
- * @tc.desc: Verify the UpdateData and GetData function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_048, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_048 start";
-    EXPECT_EQ(true, InitJsonData());
-    FormProviderData formProviderData(jsonData_);
-    formProviderData.UpdateData(jsonData_);
-    auto result = formProviderData.GetData();
-
-    EXPECT_EQ(jsonData_, result);
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_048 end";
+    constexpr int32_t overSize = 32 * 1024 * 1024 + 1;
+    char* result = formProviderData.ReadAshmemDataFromParcel(parcel, overSize);
+    EXPECT_EQ(result, nullptr);
+    GTEST_LOG_(INFO) << "ReadAshmem_BufferSizeExceed_001 end";
 }
 
 /**
- * @tc.name: FmsFormProviderDataTest_049
- * @tc.desc: Verify the RemoveImageData and AddImageData function.
+ * @tc.name: ReadAshmem_BufferSizeNegative_001
  * @tc.type: FUNC
+ * @tc.desc: Verify ReadAshmemDataFromParcel with negative bufferSize.
  */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_049, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, ReadAshmem_BufferSizeNegative_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_049 start";
+    GTEST_LOG_(INFO) << "ReadAshmem_BufferSizeNegative_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    char* result = formProviderData.ReadAshmemDataFromParcel(parcel, -1);
+    EXPECT_EQ(result, nullptr);
+    GTEST_LOG_(INFO) << "ReadAshmem_BufferSizeNegative_001 end";
+}
+
+/**
+ * @tc.name: WriteFd_ValidFd_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteFileDescriptor with valid fd.
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteFd_ValidFd_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteFd_ValidFd_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    std::string testFile = "/data/formmgr/test_fd_write.tmp";
+    int fd = open(testFile.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+    bool result = formProviderData.WriteFileDescriptor(parcel, fd);
+    close(fd);
+    unlink(testFile.c_str());
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteFd_ValidFd_001 end";
+}
+
+/**
+ * @tc.name: WriteAshmemDataToParcel_ZeroSize_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteAshmemDataToParcel with zero size data.
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteAshmemDataToParcel_ZeroSize_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteAshmemDataToParcel_ZeroSize_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    const char* dataPtr = "test";
+    bool result = formProviderData.WriteAshmemDataToParcel(parcel, 0, dataPtr);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "WriteAshmemDataToParcel_ZeroSize_001 end";
+}
+
+/**
+ * @tc.name: WriteAshmem_LargeData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteAshmemDataToParcel with large data.
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteAshmem_LargeData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteAshmem_LargeData_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    std::string largeData(1024 * 100, 'a');
+    size_t size = largeData.length();
+    bool result = formProviderData.WriteAshmemDataToParcel(parcel, size, largeData.c_str());
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteAshmem_LargeData_001 end";
+}
+
+/**
+ * @tc.name: ConvertRawImage_MultiImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ConvertRawImageData with multiple images.
+ */
+HWTEST_F(FmsFormProviderDataTest, ConvertRawImage_MultiImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConvertRawImage_MultiImages_001 start";
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
-    std::string picName = "abc";
-    int32_t size = 1;
-    std::shared_ptr<char> data;
-    formProviderData.AddImageData(picName, data, size);
-    formProviderData.RemoveImageData(picName);
-
+    std::shared_ptr<char[]> data1 = std::make_unique<char[]>(10);
+    std::shared_ptr<char[]> data2 = std::make_unique<char[]>(20);
+    formProviderData.AddImageData("image1", data1, 10);
+    formProviderData.AddImageData("image2", data2, 20);
+    EXPECT_TRUE(formProviderData.ConvertRawImageData());
+    EXPECT_EQ(2, static_cast<int>(formProviderData.GetImageDataMap().size()));
     EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_049 end";
-
+    GTEST_LOG_(INFO) << "ConvertRawImage_MultiImages_001 end";
 }
 
 /**
- 0* @tc.name: FmsFormProviderDataTest_050
- * @tc.desc: Verify the SetDataString and GetDataString function.
+ * @tc.name: WriteImageData_EmptyData_001
  * @tc.type: FUNC
+ * @tc.desc: Verify WriteImageDataToParcel with empty data.
  */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_050, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, WriteImageData_EmptyData_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_050 start";
+    GTEST_LOG_(INFO) << "WriteImageData_EmptyData_001 start";
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
-    std::string jsonDataString = "abc";
-    formProviderData.SetDataString(jsonDataString);
-    auto result = formProviderData.GetDataString();
-
-    EXPECT_FALSE(result.empty());
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_050 end";
-
+    Parcel parcel;
+    std::string picName = "emptyImage";
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(1);
+    data.get()[0] = '\0';
+    bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 1);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteImageData_EmptyData_001 end";
 }
 
 /**
- 0* @tc.name: FmsFormProviderDataTest_051
- * @tc.desc: Verify the EnableDbCache and IsDbCacheEnabled function.
+ * @tc.name: WriteImageData_ValidData_001
  * @tc.type: FUNC
+ * @tc.desc: Verify WriteImageDataToParcel with valid data.
  */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_051, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, WriteImageData_ValidData_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_051 start";
+    GTEST_LOG_(INFO) << "WriteImageData_ValidData_001 start";
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
-
-    formProviderData.EnableDbCache(true);
-    EXPECT_TRUE(formProviderData.IsDbCacheEnabled());
-    EXPECT_TRUE(formProviderData.enableDbCache_);
-
-    formProviderData.EnableDbCache(false);
-    EXPECT_FALSE(formProviderData.IsDbCacheEnabled());
-    EXPECT_FALSE(formProviderData.enableDbCache_);
-
-    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_051 end";
-
+    Parcel parcel;
+    std::string picName = "validDataImage";
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(100);
+    std::fill(data.get(), data.get() + 100, 'A');
+    bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 100);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteImageData_ValidData_001 end";
 }
+
+/**
+ * @tc.name: IsValidSize_ValidSize_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify isValidSize with valid size.
+ */
+HWTEST_F(FmsFormProviderDataTest, IsValidSize_ValidSize_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidSize_ValidSize_001 start";
+    FormProviderData formProviderData("");
+    EXPECT_TRUE(formProviderData.isValidSize(100));
+    EXPECT_TRUE(formProviderData.isValidSize(INT32_MAX));
+    GTEST_LOG_(INFO) << "IsValidSize_ValidSize_001 end";
 }
+
+/**
+ * @tc.name: IsValidSize_NegativeSize_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify isValidSize with invalid size (zero and negative).
+ */
+HWTEST_F(FmsFormProviderDataTest, IsValidSize_NegativeSize_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidSize_NegativeSize_001 start";
+    FormProviderData formProviderData("");
+    EXPECT_FALSE(formProviderData.isValidSize(0));
+    EXPECT_FALSE(formProviderData.isValidSize(-1));
+    EXPECT_FALSE(formProviderData.isValidSize(-100));
+    GTEST_LOG_(INFO) << "IsValidSize_NegativeSize_001 end";
+}
+
+/**
+ * @tc.name: IsValidSize_ExceedInt32Max_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify isValidSize with size exceeds INT32_MAX.
+ */
+HWTEST_F(FmsFormProviderDataTest, IsValidSize_ExceedInt32Max_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidSize_ExceedInt32Max_001 start";
+    FormProviderData formProviderData("");
+    EXPECT_FALSE(formProviderData.isValidSize(static_cast<off_t>(INT32_MAX) + 1));
+    EXPECT_FALSE(formProviderData.isValidSize(static_cast<off_t>(INT32_MAX) + 1000));
+    GTEST_LOG_(INFO) << "IsValidSize_ExceedInt32Max_001 end";
+}
+
+/**
+ * @tc.name: HandleImageAdded_ZeroCount_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify HandleImageDataStateAdded with imageDataNum is zero.
+ */
+HWTEST_F(FmsFormProviderDataTest, HandleImageAdded_ZeroCount_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleImageAdded_ZeroCount_001 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteInt32(0);
+    bool result = formProviderData.HandleImageDataStateAdded(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "HandleImageAdded_ZeroCount_001 end";
+}
+
+/**
+ * @tc.name: MarshallingUnmarshalling_WithImage_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling and Unmarshalling with image data and comprehensive state verification.
+ */
+HWTEST_F(FmsFormProviderDataTest, MarshallingUnmarshalling_WithImage_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "MarshallingUnmarshalling_WithImage_001 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData writeProviderData(jsonData_);
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(10);
+    std::fill(data.get(), data.get() + 10, 'B');
+    writeProviderData.AddImageData("marshTest", data, 10);
+    writeProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_ADDED;
+    
+    auto writeImageDataState = writeProviderData.GetImageDataState();
+    auto writeRawImageBytesMapSize = writeProviderData.rawImageBytesMap_.size();
+    
+    Parcel parcel;
+    EXPECT_TRUE(writeProviderData.Marshalling(parcel));
+    
+    FormProviderData* readProviderData = FormProviderData::Unmarshalling(parcel);
+    ASSERT_NE(readProviderData, nullptr);
+    EXPECT_FALSE(readProviderData->jsonFormProviderData_.empty());
+    EXPECT_EQ(readProviderData->GetImageDataState(), writeImageDataState);
+    EXPECT_EQ(readProviderData->GetImageDataMap().size(), writeRawImageBytesMapSize);
+    EXPECT_TRUE(readProviderData->HasData());
+    delete readProviderData;
+    GTEST_LOG_(INFO) << "MarshallingUnmarshalling_WithImage_001 end";
+}
+
+/**
+ * @tc.name: WriteFormData_EmptyJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteFormData with empty json data.
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteFormData_EmptyJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteFormData_EmptyJson_001 start";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    Parcel parcel;
+    bool result = formProviderData.WriteFormData(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteFormData_EmptyJson_001 end";
+}
+
+/**
+ * @tc.name: WriteFormData_NormalJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteFormData with normal json data.
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteFormData_NormalJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteFormData_NormalJson_001 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    bool result = formProviderData.WriteFormData(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteFormData_NormalJson_001 end";
+}
+
+/**
+ * @tc.name: ParseImages_NonIntegerFd_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseImagesData with invalid fd type in json.
+ */
+HWTEST_F(FmsFormProviderDataTest, ParseImages_NonIntegerFd_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseImages_NonIntegerFd_001 start";
+    std::string jsonStr = R"({"formImages": {"image1": "not_an_integer"}})";
+    FormProviderData formProviderData(jsonStr);
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "ParseImages_NonIntegerFd_001 end";
+}
+
+/**
+ * @tc.name: ParseImages_ValidFd_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseImagesData with valid fd in json.
+ */
+HWTEST_F(FmsFormProviderDataTest, ParseImages_ValidFd_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseImages_ValidFd_001 start";
+    std::string testFile = "/data/formmgr/test_parse_image.tmp";
+    std::ofstream file(testFile);
+    file << "test data";
+    file.close();
+    int fd = open(testFile.c_str(), O_RDONLY);
+    ASSERT_GE(fd, 0);
+    std::string jsonStr = R"({"formImages": {"parseTest": )" + std::to_string(fd) + R"(}})";
+    FormProviderData formProviderData(jsonStr);
+    close(fd);
+    unlink(testFile.c_str());
+    GTEST_LOG_(INFO) << "ParseImages_ValidFd_001 end";
+}
+
+/**
+ * @tc.name: AddImageData_StateUpdate_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify AddImageData with shared_ptr and size updates imageDataState.
+ */
+HWTEST_F(FmsFormProviderDataTest, AddImageData_StateUpdate_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddImageData_StateUpdate_001 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(10);
+    formProviderData.AddImageData("stateTest", data, 10);
+    EXPECT_EQ(formProviderData.GetImageDataState(), FormProviderData::IMAGE_DATA_STATE_ADDED);
+    GTEST_LOG_(INFO) << "AddImageData_StateUpdate_001 end";
+}
+
+/**
+ * @tc.name: Marshalling_MultiImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling with IMAGE_DATA_STATE_ADDED and multiple images.
+ */
+HWTEST_F(FmsFormProviderDataTest, Marshalling_MultiImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Marshalling_MultiImages_001 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::shared_ptr<char[]> data1 = std::make_unique<char[]>(20);
+    std::shared_ptr<char[]> data2 = std::make_unique<char[]>(30);
+    formProviderData.AddImageData("multi1", data1, 20);
+    formProviderData.AddImageData("multi2", data2, 30);
+    formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_ADDED;
+    Parcel parcel;
+    bool result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "Marshalling_MultiImages_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_EmptyJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel with empty json string.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_EmptyJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_EmptyJson_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(2);
+    parcel.WriteString16(Str8ToStr16("{}"));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "ReadFromParcel_EmptyJson_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_NullJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel with invalid json string and verify comprehensive state changes.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_NullJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_NullJson_001 start";
+    FormProviderData formProviderData("");
+    auto initialDataString = formProviderData.GetDataString();
+    Parcel parcel;
+    parcel.WriteInt32(11);
+    parcel.WriteString16(Str8ToStr16("{invalid json}"));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_FALSE(result);
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_.empty());
+    EXPECT_EQ(formProviderData.imageDataState_, FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    EXPECT_EQ(formProviderData.GetImageDataState(), FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    EXPECT_TRUE(formProviderData.GetImageDataMap().empty());
+    EXPECT_EQ(formProviderData.GetDataString(), initialDataString);
+    EXPECT_FALSE(formProviderData.HasData());
+    GTEST_LOG_(INFO) << "ReadFromParcel_NullJson_001 end";
+}
+
+/**
+ * @tc.name: HasData_OnlyImageMap_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify HasData with only imageDataMap.
+ */
+HWTEST_F(FmsFormProviderDataTest, HasData_OnlyImageMap_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HasData_OnlyImageMap_001 start";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
+    imageDataMap["hasDataTest"] = std::make_pair(formAshmem, 10);
+    formProviderData.SetImageDataMap(imageDataMap);
+    EXPECT_TRUE(formProviderData.HasData());
+    GTEST_LOG_(INFO) << "HasData_OnlyImageMap_001 end";
+}
+
+/**
+ * @tc.name: Constructor_NonObjectJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify constructor with non-object json (array type).
+ */
+HWTEST_F(FmsFormProviderDataTest, Constructor_NonObjectJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Constructor_NonObjectJson_001 start";
+    nlohmann::json jsonArray = nlohmann::json::array();
+    jsonArray.push_back("test");
+    FormProviderData formProviderData(jsonArray);
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_.empty());
+    GTEST_LOG_(INFO) << "Constructor_NonObjectJson_001 end";
+}
+
+/**
+ * @tc.name: AddImageData_FileTooLarge_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify AddImageData when file size exceeds MAX_IMAGE_BYTE_SIZE.
+ */
+HWTEST_F(FmsFormProviderDataTest, AddImageData_FileTooLarge_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddImageData_FileTooLarge_001 start";
+    FormProviderData formProviderData("");
+    std::string picName = "largeImage";
+    std::string testFile = "/data/formmgr/test_large_image.tmp";
+    int fd = open(testFile.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+    std::string largeData(51 * 1024 * 1024, 'A');
+    write(fd, largeData.c_str(), largeData.size());
+    close(fd);
+    fd = open(testFile.c_str(), O_RDONLY);
+    ASSERT_GE(fd, 0);
+    formProviderData.AddImageData(picName, fd);
+    close(fd);
+    unlink(testFile.c_str());
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(picName) == formProviderData.rawImageBytesMap_.end());
+    GTEST_LOG_(INFO) << "AddImageData_FileTooLarge_001 end";
+}
+
+/**
+ * @tc.name: ReadAshmemDataFromParcel_InvalidBufferSize_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadAshmemDataFromParcel with invalid buffer size (zero and negative).
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadAshmemDataFromParcel_InvalidBufferSize_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadAshmemDataFromParcel_InvalidBufferSize_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    char* result1 = formProviderData.ReadAshmemDataFromParcel(parcel, 0);
+    EXPECT_EQ(result1, nullptr);
+    char* result2 = formProviderData.ReadAshmemDataFromParcel(parcel, -1);
+    EXPECT_EQ(result2, nullptr);
+    GTEST_LOG_(INFO) << "ReadAshmemDataFromParcel_InvalidBufferSize_001 end";
+}
+
+/**
+ * @tc.name: WriteFileDescriptor_DupFailed_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteFileDescriptor when dup fails (invalid fd).
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteFileDescriptor_DupFailed_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteFileDescriptor_DupFailed_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    int invalidFd = -1;
+    bool result = formProviderData.WriteFileDescriptor(parcel, invalidFd);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "WriteFileDescriptor_DupFailed_001 end";
+}
+
+/**
+ * @tc.name: HandleImageDataStateAdded_NullAshmem_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify HandleImageDataStateAdded when ReadParcelable returns nullptr.
+ */
+HWTEST_F(FmsFormProviderDataTest, HandleImageDataStateAdded_NullAshmem_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleImageDataStateAdded_NullAshmem_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(1);
+    parcel.WriteParcelable(nullptr);
+    bool result = formProviderData.HandleImageDataStateAdded(parcel);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "HandleImageDataStateAdded_NullAshmem_001 end";
+}
+
+/**
+ * @tc.name: ConvertRawImageData_EmptyMap_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ConvertRawImageData with empty rawImageBytesMap_.
+ */
+HWTEST_F(FmsFormProviderDataTest, ConvertRawImageData_EmptyMap_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConvertRawImageData_EmptyMap_001 start";
+    FormProviderData formProviderData("");
+    bool result = formProviderData.ConvertRawImageData();
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(formProviderData.GetImageDataMap().empty());
+    GTEST_LOG_(INFO) << "ConvertRawImageData_EmptyMap_001 end";
+}
+
+/**
+ * @tc.name: IsValidSize_ZeroSize_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify isValidSize with zero size.
+ */
+HWTEST_F(FmsFormProviderDataTest, IsValidSize_ZeroSize_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidSize_ZeroSize_001 start";
+    FormProviderData formProviderData("");
+    EXPECT_FALSE(formProviderData.isValidSize(0));
+    GTEST_LOG_(INFO) << "IsValidSize_ZeroSize_001 end";
+}
+
+/**
+ * @tc.name: IsValidSize_NegativeSize_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify isValidSize with negative size.
+ */
+HWTEST_F(FmsFormProviderDataTest, IsValidSize_NegativeSize_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidSize_NegativeSize_002 start";
+    FormProviderData formProviderData("");
+    EXPECT_FALSE(formProviderData.isValidSize(-1));
+    EXPECT_FALSE(formProviderData.isValidSize(-100));
+    GTEST_LOG_(INFO) << "IsValidSize_NegativeSize_002 end";
+}
+
+/**
+ * @tc.name: ParseImagesData_NonIntegerFd_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseImagesData when fd in json is not integer.
+ */
+HWTEST_F(FmsFormProviderDataTest, ParseImagesData_NonIntegerFd_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseImagesData_NonIntegerFd_001 start";
+    std::string jsonStr = R"({"formImages": {"image1": "not_an_integer"}})";
+    FormProviderData formProviderData(jsonStr);
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "ParseImagesData_NonIntegerFd_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_BigDataNullRawData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel when ReadAshmemDataFromParcel returns nullptr for big data.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_BigDataNullRawData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_BigDataNullRawData_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(35000);
+    parcel.WriteParcelable(nullptr);
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "ReadFromParcel_BigDataNullRawData_001 end";
+}
+
+/**
+ * @tc.name: Marshalling_WriteImageDataFailed_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling with invalid image data state.
+ */
+HWTEST_F(FmsFormProviderDataTest, Marshalling_WriteImageDataFailed_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Marshalling_WriteImageDataFailed_001 start";
+    FormProviderData formProviderData("");
+    std::shared_ptr<char> validData = std::make_shared<char>('a');
+    formProviderData.AddImageData("test", validData, 1);
+    formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_NO_OPERATION;
+    Parcel parcel;
+    bool result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "Marshalling_WriteImageDataFailed_001 end";
+}
+
+/**
+ * @tc.name: MergeData_EmptyAddData_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify MergeData when addJsonData is empty.
+ */
+HWTEST_F(FmsFormProviderDataTest, MergeData_EmptyAddData_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "MergeData_EmptyAddData_002 start";
+    FormProviderData formProviderData("{\"key\": \"value\"}");
+    nlohmann::json emptyJson;
+    formProviderData.MergeData(emptyJson);
+    EXPECT_FALSE(formProviderData.jsonFormProviderData_.empty());
+    EXPECT_EQ(formProviderData.jsonFormProviderData_["key"], "value");
+    GTEST_LOG_(INFO) << "MergeData_EmptyAddData_002 end";
+}
+
+/**
+ * @tc.name: ReadFileDescriptor_NullDescriptor_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFileDescriptor when ReadObject returns nullptr.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFileDescriptor_NullDescriptor_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFileDescriptor_NullDescriptor_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteParcelable(nullptr);
+    int fd = formProviderData.ReadFileDescriptor(parcel);
+    EXPECT_EQ(fd, -1);
+    GTEST_LOG_(INFO) << "ReadFileDescriptor_NullDescriptor_001 end";
+}
+
+/**
+ * @tc.name: SetImageDataMap_EmptyMap_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify SetImageDataMap with empty map sets imageDataState to NO_OPERATION.
+ */
+HWTEST_F(FmsFormProviderDataTest, SetImageDataMap_EmptyMap_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetImageDataMap_EmptyMap_002 start";
+    FormProviderData formProviderData("");
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> emptyMap;
+    formProviderData.SetImageDataMap(emptyMap);
+    EXPECT_EQ(formProviderData.imageDataState_, FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    GTEST_LOG_(INFO) << "SetImageDataMap_EmptyMap_002 end";
+}
+
+/**
+ * @tc.name: SetImageDataMap_NonEmptyMap_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify SetImageDataMap with non-empty map sets imageDataState to ADDED.
+ */
+HWTEST_F(FmsFormProviderDataTest, SetImageDataMap_NonEmptyMap_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetImageDataMap_NonEmptyMap_002 start";
+    FormProviderData formProviderData("");
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> nonEmptyMap;
+    sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
+    nonEmptyMap["test"] = std::make_pair(formAshmem, 10);
+    formProviderData.SetImageDataMap(nonEmptyMap);
+    EXPECT_EQ(formProviderData.imageDataState_, FormProviderData::IMAGE_DATA_STATE_ADDED);
+    GTEST_LOG_(INFO) << "SetImageDataMap_NonEmptyMap_002 end";
+}
+
+/**
+ * @tc.name: CheckAshmemSize_InvalidFd_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify CheckAshmemSize with invalid fd.
+ */
+HWTEST_F(FmsFormProviderDataTest, CheckAshmemSize_InvalidFd_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CheckAshmemSize_InvalidFd_001 start";
+    int fd = -1;
+    int32_t bufferSize = 1024;
+    bool isAstc = false;
+    bool result = FormProviderData::CheckAshmemSize(fd, bufferSize, isAstc);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "CheckAshmemSize_InvalidFd_001 end";
+}
+
+/**
+ * @tc.name: Constructor_WithIsUsedInFRS_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify constructor with isUsedInFRS=true (should not call ParseImagesData).
+ */
+HWTEST_F(FmsFormProviderDataTest, Constructor_WithIsUsedInFRS_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Constructor_WithIsUsedInFRS_002 start";
+    std::string jsonStr = R"({"formImages": {"image1": 1}})";
+    FormProviderData formProviderData(jsonStr, true);
+    EXPECT_FALSE(formProviderData.jsonFormProviderData_.empty());
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "Constructor_WithIsUsedInFRS_002 end";
+}
+
+/**
+ * @tc.name: WriteAshmemDataToParcel_LargeData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteAshmemDataToParcel with large data (100KB).
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteAshmemDataToParcel_LargeData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteAshmemDataToParcel_LargeData_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    std::string largeData(100 * 1024, 'B');
+    size_t size = largeData.length();
+    bool result = formProviderData.WriteAshmemDataToParcel(parcel, size, largeData.c_str());
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteAshmemDataToParcel_LargeData_001 end";
+}
+
+/**
+ * @tc.name: AddImageData_ValidFd_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify AddImageData with valid file descriptor and small file.
+ */
+HWTEST_F(FmsFormProviderDataTest, AddImageData_ValidFd_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddImageData_ValidFd_001 start";
+    FormProviderData formProviderData("");
+    std::string picName = "validImage";
+    std::string testData = "test image data content";
+    std::string testFile = "/data/formmgr/test_valid_image_001.tmp";
+    std::ofstream file(testFile);
+    file << testData;
+    file.close();
+    int fd = open(testFile.c_str(), O_RDONLY);
+    ASSERT_GE(fd, 0);
+    formProviderData.AddImageData(picName, fd);
+    close(fd);
+    unlink(testFile.c_str());
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(picName) != formProviderData.rawImageBytesMap_.end());
+    EXPECT_EQ(formProviderData.rawImageBytesMap_[picName].second, static_cast<int32_t>(testData.length()));
+    EXPECT_EQ(formProviderData.imageDataState_, FormProviderData::IMAGE_DATA_STATE_ADDED);
+    GTEST_LOG_(INFO) << "AddImageData_ValidFd_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_InvalidJsonString_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel with invalid json string in parcel.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_InvalidJsonString_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_InvalidJsonString_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(15);
+    parcel.WriteString16(Str8ToStr16("{invalid json}"));
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "ReadFromParcel_InvalidJsonString_001 end";
+}
+
+/**
+ * @tc.name: ConvertRawImageData_MultiImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ConvertRawImageData with multiple images in rawImageBytesMap_.
+ */
+HWTEST_F(FmsFormProviderDataTest, ConvertRawImageData_MultiImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConvertRawImageData_MultiImages_001 start";
+    FormProviderData formProviderData("");
+    std::shared_ptr<char[]> data1 = std::make_unique<char[]>(10);
+    std::shared_ptr<char[]> data2 = std::make_unique<char[]>(20);
+    formProviderData.AddImageData("image1", data1, 10);
+    formProviderData.AddImageData("image2", data2, 20);
+    EXPECT_EQ(2, static_cast<int>(formProviderData.rawImageBytesMap_.size()));
+    bool result = formProviderData.ConvertRawImageData();
+    EXPECT_TRUE(result);
+    EXPECT_EQ(2, static_cast<int>(formProviderData.GetImageDataMap().size()));
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "ConvertRawImageData_MultiImages_001 end";
+}
+
+/**
+ * @tc.name: ClearData_WithJsonData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ClearData clears jsonFormProviderData_.
+ */
+HWTEST_F(FmsFormProviderDataTest, ClearData_WithJsonData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ClearData_WithJsonData_001 start";
+    FormProviderData formProviderData("{\"key\": \"value\"}");
+    EXPECT_FALSE(formProviderData.jsonFormProviderData_.empty());
+    formProviderData.ClearData();
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_.empty());
+    GTEST_LOG_(INFO) << "ClearData_WithJsonData_001 end";
+}
+
+/**
+ * @tc.name: GetDataString_EmptyJson_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify GetDataString returns empty string when jsonFormProviderData_ is empty.
+ */
+HWTEST_F(FmsFormProviderDataTest, GetDataString_EmptyJson_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetDataString_EmptyJson_002 start";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    std::string result = formProviderData.GetDataString();
+    EXPECT_TRUE(result.empty());
+    GTEST_LOG_(INFO) << "GetDataString_EmptyJson_002 end";
+}
+
+/**
+ * @tc.name: HasData_EmptyData_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify HasData returns false when both jsonFormProviderData_ and imageDataMap_ are empty.
+ */
+HWTEST_F(FmsFormProviderDataTest, HasData_EmptyData_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HasData_EmptyData_002 start";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    EXPECT_FALSE(formProviderData.HasData());
+    GTEST_LOG_(INFO) << "HasData_EmptyData_002 end";
+}
+
+/**
+ * @tc.name: UpdateData_WithNewJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify UpdateData replaces old json data with new json data.
+ */
+HWTEST_F(FmsFormProviderDataTest, UpdateData_WithNewJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateData_WithNewJson_001 start";
+    nlohmann::json oldJson;
+    oldJson["old"] = "value";
+    FormProviderData formProviderData(oldJson);
+    nlohmann::json newJson;
+    newJson["new"] = "data";
+    formProviderData.UpdateData(newJson);
+    auto data = formProviderData.GetData();
+    EXPECT_EQ(data["new"], "data");
+    EXPECT_TRUE(data.find("old") == data.end());
+    GTEST_LOG_(INFO) << "UpdateData_WithNewJson_001 end";
+}
+
+/**
+ * @tc.name: RemoveImageData_ExistingImage_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify RemoveImageData removes existing image from rawImageBytesMap_.
+ */
+HWTEST_F(FmsFormProviderDataTest, RemoveImageData_ExistingImage_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RemoveImageData_ExistingImage_001 start";
+    FormProviderData formProviderData("");
+    std::shared_ptr<char> data = std::make_shared<char>('a');
+    formProviderData.AddImageData("toRemove", data, 1);
+    EXPECT_EQ(1, formProviderData.rawImageBytesMap_.size());
+    formProviderData.RemoveImageData("toRemove");
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "RemoveImageData_ExistingImage_001 end";
+}
+
+/**
+ * @tc.name: WriteImageDataToParcel_ValidData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteImageDataToParcel with valid image data.
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteImageDataToParcel_ValidData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteImageDataToParcel_ValidData_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    std::string picName = "validImage";
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(100);
+    std::fill(data.get(), data.get() + 100, 'A');
+    bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 100);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteImageDataToParcel_ValidData_001 end";
+}
+
+/**
+ * @tc.name: WriteImageDataToParcel_EmptyData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteImageDataToParcel with empty data (size=1).
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteImageDataToParcel_EmptyData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteImageDataToParcel_EmptyData_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    std::string picName = "emptyImage";
+    std::shared_ptr<char[]> data = std::make_unique<char[]>(1);
+    data.get()[0] = '\0';
+    bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 1);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteImageDataToParcel_EmptyData_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_ImageDataStateAdded_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel with IMAGE_DATA_STATE_ADDED and zero imageDataNum.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_ImageDataStateAdded_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataStateAdded_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(2);
+    parcel.WriteString16(Str8ToStr16("{}"));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
+    parcel.WriteInt32(0);
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataStateAdded_001 end";
+}
+
+/**
+ * @tc.name: Marshalling_WithDefaultState_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling with default imageDataState_ (NO_OPERATION).
+ */
+HWTEST_F(FmsFormProviderDataTest, Marshalling_WithDefaultState_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Marshalling_WithDefaultState_001 start";
+    FormProviderData formProviderData("{\"key\": \"value\"}");
+    formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_NO_OPERATION;
+    Parcel parcel;
+    bool result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "Marshalling_WithDefaultState_001 end";
+}
+
+/**
+ * @tc.name: Marshalling_WithRemovedState_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling with IMAGE_DATA_STATE_REMOVED.
+ */
+HWTEST_F(FmsFormProviderDataTest, Marshalling_WithRemovedState_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Marshalling_WithRemovedState_001 start";
+    FormProviderData formProviderData("{\"key\": \"value\"}");
+    formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_REMOVED;
+    Parcel parcel;
+    bool result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "Marshalling_WithRemovedState_001 end";
+}
+
+/**
+ * @tc.name: WriteFormData_BigData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify WriteFormData with big data (> BIG_DATA) uses ashmem.
+ */
+HWTEST_F(FmsFormProviderDataTest, WriteFormData_BigData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "WriteFormData_BigData_001 start";
+    std::string bigJsonStr = R"({"data": ")" + std::string(35000, 'C') + R"("})";
+    FormProviderData formProviderData(bigJsonStr);
+    Parcel parcel;
+    bool result = formProviderData.WriteFormData(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "WriteFormData_BigData_001 end";
+}
+
+/**
+ * @tc.name: AddImageData_NullData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify AddImageData with null shared_ptr data.
+ */
+HWTEST_F(FmsFormProviderDataTest, AddImageData_NullData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddImageData_NullData_001 start";
+    FormProviderData formProviderData("");
+    std::string picName = "nullDataImage";
+    std::shared_ptr<char> nullData = nullptr;
+    formProviderData.AddImageData(picName, nullData, 10);
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(picName) == formProviderData.rawImageBytesMap_.end());
+    GTEST_LOG_(INFO) << "AddImageData_NullData_001 end";
+}
+
+/**
+ * @tc.name: AddImageData_EmptyPicName_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify AddImageData with empty picName.
+ */
+HWTEST_F(FmsFormProviderDataTest, AddImageData_EmptyPicName_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddImageData_EmptyPicName_001 start";
+    FormProviderData formProviderData("");
+    std::string emptyPicName = "";
+    std::shared_ptr<char> data = std::make_shared<char>('a');
+    formProviderData.AddImageData(emptyPicName, data, 1);
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(emptyPicName) == formProviderData.rawImageBytesMap_.end());
+    GTEST_LOG_(INFO) << "AddImageData_EmptyPicName_001 end";
+}
+
+/**
+ * @tc.name: ParseImagesData_NoFormImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseImagesData when json does not contain formImages key.
+ */
+HWTEST_F(FmsFormProviderDataTest, ParseImagesData_NoFormImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseImagesData_NoFormImages_001 start";
+    std::string jsonStr = R"({"key": "value"})";
+    FormProviderData formProviderData(jsonStr);
+    formProviderData.ParseImagesData();
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "ParseImagesData_NoFormImages_001 end";
+}
+
+/**
+ * @tc.name: SetImageDataState_CustomValue_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify SetImageDataState sets custom value.
+ */
+HWTEST_F(FmsFormProviderDataTest, SetImageDataState_CustomValue_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetImageDataState_CustomValue_001 start";
+    FormProviderData formProviderData("");
+    constexpr int32_t customValue = 999;
+    formProviderData.SetImageDataState(customValue);
+    EXPECT_EQ(customValue, formProviderData.GetImageDataState());
+    GTEST_LOG_(INFO) << "SetImageDataState_CustomValue_001 end";
+}
+
+/**
+ * @tc.name: GetImageDataMap_Empty_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify GetImageDataMap returns empty map when no images.
+ */
+HWTEST_F(FmsFormProviderDataTest, GetImageDataMap_Empty_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetImageDataMap_Empty_001 start";
+    FormProviderData formProviderData("");
+    auto imageMap = formProviderData.GetImageDataMap();
+    EXPECT_TRUE(imageMap.empty());
+    GTEST_LOG_(INFO) << "GetImageDataMap_Empty_001 end";
+}
+
+/**
+ * @tc.name: GetImageDataState_Default_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify GetImageDataState returns default value (0).
+ */
+HWTEST_F(FmsFormProviderDataTest, GetImageDataState_Default_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetImageDataState_Default_001 start";
+    FormProviderData formProviderData("");
+    EXPECT_EQ(0, formProviderData.GetImageDataState());
+    GTEST_LOG_(INFO) << "GetImageDataState_Default_001 end";
+}
+
+/**
+ * @tc.name: Unmarshalling_ValidParcel_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Unmarshalling creates valid FormProviderData from parcel.
+ */
+HWTEST_F(FmsFormProviderDataTest, Unmarshalling_ValidParcel_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Unmarshalling_ValidParcel_001 start";
+    FormProviderData writeProviderData("{\"key\": \"value\"}");
+    Parcel parcel;
+    EXPECT_TRUE(writeProviderData.Marshalling(parcel));
+    FormProviderData* readProviderData = FormProviderData::Unmarshalling(parcel);
+    ASSERT_NE(readProviderData, nullptr);
+    EXPECT_FALSE(readProviderData->GetData().empty());
+    delete readProviderData;
+    GTEST_LOG_(INFO) << "Unmarshalling_ValidParcel_001 end";
+}
+
+/**
+ * @tc.name: Constructor_NullJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify constructor with nullptr json.
+ */
+HWTEST_F(FmsFormProviderDataTest, Constructor_NullJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Constructor_NullJson_001 start";
+    nlohmann::json jsonNull = nullptr;
+    FormProviderData formProviderData(jsonNull);
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_.empty());
+    GTEST_LOG_(INFO) << "Constructor_NullJson_001 end";
+}
+
+/**
+ * @tc.name: Constructor_StringJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify constructor with string type json.
+ */
+HWTEST_F(FmsFormProviderDataTest, Constructor_StringJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Constructor_StringJson_001 start";
+    nlohmann::json jsonString = "test string";
+    FormProviderData formProviderData(jsonString);
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_.empty());
+    GTEST_LOG_(INFO) << "Constructor_StringJson_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_ImageDataStateRemoved_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel with IMAGE_DATA_STATE_REMOVED.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_ImageDataStateRemoved_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataStateRemoved_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(2);
+    parcel.WriteString16(Str8ToStr16("{}"));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_REMOVED);
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataStateRemoved_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_UnknownImageDataState_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel with unknown imageDataState value.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_UnknownImageDataState_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_UnknownImageDataState_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(2);
+    parcel.WriteString16(Str8ToStr16("{}"));
+    parcel.WriteInt32(999);
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "ReadFromParcel_UnknownImageDataState_001 end";
+}
+
+/**
+ * @tc.name: Marshalling_UnknownImageDataState_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling with unknown imageDataState value.
+ */
+HWTEST_F(FmsFormProviderDataTest, Marshalling_UnknownImageDataState_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Marshalling_UnknownImageDataState_001 start";
+    FormProviderData formProviderData("{\"key\": \"value\"}");
+    formProviderData.imageDataState_ = 999;
+    Parcel parcel;
+    bool result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "Marshalling_UnknownImageDataState_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_ImageDataNumExceed_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel when imageDataNum exceeds READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_ImageDataNumExceed_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataNumExceed_002 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    parcel.WriteInt32(2);
+    parcel.WriteString16(Str8ToStr16("{}"));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
+    parcel.WriteInt32(1001);
+    bool result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataNumExceed_002 end";
+}
+
+}  // namespace OHOS::AppExecFwk
