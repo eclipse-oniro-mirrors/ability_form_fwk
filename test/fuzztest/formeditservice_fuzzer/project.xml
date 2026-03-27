@@ -22,4 +22,4 @@
     <!-- memory usage limit in in Mb -->
     <rss_limit_mb>4096</rss_limit_mb>
   </fuzztest>
-</</fuzz_config>
+</fuzz_config>

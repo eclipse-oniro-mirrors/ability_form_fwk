@@ -17,38 +17,34 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
 #include "common/timer_mgr/form_timer_mgr.h"
 #undef private
 #undef protected
-#include "securec.h"
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-constexpr uint8_t ENABLE = 2;
-
-uint32_t GetU32Data(const char* ptr)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
+    if (fdp == nullptr) {
+        return true;
+    }
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
     FormTimerMgr formTimerMgr;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = fdp->ConsumeIntegral<int64_t>();
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
 
     // Cover AddFormTimerForMultiUpdate (not in original fuzzer)
     std::vector<std::vector<int>> updateAtTimes;
-    for (size_t i = 0; i < 3 && i + U32_AT_SIZE * 2 < size; i++) {
+    int32_t numTimePairs = fdp->ConsumeIntegralInRange(0, 3);
+    for (int32_t i = 0; i < numTimePairs; i++) {
         std::vector<int> timePair;
-        timePair.push_back(static_cast<int>(GetU32Data(data + i * 8)));
-        timePair.push_back(static_cast<int>(GetU32Data(data + i * 8 + 4)));
+        timePair.push_back(fdp->ConsumeIntegral<int>());
+        timePair.push_back(fdp->ConsumeIntegral<int>());
         updateAtTimes.push_back(timePair);
     }
     formTimerMgr.AddFormTimerForMultiUpdate(formId, updateAtTimes, userId);
@@ -77,7 +73,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formTimerMgr.GetLimiterWantAgent();
 
     // Cover GetDynamicWantAgent (not in original fuzzer)
-    int64_t nextTime = static_cast<int64_t>(GetU32Data(data));
+    int64_t nextTime = fdp->ConsumeIntegral<int64_t>();
     formTimerMgr.GetDynamicWantAgent(nextTime, userId);
 
     // Cover IsActiveUser (not in original fuzzer)
@@ -96,7 +92,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
     // Cover FindNextAtTimerItem (private method, not in original fuzzer)
     UpdateAtItem updateAtItem;
-    long nowTime = static_cast<long>(GetU32Data(data));
+    long nowTime = fdp->ConsumeIntegral<long>();
     formTimerMgr.FindNextAtTimerItem(nowTime, updateAtItem);
 
     // Cover CreateLimiterTimer (private method, not in original fuzzer)
@@ -136,32 +132,9 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
