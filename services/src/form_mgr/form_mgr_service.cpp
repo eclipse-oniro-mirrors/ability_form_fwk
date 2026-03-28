@@ -62,9 +62,6 @@
 #include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
-#include "net_conn_callback_stub.h"
-#include "net_conn_client.h"
-#include "net_handle.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
@@ -90,6 +87,7 @@
 #include "scene_board_judgement.h"
 #include "form_provider/form_provider_mgr.h"
 #include "form_host/form_mgr_host_adapter.h"
+#include "form_observer/net_conn_callback_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -109,7 +107,6 @@ constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
 #endif // RES_SCHEDULE_ENABLE
 }
 using namespace std::chrono;
-using namespace OHOS::NetManagerStandard;
 
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<FormMgrService>::GetInstance().get());
@@ -842,96 +839,6 @@ void FormMgrService::SubscribeSysEventReceiver()
     }
 }
 
-class NetConnCallbackObserver : public NetManagerStandard::NetConnCallbackStub {
-public:
-    explicit NetConnCallbackObserver(FormMgrService &fmservice);
-    ~NetConnCallbackObserver() override = default;
-    int32_t NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle) override;
-    int32_t NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
-        const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override;
-    int32_t NetConnectionPropertiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
-        const sptr<NetManagerStandard::NetLinkInfo> &info) override;
-    int32_t NetLost(sptr<NetManagerStandard::NetHandle> &netHandle) override;
-    int32_t NetUnavailable() override;
-    int32_t NetBlockStatusChange(sptr<NetManagerStandard::NetHandle> &netHandle, bool blocked) override;
-
-private:
-    FormMgrService &fmservice_;
-};
-
-NetConnCallbackObserver::NetConnCallbackObserver(FormMgrService &fmservice):fmservice_(fmservice)
-{
-}
-
-int32_t NetConnCallbackObserver::NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle)
-{
-    HILOG_INFO("OnNetworkAvailable");
-    this->fmservice_.SetNetConnect();
-    return ERR_OK;
-}
-
-int32_t NetConnCallbackObserver::NetUnavailable()
-{
-    HILOG_DEBUG("OnNetworkUnavailable");
-    return ERR_OK;
-}
-
-int32_t NetConnCallbackObserver::NetCapabilitiesChange(sptr<NetHandle> &netHandle,
-    const sptr<NetAllCapabilities> &netAllCap)
-{
-    HILOG_DEBUG("OnNetCapabilitiesChange");
-
-    return ERR_OK;
-}
-
-int32_t NetConnCallbackObserver::NetConnectionPropertiesChange(sptr<NetHandle> &netHandle,
-    const sptr<NetLinkInfo> &info)
-{
-    HILOG_DEBUG("OnNetConnectionPropertiesChange");
-    return ERR_OK;
-}
-
-int32_t NetConnCallbackObserver::NetLost(sptr<NetHandle> &netHandle)
-{
-    HILOG_INFO("OnNetLost");
-    this->fmservice_.SetDisConnectTypeTime();
-    return ERR_OK;
-}
-
-int32_t NetConnCallbackObserver::NetBlockStatusChange(sptr<NetHandle> &netHandle, bool blocked)
-{
-    HILOG_DEBUG("OnNetBlockStatusChange");
-    return ERR_OK;
-}
-
-
-void FormMgrService::SubscribeNetConn()
-{
-    HILOG_INFO("Register SubscribeNetConn begin");
-    sptr<NetConnCallbackObserver> defaultNetworkCallback_ = new (std::nothrow) NetConnCallbackObserver(*this);
-    if (defaultNetworkCallback_ == nullptr) {
-        HILOG_ERROR("new operator error.observer is nullptr");
-        return ;
-    }
-    int result = NetConnClient::GetInstance().RegisterNetConnCallback(defaultNetworkCallback_);
-    if (result == ERR_OK) {
-        HILOG_INFO("Register defaultNetworkCallback_ successful");
-        std::list<sptr<NetHandle>> netList;
-        NetConnClient::GetInstance().GetAllNets(netList);
-        if (netList.size() > 0) {
-            SetNetConnect();
-        }
-    } else {
-        HILOG_ERROR("Register defaultNetworkCallback_ failed, netConTime:%{public}d", netConTime);
-        netConTime++;
-        if (netConTime > FORM_CON_NET_MAX) {
-            HILOG_ERROR("Register defaultNetworkCallback_ failed 10 time");
-            return;
-        }
-        PostConnectNetWork();
-    }
-}
-
 /**
  * @brief initialization of form manager service.
  */
@@ -980,7 +887,7 @@ ErrCode FormMgrService::Init()
     }
     FormMgrAdapter::GetInstance().Init();
     FormAmsHelper::GetInstance().RegisterConfigurationObserver();
-    SubscribeNetConn();
+    NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
     ParamManager::GetInstance().InitParam();
     ParamCommonEvent::GetInstance().SubscriberEvent();
     return ERR_OK;
@@ -1604,7 +1511,14 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
 {
 #ifdef RES_SCHEDULE_ENABLE
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
-        auto formSystemloadLevelCb = [this](int32_t level) { this->OnSystemloadLevel(level); };
+        auto formSystemloadLevelCb = [weakThis = weak_from_this()](int32_t level) {
+            auto fmservice = weakThis.lock();
+            if (fmservice == nullptr) {
+                HILOG_ERROR("FormMgrService has been destroyed in system load callback");
+                return;
+            }
+            fmservice->OnSystemloadLevel(level);
+        };
         sptr<FormSystemloadListener> formSystemloadListener
             = new (std::nothrow) FormSystemloadListener(formSystemloadLevelCb);
         ResourceSchedule::ResSchedClient::GetInstance().RegisterSystemloadNotifier(formSystemloadListener);
@@ -2030,9 +1944,14 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
             static_cast<int64_t>(callingUid));
         FormMgrQueue::GetInstance().ScheduleDelayTask(
             taskId, IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME,
-            [this, taskId, formId]() {
-                std::lock_guard<std::mutex> lock(snapshotSetMutex_);
-                requestPublishFormWithSnapshotSet_.erase(formId);
+            [weakThis = weak_from_this(), taskId, formId]() {
+                auto fmservice = weakThis.lock();
+                if (fmservice == nullptr) {
+                    HILOG_ERROR("FormMgrService has been destroyed in delay task");
+                    return;
+                }
+                std::lock_guard<std::mutex> lock(fmservice->snapshotSetMutex_);
+                fmservice->requestPublishFormWithSnapshotSet_.erase(formId);
                 FormMgrQueue::GetInstance().CancelDelayTask(taskId);
             });
     }
@@ -2172,25 +2091,6 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float
     return FormMgrAdapter::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
 }
 
-void FormMgrService::SetNetConnect()
-{
-    if (lastNetLostTime_ == 0) {
-        HILOG_DEBUG("no need update");
-        return;
-    }
-
-    int64_t currentTime = FormUtil::GetCurrentMillisecond();
-    if ((currentTime - lastNetLostTime_) >= FORM_DISCON_NETWORK_CHECK_TIME) {
-        FormMgrAdapter::GetInstance().UpdateFormByCondition(CONDITION_NETWORK);
-        lastNetLostTime_ = 0;
-    }
-}
-
-void FormMgrService::SetDisConnectTypeTime()
-{
-    lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
-}
-
 ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -2253,16 +2153,6 @@ ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
     return FormEditService::GetInstance().CloseFormEditAbility(uid, isMainPage);
 }
 
-void FormMgrService::PostConnectNetWork()
-{
-    HILOG_DEBUG("start");
-
-    auto connectNetWork = []() {
-        DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
-    };
-    FormMgrQueue::GetInstance().ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
-    HILOG_DEBUG("end");
-}
 ErrCode FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");

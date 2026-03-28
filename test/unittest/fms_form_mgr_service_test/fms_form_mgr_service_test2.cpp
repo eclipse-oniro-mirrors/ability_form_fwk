@@ -1283,8 +1283,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0138, TestSize.Level1)
     int fd = 1;
     formMgrService.Dump(fd, args);
     formMgrService.Dump(args, result);
-    formMgrService.SetNetConnect();
-    formMgrService.SetDisConnectTypeTime();
     formMgrService.OpenFormEditAbility(abilityName, formId, true);
     formMgrService.OpenFormEditAbility(abilityName, formId, false);
     GTEST_LOG_(INFO) << "FormMgrService_0138 end";
@@ -1374,19 +1372,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0182, TestSize.Level1)
     int32_t state = 1;
     EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0182 end";
-}
-
-/**
- * @tc.name: FormMgrService_0183
- * @tc.desc: Verify PostConnectNetWork
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0183, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0183 start";
-    std::shared_ptr<FormMgrService> formTaskMgr = std::make_shared<FormMgrService>();
-    formTaskMgr->PostConnectNetWork();
-    GTEST_LOG_(INFO) << "FormMgrService_0183 end";
 }
 
 /**
