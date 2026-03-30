@@ -194,7 +194,7 @@ int32_t FormMgrService::CheckFMSReady()
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
 
     if (!result) {
-        HILOG_ERROR("form info not yet loaded")
+        HILOG_ERROR("form info not yet loaded");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
