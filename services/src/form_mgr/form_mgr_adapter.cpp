@@ -377,14 +377,16 @@ void FormMgrAdapter::IncreaseAddFormRequestTimeOutTask(const int64_t formId)
         HILOG_ERROR("null serialQueue_");
         return;
     }
-    auto timerTask = [this, formId]() {
-        std::lock_guard<std::mutex> lock(formResultMutex_);
-        auto iter = formIdMap_.find(formId);
-        if (iter != formIdMap_.end()) {
+    auto timerTask = [formId]() {
+        auto &instance = FormMgrAdapter::GetInstance();
+        std::lock_guard<std::mutex> lock(instance.formResultMutex_);
+        auto iter = instance.formIdMap_.find(formId);
+        if (iter != instance.formIdMap_.end()) {
             iter->second = AddFormResultErrorCode::TIMEOUT;
-            condition_.notify_all();
+            instance.condition_.notify_all();
         }
-        serialQueue_->CancelDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId));
+        instance.serialQueue_->CancelDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER),
+            formId));
     };
     serialQueue_->ScheduleDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId),
         ADD_FORM_REQUEST_TIMTOUT_PERIOD, timerTask);
@@ -410,18 +412,16 @@ void FormMgrAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, const
 ErrCode FormMgrAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates)
 {
     std::lock_guard<std::mutex> lock(formResultMutex_);
-    auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [this, formId, &formStates] (const auto elem) {
-        if (elem.first == formId) {
-            if (elem.second == AddFormResultErrorCode::FAILED || elem.second == AddFormResultErrorCode::TIMEOUT) {
-                formIdMap_.erase(formId);
-                return true;
-            }
-            formStates = elem.second;
-            return false;
+    auto iter = formIdMap_.find(formId);
+    if (iter != formIdMap_.end()) {
+        if (iter->second == AddFormResultErrorCode::FAILED || iter->second == AddFormResultErrorCode::TIMEOUT) {
+            formIdMap_.erase(iter);
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
-        return false;
-    });
-    return (result != formIdMap_.end()) ? ERR_APPEXECFWK_FORM_COMMON_CODE : ERR_OK;
+        formStates = iter->second;
+    }
+
+    return ERR_OK;
 }
 
 void FormMgrAdapter::RemoveFormIdMapElement(const int64_t formId)
@@ -2661,9 +2661,9 @@ ErrCode FormMgrAdapter::AcquireAddFormResult(const int64_t formId)
     HILOG_INFO("call");
     auto apiRet = std::make_shared<ErrCode>(ERR_OK);
     std::unique_lock<std::mutex> lock(formResultMutex_);
-    condition_.wait(lock, [this, formId, ret = apiRet]() {
-        auto iter = formIdMap_.find(formId);
-        if (iter != formIdMap_.end()) {
+    condition_.wait(lock, [formId, ret = apiRet]() {
+        auto iter = FormMgrAdapter::GetInstance().formIdMap_.find(formId);
+        if (iter != FormMgrAdapter::GetInstance().formIdMap_.end()) {
             if (iter->second == AddFormResultErrorCode::SUCCESS) {
                 HILOG_INFO("Acquire the result of the success");
                 *ret = ERR_OK;

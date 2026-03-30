@@ -50,6 +50,7 @@ constexpr int64_t MIN_DURATION_MS = 1500;
 constexpr int64_t TASK_ONCONFIGURATIONUPDATED_DELAY_MS = 1000;
 constexpr int32_t MEMORY_MONITOR_INTERVAL = Constants::MS_PER_DAY * 2;
 constexpr uint64_t MEMORY_LEAK_THRESHOLD = 300 * 1024 * 1024;
+constexpr size_t BYTE_PER_KB = 1024;
 constexpr const char *FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
 constexpr const char *TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
 constexpr const char *FRS_MEMORY_MONITOR = "FormRenderMemoryMonitor";
@@ -80,7 +81,7 @@ uint64_t GetPss()
         }
     }
     file.close();
-    return pss + swapPss;
+    return (pss + swapPss) * BYTE_PER_KB;
 }
 }  // namespace
 using namespace AbilityRuntime;
