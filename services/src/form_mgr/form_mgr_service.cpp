@@ -179,6 +179,7 @@ int32_t FormMgrService::CheckFMSReady()
     }
 
     if (state_ != ServiceRunningState::STATE_RUNNING) {
+        HILOG_ERROR("fms is not running");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -191,7 +192,13 @@ int32_t FormMgrService::CheckFMSReady()
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     bool result = FormInfoMgr::GetInstance().HasReloadedFormInfos();
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
+
+    if (!result) {
+        HILOG_ERROR("form info not yet loaded");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    return ERR_OK;
 }
 
 bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
