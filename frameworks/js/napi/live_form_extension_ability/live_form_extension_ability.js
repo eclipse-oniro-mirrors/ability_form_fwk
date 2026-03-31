@@ -19,6 +19,7 @@ let UIExtensionAbility = requireNapi('app.ability.UIExtensionAbility');
 const domainID = 0xD001301;
 const TAG = 'FormManagerService';
 const FORM_LAYOUT_SCALE = 'layout_scale';
+const FONT_SCALE = 'font_scale';
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
   liveFormInfo = undefined;
@@ -66,7 +67,22 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
           });
       } catch(err) {
         hilog.sLogE(domainID, TAG, `setUIExtCustomDensity failed, code is ${err?.code}, message is ${err?.message}`);
-     }
+      }
+    }
+
+    let fontScale = want.parameters[FONT_SCALE];
+    if (typeof fontScale === 'number') {
+      try {
+        this.context.setFontScale(fontScale)
+          .then(() => {
+            hilog.sLogI(domainID, TAG, `setFontScale succeed, scale is ${fontScale}`);
+          })
+          .catch((err) => {
+            hilog.sLogE(domainID, TAG, `setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
+          });
+      } catch(err) {
+        hilog.sLogE(domainID, TAG, `setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
+      }
     }
 
     this.onLiveFormCreate(this.liveFormInfo, session);
