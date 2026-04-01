@@ -229,7 +229,7 @@ void FormAmsHelper::UnRegisterConfigurationObserver()
 }
 
 ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject> &callerToken,
-    const int32_t userId)
+    uint32_t specifyTokenId, const int32_t userId)
 {
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
@@ -242,7 +242,7 @@ ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteO
         HILOG_ERROR("StartAbility not allowed:%{public}d", ERR_APPEXECFWK_FORM_INVALID_PARAM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    return IN_PROCESS_CALL(ams->StartAbility(want, callerToken, userId));
+    return IN_PROCESS_CALL(ams->StartAbilityWithSpecifyTokenId(want, callerToken, specifyTokenId, userId));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

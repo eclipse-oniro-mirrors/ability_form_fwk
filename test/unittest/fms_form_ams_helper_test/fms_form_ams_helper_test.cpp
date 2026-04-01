@@ -93,8 +93,9 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_StartAbilityOnlyUIAbility_001, Test
     int32_t userId = 100;
     sptr<IRemoteObject> callerToken;
     MockGetAbilityManager(false);
+    uint32_t specifyTokenId = 0;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken,
-        userId));
+        specifyTokenId, userId));
     GTEST_LOG_(INFO) << "FormAmsHelper_StartAbilityOnlyUIAbility_001 end";
 }
 
@@ -111,7 +112,9 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_StartAbilityOnlyUIAbility_002, Test
     want.SetFlags(Want::FLAG_ABILITY_CONTINUATION);
     int32_t userId = 100;
     sptr<IRemoteObject> callerToken;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken, userId));
+    uint32_t specifyTokenId = 0;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken,
+        specifyTokenId, userId));
     GTEST_LOG_(INFO) << "FormAmsHelper_StartAbilityOnlyUIAbility_002 end";
 }
 
@@ -128,9 +131,10 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_StartAbilityOnlyUIAbility_003, Test
     int32_t userId = 100;
     sptr<IRemoteObject> callerToken;
     auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
-    mockAmsMgr->startAbility_ = ERR_OK;
+    mockAmsMgr->startAbilityWithSpecifyTokenId_ = ERR_OK;
     formAmsHelper.abilityManager_ = mockAmsMgr;
-    EXPECT_EQ(ERR_OK, formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken, userId));
+    uint32_t specifyTokenId = 0;
+    EXPECT_EQ(ERR_OK, formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken, specifyTokenId, userId));
     GTEST_LOG_(INFO) << "FormAmsHelper_StartAbilityOnlyUIAbility_003 end";
 }
 } // namespace AppExecFwk
