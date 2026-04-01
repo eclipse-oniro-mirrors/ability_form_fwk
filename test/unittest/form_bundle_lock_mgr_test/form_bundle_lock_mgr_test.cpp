@@ -148,7 +148,7 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_008, TestSize.Level1)
 HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_IsBundleProtect_003, TestSize.Level1)
 {
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, true);
-    int32_t userId = DEFAULT_USER_ID;
+    int32_t userId = 0;
     formBundleLockMgr.isLockServiceInitialized_.store(false);
     bool forbid = formBundleLockMgr.IsBundleProtect(BUNDLE_NAME, userId);
     formBundleLockMgr.isLockServiceInitialized_.store(true);
