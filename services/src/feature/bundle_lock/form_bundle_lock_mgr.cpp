@@ -126,7 +126,7 @@ bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, int64_t f
     if (!isLockServiceInitialized_.load()) {
         HILOG_WARN("The app lock service has not been initialized; returning bundle lock Info, bundleName:%{public}s.",
             bundleName.c_str());
-        return IsBundleLock(bundleName, userId, formId);
+        return IsBundleLock(bundleName, formId);
     }
 
     std::shared_lock<std::shared_mutex> lock(bundleProtectSetMutex_);
