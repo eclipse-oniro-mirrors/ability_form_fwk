@@ -2080,6 +2080,7 @@ int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos
             }
         }
     }
+    FormBundleLockMgr::GetInstance().InitLockService();
     return retErrCode;
 }
 
