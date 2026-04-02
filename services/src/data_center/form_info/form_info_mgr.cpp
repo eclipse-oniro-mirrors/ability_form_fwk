@@ -596,7 +596,6 @@ void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bu
             if (bundleFormInfoIter != bundleFormInfoMap_.end()) {
                 bundleFormInfoIter->second->UpdateStaticFormInfos(formInfos, userId);
                 HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
- 
             }
         }
     }
@@ -710,7 +709,6 @@ void FormInfoMgr::ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
     for (auto const& bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string& bundleName = bundleFormInfoPair.first;
         auto bundleVersionPair = bundleVersionMap.find(bundleName);
- 
         if (bundleVersionPair == bundleVersionMap.end()) {
             bundleFormInfoPair.second->Remove(userId);
             continue;

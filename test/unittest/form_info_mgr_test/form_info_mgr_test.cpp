@@ -437,7 +437,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_UpdateStaticFormInfos_0100, TestSize.Level
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::vector<std::string> &bundleNames, int32_t flag, 
+    auto bmsTask = [] (const std::vector<std::string> &bundleNames, int32_t flag,
         std::vector<BundleInfo> &bundleInfos, int32_t userId) {
         GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 bmsTask called";
         BundleInfo bundleInfo;
