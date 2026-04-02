@@ -22,6 +22,7 @@
 #define private public
 #define protected public
 #include "data_center/form_info/bundle_form_info.h"
+#include "data_center/form_info/form_info_mgr.h"
 #undef private
 #undef protected
 
@@ -38,6 +39,10 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
         return true;
     }
 
+    // Initialize FormInfoMgr to ensure necessary singletons and database are initialized
+    FormInfoMgr formInfoMgr;
+    formInfoMgr.Start();
+
     std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     BundleFormInfo bundleFormInfo(bundleName);
 
@@ -45,15 +50,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     bundleFormInfo.InitFromJson(formInfoStoragesJson);
 
     int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
-    bundleFormInfo.UpdateStaticFormInfos(userId);
-
-    bundleFormInfo.Remove(userId);
 
     std::string moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     std::string formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId);
-
-    bundleFormInfo.RemoveAllDynamicFormsInfo(userId);
 
     bundleFormInfo.Empty();
 

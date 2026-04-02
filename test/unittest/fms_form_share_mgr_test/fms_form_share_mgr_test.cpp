@@ -761,42 +761,6 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_002, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormInfoHelper_001
- * @tc.desc: test LoadFormConfigInfoByBundleName function.
- * @tc.type: FormInfoHelper
- */
-HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_001 start";
-
-    FormInfoHelper formInfoHelper;
-    std::string bundleName = "";
-    std::vector<FormInfo> formInfos;
-    int32_t userId = 2;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formInfoHelper.LoadFormConfigInfoByBundleName(bundleName, formInfos, userId));
-
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_001 end";
-}
-
-/**
- * @tc.name: FormInfoHelper_002
- * @tc.desc: test UpdateStaticFormInfos function.
- * @tc.type: FormInfoHelper
- */
-HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_002 start";
-
-    std::string bundleName = "";
-    int32_t userId = 2;
-    BundleFormInfo bundleFormInfo(bundleName);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.UpdateStaticFormInfos(userId));
-
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_002 end";
-}
-
-/**
  * @tc.name: FormInfoHelper_003
  * @tc.desc: test UpdateStaticFormInfos function and item->userId != userId.
  * @tc.type: FormInfoHelper
@@ -826,7 +790,26 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_003, TestSize.Level0)
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
 
-    bundleFormInfo.UpdateStaticFormInfos(userId);
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(formInfo);
+ 
+    auto ret = bundleFormInfo.UpdateStaticFormInfos(formInfos, userId);
+    EXPECT_EQ(ERR_OK, ret);
+    
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_.size(), 2);
+    
+    bool hasOriginalUser = false;
+    bool hasNewUser = false;
+    for (const auto& storage : bundleFormInfo.formInfoStorages_) {
+        if (storage.userId == USER_ID) {
+            hasOriginalUser = true;
+        }
+        if (storage.userId == userId) {
+            hasNewUser = true;
+        }
+    }
+    EXPECT_TRUE(hasOriginalUser);
+    EXPECT_TRUE(hasNewUser);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_003 end";
 }
@@ -1565,7 +1548,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_030, TestSize.Level0)
     int32_t userId = 1;
     BundleFormInfo bundleFormInfo(bundleName);
     FormInfoMgr formInfoMgr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formInfoMgr.UpdateStaticFormInfos(bundleNames, userId));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formInfoMgr.UpdateStaticFormInfos(bundleNames, userId));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_030 end";
 }
 

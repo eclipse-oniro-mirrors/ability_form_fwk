@@ -35,11 +35,8 @@ struct ExtraFormInfo {
 
 class FormInfoHelper {
 public:
-    static ErrCode LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
-        int32_t userId);
-
-    static ErrCode LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames,
-        std::map<std::string, std::vector<FormInfo>> &formInfosMap, int32_t userId);
+    static ErrCode LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames, int32_t userId,
+        std::map<std::string, std::vector<FormInfo>> &formInfosMap);
 
 private:
     static ErrCode LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos);
