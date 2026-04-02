@@ -104,43 +104,6 @@ FormInfo GetTestCircleFormInfo()
 }
 
 /**
- * @tc.name: FormInfoHelper_LoadFormConfigInfoByBundleName_0100
- * @tc.number: LoadFormConfigInfoByBundleName
- * @tc.desc: call LoadFormConfigInfoByBundleName with wrong userId
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_LoadFormConfigInfoByBundleName_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0100 start";
-    std::vector<FormInfo> formInfos;
-    int32_t userId = 0;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED,
-        formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, userId));
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0100 end";
-}
-
-/**
- * @tc.name: FormInfoHelper_LoadFormConfigInfoByBundleName_0200
- * @tc.number: LoadFormConfigInfoByBundleName
- * @tc.desc: call LoadFormConfigInfoByBundleName success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_LoadFormConfigInfoByBundleName_0200, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_OK, formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 end";
-}
-
-/**
  * @tc.name: FormInfoHelper_LoadStageFormConfigInfo_0100
  * @tc.number: LoadStageFormConfigInfo
  * @tc.desc: call LoadStageFormConfigInfo with wrong extensionAbilityInfo type
@@ -223,28 +186,6 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0200, TestSize.L
 }
 
 /**
- * @tc.name: FormInfoHelper_GetFormInfoDescription_0300
- * @tc.number: GetFormInfoDescription
- * @tc.desc: call LoadFormConfigInfoByBundleName with GetStringById success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_OK, formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 end";
-}
-
-/**
  * @tc.name: BundleFormInfo_InitFromJson_0100
  * @tc.number: InitFromJson
  * @tc.desc: call InitFromJson with bad profile
@@ -266,14 +207,6 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_InitFromJson_0100, TestSize.Level1)
 HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
     FormInfo formInfo = GetTestFormInfo();
     FormInfoStorage formInfoStorage;
@@ -282,8 +215,17 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Le
     formInfo.isStatic = false;
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(GetTestFormInfo());
+ 
+    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(formInfos, USER_ID));
+ 
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_.size(), 1);
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_[0].userId, USER_ID);
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_[0].formInfos.size(), 1);
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_[0].formInfos[0].name, PARAM_FORM_NAME);
+
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 end";
 }
 
@@ -295,21 +237,32 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Le
 HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0200, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = 101;
     formInfoStorage.formInfos.push_back(GetTestFormInfo());
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(GetTestFormInfo());
+ 
+    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(formInfos, USER_ID));
+    
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_.size(), 2);
+    
+    bool hasOriginalUser = false;
+    bool hasNewUser = false;
+    for (const auto& storage : bundleFormInfo.formInfoStorages_) {
+        if (storage.userId == 101) {
+            hasOriginalUser = true;
+        }
+        if (storage.userId == USER_ID) {
+            hasNewUser = true;
+        }
+    }
+    EXPECT_TRUE(hasOriginalUser);
+    EXPECT_TRUE(hasNewUser);
+
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 end";
 }
 
@@ -484,11 +437,29 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_UpdateStaticFormInfos_0100, TestSize.Level
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::vector<std::string> &bundleNames, int32_t flag,
+        std::vector<BundleInfo> &bundleInfos, int32_t userId) {
         GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 bmsTask called";
-        return true;
+        BundleInfo bundleInfo;
+        bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+        
+        HapModuleInfo moduleInfo;
+        moduleInfo.name = PARAM_MODULE_NAME_TEST;
+        moduleInfo.moduleType = ModuleType::ENTRY;
+        
+        AbilityInfo abilityInfo;
+        abilityInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+        abilityInfo.moduleName = PARAM_MODULE_NAME_TEST;
+        abilityInfo.type = AbilityType::FORM;
+        abilityInfo.visible = true;
+        
+        moduleInfo.abilityInfos.push_back(abilityInfo);
+        bundleInfo.hapModuleInfos.emplace_back(moduleInfo);
+        
+        bundleInfos.push_back(bundleInfo);
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bmsProxy, BatchGetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_EQ(ERR_OK, formInfoMgr_.UpdateStaticFormInfos(FORM_BUNDLE_NAME_TEST, USER_ID));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 end";
@@ -2169,4 +2140,211 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_0
         EXPECT_EQ(info.moduleName, "entry");
     }
     GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_006 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0100
+ * @tc.desc: test ProcessBundleVersionMap with empty bundleFormInfoMap_
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0100 start";
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.bundle1"] = 1001;
+    bundleVersionMap["com.test.bundle2"] = 1002;
+    std::vector<std::string> needUpdateBundleNames;
+    
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+    
+    EXPECT_TRUE(needUpdateBundleNames.empty());
+    EXPECT_EQ(bundleVersionMap.size(), 2);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0100 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0200
+ * @tc.desc: test ProcessBundleVersionMap with bundle not in bundleVersionMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0200 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+ 
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.newbundle"] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+ 
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+ 
+    EXPECT_TRUE(needUpdateBundleNames.empty());
+    EXPECT_FALSE(formInfoMgr_.bundleFormInfoMap_.empty());
+    EXPECT_TRUE(formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST]->Empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0200 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0300
+ * @tc.desc: test ProcessBundleVersionMap with isNeedUpdateAll=true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0300 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+ 
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap[FORM_BUNDLE_NAME_TEST] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+ 
+    formInfoMgr_.ProcessBundleVersionMap(true, USER_ID, bundleVersionMap, needUpdateBundleNames);
+ 
+    EXPECT_EQ(needUpdateBundleNames.size(), 1);
+    EXPECT_EQ(needUpdateBundleNames[0], FORM_BUNDLE_NAME_TEST);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0300 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0400
+ * @tc.desc: test ProcessBundleVersionMap with same version code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0400 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.versionCode = 1001;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap[FORM_BUNDLE_NAME_TEST] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+    
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+    
+    EXPECT_TRUE(needUpdateBundleNames.empty());
+    EXPECT_TRUE(bundleVersionMap.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0400 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0500
+ * @tc.desc: test ProcessBundleVersionMap with different version code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0500, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0500 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.versionCode = 1000;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+ 
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap[FORM_BUNDLE_NAME_TEST] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+ 
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+ 
+    EXPECT_EQ(needUpdateBundleNames.size(), 1);
+    EXPECT_EQ(needUpdateBundleNames[0], FORM_BUNDLE_NAME_TEST);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0500 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0100
+ * @tc.desc: test AddBundleFormInfos with empty bundleVersionMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0100 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0100 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0200
+ * @tc.desc: test AddBundleFormInfos when LoadFormConfigInfoByBundleNames fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0200 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.bundle1"] = 1001;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0200 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0300
+ * @tc.desc: test AddBundleFormInfos when UpdateStaticFormInfos fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0300 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.invalid"] = 1001;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0300 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0400
+ * @tc.desc: test AddBundleFormInfos when BundleFormInfo is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0400 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.empty"] = 1001;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0400 end";
 }

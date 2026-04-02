@@ -137,10 +137,10 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formTimerMgr.Init();
     FormInfoHelper formInfoHelper;
     std::string bundleName = fdp->ConsumeRandomLengthString();
-    FormInfo formInfo;
-    std::vector<FormInfo> formInfos;
-    formInfos.emplace_back(formInfo);
-    formInfoHelper.LoadFormConfigInfoByBundleName(bundleName, formInfos, userId);
+    std::vector<std::string> bundleNames;
+    bundleNames.push_back(bundleName);
+    std::map<std::string, std::vector<FormInfo>> formInfosMap;
+    formInfoHelper.LoadFormConfigInfoByBundleNames(bundleNames, userId, formInfosMap);
     return formTimerMgr.IsActiveUser(userId);
 }
 }

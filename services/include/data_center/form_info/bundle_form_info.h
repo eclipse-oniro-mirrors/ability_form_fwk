@@ -34,7 +34,7 @@ public:
 
     ErrCode InitFromJson(const std::string &formInfoStoragesJson);
 
-    ErrCode UpdateStaticFormInfos(int32_t userId);
+    ErrCode UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode Remove(int32_t userId);
 
