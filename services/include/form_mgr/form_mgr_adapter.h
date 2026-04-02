@@ -30,6 +30,7 @@
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_publish_interceptor_interface.h"
+#include "common/util/form_proxy_registry.h"
 #include "common/util/form_serial_queue.h"
 #include "form_major_info.h"
 #include "form_state_info.h"
@@ -1534,24 +1535,6 @@ private:
 
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
 
-    void SetTemplateFormDetailInfoCallerToken(const sptr<IRemoteObject> templateFormDetailInfoCallerToken);
-
-    void ClearTemplateFormDetailInfoCallerToken();
-
-    sptr<IRemoteObject> GetTemplateFormDetailInfoCallerToken();
-
-    void SetFormRectCallerToken(const sptr<IRemoteObject> formRectCallerToken);
-
-    void ClearFormRectCallerToken();
-
-    sptr<IRemoteObject> GetFormRectCallerToken();
-
-    void SetLiveFormStatusCallerToken(const sptr<IRemoteObject> liveFormStatusCallerToken);
-
-    void ClearLiveFormStatusCallerToken();
-
-    sptr<IRemoteObject> GetLiveFormStatusCallerToken();
-
     bool CheckUIAbilityContext(const pid_t pid);
     /**
      * @brief This function is used to remove dirty data from form_cache. It is executed only once.
@@ -1565,29 +1548,12 @@ private:
 
     std::map<int, std::vector<int64_t>> conditionUpdateFormMap;
 
-    sptr<IRemoteObject> overflowCallerToken_;
-
-    sptr<IRemoteObject> sceneanimationCallerToken_;
-
-    sptr<IRemoteObject> formRectCallerToken_;
-
-    sptr<IRemoteObject> liveFormStatusCallerToken_;
-
-    sptr<IRemoteObject> crossBundleControlCallerToken_;
-
-    sptr<IRemoteObject> templateFormDetailInfoCallerToken_;
-
-    mutable std::mutex overflowCallerTokenMutex_;
-
-    mutable std::mutex sceneanimationCallerTokenMutex_;
-
-    mutable std::mutex formRectCallerTokenMutex_;
-
-    mutable std::mutex liveFormStatusCallerTokenMutex_;
-
-    mutable std::mutex crossBundleControlCallerTokenMutex_;
-
-    mutable std::mutex templateFormDetailInfoCallerTokenMutex_;
+    FormProxyRegistry overflowRegistry_{"Overflow"};
+    FormProxyRegistry sceneAnimationRegistry_{"SceneAnimation"};
+    FormProxyRegistry templateFormDetailInfoRegistry_{"TemplateFormDetailInfo"};
+    FormProxyRegistry formRectRegistry_{"FormRect"};
+    FormProxyRegistry liveFormStatusRegistry_{"LiveFormStatus"};
+    FormProxyRegistry crossBundleControlRegistry_{"CrossBundleControl"};
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -109,6 +109,7 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_ipc_skeleton.cpp",
+    "${form_fwk_path}/services/src/common/util/form_proxy_registry.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test2.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test3.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
@@ -130,7 +131,7 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "${form_fwk_path}/test/mock/include",
   ]
 
-  configs = []
+  configs = [ "${form_fwk_path}:fms_idl_config" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -142,6 +143,8 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:form_host_delegate_stub",
+    "${form_fwk_path}:form_provider_delegate_stub",
   ]
 
   external_deps = [

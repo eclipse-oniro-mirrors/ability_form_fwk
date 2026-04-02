@@ -178,6 +178,7 @@ ohos_shared_library("libfms") {
     "services/src/common/timer_mgr/form_refresh_limiter.cpp",
     "services/src/common/timer_mgr/form_timer_mgr.cpp",
     "services/src/common/util/form_dump_mgr.cpp",
+    "services/src/common/util/form_proxy_registry.cpp",
     "services/src/common/util/form_report.cpp",
     "services/src/common/util/form_serial_queue.cpp",
     "services/src/common/util/form_trust_mgr.cpp",
