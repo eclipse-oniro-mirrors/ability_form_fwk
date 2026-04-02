@@ -75,13 +75,13 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
         HILOG_ERROR("invalid bundleNames");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
- 
+
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("get IBundleMgr failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
- 
+
     std::vector<BundleInfo> bundleInfos;
     ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(bundleNames, GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS,
         bundleInfos, userId));
@@ -390,18 +390,6 @@ void FormInfoHelper::LoadProfileFormInfos(std::vector<FormInfo> &formInfos, cons
 {
     for (const auto &profileInfo: profileInfos) {
         LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, extraFormInfo);
-    }
-}
-
-void FormInfoHelper::LoadExtensionInfos(const BundleInfo &bundleInfo, std::vector<ExtensionAbilityInfo> &extensionInfos)
-{
-    extensionInfos = bundleInfo.extensionInfos;
-    if (extensionInfos.empty()) {
-        for (const auto &moduleInfo: bundleInfo.hapModuleInfos) {
-            for (auto const &extensionInfo: moduleInfo.extensionInfos) {
-                extensionInfos.push_back(extensionInfo);
-            }
-        }
     }
 }
 

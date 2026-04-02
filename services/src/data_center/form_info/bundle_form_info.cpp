@@ -67,7 +67,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, 
         std::vector<FormDBInfo> formDBInfos;
         std::vector<FormInfo> finalFormInfos;
         FormDbCache::GetInstance().GetAllFormDBInfoByBundleName(bundleName_, userId, formDBInfos);
-        HandleFormInfosMaxLimit(const_cast<std::vector<FormInfo>&>(formInfos), finalFormInfos, formDBInfos);
+        HandleFormInfosMaxLimit(formInfos, finalFormInfos, formDBInfos);
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
             // Update all user's formInfos
