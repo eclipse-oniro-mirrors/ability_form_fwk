@@ -61,7 +61,7 @@ constexpr std::pair<int32_t, const char *> CODE_MSG_MAP[] = {
     { ERR_IN_RECOVERY, "the form is being restored" }
 };
 constexpr const char *BUSINESS_ERROR_CLASS = "@ohos.base.BusinessError";
-constexpr const char *ERROR_CLASS_NAME = "escompat.Error";
+constexpr const char *ERROR_CLASS_NAME = "std.core.Error";
 
 std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type)
 {
@@ -163,7 +163,7 @@ ani_object EtsFormErrorUtil::CreateError(ani_env *env, ani_int code, const std::
         return nullptr;
     }
     ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{std.core.Error}:", &method)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
@@ -222,7 +222,7 @@ ani_object EtsFormErrorUtil::WrapError(ani_env *env, const std::string &msg)
         return nullptr;
     }
     ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{std.core.ErrorOptions}:", &method)) !=
         ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
