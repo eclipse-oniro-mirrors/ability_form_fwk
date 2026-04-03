@@ -548,7 +548,7 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     wptr<EtsFormStateObserver> weakObserver = this;
-    handler->PostSyncTask([weakObserver, visibleType, formInstances, bundleName, aniVm = ani_vm_, this]() {
+    handler->PostSyncTask([weakObserver, visibleType, formInstances, bundleName, aniVm = ani_vm_]() {
         std::string specialFlag = "#";
         bool isVisibleTypeFlag = false;
         auto sharedThis = weakObserver.promote();
@@ -556,7 +556,7 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
             HILOG_ERROR("null sharedThis");
             return;
         }
-        ani_env* env = GetAniEnv(aniVm);
+        ani_env* env = sharedThis->GetAniEnv(aniVm);
         if (env == nullptr) {
             HILOG_ERROR("GetAniEnv failed");
             return;
