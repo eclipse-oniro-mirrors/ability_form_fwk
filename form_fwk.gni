@@ -52,6 +52,7 @@ declare_args() {
   form_fwk_form_dimension_3_3 = false
   form_fwk_watch_api_disable = false
   form_fwk_dynamic_support = false
+  form_fwk_with_distributed_capability = true
 }
 
 declare_args() {
@@ -105,8 +106,8 @@ declare_args() {
 
 declare_args() {
   device_manager_enable = false
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.distributedhardware_device_manager)) {
+  if (defined(global_parts_info) && defined(global_parts_info.distributedhardware_device_manager) &&
+    form_fwk_with_distributed_capability == true) {
     device_manager_enable = true
   }
 }
