@@ -57,7 +57,7 @@ enum class AddFormResultErrorCodes : int8_t {
 /**
  * @class FormCommonAdapter
  * @brief Shared adapter class that provides shared functionality and data across all sub-adapters
- * 
+ *
  * This class is used by other adapters through **member variable composition** instead of inheritance
  * This design is more flexible and avoids deep class hierarchies
  */
@@ -123,7 +123,8 @@ public:
      * @param formInfo Form info
      * @param itemInfo Form item info
      */
-    virtual void SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo);
+    virtual void SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo,
+        const FormInfo& formInfo, FormItemInfo& itemInfo);
 
     /**
      * @brief Set host bundle name

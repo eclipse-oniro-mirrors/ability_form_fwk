@@ -470,8 +470,8 @@ bool FormVisibilityAdapter::CreateHandleEventMap(const int64_t matchedFormId, co
     return true;
 }
 
-ErrCode FormVisibilityAdapter::HandleEventNotify(const std::string &providerKey, const std::vector<int64_t> &formIdsByProvider,
-    const int32_t formVisibleType)
+ErrCode FormVisibilityAdapter::HandleEventNotify(const std::string &providerKey,
+    const std::vector<int64_t> &formIdsByProvider, const int32_t formVisibleType)
 {
     HILOG_INFO("call");
     size_t position = providerKey.find(Constants::NAME_DELIMITER);
@@ -600,7 +600,8 @@ int32_t FormVisibilityAdapter::SetFormsRecyclable(const std::vector<int64_t> &fo
     return ERR_OK;
 }
 
-int32_t FormVisibilityAdapter::RecycleForms(const std::vector<int64_t> &formIds, const Want &want, bool isCheckCallingUid)
+int32_t FormVisibilityAdapter::RecycleForms(const std::vector<int64_t> &formIds,
+    const Want &want, bool isCheckCallingUid)
 {
     FormRecord record;
     std::vector<int64_t> validFormIds;

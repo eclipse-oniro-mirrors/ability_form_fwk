@@ -243,7 +243,7 @@ ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formIn
 }
 
 ErrCode FormCommonAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo,
-                                            const FormInfo &formInfo, FormItemInfo &formItemInfo)
+    const FormInfo &formInfo, FormItemInfo &formItemInfo)
 {
     HILOG_DEBUG("GetFormItemInfo start");
     int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, formInfo.defaultDimension);
@@ -269,7 +269,8 @@ ErrCode FormCommonAdapter::GetFormItemInfo(const AAFwk::Want &want, const Bundle
     return ERR_OK;
 }
 
-ErrCode FormCommonAdapter::CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo)
+ErrCode FormCommonAdapter::CreateFormItemInfo(const BundleInfo& bundleInfo,
+    const FormInfo& formInfo, FormItemInfo& itemInfo)
 {
     itemInfo.SetProviderBundleName(bundleInfo.name);
     itemInfo.SetVersionCode(bundleInfo.versionCode);
@@ -358,7 +359,7 @@ void FormCommonAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo
     HILOG_INFO("module [%{public}s] packageName is %{public}s, hap path is %{public}s", moduleName.c_str(),
         hapModuleInfo.packageName.c_str(), hapPath.c_str());
     if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
-        hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), 
+        hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH),
                                         Constants::LOCAL_BUNDLES);
     }
     nlohmann::json moduleInfos = {
@@ -518,7 +519,7 @@ void FormCommonAdapter::CleanResource(const wptr<IRemoteObject> &remote)
 }
 
 void FormCommonAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
-                                         const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
+    const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
     HILOG_DEBUG("call");
     if (callerToken == nullptr || deathRecipient == nullptr) {
