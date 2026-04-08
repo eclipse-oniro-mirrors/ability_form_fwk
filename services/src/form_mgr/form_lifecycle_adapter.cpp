@@ -116,7 +116,6 @@ ErrCode FormLifecycleAdapter::AllotForm(const int64_t formId, const Want &want,
     HILOG_DEBUG("call");
     Want newWant(want);
     bool directCallInApp = newWant.GetBoolParam(Constants::KEY_DIRECT_CALL_INAPP, false);
-
     // in application form
     if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName() && directCallInApp) {
         HILOG_DEBUG("form in application");
@@ -678,7 +677,6 @@ int FormLifecycleAdapter::ReleaseForm(const int64_t formId,
     bool isSelfDbFormId = (callerUserId == dbRecord.providerUserId) &&
         ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), callingUid)
         != dbRecord.formUserUids.end()) ? true : false);
-
     if (!isSelfDbFormId) {
         HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
@@ -719,7 +717,6 @@ int FormLifecycleAdapter::CastTempForm(const int64_t formId,
     }
 
     int64_t matchedFormId = formDataMgr_->FindMatchedFormId(formId);
-
     if (!formDataMgr_->ExistFormRecord(matchedFormId) ||
         !formDataMgr_->ExistTempForm(matchedFormId)) {
         HILOG_ERROR("not exist such temp form:%{public}" PRId64 "", matchedFormId);
