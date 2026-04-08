@@ -72,8 +72,8 @@ ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
     return ERR_OK;
 }
 
-ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject>& callerToken,
-    const int32_t userId)
+ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject> &callerToken,
+    uint32_t specifyTokenId, const int32_t userId)
 {
     if (!g_mockStartAbilityOnlyUIAbilityRet) {
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;

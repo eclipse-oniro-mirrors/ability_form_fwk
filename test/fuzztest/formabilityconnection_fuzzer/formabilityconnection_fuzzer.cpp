@@ -64,7 +64,8 @@ void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
     int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formAmsHelper.StartAbility(want, userId);
     sptr<IRemoteObject> callerToken = nullptr;
-    formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken, userId);
+    uint32_t specifyTokenId = fdp->ConsumeIntegralInRange<uint32_t>(MIN_NUM, MAX_NUM);
+    formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken, specifyTokenId, userId);
     std::set<int64_t> formIds;
     int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
     int32_t numFormIds = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_LOOP_COUNT);
