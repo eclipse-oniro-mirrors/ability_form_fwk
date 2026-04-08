@@ -68,7 +68,7 @@ FormPublishAdapter::FormPublishAdapter(
 }
 
 ErrCode FormPublishAdapter::CheckFormBundleName(Want &want, std::string &bundleName,
-                                             bool needCheckFormPermission)
+    bool needCheckFormPermission)
 {
     if (!GetBundleName(bundleName, needCheckFormPermission)) {
         HILOG_ERROR("get BundleName failed");

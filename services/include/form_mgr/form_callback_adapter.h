@@ -71,13 +71,13 @@ public:
 
     ErrCode UnregisterChangeSceneAnimationStateProxy();
 
-    ErrCode ChangeSceneAnimationState(const int64_t formId,const int32_t callingUid, int32_t state);
+    ErrCode ChangeSceneAnimationState(const int64_t formId, const int32_t callingUid, int32_t state);
 
     ErrCode RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken);
 
     ErrCode UnregisterGetFormRectProxy();
 
-    ErrCode GetFormRect(const int64_t formId,const int32_t callingUid, Rect &rect);
+    ErrCode GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect);
 
     ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
 
