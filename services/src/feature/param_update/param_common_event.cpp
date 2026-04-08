@@ -67,7 +67,7 @@ void ParamCommonEvent::SubscriberEvent()
     }
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     subscribeInfo.SetPermission(RECEIVE_UPDATE_PERMISSION);
-    subscriber_ = std::make_shared<ParamCommonEventSubscriber>(subscribeInfo, *this);
+    subscriber_ = std::make_shared<ParamCommonEventSubscriber>(subscribeInfo, ParamCommonEvent::GetInstance());
 
     int32_t retry = RETRY_SUBSCRIBER;
     do {
