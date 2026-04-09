@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,16 +30,16 @@ namespace OHOS {
 namespace AppExecFwk {
 
 FormMgrAdapterFacade::FormMgrAdapterFacade(
-        FormLifecycleAdapter* lifecycleAdapter,
-        FormDataAdapter* dataAdapter,
-        FormVisibilityAdapter* visibilityAdapter,
-        FormQueryAdapter* queryAdapter,
-        FormEventAdapter* eventAdapter,
-        FormObserverAdapter* observerAdapter,
-        FormPublishAdapter* publishAdapter,
-        FormCallbackAdapter* callbackAdapter,
-        FormDebugAdapter* debugAdapter,
-        FormCommonAdapter* commonAdapter)
+    FormLifecycleAdapter* lifecycleAdapter,
+    FormDataAdapter* dataAdapter,
+    FormVisibilityAdapter* visibilityAdapter,
+    FormQueryAdapter* queryAdapter,
+    FormEventAdapter* eventAdapter,
+    FormObserverAdapter* observerAdapter,
+    FormPublishAdapter* publishAdapter,
+    FormCallbackAdapter* callbackAdapter,
+    FormDebugAdapter* debugAdapter,
+    FormCommonAdapter* commonAdapter)
     : lifecycleAdapter_(lifecycleAdapter),
       dataAdapter_(dataAdapter),
       visibilityAdapter_(visibilityAdapter),
@@ -157,15 +157,15 @@ int32_t FormMgrAdapterFacade::EnableForms(const std::string bundleName, const in
 
 ErrCode FormMgrAdapterFacade::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
 {
-    HILOG_INFO("FormMgrAdapterFacade::ProtectLockForms called, bundleName:%{public}s, userId:%{public}d, protect:%{public}d",
-        bundleName.c_str(), userId, protect);
+    HILOG_INFO("FormMgrAdapterFacade::ProtectLockForms called, bundleName:%{public}s, userId:%{public}d,
+        protect:%{public}d", bundleName.c_str(), userId, protect);
     return lifecycleAdapter_->ProtectLockForms(bundleName, userId, protect);
 }
 
 ErrCode FormMgrAdapterFacade::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
-    HILOG_INFO("FormMgrAdapterFacade::SwitchLockForms called, bundleName:%{public}s, userId:%{public}d, lock:%{public}d",
-        bundleName.c_str(), userId, lock);
+    HILOG_INFO("FormMgrAdapterFacade::SwitchLockForms called, bundleName:%{public}s, userId:%{public}d,
+        lock:%{public}d", bundleName.c_str(), userId, lock);
     return lifecycleAdapter_->SwitchLockForms(bundleName, userId, lock);
 }
 
@@ -212,8 +212,8 @@ ErrCode FormMgrAdapterFacade::UpdateFormSize(const int64_t &formId, float width,
 
 ErrCode FormMgrAdapterFacade::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
 {
-    HILOG_INFO("FormMgrAdapterFacade::UpdateFormSize(dimension) called, formId:%{public}" PRId64 ", dimension:%{public}d", 
-        formId, newDimension);
+    HILOG_INFO("FormMgrAdapterFacade::UpdateFormSize(dimension) called, formId:%{public}" PRId64 ",
+        dimension:%{public}d", formId, newDimension);
     return dataAdapter_->UpdateFormSize(formId, newDimension, newRect);
 }
 
@@ -277,8 +277,10 @@ void FormMgrAdapterFacade::HandlerNotifyWhetherVisibleForms(const std::vector<in
     std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("FormMgrAdapterFacade::HandlerNotifyWhetherVisibleForms called, formIds size:%{public}zu", formIds.size());
-    visibilityAdapter_->HandlerNotifyWhetherVisibleForms(formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken);
+    HILOG_INFO("FormMgrAdapterFacade::HandlerNotifyWhetherVisibleForms called,
+        formIds size:%{public}zu", formIds.size());
+    visibilityAdapter_->HandlerNotifyWhetherVisibleForms(formIds, formInstanceMaps, eventMaps, formVisibleType,
+        callerToken);
 }
 
 void FormMgrAdapterFacade::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType, int64_t formId,
@@ -294,7 +296,8 @@ int32_t FormMgrAdapterFacade::SetFormsRecyclable(const std::vector<int64_t> &for
     return visibilityAdapter_->SetFormsRecyclable(formIds);
 }
 
-int32_t FormMgrAdapterFacade::RecycleForms(const std::vector<int64_t> &formIds, const Want &want, bool isCheckCallingUid)
+int32_t FormMgrAdapterFacade::RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
+    bool isCheckCallingUid)
 {
     HILOG_INFO("FormMgrAdapterFacade::RecycleForms called, formIds size:%{public}zu", formIds.size());
     return visibilityAdapter_->RecycleForms(formIds, want, isCheckCallingUid);
@@ -322,7 +325,7 @@ int FormMgrAdapterFacade::GetFormsInfoByApp(const std::string &bundleName,
 int FormMgrAdapterFacade::GetFormsInfoByModule(const std::string &bundleName,
     const std::string &moduleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("FormMgrAdapterFacade::GetFormsInfoByModule called, bundleName:%{public}s, moduleName:%{public}s", 
+    HILOG_INFO("FormMgrAdapterFacade::GetFormsInfoByModule called, bundleName:%{public}s, moduleName:%{public}s",
         bundleName.c_str(), moduleName.c_str());
     return queryAdapter_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
@@ -350,8 +353,8 @@ int FormMgrAdapterFacade::GetTemplateFormsInfoByApp(const std::string &bundleNam
 int FormMgrAdapterFacade::GetTemplateFormsInfoByModule(const std::string &bundleName,
     const std::string &moduleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("FormMgrAdapterFacade::GetTemplateFormsInfoByModule called, bundleName:%{public}s, moduleName:%{public}s",
-        bundleName.c_str(), moduleName.c_str());
+    HILOG_INFO("FormMgrAdapterFacade::GetTemplateFormsInfoByModule called, bundleName:%{public}s,
+        moduleName:%{public}s", bundleName.c_str(), moduleName.c_str());
     return queryAdapter_->GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
@@ -468,16 +471,16 @@ void FormMgrAdapterFacade::CleanResource(const wptr<IRemoteObject> &remote)
 ErrCode FormMgrAdapterFacade::RegisterClickEventObserver(const std::string &bundleName,
     const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_INFO("FormMgrAdapterFacade::RegisterClickEventObserver called, bundleName:%{public}s, formEventType:%{public}s", 
-        bundleName.c_str(), formEventType.c_str());
+    HILOG_INFO("FormMgrAdapterFacade::RegisterClickEventObserver called, bundleName:%{public}s,
+        formEventType:%{public}s", bundleName.c_str(), formEventType.c_str());
     return observerAdapter_->RegisterClickEventObserver(bundleName, formEventType, observer);
 }
 
 ErrCode FormMgrAdapterFacade::UnregisterClickEventObserver(const std::string &bundleName,
     const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_INFO("FormMgrAdapterFacade::UnregisterClickEventObserver called, bundleName:%{public}s, formEventType:%{public}s", 
-        bundleName.c_str(), formEventType.c_str());
+    HILOG_INFO("FormMgrAdapterFacade::UnregisterClickEventObserver called, bundleName:%{public}s,
+        formEventType:%{public}s", bundleName.c_str(), formEventType.c_str());
     return observerAdapter_->UnregisterClickEventObserver(bundleName, formEventType, observer);
 }
 
@@ -506,7 +509,8 @@ ErrCode FormMgrAdapterFacade::ReAcquireProviderFormInfoAsync(const FormItemInfo 
     return dataAdapter_->ReAcquireProviderFormInfoAsync(info, wantParams);
 }
 
-ErrCode FormMgrAdapterFacade::AcquireProviderFormInfoByFormRecord(const FormRecord &record, const WantParams &wantParams)
+ErrCode FormMgrAdapterFacade::AcquireProviderFormInfoByFormRecord(const FormRecord &record,
+    const WantParams &wantParams)
 {
     HILOG_INFO("FormMgrAdapterFacade::AcquireProviderFormInfoByFormRecord called");
     return dataAdapter_->AcquireProviderFormInfoByFormRecord(record, wantParams);

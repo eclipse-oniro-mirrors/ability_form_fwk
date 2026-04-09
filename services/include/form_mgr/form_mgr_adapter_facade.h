@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,7 +85,7 @@ public:
 
     /**
      * @brief Initialize the facade.
-     * 
+     *
      * Note: Individual adapters handle their own initialization internally.
      * This method is provided for API compatibility with FormMgrAdapter.
      */
@@ -93,7 +93,7 @@ public:
 
     // ==================== Lifecycle Management ====================
 
-    int AddForm(const int64_t formId, const Want &want, 
+    int AddForm(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo);
 
     int CreateForm(const Want &want, RunningFormInfo &runningFormInfo);
@@ -131,13 +131,13 @@ public:
 
     // ==================== Data Update Management ====================
 
-    int UpdateForm(const int64_t formId, const int32_t callingUid, 
+    int UpdateForm(const int64_t formId, const int32_t callingUid,
         const FormProviderData &formProviderData,
         const std::vector<FormDataProxy> &formDataProxies = {});
 
     int RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want);
 
-    ErrCode UpdateFormSize(const int64_t &formId, float width, float height, 
+    ErrCode UpdateFormSize(const int64_t &formId, float width, float height,
         float borderWidth, float formViewScale);
 
     ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect);
@@ -248,7 +248,7 @@ public:
 
     ErrCode HandleFormRemoveObserver(const RunningFormInfo runningFormInfo);
 
-    ErrCode RegisterFormAddObserverByBundle(const std::string bundleName, 
+    ErrCode RegisterFormAddObserverByBundle(const std::string bundleName,
         const sptr<IRemoteObject> &callerToken);
 
     ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName,
