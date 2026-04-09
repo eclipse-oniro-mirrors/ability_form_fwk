@@ -18,6 +18,7 @@
 
 #include <map>
 #include <string>
+#include <unordered_set>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -33,6 +34,7 @@ namespace Constants {
     constexpr const char* PERMISSION_START_ABILITIES_FROM_BACKGROUND =
         "ohos.permission.START_ABILITIES_FROM_BACKGROUND";
     constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE = "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE";
+    constexpr const char* PERMISSION_INTERNET = "ohos.permission.INTERNET";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
     constexpr const char* PARAM_FORM_MANUAL_CLICK_KEY = "ohos.extra.param.key.manually_click";
@@ -506,6 +508,12 @@ namespace Constants {
     constexpr const char *FORM_HOST_PARAM_NAMES[] = {PARAM_HOST_BG_INVERSE_COLOR_KEY, PARAM_VISUAL_EFFECT_TYPE_KEY,
         PARAM_FORM_DISABLE_UIFIRST_KEY, FORM_ENABLE_MATERIAL_BACKGROUND_KEY, FORM_STYLE_PARAMETERS_KEY,
         FORM_ONE_MIRROR_CHANGE_KEY};
+
+    constexpr const int32_t DELAY_REFRESH_PER_BATCH = 6;
+
+    const std::unordered_set<int32_t> CONDITION_REFRESHTYPE_SET = {
+        REFRESHTYPE_NETWORKCHANGED,
+    };
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

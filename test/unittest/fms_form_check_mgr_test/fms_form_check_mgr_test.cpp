@@ -24,6 +24,7 @@
 #include "form_refresh/check_mgr/add_finish_checker.h"
 #include "form_refresh/check_mgr/untrust_app_checker.h"
 #include "form_refresh/check_mgr/multi_active_users_checker.h"
+#include "form_refresh/check_mgr/network_permission_checker.h"
 #include "form_refresh/refresh_impl/form_data_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_force_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
@@ -469,6 +470,34 @@ HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_MultiActiveUsersChecker_001, T
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, MultiActiveUsersChecker::GetInstance().CheckValid(reqFactor));
 
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_MultiActiveUsersChecker_001 end";
+}
+
+HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_NetworkPermissionChecker_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_NetworkPermissionChecker_001 start";
+
+    CheckValidFactor reqFactor;
+    FormRecord formRecord;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.providerUserId = 100;
+    reqFactor.record = formRecord;
+
+    // GetHapTokenID returns 0, should fail
+    MockGetHapTokenID(0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+        NetworkPermissionChecker::GetInstance().CheckValid(reqFactor));
+
+    // Permission denied
+    MockGetHapTokenID(12345);
+    MockVerifyAccessToken(-1);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
+        NetworkPermissionChecker::GetInstance().CheckValid(reqFactor));
+
+    // Permission granted
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(ERR_OK, NetworkPermissionChecker::GetInstance().CheckValid(reqFactor));
+
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_NetworkPermissionChecker_001 end";
 }
 
 HWTEST_F(FmsFormCheckMgrTest, FmsFormCheckMgrTest_BaseFormRefresh_001, TestSize.Level1)

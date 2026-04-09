@@ -255,6 +255,24 @@ bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
     return true;
 }
 
+bool FormUtil::VerifyPermissionByBundleName(int32_t userId, const std::string &bundleName,
+    const std::string &permissionName)
+{
+    auto accessTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
+    if (accessTokenId == 0) {
+        HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
+            userId, bundleName.c_str());
+        return false;
+    }
+    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(accessTokenId, permissionName);
+    if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
+        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED for bundleName:%{public}s",
+            permissionName.c_str(), bundleName.c_str());
+        return false;
+    }
+    return true;
+}
+
 bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
 {
     size_t strLength = strInfo.size();

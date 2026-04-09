@@ -16,6 +16,10 @@
 #ifndef MOCK_FORM_REFRESH_MGR_H
 #define MOCK_FORM_REFRESH_MGR_H
 
+#include <vector>
+#include "form_refresh/form_refresh_mgr.h"
+
 void MockRequestRefreshRet(bool mockRet);
+void MockBatchRequestRefresh(const std::vector<int32_t> &errorCodes);
 
 #endif // MOCK_FORM_REFRESH_MGR_H

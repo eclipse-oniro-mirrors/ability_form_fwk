@@ -33,6 +33,7 @@ struct RefreshData {
     sptr<IRemoteObject> callerToken;
     Want want;
     FormProviderData providerData;
+    int32_t errorCode = ERR_OK; // Used to record refresh result for batch operations
 };
 
 /**

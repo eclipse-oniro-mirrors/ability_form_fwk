@@ -19,6 +19,7 @@
 #include <singleton.h>
 
 #include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/batch_refresh/batch_refresh_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,6 +46,8 @@ public:
     DISALLOW_COPY_AND_MOVE(FormRefreshMgr);
 
     int RequestRefresh(RefreshData &data, const int32_t refreshType);
+    int32_t BatchRequestRefresh(const int32_t refreshType,
+        const StaggerStrategyType strategyType, std::vector<RefreshData> &batch);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

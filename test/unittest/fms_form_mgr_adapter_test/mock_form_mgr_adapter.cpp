@@ -20,6 +20,7 @@ namespace {
     bool g_mockRequestPublishFormToHost = true;
     OHOS::ErrCode g_mockSceneAnimationCheckResult = OHOS::ERR_OK;
     OHOS::ErrCode g_mockCallerCheckResult = OHOS::ERR_OK;
+    bool g_mockCheckUIAbilityContextRet = true;
 }
 
 void MockRequestPublishFormToHost(bool mockRet)
@@ -35,6 +36,11 @@ void MockSceneAnimationCheck(OHOS::ErrCode mockRet)
 void MockCallerCheck(OHOS::ErrCode mockRet)
 {
     g_mockCallerCheckResult = mockRet;
+}
+
+void MockCheckUIAbilityContext(bool mockRet)
+{
+    g_mockCheckUIAbilityContextRet = mockRet;
 }
 
 namespace OHOS {
@@ -69,5 +75,11 @@ ErrCode FormMgrAdapter::CallerCheck(const int64_t formId, const int32_t callingU
 {
     return g_mockCallerCheckResult;
 }
+
+bool FormMgrAdapter::CheckUIAbilityContext(pid_t callingPid)
+{
+    GTEST_LOG_(INFO) << "CheckUIAbilityContext called " << g_mockCheckUIAbilityContextRet;
+    return g_mockCheckUIAbilityContextRet;
 }
-}
+}  // namespace AppExecFwk
+}  // namespace OHOS

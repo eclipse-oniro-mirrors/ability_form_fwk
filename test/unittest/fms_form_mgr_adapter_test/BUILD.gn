@@ -112,6 +112,7 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test2.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test3.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_refresh_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_cache_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_data_mgr.cpp",

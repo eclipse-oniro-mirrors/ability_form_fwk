@@ -1094,7 +1094,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0169, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_0170
- * @tc.desc: test SetNextRefreshTime function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
+ * @tc.desc: test SetNextRefreshTime function and the return value is ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0170, TestSize.Level0)
@@ -1108,13 +1108,13 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0170, TestSize.Level0)
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsUid(false);
     MockGetFormRecordParamsSysUid(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0170 end";
 }
 
 /**
  * @tc.name: FormMgrAdapter_0171
- * @tc.desc: test SetNextRefreshTime function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
+ * @tc.desc: test SetNextRefreshTime function and the return value is ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0171, TestSize.Level0)
@@ -1128,7 +1128,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0171, TestSize.Level0)
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsUid(true);
     MockGetFormRecordParamsSysUid(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0171 end";
 }
 

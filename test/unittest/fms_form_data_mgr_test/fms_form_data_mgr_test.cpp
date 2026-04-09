@@ -7460,3 +7460,214 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_007, TestSiz
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos2_007 end";
 }
 
+/**
+ * @tc.number: FmsFormDataMgrTest_IsNetworkConditionForm_001
+ * @tc.name: IsNetworkConditionForm
+ * @tc.desc: Verify that IsNetworkConditionForm returns true when conditionUpdate contains CONDITION_NETWORK.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsNetworkConditionForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsNetworkConditionForm_001 start";
+    FormRecord record;
+    record.conditionUpdate = {1, 2};
+    EXPECT_TRUE(FormDataMgr::IsNetworkConditionForm(record));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsNetworkConditionForm_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_IsNetworkConditionForm_002
+ * @tc.name: IsNetworkConditionForm
+ * @tc.desc: Verify that IsNetworkConditionForm returns false when conditionUpdate does not contain CONDITION_NETWORK.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsNetworkConditionForm_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsNetworkConditionForm_002 start";
+    FormRecord record;
+    record.conditionUpdate = {2, 3};
+    EXPECT_FALSE(FormDataMgr::IsNetworkConditionForm(record));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsNetworkConditionForm_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_IsNetworkConditionForm_003
+ * @tc.name: IsNetworkConditionForm
+ * @tc.desc: Verify that IsNetworkConditionForm returns false when conditionUpdate is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsNetworkConditionForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsNetworkConditionForm_003 start";
+    FormRecord record;
+    record.conditionUpdate = {};
+    EXPECT_FALSE(FormDataMgr::IsNetworkConditionForm(record));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsNetworkConditionForm_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_HasNetworkConditionForm_001
+ * @tc.name: HasNetworkConditionForm
+ * @tc.desc: Verify that HasNetworkConditionForm returns false when no forms have network condition.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HasNetworkConditionForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasNetworkConditionForm_001 start";
+    int64_t formId = 100;
+    int callingUid = 0;
+    FormItemInfo form_item_info;
+    InitFormItemInfo(formId, form_item_info);
+    FormRecord record = formDataMgr_.CreateFormRecord(form_item_info, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+    EXPECT_FALSE(formDataMgr_.HasNetworkConditionForm());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasNetworkConditionForm_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_HasNetworkConditionForm_002
+ * @tc.name: HasNetworkConditionForm
+ * @tc.desc: Verify that HasNetworkConditionForm returns true when a form has network condition.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HasNetworkConditionForm_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasNetworkConditionForm_002 start";
+    int64_t formId = 101;
+    int callingUid = 0;
+    FormItemInfo form_item_info;
+    InitFormItemInfo(formId, form_item_info);
+    FormRecord record = formDataMgr_.CreateFormRecord(form_item_info, callingUid);
+    record.conditionUpdate = {1};
+    formDataMgr_.formRecords_.emplace(formId, record);
+    EXPECT_TRUE(formDataMgr_.HasNetworkConditionForm());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasNetworkConditionForm_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_HasNetworkConditionForm_003
+ * @tc.name: HasNetworkConditionForm
+ * @tc.desc: Verify that HasNetworkConditionForm returns false when formRecords_ is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HasNetworkConditionForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasNetworkConditionForm_003 start";
+    EXPECT_FALSE(formDataMgr_.HasNetworkConditionForm());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasNetworkConditionForm_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_AllotFormRecord_010
+ * @tc.name: AllotFormRecord
+ * @tc.desc: Verify AllotFormRecord triggers RegisterNetConnCallback when new record has network condition.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_AllotFormRecord_010 start";
+    int64_t formId = 1001;
+    int callingUid = 0;
+    FormItemInfo form_item_info;
+    InitFormItemInfo(formId, form_item_info);
+    form_item_info.SetConditionUpdate({1});
+    FormRecord recordResult = formDataMgr_.AllotFormRecord(form_item_info, callingUid);
+    EXPECT_EQ(formId, recordResult.formId);
+    EXPECT_TRUE(recordResult.conditionUpdate.size() > 0);
+    EXPECT_TRUE(FormDataMgr::IsNetworkConditionForm(recordResult));
+    formDataMgr_.formRecords_.erase(formId);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_AllotFormRecord_010 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_DeleteFormRecord_004
+ * @tc.name: DeleteFormRecord
+ * @tc.desc: Verify DeleteFormRecord triggers UnregisterNetConnCallback when last network condition form is deleted.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteFormRecord_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteFormRecord_004 start";
+    int64_t formId = 1002;
+    int callingUid = 0;
+    FormItemInfo form_item_info;
+    InitFormItemInfo(formId, form_item_info);
+    form_item_info.SetConditionUpdate({1});
+    formDataMgr_.AllotFormRecord(form_item_info, callingUid);
+    bool result = formDataMgr_.DeleteFormRecord(formId);
+    EXPECT_EQ(result, true);
+    EXPECT_FALSE(formDataMgr_.HasNetworkConditionForm());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteFormRecord_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CleanRemovedFormRecords_003
+ * @tc.name: CleanRemovedFormRecords
+ * @tc.desc: Verify CleanRemovedFormRecords triggers UnregisterNetConnCallback for network condition forms.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CleanRemovedFormRecords_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CleanRemovedFormRecords_003 start";
+    int callingUid = 0;
+    int64_t formId = 1003;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    formItemInfo.SetConditionUpdate({1});
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    std::set<int64_t> removedForms;
+    removedForms.emplace(formId);
+
+    formDataMgr_.CleanRemovedFormRecords(bundleName, removedForms);
+    EXPECT_EQ(true, formDataMgr_.formRecords_.empty());
+    EXPECT_FALSE(formDataMgr_.HasNetworkConditionForm());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CleanRemovedFormRecords_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CleanRemovedTempFormRecords_003
+ * @tc.name: CleanRemovedTempFormRecords
+ * @tc.desc: Verify CleanRemovedTempFormRecords triggers UnregisterNetConnCallback for network condition forms.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CleanRemovedTempFormRecords_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CleanRemovedTempFormRecords_003 start";
+    int64_t formId = 1004;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    std::set<int64_t> removedForms;
+    removedForms.emplace(formId);
+
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetConditionUpdate({1});
+    int32_t userId = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid, userId);
+    formDataMgr_.formRecords_.emplace(formId, record);
+    formDataMgr_.tempForms_.emplace_back(formId);
+
+    formDataMgr_.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    EXPECT_EQ(true, formDataMgr_.formRecords_.empty());
+    EXPECT_EQ(true, formDataMgr_.tempForms_.empty());
+    EXPECT_FALSE(formDataMgr_.HasNetworkConditionForm());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CleanRemovedTempFormRecords_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_DeleteFormsByUserId_002
+ * @tc.name: DeleteFormsByUserId
+ * @tc.desc: Verify DeleteFormsByUserId triggers UnregisterNetConnCallback for network condition forms.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteFormsByUserId_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteFormsByUserId_002 start";
+    int64_t formId = 1005;
+    FormRecord formRecord;
+    formRecord.formTempFlag = true;
+    formRecord.providerUserId = formId;
+    formRecord.formId = formId;
+    formRecord.conditionUpdate = {1};
+    formDataMgr_.formRecords_.emplace(formId, formRecord);
+
+    std::vector<int64_t> removedFormIds;
+    formDataMgr_.DeleteFormsByUserId(formId, removedFormIds);
+    EXPECT_NE(std::find(removedFormIds.begin(), removedFormIds.end(), formRecord.formId), removedFormIds.end());
+    EXPECT_FALSE(formDataMgr_.HasNetworkConditionForm());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteFormsByUserId_002 end";
+}
+

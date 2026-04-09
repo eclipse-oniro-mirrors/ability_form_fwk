@@ -111,6 +111,16 @@ public:
     static bool VerifyCallingPermission(const std::string &permissionName);
 
     /**
+     * @brief Checks whether the specified bundle has a certain permission.
+     * @param userId The user ID.
+     * @param bundleName The bundle name.
+     * @param permissionName The name of the permission.
+     * @return Returns true if the bundle has certain permissions; returns false otherwise.
+     */
+    static bool VerifyPermissionByBundleName(int32_t userId, const std::string &bundleName,
+        const std::string &permissionName);
+
+    /**
      * @brief Convert string to int64_t
      *
      * @param[in] strInfo The string information

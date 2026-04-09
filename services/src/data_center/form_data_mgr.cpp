@@ -44,6 +44,7 @@
 #include "status_mgr_center/form_status.h"
 #include "parameter.h"
 #include "parameters.h"
+#include "form_observer/net_conn_callback_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -51,6 +52,7 @@ namespace {
 constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.watermark";
 constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
 constexpr const char *FORM_STANDBY_CAPABILITY_PARAM_NAME = "const.form.standby.capability";
+constexpr int32_t CONDITION_NETWORK = 1;
 
 static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
 {
@@ -126,22 +128,28 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
         tempForms_.emplace_back(formInfo.GetFormId());
     }
     FormRecord record;
+    bool isNewRecord = false;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         if (formRecords_.empty()) { // formRecords_ is empty, create a new one
             HILOG_DEBUG("form info not exist");
             record = CreateFormRecord(formInfo, callingUid, userId);
             formRecords_.emplace(formInfo.GetFormId(), record);
+            isNewRecord = true;
         } else {
             auto info = formRecords_.find(formInfo.GetFormId());
             if (info == formRecords_.end()) {
                 HILOG_DEBUG("form info not find");
                 record = CreateFormRecord(formInfo, callingUid, userId);
                 formRecords_.emplace(formInfo.GetFormId(), record);
+                isNewRecord = true;
             } else {
                 record = info->second;
             }
         }
+    }
+    if (isNewRecord && IsNetworkConditionForm(record)) {
+        NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
     }
     HILOG_INFO("end formId: %{public}" PRId64, formInfo.GetFormId());
     FormBasicInfo basic {
@@ -162,6 +170,7 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
 {
     HILOG_INFO("delete record, form:%{public}" PRId64, formId);
     FormRecord formRecord;
+    bool isNetConditionForm = false;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         auto iter = formRecords_.find(formId);
@@ -170,7 +179,11 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
             return false;
         }
         formRecord = iter->second;
+        isNetConditionForm = IsNetworkConditionForm(formRecord);
         formRecords_.erase(iter);
+    }
+    if (isNetConditionForm && !HasNetworkConditionForm()) {
+        NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
     FormUtil::DeleteFormId(formId);
     FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
@@ -828,6 +841,27 @@ bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, std::vector<Fo
     }
 }
 
+bool FormDataMgr::IsNetworkConditionForm(const FormRecord &record)
+{
+    for (int32_t item : record.conditionUpdate) {
+        if (item == CONDITION_NETWORK) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool FormDataMgr::HasNetworkConditionForm() const
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (const auto &pair : formRecords_) {
+        if (IsNetworkConditionForm(pair.second)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * @brief Get temporary form record.
  * @param formTempRecords The temp form record.
@@ -1423,19 +1457,28 @@ bool FormDataMgr::IsSameForm(const FormRecord &record, const FormInfo &formInfo)
 void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::set<int64_t> &removedForms)
 {
     HILOG_INFO("clean removed form records");
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    std::map<int64_t, FormRecord>::iterator itFormRecord;
-    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
-        int64_t formId = itFormRecord->first;
-        auto itForm = std::find(removedForms.begin(), removedForms.end(), formId);
-        if (itForm != removedForms.end()) {
-            FormCacheMgr::GetInstance().DeleteData(formId);
-            FormRenderMgr::GetInstance().StopRenderingForm(formId, itFormRecord->second);
-            itFormRecord = formRecords_.erase(itFormRecord);
-            FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
-        } else {
-            itFormRecord++;
+    bool hadNetCondition = false;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        std::map<int64_t, FormRecord>::iterator itFormRecord;
+        for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
+            int64_t formId = itFormRecord->first;
+            auto itForm = std::find(removedForms.begin(), removedForms.end(), formId);
+            if (itForm != removedForms.end()) {
+                FormCacheMgr::GetInstance().DeleteData(formId);
+                FormRenderMgr::GetInstance().StopRenderingForm(formId, itFormRecord->second);
+                if (IsNetworkConditionForm(itFormRecord->second)) {
+                    hadNetCondition = true;
+                }
+                itFormRecord = formRecords_.erase(itFormRecord);
+                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
+            } else {
+                itFormRecord++;
+            }
         }
+    }
+    if (hadNetCondition && !HasNetworkConditionForm()) {
+        NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
 }
 /**
@@ -1448,6 +1491,7 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
 {
     HILOG_INFO("clean removed form records");
     std::set<int64_t> removedTempForms;
+    bool hadNetCondition = false;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         std::map<int64_t, FormRecord>::iterator itFormRecord;
@@ -1457,6 +1501,9 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
                 && (userId == itFormRecord->second.providerUserId)) {
                 removedTempForms.emplace(formId);
                 FormRenderMgr::GetInstance().StopRenderingForm(formId, itFormRecord->second);
+                if (IsNetworkConditionForm(itFormRecord->second)) {
+                    hadNetCondition = true;
+                }
                 itFormRecord = formRecords_.erase(itFormRecord);
                 FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
             } else {
@@ -1476,6 +1523,9 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
             }
         }
         removedForms.merge(removedTempForms);
+    }
+    if (hadNetCondition && !HasNetworkConditionForm()) {
+        NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
 }
 /**
@@ -2018,6 +2068,7 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
     HILOG_WARN("delete forms, userId: %{public}d", userId);
     // handle formRecords_
     std::vector<int64_t> removedTempForms;
+    bool hadNetCondition = false;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         auto itFormRecord = formRecords_.begin();
@@ -2026,6 +2077,9 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
             if (userId == itFormRecord->second.providerUserId) {
                 if (itFormRecord->second.formTempFlag) {
                     removedTempForms.emplace_back(formId);
+                }
+                if (IsNetworkConditionForm(itFormRecord->second)) {
+                    hadNetCondition = true;
                 }
                 removedFormIds.emplace_back(formId);
                 itFormRecord = formRecords_.erase(itFormRecord);
@@ -2048,6 +2102,9 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
             }
         }
     }
+    if (hadNetCondition && !HasNetworkConditionForm()) {
+        NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
+    }
 }
 /**
  * @brief Clear form records for st limit value test.
@@ -2062,6 +2119,7 @@ void FormDataMgr::ClearFormRecords()
         std::lock_guard<std::mutex> lock(formTempMutex_);
         tempForms_.clear();
     }
+    NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
 }
 
 /**
@@ -3334,20 +3392,29 @@ bool FormDataMgr::IsExpectRecycled(int64_t formId)
 
 void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempForms)
 {
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    std::map<int64_t, FormRecord>::iterator itFormRecord;
-    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
-        int64_t formId = itFormRecord->first;
-        // if temp form, remove it
-        if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
-            FormRecord formRecord = itFormRecord->second;
-            itFormRecord = formRecords_.erase(itFormRecord);
-            FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
-            FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
-            FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
-        } else {
-            itFormRecord++;
+    bool hadNetCondition = false;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        std::map<int64_t, FormRecord>::iterator itFormRecord;
+        for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
+            int64_t formId = itFormRecord->first;
+            // if temp form, remove it
+            if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
+                FormRecord formRecord = itFormRecord->second;
+                if (IsNetworkConditionForm(formRecord)) {
+                    hadNetCondition = true;
+                }
+                itFormRecord = formRecords_.erase(itFormRecord);
+                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
+                FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+                FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
+            } else {
+                itFormRecord++;
+            }
         }
+    }
+    if (hadNetCondition && !HasNetworkConditionForm()) {
+        NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
 }
 

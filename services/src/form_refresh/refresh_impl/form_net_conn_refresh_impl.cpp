@@ -23,7 +23,7 @@ static RefreshConfig CreateConfig()
 {
     RefreshConfig config;
     // Check types configuration
-    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_SYSTEM_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_ADD_FINISH };
+    config.checkTypes = { TYPE_UNTRUST_APP, TYPE_MULTI_ACTIVE_USERS, TYPE_ADD_FINISH, TYPE_NETWORK_PERMISSION };
     // Control checks configuration
     config.controlCheckFlags = CONTROL_CHECK_HEALTHY_CONTROL | CONTROL_CHECK_INVISIBLE | CONTROL_CHECK_SCREEN_OFF |
         CONTROL_CHECK_NEED_TO_FRESH;

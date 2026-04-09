@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_FORM_FWK_FORM_TASK_COMMON_H
 #define OHOS_FORM_FWK_FORM_TASK_COMMON_H
- 
+
 namespace OHOS {
 namespace AppExecFwk {
 enum class TaskType : int64_t {
@@ -37,6 +37,7 @@ constexpr int32_t IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME = 2000; // ms
 constexpr int32_t WAIT_ON_ADD_FORM_DELAY_TIME = 50; // ms
 constexpr int32_t RECONNECT_RETRY_DELAY_TIME = 500; // ms
 constexpr int32_t LAST_RECONNECT_RETRY_DELAY_TIME = 1000 * 60 * 30; // ms
+constexpr int32_t BATCH_DELAY_REFRESH_TIME = 1000; // ms
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

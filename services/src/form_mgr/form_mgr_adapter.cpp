@@ -1020,6 +1020,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     std::map<std::string, std::vector<int64_t>> eventMaps = {};
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
     std::vector<int64_t> checkFormIds;
+    std::vector<FormRecord> needRefreshRecords;
 
     for (int64_t formId : formIds) {
         if (formId <= 0) {
@@ -1035,9 +1036,16 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         SetVisibleChange(matchedFormId, formVisibleType, userId);
         PaddingNotifyVisibleFormsMap(formVisibleType, matchedFormId, formInstanceMaps);
         checkFormIds.push_back(formId);
+
         // Update info to host and check if the form was created by the system application.
-        if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
-            (!formRecord.isSystemApp)) {
+        bool updateRet = UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord);
+        // Check if the form needs visibility refersh
+        if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE &&
+            (formRecord.isTimerRefresh || formRecord.isHostRefresh)) {
+            needRefreshRecords.emplace_back(formRecord);
+        }
+
+        if (!updateRet || !formRecord.isSystemApp) {
             continue;
         }
 
@@ -1058,6 +1066,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
     }
+    RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(needRefreshRecords, userId);
     PostVisibleNotify(
         (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
         formInstanceMaps, eventMaps, formVisibleType, Constants::DEFAULT_VISIBLE_NOTIFY_DELAY, callerToken);
@@ -3217,12 +3226,9 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         "isTimerRefresh:%{public}d,wantCacheMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
         (int)formRecord.wantCacheMap.size(), formRecord.isHostRefresh);
-    if (!formRecord.needRefresh || formVisibleType != Constants::FORM_VISIBLE) {
-        return true;
-    }
-    // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
-    if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
-        RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formRecord.formId, userId);
+
+    if (!formRecord.needRefresh || formVisibleType != Constants::FORM_VISIBLE ||
+        formRecord.isTimerRefresh || formRecord.isHostRefresh) {
         return true;
     }
 
@@ -4266,23 +4272,24 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
     FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, invisibleFormRecords);
     HILOG_INFO("getRecords visible size:%{public}zu, invisible size:%{public}zu",
         visibleFormRecords.size(), invisibleFormRecords.size());
-    std::vector<FormRecord> forceRefreshForms;
+    std::vector<RefreshData> batch;
     for (auto &formRecord : visibleFormRecords) {
         formRecord.isCountTimerRefresh = false;
         formRecord.isTimerRefresh = false;
-        forceRefreshForms.emplace_back(formRecord);
+        RefreshData data;
+        data.record = formRecord;
+        data.formId = formRecord.formId;
+        batch.push_back(data);
     }
     for (auto &formRecord : invisibleFormRecords) {
         formRecord.isCountTimerRefresh = false;
         formRecord.isTimerRefresh = false;
-        forceRefreshForms.emplace_back(formRecord);
-    }
-    for (const auto &formRecord : forceRefreshForms) {
         RefreshData data;
         data.record = formRecord;
         data.formId = formRecord.formId;
-        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_FORCE);
+        batch.push_back(data);
     }
+    FormRefreshMgr::GetInstance().BatchRequestRefresh(TYPE_FORCE, StaggerStrategyType::DEFAULT, batch);
     return ERR_OK;
 }
 
@@ -4525,12 +4532,14 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
     std::string reportStr = "";
     std::set<std::string> reportList;
 
+    std::vector<RefreshData> batch;
     for (FormRecord& formRecord : formInfos) {
         RefreshData data;
         data.formId = formRecord.formId;
         data.record = formRecord;
-        FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_NETWORK);
+        batch.push_back(data);
     }
+    FormRefreshMgr::GetInstance().BatchRequestRefresh(TYPE_NETWORK, StaggerStrategyType::VISIBLE_DELAY, batch);
 
     if (reportList.size() > 0) {
         for (const auto& item : reportList) {
@@ -5032,13 +5041,17 @@ ErrCode FormMgrAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRe
     }
 
     int callingUid = IPCSkeleton::GetCallingUid();
-    RefreshData data;
-    data.callingUid = callingUid;
+    std::vector<RefreshData> batch;
     for (const FormRecord &formRecord : refreshForms) {
+        RefreshData data;
         data.record = formRecord;
         data.formId = formRecord.formId;
-        ErrCode requestRet = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_PROVIDER);
-        if (requestRet == ERR_OK) {
+        data.callingUid = callingUid;
+        batch.push_back(data);
+    }
+    FormRefreshMgr::GetInstance().BatchRequestRefresh(TYPE_PROVIDER, StaggerStrategyType::DEFAULT, batch);
+    for (const auto &data : batch) {
+        if (data.errorCode == ERR_OK) {
             reloadNum++;
         }
     }

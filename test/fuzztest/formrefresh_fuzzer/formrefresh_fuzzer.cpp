@@ -125,12 +125,16 @@ void RefreshCacheMgrTest(FuzzedDataProvider *fdp)
 
     // Test invisible flag operations
     RefreshCacheMgr::GetInstance().AddFlagByInvisible(formId, refreshType);
-    RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(formId, userId);
+    FormRecord record = GenerateFuzzedFormRecord(fdp);
+    record.formId = formId;
+    record.needRefresh = true;
+    std::vector<FormRecord> visibleFormRecords = {record};
+    RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(visibleFormRecords, userId);
 
     // Test screen off flag operations
     Want want;
-    FormRecord record = GenerateFuzzedFormRecord(fdp);
-    RefreshCacheMgr::GetInstance().AddFlagByScreenOff(formId, want, record);
+    FormRecord screenOffRecord = GenerateFuzzedFormRecord(fdp);
+    RefreshCacheMgr::GetInstance().AddFlagByScreenOff(formId, want, screenOffRecord);
     RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
 
     // Test render task operations
