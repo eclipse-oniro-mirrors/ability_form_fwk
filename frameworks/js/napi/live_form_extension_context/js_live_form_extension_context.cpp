@@ -37,6 +37,7 @@ constexpr int32_t INDEX_ONE = 1;
 constexpr size_t ARGC_ONE = 1;
 constexpr size_t ARGC_TWO = 2;
 constexpr int32_t ERR_FAILED = -1;
+constexpr double MAX_FONT_SCALE = 1.3;
 
 std::map<UIExtensionConnectionKey, sptr<JSUIExtensionConnection>, key_compare> g_connects;
 std::mutex g_connectsMutex_;
@@ -99,6 +100,7 @@ napi_value JsLiveFormExtensionContext::CreateJsLiveFormExtensionContext(
     const char *moduleName = "JsLiveFormExtensionContext";
     BindNativeFunction(env, objValue, "setWindowBackgroundColor", moduleName, SetWindowBackgroundColor);
     BindNativeFunction(env, objValue, "setUIExtCustomDensity", moduleName, SetUIExtCustomDensity);
+    BindNativeFunction(env, objValue, "setFontScale", moduleName, SetFontScale);
     BindNativeFunction(env, objValue, "startAbilityByLiveForm", moduleName, StartAbilityByLiveForm);
     BindNativeFunction(env, objValue, "connectServiceExtensionAbility", moduleName, ConnectAbility);
     BindNativeFunction(env, objValue, "disconnectServiceExtensionAbility", moduleName, DisconnectAbility);
@@ -116,6 +118,12 @@ napi_value JsLiveFormExtensionContext::SetUIExtCustomDensity(napi_env env, napi_
 {
     HILOG_DEBUG("called");
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnSetUIExtCustomDensity);
+}
+
+napi_value JsLiveFormExtensionContext::SetFontScale(napi_env env, napi_callback_info info)
+{
+    HILOG_DEBUG("called");
+    GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnSetFontScale);
 }
 
 napi_value JsLiveFormExtensionContext::StartAbilityByLiveForm(napi_env env, napi_callback_info info)
@@ -207,6 +215,55 @@ napi_value JsLiveFormExtensionContext::OnSetUIExtCustomDensity(napi_env env, Nap
 
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleHighQos("JsLiveFormExtensionContext OnSetUIExtCustomDensity", env,
+        CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsLiveFormExtensionContext::OnSetFontScale(napi_env env, NapiCallbackInfo &info)
+{
+    HILOG_DEBUG("called");
+    if (info.argc != ARGC_ONE) {
+        HILOG_ERROR("argc is not one");
+        ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        return CreateJsUndefined(env);
+    }
+
+    double fontScale = 0.0;
+    if (!OHOS::AppExecFwk::UnwrapDoubleFromJS2(env, info.argv[0], fontScale) || std::isnan(fontScale)) {
+        HILOG_ERROR("failed to get fontScale");
+        ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        return CreateJsUndefined(env);
+    }
+
+    if (std::islessequal(fontScale, 0.0)) {
+        HILOG_ERROR("fontScale %{public}f less than 0.0", fontScale);
+        ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
+            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        return CreateJsUndefined(env);
+    }
+
+    if (std::isgreaterequal(fontScale, MAX_FONT_SCALE)) {
+        HILOG_WARN("fontScale %{public}f greater than max scale %{public}f", fontScale, MAX_FONT_SCALE);
+        fontScale = MAX_FONT_SCALE;
+    }
+
+    NapiAsyncTask::CompleteCallback complete =
+        [weak = context_, fontScale](napi_env env, NapiAsyncTask &task, int32_t status) {
+        HILOG_DEBUG("OnSetFontScale begin");
+        auto context = weak.lock();
+        if (!context) {
+            HILOG_ERROR("null context");
+            task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
+                FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
+            return;
+        }
+        context->SetAbilityFontSize(fontScale);
+    };
+
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleHighQos("JsLiveFormExtensionContext OnSetFontScale", env,
         CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
