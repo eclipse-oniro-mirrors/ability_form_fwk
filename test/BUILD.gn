@@ -141,6 +141,7 @@ group("unittest") {
     "unittest/fms_form_host_task_mgr_test:unittest",
     "unittest/fms_form_observer_task_mgr_test:unittest",
     "unittest/fms_form_provider_task_mgr_test:unittest",
+    "unittest/fms_form_proxy_registry_test:unittest",
     "unittest/fms_form_render_task_mgr_test:unittest",
     "unittest/fms_form_status_task_mgr_test:unittest",
     "unittest/fms_form_mgr_service_queue_test:unittest",

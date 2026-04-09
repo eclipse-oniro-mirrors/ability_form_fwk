@@ -43,6 +43,7 @@
 #include "inner/mock_form_mgr_adapter.h"
 #include "inner/mock_want.h"
 #include "inner/mock_form_refresh_mgr.h"
+#include "inner/mock_form_delegate_stub.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1275,17 +1276,17 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0300, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_0301
- * @tc.desc: test UnregisterGetFormRectProxy function.
+ * @tc.name: FormMgrAdapter_UnregisterGetFormRectProxy_0001
+ * @tc.desc: test UnregisterGetFormRectProxy function without register.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0301, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UnregisterGetFormRectProxy_0001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0301 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetFormRectProxy_0001 start";
     FormMgrAdapter formMgrAdapter;
     auto ret = formMgrAdapter.UnregisterGetFormRectProxy();
-    EXPECT_EQ(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0301 end";
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetFormRectProxy_0001 end";
 }
 
 
@@ -1323,32 +1324,31 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0303, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_0304
- * @tc.desc: test UnregisterGetLiveFormStatusProxy function.
+ * @tc.name: FormMgrAdapter_UnregisterGetLiveFormStatusProxy_0001
+ * @tc.desc: test UnregisterGetLiveFormStatusProxy function without register.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0304, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UnregisterGetLiveFormStatusProxy_0001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0304 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetLiveFormStatusProxy_0001 start";
     FormMgrAdapter formMgrAdapter;
     auto ret = formMgrAdapter.UnregisterGetLiveFormStatusProxy();
-    EXPECT_EQ(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0304 end";
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetLiveFormStatusProxy_0001 end";
 }
 
 /**
- * @tc.name: FormMgrAdapter_0305
- * @tc.desc: test GetLiveFormStatus function.
+ * @tc.name: FormMgrAdapter_GetLiveFormStatus_0001
+ * @tc.desc: test GetLiveFormStatus function without proxy registered.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0305, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_GetLiveFormStatus_0001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0305 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetLiveFormStatus_0001 start";
     FormMgrAdapter formMgrAdapter;
     std::unordered_map<std::string, std::string> liveFormStatusMap;
-    formMgrAdapter.liveFormStatusCallerToken_ = nullptr;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.GetLiveFormStatus(liveFormStatusMap));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0305 end";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetLiveFormStatus_0001 end";
 }
 
 /**
@@ -1863,5 +1863,625 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ReloadForms_005, TestSize.Level1
     delete MockIPCSkeleton::obj;
     MockIPCSkeleton::obj = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_ReloadForms_005 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterOverflowProxy_0001
+ * @tc.desc: test RegisterOverflowProxy with null and UnregisterOverflowProxy without register.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterOverflowProxy_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterOverflowProxy_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> nullProxy = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.RegisterOverflowProxy(nullProxy));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterOverflowProxy());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterOverflowProxy_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterOverflowProxy_0002
+ * @tc.desc: test RegisterOverflowProxy with valid proxy and UnregisterOverflowProxy.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterOverflowProxy_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterOverflowProxy_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterOverflowProxy(proxy));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterOverflowProxy());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterOverflowProxy());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterOverflowProxy_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RequestOverflow_0001
+ * @tc.desc: test RequestOverflow with no proxy registered.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RequestOverflow_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    MockSceneAnimationCheck(ERR_OK);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED,
+        formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0001
+ * @tc.desc: test RegisterChangeSceneAnimationStateProxy with null and Unregister without register.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> nullProxy = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.RegisterChangeSceneAnimationStateProxy(nullProxy));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.UnregisterChangeSceneAnimationStateProxy());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0002
+ * @tc.desc: test RegisterChangeSceneAnimationStateProxy with valid proxy and Unregister.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterChangeSceneAnimationStateProxy(proxy));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterChangeSceneAnimationStateProxy());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.UnregisterChangeSceneAnimationStateProxy());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ChangeSceneAnimationState_0001
+ * @tc.desc: test ChangeSceneAnimationState with no proxy registered.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ChangeSceneAnimationState_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    int32_t state = 1;
+    MockSceneAnimationCheck(ERR_OK);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED,
+        formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterPublishFormCrossBundleControl_0001
+ * @tc.desc: test RegisterPublishFormCrossBundleControl with null and Unregister without register.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterPublishFormCrossBundleControl_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterPublishFormCrossBundleControl_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> nullProxy = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.RegisterPublishFormCrossBundleControl(nullProxy));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.UnregisterPublishFormCrossBundleControl());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterPublishFormCrossBundleControl_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterPublishFormCrossBundleControl_0002
+ * @tc.desc: test RegisterPublishFormCrossBundleControl with valid proxy and Unregister.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterPublishFormCrossBundleControl_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterPublishFormCrossBundleControl_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterPublishFormCrossBundleControl(proxy));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterPublishFormCrossBundleControl());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.UnregisterPublishFormCrossBundleControl());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterPublishFormCrossBundleControl_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_PublishFormCrossBundleControl_0001
+ * @tc.desc: test PublishFormCrossBundleControl with no proxy registered.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_PublishFormCrossBundleControl_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    PublishFormCrossBundleInfo bundleInfo;
+    bundleInfo.callerBundleName = "com.test.caller";
+    bundleInfo.targetBundleName = "com.test.target";
+    bundleInfo.targetTemplateFormDetailId = "detail123";
+    EXPECT_FALSE(formMgrAdapter.PublishFormCrossBundleControl(bundleInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0001
+ * @tc.desc: test RegisterTemplateFormDetailInfoChange with null and Unregister without register.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> nullProxy = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.RegisterTemplateFormDetailInfoChange(nullProxy));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.UnregisterTemplateFormDetailInfoChange());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0002
+ * @tc.desc: test RegisterTemplateFormDetailInfoChange with valid proxy and Unregister.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterTemplateFormDetailInfoChange(proxy));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterTemplateFormDetailInfoChange());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.UnregisterTemplateFormDetailInfoChange());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_UpdateTemplateFormDetailInfo_0001
+ * @tc.desc: test UpdateTemplateFormDetailInfo with no proxy registered.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UpdateTemplateFormDetailInfo_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateTemplateFormDetailInfo_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<TemplateFormDetailInfo> templateFormInfo;
+    EXPECT_EQ(ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION,
+        formMgrAdapter.UpdateTemplateFormDetailInfo(templateFormInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateTemplateFormDetailInfo_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterGetFormRectProxy_0001
+ * @tc.desc: test RegisterGetFormRectProxy with valid proxy and UnregisterGetFormRectProxy.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterGetFormRectProxy_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterGetFormRectProxy_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterGetFormRectProxy(proxy));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterGetFormRectProxy());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterGetFormRectProxy());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterGetFormRectProxy_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RegisterGetLiveFormStatusProxy_0001
+ * @tc.desc: test RegisterGetLiveFormStatusProxy with valid proxy and UnregisterGetLiveFormStatusProxy.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterGetLiveFormStatusProxy_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterGetLiveFormStatusProxy_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterGetLiveFormStatusProxy(proxy));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterGetLiveFormStatusProxy());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterGetLiveFormStatusProxy());
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterGetLiveFormStatusProxy_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RequestOverflow_0002
+ * @tc.desc: test RequestOverflow with GetFormRecord returning false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RequestOverflow_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    MockSceneAnimationCheck(ERR_OK);
+    MockGetFormRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+        formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RequestOverflow_0003
+ * @tc.desc: test RequestOverflow with formRecord found but proxy not matched in formUserUids.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RequestOverflow_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    MockSceneAnimationCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    // No proxy registered for the uid in formUserUids, so loop finds no match
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED,
+        formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_RequestOverflow_0004
+ * @tc.desc: test RequestOverflow with valid proxy registered, proxy returns ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RequestOverflow_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0004 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormHostDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    formMgrAdapter.overflowRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    int64_t formId = 1;
+    int32_t uid = 1;
+    OverflowInfo overflowInfo;
+    bool isOverflow = true;
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+    MockSceneAnimationCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RequestOverflow(formId, uid, overflowInfo, isOverflow));
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_RequestOverflow_0004 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ChangeSceneAnimationState_0002
+ * @tc.desc: test ChangeSceneAnimationState with GetFormRecord returning false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ChangeSceneAnimationState_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    int32_t state = 1;
+    MockSceneAnimationCheck(ERR_OK);
+    MockGetFormRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+        formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ChangeSceneAnimationState_0003
+ * @tc.desc: test ChangeSceneAnimationState with formRecord found but no proxy matched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ChangeSceneAnimationState_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    int32_t state = 1;
+    MockSceneAnimationCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED,
+        formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ChangeSceneAnimationState_0004
+ * @tc.desc: test ChangeSceneAnimationState with valid proxy, proxy returns ERR_OK → break.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ChangeSceneAnimationState_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0004 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormHostDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    formMgrAdapter.sceneAnimationRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    int64_t formId = 1;
+    int32_t uid = 1;
+    int32_t state = 1;
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+    MockSceneAnimationCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0004 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_ChangeSceneAnimationState_0005
+ * @tc.desc: test ChangeSceneAnimationState with valid proxy, proxy returns error → no break.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_ChangeSceneAnimationState_0005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0005 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormHostDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    mockProxy->changeSceneResult_ = ERR_APPEXECFWK_FORM_COMMON_CODE;
+    formMgrAdapter.sceneAnimationRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    int64_t formId = 1;
+    int32_t uid = 1;
+    int32_t state = 1;
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+    MockSceneAnimationCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.ChangeSceneAnimationState(formId, uid, state));
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_ChangeSceneAnimationState_0005 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_GetFormRect_0001
+ * @tc.desc: test GetFormRect with GetFormRecord returning false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_GetFormRect_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0001 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    Rect rect;
+    MockCallerCheck(ERR_OK);
+    MockGetFormRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+        formMgrAdapter.GetFormRect(formId, uid, rect));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_GetFormRect_0002
+ * @tc.desc: test GetFormRect with formRecord found but no proxy matched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_GetFormRect_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t uid = 1;
+    Rect rect;
+    MockCallerCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED,
+        formMgrAdapter.GetFormRect(formId, uid, rect));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_GetFormRect_0003
+ * @tc.desc: test GetFormRect with valid proxy, proxy returns ERR_OK → break.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_GetFormRect_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormHostDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    formMgrAdapter.formRectRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    int64_t formId = 1;
+    int32_t uid = 1;
+    Rect rect;
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+    MockCallerCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.GetFormRect(formId, uid, rect));
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_GetFormRect_0004
+ * @tc.desc: test GetFormRect with valid proxy, proxy returns error → no break.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_GetFormRect_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0004 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormHostDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    mockProxy->getFormRectResult_ = ERR_APPEXECFWK_FORM_COMMON_CODE;
+    formMgrAdapter.formRectRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    int64_t formId = 1;
+    int32_t uid = 1;
+    Rect rect;
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    EXPECT_CALL(*(MockIPCSkeleton::obj), GetCallingUid()).WillRepeatedly(Return(DEFAULT_CALLING_UID));
+    MockCallerCheck(ERR_OK);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.GetFormRect(formId, uid, rect));
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetFormRect_0004 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_GetLiveFormStatus_0002
+ * @tc.desc: test GetLiveFormStatus with proxy registered but iface_cast returns nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_GetLiveFormStatus_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetLiveFormStatus_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(proxy, nullptr);
+    formMgrAdapter.liveFormStatusRegistry_.Register(DEFAULT_CALLING_UID, proxy);
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.GetLiveFormStatus(liveFormStatusMap));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetLiveFormStatus_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_GetLiveFormStatus_0003
+ * @tc.desc: test GetLiveFormStatus with valid proxy, proxy returns ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_GetLiveFormStatus_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetLiveFormStatus_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormHostDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    formMgrAdapter.liveFormStatusRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.GetLiveFormStatus(liveFormStatusMap));
+    EXPECT_EQ(liveFormStatusMap.size(), 1u);
+    EXPECT_EQ(liveFormStatusMap["key"], "value");
+    GTEST_LOG_(INFO) << "FormMgrAdapter_GetLiveFormStatus_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_PublishFormCrossBundleControl_0002
+ * @tc.desc: test PublishFormCrossBundleControl with proxy registered but iface_cast returns nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_PublishFormCrossBundleControl_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(proxy, nullptr);
+    // Use formMgrAdapter's registry directly to register for the current calling uid
+    formMgrAdapter.crossBundleControlRegistry_.Register(DEFAULT_CALLING_UID, proxy);
+    PublishFormCrossBundleInfo bundleInfo;
+    bundleInfo.callerBundleName = "com.test.caller";
+    bundleInfo.targetBundleName = "com.test.target";
+    // iface_cast<IFormProviderDelegate> on MockFormProviderClient returns nullptr → continue → return true
+    EXPECT_TRUE(formMgrAdapter.PublishFormCrossBundleControl(bundleInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_PublishFormCrossBundleControl_0003
+ * @tc.desc: test PublishFormCrossBundleControl with valid proxy, proxy approves.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_PublishFormCrossBundleControl_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormProviderDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    formMgrAdapter.crossBundleControlRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    PublishFormCrossBundleInfo bundleInfo;
+    bundleInfo.callerBundleName = "com.test.caller";
+    bundleInfo.targetBundleName = "com.test.target";
+    EXPECT_TRUE(formMgrAdapter.PublishFormCrossBundleControl(bundleInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_PublishFormCrossBundleControl_0004
+ * @tc.desc: test PublishFormCrossBundleControl with valid proxy, proxy rejects.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_PublishFormCrossBundleControl_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0004 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormProviderDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    mockProxy->isCanOpenResult_ = false;
+    formMgrAdapter.crossBundleControlRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    PublishFormCrossBundleInfo bundleInfo;
+    bundleInfo.callerBundleName = "com.test.caller";
+    bundleInfo.targetBundleName = "com.test.target";
+    EXPECT_FALSE(formMgrAdapter.PublishFormCrossBundleControl(bundleInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_PublishFormCrossBundleControl_0004 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_UpdateTemplateFormDetailInfo_0002
+ * @tc.desc: test UpdateTemplateFormDetailInfo with proxy registered but iface_cast returns nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UpdateTemplateFormDetailInfo_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateTemplateFormDetailInfo_0002 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(proxy, nullptr);
+    formMgrAdapter.templateFormDetailInfoRegistry_.Register(DEFAULT_CALLING_UID, proxy);
+    std::vector<TemplateFormDetailInfo> templateFormInfo;
+    // iface_cast<IFormHostDelegate> returns nullptr → continue → return UNSUPPORTED
+    EXPECT_EQ(ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION,
+        formMgrAdapter.UpdateTemplateFormDetailInfo(templateFormInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateTemplateFormDetailInfo_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_UpdateTemplateFormDetailInfo_0003
+ * @tc.desc: test UpdateTemplateFormDetailInfo with valid proxy, proxy returns ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UpdateTemplateFormDetailInfo_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateTemplateFormDetailInfo_0003 start";
+    FormMgrAdapter formMgrAdapter;
+    auto mockProxy = new (std::nothrow) MockFormHostDelegateStub();
+    ASSERT_NE(mockProxy, nullptr);
+    formMgrAdapter.templateFormDetailInfoRegistry_.Register(DEFAULT_CALLING_UID, mockProxy);
+    std::vector<TemplateFormDetailInfo> templateFormInfo;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateTemplateFormDetailInfo(templateFormInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_UpdateTemplateFormDetailInfo_0003 end";
 }
 }
