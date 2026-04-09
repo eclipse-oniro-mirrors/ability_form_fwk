@@ -50,7 +50,7 @@ namespace AppExecFwk {
  * Facade class that delegates all form management operations to specialized adapters.
  * This class follows the Facade pattern to provide a unified interface while
  * delegating to specialized adapters for different concerns.
- * 
+ *
  * Design Note: This class does NOT inherit from IFormMgr. It is a standalone facade
  * that provides the same public interface as FormMgrAdapter for backward compatibility.
  */
