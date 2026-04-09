@@ -7461,6 +7461,84 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos2_007, TestSiz
 }
 
 /**
+ * @tc.number: FmsFormDataMgrTest_PrintFormsExceedsInfo_001
+ * @tc.name: PrintFormsExceedsInfo
+ * @tc.desc: Verify CollectFormDistributionInfo with multiple users, locations, hosts.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_PrintFormsExceedsInfo_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PrintFormsExceedsInfo_001 start";
+ 
+    // Set up test DB data with multiple users, locations, hosts
+    FormDBInfo info1;
+    info1.formId = 1;
+    info1.userId = 100;
+    info1.formLocation = Constants::FormLocation::DESKTOP;
+    info1.formUserUids = {1000, 1001};
+ 
+    FormDBInfo info2;
+    info2.formId = 2;
+    info2.userId = 100;
+    info2.formLocation = Constants::FormLocation::DESKTOP;
+    info2.formUserUids = {1000};
+ 
+    FormDBInfo info3;
+    info3.formId = 3;
+    info3.userId = 200;
+    info3.formLocation = Constants::FormLocation::SCREEN_LOCK;
+    info3.formUserUids = {1002};
+ 
+    std::vector<FormDBInfo> testDBInfos = {info1, info2, info3};
+    MockGetAllFormInfo(testDBInfos);
+    MockGetBundleNameByUid(ERR_OK, "com.test.host");
+ 
+    // Trigger PrintFormsExceedsInfo via CheckEnoughFormOnDevice
+    int callingUid = 0;
+    MockGetAllFormInfoSize(2, callingUid); // GetAllFormInfoSize returns MAX_FORMS
+ 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS,
+        formDataMgr_.CheckEnoughFormOnDevice(callingUid, FormUtil::GetCurrentAccountId()));
+ 
+    // Reset mocks
+    MockGetAllFormInfo(std::vector<FormDBInfo>());
+    MockGetAllFormInfoSize(0, 0);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PrintFormsExceedsInfo_001 end";
+}
+ 
+/**
+ * @tc.number: FmsFormDataMgrTest_PrintFormsExceedsInfo_002
+ * @tc.name: PrintFormsExceedsInfo
+ * @tc.desc: Verify no crash when GetBundleNameByUid fails.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_PrintFormsExceedsInfo_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PrintFormsExceedsInfo_002 start";
+ 
+    FormDBInfo info;
+    info.formId = 1;
+    info.userId = 100;
+    info.formLocation = Constants::FormLocation::DESKTOP;
+    info.formUserUids = {1000};
+ 
+    std::vector<FormDBInfo> testDBInfos = {info};
+    MockGetAllFormInfo(testDBInfos);
+ 
+    // GetBundleNameByUid returns error
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+ 
+    int callingUid = 0;
+    MockGetAllFormInfoSize(2, callingUid);
+ 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS,
+        formDataMgr_.CheckEnoughFormOnDevice(callingUid, FormUtil::GetCurrentAccountId()));
+ 
+    MockGetAllFormInfo(std::vector<FormDBInfo>());
+    MockGetAllFormInfoSize(0, 0);
+    MockGetBundleNameByUid(ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_PrintFormsExceedsInfo_002 end";
+}
+
+/**
  * @tc.number: FmsFormDataMgrTest_IsNetworkConditionForm_001
  * @tc.name: IsNetworkConditionForm
  * @tc.desc: Verify that IsNetworkConditionForm returns true when conditionUpdate contains CONDITION_NETWORK.

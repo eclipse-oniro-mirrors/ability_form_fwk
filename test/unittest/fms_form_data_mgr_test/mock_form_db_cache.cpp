@@ -112,12 +112,6 @@ int32_t FormDbCache::GetAllFormInfoSize()
     return 0;
 }
 
-void FormDbCache::GetLocationMap(std::map<Constants::FormLocation, int> &locationMap)
-{
-    locationMap[Constants::FormLocation::DESKTOP] = Constants::MAX_RECORD_PER_HOST;
-    locationMap[Constants::FormLocation::SCREEN_LOCK] = 1;
-}
-
 int32_t FormDbCache::GetFormCountsByUserId(const int32_t userId)
 {
     return g_mockFormCountsByUserIdRet;

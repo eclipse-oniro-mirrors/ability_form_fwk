@@ -109,6 +109,7 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     {FormEventName::FORM_STATUS_ERROR, "FORM_STATUS_ERROR"},
     {FormEventName::FORM_EVENT_QUEUE_OVER_LIMIT, "FORM_EVENT_QUEUE_OVER_LIMIT"},
     {FormEventName::FORM_DUE_CONTROL, "FORM_DUE_CONTROL"},
+    {FormEventName::FORM_EXCEEDS_DISTRIBUTION, "FORM_EXCEEDS_DISTRIBUTION"},
 };
 }
 
@@ -448,6 +449,7 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_
         case FormEventName::FORM_STATUS_ERROR:
         case FormEventName::FORM_EVENT_QUEUE_OVER_LIMIT:
         case FormEventName::FORM_DUE_CONTROL:
+        case FormEventName::FORM_EXCEEDS_DISTRIBUTION:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER, FORM_ERROR,
                 HiSysEventType::FAULT,
