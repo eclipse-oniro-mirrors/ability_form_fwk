@@ -53,6 +53,7 @@ constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.w
 constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
 constexpr const char *FORM_STANDBY_CAPABILITY_PARAM_NAME = "const.form.standby.capability";
 constexpr int32_t CONDITION_NETWORK = 1;
+static bool g_hasReportedExceedsDistribution = false;
 
 static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
 {
@@ -85,20 +86,77 @@ static void ReportDistributedFormEvent(const FormEventName &eventName, const For
     FormEventReport::SendFormFwkUEEvent(eventName, eventInfo);
 }
 
-static void PrintFormsExceedsInfo()
+static void CollectFormDistributionInfo(const std::vector<FormDBInfo> &formDBInfos,
+    std::map<int32_t, int32_t> &userFormCountMap,
+    std::map<Constants::FormLocation, int32_t> &locationCountMap,
+    std::map<std::string, int32_t> &hostFormCountMap)
 {
-    std::map<Constants::FormLocation, int> locationMap;
-    FormDbCache::GetInstance().GetLocationMap(locationMap);
-    Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
-    int32_t maxCount = 0;
-    for (const auto &location : locationMap) {
-        if (location.second > maxCount) {
-            maxCount = location.second;
-            maxLocation = location.first;
+    for (const auto &dbInfo : formDBInfos) {
+        userFormCountMap[dbInfo.userId]++;
+        locationCountMap[dbInfo.formLocation]++;
+        for (const auto &hostUid : dbInfo.formUserUids) {
+            std::string hostBundleName;
+            auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(hostUid, hostBundleName);
+            if (ret != ERR_OK) {
+                continue;
+            }
+            hostFormCountMap[hostBundleName]++;
         }
     }
-    HILOG_WARN("maxLocation:%{public}d, maxCount:%{public}d", static_cast<int>(maxLocation), maxCount);
 }
+
+static void PrintFormsExceedsInfo()
+{
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+ 
+    std::map<int32_t, int32_t> userFormCountMap;
+    std::map<Constants::FormLocation, int32_t> locationCountMap;
+    std::map<std::string, int32_t> hostFormCountMap;
+    CollectFormDistributionInfo(formDBInfos, userFormCountMap, locationCountMap, hostFormCountMap);
+ 
+    Constants::FormLocation maxLocation = Constants::FormLocation::OTHER;
+    int32_t maxLocationCount = 0;
+    for (const auto &loc : locationCountMap) {
+        if (loc.second > maxLocationCount) {
+            maxLocationCount = loc.second;
+            maxLocation = loc.first;
+        }
+    }
+    int32_t maxUserId = 0;
+    int32_t maxUserFormCount = 0;
+    for (const auto &user : userFormCountMap) {
+        if (user.second > maxUserFormCount) {
+            maxUserFormCount = user.second;
+            maxUserId = user.first;
+        }
+    }
+    std::string maxHostBundleName;
+    int32_t maxHostFormCount = 0;
+    for (const auto &host : hostFormCountMap) {
+        if (host.second > maxHostFormCount) {
+            maxHostFormCount = host.second;
+            maxHostBundleName = host.first;
+        }
+    }
+ 
+    std::string logMsg = "userCount:" + std::to_string(userFormCountMap.size()) +
+        ", totalFormCount:" + std::to_string(formDBInfos.size()) +
+        ", maxLocation:" + std::to_string(static_cast<int>(maxLocation)) +
+        ", maxLocationCount:" + std::to_string(maxLocationCount) +
+        ", maxUserId:" + std::to_string(maxUserId) +
+        ", maxUserFormCount:" + std::to_string(maxUserFormCount) +
+        ", maxHostBundleName:" + maxHostBundleName +
+        ", maxHostFormCount:" + std::to_string(maxHostFormCount);
+    HILOG_WARN("%{public}s", logMsg.c_str());
+ 
+    if (!g_hasReportedExceedsDistribution) {
+        g_hasReportedExceedsDistribution = true;
+        FormEventReport::SendFormFailedEvent(FormEventName::FORM_EXCEEDS_DISTRIBUTION,
+            0, "", logMsg, 0, 0);
+    }
+}
+
 }
 
 FormDataMgr::FormDataMgr()

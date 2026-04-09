@@ -535,23 +535,6 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_021, TestSize.Level0)
 }
 
 /**
- * @tc.number: FmsFormDbRecordTest_022
- * @tc.name: GetLocationMap
- */
-HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_022, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_022 start";
-    FormDBInfo formDBInfo;
-    formDBInfo.formId = 0;
-    formDBInfo.formLocation = Constants::FormLocation::OTHER;
-    FormDbCache::GetInstance().formDBInfos_.push_back(formDBInfo);
-    std::map<Constants::FormLocation, int> locationMap;
-    FormDbCache::GetInstance().GetLocationMap(locationMap);
-    EXPECT_TRUE(locationMap.size() > 0);
-    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_022 end";
-}
-
-/**
  * @tc.number: FmsFormDbRecordTest_GetFormCountsByUserId_001
  * @tc.name: GetFormCountsByUserId
  * @tc.desc: Verify that the return value is correct.

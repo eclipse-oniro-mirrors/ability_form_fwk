@@ -180,6 +180,7 @@ enum class FormEventName {
     FORM_STATUS_ERROR,
     FORM_EVENT_QUEUE_OVER_LIMIT,
     FORM_DUE_CONTROL,
+    FORM_EXCEEDS_DISTRIBUTION,
 };
  
 enum class RequestFormType : int8_t {
