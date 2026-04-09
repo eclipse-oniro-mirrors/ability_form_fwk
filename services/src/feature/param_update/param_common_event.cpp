@@ -44,7 +44,7 @@ ParamCommonEvent::ParamCommonEvent()
     handleEventFunc_[CFG_UPDATED_ACTION] = &ParamCommonEvent::HandleParamUpdate;
     for (auto it = handleEventFunc_.begin(); it != handleEventFunc_.end(); ++it) {
         HILOG_INFO("Add event: %{public}s", it->first.c_str());
-        eventHandles_.emplace(it->first, std::bind(it->second, ParamCommonEvent::GetInstance(), std::placeholders::_1));
+        eventHandles_.emplace(it->first, std::bind(it->second, this, std::placeholders::_1));
     }
 }
 
