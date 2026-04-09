@@ -112,6 +112,8 @@ namespace Constants {
     constexpr const char* FORM_HEIGHT_VP_KEY = "ohos.extra.param.key.form_height_vp";
     constexpr const char* FORM_DISABLE_GESTURE_KEY = "ohos.extra.param.key.form_disable_gesture";
     constexpr const char* FORM_DISABLE_BLUR_BACKGROUND = "ohos.extra.param.key.form_disable_blur_background";
+    constexpr const char* FORM_FONT_SIZE_SCALE_KEY = "ohos.extra.param.key.form_font_size_scale";
+    constexpr const char* FORM_FONT_WEIGHT_SCALE_KEY = "ohos.extra.param.key.form_font_weight_scale";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
