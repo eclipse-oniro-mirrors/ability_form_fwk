@@ -19,7 +19,9 @@ let UIExtensionAbility = requireNapi('app.ability.UIExtensionAbility');
 const domainID = 0xD001301;
 const TAG = 'FormManagerService';
 const FORM_LAYOUT_SCALE = 'layout_scale';
-const FONT_SCALE = 'font_scale';
+const NUMBER_TYPE = 'number';
+const FORM_FONT_SCALE_KEY = 'ohos.extra.param.key.form_font_size_scale';
+const FORM_FONT_WEIGHT_SCALE_KEY = 'ohos.extra.param.key.form_font_weight_scale';
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
   liveFormInfo = undefined;
@@ -70,8 +72,12 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
       }
     }
 
-    let fontScale = want.parameters[FONT_SCALE];
-    if (typeof fontScale === 'number') {
+    let fontScale = want.parameters[FORM_FONT_SCALE_KEY];
+    // fontWeight is unused until UEA providers api for setting font weight
+    let fontWeight = want.parameters[FORM_FONT_WEIGHT_SCALE_KEY];
+    if (typeof fontScale === NUMBER_TYPE && typeof fontWeight === NUMBER_TYPE) {
+      hilog.sLogD(domainID, TAG,
+        `setFontScale ${FORM_FONT_SCALE_KEY}: ${fontScale}, ${FORM_FONT_WEIGHT_SCALE_KEY}: ${fontWeight}`);
       try {
         this.context.setFontScale(fontScale)
           .then(() => {
@@ -83,6 +89,8 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
       } catch(err) {
         hilog.sLogE(domainID, TAG, `setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
       }
+    } else {
+      hilog.sLogE(domainID, TAG, `setFontScale fontScale or fontWeight isn't number type`);
     }
 
     this.onLiveFormCreate(this.liveFormInfo, session);
