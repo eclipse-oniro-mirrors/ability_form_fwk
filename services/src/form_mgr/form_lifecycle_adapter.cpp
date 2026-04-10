@@ -550,7 +550,12 @@ int FormLifecycleAdapter::AddForm(const int64_t formId, const Want &want,
     }
 
     AddFormResultErrorCodes states = AddFormResultErrorCodes::SUCCESS;
-    // need to call publishAdapter
+    ErrCode ret = publishAdapter_->CheckAddFormTaskTimeoutOrFailed(formId, states);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("AddForm Task Timeout or Failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
+        return ret;
+    }
+
     ret = CheckFormCountLimit(formId, want);
     if (ret != ERR_OK) {
         HILOG_ERROR("CheckFormCountLimit failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
@@ -604,8 +609,12 @@ int FormLifecycleAdapter::AddForm(const int64_t formId, const Want &want,
         }
     }
 
+    if (states == AddFormResultErrorCodes::UNKNOWN) {
+        publishAdapter_->CancelAddFormRequestTimeOutTask(formId, ret);
+    }
+
     ret = AllotForm(formId, want, callerToken, formJsInfo, formItemInfo);
-    // need to call publishAdapter
+    publishAdapter_->RemoveFormIdMapElement(formId);
     if (ret != ERR_OK) {
         HILOG_ERROR("allot form failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
     }
