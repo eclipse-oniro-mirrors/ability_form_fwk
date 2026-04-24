@@ -101,12 +101,12 @@ export default namespace formHost {
   export native function nativeOffTemplateFormDetailInfoChange(callback?: TemplateFormDetailInfoChangeCallbackWrapper): void;
   export native function nativeUpdateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void;
 
-  const ERR_OK = 0;
-  const INVALID_PARAM_ERROR_CODE = 401;
-  const INVALID_PARAM_MESSAGE_ETS = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
+  const ERR_OK: int = 0;
+  const INVALID_PARAM_ERROR_CODE: int = 401;
+  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
     + " 2.Incorrect parameter types;"
     + " 3.Parameter verification failed.";
-  const INVALID_CALLBACK_INDEX = -1;
+  const INVALID_CALLBACK_INDEX: int = -1;
 
   export function acquireFormState(want: Want, callback: AsyncCallback<formInfo.FormStateInfo>): void {
     if (want === undefined || want === null) {
