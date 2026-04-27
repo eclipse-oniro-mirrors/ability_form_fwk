@@ -3029,4 +3029,88 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0300, TestSize.Level1)
     int32_t result = proxy->GetFormRect(formId, rect);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_RegisterFormWantCallback_001
+ * @tc.desc: test RegisterFormWantCallback function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_RegisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_001 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) -> int {
+            reply.WriteInt32(ERR_OK);
+            return NO_ERROR;
+        }), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->RegisterFormWantCallback(iremoteObject);
+    EXPECT_EQ(ERR_OK, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_RegisterFormWantCallback_002
+ * @tc.desc: test RegisterFormWantCallback with send request failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_RegisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_002 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(Return(-1));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->RegisterFormWantCallback(iremoteObject);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_002 end";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_UnregisterFormWantCallback_001
+ * @tc.desc: test UnregisterFormWantCallback function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_UnregisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_001 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) -> int {
+            reply.WriteInt32(ERR_OK);
+            return NO_ERROR;
+        }), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->UnregisterFormWantCallback();
+    EXPECT_EQ(ERR_OK, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_UnregisterFormWantCallback_002
+ * @tc.desc: test UnregisterFormWantCallback with send request failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_UnregisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_002 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(Return(-1));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->UnregisterFormWantCallback();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_002 end";
+}
 }

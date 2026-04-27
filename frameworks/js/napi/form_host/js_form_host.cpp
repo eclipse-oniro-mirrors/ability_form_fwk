@@ -466,6 +466,16 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormIdsByFormLocation);
     }
 
+    static napi_value RegisterGetWantParamsCallback(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRegisterGetWantParamsCallback);
+    }
+
+    static napi_value UnregisterGetWantParamsCallback(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterGetWantParamsCallback);
+    }
+
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -2393,7 +2403,67 @@ private:
             CreateAsyncTaskWithLastParam(env, nullptr, std::move(execute), std::move(complete), &result));
         return result;
     }
- 
+
+    napi_value OnRegisterGetWantParamsCallback(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_DEBUG("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+
+        if (argc != ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+            return CreateJsUndefined(env);
+        }
+
+        if (!IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
+            HILOG_ERROR("invalid param0");
+            NapiFormUtil::ThrowParamTypeError(env, "callback",
+                "Callback<Array<formInfo.FormInfo>, Array<Record<string, Object>>>");
+            return CreateJsUndefined(env);
+        }
+        napi_value callback = argv[PARAM0];
+        napi_ref callbackRef;
+        napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+
+        ErrCode result = FormMgr::GetInstance().RegisterFormWantCallback(
+            JsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
+            napi_delete_reference(env, callbackRef);
+            NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            return CreateJsUndefined(env);
+        }
+        JsFormRouterProxyMgr::GetInstance()->RegisterFormWantCallbackListener(env, callbackRef);
+        return CreateJsUndefined(env);
+    }
+
+    napi_value OnUnregisterGetWantParamsCallback(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_DEBUG("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+
+        if (argc > ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
+            return CreateJsUndefined(env);
+        }
+
+        ErrCode result = FormMgr::GetInstance().UnregisterFormWantCallback();
+        if (result != ERR_OK) {
+            NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            return CreateJsUndefined(env);
+        }
+        JsFormRouterProxyMgr::GetInstance()->UnregisterFormWantCallbackListener();
+        return CreateJsUndefined(env);
+    }
+
     NapiAsyncTask::CompleteCallback CreateFormIdsCompleteCallback(
         std::shared_ptr<int32_t> errCodeVal, std::shared_ptr<std::vector<std::string>> formIdList)
     {
@@ -2424,8 +2494,6 @@ private:
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
 {
-    HILOG_DEBUG("call");
-
     std::unique_ptr<JsFormHost> jsFormHost = std::make_unique<JsFormHost>();
     napi_wrap(env, exportObj, jsFormHost.release(), JsFormHost::Finalizer, nullptr, nullptr);
 
@@ -2470,6 +2538,10 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "offTemplateFormDetailInfoChange", moduleName,
         JsFormHost::UnregisterTemplateFormDetailInfoObserver);
     BindNativeFunction(env, exportObj, "getFormIdsByFormLocation", moduleName, JsFormHost::GetFormIdsByFormLocation);
+    BindNativeFunction(env, exportObj, "onGetWantParamsCallback", moduleName,
+        JsFormHost::RegisterGetWantParamsCallback);
+    BindNativeFunction(env, exportObj, "offGetWantParamsCallback", moduleName,
+        JsFormHost::UnregisterGetWantParamsCallback);
 
     return CreateJsUndefined(env);
 }
@@ -3405,6 +3477,134 @@ void PromiseCallbackInfo::Destroy(PromiseCallbackInfo *callbackInfo)
 std::shared_ptr<LiveFormInterfaceParam> PromiseCallbackInfo::GetJsCallBackParam()
 {
     return liveFormInterfaceParam_;
+}
+
+void JsFormRouterProxyMgr::RegisterFormWantCallbackListener(napi_env env, napi_ref callbackRef)
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(registerFormWantCallbackMutex_);
+    if (formWantCallbackRef_ != nullptr) {
+        napi_delete_reference(formWantCallbackEnv_, formWantCallbackRef_);
+        formWantCallbackRef_ = nullptr;
+    }
+    formWantCallbackRef_ = callbackRef;
+    formWantCallbackEnv_ = env;
+}
+
+void JsFormRouterProxyMgr::UnregisterFormWantCallbackListener()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(registerFormWantCallbackMutex_);
+    if (formWantCallbackRef_ != nullptr) {
+        napi_delete_reference(formWantCallbackEnv_, formWantCallbackRef_);
+        formWantCallbackRef_ = nullptr;
+    }
+    formWantCallbackEnv_ = nullptr;
+}
+
+ErrCode JsFormRouterProxyMgr::RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
+    std::vector<AAFwk::WantParams> &wantParamsList)
+{
+    HILOG_INFO("call, formCount:%{public}zu", formInfos.size());
+    auto resultList = std::make_shared<std::vector<AAFwk::WantParams>>();
+    bool success = false;
+
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
+    std::function<void()> executeFunc = [&]() {
+        success = JsFormRouterProxyMgr::GetInstance()->RequestFormWantsInner(formInfos, *resultList);
+    };
+    mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::RequestFormWants");
+    HILOG_INFO("call RequestFormWants end, success:%{public}d", success);
+    if (success) {
+        wantParamsList = std::move(*resultList);
+        return ERR_OK;
+    }
+    return ERR_GET_INFO_FAILED;
+}
+
+bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
+    std::vector<AAFwk::WantParams> &wantParamsList)
+{
+    HILOG_INFO("call, formCount:%{public}zu", formInfos.size());
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(formWantCallbackEnv_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return false;
+    }
+    AbilityRuntime::HandleEscape handleEscape(formWantCallbackEnv_);
+
+    napi_value myCallback = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(registerFormWantCallbackMutex_);
+        if (formWantCallbackRef_ == nullptr) {
+            HILOG_ERROR("null formWantCallbackRef_");
+            napi_close_handle_scope(formWantCallbackEnv_, scope);
+            return false;
+        }
+        napi_get_reference_value(formWantCallbackEnv_, formWantCallbackRef_, &myCallback);
+    }
+    napi_valuetype valueType;
+    napi_typeof(formWantCallbackEnv_, myCallback, &valueType);
+    if (valueType != napi_function) {
+        napi_close_handle_scope(formWantCallbackEnv_, scope);
+        return false;
+    }
+
+    napi_value formInfoArray = CreateFormInfos(formWantCallbackEnv_, formInfos);
+    napi_value callResult = nullptr;
+    napi_status status =
+        napi_call_function(formWantCallbackEnv_, nullptr, myCallback, ARGS_ONE, &formInfoArray, &callResult);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_call_function failed");
+        napi_close_handle_scope(formWantCallbackEnv_, scope);
+        return false;
+    }
+
+    napi_valuetype returnType;
+    napi_typeof(formWantCallbackEnv_, callResult, &returnType);
+    if (returnType == napi_undefined) {
+        napi_close_handle_scope(formWantCallbackEnv_, scope);
+        return false;
+    }
+
+    napi_value funcResult = handleEscape.Escape(callResult);
+    bool result = ParseWantParamsArray(funcResult, wantParamsList);
+    napi_close_handle_scope(formWantCallbackEnv_, scope);
+    return result;
+}
+
+bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_value funcResult,
+    std::vector<AAFwk::WantParams> &wantParamsList)
+{
+    bool isPromise = false;
+    napi_is_promise(formWantCallbackEnv_, funcResult, &isPromise);
+    if (isPromise) {
+        HILOG_WARN("callback returned promise, not supported in batch mode");
+        return false;
+    }
+
+    bool isArray = false;
+    napi_is_array(formWantCallbackEnv_, funcResult, &isArray);
+    if (!isArray) {
+        HILOG_ERROR("callback result is not array");
+        return false;
+    }
+
+    uint32_t arrayLength = 0;
+    napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    for (uint32_t i = 0; i < arrayLength; i++) {
+        napi_value element = nullptr;
+        napi_get_element(formWantCallbackEnv_, funcResult, i, &element);
+        AAFwk::WantParams wp;
+        if (UnwrapWantParams(formWantCallbackEnv_, element, wp)) {
+            wantParamsList.push_back(std::move(wp));
+        } else {
+            HILOG_WARN("parse wantParams at index %{public}u failed, using empty", i);
+            wantParamsList.emplace_back();
+        }
+    }
+    return true;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

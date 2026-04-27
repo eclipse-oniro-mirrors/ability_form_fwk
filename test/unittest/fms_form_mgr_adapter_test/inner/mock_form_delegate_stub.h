@@ -48,6 +48,11 @@ public:
     {
         return templateFormResult_;
     }
+    ErrCode RequestFormWants(const std::vector<FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList) override
+    {
+        return ERR_OK;
+    }
     ErrCode requestOverflowResult_ = ERR_OK;
     ErrCode changeSceneResult_ = ERR_OK;
     ErrCode getFormRectResult_ = ERR_OK;

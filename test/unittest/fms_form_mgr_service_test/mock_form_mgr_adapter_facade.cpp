@@ -81,6 +81,9 @@ namespace {
     bool g_publishFormCrossBundleControl = true;
     bool g_hasFormVisible = true;
     int g_enableForms = OHOS::ERR_OK;
+    int g_registerFormWantCallback = OHOS::ERR_OK;
+    int g_unregisterFormWantCallback = OHOS::ERR_OK;
+    int g_getWantCallbackProxy = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -243,6 +246,16 @@ void MockHasFormVisible(bool mockRet)
 void MockEnableForms(int mockRet)
 {
     g_enableForms = mockRet;
+}
+
+void MockRegisterFormWantCallback(int mockRet)
+{
+    g_registerFormWantCallback = mockRet;
+}
+
+void MockUnregisterFormWantCallback(int mockRet)
+{
+    g_unregisterFormWantCallback = mockRet;
 }
 
 int FormMgrAdapterFacade::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
@@ -565,6 +578,21 @@ bool FormMgrAdapterFacade::HasFormVisible(const uint32_t tokenId)
 int32_t FormMgrAdapterFacade::EnableForms(const std::string bundleName, const int32_t userId, const bool enable)
 {
     return g_enableForms;
+}
+
+ErrCode FormMgrAdapterFacade::RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerFormWantCallback;
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterFormWantCallback(int32_t callingUid)
+{
+    return g_unregisterFormWantCallback;
+}
+
+ErrCode FormMgrAdapterFacade::GetWantCallbackProxy(int32_t callingUid, sptr<IRemoteObject> &proxy)
+{
+    return g_getWantCallbackProxy;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

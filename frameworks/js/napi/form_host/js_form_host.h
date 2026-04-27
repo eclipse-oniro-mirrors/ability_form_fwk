@@ -74,8 +74,12 @@ public:
     bool UnregisterGetLiveFormStatusListener();
 
     bool RegisterTemplateFormDetailInfoChange(napi_env env, napi_ref callback);
- 
+
     bool UnregisterTemplateFormDetailInfoChange();
+
+    void RegisterFormWantCallbackListener(napi_env env, napi_ref callback);
+
+    void UnregisterFormWantCallbackListener();
 
 private:
     static std::mutex mutex_;
@@ -115,11 +119,20 @@ private:
     void GetTemplateFormInfoArray(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
         napi_value &templateFormInfoArray);
 
+    napi_ref formWantCallbackRef_ = nullptr;
+    napi_env formWantCallbackEnv_ = nullptr;
+    ErrCode RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
+    bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
+    bool ParseWantParamsArray(napi_value funcResult, std::vector<AAFwk::WantParams> &wantParamsList);
+
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
     mutable std::mutex registerGetFormRectProxyMutex_;
     mutable std::mutex registerGetLiveFormStatusProxyMutex_;
     mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
+    mutable std::mutex registerFormWantCallbackMutex_;
 };
 
 class PromiseCallbackInfo {

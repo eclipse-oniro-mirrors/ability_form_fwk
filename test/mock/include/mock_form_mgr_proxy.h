@@ -132,6 +132,8 @@ public:
     MOCK_METHOD0(UnregisterPublishFormCrossBundleControl, ErrCode());
     MOCK_METHOD2(GetFormIdsByFormLocation, ErrCode(int32_t formLocation, std::vector<std::string> &formIds));
     MOCK_METHOD3(RequestPublishFormCrossUser, ErrCode(Want &want, int32_t userId, int64_t &formId));
+    MOCK_METHOD1(RegisterFormWantCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterFormWantCallback, ErrCode());
 
     sptr<IRemoteObject> AsObject()
     {

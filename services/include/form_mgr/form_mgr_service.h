@@ -962,6 +962,9 @@ public:
      */
     ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds) override;
 
+    ErrCode RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken) override;
+    ErrCode UnregisterFormWantCallback() override;
+
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.

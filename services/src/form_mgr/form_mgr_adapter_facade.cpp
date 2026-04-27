@@ -797,5 +797,23 @@ int FormMgrAdapterFacade::DumpFormRunningFormInfos(std::string &runningFormInfos
     HILOG_INFO("FormMgrAdapterFacade::DumpFormRunningFormInfos called");
     return FormDebugAdapter::GetInstance().DumpFormRunningFormInfos(runningFormInfosResult);
 }
+
+ErrCode FormMgrAdapterFacade::RegisterFormWantCallback(int32_t callingUid,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("FormMgrAdapterFacade::RegisterFormWantCallback called");
+    return FormCallbackAdapter::GetInstance().RegisterFormWantCallback(callingUid, callerToken);
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterFormWantCallback(int32_t callingUid)
+{
+    HILOG_INFO("FormMgrAdapterFacade::UnregisterFormWantCallback called");
+    return FormCallbackAdapter::GetInstance().UnregisterFormWantCallback(callingUid);
+}
+
+ErrCode FormMgrAdapterFacade::GetWantCallbackProxy(int32_t callingUid, sptr<IRemoteObject> &proxy)
+{
+    return FormCallbackAdapter::GetInstance().GetWantCallbackProxy(callingUid, proxy);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

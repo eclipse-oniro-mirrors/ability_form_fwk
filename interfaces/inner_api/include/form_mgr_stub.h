@@ -130,6 +130,9 @@ private:
      */
     ErrCode HandleRequestPublishFormCrossUser(MessageParcel &data, MessageParcel &reply);
 
+    ErrCode HandleRegisterFormWantCallback(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleUnregisterFormWantCallback(MessageParcel &data, MessageParcel &reply);
+
     ErrCode HandleSetPublishFormResult(MessageParcel &data, MessageParcel &reply);
 
     ErrCode HandleAcquireAddFormResult(MessageParcel &data, MessageParcel &reply);

@@ -2484,4 +2484,146 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_PublishFormCrossBundleControl_00
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FormMgrService_PublishFormCrossBundleControl_0003 end";
 }
+
+/**
+ * @tc.number: FormMgrService_RegisterFormWantCallback_001
+ * @tc.name: test RegisterFormWantCallback function.
+ * @tc.desc: Verify that the RegisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS
+ *           when not system app.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_001 start";
+    FormMgrService formMgrService;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_RegisterFormWantCallback_002
+ * @tc.name: test RegisterFormWantCallback function.
+ * @tc.desc: Verify that the RegisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE
+ *           when permission denied.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_002 start";
+    FormMgrService formMgrService;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(false);
+    ErrCode ret = formMgrService.RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_RegisterFormWantCallback_003
+ * @tc.name: test RegisterFormWantCallback function.
+ * @tc.desc: Verify that the RegisterFormWantCallback returns ERR_OK on success.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_003 start";
+    FormMgrService formMgrService;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(true);
+    MockRegisterFormWantCallback(ERR_OK);
+    ErrCode ret = formMgrService.RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_003 end";
+}
+
+/**
+ * @tc.number: FormMgrService_UnregisterFormWantCallback_001
+ * @tc.name: test UnregisterFormWantCallback function.
+ * @tc.desc: Verify that the UnregisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS
+ *           when not system app.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_001 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.UnregisterFormWantCallback();
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_UnregisterFormWantCallback_002
+ * @tc.name: test UnregisterFormWantCallback function.
+ * @tc.desc: Verify that the UnregisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE
+ *           when permission denied.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_002 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(false);
+    ErrCode ret = formMgrService.UnregisterFormWantCallback();
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_UnregisterFormWantCallback_003
+ * @tc.name: test UnregisterFormWantCallback function.
+ * @tc.desc: Verify that the UnregisterFormWantCallback returns ERR_OK on success.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_003 start";
+    FormMgrService formMgrService;
+    MockIsSACall(true);
+    MockUnregisterFormWantCallback(ERR_OK);
+    ErrCode ret = formMgrService.UnregisterFormWantCallback();
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_003 end";
+}
+
+/**
+ * @tc.number: FormMgrService_RegisterFormWantCallback_004
+ * @tc.name: test RegisterFormWantCallback function.
+ * @tc.desc: Verify that the RegisterFormWantCallback returns ERR_OK when permission check passes.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_004 start";
+    FormMgrService formMgrService;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockRegisterFormWantCallback(ERR_OK);
+    ErrCode ret = formMgrService.RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_004 end";
+}
+
+/**
+ * @tc.number: FormMgrService_UnregisterFormWantCallback_004
+ * @tc.name: test UnregisterFormWantCallback function.
+ * @tc.desc: Verify that the UnregisterFormWantCallback returns ERR_OK when permission check passes.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockUnregisterFormWantCallback(ERR_OK);
+    ErrCode ret = formMgrService.UnregisterFormWantCallback();
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 end";
+}
 }

@@ -10,6 +10,8 @@ sequenceable OHOS.AAFwk.Want;
 sequenceable FormInstance..OHOS.AppExecFwk.OverflowInfo;
 sequenceable FormInstance..OHOS.AppExecFwk.Rect;
 sequenceable OHOS.AppExecFwk.TemplateFormDetailInfo;
+sequenceable OHOS.AppExecFwk.FormInfo;
+sequenceable OHOS.AAFwk.WantParams;
 
 interface OHOS.AppExecFwk.IFormHostDelegate {
     [ipccode 4002] void RouterEvent([in] long formId, [in] Want want);
@@ -18,4 +20,5 @@ interface OHOS.AppExecFwk.IFormHostDelegate {
     [ipccode 4005] void GetFormRect([in] long formId, [inout] Rect rect);
     [ipccode 4006] void GetLiveFormStatus([inout] Map<String, String> liveFormStatusMap);
     [ipccode 4007] void TemplateFormDetailInfoChange([in] TemplateFormDetailInfo[] templateFormDetailInfo);
+    [ipccode 4008] void RequestFormWants([in] FormInfo[] formInfos, [out] WantParams[] wantParamsList);
 }

@@ -38,6 +38,8 @@ void MockFormMgrAdapterFacadeUnregisterPublishFormCrossBundleControl(int mockRet
 void MockFormMgrAdapterFacadePublishFormCrossBundleControl(bool mockRet);
 void MockHasFormVisible(bool mockRet);
 void MockEnableForms(int mockRet);
+void MockRegisterFormWantCallback(int mockRet);
+void MockUnregisterFormWantCallback(int mockRet);
 
 }  // namespace AppExecFwk
 }  // namespace OHOS

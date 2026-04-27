@@ -32,6 +32,7 @@
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "form_provider/form_provider_mgr.h"
+#include "iform_host_delegate.h"
 #include "want.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "feature/param_update/param_control.h"
@@ -158,6 +159,8 @@ void FormEventUtil::HandleFormReload(
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
+    // For forms with registered want callback, trigger onAddForm directly
+    HandleFormWantCallbackAddForm(updatedForms);
     FormMgrAdapterFacade::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want);
     if (needReload) {
         FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
@@ -767,6 +770,77 @@ void FormEventUtil::HandleProviderUpdatedDetail(const std::vector<int64_t> &remo
     }
     ParamControl::GetInstance().ReloadDueControlByAppUpgrade(updatedForms);
     HandleFormReload(bundleName, userId, needReload, updatedForms);
+}
+
+void FormEventUtil::HandleFormWantCallbackAddForm(const std::vector<FormRecord> &updatedForms)
+{
+    std::unordered_map<int32_t, std::vector<FormRecord>> hostGroups;
+    for (const auto &record : updatedForms) {
+        for (int32_t hostUid : record.formUserUids) {
+            hostGroups[hostUid].push_back(record);
+        }
+    }
+    for (const auto &[hostUid, records] : hostGroups) {
+        HandleWantCallbackForHost(hostUid, records);
+    }
+}
+
+void FormEventUtil::HandleWantCallbackForHost(int32_t hostUid, const std::vector<FormRecord> &records)
+{
+    sptr<IRemoteObject> proxy;
+    ErrCode ret = FormMgrAdapterFacade::GetInstance().GetWantCallbackProxy(hostUid, proxy);
+    if (ret != ERR_OK || proxy == nullptr) {
+        return;
+    }
+    auto formHostProxy = iface_cast<IFormHostDelegate>(proxy);
+    if (formHostProxy == nullptr) {
+        HILOG_WARN("iface_cast IFormHostDelegate failed for hostUid=%{public}d", hostUid);
+        return;
+    }
+    auto formInfos = BuildFormInfos(records);
+    std::vector<AAFwk::WantParams> wantParamsList;
+    ret = formHostProxy->RequestFormWants(formInfos, wantParamsList);
+    if (ret != ERR_OK) {
+        HILOG_WARN("RequestFormWants failed:%{public}d for hostUid=%{public}d", ret, hostUid);
+        return;
+    }
+    if (wantParamsList.size() != records.size()) {
+        HILOG_WARN("wantParamsList size %{public}zu != records size %{public}zu for hostUid=%{public}d",
+            wantParamsList.size(), records.size(), hostUid);
+    }
+    ApplyWantParams(records, wantParamsList);
+}
+
+std::vector<FormInfo> FormEventUtil::BuildFormInfos(const std::vector<FormRecord> &records)
+{
+    std::vector<FormInfo> formInfos;
+    for (const auto &record : records) {
+        FormInfo formInfo;
+        if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo) == ERR_OK) {
+            formInfos.push_back(std::move(formInfo));
+        } else {
+            HILOG_WARN("GetFormsInfoByRecord failed, formId:%{public}" PRId64, record.formId);
+            formInfos.emplace_back();
+        }
+    }
+    return formInfos;
+}
+
+void FormEventUtil::ApplyWantParams(const std::vector<FormRecord> &records,
+    const std::vector<AAFwk::WantParams> &wantParamsList)
+{
+    for (size_t i = 0; i < records.size(); i++) {
+        const auto &record = records[i];
+        AAFwk::WantParams params;
+        if (i < wantParamsList.size()) {
+            params = wantParamsList[i];
+        }
+        AAFwk::Want hostWant;
+        hostWant.SetParams(params);
+        FormDataMgr::GetInstance().UpdateFormHostParams(record.formId, hostWant);
+        ErrCode ret = FormMgrAdapterFacade::GetInstance().AcquireProviderFormInfoByFormRecord(record, params);
+        HILOG_INFO("onAddForm via want callback, formId:%{public}" PRId64 ", ret:%{public}d", record.formId, ret);
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS
