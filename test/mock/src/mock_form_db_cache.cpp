@@ -41,5 +41,13 @@ ErrCode FormDbCache::UpdateDBRecord(const int64_t formId, const FormRecord &reco
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
+
+void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
+{
+    GTEST_LOG_(INFO) << "GetAllFormInfo called";
+    if (AppExecFwk::MockFormDbCache::obj) {
+        AppExecFwk::MockFormDbCache::obj->GetAllFormInfo(formDBInfos);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

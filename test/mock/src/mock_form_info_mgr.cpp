@@ -48,5 +48,14 @@ bool FormInfoMgr::IsMultiAppForm(const FormInfo &formInfo)
     }
     return false;
 }
+
+ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetAllFormsInfo called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetAllFormsInfo(formInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

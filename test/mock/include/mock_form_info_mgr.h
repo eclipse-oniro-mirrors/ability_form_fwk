@@ -29,6 +29,7 @@ public:
     virtual ErrCode GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos, int32_t userId) = 0;
     virtual bool IsMultiAppForm(const FormInfo &formInfo) = 0;
+    virtual ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId) = 0;
 };
 
 class MockFormInfoMgr : public AbstractMockFormInfoMgr {
@@ -39,6 +40,7 @@ public:
     MOCK_METHOD4(GetFormsInfoByModule, ErrCode(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos, int32_t userId));
     MOCK_METHOD1(IsMultiAppForm, bool(const FormInfo &formInfo));
+    MOCK_METHOD2(GetAllFormsInfo, ErrCode(std::vector<FormInfo> &formInfos, int32_t userId));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

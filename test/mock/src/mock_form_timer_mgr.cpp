@@ -50,5 +50,32 @@ bool FormTimerMgr::AddFormTimer(int64_t formId, long updateAtHour, long updateAt
     }
     return false;
 }
+
+bool FormTimerMgr::GetIntervalTimer(int64_t formId, FormTimer &formTimer)
+{
+    GTEST_LOG_(INFO) << "GetIntervalTimer called";
+    if (AppExecFwk::MockFormTimerMgr::obj) {
+        return AppExecFwk::MockFormTimerMgr::obj->GetIntervalTimer(formId, formTimer);
+    }
+    return false;
+}
+
+bool FormTimerMgr::GetUpdateAtTimer(int64_t formId, UpdateAtItem &updateAtItem)
+{
+    GTEST_LOG_(INFO) << "GetUpdateAtTimer called";
+    if (AppExecFwk::MockFormTimerMgr::obj) {
+        return AppExecFwk::MockFormTimerMgr::obj->GetUpdateAtTimer(formId, updateAtItem);
+    }
+    return false;
+}
+
+bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicItem)
+{
+    GTEST_LOG_(INFO) << "GetDynamicItem called";
+    if (AppExecFwk::MockFormTimerMgr::obj) {
+        return AppExecFwk::MockFormTimerMgr::obj->GetDynamicItem(formId, dynamicItem);
+    }
+    return false;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

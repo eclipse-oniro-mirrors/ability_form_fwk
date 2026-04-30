@@ -18,8 +18,10 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 #include "gmock/gmock.h"
 #include "data_center/form_record/form_record.h"
+#include "data_center/database/form_db_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -28,6 +30,7 @@ public:
     virtual ~AbstractMockFormDbCache() = default;
     virtual ErrCode GetDBRecord(const int64_t formId, FormRecord &record) const = 0;
     virtual ErrCode UpdateDBRecord(const int64_t formId, const FormRecord &record) const = 0;
+    virtual void GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos) = 0;
 };
 
 class MockFormDbCache : public AbstractMockFormDbCache {
@@ -37,6 +40,7 @@ public:
     ~MockFormDbCache() override = default;
     MOCK_CONST_METHOD2(GetDBRecord, ErrCode(const int64_t formId, FormRecord &record));
     MOCK_CONST_METHOD2(UpdateDBRecord, ErrCode(const int64_t formId, const FormRecord &record));
+    MOCK_METHOD1(GetAllFormInfo, void(std::vector<FormDBInfo> &formDBInfos));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

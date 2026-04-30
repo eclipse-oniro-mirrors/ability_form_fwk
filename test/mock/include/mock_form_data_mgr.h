@@ -21,7 +21,9 @@
 #include <vector>
 #include "gmock/gmock.h"
 #include "data_center/form_record/form_record.h"
+#include "form_host/form_host_record.h"
 #include "form_info.h"
+#include "running_form_info.h"
 #include "want.h"
 
 namespace OHOS {
@@ -43,6 +45,14 @@ public:
     virtual int GetFormCloudUpdateDuration(const std::string &bundleName) = 0;
     virtual void UpdateFormCloudUpdateDuration(const std::string &bundleName, int duration) = 0;
     virtual void RemoveFormCloudUpdateDuration(const std::string &bundleName) = 0;
+    virtual int64_t FindMatchedFormId(const int64_t formId) = 0;
+    virtual bool GetTempFormRecord(std::vector<FormRecord> &formTempRecords) = 0;
+    virtual bool GetFormRecordByBundleName(const std::string &bundleName,
+        std::vector<FormRecord> &formInfos) const = 0;
+    virtual void GetFormHostRecord(const int64_t formId,
+        std::vector<FormHostRecord> &formHostRecords) const = 0;
+    virtual ErrCode GetRunningFormInfos(bool isUnusedIncluded,
+        std::vector<RunningFormInfo> &runningFormInfos, int32_t userId) = 0;
 };
 
 class MockFormDataMgr : public AbstractMockFormDataMgr {
@@ -64,6 +74,14 @@ public:
     MOCK_METHOD1(GetFormCloudUpdateDuration, int(const std::string &bundleName));
     MOCK_METHOD2(UpdateFormCloudUpdateDuration, void(const std::string &bundleName, int duration));
     MOCK_METHOD1(RemoveFormCloudUpdateDuration, void(const std::string &bundleName));
+    MOCK_METHOD1(FindMatchedFormId, int64_t(const int64_t formId));
+    MOCK_METHOD1(GetTempFormRecord, bool(std::vector<FormRecord> &formTempRecords));
+    MOCK_CONST_METHOD2(GetFormRecordByBundleName, bool(const std::string &bundleName,
+        std::vector<FormRecord> &formInfos));
+    MOCK_CONST_METHOD2(GetFormHostRecord, void(const int64_t formId,
+        std::vector<FormHostRecord> &formHostRecords));
+    MOCK_METHOD3(GetRunningFormInfos, ErrCode(bool isUnusedIncluded,
+        std::vector<RunningFormInfo> &runningFormInfos, int32_t userId));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
