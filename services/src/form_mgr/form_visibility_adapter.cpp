@@ -200,10 +200,10 @@ void FormVisibilityAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisib
     if (formVisibleType == static_cast<int32_t>(formInstance.formVisiblity)) {
         return;
     }
-    std::lock_guard<std::mutex> lock(formObserversMutex_);
+    auto formObserversTemp = FormCommonAdapter::GetInstance().GetFormObservers();
     std::string visibleKey = formHostName + specialFlag + std::to_string(isVisibility);
     std::string allHostKey = formAllHostName + specialFlag + std::to_string(isVisibility);
-    for (const auto &formObserver : formObservers_) {
+    for (const auto &formObserver : formObserversTemp) {
         if (formObserver.first == visibleKey || formObserver.first == allHostKey) {
             auto observer = formInstanceMaps.find(formObserver.first);
             if (observer == formInstanceMaps.end()) {
@@ -227,11 +227,8 @@ void FormVisibilityAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<i
     auto localFormInstanceMaps = formInstanceMaps;
     auto localEventMaps = eventMaps;
     FilterDataByVisibleType(localFormInstanceMaps, localEventMaps, formVisibleType);
-    std::unordered_map<std::string, std::vector<sptr<IRemoteObject>>> formObserversTemp;
-    {
-        std::lock_guard<std::mutex> lock(formObserversMutex_);
-        formObserversTemp = formObservers_;
-    }
+    std::unordered_map<std::string, std::vector<sptr<IRemoteObject>>> formObserversTemp =
+        FormCommonAdapter::GetInstance().GetFormObservers();
     for (auto const &formObserver : formObserversTemp) {
         NotifyWhetherFormsVisible(formObserver.first, formObserver.second, localFormInstanceMaps, formVisibleType);
     }

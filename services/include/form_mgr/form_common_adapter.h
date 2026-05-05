@@ -198,6 +198,12 @@ public:
      */
     virtual sptr<OHOS::AppExecFwk::IAppMgr> GetAppMgr();
 
+    /**
+     * @brief Get a snapshot of registered form observers (thread-safe read-only).
+     * @return Copy of the current form observers map.
+     */
+    std::unordered_map<std::string, std::vector<sptr<IRemoteObject>>> GetFormObservers() const;
+
     void SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation);
 
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);

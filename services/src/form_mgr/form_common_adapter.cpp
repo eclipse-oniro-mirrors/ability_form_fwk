@@ -476,6 +476,12 @@ int32_t FormCommonAdapter::GetCallingUserId()
     return FormUtil::GetCallerUserId(callingUid);
 }
 
+std::unordered_map<std::string, std::vector<sptr<IRemoteObject>>> FormCommonAdapter::GetFormObservers() const
+{
+    std::lock_guard<std::mutex> lock(formObserversMutex_);
+    return formObservers_;
+}
+
 void FormCommonAdapter::CleanResource(const wptr<IRemoteObject> &remote)
 {
     HILOG_DEBUG("call");
