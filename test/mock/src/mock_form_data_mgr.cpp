@@ -253,7 +253,8 @@ bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormIte
 {
     GTEST_LOG_(INFO) << "CreateFormAcquireDataRecord called";
     if (AppExecFwk::MockFormDataMgr::obj) {
-        return AppExecFwk::MockFormDataMgr::obj->CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+        return AppExecFwk::MockFormDataMgr::obj->CreateFormAcquireDataRecord(requestCode, info,
+            callerToken, callingUid);
     }
     return false;
 }
