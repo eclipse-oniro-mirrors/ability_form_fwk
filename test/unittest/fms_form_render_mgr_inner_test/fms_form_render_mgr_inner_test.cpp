@@ -1540,7 +1540,7 @@ HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_001, TestSize.Level0)
     float height = 100.0f;
     float borderWidth = 1.0f;
     float formViewScale = 1.0f;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
         formRenderMgrInner.UpdateFormSize(formId, width, height, borderWidth, formViewScale));
     GTEST_LOG_(INFO) << "UpdateFormSize_001 end";
 }
@@ -1582,7 +1582,8 @@ HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_003, TestSize.Level0)
     float borderWidth = 1.0f;
     float formViewScale = 1.0f;
     MockGetFormRecord(true, 0);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.UpdateFormSize(formId, width, height, borderWidth, formViewScale));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.UpdateFormSize(formId, width, height, borderWidth, formViewScale));
     GTEST_LOG_(INFO) << "UpdateFormSize_003 end";
 }
 
@@ -1788,7 +1789,7 @@ HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_002, TestSize.Level0)
     WantParams wantParams;
     sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
     MockConnectServiceAbility(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
         formRenderMgrInner.RenderConnectedForm(formRecord, want, connection));
     GTEST_LOG_(INFO) << "RenderConnectedForm_002 end";
 }
@@ -2209,7 +2210,8 @@ HWTEST_F(FormRenderMgrInnerTest, StopRenderingForm_001, TestSize.Level0)
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
     formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
     formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.StopRenderingForm(formId, formRecord, compId, hostToken));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.StopRenderingForm(formId, formRecord, compId, hostToken));
     GTEST_LOG_(INFO) << "StopRenderingForm_001 end";
 }
 
