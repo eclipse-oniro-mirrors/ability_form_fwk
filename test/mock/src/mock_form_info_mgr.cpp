@@ -102,7 +102,8 @@ ErrCode FormInfoMgr::GetTemplateFormsInfoByModule(const std::string &bundleName,
 {
     GTEST_LOG_(INFO) << "GetTemplateFormsInfoByModule called";
     if (AppExecFwk::MockFormInfoMgr::obj) {
-        return AppExecFwk::MockFormInfoMgr::obj->GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos, userId);
+        return AppExecFwk::MockFormInfoMgr::obj->GetTemplateFormsInfoByModule(bundleName, moduleName,
+            formInfos, userId);
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
@@ -112,7 +113,8 @@ ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleN
 {
     GTEST_LOG_(INFO) << "GetFormsInfoByModuleWithoutCheck called";
     if (AppExecFwk::MockFormInfoMgr::obj) {
-        return AppExecFwk::MockFormInfoMgr::obj->GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
+        return AppExecFwk::MockFormInfoMgr::obj->GetFormsInfoByModuleWithoutCheck(bundleName, moduleName,
+            formInfos, userId);
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
