@@ -34,5 +34,13 @@ bool FormExemptLockMgr::IsExemptLock(int64_t formId)
     }
     return false;
 }
+
+void FormExemptLockMgr::SetExemptLockStatus(int64_t formId, bool isExempt)
+{
+    GTEST_LOG_(INFO) << "SetExemptLockStatus called";
+    if (AppExecFwk::MockFormExemptLockMgr::obj) {
+        AppExecFwk::MockFormExemptLockMgr::obj->SetExemptLockStatus(formId, isExempt);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

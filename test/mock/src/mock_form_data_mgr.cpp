@@ -170,5 +170,183 @@ ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded,
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
+
+ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+{
+    GTEST_LOG_(INFO) << "GetFormInstanceById(2) called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormInstanceById2(formId, formInstance);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded,
+    FormInstance &formInstance)
+{
+    GTEST_LOG_(INFO) << "GetFormInstanceById(3) called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormInstanceById3(formId, isUnusedIncluded, formInstance);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+int32_t FormDataMgr::GetTempFormsCount(int32_t &formCount)
+{
+    GTEST_LOG_(INFO) << "GetTempFormsCount called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetTempFormsCount(formCount);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+int32_t FormDataMgr::GetCastFormsCount(int32_t &formCount)
+{
+    GTEST_LOG_(INFO) << "GetCastFormsCount called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetCastFormsCount(formCount);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &formCount)
+{
+    GTEST_LOG_(INFO) << "GetHostFormsCount called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetHostFormsCount(bundleName, formCount);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,
+    bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetRunningFormInfosByBundleName called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetRunningFormInfosByBundleName(
+            bundleName, isUnusedIncluded, runningFormInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &filter,
+    std::vector<FormInstance> &formInstances)
+{
+    GTEST_LOG_(INFO) << "GetFormInstancesByFilter called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormInstancesByFilter(filter, formInstances);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+bool FormDataMgr::CreateFormStateRecord(std::string &provider, const FormItemInfo &info,
+    const sptr<IRemoteObject> &callerToken, int32_t callingUid)
+{
+    GTEST_LOG_(INFO) << "CreateFormStateRecord called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->CreateFormStateRecord(provider, info, callerToken, callingUid);
+    }
+    return false;
+}
+
+bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
+    const sptr<IRemoteObject> &callerToken, int32_t callingUid)
+{
+    GTEST_LOG_(INFO) << "CreateFormAcquireDataRecord called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+    }
+    return false;
+}
+
+bool FormDataMgr::GetMatchedHostClient(const sptr<IRemoteObject> &callerToken,
+    FormHostRecord &formHostRecord) const
+{
+    GTEST_LOG_(INFO) << "GetMatchedHostClient called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetMatchedHostClient(callerToken, formHostRecord);
+    }
+    return false;
+}
+
+ErrCode FormDataMgr::UpdateHostFormFlag(const std::vector<int64_t> &formIds,
+    const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate,
+    std::vector<int64_t> &refreshForms)
+{
+    GTEST_LOG_(INFO) << "UpdateHostFormFlag called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->UpdateHostFormFlag(
+            formIds, callerToken, flag, isOnlyEnableUpdate, refreshForms);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+bool FormDataMgr::UpdateFormRecord(const int64_t formId, std::function<void(FormRecord &)> updateFunc)
+{
+    GTEST_LOG_(INFO) << "UpdateFormRecord(func) called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->UpdateFormRecordFunc(formId, updateFunc);
+    }
+    return false;
+}
+
+void FormDataMgr::SetFormVisible(int64_t formId, bool isVisible)
+{
+    GTEST_LOG_(INFO) << "SetFormVisible called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->SetFormVisible(formId, isVisible);
+    }
+}
+
+void FormDataMgr::SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled)
+{
+    GTEST_LOG_(INFO) << "SetExpectRecycledStatus(int64_t) called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->SetExpectRecycledStatus(formId, isExpectRecycled);
+    }
+}
+
+void FormDataMgr::SetExpectRecycledStatus(const std::vector<int64_t> &formIds, bool isExpectRecycled)
+{
+    GTEST_LOG_(INFO) << "SetExpectRecycledStatus(vector) called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->SetExpectRecycledStatusVec(formIds, isExpectRecycled);
+    }
+}
+
+bool FormDataMgr::ExistFormRecord(const int64_t formId) const
+{
+    GTEST_LOG_(INFO) << "ExistFormRecord called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->ExistFormRecord(formId);
+    }
+    return false;
+}
+
+ErrCode FormDataMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
+    const sptr<IRemoteObject> &callerToken, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "NotifyFormsVisible called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->NotifyFormsVisible(formIds, isVisible, callerToken, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormDataMgr::SetFormProtect(const int64_t formId, const bool protect)
+{
+    GTEST_LOG_(INFO) << "SetFormProtect called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->SetFormProtect(formId, protect);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+void FormDataMgr::LockForms(const std::vector<FormRecord> &&formRecords, const bool protect)
+{
+    GTEST_LOG_(INFO) << "LockForms called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->LockForms(std::move(formRecords), protect);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
