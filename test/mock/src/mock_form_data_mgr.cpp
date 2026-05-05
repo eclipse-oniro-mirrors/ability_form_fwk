@@ -122,5 +122,53 @@ void FormDataMgr::RemoveFormCloudUpdateDuration(const std::string &bundleName)
         AppExecFwk::MockFormDataMgr::obj->RemoveFormCloudUpdateDuration(bundleName);
     }
 }
+
+int64_t FormDataMgr::FindMatchedFormId(const int64_t formId)
+{
+    GTEST_LOG_(INFO) << "FindMatchedFormId called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->FindMatchedFormId(formId);
+    }
+    return formId;
+}
+
+bool FormDataMgr::GetTempFormRecord(std::vector<FormRecord> &formTempRecords)
+{
+    GTEST_LOG_(INFO) << "GetTempFormRecord called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetTempFormRecord(formTempRecords);
+    }
+    return false;
+}
+
+bool FormDataMgr::GetFormRecord(const std::string &bundleName,
+    std::vector<FormRecord> &formInfos, int32_t userId) const
+{
+    GTEST_LOG_(INFO) << "GetFormRecord(bundleName) called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormRecordByBundleName(bundleName, formInfos);
+    }
+    return false;
+}
+
+void FormDataMgr::GetFormHostRecord(const int64_t formId,
+    std::vector<FormHostRecord> &formHostRecords) const
+{
+    GTEST_LOG_(INFO) << "GetFormHostRecord called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->GetFormHostRecord(formId, formHostRecords);
+    }
+}
+
+ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded,
+    std::vector<RunningFormInfo> &runningFormInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetRunningFormInfos called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetRunningFormInfos(
+            isUnusedIncluded, runningFormInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
