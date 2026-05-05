@@ -20,6 +20,7 @@
 #include <memory>
 #include "gmock/gmock.h"
 #include "form_info.h"
+#include "form_info_filter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -30,6 +31,19 @@ public:
         std::vector<FormInfo> &formInfos, int32_t userId) = 0;
     virtual bool IsMultiAppForm(const FormInfo &formInfo) = 0;
     virtual ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId) = 0;
+    virtual ErrCode GetFormsInfoByBundle(const std::string &bundleName,
+        std::vector<FormInfo> &formInfos, int32_t userId) = 0;
+    virtual ErrCode GetFormsInfoByFilter(const FormInfoFilter &filter,
+        std::vector<FormInfo> &formInfos, int32_t userId) = 0;
+    virtual ErrCode GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId) = 0;
+    virtual ErrCode GetTemplateFormsInfoByBundle(const std::string &bundleName,
+        std::vector<FormInfo> &formInfos, int32_t userId) = 0;
+    virtual ErrCode GetTemplateFormsInfoByModule(const std::string &bundleName,
+        const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId) = 0;
+    virtual ErrCode GetFormsInfoByModuleWithoutCheck(const std::string &bundleName,
+        const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId) = 0;
+    virtual ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
+        int32_t providerUserId, bool &appFormVisibleNotify) = 0;
 };
 
 class MockFormInfoMgr : public AbstractMockFormInfoMgr {
@@ -41,6 +55,19 @@ public:
         std::vector<FormInfo> &formInfos, int32_t userId));
     MOCK_METHOD1(IsMultiAppForm, bool(const FormInfo &formInfo));
     MOCK_METHOD2(GetAllFormsInfo, ErrCode(std::vector<FormInfo> &formInfos, int32_t userId));
+    MOCK_METHOD3(GetFormsInfoByBundle, ErrCode(const std::string &bundleName,
+        std::vector<FormInfo> &formInfos, int32_t userId));
+    MOCK_METHOD3(GetFormsInfoByFilter, ErrCode(const FormInfoFilter &filter,
+        std::vector<FormInfo> &formInfos, int32_t userId));
+    MOCK_METHOD2(GetAllTemplateFormsInfo, ErrCode(std::vector<FormInfo> &formInfos, int32_t userId));
+    MOCK_METHOD3(GetTemplateFormsInfoByBundle, ErrCode(const std::string &bundleName,
+        std::vector<FormInfo> &formInfos, int32_t userId));
+    MOCK_METHOD4(GetTemplateFormsInfoByModule, ErrCode(const std::string &bundleName,
+        const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId));
+    MOCK_METHOD4(GetFormsInfoByModuleWithoutCheck, ErrCode(const std::string &bundleName,
+        const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId));
+    MOCK_METHOD3(GetAppFormVisibleNotifyByBundleName, ErrCode(const std::string &bundleName,
+        int32_t providerUserId, bool &appFormVisibleNotify));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

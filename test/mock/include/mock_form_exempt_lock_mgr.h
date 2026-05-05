@@ -26,6 +26,7 @@ class AbstractMockFormExemptLockMgr {
 public:
     virtual ~AbstractMockFormExemptLockMgr() = default;
     virtual bool IsExemptLock(int64_t formId) = 0;
+    virtual void SetExemptLockStatus(int64_t formId, bool isExempt) = 0;
 };
 
 class MockFormExemptLockMgr : public AbstractMockFormExemptLockMgr {
@@ -34,6 +35,7 @@ public:
     MockFormExemptLockMgr() = default;
     ~MockFormExemptLockMgr() override = default;
     MOCK_METHOD1(IsExemptLock, bool(int64_t formId));
+    MOCK_METHOD2(SetExemptLockStatus, void(int64_t formId, bool isExempt));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

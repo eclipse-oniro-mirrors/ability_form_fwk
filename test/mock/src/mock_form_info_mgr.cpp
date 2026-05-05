@@ -57,5 +57,77 @@ ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t u
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
+
+ErrCode FormInfoMgr::GetFormsInfoByBundle(const std::string &bundleName,
+    std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetFormsInfoByBundle called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetFormsInfoByBundle(bundleName, formInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormInfoMgr::GetFormsInfoByFilter(const FormInfoFilter &filter,
+    std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetFormsInfoByFilter called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetFormsInfoByFilter(filter, formInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormInfoMgr::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetAllTemplateFormsInfo called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetAllTemplateFormsInfo(formInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormInfoMgr::GetTemplateFormsInfoByBundle(const std::string &bundleName,
+    std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetTemplateFormsInfoByBundle called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetTemplateFormsInfoByBundle(bundleName, formInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormInfoMgr::GetTemplateFormsInfoByModule(const std::string &bundleName,
+    const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetTemplateFormsInfoByModule called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetTemplateFormsInfoByModule(bundleName, moduleName,
+            formInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleName,
+    const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetFormsInfoByModuleWithoutCheck called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetFormsInfoByModuleWithoutCheck(bundleName, moduleName,
+            formInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
+    int32_t providerUserId, bool &appFormVisibleNotify)
+{
+    GTEST_LOG_(INFO) << "GetAppFormVisibleNotifyByBundleName called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetAppFormVisibleNotifyByBundleName(
+            bundleName, providerUserId, appFormVisibleNotify);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
