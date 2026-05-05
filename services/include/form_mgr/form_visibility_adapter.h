@@ -111,8 +111,6 @@ private:
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate);
 
     int32_t visibleNotifyDelay_;
-    mutable std::mutex formObserversMutex_;
-    std::unordered_map<std::string, std::vector<sptr<IRemoteObject>>> formObservers_;
 };
 
 } // namespace AppExecFwk
