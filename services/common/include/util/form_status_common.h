@@ -64,7 +64,7 @@ enum class FormFsmProcessType {
 
 enum class FormEventTimeout {
     TIMEOUT_NO_NEED = 0,
-    TIMEOUT_3_S = 3000,
+    TIMEOUT_30_S = 30000,
 };
 
 } // namespace AppExecFwk
