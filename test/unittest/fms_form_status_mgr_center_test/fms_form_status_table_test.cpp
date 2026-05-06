@@ -51,7 +51,7 @@ void FormStatusTableTest::TearDown()
  */
 HWTEST_F(FormStatusTableTest, GetFormStatusInfoTest, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetFormStatusInfoTest start";
+    GTEST_LOG_(INFO) << "GetFormStatusInfoTest start"; 
 
     FormStatusMachineInfo info;
     bool ret =
