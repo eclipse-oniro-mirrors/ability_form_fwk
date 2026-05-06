@@ -70,6 +70,7 @@ ohos_unittest("FmsFormCallbackAdapterTest") {
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
     "${form_fwk_path}:form_host_delegate_stub",
+    "${form_fwk_path}:form_manager",
   ]
 
   external_deps = [
@@ -78,6 +79,7 @@ ohos_unittest("FmsFormCallbackAdapterTest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -85,6 +87,7 @@ ohos_unittest("FmsFormCallbackAdapterTest") {
     "ipc:ipc_core",
     "libxml2:libxml2",
     "safwk:system_ability_fwk",
+    "init:libbegetutil",
     "samgr:samgr_proxy",
   ]
 }
