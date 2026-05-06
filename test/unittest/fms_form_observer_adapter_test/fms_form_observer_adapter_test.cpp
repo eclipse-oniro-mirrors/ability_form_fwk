@@ -304,8 +304,7 @@ HWTEST_F(FmsFormObserverAdapterTest, CleanResource_001, TestSize.Level1)
 
     wptr<IRemoteObject> remote = nullptr;
     FormObserverAdapter::GetInstance().CleanResource(remote);
-    // No crash expected - verifying null safety
-    EXPECT_TRUE(true);
+    EXPECT_EQ(FormCommonAdapter::GetInstance().formObservers_.size(), 0u);
 
     GTEST_LOG_(INFO) << "CleanResource_001 end";
 }
@@ -330,8 +329,7 @@ HWTEST_F(FmsFormObserverAdapterTest, CleanResource_002, TestSize.Level1)
 
     wptr<IRemoteObject> remote = callerToken;
     FormObserverAdapter::GetInstance().CleanResource(remote);
-    // No crash expected - verifying clean resource completes
-    EXPECT_TRUE(true);
+    EXPECT_EQ(FormCommonAdapter::GetInstance().formObservers_.count(TEST_BUNDLE_NAME), 0u);
 
     FormCommonAdapter::GetInstance().formObservers_.clear();
     FormCommonAdapter::GetInstance().deathRecipients_.clear();
