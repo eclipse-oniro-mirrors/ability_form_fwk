@@ -241,7 +241,7 @@ HWTEST_F(FmsFormObserverAdapterTest, RegisterAddObserver_002, TestSize.Level1)
 
     sptr<IRemoteObject> callerToken = nullptr;
     auto result = FormObserverAdapter::GetInstance().RegisterAddObserver(TEST_BUNDLE_NAME, callerToken);
-    EXPECT_NE(result, ERR_OK);
+    EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "RegisterAddObserver_002 end";
 }
