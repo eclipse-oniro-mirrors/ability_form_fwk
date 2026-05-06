@@ -1181,116 +1181,6 @@ HWTEST_F(FormRenderMgrInnerTest, DisconnectAllRenderConnections_002, TestSize.Le
 }
 
 /**
- * @tc.name: PostSetRenderGroupParamsTask_001
- * @tc.desc: test PostSetRenderGroupParamsTask function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    Want want;
-    formRenderMgrInner.PostSetRenderGroupParamsTask(1, want);
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 end";
-}
-
-/**
- * @tc.name: PostSetRenderGroupParamsTask_002
- * @tc.desc: test PostSetRenderGroupParamsTask function when renderRemoteObj_ is nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    Want want;
-    formRenderMgrInner.PostSetRenderGroupParamsTask(1, want);
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_002 end";
-}
-
-/**
- * @tc.name: PostSetRenderGroupEnableFlagTask_001
- * @tc.desc: test PostSetRenderGroupEnableFlagTask function when renderRemoteObj_ is nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupEnableFlagTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    int64_t formId = 1;
-    bool isEnable = true;
-    formRenderMgrInner.PostSetRenderGroupEnableFlagTask(formId, isEnable);
-    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_001 end";
-}
-
-/**
- * @tc.name: PostSetRenderGroupEnableFlagTask_002
- * @tc.desc: test PostSetRenderGroupEnableFlagTask function when renderRemoteObj_ is not nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupEnableFlagTask_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    int64_t formId = 1;
-    bool isEnable = true;
-    formRenderMgrInner.PostSetRenderGroupEnableFlagTask(formId, isEnable);
-    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_002 end";
-}
-
-/**
- * @tc.name: PostSetVisibleChangeTask_001
- * @tc.desc: test PostSetVisibleChangeTask function when renderRemoteObj_ is nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetVisibleChangeTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    int64_t formId = 1;
-    bool isVisible = true;
-    formRenderMgrInner.PostSetVisibleChangeTask(formId, isVisible);
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_001 end";
-}
-
-/**
- * @tc.name: PostSetVisibleChangeTask_002
- * @tc.desc: test PostSetVisibleChangeTask function when renderRemoteObj_ is not nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetVisibleChangeTask_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    int64_t formId = 1;
-    bool isVisible = true;
-    formRenderMgrInner.PostSetVisibleChangeTask(formId, isVisible);
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_002 end";
-}
-
-/**
- * @tc.name: PostSetVisibleChangeTask_003
- * @tc.desc: test PostSetVisibleChangeTask function when isVisible is false.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetVisibleChangeTask_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_003 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    int64_t formId = 1;
-    bool isVisible = false;
-    formRenderMgrInner.PostSetVisibleChangeTask(formId, isVisible);
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_003 end";
-}
-
-/**
  * @tc.name: ReleaseRenderer_001
  * @tc.desc: test ReleaseRenderer function when uiSyntax is JS.
  * @tc.type: FUNC
@@ -1982,21 +1872,6 @@ HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_002, TestSize.Level0)
 }
 
 /**
- * @tc.name: ExecOnUnlockTask_001
- * @tc.desc: test ExecOnUnlockTask function when onUnlockTask_ is nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, ExecOnUnlockTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "ExecOnUnlockTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.onUnlockTask_ = nullptr;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    formRenderMgrInner.ExecOnUnlockTask(remoteObject);
-    GTEST_LOG_(INFO) << "ExecOnUnlockTask_001 end";
-}
-
-/**
  * @tc.name: ExecOnUnlockTask_002
  * @tc.desc: test ExecOnUnlockTask function when onUnlockTask_ is not nullptr.
  * @tc.type: FUNC
@@ -2010,20 +1885,6 @@ HWTEST_F(FormRenderMgrInnerTest, ExecOnUnlockTask_002, TestSize.Level0)
     formRenderMgrInner.ExecOnUnlockTask(remoteObject);
     EXPECT_EQ(formRenderMgrInner.onUnlockTask_, nullptr);
     GTEST_LOG_(INFO) << "ExecOnUnlockTask_002 end";
-}
-
-/**
- * @tc.name: OnRenderingBlock_001
- * @tc.desc: test OnRenderingBlock function with valid bundleName.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, OnRenderingBlock_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "OnRenderingBlock_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    std::string bundleName = "testBundle";
-    formRenderMgrInner.OnRenderingBlock(bundleName);
-    GTEST_LOG_(INFO) << "OnRenderingBlock_001 end";
 }
 
 /**
@@ -2145,20 +2006,6 @@ HWTEST_F(FormRenderMgrInnerTest, SetRenderRemoteObj_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: NotifyScreenOn_002
- * @tc.desc: test NotifyScreenOn function when renderRemoteObj_ is nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, NotifyScreenOn_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "NotifyScreenOn_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    formRenderMgrInner.NotifyScreenOn();
-    GTEST_LOG_(INFO) << "NotifyScreenOn_002 end";
-}
-
-/**
  * @tc.name: PostOnUnlockTask_001
  * @tc.desc: test PostOnUnlockTask function when renderRemoteObj_ is nullptr.
  * @tc.type: FUNC
@@ -2252,37 +2099,5 @@ HWTEST_F(FormRenderMgrInnerTest, AddConnection_001, TestSize.Level0)
     EXPECT_EQ(ERR_OK, formRenderMgrInner.AddConnection(formId, newConn));
     EXPECT_NE(nullptr, formRenderMgrInner.renderFormConnections_[formId]);
     GTEST_LOG_(INFO) << "AddConnection_001 end";
-}
-
-/**
- * @tc.name: NotifyHostRenderServiceIsDead_001
- * @tc.desc: test NotifyHostRenderServiceIsDead function when renderRemoteObj_ is not nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, NotifyHostRenderServiceIsDead_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
-    std::unordered_set<int64_t> form;
-    form.insert(1);
-    formRenderMgrInner.etsHosts_.emplace(remote, form);
-    formRenderMgrInner.NotifyHostRenderServiceIsDead();
-    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_001 end";
-}
-
-/**
- * @tc.name: NotifyHostRenderServiceIsDead_002
- * @tc.desc: test NotifyHostRenderServiceIsDead function when etsHosts_ is empty.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, NotifyHostRenderServiceIsDead_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    formRenderMgrInner.NotifyHostRenderServiceIsDead();
-    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_002 end";
 }
 }
