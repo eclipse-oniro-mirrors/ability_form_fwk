@@ -446,8 +446,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             return RENDER_FORM_FAILED;
         }
         eventHandler->PostTask(task, "UpdateRenderRecord");
-        FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
-            FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
     }
 
     return AddHostByFormId(formJsInfo.formId, hostRemoteObj);
@@ -460,6 +458,8 @@ void FormRenderRecord::HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, co
     HandleUpdateInJsThread(formJsInfo, want);
     MarkRenderFormTaskDone(renderType);
     std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
+    FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
+        FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
     bool isVisible = IsFormVisible(formJsInfo.formId);
     if (renderType == Constants::RENDER_FORM && !isVisible) {
         // after FRS restart, if form invisible, need to reset form invisible status.
