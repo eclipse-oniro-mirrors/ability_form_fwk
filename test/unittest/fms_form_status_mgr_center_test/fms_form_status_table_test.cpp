@@ -65,7 +65,7 @@ HWTEST_F(FormStatusTableTest, GetFormStatusInfoTest, TestSize.Level0)
     EXPECT_EQ(ret, true);
     EXPECT_EQ(info.nextStatus, FormFsmStatus::RENDERING);
     EXPECT_EQ(info.processType, FormFsmProcessType::PROCESS_TASK_DIRECT);
-    EXPECT_EQ(info.timeoutMs, FormEventTimeout::TIMEOUT_3_S);
+    EXPECT_EQ(info.timeoutMs, FormEventTimeout::TIMEOUT_30_S);
 
     GTEST_LOG_(INFO) << "GetFormStatusInfoTest end";
 }

@@ -107,7 +107,7 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0003, TestSize.Level0)
     std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
     EXPECT_EQ(eventId, "");
 
-    timeoutMs = FormEventTimeout::TIMEOUT_3_S;
+    timeoutMs = FormEventTimeout::TIMEOUT_30_S;
     FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, timeoutMs, event, status);
 
     FormStatusMgr::GetInstance().SetFormEventId(formId);
