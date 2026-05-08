@@ -30,5 +30,29 @@ void FormEventReport::SendFormAbnormalEvent(const FormAbnormalReportParams &para
         return AppExecFwk::MockFormEventReport::obj->SendFormAbnormalEvent(params);
     }
 }
+
+void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_t formId,
+    const std::string &bundleName, const std::string &abilityName, int32_t errorCode, int errCode)
+{
+    GTEST_LOG_(INFO) << "SendFormFailedEvent called";
+}
+
+void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName,
+    HiSysEventType type, const NewFormEventInfo &eventInfo)
+{
+    GTEST_LOG_(INFO) << "SendConditonUpdateFormEvent called";
+}
+
+void FormEventReport::SendFourthFormEvent(const FormEventName &eventName,
+    HiSysEventType type, const NewFormEventInfo &eventInfo, const Want &want)
+{
+    GTEST_LOG_(INFO) << "SendFourthFormEvent called";
+}
+
+void FormEventReport::SendRequestPublicFormEvent(const std::string &bundleName,
+    const std::string &abilityName, RequestFormType requestFormType)
+{
+    GTEST_LOG_(INFO) << "SendRequestPublicFormEvent called";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -20,10 +20,23 @@
 #include <memory>
 #include <vector>
 #include "gmock/gmock.h"
-#include "feature/theme_form/theme_form_client.h"
+#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
+struct FormNotifyInfo {
+    int64_t formId;
+    AAFwk::Want want;
+};
+
+class ThemeFormClient {
+public:
+    virtual ~ThemeFormClient() = default;
+    virtual int32_t AddForm(const FormNotifyInfo& info);
+    virtual int32_t DeleteForms(const std::vector<int64_t> &formIds);
+};
+
 class AbstractMockThemeFormClient {
 public:
     virtual ~AbstractMockThemeFormClient() = default;

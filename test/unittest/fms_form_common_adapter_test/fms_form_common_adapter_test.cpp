@@ -125,6 +125,8 @@ HWTEST_F(FmsFormCommonAdapterTest, GetFormConfigInfo_001, TestSize.Level1)
 
     FormItemInfo formItemInfo;
 
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 

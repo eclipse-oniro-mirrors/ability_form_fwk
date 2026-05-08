@@ -430,8 +430,8 @@ ErrCode FormDataAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
 
-        auto task = [formId, newInfo = info, newWant = wantParams, this]() {
-            InnerAcquireProviderFormInfoAsync(formId, newInfo, newWant);
+        auto task = [formId, newInfo = info, newWant = wantParams]() {
+            FormDataAdapter::GetInstance().InnerAcquireProviderFormInfoAsync(formId, newInfo, newWant);
         };
         FormRenderMgr::GetInstance().AddAcquireProviderForbiddenTask(info.GetProviderBundleName(), formId, task);
         return ERR_OK;
@@ -450,8 +450,8 @@ ErrCode FormDataAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    auto task = [formId, newInfo = info, newWant = wantParams, this]() {
-        InnerAcquireProviderFormInfoAsync(formId, newInfo, newWant);
+    auto task = [formId, newInfo = info, newWant = wantParams]() {
+        FormDataAdapter::GetInstance().InnerAcquireProviderFormInfoAsync(formId, newInfo, newWant);
     };
     FormRenderMgr::GetInstance().AddAcquireProviderFormInfoTask(record.providerUserId, task);
     return ERR_OK;
@@ -529,8 +529,8 @@ ErrCode FormDataAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info
         formReconnectMap_.erase(formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    auto delayAcquireProviderFormInfo = [info, wantParams, this]() {
-        AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
+    auto delayAcquireProviderFormInfo = [info, wantParams]() {
+        FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(info.GetFormId(), info, wantParams);
     };
     HILOG_WARN("reconnect formId:%{public}" PRId64 ", schedule retry after %{public}d ms", formId,
         delayAcquireProviderFormInfoTime);
@@ -595,6 +595,9 @@ bool FormDataAdapter::CheckUIAbilityContext(const pid_t pid)
 
 bool FormDataAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record)
 {
+    if (record.isDataProxy) {
+        return false;
+    }
     FormInfo formInfo;
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo);
     if (errCode != ERR_OK) {
@@ -682,9 +685,9 @@ ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type)
 void FormDataAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord> &updatedForms, const Want &want)
 {
     HILOG_INFO("start");
-    auto delayRefreshForms = [updatedForms, want, this]() {
+    auto delayRefreshForms = [updatedForms, want]() {
         for (const auto &updatedForm : updatedForms) {
-            UpdateFormRenderParamsAfterReload(updatedForm.formId);
+            FormDataAdapter::GetInstance().UpdateFormRenderParamsAfterReload(updatedForm.formId);
             RefreshData data;
             data.formId = updatedForm.formId;
             data.record = updatedForm;
@@ -693,7 +696,7 @@ void FormDataAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord
             if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
                 HILOG_WARN("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
                     updatedForm.formId);
-                PostEnterpriseAppInstallFailedRetryTask(updatedForm, want);
+                FormDataAdapter::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm, want);
             }
         }
     };
@@ -704,7 +707,7 @@ void FormDataAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord
 void FormDataAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &record, const Want &want)
 {
     HILOG_INFO("start");
-    auto refreshForm = [record, want, this]() {
+    auto refreshForm = [record, want]() {
         RefreshData data;
         data.formId = record.formId;
         data.record = record;

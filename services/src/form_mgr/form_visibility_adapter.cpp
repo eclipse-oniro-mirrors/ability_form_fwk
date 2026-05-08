@@ -518,15 +518,15 @@ void FormVisibilityAdapter::PostVisibleNotify(const std::vector<int64_t> &formId
 {
     HILOG_INFO("call, formIds size:%{public}zu", formIds.size());
 
-    auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken, this]() {
-        HandlerNotifyWhetherVisibleForms(formIds,
+    auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken]() {
+        FormVisibilityAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
             formInstanceMaps, eventMaps, formVisibleType, callerToken);
     };
 
     bool ret = FormMgrQueue::GetInstance().ScheduleTask(visibleNotifyDelay, task);
     if (!ret) {
         HILOG_WARN("post visible notify task failed, exec now");
-        HandlerNotifyWhetherVisibleForms(formIds,
+        FormVisibilityAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
             formInstanceMaps, eventMaps, formVisibleType, callerToken);
     }
     HILOG_DEBUG("end");

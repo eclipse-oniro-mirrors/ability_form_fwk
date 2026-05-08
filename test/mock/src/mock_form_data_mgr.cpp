@@ -349,5 +349,91 @@ void FormDataMgr::LockForms(const std::vector<FormRecord> &&formRecords, const b
         AppExecFwk::MockFormDataMgr::obj->LockForms(std::move(formRecords), protect);
     }
 }
+
+int64_t FormDataMgr::GenerateFormId()
+{
+    GTEST_LOG_(INFO) << "GenerateFormId called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GenerateFormId();
+    }
+    return 0;
+}
+
+ErrCode FormDataMgr::AddRequestPublishFormInfo(int64_t formId, const Want &want,
+    std::unique_ptr<FormProviderData> &formProviderData)
+{
+    GTEST_LOG_(INFO) << "AddRequestPublishFormInfo called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->AddRequestPublishFormInfo(formId, want, formProviderData);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+ErrCode FormDataMgr::RemoveRequestPublishFormInfo(int64_t formId)
+{
+    GTEST_LOG_(INFO) << "RemoveRequestPublishFormInfo called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->RemoveRequestPublishFormInfo(formId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+void FormDataMgr::UpdateFormHostParams(const int64_t formId, const Want &want)
+{
+    GTEST_LOG_(INFO) << "UpdateFormHostParams called";
+}
+
+bool FormDataMgr::GetFormUpgradeInfo(const int64_t formId, FormUpgradeInfo &formUpgradeInfo) const
+{
+    GTEST_LOG_(INFO) << "GetFormUpgradeInfo called";
+    return false;
+}
+
+bool FormDataMgr::UpdateFormUpgradeInfo(const int64_t formId, const FormUpgradeInfo &formUpgradeInfo)
+{
+    GTEST_LOG_(INFO) << "UpdateFormUpgradeInfo called";
+    return false;
+}
+
+ErrCode FormDataMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    GTEST_LOG_(INFO) << "UpdateFormLocation called";
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::SetSpecification(const int64_t formId, const int32_t specification)
+{
+    GTEST_LOG_(INFO) << "SetSpecification called";
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
+    std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &invisibleFormRecords)
+{
+    GTEST_LOG_(INFO) << "GetRecordsByFormType called";
+    return ERR_OK;
+}
+
+bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const
+{
+    GTEST_LOG_(INFO) << "GetFormRecordByCondition called";
+    return false;
+}
+
+ErrCode FormDataMgr::SetRefreshDuringDisableForm(const int64_t formId, const bool enable)
+{
+    GTEST_LOG_(INFO) << "SetRefreshDuringDisableForm called";
+    return ERR_OK;
+}
+
+void FormDataMgr::SetHostTransparentFormColor(const int64_t formId, const std::string &transparencyColor)
+{
+    GTEST_LOG_(INFO) << "SetHostTransparentFormColor called";
+}
+
+void FormDataMgr::DelHostTransparentFormColor(const int64_t formId)
+{
+    GTEST_LOG_(INFO) << "DelHostTransparentFormColor called";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

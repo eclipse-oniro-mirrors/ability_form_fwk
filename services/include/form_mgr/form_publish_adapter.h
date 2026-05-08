@@ -80,6 +80,8 @@ public:
 
     ErrCode RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId);
 
+    bool IsActionAllowToPublish(const std::string &action);
+
     // Functions moved from FormLifecycleAdapter
     ErrCode CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCodes &formStates);
     void RemoveFormIdMapElement(const int64_t formId);
@@ -89,7 +91,6 @@ private:
     ErrCode CheckFormBundleName(Want &want, std::string &bundleName, bool needCheckFormPermission);
     bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want,
         bool needCheckFormPermission = true);
-    bool IsActionAllowToPublish(const std::string &action);
     bool CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
         const int32_t &userId, const std::string &bundleName);
     bool IsErmsSupportPublishForm(const std::string &bundleName, std::vector<Want> wants);

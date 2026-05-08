@@ -113,7 +113,7 @@ public:
      * @brief Handle form remove observer.
      * @param runningFormInfo the running form infos of the specify application name.
      */
-    void HandleFormRemoveObserver(const RunningFormInfo runningFormInfo);
+    ErrCode HandleFormRemoveObserver(const RunningFormInfo runningFormInfo);
 
 private:
     // Private helper methods

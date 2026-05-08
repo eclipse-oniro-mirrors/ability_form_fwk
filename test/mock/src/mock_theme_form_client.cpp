@@ -17,7 +17,7 @@
 #include <gtest/gtest.h>
 
 #include "fms_log_wrapper.h"
-#include "services/include/feature/theme_form/theme_form_client.h"
+#include "form_mgr_errors.h"
 
 namespace OHOS {
 namespace AppExecFwk {

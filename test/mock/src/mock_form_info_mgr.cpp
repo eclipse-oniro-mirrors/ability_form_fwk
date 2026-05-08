@@ -129,5 +129,17 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
+
+ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &record, FormInfo &formInfo)
+{
+    GTEST_LOG_(INFO) << "GetFormsInfoByRecord called";
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+bool FormInfoMgr::IsDeleteCacheInUpgradeScene(const FormInfo &formInfo)
+{
+    GTEST_LOG_(INFO) << "IsDeleteCacheInUpgradeScene called";
+    return false;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

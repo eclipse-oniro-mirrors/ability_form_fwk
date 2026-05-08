@@ -27,6 +27,10 @@ class AbstractMockFormBundleLockMgr {
 public:
     virtual ~AbstractMockFormBundleLockMgr() = default;
     virtual bool IsBundleProtect(const std::string &bundleName, const int32_t userId, int64_t formId) = 0;
+    virtual bool IsBundleLock(const std::string &bundleName, const int32_t userId, int64_t formId) = 0;
+    virtual void SetBundleLockStatus(const std::string &bundleName, bool isLock) = 0;
+    virtual void SetBundleProtectStatus(const std::string &bundleName, bool isProtect) = 0;
+    virtual bool IsLockServiceInitialized() const = 0;
 };
 
 class MockFormBundleLockMgr : public AbstractMockFormBundleLockMgr {
@@ -35,6 +39,10 @@ public:
     MockFormBundleLockMgr() = default;
     ~MockFormBundleLockMgr() override = default;
     MOCK_METHOD3(IsBundleProtect, bool(const std::string &bundleName, const int32_t userId, int64_t formId));
+    MOCK_METHOD3(IsBundleLock, bool(const std::string &bundleName, const int32_t userId, int64_t formId));
+    MOCK_METHOD2(SetBundleLockStatus, void(const std::string &bundleName, bool isLock));
+    MOCK_METHOD2(SetBundleProtectStatus, void(const std::string &bundleName, bool isProtect));
+    MOCK_CONST_METHOD0(IsLockServiceInitialized, bool());
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

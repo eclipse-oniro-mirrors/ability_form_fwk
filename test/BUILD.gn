@@ -165,6 +165,9 @@ group("unittest") {
     "unittest/fms_form_query_adapter_test:unittest",
     "unittest/fms_form_visibility_adapter_test:unittest",
     "unittest/fms_form_callback_adapter_test:unittest",
+    "unittest/fms_form_publish_adapter_test:unittest",
+    "unittest/fms_form_data_adapter_test:unittest",
+    "unittest/fms_form_lifecycle_adapter_test:unittest",
   ]
 }
 

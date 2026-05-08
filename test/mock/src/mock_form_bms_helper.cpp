@@ -19,6 +19,7 @@
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "form_mgr_errors.h"
+#include "ability_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -58,6 +59,17 @@ ErrCode FormBmsHelper::GetApplicationInfo(const std::string &bundleName, int32_t
         return AppExecFwk::MockFormBmsHelper::obj->GetApplicationInfo(bundleName, userId, appInfo);
     }
     return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+}
+
+bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,
+    AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo)
+{
+    GTEST_LOG_(INFO) << "GetAbilityInfoByAction called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetAbilityInfoByAction(action, userId,
+            abilityInfo, extensionAbilityInfo);
+    }
+    return false;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

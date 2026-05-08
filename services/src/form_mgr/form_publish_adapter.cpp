@@ -585,6 +585,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
         NewFormEventInfo eventInfo;
         FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
+        IncreaseAddFormRequestTimeOutTask(formId);
         return errCode;
     }
 
