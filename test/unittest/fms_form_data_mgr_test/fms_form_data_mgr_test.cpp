@@ -7749,3 +7749,188 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteFormsByUserId_002, TestSiz
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteFormsByUserId_002 end";
 }
 
+/**
+ * @tc.number: FormDataMgr_UpdateHostWant_Assign_001
+ * @tc.name: UpdateHostWant
+ * @tc.desc: Verify UpdateHostWant with shouldMerge=false (assign mode), hostWant is replaced with new Want.
+ */
+HWTEST_F(FmsFormDataMgrTest, FormDataMgr_UpdateHostWant_Assign_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWant_Assign_001 start";
+    int64_t formId = 1001;
+    int callingUid = 0;
+    int32_t userId = 100;
+
+    // Create FormItemInfo and FormRecord
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid, userId);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    // Set initial hostWant parameters
+    Want initialWant;
+    initialWant.SetParam("initial_key", std::string("initial_value"));
+    formDataMgr_.UpdateHostWant(formId, initialWant, false);
+
+    Want newWant;
+    newWant.SetParam("new_key", std::string("new_value"));
+    newWant.SetParam("another_key", std::string("another_value"));
+    formDataMgr_.UpdateHostWant(formId, newWant, false);
+
+    // Verify hostWant is replaced with new Want
+    auto formRecord = formDataMgr_.formRecords_.find(formId);
+    ASSERT_NE(formRecord, formDataMgr_.formRecords_.end());
+    Want resultWant = formRecord->second.hostWant.GetWant();
+    EXPECT_EQ(resultWant.GetStringParam("new_key"), "new_value");
+    EXPECT_EQ(resultWant.GetStringParam("another_key"), "another_value");
+    EXPECT_EQ(resultWant.GetStringParam("initial_key"), ""); // initial parameter should be cleared
+
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWant_Assign_001 end";
+}
+
+/**
+ * @tc.number: FormDataMgr_UpdateHostWant_Merge_001
+ * @tc.name: UpdateHostWant
+ * @tc.desc: Verify UpdateHostWant with shouldMerge=true (merge mode), hostWant parameters are merged correctly.
+ */
+HWTEST_F(FmsFormDataMgrTest, FormDataMgr_UpdateHostWant_Merge_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWant_Merge_001 start";
+    int64_t formId = 1002;
+    int callingUid = 0;
+    int32_t userId = 100;
+
+    // Create FormItemInfo and FormRecord
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid, userId);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    // Set initial hostWant parameters
+    Want initialWant;
+    initialWant.SetParam("existing_key", std::string("existing_value"));
+    initialWant.SetParam("shared_key", std::string("initial_shared_value"));
+    formDataMgr_.UpdateHostWant(formId, initialWant, false);
+
+    Want mergeWant;
+    mergeWant.SetParam("new_key", std::string("new_value"));
+    mergeWant.SetParam("shared_key", std::string("merged_shared_value"));
+    formDataMgr_.UpdateHostWant(formId, mergeWant, true);
+
+    // Verify hostWant parameters are merged correctly
+    auto formRecord = formDataMgr_.formRecords_.find(formId);
+    ASSERT_NE(formRecord, formDataMgr_.formRecords_.end());
+    Want resultWant = formRecord->second.hostWant.GetWant();
+    EXPECT_EQ(resultWant.GetStringParam("existing_key"), "existing_value"); // Existing parameter preserved
+    EXPECT_EQ(resultWant.GetStringParam("new_key"), "new_value"); // New parameter added
+    EXPECT_EQ(resultWant.GetStringParam("shared_key"), "merged_shared_value"); // Shared parameter updated
+
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWant_Merge_001 end";
+}
+
+/**
+ * @tc.number: FormDataMgr_UpdateHostWant_FormNotExist_001
+ * @tc.name: UpdateHostWant
+ * @tc.desc: Verify UpdateHostWant when formId does not exist, method returns safely without crash.
+ */
+HWTEST_F(FmsFormDataMgrTest, FormDataMgr_UpdateHostWant_FormNotExist_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWant_FormNotExist_001 start";
+    int64_t nonExistentFormId = 9999;
+
+    EXPECT_EQ(formDataMgr_.formRecords_.find(nonExistentFormId), formDataMgr_.formRecords_.end());
+    EXPECT_EQ(formDataMgr_.formRecords_.size(), 0);
+
+    Want want;
+    want.SetParam("test_key", std::string("test_value"));
+    formDataMgr_.UpdateHostWant(nonExistentFormId, want, false);
+
+    EXPECT_EQ(formDataMgr_.formRecords_.find(nonExistentFormId), formDataMgr_.formRecords_.end());
+    EXPECT_EQ(formDataMgr_.formRecords_.size(), 0);
+
+    int64_t anotherFormId = 8888;
+    Want anotherWant;
+    anotherWant.SetParam("another_key", std::string("another_value"));
+    formDataMgr_.UpdateHostWant(anotherFormId, anotherWant, true);
+    EXPECT_EQ(formDataMgr_.formRecords_.find(anotherFormId), formDataMgr_.formRecords_.end());
+    EXPECT_EQ(formDataMgr_.formRecords_.size(), 0);
+
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWant_FormNotExist_001 end";
+}
+
+/**
+ * @tc.number: FormDataMgr_UpdateHostWantSize_001
+ * @tc.name: UpdateHostWantSize
+ * @tc.desc: Verify UpdateHostWantSize updates width/height/borderWidth/formViewScale parameters correctly.
+ */
+HWTEST_F(FmsFormDataMgrTest, FormDataMgr_UpdateHostWantSize_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWantSize_001 start";
+    int64_t formId = 1003;
+    int callingUid = 0;
+    int32_t userId = 100;
+
+    // Create FormItemInfo and FormRecord
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid, userId);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    float width = 100.5f;
+    float height = 200.8f;
+    float borderWidth = 5.0f;
+    float formViewScale = 1.5f;
+    formDataMgr_.UpdateHostWantSize(formId, width, height, borderWidth, formViewScale);
+
+    // Verify size parameters are set correctly
+    auto formRecord = formDataMgr_.formRecords_.find(formId);
+    ASSERT_NE(formRecord, formDataMgr_.formRecords_.end());
+    Want resultWant = formRecord->second.hostWant.GetWant();
+    EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0.0), static_cast<double>(width));
+    EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_HEIGHT_KEY, 0.0), static_cast<double>(height));
+    EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_BORDER_WIDTH_KEY, 0.0), static_cast<double>(borderWidth));
+    EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_VIEW_SCALE, 0.0), static_cast<double>(formViewScale));
+
+    GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWantSize_001 end";
+}
+
+/**
+ * @tc.number: FormRecord_HostWant_GetWant_001
+ * @tc.name: FormRecord.hostWant property
+ * @tc.desc: Verify FormRecord.hostWant property access and GetWant method returns correct Want object.
+ */
+HWTEST_F(FmsFormDataMgrTest, FormRecord_HostWant_GetWant_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRecord_HostWant_GetWant_001 start";
+    int64_t formId = 1004;
+    int callingUid = 0;
+    int32_t userId = 100;
+
+    // Create FormItemInfo and FormRecord
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid, userId);
+
+    // Set hostWant parameters directly
+    Want testWant;
+    testWant.SetParam("string_key", std::string("string_value"));
+    testWant.SetParam("int_key", 42);
+    testWant.SetParam("bool_key", true);
+    testWant.SetParam("double_key", 3.14);
+
+    record.hostWant = FormWant(testWant);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    // Verify hostWant property access and GetWant method
+    auto formRecord = formDataMgr_.formRecords_.find(formId);
+    ASSERT_NE(formRecord, formDataMgr_.formRecords_.end());
+
+    Want resultWant = formRecord->second.hostWant.GetWant();
+    EXPECT_EQ(resultWant.GetStringParam("string_key"), "string_value");
+    EXPECT_EQ(resultWant.GetIntParam("int_key", 0), 42);
+    EXPECT_EQ(resultWant.GetBoolParam("bool_key", false), true);
+    EXPECT_EQ(resultWant.GetDoubleParam("double_key", 0.0), 3.14);
+
+    GTEST_LOG_(INFO) << "FormRecord_HostWant_GetWant_001 end";
+}
+

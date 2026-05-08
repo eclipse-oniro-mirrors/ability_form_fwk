@@ -127,7 +127,7 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
         if (record.isHostRefresh) {
             auto it = record.wantCacheMap.find(formId);
             if (it != record.wantCacheMap.end()) {
-                FormDataMgr::GetInstance().MergeFormWant(it->second, want);
+                FormWant::MergeWantParams(want, it->second);
             }
         }
         RefreshData data;
@@ -264,7 +264,7 @@ void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId, const int32_t
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     if (record.isHostRefresh && record.wantCacheMap.find(formId) != record.wantCacheMap.end()) {
-        FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], want);
+        FormWant::MergeWantParams(want, record.wantCacheMap[formId]);
     }
     RefreshData data;
     data.formId = formId;

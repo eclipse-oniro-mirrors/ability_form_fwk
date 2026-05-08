@@ -148,7 +148,7 @@ int FormDataAdapter::RequestForm(const int64_t formId,
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     UpdateFormRenderParam(matchedFormId, callerToken, want);
-    FormDataMgr::GetInstance().UpdateFormHostParams(formId, want);
+    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {

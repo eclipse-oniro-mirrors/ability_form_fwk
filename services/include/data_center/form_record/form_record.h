@@ -17,12 +17,14 @@
 #define OHOS_FORM_FWK_FORM_RECORD_H
 
 #include <vector>
+#include <map>
 #include "form_constants.h"
 #include "form_info_base.h"
 #include "form_instance.h"
 #include "form_provider_info.h"
 #include "application_info.h"
 #include "want.h"
+#include "form_want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -98,6 +100,7 @@ public:
     bool lockForm = false;
     bool protectForm = false;
     std::vector<int32_t> conditionUpdate;
+    FormWant hostWant; // Host call parameter cache
     std::map<int64_t, Want> wantCacheMap;
     bool isLocationChange = false;
     bool isExistRecycleTask = false;
@@ -112,7 +115,6 @@ public:
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool addFormFinish = false;
     bool isNeedUpdateFormOnAddFormFinish = false;
-    AAFwk::WantParams formHostParams;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

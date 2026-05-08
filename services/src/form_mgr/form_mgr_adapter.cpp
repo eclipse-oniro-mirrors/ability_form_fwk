@@ -366,7 +366,11 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
             HandleFormAddObserver(formJsInfo.formId);
         }
     }
-    FormDataMgr::GetInstance().UpdateFormHostParams(formJsInfo.formId, want);
+
+    bool isAddFormByHost = want.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false);
+    if (isAddFormByHost) {
+        FormDataMgr::GetInstance().UpdateHostWant(formJsInfo.formId, want);
+    }
     return ret;
 }
 
@@ -874,7 +878,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     UpdateFormRenderParam(matchedFormId, callerToken, want);
-    FormDataMgr::GetInstance().UpdateFormHostParams(formId, want);
+    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {
@@ -1039,7 +1043,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
 
         // Update info to host and check if the form was created by the system application.
         bool updateRet = UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord);
-        // Check if the form needs visibility refersh
+        // Check if the form needs visibility refresh
         if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE &&
             (formRecord.isTimerRefresh || formRecord.isHostRefresh)) {
             needRefreshRecords.emplace_back(formRecord);
@@ -3279,7 +3283,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         HILOG_WARN("set formVisibleNotifyState error,formId:%{public}" PRId64 ".",
             matchedFormId);
         return false;
-    }
+}
 
     HILOG_INFO("formId:%{public}" PRId64 ",needRefresh:%{public}d,formVisibleType:%{public}d,"
         "isTimerRefresh:%{public}d,wantCacheMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
@@ -5323,12 +5327,13 @@ void FormMgrAdapter::DeleteInvalidFormCacheIfNeed()
 void FormMgrAdapter::CheckIsAddFormByHost(const FormRecord &formRecord, Want &allotFormWant)
 {
     bool isAddFormByHost = allotFormWant.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false);
+    int64_t formId = formRecord.formId;
     if (isAddFormByHost) {
+        HILOG_INFO("formId: %{public}" PRId64 " is add form by host.", formId);
         return;
     }
-    int64_t formId = formRecord.formId;
-    HILOG_INFO("formId: %{public}" PRId64 " is not add form by host, update want.", formId);
-    FormDataMgr::GetInstance().GetFormHostParams(formId, allotFormWant);
+    HILOG_INFO("formId: %{public}" PRId64 " is not add form by host, extract params.", formId);
+    formRecord.hostWant.ExtractHostParamsToWant(allotFormWant);
     FormInfo formInfo;
     FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
     if (formInfo.enableBlurBackground) {

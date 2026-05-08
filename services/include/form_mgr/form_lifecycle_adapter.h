@@ -137,6 +137,15 @@ private:
     ErrCode HandleDeleteFormCache(FormRecord &dbRecord, const int uid, const int64_t formId);
     ErrCode HandleReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
     ErrCode HandleCastTempForm(const int64_t formId, const FormRecord &formRecord);
+    /**
+     * @brief Process AddForm by Host scenario: check IS_ADD_FORM_BY_HOST flag and process parameters
+     * @param formRecord Form record
+     * @param allotFormWant Want parameters (will be modified for non-host AddForm)
+     * @note IS_ADD_FORM_BY_HOST=true: FormComponent scenario, return without processing
+     *       IS_ADD_FORM_BY_HOST=false: Other AddForm scenarios
+     *         - Extract hostWant parameters to allotFormWant
+     *         - Get enableBlurBackground from FormInfo and set to allotFormWant if enabled
+     */
     void CheckIsAddFormByHost(const FormRecord &formRecord, Want &allotFormWant);
     int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const int32_t userId);
     bool IsFormRenderServiceCall(int callingUid);

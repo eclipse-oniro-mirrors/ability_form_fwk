@@ -157,6 +157,7 @@ group("unittest") {
     "unittest/fms_form_singleton_queue_base_test:unittest",
     "unittest/fms_form_status_print_test:unittest",
     "unittest/fms_form_time_util_test:unittest",
+    "unittest/fms_form_want_test:unittest",
     "unittest/fms_task_wrapper_strategy_test:unittest",
     "unittest/fms_form_ability_connection_test:unittest",
     "unittest/fms_form_debug_adapter_test:unittest",

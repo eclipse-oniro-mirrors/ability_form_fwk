@@ -44,6 +44,7 @@ ohos_unittest("FmsFormMgrHostAdapterTest") {
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
     "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_manager",
   ]
 
   external_deps = [

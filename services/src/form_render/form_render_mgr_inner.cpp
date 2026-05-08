@@ -807,6 +807,14 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
 {
     HILOG_DEBUG("call");
     RecoverFRSOnFormActivity();
+    
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    FormDataMgr::GetInstance().UpdateHostWantSize(formId, width, height, borderWidth, formViewScale);
+
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -814,17 +822,13 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
         return ret;
     }
 
-    FormRecord formRecord;
-    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
     FormSurfaceInfo formSurfaceInfo;
     formSurfaceInfo.width = width;
     formSurfaceInfo.height = height;
     formSurfaceInfo.borderWidth = borderWidth;
     formSurfaceInfo.formViewScale = formViewScale;
     std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
+
     FormRenderTaskMgr::GetInstance().PostUpdateFormSize(formId, formSurfaceInfo, uid, remoteObject);
     return ERR_OK;
 }

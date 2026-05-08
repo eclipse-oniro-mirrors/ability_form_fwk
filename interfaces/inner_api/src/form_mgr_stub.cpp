@@ -660,6 +660,7 @@ int32_t FormMgrStub::HandleRequestForm(MessageParcel &data, MessageParcel &reply
     reply.WriteInt32(result);
     return result;
 }
+
 /**
  * @brief handle NotifyVisibleForms message.
  * @param data input param.
