@@ -49,5 +49,11 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
         AppExecFwk::MockFormDbCache::obj->GetAllFormInfo(formDBInfos);
     }
 }
+
+ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t formLocation)
+{
+    GTEST_LOG_(INFO) << "UpdateFormLocation called";
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

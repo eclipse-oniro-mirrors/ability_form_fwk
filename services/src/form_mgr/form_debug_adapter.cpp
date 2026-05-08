@@ -34,6 +34,7 @@
 #include "data_center/form_data_proxy_mgr.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
+#include "form_mgr/form_query_adapter.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -198,7 +199,7 @@ int FormDebugAdapter::DumpFormRunningFormInfos(std::string &runningFormInfosResu
     HILOG_INFO("call");
     std::vector<RunningFormInfo> runningFormInfos;
     int32_t userId = FormUtil::GetCurrentAccountId();
-    auto ret = FormDataMgr::GetInstance().GetRunningFormInfos(true, runningFormInfos, userId);
+    auto ret = FormQueryAdapter::GetInstance().GetRunningFormInfos(true, runningFormInfos, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("GetRunningFormInfos error");
         return ret;

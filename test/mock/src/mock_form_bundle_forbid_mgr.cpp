@@ -34,5 +34,13 @@ bool FormBundleForbidMgr::IsBundleForbidden(const std::string &bundleName)
     }
     return false;
 }
+
+void FormBundleForbidMgr::SetBundleForbiddenStatus(const std::string &bundleName, bool isForbidden)
+{
+    GTEST_LOG_(INFO) << "SetBundleForbiddenStatus called";
+    if (AppExecFwk::MockFormBundleForbidMgr::obj) {
+        AppExecFwk::MockFormBundleForbidMgr::obj->SetBundleForbiddenStatus(bundleName, isForbidden);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

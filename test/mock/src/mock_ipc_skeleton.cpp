@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace {
 constexpr int32_t DEFAULT_CALLING_UID = 20000000;
+constexpr int32_t DEFAULT_CALLING_PID = 1234;
 }  // namespace
 
 namespace AppExecFwk {
@@ -35,5 +36,26 @@ pid_t IPCSkeleton::GetCallingUid()
         return AppExecFwk::MockIPCSkeleton::obj->GetCallingUid();
     }
     return DEFAULT_CALLING_UID;
+}
+
+pid_t IPCSkeleton::GetCallingPid()
+{
+    GTEST_LOG_(INFO) << "GetCallingPid called ";
+    if (AppExecFwk::MockIPCSkeleton::obj) {
+        return AppExecFwk::MockIPCSkeleton::obj->GetCallingPid();
+    }
+    return DEFAULT_CALLING_PID;
+}
+
+std::string IPCSkeleton::ResetCallingIdentity()
+{
+    GTEST_LOG_(INFO) << "ResetCallingIdentity called";
+    return "";
+}
+
+bool IPCSkeleton::SetCallingIdentity(std::string &identity, bool flag)
+{
+    GTEST_LOG_(INFO) << "SetCallingIdentity called";
+    return true;
 }
 }  // namespace OHOS

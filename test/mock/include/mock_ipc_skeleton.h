@@ -25,6 +25,7 @@ class AbstractMockIPCSkeleton {
 public:
     virtual ~AbstractMockIPCSkeleton() = default;
     virtual pid_t GetCallingUid() = 0;
+    virtual pid_t GetCallingPid() = 0;
 };
 
 class MockIPCSkeleton : public AbstractMockIPCSkeleton {
@@ -33,6 +34,7 @@ public:
     MockIPCSkeleton() = default;
     ~MockIPCSkeleton() override = default;
     MOCK_METHOD(pid_t, GetCallingUid, ());
+    MOCK_METHOD(pid_t, GetCallingPid, ());
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

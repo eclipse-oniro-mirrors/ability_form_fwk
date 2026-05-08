@@ -323,16 +323,16 @@ ErrCode FormLifecycleAdapter::AllotFormByInfo(const FormItemInfo &info,
 }
 
 // Implementation of HandleFormRemoveObserver
-void FormLifecycleAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFormInfo)
+ErrCode FormLifecycleAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFormInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::string hostBundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(hostBundleName);
     if (ret != ERR_OK) {
         HILOG_ERROR("get BundleName failed");
-        return;
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
-    FormDataMgr::GetInstance().HandleFormRemoveObserver(hostBundleName, runningFormInfo);
+    return FormDataMgr::GetInstance().HandleFormRemoveObserver(hostBundleName, runningFormInfo);
 }
 
 // Implementation of HandleDeleteTempForm

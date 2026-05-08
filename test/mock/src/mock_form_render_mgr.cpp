@@ -32,5 +32,32 @@ int32_t FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     }
     return ERR_OK;
 }
+
+void FormRenderMgr::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    float formViewScale)
+{
+    GTEST_LOG_(INFO) << "UpdateFormSize called";
+}
+
+void FormRenderMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag called";
+}
+
+void FormRenderMgr::SetRenderGroupParams(int64_t formId, const Want &want)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupParams called";
+}
+
+void FormRenderMgr::AddAcquireProviderFormInfoTask(int32_t userId, std::function<void()> task)
+{
+    GTEST_LOG_(INFO) << "AddAcquireProviderFormInfoTask called";
+}
+
+void FormRenderMgr::AddAcquireProviderForbiddenTask(
+    const std::string &bundleName, int64_t formId, std::function<void()> task)
+{
+    GTEST_LOG_(INFO) << "AddAcquireProviderForbiddenTask called";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

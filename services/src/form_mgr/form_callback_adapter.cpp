@@ -35,6 +35,7 @@
 #include "feature/route_proxy/form_router_proxy_mgr.h"
 #include "form_mgr/form_common_adapter.h"
 #include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_publish_adapter.h"
 #include "form_mgr_errors.h"
 #include "form_event_report.h"
 #include "fms_log_wrapper.h"
@@ -580,6 +581,11 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     if (!wantToHost.GetAction().empty()) {
         action = wantToHost.GetAction();
         HILOG_INFO("GetAction:%{public}s", action.c_str());
+    }
+
+    if (!FormPublishAdapter::GetInstance().IsActionAllowToPublish(action)) {
+        HILOG_ERROR("action is not allowed to publish: %{public}s", action.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     AppExecFwk::AbilityInfo abilityInfo;

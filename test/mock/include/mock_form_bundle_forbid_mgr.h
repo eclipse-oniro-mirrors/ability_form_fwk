@@ -27,6 +27,7 @@ class AbstractMockFormBundleForbidMgr {
 public:
     virtual ~AbstractMockFormBundleForbidMgr() = default;
     virtual bool IsBundleForbidden(const std::string &bundleName) = 0;
+    virtual void SetBundleForbiddenStatus(const std::string &bundleName, bool isForbidden) = 0;
 };
 
 class MockFormBundleForbidMgr : public AbstractMockFormBundleForbidMgr {
@@ -35,6 +36,7 @@ public:
     MockFormBundleForbidMgr() = default;
     ~MockFormBundleForbidMgr() override = default;
     MOCK_METHOD1(IsBundleForbidden, bool(const std::string &bundleName));
+    MOCK_METHOD2(SetBundleForbiddenStatus, void(const std::string &bundleName, bool isForbidden));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

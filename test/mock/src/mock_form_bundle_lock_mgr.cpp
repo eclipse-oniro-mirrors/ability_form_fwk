@@ -34,5 +34,31 @@ bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, const int
     }
     return false;
 }
+
+bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, const int32_t userId, int64_t formId)
+{
+    GTEST_LOG_(INFO) << "IsBundleLock called";
+    if (AppExecFwk::MockFormBundleLockMgr::obj) {
+        return AppExecFwk::MockFormBundleLockMgr::obj->IsBundleLock(bundleName, userId, formId);
+    }
+    return false;
+}
+
+void FormBundleLockMgr::SetBundleLockStatus(const std::string &bundleName, bool isLock)
+{
+    GTEST_LOG_(INFO) << "SetBundleLockStatus called";
+    if (AppExecFwk::MockFormBundleLockMgr::obj) {
+        AppExecFwk::MockFormBundleLockMgr::obj->SetBundleLockStatus(bundleName, isLock);
+    }
+}
+
+void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bool isProtect)
+{
+    GTEST_LOG_(INFO) << "SetBundleProtectStatus called";
+    if (AppExecFwk::MockFormBundleLockMgr::obj) {
+        AppExecFwk::MockFormBundleLockMgr::obj->SetBundleProtectStatus(bundleName, isProtect);
+    }
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

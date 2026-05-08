@@ -29,6 +29,7 @@
 #include "form_instances_filter.h"
 #include "running_form_info.h"
 #include "want.h"
+#include "form_provider_data.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -86,6 +87,10 @@ public:
         const sptr<IRemoteObject> &callerToken, int32_t userId) = 0;
     virtual ErrCode SetFormProtect(const int64_t formId, const bool protect) = 0;
     virtual void LockForms(const std::vector<FormRecord> &&formRecords, const bool protect) = 0;
+    virtual int64_t GenerateFormId() = 0;
+    virtual ErrCode AddRequestPublishFormInfo(int64_t formId, const Want &want,
+        std::unique_ptr<FormProviderData> &formProviderData) = 0;
+    virtual ErrCode RemoveRequestPublishFormInfo(int64_t formId) = 0;
 };
 
 class MockFormDataMgr : public AbstractMockFormDataMgr {
@@ -112,6 +117,8 @@ public:
     MOCK_METHOD1(FindMatchedFormId, int64_t(const int64_t formId));
     MOCK_METHOD1(GetTempFormRecord, bool(std::vector<FormRecord> &formTempRecords));
     MOCK_CONST_METHOD2(GetFormRecordByBundleName, bool(const std::string &bundleName,
+        std::vector<FormRecord> &formInfos));
+    MOCK_CONST_METHOD2(GetFormRecordByCondition, bool(int32_t conditionType,
         std::vector<FormRecord> &formInfos));
     MOCK_CONST_METHOD2(GetFormHostRecord, void(const int64_t formId,
         std::vector<FormHostRecord> &formHostRecords));
@@ -144,6 +151,11 @@ public:
         const sptr<IRemoteObject> &callerToken, int32_t userId));
     MOCK_METHOD2(SetFormProtect, ErrCode(const int64_t formId, const bool protect));
     MOCK_METHOD2(LockForms, void(const std::vector<FormRecord> &&formRecords, const bool protect));
+    MOCK_METHOD0(GenerateFormId, int64_t());
+    MOCK_METHOD3(AddRequestPublishFormInfo, ErrCode(int64_t formId, const Want &want,
+        std::unique_ptr<FormProviderData> &formProviderData));
+    MOCK_METHOD1(RemoveRequestPublishFormInfo, ErrCode(int64_t formId));
+    MOCK_METHOD2(HandleFormRemoveObserver, void(const std::string &, const RunningFormInfo &));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
