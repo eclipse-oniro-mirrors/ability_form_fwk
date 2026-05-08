@@ -641,5 +641,20 @@ bool FormCallbackAdapter::IsForegroundApp()
     return checkFlag;
 }
 
+ErrCode FormCallbackAdapter::RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken)
+{
+    return wantCallbackRegistry_.Register(callingUid, callerToken);
+}
+
+ErrCode FormCallbackAdapter::UnregisterFormWantCallback(int32_t callingUid)
+{
+    return wantCallbackRegistry_.Unregister(callingUid);
+}
+
+ErrCode FormCallbackAdapter::GetWantCallbackProxy(int32_t callingUid, sptr<IRemoteObject> &proxy)
+{
+    return wantCallbackRegistry_.Get(callingUid, proxy);
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

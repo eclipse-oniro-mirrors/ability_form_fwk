@@ -111,6 +111,9 @@ public:
 
     void UnregisterTemplateFormDetailInfoChange();
 
+    void RegisterFormWantCallbackListener(ani_vm *vm, ani_object callback);
+    void UnregisterFormWantCallbackListener();
+
     void RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds);
 
     void AddFormRouterProxyCallback(ani_env* env, ani_object callback,
@@ -162,6 +165,14 @@ private:
     void GetTemplateFormInfoArray(ani_env* env,
         const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
         ani_array &templateFormInfoArray);
+
+    ani_ref formWantCallbackRef_ = nullptr;
+    ani_vm *formWantCallbackVM_ = nullptr;
+    mutable std::mutex registerFormWantCallbackMutex_;
+    ErrCode RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
+    bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

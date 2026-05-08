@@ -2453,5 +2453,31 @@ ErrCode FormMgrService::UpdateTemplateFormDetailInfo(
     }
     return FormMgrAdapterFacade::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
 }
+
+ErrCode FormMgrService::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapterFacade::GetInstance().RegisterFormWantCallback(callingUid, callerToken);
+}
+
+ErrCode FormMgrService::UnregisterFormWantCallback()
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapterFacade::GetInstance().UnregisterFormWantCallback(callingUid);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

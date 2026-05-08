@@ -5568,4 +5568,70 @@ HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_004, TestSize.Level1)
     EXPECT_THAT(formIds, ContainerEq(expectedFormIds));
     GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_004 end";
 }
+
+/**
+ * @tc.name: FormMgr_RegisterFormWantCallback_001
+ * @tc.desc: Verify RegisterFormWantCallback returns ERR_OK on success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_RegisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_001 begin";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
+    EXPECT_CALL(*mockProxy, RegisterFormWantCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = FormMgr::GetInstance().RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgr_RegisterFormWantCallback_002
+ * @tc.desc: Verify RegisterFormWantCallback returns error when proxy returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_RegisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_002 begin";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
+    EXPECT_CALL(*mockProxy, RegisterFormWantCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+    auto result = FormMgr::GetInstance().RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_002 end";
+}
+
+/**
+ * @tc.name: FormMgr_UnregisterFormWantCallback_001
+ * @tc.desc: Verify UnregisterFormWantCallback returns ERR_OK on success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_UnregisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_001 begin";
+    EXPECT_CALL(*mockProxy, UnregisterFormWantCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = FormMgr::GetInstance().UnregisterFormWantCallback();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgr_UnregisterFormWantCallback_002
+ * @tc.desc: Verify UnregisterFormWantCallback returns error when proxy returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_UnregisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_002 begin";
+    EXPECT_CALL(*mockProxy, UnregisterFormWantCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+    auto result = FormMgr::GetInstance().UnregisterFormWantCallback();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_002 end";
+}
 } // namespace

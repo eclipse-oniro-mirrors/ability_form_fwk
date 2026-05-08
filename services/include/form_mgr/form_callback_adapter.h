@@ -100,6 +100,12 @@ public:
 
     ErrCode UpdateTemplateFormDetailInfo(const std::vector<TemplateFormDetailInfo> &templateFormInfo);
 
+    ErrCode RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterFormWantCallback(int32_t callingUid);
+
+    ErrCode GetWantCallbackProxy(int32_t callingUid, sptr<IRemoteObject> &proxy);
+
     void SetFormPublishInterceptor(const sptr<IFormPublishInterceptor> &interceptor);
 
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
@@ -117,6 +123,7 @@ private:
     FormProxyRegistry liveFormStatusRegistry_{"LiveFormStatus"};
     FormProxyRegistry crossBundleControlRegistry_{"CrossBundleControl"};
     FormProxyRegistry templateFormDetailInfoRegistry_{"TemplateFormDetailInfo"};
+    FormProxyRegistry wantCallbackRegistry_{"WantCallback"};
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
 
     mutable std::mutex formPublishInterceptorMutex_;

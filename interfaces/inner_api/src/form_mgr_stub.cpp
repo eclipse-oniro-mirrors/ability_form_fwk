@@ -154,6 +154,10 @@ int FormMgrStub::OnRemoteRequestSecond(uint32_t code, MessageParcel &data, Messa
             return HandleRequestPublishForm(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER):
             return HandleRequestPublishFormCrossUser(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK):
+            return HandleRegisterFormWantCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK):
+            return HandleUnregisterFormWantCallback(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM):
             return HandleShareForm(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE):
@@ -2375,6 +2379,33 @@ ErrCode FormMgrStub::HandleGetFormIdsByFormLocation(MessageParcel &data, Message
         }
     }
 
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterFormWantCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    auto callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("ReadRemoteObject failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterFormWantCallback(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterFormWantCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    ErrCode result = UnregisterFormWantCallback();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return ERR_OK;
 }
 }  // namespace AppExecFwk

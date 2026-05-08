@@ -922,6 +922,9 @@ private:
         std::vector<RunningFormInfo> &runningFormInfos);
     int32_t GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances);
     bool WriteFormDataProxies(MessageParcel &data, const std::vector<FormDataProxy> &formDataProxies);
+
+    ErrCode RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken) override;
+    ErrCode UnregisterFormWantCallback() override;
 private:
     static inline BrokerDelegator<FormMgrProxy> delegator_;
 };

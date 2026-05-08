@@ -106,6 +106,12 @@ public:
         return ERR_OK;
     }
 
+    ErrCode RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 

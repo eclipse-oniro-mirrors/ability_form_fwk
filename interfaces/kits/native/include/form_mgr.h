@@ -954,6 +954,19 @@ public:
         const std::vector<TemplateFormDetailInfo> &templateFormInfo);
 
     /**
+     * @brief Register form want callback for app upgrade.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister form want callback for app upgrade.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormWantCallback();
+
+    /**
      * @brief Get formIds by form location.
      * @param formLocation Indicate the location of the form.
      * @param formIds [out] The formIds of the form location to be returned.

@@ -1059,6 +1059,25 @@ public:
     }
 
     /**
+     * @brief Register want callback proxy for form host.
+     * @param callerToken The form host proxy for want callback.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Unregister want callback proxy for form host.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterFormWantCallback()
+    {
+        return ERR_OK;
+    }
+
+    /**
      * @brief Update template form detail info.
      * @param templateFormInfo The template form info to be updated.
      * @return Returns ERR_OK on success, others on failure.
@@ -1201,6 +1220,8 @@ public:
         FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO,
         FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION,
         FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER,
+        FORM_MGR_REGISTER_FORM_WANT_CALLBACK,
+        FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK,
     };
 };
 }  // namespace AppExecFwk

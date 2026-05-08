@@ -329,6 +329,12 @@ public:
 
     ErrCode UpdateTemplateFormDetailInfo(const std::vector<TemplateFormDetailInfo> &templateFormInfo);
 
+    ErrCode RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterFormWantCallback(int32_t callingUid);
+
+    ErrCode GetWantCallbackProxy(int32_t callingUid, sptr<IRemoteObject> &proxy);
+
     // ==================== Debug/Dump Management ====================
 
     int DumpStorageFormInfos(std::string &formInfos) const;
