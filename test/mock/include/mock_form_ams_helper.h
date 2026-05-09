@@ -29,6 +29,8 @@ class AbstractMockFormAmsHelper {
 public:
     virtual ~AbstractMockFormAmsHelper() = default;
     virtual ErrCode StartAbility(const Want &want, int32_t userId) = 0;
+    virtual ErrCode ConnectServiceAbility(
+        const Want &want, const sptr<AAFwk::IAbilityConnection> &connect) = 0;
     virtual ErrCode ConnectServiceAbilityWithUserId(
         const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId) = 0;
 };
@@ -39,6 +41,8 @@ public:
     MockFormAmsHelper() = default;
     ~MockFormAmsHelper() override = default;
     MOCK_METHOD2(StartAbility, ErrCode(const Want &want, int32_t userId));
+    MOCK_METHOD2(ConnectServiceAbility, ErrCode(const Want &want,
+        const sptr<AAFwk::IAbilityConnection> &connect));
     MOCK_METHOD3(ConnectServiceAbilityWithUserId, ErrCode(const Want &want,
         const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId));
 };

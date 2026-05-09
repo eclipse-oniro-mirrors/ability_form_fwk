@@ -71,5 +71,14 @@ void FormProviderTaskMgr::PostCastTempTask(const int64_t formId, const Want &wan
         MockFormProviderTaskMgr::obj->PostCastTempTask(formId, want, remoteObject);
     }
 }
+
+void FormProviderTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::string &provider, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    GTEST_LOG_(INFO) << "PostAcquireStateTask called";
+    if (MockFormProviderTaskMgr::obj) {
+        MockFormProviderTaskMgr::obj->PostAcquireStateTask(wantArg, provider, want, remoteObject);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

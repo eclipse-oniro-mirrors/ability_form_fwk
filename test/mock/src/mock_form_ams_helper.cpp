@@ -33,6 +33,16 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
     return ERR_OK;
 }
 
+ErrCode FormAmsHelper::ConnectServiceAbility(
+    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+{
+    GTEST_LOG_(INFO) << "ConnectServiceAbility called";
+    if (AppExecFwk::MockFormAmsHelper::obj) {
+        return AppExecFwk::MockFormAmsHelper::obj->ConnectServiceAbility(want, connect);
+    }
+    return ERR_OK;
+}
+
 ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
     const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
 {

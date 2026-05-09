@@ -37,6 +37,7 @@
 #include "mock_form_data_mgr.h"
 #include "mock_form_info_mgr.h"
 #include "mock_form_bms_helper.h"
+#include "mock_form_ams_helper.h"
 #include "mock_form_timer_mgr.h"
 #include "mock_form_db_cache.h"
 #include "mock_ipc_skeleton.h"
@@ -67,6 +68,7 @@ void FmsFormQueryAdapterTest::SetUpTestCase()
     MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
     MockFormInfoMgr::obj = std::make_shared<MockFormInfoMgr>();
     MockFormBmsHelper::obj = std::make_shared<MockFormBmsHelper>();
+    MockFormAmsHelper::obj = std::make_shared<MockFormAmsHelper>();
     MockFormTimerMgr::obj = std::make_shared<MockFormTimerMgr>();
     MockFormDbCache::obj = std::make_shared<MockFormDbCache>();
     MockIPCSkeleton::obj = new MockIPCSkeleton();
@@ -77,6 +79,7 @@ void FmsFormQueryAdapterTest::TearDownTestCase()
     MockFormDataMgr::obj = nullptr;
     MockFormInfoMgr::obj = nullptr;
     MockFormBmsHelper::obj = nullptr;
+    MockFormAmsHelper::obj = nullptr;
     MockFormTimerMgr::obj = nullptr;
     MockFormDbCache::obj = nullptr;
     delete MockIPCSkeleton::obj;
@@ -733,6 +736,136 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "AcquireFormState_001 end";
 }
 
+/**
+ * @tc.name: AcquireFormState_002
+ * @tc.desc: Verify AcquireFormStateCheck fails propagates error code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormState_002 start";
+
+    Want want;
+    // Empty bundleName/abilityName via element will cause AcquireFormStateCheck to fail
+    FormStateInfo stateInfo;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormState(
+        want, callerToken, stateInfo);
+    // bundleName and abilityName are empty, AcquireFormStateCheck returns ERR_APPEXECFWK_FORM_INVALID_PARAM
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "AcquireFormState_002 end";
+}
+
+/**
+ * @tc.name: AcquireFormState_003
+ * @tc.desc: Verify AcquireFormStateCheck fails with GetFormsInfoByModuleWithoutCheck error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormState_003 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    FormStateInfo stateInfo;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormState(
+        want, callerToken, stateInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    GTEST_LOG_(INFO) << "AcquireFormState_003 end";
+}
+
+/**
+ * @tc.name: AcquireFormState_004
+ * @tc.desc: Verify ConnectServiceAbility fails returns ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormState_004 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    FormStateInfo stateInfo;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    FormInfo matchFormInfo;
+    matchFormInfo.abilityName = "MainAbility";
+    matchFormInfo.name = "widget";
+    matchFormInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
+    std::vector<FormInfo> formInfos = {matchFormInfo};
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(2)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormStateRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormState(
+        want, callerToken, stateInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    GTEST_LOG_(INFO) << "AcquireFormState_004 end";
+}
+
+/**
+ * @tc.name: AcquireFormState_005
+ * @tc.desc: Verify ConnectServiceAbility success returns ERR_OK and stateInfo is DEFAULT
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormState_005 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    FormStateInfo stateInfo;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    FormInfo matchFormInfo;
+    matchFormInfo.abilityName = "MainAbility";
+    matchFormInfo.name = "widget";
+    matchFormInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
+    std::vector<FormInfo> formInfos = {matchFormInfo};
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(2)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormStateRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormState(
+        want, callerToken, stateInfo);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(stateInfo.state, FormState::DEFAULT);
+
+    GTEST_LOG_(INFO) << "AcquireFormState_005 end";
+}
+
 // ========== AcquireFormData Tests ==========
 
 /**
@@ -755,6 +888,138 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_001, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
 
     GTEST_LOG_(INFO) << "AcquireFormData_001 end";
+}
+
+/**
+ * @tc.name: AcquireFormData_002
+ * @tc.desc: Verify AcquireFormData succeeds with empty moduleName, ConnectServiceAbility returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormData_002 start";
+
+    AAFwk::WantParams formData;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    FormRecord formRecord;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "";  // empty moduleName branch
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormData(
+        TEST_FORM_ID, 0, callerToken, formData);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AcquireFormData_002 end";
+}
+
+/**
+ * @tc.name: AcquireFormData_003
+ * @tc.desc: Verify AcquireFormData succeeds with non-empty moduleName, ConnectServiceAbility returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormData_003 start";
+
+    AAFwk::WantParams formData;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    FormRecord formRecord;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "entry";  // non-empty moduleName branch
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormData(
+        TEST_FORM_ID, 0, callerToken, formData);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AcquireFormData_003 end";
+}
+
+/**
+ * @tc.name: AcquireFormData_004
+ * @tc.desc: Verify ConnectServiceAbility fails returns ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormData_004 start";
+
+    AAFwk::WantParams formData;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    FormRecord formRecord;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "entry";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormData(
+        TEST_FORM_ID, 0, callerToken, formData);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    GTEST_LOG_(INFO) << "AcquireFormData_004 end";
+}
+
+/**
+ * @tc.name: AcquireFormData_005
+ * @tc.desc: Verify empty moduleName with ConnectServiceAbility fails returns ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormData_005 start";
+
+    AAFwk::WantParams formData;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    FormRecord formRecord;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "";  // empty moduleName - skip SetModuleName branch
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormData(
+        TEST_FORM_ID, 0, callerToken, formData);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    GTEST_LOG_(INFO) << "AcquireFormData_005 end";
 }
 
 }  // namespace AppExecFwk

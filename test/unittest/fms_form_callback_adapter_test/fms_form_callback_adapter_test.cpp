@@ -37,6 +37,7 @@
 #include "mock_form_data_mgr.h"
 #include "mock_form_info_mgr.h"
 #include "mock_form_bms_helper.h"
+#include "mock_form_ams_helper.h"
 #include "mock_form_timer_mgr.h"
 #include "mock_form_db_cache.h"
 #include "mock_form_bundle_forbid_mgr.h"
@@ -47,6 +48,7 @@
 #include "mock_i_remote_object.h"
 #include "mock_ipc_skeleton.h"
 #include "mock_bundle_mgr.h"
+#include "form_host_delegate_stub.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -61,6 +63,51 @@ constexpr int32_t TEST_DIMENSION_ID = 2;
 constexpr int32_t INVALID_UID = 99999999;
 constexpr int64_t INVALID_FORM_ID = -1L;
 constexpr int64_t ZERO_FORM_ID = 0L;
+constexpr const char* TEST_BUNDLE_NAME = "com.test.bundle";
+constexpr const char* TEST_ABILITY_NAME = "MainAbility";
+constexpr const char* TEST_MODULE_NAME = "entry";
+constexpr const char* TEST_FORM_NAME = "widget";
+
+class MockFormHostDelegateStub : public FormHostDelegateStub {
+public:
+    MockFormHostDelegateStub() = default;
+    ~MockFormHostDelegateStub() override = default;
+    ErrCode RouterEvent(int64_t formId, const Want &want) override { return ERR_OK; }
+    ErrCode RequestOverflow(int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow) override
+    {
+        return requestOverflowResult_;
+    }
+    ErrCode ChangeSceneAnimationState(int64_t formId, int32_t state) override
+    {
+        return changeSceneResult_;
+    }
+    ErrCode GetFormRect(int64_t formId, Rect &rect) override
+    {
+        return getFormRectResult_;
+    }
+    ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap) override
+    {
+        for (const auto &pair : liveFormStatusData_) {
+            liveFormStatusMap[pair.first] = pair.second;
+        }
+        return getLiveFormStatusResult_;
+    }
+    ErrCode TemplateFormDetailInfoChange(const std::vector<TemplateFormDetailInfo> &info) override
+    {
+        return templateFormResult_;
+    }
+    ErrCode RequestFormWants(const std::vector<FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList) override
+    {
+        return ERR_OK;
+    }
+    ErrCode requestOverflowResult_ = ERR_OK;
+    ErrCode changeSceneResult_ = ERR_OK;
+    ErrCode getFormRectResult_ = ERR_OK;
+    ErrCode getLiveFormStatusResult_ = ERR_OK;
+    ErrCode templateFormResult_ = ERR_OK;
+    std::unordered_map<std::string, std::string> liveFormStatusData_;
+};
 }
 
 class FmsFormCallbackAdapterTest : public testing::Test {
@@ -76,6 +123,7 @@ void FmsFormCallbackAdapterTest::SetUpTestCase()
     MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
     MockFormInfoMgr::obj = std::make_shared<MockFormInfoMgr>();
     MockFormBmsHelper::obj = std::make_shared<MockFormBmsHelper>();
+    MockFormAmsHelper::obj = std::make_shared<MockFormAmsHelper>();
     MockFormTimerMgr::obj = std::make_shared<MockFormTimerMgr>();
     MockFormDbCache::obj = std::make_shared<MockFormDbCache>();
     MockFormBundleForbidMgr::obj = std::make_shared<MockFormBundleForbidMgr>();
@@ -91,6 +139,7 @@ void FmsFormCallbackAdapterTest::TearDownTestCase()
     MockFormDataMgr::obj = nullptr;
     MockFormInfoMgr::obj = nullptr;
     MockFormBmsHelper::obj = nullptr;
+    MockFormAmsHelper::obj = nullptr;
     MockFormTimerMgr::obj = nullptr;
     MockFormDbCache::obj = nullptr;
     MockFormBundleForbidMgr::obj = nullptr;
@@ -1110,6 +1159,942 @@ HWTEST_F(FmsFormCallbackAdapterTest, SceneAnimationCheck_001, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
 
     GTEST_LOG_(INFO) << "SceneAnimationCheck_001 end";
+}
+
+// ========== StartAbilityByFms Tests ==========
+
+/**
+ * @tc.name: StartAbilityByFms_001
+ * @tc.desc: Verify FORM_MANAGE code with IsForegroundApp returning false returns NOT_TRUST
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_001 start";
+
+    Want want;
+    want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+        Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    // GetCallerBundleName fails -> IsForegroundApp returns false
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_TRUST);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_001 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_002
+ * @tc.desc: Verify LIVE_FORM code with no registered proxy returns LIVE_OP_UNSUPPORTED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_002 start";
+
+    // Clear registry so GetLiveFormStatus returns error
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+
+    Want want;
+    want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+        Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM);
+    want.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, std::to_string(TEST_FORM_ID));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_002 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_003
+ * @tc.desc: Verify invalid action returns INVALID_PARAM
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_003 start";
+
+    Want want;
+    want.SetAction("action.invalid.test");
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_003 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_004
+ * @tc.desc: Verify GetAbilityInfoByAction returns false returns GET_HOST_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_004 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_004 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_005
+ * @tc.desc: Verify abilityInfo.name not empty and StartAbility succeeds returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_005 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce([](const std::string &, int32_t, AbilityInfo &info, ExtensionAbilityInfo &) {
+            info.bundleName = "com.test.host";
+            info.name = "HostAbility";
+            return true;
+        });
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_005 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_006
+ * @tc.desc: Verify extensionAbilityInfo.name used when abilityInfo.name is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_006 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce([](const std::string &, int32_t, AbilityInfo &info, ExtensionAbilityInfo &extInfo) {
+            info.bundleName = "";
+            info.name = "";
+            extInfo.bundleName = "com.test.host";
+            extInfo.name = "ExtHostAbility";
+            return true;
+        });
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_006 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_007
+ * @tc.desc: Verify both abilityInfo and extensionAbilityInfo names empty returns GET_HOST_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_007 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_007 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_008
+ * @tc.desc: Verify StartAbility failure returns error code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_008 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce([](const std::string &, int32_t, AbilityInfo &info, ExtensionAbilityInfo &) {
+            info.bundleName = "com.test.host";
+            info.name = "HostAbility";
+            return true;
+        });
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_HOST_FAILED));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_008 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_009
+ * @tc.desc: Verify LIVE_FORM with valid status and supportLauncher false returns LIVE_OP_UNSUPPORTED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_009 start";
+
+    // Register mock delegate with live form status "10" (PAUSE, isSupportLauncher=false)
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_OK;
+    mockDelegate->liveFormStatusData_ = {{"form_999", "10"}};
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    Want want;
+    want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+        Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM);
+    want.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, std::string("form_999"));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    // Status "10" maps to {PAUSE, false} -> isSupportLauncher=false -> LIVE_OP_UNSUPPORTED
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_009 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_010
+ * @tc.desc: Verify LIVE_FORM with status not in LIVE_FORM_STATUS_MAP returns LIVE_OP_UNSUPPORTED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_010 start";
+
+    // Register mock delegate with an unknown status value
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_OK;
+    mockDelegate->liveFormStatusData_ = {{"form_888", "99"}};
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    Want want;
+    want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+        Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM);
+    want.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, std::string("form_888"));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    // Status "99" not in LIVE_FORM_STATUS_MAP -> LIVE_OP_UNSUPPORTED
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_010 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_011
+ * @tc.desc: Verify LIVE_FORM with supported status continues to action check and succeeds
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_011 start";
+
+    // Register mock delegate with status "21" (ACTIVE, isSupportLauncher=true)
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_OK;
+    mockDelegate->liveFormStatusData_ = {{"form_777", "21"}};
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    Want want;
+    want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+        Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM);
+    want.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, std::string("form_777"));
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce([](const std::string &, int32_t, AbilityInfo &info, ExtensionAbilityInfo &) {
+            info.bundleName = "com.test.host";
+            info.name = "HostAbility";
+            return true;
+        });
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_011 end";
+}
+
+/**
+ * @tc.name: StartAbilityByFms_012
+ * @tc.desc: Verify default action FORM_PUBLISH_ACTION is used when want has no action
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartAbilityByFms_012 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    // No action set -> default to FORM_PUBLISH_ACTION
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce([](const std::string &, int32_t, AbilityInfo &info, ExtensionAbilityInfo &) {
+            info.bundleName = "com.test.host";
+            info.name = "HostAbility";
+            return true;
+        });
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "StartAbilityByFms_012 end";
+}
+
+// ========== IsForegroundApp Tests ==========
+
+/**
+ * @tc.name: IsForegroundApp_001
+ * @tc.desc: Verify GetCallerBundleName failure returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, IsForegroundApp_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsForegroundApp_001 start";
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormCallbackAdapter::GetInstance().IsForegroundApp();
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "IsForegroundApp_001 end";
+}
+
+/**
+ * @tc.name: IsForegroundApp_002
+ * @tc.desc: Verify GetAppMgr returning null returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, IsForegroundApp_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsForegroundApp_002 start";
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::string(TEST_BUNDLE_NAME)), Return(ERR_OK)));
+
+    // In test environment, GetAppMgr returns null (no system ability manager)
+    auto result = FormCallbackAdapter::GetInstance().IsForegroundApp();
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "IsForegroundApp_002 end";
+}
+
+// ========== RequestOverflow Additional Tests ==========
+
+/**
+ * @tc.name: RequestOverflow_004
+ * @tc.desc: Verify SceneAnimationCheck returns SYSTEMCAP_ERROR when scene animation not supported
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestOverflow_004 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    OverflowInfo overflowInfo;
+    bool isOverflow = false;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // Ensure scene animation is not supported
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    auto result = FormCallbackAdapter::GetInstance().RequestOverflow(
+        TEST_FORM_ID, callingUid, overflowInfo, isOverflow);
+    EXPECT_EQ(result, ERR_APPEXECFWK_SYSTEMCAP_ERROR);
+
+    GTEST_LOG_(INFO) << "RequestOverflow_004 end";
+}
+
+/**
+ * @tc.name: RequestOverflow_005
+ * @tc.desc: Verify RequestOverflow returns GET_HOST_FAILED when no proxy registered for formUserUids
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestOverflow_005 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    OverflowInfo overflowInfo;
+    bool isOverflow = false;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = TEST_BUNDLE_NAME;
+    record.abilityName = TEST_ABILITY_NAME;
+    record.moduleName = TEST_MODULE_NAME;
+    record.formName = TEST_FORM_NAME;
+    record.uid = callingUid;
+    record.providerUserId = TEST_USER_ID;
+    record.formUserUids = { callingUid };
+
+    FormInfo formInfo;
+    formInfo.abilityName = TEST_ABILITY_NAME;
+    formInfo.name = TEST_FORM_NAME;
+    formInfo.sceneAnimationParams.abilityName = "SceneAnimationAbility";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
+        .WillRepeatedly(Return(false));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    // Enable scene animation support
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::SCENE_ANIMATION;
+
+    // Clear overflow registry so no proxy found
+    FormCallbackAdapter::GetInstance().overflowRegistry_.Clear();
+
+    auto result = FormCallbackAdapter::GetInstance().RequestOverflow(
+        TEST_FORM_ID, callingUid, overflowInfo, isOverflow);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    // Cleanup
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    GTEST_LOG_(INFO) << "RequestOverflow_005 end";
+}
+
+/**
+ * @tc.name: RequestOverflow_006
+ * @tc.desc: Verify RequestOverflow succeeds with registered proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestOverflow_006 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    OverflowInfo overflowInfo;
+    bool isOverflow = false;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = TEST_BUNDLE_NAME;
+    record.abilityName = TEST_ABILITY_NAME;
+    record.moduleName = TEST_MODULE_NAME;
+    record.formName = TEST_FORM_NAME;
+    record.uid = callingUid;
+    record.providerUserId = TEST_USER_ID;
+    record.formUserUids = { callingUid };
+
+    FormInfo formInfo;
+    formInfo.abilityName = TEST_ABILITY_NAME;
+    formInfo.name = TEST_FORM_NAME;
+    formInfo.sceneAnimationParams.abilityName = "SceneAnimationAbility";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
+        .WillRepeatedly(Return(false));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    // Enable scene animation support
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::SCENE_ANIMATION;
+
+    // Register mock delegate in overflow registry
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->requestOverflowResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().overflowRegistry_.Register(callingUid,
+        sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().RequestOverflow(
+        TEST_FORM_ID, callingUid, overflowInfo, isOverflow);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().overflowRegistry_.Clear();
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    GTEST_LOG_(INFO) << "RequestOverflow_006 end";
+}
+
+// ========== ChangeSceneAnimationState Additional Tests ==========
+
+/**
+ * @tc.name: ChangeSceneAnimationState_003
+ * @tc.desc: Verify SceneAnimationCheck SYSTEMCAP_ERROR is propagated
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_003 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    int32_t state = 1;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // Ensure scene animation is not supported
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    auto result = FormCallbackAdapter::GetInstance().ChangeSceneAnimationState(
+        TEST_FORM_ID, callingUid, state);
+    EXPECT_EQ(result, ERR_APPEXECFWK_SYSTEMCAP_ERROR);
+
+    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_003 end";
+}
+
+/**
+ * @tc.name: ChangeSceneAnimationState_004
+ * @tc.desc: Verify ChangeSceneAnimationState succeeds with registered proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_004 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    int32_t state = 1;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = TEST_BUNDLE_NAME;
+    record.abilityName = TEST_ABILITY_NAME;
+    record.moduleName = TEST_MODULE_NAME;
+    record.formName = TEST_FORM_NAME;
+    record.uid = callingUid;
+    record.providerUserId = TEST_USER_ID;
+    record.formUserUids = { callingUid };
+
+    FormInfo formInfo;
+    formInfo.abilityName = TEST_ABILITY_NAME;
+    formInfo.name = TEST_FORM_NAME;
+    formInfo.sceneAnimationParams.abilityName = "SceneAnimationAbility";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
+        .WillRepeatedly(Return(false));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    // Enable scene animation support
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::SCENE_ANIMATION;
+
+    // Register mock delegate in scene animation registry
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->changeSceneResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().sceneAnimationRegistry_.Register(callingUid,
+        sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().ChangeSceneAnimationState(
+        TEST_FORM_ID, callingUid, state);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().sceneAnimationRegistry_.Clear();
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_004 end";
+}
+
+// ========== GetFormRect Additional Tests ==========
+
+/**
+ * @tc.name: GetFormRect_003
+ * @tc.desc: Verify CallerCheck uid mismatch returns OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetFormRect_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormRect_003 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = INVALID_UID;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormCallbackAdapter::GetInstance().GetFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "GetFormRect_003 end";
+}
+
+/**
+ * @tc.name: GetFormRect_004
+ * @tc.desc: Verify GetFormRect returns GET_HOST_FAILED when no proxy registered
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetFormRect_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormRect_004 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { callingUid };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // Clear registry so no proxy found
+    FormCallbackAdapter::GetInstance().formRectRegistry_.Clear();
+
+    auto result = FormCallbackAdapter::GetInstance().GetFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "GetFormRect_004 end";
+}
+
+/**
+ * @tc.name: GetFormRect_005
+ * @tc.desc: Verify GetFormRect succeeds with registered proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetFormRect_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormRect_005 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { callingUid };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // Register mock delegate in form rect registry
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getFormRectResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().formRectRegistry_.Register(callingUid,
+        sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().GetFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().formRectRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "GetFormRect_005 end";
+}
+
+// ========== GetLiveFormStatus Additional Tests ==========
+
+/**
+ * @tc.name: GetLiveFormStatus_003
+ * @tc.desc: Verify GetLiveFormStatus succeeds with registered delegate proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetLiveFormStatus_003 start";
+
+    // Register a proper mock delegate
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_OK;
+    mockDelegate->liveFormStatusData_ = {{"form_123", "21"}};
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    auto result = FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(liveFormStatusMap.size(), 1u);
+    EXPECT_EQ(liveFormStatusMap["form_123"], "21");
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "GetLiveFormStatus_003 end";
+}
+
+/**
+ * @tc.name: GetLiveFormStatus_004
+ * @tc.desc: Verify GetLiveFormStatus returns GET_HOST_FAILED when proxy returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetLiveFormStatus_004 start";
+
+    // Register a mock delegate that returns error
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    auto result = FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+    EXPECT_TRUE(liveFormStatusMap.empty());
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "GetLiveFormStatus_004 end";
+}
+
+// ========== SceneAnimationCheck Additional Tests ==========
+
+/**
+ * @tc.name: SceneAnimationCheck_002
+ * @tc.desc: Verify SceneAnimationCheck returns SYSTEMCAP_ERROR when not supported
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, SceneAnimationCheck_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_002 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = TEST_CALLING_UID;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // Ensure scene animation is not supported
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    auto result = FormCallbackAdapter::GetInstance().SceneAnimationCheck(TEST_FORM_ID, TEST_CALLING_UID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_SYSTEMCAP_ERROR);
+
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_002 end";
+}
+
+/**
+ * @tc.name: SceneAnimationCheck_003
+ * @tc.desc: Verify SceneAnimationCheck returns LIVE_OP_UNSUPPORTED when bundle is protected
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, SceneAnimationCheck_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_003 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = TEST_CALLING_UID;
+    record.bundleName = TEST_BUNDLE_NAME;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    // Enable scene animation support
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::SCENE_ANIMATION;
+
+    auto result = FormCallbackAdapter::GetInstance().SceneAnimationCheck(TEST_FORM_ID, TEST_CALLING_UID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+
+    // Cleanup
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_003 end";
+}
+
+/**
+ * @tc.name: SceneAnimationCheck_004
+ * @tc.desc: Verify SceneAnimationCheck returns LIVE_OP_UNSUPPORTED when sceneAnimationParams empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, SceneAnimationCheck_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_004 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = TEST_CALLING_UID;
+    record.bundleName = TEST_BUNDLE_NAME;
+    record.abilityName = TEST_ABILITY_NAME;
+    record.moduleName = TEST_MODULE_NAME;
+    record.formName = TEST_FORM_NAME;
+
+    // FormInfo with empty sceneAnimationParams.abilityName
+    FormInfo formInfo;
+    formInfo.abilityName = TEST_ABILITY_NAME;
+    formInfo.name = TEST_FORM_NAME;
+    formInfo.sceneAnimationParams.abilityName = "";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
+        .WillRepeatedly(Return(false));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    // Enable scene animation support
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::SCENE_ANIMATION;
+
+    auto result = FormCallbackAdapter::GetInstance().SceneAnimationCheck(TEST_FORM_ID, TEST_CALLING_UID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+
+    // Cleanup
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_004 end";
+}
+
+/**
+ * @tc.name: SceneAnimationCheck_005
+ * @tc.desc: Verify SceneAnimationCheck returns ERR_OK when all checks pass
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, SceneAnimationCheck_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_005 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = TEST_CALLING_UID;
+    record.bundleName = TEST_BUNDLE_NAME;
+    record.abilityName = TEST_ABILITY_NAME;
+    record.moduleName = TEST_MODULE_NAME;
+    record.formName = TEST_FORM_NAME;
+
+    FormInfo formInfo;
+    formInfo.abilityName = TEST_ABILITY_NAME;
+    formInfo.name = TEST_FORM_NAME;
+    formInfo.sceneAnimationParams.abilityName = "SceneAnimationAbility";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
+        .WillRepeatedly(Return(false));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    // Enable scene animation support
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::SCENE_ANIMATION;
+
+    auto result = FormCallbackAdapter::GetInstance().SceneAnimationCheck(TEST_FORM_ID, TEST_CALLING_UID);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
+
+    GTEST_LOG_(INFO) << "SceneAnimationCheck_005 end";
 }
 
 }  // namespace AppExecFwk
