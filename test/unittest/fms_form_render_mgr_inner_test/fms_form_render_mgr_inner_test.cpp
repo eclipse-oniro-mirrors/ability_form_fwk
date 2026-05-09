@@ -1203,12 +1203,12 @@ HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_001, TestSize.Leve
 HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ReleaseRenderer_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     formRecord.uiSyntax = FormType::JS;
     std::string compId = "compId";
-    EXPECT_EQ(ERR_OK, formRenderMgrInner.ReleaseRenderer(formId, formRecord, compId));
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "ReleaseRenderer_001 end";
 }
 
@@ -1220,13 +1220,13 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ReleaseRenderer_002 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     formRecord.uiSyntax = FormType::ETS;
     formRecord.abilityName = "";
     std::string compId = "compId";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.ReleaseRenderer(formId, formRecord, compId));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "ReleaseRenderer_002 end";
 }
 
@@ -1238,14 +1238,14 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ReleaseRenderer_003 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     formRecord.uiSyntax = FormType::ETS;
     formRecord.abilityName = "abilityName";
     formRecord.bundleName = "";
     std::string compId = "compId";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.ReleaseRenderer(formId, formRecord, compId));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "ReleaseRenderer_003 end";
 }
 
@@ -1257,7 +1257,7 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_003, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ReleaseRenderer_004 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     formRecord.formId = formId;
@@ -1265,7 +1265,7 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_004, TestSize.Level0)
     formRecord.abilityName = "abilityName";
     formRecord.bundleName = "bundleName";
     std::string compId = "compId";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.ReleaseRenderer(formId, formRecord, compId));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "ReleaseRenderer_004 end";
 }
 
@@ -1277,7 +1277,7 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_004, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ReleaseRenderer_005 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     formRecord.formId = formId;
@@ -1287,9 +1287,9 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_005, TestSize.Level0)
     std::string compId = "compId";
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.ReleaseRenderer(formId, formRecord, compId));
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "ReleaseRenderer_005 end";
 }
 
@@ -1301,7 +1301,7 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_005, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ReleaseRenderer_006 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     formRecord.formId = formId;
@@ -1313,9 +1313,9 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_006, TestSize.Level0)
     std::string compId = "compId";
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.ReleaseRenderer(formId, formRecord, compId));
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "ReleaseRenderer_006 end";
 }
 
@@ -1327,12 +1327,12 @@ HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_006, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RecycleForms_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RecycleForms_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
     std::vector<int64_t> formIds = {1, 2, 3};
     Want want;
     sptr<IRemoteObject> remoteObjectOfHost = nullptr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.RecycleForms(formIds, want, remoteObjectOfHost));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecycleForms(formIds, want, remoteObjectOfHost));
     GTEST_LOG_(INFO) << "RecycleForms_001 end";
 }
 
@@ -1344,15 +1344,15 @@ HWTEST_F(FormRenderMgrInnerTest, RecycleForms_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RecycleForms_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RecycleForms_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     std::vector<int64_t> formIds = {1};
     Want want;
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(FormRecord(), wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(1, conn);
+    formRenderMgrInner->renderFormConnections_.emplace(1, conn);
     sptr<IRemoteObject> remoteObjectOfHost = nullptr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.RecycleForms(formIds, want, remoteObjectOfHost));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecycleForms(formIds, want, remoteObjectOfHost));
     GTEST_LOG_(INFO) << "RecycleForms_002 end";
 }
 
@@ -1364,11 +1364,11 @@ HWTEST_F(FormRenderMgrInnerTest, RecycleForms_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RecoverForms_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RecoverForms_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
     std::vector<int64_t> formIds = {1, 2, 3};
     WantParams wantParams;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.RecoverForms(formIds, wantParams));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
     GTEST_LOG_(INFO) << "RecoverForms_001 end";
 }
 
@@ -1380,12 +1380,12 @@ HWTEST_F(FormRenderMgrInnerTest, RecoverForms_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RecoverForms_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RecoverForms_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     std::vector<int64_t> formIds = {1};
     WantParams wantParams;
     MockGetFormRecord(false, 0);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.RecoverForms(formIds, wantParams));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
     GTEST_LOG_(INFO) << "RecoverForms_002 end";
 }
 
@@ -1397,12 +1397,12 @@ HWTEST_F(FormRenderMgrInnerTest, RecoverForms_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RecoverForms_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RecoverForms_003 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     std::vector<int64_t> formIds = {1};
     WantParams wantParams;
     MockGetFormRecord(true, 0);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.RecoverForms(formIds, wantParams));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
     GTEST_LOG_(INFO) << "RecoverForms_003 end";
 }
 
@@ -1414,8 +1414,8 @@ HWTEST_F(FormRenderMgrInnerTest, RecoverForms_003, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RecoverForms_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RecoverForms_004 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     std::vector<int64_t> formIds = {100};
     WantParams wantParams;
     FormRecord formRecord;
@@ -1424,9 +1424,9 @@ HWTEST_F(FormRenderMgrInnerTest, RecoverForms_004, TestSize.Level0)
     formRecord.bundleName = "bundleName";
     WantParams connWantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, connWantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(100, conn);
+    formRenderMgrInner->renderFormConnections_.emplace(100, conn);
     MockGetFormRecord(true, 0);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.RecoverForms(formIds, wantParams));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
     GTEST_LOG_(INFO) << "RecoverForms_004 end";
 }
 
@@ -1438,15 +1438,15 @@ HWTEST_F(FormRenderMgrInnerTest, RecoverForms_004, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "UpdateFormSize_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
     int64_t formId = 1;
     float width = 100.0f;
     float height = 100.0f;
     float borderWidth = 1.0f;
     float formViewScale = 1.0f;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formRenderMgrInner.UpdateFormSize(formId, width, height, borderWidth, formViewScale));
+        formRenderMgrInner->UpdateFormSize(formId, width, height, borderWidth, formViewScale));
     GTEST_LOG_(INFO) << "UpdateFormSize_001 end";
 }
 
@@ -1458,8 +1458,8 @@ HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "UpdateFormSize_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     int64_t formId = 1;
     float width = 100.0f;
     float height = 100.0f;
@@ -1467,7 +1467,7 @@ HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_002, TestSize.Level0)
     float formViewScale = 1.0f;
     MockGetFormRecord(false, 0);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formRenderMgrInner.UpdateFormSize(formId, width, height, borderWidth, formViewScale));
+        formRenderMgrInner->UpdateFormSize(formId, width, height, borderWidth, formViewScale));
     GTEST_LOG_(INFO) << "UpdateFormSize_002 end";
 }
 
@@ -1479,8 +1479,8 @@ HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "UpdateFormSize_003 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     int64_t formId = 100;
     float width = 100.0f;
     float height = 100.0f;
@@ -1488,7 +1488,7 @@ HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_003, TestSize.Level0)
     float formViewScale = 1.0f;
     MockGetFormRecord(true, 0);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formRenderMgrInner.UpdateFormSize(formId, width, height, borderWidth, formViewScale));
+        formRenderMgrInner->UpdateFormSize(formId, width, height, borderWidth, formViewScale));
     GTEST_LOG_(INFO) << "UpdateFormSize_003 end";
 }
 
@@ -1500,10 +1500,10 @@ HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_003, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderObject_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderObject_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
     sptr<IRemoteObject> renderObj;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.GetRenderObject(renderObj));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->GetRenderObject(renderObj));
     GTEST_LOG_(INFO) << "GetRenderObject_001 end";
 }
 
@@ -1515,10 +1515,10 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderObject_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderObject_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderObject_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     sptr<IRemoteObject> renderObj;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.GetRenderObject(renderObj));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->GetRenderObject(renderObj));
     GTEST_LOG_(INFO) << "GetRenderObject_002 end";
 }
 
@@ -1530,10 +1530,10 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderObject_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderFormConnectId_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     int32_t connectId = 0;
-    EXPECT_FALSE(formRenderMgrInner.GetRenderFormConnectId(formId, connectId));
+    EXPECT_FALSE(formRenderMgrInner->GetRenderFormConnectId(formId, connectId));
     GTEST_LOG_(INFO) << "GetRenderFormConnectId_001 end";
 }
 
@@ -1545,11 +1545,11 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderFormConnectId_002 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     int32_t connectId = 0;
-    formRenderMgrInner.renderFormConnections_.emplace(formId, nullptr);
-    EXPECT_FALSE(formRenderMgrInner.GetRenderFormConnectId(formId, connectId));
+    formRenderMgrInner->renderFormConnections_.emplace(formId, nullptr);
+    EXPECT_FALSE(formRenderMgrInner->GetRenderFormConnectId(formId, connectId));
     GTEST_LOG_(INFO) << "GetRenderFormConnectId_002 end";
 }
 
@@ -1561,14 +1561,14 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderFormConnectId_003 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     int32_t connectId = 0;
     FormRecord formRecord;
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
-    EXPECT_TRUE(formRenderMgrInner.GetRenderFormConnectId(formId, connectId));
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    EXPECT_TRUE(formRenderMgrInner->GetRenderFormConnectId(formId, connectId));
     GTEST_LOG_(INFO) << "GetRenderFormConnectId_003 end";
 }
 
@@ -1580,10 +1580,10 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_003, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnection_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderFormConnection_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     sptr<FormRenderConnection> connection;
-    EXPECT_FALSE(formRenderMgrInner.GetRenderFormConnection(connection, formId));
+    EXPECT_FALSE(formRenderMgrInner->GetRenderFormConnection(connection, formId));
     GTEST_LOG_(INFO) << "GetRenderFormConnection_001 end";
 }
 
@@ -1595,14 +1595,14 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnection_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnection_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderFormConnection_002 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
     sptr<FormRenderConnection> connection;
-    EXPECT_TRUE(formRenderMgrInner.GetRenderFormConnection(connection, formId));
+    EXPECT_TRUE(formRenderMgrInner->GetRenderFormConnection(connection, formId));
     EXPECT_NE(connection, nullptr);
     GTEST_LOG_(INFO) << "GetRenderFormConnection_002 end";
 }
@@ -1615,10 +1615,10 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnection_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetConnectedForms_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     std::vector<int64_t> formIds = {1, 2, 3};
     std::vector<int64_t> connectedForms;
-    formRenderMgrInner.GetConnectedForms(formIds, connectedForms);
+    formRenderMgrInner->GetConnectedForms(formIds, connectedForms);
     EXPECT_EQ(0, connectedForms.size());
     GTEST_LOG_(INFO) << "GetConnectedForms_001 end";
 }
@@ -1631,12 +1631,12 @@ HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetConnectedForms_002 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
-    formRenderMgrInner.renderFormConnections_.emplace(formId, nullptr);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, nullptr);
     std::vector<int64_t> formIds = {formId};
     std::vector<int64_t> connectedForms;
-    formRenderMgrInner.GetConnectedForms(formIds, connectedForms);
+    formRenderMgrInner->GetConnectedForms(formIds, connectedForms);
     EXPECT_EQ(0, connectedForms.size());
     GTEST_LOG_(INFO) << "GetConnectedForms_002 end";
 }
@@ -1649,15 +1649,15 @@ HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetConnectedForms_003 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
     std::vector<int64_t> formIds = {formId};
     std::vector<int64_t> connectedForms;
-    formRenderMgrInner.GetConnectedForms(formIds, connectedForms);
+    formRenderMgrInner->GetConnectedForms(formIds, connectedForms);
     EXPECT_EQ(1, connectedForms.size());
     GTEST_LOG_(INFO) << "GetConnectedForms_003 end";
 }
@@ -1670,11 +1670,11 @@ HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_003, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RenderConnectedForm_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     FormRecord formRecord;
     Want want;
     sptr<FormRenderConnection> connection = nullptr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.RenderConnectedForm(formRecord, want, connection));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RenderConnectedForm(formRecord, want, connection));
     GTEST_LOG_(INFO) << "RenderConnectedForm_001 end";
 }
 
@@ -1686,8 +1686,8 @@ HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RenderConnectedForm_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
     FormRecord formRecord;
     formRecord.formId = 1;
     Want want;
@@ -1695,7 +1695,7 @@ HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_002, TestSize.Level0)
     sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
     MockConnectServiceAbility(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
-        formRenderMgrInner.RenderConnectedForm(formRecord, want, connection));
+        formRenderMgrInner->RenderConnectedForm(formRecord, want, connection));
     GTEST_LOG_(INFO) << "RenderConnectedForm_002 end";
 }
 
@@ -1707,15 +1707,15 @@ HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RenderConnectedForm_003 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     FormRecord formRecord;
     formRecord.formId = 1;
     Want want;
     WantParams wantParams;
     sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formRenderMgrInner.RenderConnectedForm(formRecord, want, connection));
+        formRenderMgrInner->RenderConnectedForm(formRecord, want, connection));
     GTEST_LOG_(INFO) << "RenderConnectedForm_003 end";
 }
 
@@ -1727,11 +1727,11 @@ HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_003, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     FormRecord formRecord;
     formRecord.formId = 1;
     Want want;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.PostStopRenderingFormTask(formRecord, want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_001 end";
 }
 
@@ -1743,12 +1743,12 @@ HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_002 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     FormRecord formRecord;
     formRecord.formId = 1;
     Want want;
-    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, nullptr);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.PostStopRenderingFormTask(formRecord, want));
+    formRenderMgrInner->renderFormConnections_.emplace(formRecord.formId, nullptr);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_002 end";
 }
 
@@ -1760,15 +1760,15 @@ HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_003 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     FormRecord formRecord;
     formRecord.formId = 1;
     Want want;
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, conn);
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.PostStopRenderingFormTask(formRecord, want));
+    formRenderMgrInner->renderFormConnections_.emplace(formRecord.formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_003 end";
 }
 
@@ -1780,15 +1780,15 @@ HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_003, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_004 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     FormRecord formRecord;
     formRecord.formId = 1;
     Want want;
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, conn);
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.PostStopRenderingFormTask(formRecord, want));
+    formRenderMgrInner->renderFormConnections_.emplace(formRecord.formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
     GTEST_LOG_(INFO) << "PostStopRenderingFormTask_004 end";
 }
 
@@ -1800,9 +1800,9 @@ HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_004, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.CheckRenderConnectionExistById(formId));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->CheckRenderConnectionExistById(formId));
     GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_001 end";
 }
 
@@ -1814,10 +1814,10 @@ HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_001, TestSize.Le
 HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_002 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
-    formRenderMgrInner.renderFormConnections_.emplace(formId, nullptr);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner.CheckRenderConnectionExistById(formId));
+    formRenderMgrInner->renderFormConnections_.emplace(formId, nullptr);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->CheckRenderConnectionExistById(formId));
     GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_002 end";
 }
 
@@ -1829,13 +1829,13 @@ HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_002, TestSize.Le
 HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_003 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId = 1;
     FormRecord formRecord;
     WantParams wantParams;
     sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
-    EXPECT_EQ(ERR_OK, formRenderMgrInner.CheckRenderConnectionExistById(formId));
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->CheckRenderConnectionExistById(formId));
     GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_003 end";
 }
 
@@ -1847,14 +1847,14 @@ HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_003, TestSize.Le
 HWTEST_F(FormRenderMgrInnerTest, RecoverFRSOnFormActivity_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "RecoverFRSOnFormActivity_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.isFrsDiedInLowMemory_ = true;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->isFrsDiedInLowMemory_ = true;
     sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
     std::unordered_set<int64_t> form;
     form.insert(1);
-    formRenderMgrInner.etsHosts_.emplace(remote, form);
-    formRenderMgrInner.RecoverFRSOnFormActivity();
-    EXPECT_FALSE(formRenderMgrInner.isFrsDiedInLowMemory_);
+    formRenderMgrInner->etsHosts_.emplace(remote, form);
+    formRenderMgrInner->RecoverFRSOnFormActivity();
+    EXPECT_FALSE(formRenderMgrInner->isFrsDiedInLowMemory_);
     GTEST_LOG_(INFO) << "RecoverFRSOnFormActivity_002 end";
 }
 
@@ -1866,9 +1866,9 @@ HWTEST_F(FormRenderMgrInnerTest, RecoverFRSOnFormActivity_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.isFrsDiedInLowMemory_ = false;
-    EXPECT_FALSE(formRenderMgrInner.GetIsFRSDiedInLowMemory());
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->isFrsDiedInLowMemory_ = false;
+    EXPECT_FALSE(formRenderMgrInner->GetIsFRSDiedInLowMemory());
     GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_001 end";
 }
 
@@ -1880,9 +1880,9 @@ HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.isFrsDiedInLowMemory_ = true;
-    EXPECT_TRUE(formRenderMgrInner.GetIsFRSDiedInLowMemory());
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->isFrsDiedInLowMemory_ = true;
+    EXPECT_TRUE(formRenderMgrInner->GetIsFRSDiedInLowMemory());
     GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_002 end";
 }
 
@@ -1894,11 +1894,11 @@ HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, ExecOnUnlockTask_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ExecOnUnlockTask_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.onUnlockTask_ = [](const sptr<IRemoteObject> &remoteObject) {};
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->onUnlockTask_ = [](const sptr<IRemoteObject> &remoteObject) {};
     sptr<IRemoteObject> remoteObject = nullptr;
-    formRenderMgrInner.ExecOnUnlockTask(remoteObject);
-    EXPECT_EQ(formRenderMgrInner.onUnlockTask_, nullptr);
+    formRenderMgrInner->ExecOnUnlockTask(remoteObject);
+    EXPECT_EQ(formRenderMgrInner->onUnlockTask_, nullptr);
     GTEST_LOG_(INFO) << "ExecOnUnlockTask_002 end";
 }
 
@@ -1910,18 +1910,18 @@ HWTEST_F(FormRenderMgrInnerTest, ExecOnUnlockTask_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, checkConnectionsFormIds_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "checkConnectionsFormIds_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId1 = 1;
     int64_t formId2 = 2;
     FormRecord formRecord;
     WantParams wantParams;
     sptr<FormRenderConnection> conn1 = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
     sptr<FormRenderConnection> conn2 = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId1, conn1);
-    formRenderMgrInner.renderFormConnections_.emplace(formId2, conn2);
+    formRenderMgrInner->renderFormConnections_.emplace(formId1, conn1);
+    formRenderMgrInner->renderFormConnections_.emplace(formId2, conn2);
     std::vector<int64_t> formIds = {formId1, formId2};
     std::vector<int64_t> needConFormIds;
-    EXPECT_EQ(ERR_OK, formRenderMgrInner.checkConnectionsFormIds(formIds, needConFormIds));
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->checkConnectionsFormIds(formIds, needConFormIds));
     EXPECT_EQ(0, needConFormIds.size());
     GTEST_LOG_(INFO) << "checkConnectionsFormIds_001 end";
 }
@@ -1934,17 +1934,17 @@ HWTEST_F(FormRenderMgrInnerTest, checkConnectionsFormIds_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, checkConnectionsFormIds_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "checkConnectionsFormIds_002 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     int64_t formId1 = 1;
     int64_t formId2 = 2;
     int64_t formId3 = 3;
     FormRecord formRecord;
     WantParams wantParams;
     sptr<FormRenderConnection> conn1 = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner.renderFormConnections_.emplace(formId1, conn1);
+    formRenderMgrInner->renderFormConnections_.emplace(formId1, conn1);
     std::vector<int64_t> formIds = {formId1, formId2, formId3};
     std::vector<int64_t> needConFormIds;
-    EXPECT_EQ(ERR_OK, formRenderMgrInner.checkConnectionsFormIds(formIds, needConFormIds));
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->checkConnectionsFormIds(formIds, needConFormIds));
     EXPECT_EQ(2, needConFormIds.size());
     GTEST_LOG_(INFO) << "checkConnectionsFormIds_002 end";
 }
@@ -1957,9 +1957,9 @@ HWTEST_F(FormRenderMgrInnerTest, checkConnectionsFormIds_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetReRenderCount_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.atomicRerenderCount_ = 0;
-    EXPECT_EQ(0, formRenderMgrInner.GetReRenderCount());
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->atomicRerenderCount_ = 0;
+    EXPECT_EQ(0, formRenderMgrInner->GetReRenderCount());
     GTEST_LOG_(INFO) << "GetReRenderCount_001 end";
 }
 
@@ -1971,9 +1971,9 @@ HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetReRenderCount_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.atomicRerenderCount_ = 5;
-    EXPECT_EQ(5, formRenderMgrInner.GetReRenderCount());
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->atomicRerenderCount_ = 5;
+    EXPECT_EQ(5, formRenderMgrInner->GetReRenderCount());
     GTEST_LOG_(INFO) << "GetReRenderCount_002 end";
 }
 
@@ -1985,9 +1985,9 @@ HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderRemoteObj_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    EXPECT_EQ(nullptr, formRenderMgrInner.GetRenderRemoteObj());
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    EXPECT_EQ(nullptr, formRenderMgrInner->GetRenderRemoteObj());
     GTEST_LOG_(INFO) << "GetRenderRemoteObj_001 end";
 }
 
@@ -1999,9 +1999,9 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_001, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetRenderRemoteObj_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    EXPECT_NE(nullptr, formRenderMgrInner.GetRenderRemoteObj());
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_NE(nullptr, formRenderMgrInner->GetRenderRemoteObj());
     GTEST_LOG_(INFO) << "GetRenderRemoteObj_002 end";
 }
 
@@ -2013,10 +2013,10 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_002, TestSize.Level0)
 HWTEST_F(FormRenderMgrInnerTest, SetRenderRemoteObj_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 start";
-    FormRenderMgrInner formRenderMgrInner;
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
     sptr<IFormRender> remoteObject = new (std::nothrow) MockIFormRender();
-    formRenderMgrInner.SetRenderRemoteObj(remoteObject);
-    EXPECT_NE(nullptr, formRenderMgrInner.renderRemoteObj_);
+    formRenderMgrInner->SetRenderRemoteObj(remoteObject);
+    EXPECT_NE(nullptr, formRenderMgrInner->renderRemoteObj_);
     GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 end";
 }
 
