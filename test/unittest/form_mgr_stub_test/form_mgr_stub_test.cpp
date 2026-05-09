@@ -3782,7 +3782,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterFormWantCallback_002, TestSize
     MessageParcel reply;
     MessageOption option{MessageOption::TF_SYNC};
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterFormWantCallback_002 ends";
 }
 
@@ -3820,7 +3820,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterFormWantCallback_002, TestSi
     MessageParcel reply;
     MessageOption option{MessageOption::TF_SYNC};
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 ends";
 }
 }
