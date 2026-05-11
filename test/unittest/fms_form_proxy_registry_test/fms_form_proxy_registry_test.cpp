@@ -84,7 +84,7 @@ HWTEST_F(FmsFormProxyRegistryTest, FmsFormProxyRegistryTest_Register_0002, TestS
 HWTEST_F(FmsFormProxyRegistryTest, FmsFormProxyRegistryTest_Unregister_0001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_Unregister_0001 start";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, registry_.Unregister(UID_A));
+    EXPECT_EQ(ERR_OK, registry_.Unregister(UID_A));
     EXPECT_EQ(0u, registry_.Size());
     GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_Unregister_0001 end";
 }

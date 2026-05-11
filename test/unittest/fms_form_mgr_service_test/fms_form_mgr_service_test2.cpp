@@ -2533,6 +2533,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_003, Te
     FormMgrService formMgrService;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockIsSACall(true);
+    MockVerifyCallingPermission(true);
     MockRegisterFormWantCallback(ERR_OK);
     ErrCode ret = formMgrService.RegisterFormWantCallback(callerToken);
     EXPECT_EQ(ret, ERR_OK);
@@ -2584,6 +2585,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_003, 
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_003 start";
     FormMgrService formMgrService;
     MockIsSACall(true);
+    MockVerifyCallingPermission(true);
     MockUnregisterFormWantCallback(ERR_OK);
     ErrCode ret = formMgrService.UnregisterFormWantCallback();
     EXPECT_EQ(ret, ERR_OK);

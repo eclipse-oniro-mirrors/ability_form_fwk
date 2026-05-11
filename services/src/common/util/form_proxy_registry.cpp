@@ -65,7 +65,7 @@ ErrCode FormProxyRegistry::Unregister(int32_t callingUid)
     auto it = proxies_.find(callingUid);
     if (it == proxies_.end()) {
         HILOG_WARN("%{public}s: no proxy registered for uid=%{public}d", tag_.c_str(), callingUid);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return ERR_OK;
     }
     RemoveDeathRecipient(callingUid, it->second);
     proxies_.erase(it);

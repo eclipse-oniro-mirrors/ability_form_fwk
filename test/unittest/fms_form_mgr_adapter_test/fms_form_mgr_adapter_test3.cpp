@@ -1285,7 +1285,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UnregisterGetFormRectProxy_0001,
     GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetFormRectProxy_0001 start";
     FormMgrAdapter formMgrAdapter;
     auto ret = formMgrAdapter.UnregisterGetFormRectProxy();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetFormRectProxy_0001 end";
 }
 
@@ -1333,7 +1333,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_UnregisterGetLiveFormStatusProxy
     GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetLiveFormStatusProxy_0001 start";
     FormMgrAdapter formMgrAdapter;
     auto ret = formMgrAdapter.UnregisterGetLiveFormStatusProxy();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_UnregisterGetLiveFormStatusProxy_0001 end";
 }
 
@@ -1876,7 +1876,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterOverflowProxy_0001, Test
     FormMgrAdapter formMgrAdapter;
     sptr<IRemoteObject> nullProxy = nullptr;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.RegisterOverflowProxy(nullProxy));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterOverflowProxy());
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterOverflowProxy());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterOverflowProxy_0001 end";
 }
 
@@ -1892,7 +1892,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterOverflowProxy_0002, Test
     sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
     EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterOverflowProxy(proxy));
     EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterOverflowProxy());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterOverflowProxy());
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterOverflowProxy());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterOverflowProxy_0002 end";
 }
 
@@ -1927,7 +1927,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterChangeSceneAnimationStat
     sptr<IRemoteObject> nullProxy = nullptr;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
         formMgrAdapter.RegisterChangeSceneAnimationStateProxy(nullProxy));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+    EXPECT_EQ(ERR_OK,
         formMgrAdapter.UnregisterChangeSceneAnimationStateProxy());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0001 end";
 }
@@ -1944,7 +1944,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterChangeSceneAnimationStat
     sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
     EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterChangeSceneAnimationStateProxy(proxy));
     EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterChangeSceneAnimationStateProxy());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+    EXPECT_EQ(ERR_OK,
         formMgrAdapter.UnregisterChangeSceneAnimationStateProxy());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterChangeSceneAnimationStateProxy_0002 end";
 }
@@ -1979,7 +1979,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterPublishFormCrossBundleCo
     sptr<IRemoteObject> nullProxy = nullptr;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
         formMgrAdapter.RegisterPublishFormCrossBundleControl(nullProxy));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+    EXPECT_EQ(ERR_OK,
         formMgrAdapter.UnregisterPublishFormCrossBundleControl());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterPublishFormCrossBundleControl_0001 end";
 }
@@ -1996,7 +1996,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterPublishFormCrossBundleCo
     sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
     EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterPublishFormCrossBundleControl(proxy));
     EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterPublishFormCrossBundleControl());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+    EXPECT_EQ(ERR_OK,
         formMgrAdapter.UnregisterPublishFormCrossBundleControl());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterPublishFormCrossBundleControl_0002 end";
 }
@@ -2030,7 +2030,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterTemplateFormDetailInfoCh
     sptr<IRemoteObject> nullProxy = nullptr;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
         formMgrAdapter.RegisterTemplateFormDetailInfoChange(nullProxy));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+    EXPECT_EQ(ERR_OK,
         formMgrAdapter.UnregisterTemplateFormDetailInfoChange());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0001 end";
 }
@@ -2047,7 +2047,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterTemplateFormDetailInfoCh
     sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
     EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterTemplateFormDetailInfoChange(proxy));
     EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterTemplateFormDetailInfoChange());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+    EXPECT_EQ(ERR_OK,
         formMgrAdapter.UnregisterTemplateFormDetailInfoChange());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterTemplateFormDetailInfoChange_0002 end";
 }
@@ -2079,7 +2079,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterGetFormRectProxy_0001, T
     sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
     EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterGetFormRectProxy(proxy));
     EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterGetFormRectProxy());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterGetFormRectProxy());
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterGetFormRectProxy());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterGetFormRectProxy_0001 end";
 }
 
@@ -2095,7 +2095,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_RegisterGetLiveFormStatusProxy_0
     sptr<IRemoteObject> proxy = new (std::nothrow) MockFormProviderClient();
     EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterGetLiveFormStatusProxy(proxy));
     EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterGetLiveFormStatusProxy());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.UnregisterGetLiveFormStatusProxy());
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterGetLiveFormStatusProxy());
     GTEST_LOG_(INFO) << "FormMgrAdapter_RegisterGetLiveFormStatusProxy_0001 end";
 }
 
