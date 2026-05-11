@@ -465,5 +465,479 @@ HWTEST_F(FmsFormEventAdapterTest, OpenByOpenType_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "OpenByOpenType_003 end";
 }
 
+// ========== Method 6: CheckKeepBackgroundRunningPermission Tests ==========
+
+/**
+ * @tc.name: CheckKeepBackgroundRunningPermission_001
+ * @tc.desc: Verify GetBundleInfoWithPermission returns false → returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_001 start";
+
+    sptr<IBundleMgr> iBundleMgr = new MockBundleMgrStub();
+    std::string bundleName = "com.test.bundle";
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormEventAdapter::GetInstance().CheckKeepBackgroundRunningPermission(
+        iBundleMgr, bundleName);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_001 end";
+}
+
+/**
+ * @tc.name: CheckKeepBackgroundRunningPermission_002
+ * @tc.desc: Verify GetBundleInfoWithPermission returns true but reqPermissions does NOT
+ *           contain PERMISSION_KEEP_BACKGROUND_RUNNING → returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_002 start";
+
+    sptr<IBundleMgr> iBundleMgr = new MockBundleMgrStub();
+    std::string bundleName = "com.test.bundle";
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(BundleInfo()), Return(true)));
+
+    auto result = FormEventAdapter::GetInstance().CheckKeepBackgroundRunningPermission(
+        iBundleMgr, bundleName);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_002 end";
+}
+
+/**
+ * @tc.name: CheckKeepBackgroundRunningPermission_003
+ * @tc.desc: Verify GetBundleInfoWithPermission returns true and reqPermissions contains
+ *           PERMISSION_KEEP_BACKGROUND_RUNNING → returns true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_003 start";
+
+    sptr<IBundleMgr> iBundleMgr = new MockBundleMgrStub();
+    std::string bundleName = "com.test.bundle";
+
+    BundleInfo bundleInfo;
+    bundleInfo.reqPermissions.push_back(Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+
+    auto result = FormEventAdapter::GetInstance().CheckKeepBackgroundRunningPermission(
+        iBundleMgr, bundleName);
+    EXPECT_TRUE(result);
+
+    GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_003 end";
+}
+
+// ========== Method 7: BackgroundEvent Additional Branch Tests ==========
+
+/**
+ * @tc.name: BackgroundEvent_004
+ * @tc.desc: Verify CheckKeepBackgroundRunningPermission returns false → ERR_APPEXECFWK_FORM_PERMISSION_DENY
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BackgroundEvent_004 start";
+
+    Want want;
+    want.SetBundle("com.test.bundle");
+    want.SetElementName("com.test.bundle", "MainAbility");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormEventAdapter::GetInstance().BackgroundEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+
+    GTEST_LOG_(INFO) << "BackgroundEvent_004 end";
+}
+
+/**
+ * @tc.name: BackgroundEvent_005
+ * @tc.desc: Verify invalid JSON params (is_discarded) → ERR_APPEXECFWK_FORM_INVALID_PARAM
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BackgroundEvent_005 start";
+
+    Want want;
+    want.SetBundle("com.test.bundle");
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, std::string("invalid json"));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+
+    BundleInfo bundleInfo;
+    bundleInfo.reqPermissions.push_back(Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+
+    auto result = FormEventAdapter::GetInstance().BackgroundEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "BackgroundEvent_005 end";
+}
+
+/**
+ * @tc.name: BackgroundEvent_006
+ * @tc.desc: Verify JSON missing method key → ERR_APPEXECFWK_FORM_INVALID_PARAM
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BackgroundEvent_006 start";
+
+    Want want;
+    want.SetBundle("com.test.bundle");
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, std::string("{\"otherKey\":\"otherValue\"}"));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+
+    BundleInfo bundleInfo;
+    bundleInfo.reqPermissions.push_back(Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+
+    auto result = FormEventAdapter::GetInstance().BackgroundEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "BackgroundEvent_006 end";
+}
+
+/**
+ * @tc.name: BackgroundEvent_007
+ * @tc.desc: Verify JSON method key is not string type → ERR_APPEXECFWK_FORM_INVALID_PARAM
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BackgroundEvent_007 start";
+
+    Want want;
+    want.SetBundle("com.test.bundle");
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, std::string("{\"method\":12345}"));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+
+    BundleInfo bundleInfo;
+    bundleInfo.reqPermissions.push_back(Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+
+    auto result = FormEventAdapter::GetInstance().BackgroundEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "BackgroundEvent_007 end";
+}
+
+/**
+ * @tc.name: BackgroundEvent_008
+ * @tc.desc: Verify empty bundle in want gets corrected to record.bundleName
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BackgroundEvent_008 start";
+
+    Want want;
+    // No bundle set → empty bundle
+    want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, std::string("invalid json"));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormEventAdapter::GetInstance().BackgroundEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    // Verify want bundle was corrected
+    EXPECT_EQ(want.GetBundle(), "com.test.bundle");
+
+    GTEST_LOG_(INFO) << "BackgroundEvent_008 end";
+}
+
+// ========== Method 8: RouterEvent Additional Branch Tests ==========
+
+/**
+ * @tc.name: RouterEvent_005
+ * @tc.desc: Verify formId < MAX_NUMBER_OF_JS sets formId as int64 parameter
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_005 start";
+
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+
+    // formId 123456789 (< MAX_NUMBER_OF_JS) should be set as int64
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    // Verify formId was set as int64 (not string) - parameter should exist
+    EXPECT_TRUE(want.HasParameter(Constants::PARAM_FORM_IDENTITY_KEY));
+
+    GTEST_LOG_(INFO) << "RouterEvent_005 end";
+}
+
+/**
+ * @tc.name: RouterEvent_006
+ * @tc.desc: Verify formId >= MAX_NUMBER_OF_JS sets formId as string parameter
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_006 start";
+
+    constexpr int64_t LARGE_FORM_ID = 200000000000000L;
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(LARGE_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(LARGE_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    // Verify formId was set as string for large formId
+    EXPECT_TRUE(want.HasParameter(Constants::PARAM_FORM_IDENTITY_KEY));
+
+    GTEST_LOG_(INFO) << "RouterEvent_006 end";
+}
+
+/**
+ * @tc.name: RouterEvent_007
+ * @tc.desc: Verify bundle mismatch with non-system app sets bundle to record.bundleName
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_007 start";
+
+    Want want;
+    want.SetBundle("com.other.bundle");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    // GetApplicationInfo fails → ERR_APPEXECFWK_FORM_GET_BMS_FAILED
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    // Verify bundle was corrected for non-system app
+    EXPECT_EQ(want.GetBundle(), "com.test.bundle");
+
+    GTEST_LOG_(INFO) << "RouterEvent_007 end";
+}
+
+/**
+ * @tc.name: RouterEvent_008
+ * @tc.desc: Verify GetApplicationInfo fails → ERR_APPEXECFWK_FORM_GET_BMS_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_008 start";
+
+    Want want;
+    want.SetBundle("com.test.bundle");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+
+    GTEST_LOG_(INFO) << "RouterEvent_008 end";
+}
+
+/**
+ * @tc.name: RouterEvent_009
+ * @tc.desc: Verify PARAM_OPEN_TYPE triggers OpenByOpenType path
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_009 start";
+
+    Want want;
+    want.SetBundle("com.test.bundle");
+    want.SetParam(Constants::PARAM_OPEN_TYPE,
+        static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_APP_LINKING));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    // OpenByOpenType with non-system app → PERMISSION_DENY
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+
+    GTEST_LOG_(INFO) << "RouterEvent_009 end";
+}
+
+/**
+ * @tc.name: RouterEvent_010
+ * @tc.desc: Verify system app with bundle mismatch does NOT override bundle when URI is not empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_010 start";
+
+    Want want;
+    want.SetBundle("com.other.bundle");
+    want.SetUri("test://uri");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    // When URI is not empty, bundle is NOT overridden even if mismatched
+    EXPECT_EQ(want.GetBundle(), "com.other.bundle");
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+
+    GTEST_LOG_(INFO) << "RouterEvent_010 end";
+}
+
+// ========== Method 9: OpenByOpenType Additional Branch Tests ==========
+
+/**
+ * @tc.name: OpenByOpenType_004
+ * @tc.desc: Verify invalid openType returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, OpenByOpenType_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenByOpenType_004 start";
+
+    FormRecord record;
+    record.isSystemApp = true;
+    record.formId = TEST_FORM_ID;
+    Want want;
+    int32_t openResult = ERR_OK;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    bool result = FormEventAdapter::GetInstance().OpenByOpenType(
+        999, // invalid openType
+        record, callerToken, want, openResult);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "OpenByOpenType_004 end";
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

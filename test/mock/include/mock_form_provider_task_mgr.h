@@ -35,6 +35,8 @@ public:
         const sptr<IRemoteObject> &remoteObject) = 0;
     virtual void PostCastTempTask(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &remoteObject) = 0;
+    virtual void PostAcquireStateTask(const Want &wantArg, const std::string &provider, const Want &want,
+        const sptr<IRemoteObject> &remoteObject) = 0;
 };
 
 class MockFormProviderTaskMgr : public AbstractMockFormProviderTaskMgr {
@@ -53,6 +55,8 @@ public:
     MOCK_METHOD3(PostProviderBatchDeleteTask, void(std::set<int64_t> &formIds, const Want &want,
         const sptr<IRemoteObject> &remoteObject));
     MOCK_METHOD3(PostCastTempTask, void(const int64_t formId, const Want &want,
+        const sptr<IRemoteObject> &remoteObject));
+    MOCK_METHOD4(PostAcquireStateTask, void(const Want &wantArg, const std::string &provider, const Want &want,
         const sptr<IRemoteObject> &remoteObject));
 };
 }  // namespace AppExecFwk

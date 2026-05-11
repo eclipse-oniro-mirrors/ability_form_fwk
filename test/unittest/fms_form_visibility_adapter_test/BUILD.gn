@@ -28,6 +28,7 @@ ohos_unittest("FmsFormVisibilityAdapterTest") {
     "${form_fwk_path}/interfaces/inner_api/src/form_instance.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_info_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_ams_helper.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_bundle_lock_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_exempt_lock_mgr.cpp",

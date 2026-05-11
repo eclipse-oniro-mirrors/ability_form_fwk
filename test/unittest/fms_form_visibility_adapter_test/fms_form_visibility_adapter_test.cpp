@@ -19,6 +19,7 @@
 #define private public
 #define protected public
 #include "form_mgr/form_visibility_adapter.h"
+#include "form_mgr/form_common_adapter.h"
 #undef private
 #undef protected
 
@@ -29,6 +30,7 @@
 
 #include "mock_form_data_mgr.h"
 #include "mock_form_info_mgr.h"
+#include "mock_form_ams_helper.h"
 #include "mock_form_bms_helper.h"
 #include "mock_form_bundle_lock_mgr.h"
 #include "mock_form_exempt_lock_mgr.h"
@@ -59,6 +61,7 @@ void FmsFormVisibilityAdapterTest::SetUpTestCase()
 {
     MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
     MockFormInfoMgr::obj = std::make_shared<MockFormInfoMgr>();
+    MockFormAmsHelper::obj = std::make_shared<MockFormAmsHelper>();
     MockFormBmsHelper::obj = std::make_shared<MockFormBmsHelper>();
     MockFormBundleLockMgr::obj = std::make_shared<MockFormBundleLockMgr>();
     MockFormExemptLockMgr::obj = std::make_shared<MockFormExemptLockMgr>();
@@ -69,6 +72,7 @@ void FmsFormVisibilityAdapterTest::TearDownTestCase()
 {
     MockFormDataMgr::obj = nullptr;
     MockFormInfoMgr::obj = nullptr;
+    MockFormAmsHelper::obj = nullptr;
     MockFormBmsHelper::obj = nullptr;
     MockFormBundleLockMgr::obj = nullptr;
     MockFormExemptLockMgr::obj = nullptr;
@@ -444,6 +448,570 @@ HWTEST_F(FmsFormVisibilityAdapterTest, NotifyFormLocked_004, TestSize.Level1)
     auto result = FormVisibilityAdapter::GetInstance().NotifyFormLocked(TEST_FORM_ID, true);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "NotifyFormLocked_004 end";
+}
+
+// ========== PaddingNotifyVisibleFormsMap Tests ==========
+
+/**
+ * @tc.name: PaddingNotifyVisibleFormsMap_001
+ * @tc.desc: Verify formVisibleType matches formInstance.formVisiblity → early return, map unchanged
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, PaddingNotifyVisibleFormsMap_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "PaddingNotifyVisibleFormsMap_001 start";
+    int32_t formVisibleType = Constants::FORM_VISIBLE;
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+
+    // Set formVisiblity to match formVisibleType (VISIBLE) so it returns early
+    FormInstance matchInstance;
+    matchInstance.formVisiblity = FormVisibilityType::VISIBLE;
+    matchInstance.formHostName = "com.test.host";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormInstanceById3(TEST_FORM_ID, false, _))
+        .WillOnce(DoAll(SetArgReferee<2>(matchInstance), Return(ERR_OK)));
+
+    FormVisibilityAdapter::GetInstance().PaddingNotifyVisibleFormsMap(
+        formVisibleType, TEST_FORM_ID, formInstanceMaps);
+    EXPECT_TRUE(formInstanceMaps.empty());
+    GTEST_LOG_(INFO) << "PaddingNotifyVisibleFormsMap_001 end";
+}
+
+// ========== CreateHandleEventMap Tests ==========
+
+/**
+ * @tc.name: CreateHandleEventMap_001
+ * @tc.desc: Verify formVisibleNotify is false → return false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, CreateHandleEventMap_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CreateHandleEventMap_001 start";
+    FormRecord formRecord;
+    formRecord.formVisibleNotify = false;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "entry";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+
+    bool result = FormVisibilityAdapter::GetInstance().CreateHandleEventMap(
+        TEST_FORM_ID, formRecord, eventMaps);
+    EXPECT_FALSE(result);
+    EXPECT_TRUE(eventMaps.empty());
+    GTEST_LOG_(INFO) << "CreateHandleEventMap_001 end";
+}
+
+/**
+ * @tc.name: CreateHandleEventMap_002
+ * @tc.desc: Verify new providerKey → insert into eventMaps
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, CreateHandleEventMap_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CreateHandleEventMap_002 start";
+    FormRecord formRecord;
+    formRecord.formVisibleNotify = true;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "entry";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+
+    bool result = FormVisibilityAdapter::GetInstance().CreateHandleEventMap(
+        TEST_FORM_ID, formRecord, eventMaps);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(eventMaps.size(), 1u);
+    std::string expectedKey = "com.test.bundle::MainAbility::entry";
+    EXPECT_TRUE(eventMaps.find(expectedKey) != eventMaps.end());
+    EXPECT_EQ(eventMaps[expectedKey].size(), 1u);
+    EXPECT_EQ(eventMaps[expectedKey][0], TEST_FORM_ID);
+    GTEST_LOG_(INFO) << "CreateHandleEventMap_002 end";
+}
+
+/**
+ * @tc.name: CreateHandleEventMap_003
+ * @tc.desc: Verify existing providerKey → emplace_back to existing vector
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, CreateHandleEventMap_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CreateHandleEventMap_003 start";
+    FormRecord formRecord;
+    formRecord.formVisibleNotify = true;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "entry";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+
+    std::string expectedKey = "com.test.bundle::MainAbility::entry";
+    eventMaps[expectedKey] = {111L};
+
+    bool result = FormVisibilityAdapter::GetInstance().CreateHandleEventMap(
+        TEST_FORM_ID, formRecord, eventMaps);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(eventMaps[expectedKey].size(), 2u);
+    EXPECT_EQ(eventMaps[expectedKey][1], TEST_FORM_ID);
+    GTEST_LOG_(INFO) << "CreateHandleEventMap_003 end";
+}
+
+// ========== HandleEventNotify Tests ==========
+
+/**
+ * @tc.name: HandleEventNotify_001
+ * @tc.desc: Verify no first delimiter → ERR_APPEXECFWK_FORM_COMMON_CODE
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HandleEventNotify_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleEventNotify_001 start";
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    auto result = FormVisibilityAdapter::GetInstance().HandleEventNotify(
+        "NoDelimiter", formIds, Constants::FORM_VISIBLE);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "HandleEventNotify_001 end";
+}
+
+/**
+ * @tc.name: HandleEventNotify_002
+ * @tc.desc: Verify no second delimiter → ERR_APPEXECFWK_FORM_COMMON_CODE
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HandleEventNotify_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleEventNotify_002 start";
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    auto result = FormVisibilityAdapter::GetInstance().HandleEventNotify(
+        "com.test.bundle::OnlyOneDelimiter", formIds, Constants::FORM_VISIBLE);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "HandleEventNotify_002 end";
+}
+
+// ========== FilterFormInstanceMapsByVisibleType Tests ==========
+
+/**
+ * @tc.name: FilterFormInstanceMapsByVisibleType_001
+ * @tc.desc: Verify GetFormRecord fails → instance skipped, kept in map
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterFormInstanceMapsByVisibleType_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_001 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance;
+    instance.formId = TEST_FORM_ID;
+    formInstanceMaps["com.test.host"] = {instance};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(Return(false));
+
+    FormVisibilityAdapter::GetInstance().FilterFormInstanceMapsByVisibleType(
+        formInstanceMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    // When GetFormRecord fails, instanceIter++ continues, the instance remains
+    // Since formInstances is not empty, the entry is kept
+    EXPECT_EQ(formInstanceMaps["com.test.host"].size(), 1u);
+    EXPECT_TRUE(restoreFormRecords.empty());
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_001 end";
+}
+
+/**
+ * @tc.name: FilterFormInstanceMapsByVisibleType_002
+ * @tc.desc: Verify formVisibleNotifyState != formVisibleType → erased, added to restoreFormRecords
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterFormInstanceMapsByVisibleType_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_002 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance;
+    instance.formId = TEST_FORM_ID;
+    formInstanceMaps["com.test.host"] = {instance};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
+    record.isNeedNotify = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterFormInstanceMapsByVisibleType(
+        formInstanceMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    // Instance erased because formVisibleNotifyState != FORM_VISIBLE
+    EXPECT_TRUE(formInstanceMaps.empty());
+    EXPECT_EQ(restoreFormRecords.size(), 1u);
+    EXPECT_TRUE(restoreFormRecords.find(TEST_FORM_ID) != restoreFormRecords.end());
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_002 end";
+}
+
+/**
+ * @tc.name: FilterFormInstanceMapsByVisibleType_003
+ * @tc.desc: Verify isNeedNotify false → erased (not added to restoreFormRecords)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterFormInstanceMapsByVisibleType_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_003 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance;
+    instance.formId = TEST_FORM_ID;
+    formInstanceMaps["com.test.host"] = {instance};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record.isNeedNotify = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterFormInstanceMapsByVisibleType(
+        formInstanceMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    // Instance erased because isNeedNotify is false
+    EXPECT_TRUE(formInstanceMaps.empty());
+    // Not added to restoreFormRecords since it wasn't a state mismatch
+    EXPECT_TRUE(restoreFormRecords.empty());
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_003 end";
+}
+
+/**
+ * @tc.name: FilterFormInstanceMapsByVisibleType_004
+ * @tc.desc: Verify formVisibleNotifyState matches && isNeedNotify → kept in map
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterFormInstanceMapsByVisibleType_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_004 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance;
+    instance.formId = TEST_FORM_ID;
+    formInstanceMaps["com.test.host"] = {instance};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record.isNeedNotify = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterFormInstanceMapsByVisibleType(
+        formInstanceMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    EXPECT_EQ(formInstanceMaps["com.test.host"].size(), 1u);
+    EXPECT_TRUE(restoreFormRecords.empty());
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_004 end";
+}
+
+/**
+ * @tc.name: FilterFormInstanceMapsByVisibleType_005
+ * @tc.desc: Verify all instances filtered → entry erased from formInstanceMaps
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterFormInstanceMapsByVisibleType_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_005 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance1;
+    instance1.formId = TEST_FORM_ID;
+    FormInstance instance2;
+    instance2.formId = TEST_FORM_ID + 1;
+    formInstanceMaps["com.test.host"] = {instance1, instance2};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record.isNeedNotify = false;
+
+    FormRecord record2;
+    record2.formId = TEST_FORM_ID + 1;
+    record2.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record2.isNeedNotify = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID + 1, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record2), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterFormInstanceMapsByVisibleType(
+        formInstanceMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    EXPECT_TRUE(formInstanceMaps.empty());
+    GTEST_LOG_(INFO) << "FilterFormInstanceMapsByVisibleType_005 end";
+}
+
+// ========== FilterEventMapsByVisibleType Tests ==========
+
+/**
+ * @tc.name: FilterEventMapsByVisibleType_001
+ * @tc.desc: Verify GetFormRecord fails → formId skipped, kept in map
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterEventMapsByVisibleType_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_001 start";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    eventMaps["com.test.bundle::MainAbility::entry"] = {TEST_FORM_ID};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(Return(false));
+
+    FormVisibilityAdapter::GetInstance().FilterEventMapsByVisibleType(
+        eventMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    // GetFormRecord fails, formItr++ continues, kept in map
+    EXPECT_EQ(eventMaps["com.test.bundle::MainAbility::entry"].size(), 1u);
+    EXPECT_TRUE(restoreFormRecords.empty());
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_001 end";
+}
+
+/**
+ * @tc.name: FilterEventMapsByVisibleType_002
+ * @tc.desc: Verify formVisibleNotifyState != formVisibleType → erased, added to restoreFormRecords
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterEventMapsByVisibleType_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_002 start";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    eventMaps["com.test.bundle::MainAbility::entry"] = {TEST_FORM_ID};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
+    record.isNeedNotify = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterEventMapsByVisibleType(
+        eventMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    EXPECT_TRUE(eventMaps.empty());
+    EXPECT_EQ(restoreFormRecords.size(), 1u);
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_002 end";
+}
+
+/**
+ * @tc.name: FilterEventMapsByVisibleType_003
+ * @tc.desc: Verify isNeedNotify false → erased (not added to restoreFormRecords)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterEventMapsByVisibleType_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_003 start";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    eventMaps["com.test.bundle::MainAbility::entry"] = {TEST_FORM_ID};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record.isNeedNotify = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterEventMapsByVisibleType(
+        eventMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    EXPECT_TRUE(eventMaps.empty());
+    EXPECT_TRUE(restoreFormRecords.empty());
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_003 end";
+}
+
+/**
+ * @tc.name: FilterEventMapsByVisibleType_004
+ * @tc.desc: Verify formVisibleNotifyState matches && isNeedNotify → kept in map
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterEventMapsByVisibleType_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_004 start";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    eventMaps["com.test.bundle::MainAbility::entry"] = {TEST_FORM_ID};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record.isNeedNotify = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterEventMapsByVisibleType(
+        eventMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    EXPECT_EQ(eventMaps["com.test.bundle::MainAbility::entry"].size(), 1u);
+    EXPECT_TRUE(restoreFormRecords.empty());
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_004 end";
+}
+
+/**
+ * @tc.name: FilterEventMapsByVisibleType_005
+ * @tc.desc: Verify all formIds filtered → entry erased from eventMaps
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterEventMapsByVisibleType_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_005 start";
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    eventMaps["com.test.bundle::MainAbility::entry"] = {TEST_FORM_ID, TEST_FORM_ID + 1};
+    std::map<int64_t, FormRecord> restoreFormRecords;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record.isNeedNotify = false;
+
+    FormRecord record2;
+    record2.formId = TEST_FORM_ID + 1;
+    record2.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    record2.isNeedNotify = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID + 1, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record2), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterEventMapsByVisibleType(
+        eventMaps, Constants::FORM_VISIBLE, restoreFormRecords);
+    EXPECT_TRUE(eventMaps.empty());
+    GTEST_LOG_(INFO) << "FilterEventMapsByVisibleType_005 end";
+}
+
+// ========== FilterDataByVisibleType Tests ==========
+
+/**
+ * @tc.name: FilterDataByVisibleType_001
+ * @tc.desc: Verify restoreFormRecords updated with isNeedNotify=false via UpdateFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterDataByVisibleType_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterDataByVisibleType_001 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance;
+    instance.formId = TEST_FORM_ID;
+    formInstanceMaps["com.test.host"] = {instance};
+
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.formVisibleNotifyState = Constants::FORM_INVISIBLE;
+    record.isNeedNotify = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    // UpdateFormRecord called for restoreFormRecords entry
+    EXPECT_CALL(*MockFormDataMgr::obj, UpdateFormRecord(TEST_FORM_ID, _))
+        .WillOnce(Return(true));
+
+    FormVisibilityAdapter::GetInstance().FilterDataByVisibleType(
+        formInstanceMaps, eventMaps, Constants::FORM_VISIBLE);
+    // Instance was erased from formInstanceMaps due to state mismatch
+    EXPECT_TRUE(formInstanceMaps.empty());
+    GTEST_LOG_(INFO) << "FilterDataByVisibleType_001 end";
+}
+
+/**
+ * @tc.name: FilterDataByVisibleType_002
+ * @tc.desc: Verify both formInstanceMaps and eventMaps filtered correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterDataByVisibleType_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterDataByVisibleType_002 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance;
+    instance.formId = TEST_FORM_ID;
+    formInstanceMaps["com.test.host"] = {instance};
+
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    eventMaps["com.test.bundle::MainAbility::entry"] = {TEST_FORM_ID + 1};
+
+    FormRecord formInstanceRecord;
+    formInstanceRecord.formId = TEST_FORM_ID;
+    formInstanceRecord.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    formInstanceRecord.isNeedNotify = true;
+
+    FormRecord eventRecord;
+    eventRecord.formId = TEST_FORM_ID + 1;
+    eventRecord.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    eventRecord.isNeedNotify = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInstanceRecord), Return(true)));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID + 1, _))
+        .WillOnce(DoAll(SetArgReferee<1>(eventRecord), Return(true)));
+
+    FormVisibilityAdapter::GetInstance().FilterDataByVisibleType(
+        formInstanceMaps, eventMaps, Constants::FORM_VISIBLE);
+    // Both should be kept since state matches and isNeedNotify is true
+    EXPECT_EQ(formInstanceMaps["com.test.host"].size(), 1u);
+    EXPECT_EQ(eventMaps["com.test.bundle::MainAbility::entry"].size(), 1u);
+    GTEST_LOG_(INFO) << "FilterDataByVisibleType_002 end";
+}
+
+/**
+ * @tc.name: FilterDataByVisibleType_003
+ * @tc.desc: Verify empty maps → no crashes, no UpdateFormRecord calls
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, FilterDataByVisibleType_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FilterDataByVisibleType_003 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+
+    FormVisibilityAdapter::GetInstance().FilterDataByVisibleType(
+        formInstanceMaps, eventMaps, Constants::FORM_VISIBLE);
+    EXPECT_TRUE(formInstanceMaps.empty());
+    EXPECT_TRUE(eventMaps.empty());
+    GTEST_LOG_(INFO) << "FilterDataByVisibleType_003 end";
+}
+
+// ========== NotifyWhetherFormsVisible Tests ==========
+
+/**
+ * @tc.name: NotifyWhetherFormsVisible_001
+ * @tc.desc: Verify bundleName not found in formInstanceMaps → no notify calls
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherFormsVisible_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "NotifyWhetherFormsVisible_001 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::vector<sptr<IRemoteObject>> remoteObjects;
+    remoteObjects.push_back(new MockIRemoteObject());
+
+    FormVisibilityAdapter::GetInstance().NotifyWhetherFormsVisible(
+        "com.test.host", remoteObjects, formInstanceMaps, Constants::FORM_VISIBLE);
+    // bundleName not in formInstanceMaps, maps unchanged
+    EXPECT_TRUE(formInstanceMaps.empty());
+    GTEST_LOG_(INFO) << "NotifyWhetherFormsVisible_001 end";
+}
+
+/**
+ * @tc.name: NotifyWhetherFormsVisible_002
+ * @tc.desc: Verify empty remoteObjects → no iteration, no crash
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherFormsVisible_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "NotifyWhetherFormsVisible_002 start";
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    FormInstance instance;
+    instance.formId = TEST_FORM_ID;
+    formInstanceMaps["com.test.host"] = {instance};
+    std::vector<sptr<IRemoteObject>> remoteObjects;
+
+    FormVisibilityAdapter::GetInstance().NotifyWhetherFormsVisible(
+        "com.test.host", remoteObjects, formInstanceMaps, Constants::FORM_VISIBLE);
+    // Empty remoteObjects → no iteration, formInstanceMaps unchanged
+    EXPECT_EQ(formInstanceMaps["com.test.host"].size(), 1u);
+    GTEST_LOG_(INFO) << "NotifyWhetherFormsVisible_002 end";
 }
 
 }  // namespace AppExecFwk

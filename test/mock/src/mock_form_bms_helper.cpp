@@ -71,5 +71,15 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
     }
     return false;
 }
+
+bool FormBmsHelper::GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId,
+    BundleInfo &bundleInfo)
+{
+    GTEST_LOG_(INFO) << "GetBundleInfoWithPermission called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetBundleInfoWithPermission(bundleName, userId, bundleInfo);
+    }
+    return false;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

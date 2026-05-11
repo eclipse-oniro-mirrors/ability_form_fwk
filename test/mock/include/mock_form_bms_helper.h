@@ -34,6 +34,8 @@ public:
     virtual ErrCode GetApplicationInfo(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo) = 0;
     virtual bool GetAbilityInfoByAction(const std::string &action, int32_t userId,
         AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo) = 0;
+    virtual bool GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId,
+        BundleInfo &bundleInfo) = 0;
 };
 
 class MockFormBmsHelper : public AbstractMockFormBmsHelper {
@@ -47,6 +49,8 @@ public:
     MOCK_METHOD3(GetApplicationInfo, ErrCode(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo));
     MOCK_METHOD4(GetAbilityInfoByAction, bool(const std::string &action, int32_t userId,
         AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo));
+    MOCK_METHOD3(GetBundleInfoWithPermission, bool(const std::string &bundleName, int32_t userId,
+        BundleInfo &bundleInfo));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
