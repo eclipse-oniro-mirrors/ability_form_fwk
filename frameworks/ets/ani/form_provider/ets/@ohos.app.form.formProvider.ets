@@ -58,9 +58,9 @@ export namespace formProvider {
   native function nativeOnPublishFormCrossBundleControl(callback: PublishFormCrossBundleControlCallbackWrapper): void;
   native function nativeOffPublishFormCrossBundleControl(callback?: PublishFormCrossBundleControlCallbackWrapper): void;
 
-  const ERR_OK = 0;
-  const INVALID_PARAM_ERROR_CODE = 401;
-  const INVALID_PARAM_MESSAGE_ETS = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
+  const ERR_OK: int = 0;
+  const INVALID_PARAM_ERROR_CODE: int = 401;
+  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
     + " 2.Incorrect parameter types;"
     + " 3.Parameter verification failed.";
 
