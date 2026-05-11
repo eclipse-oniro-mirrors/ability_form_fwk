@@ -709,12 +709,15 @@ ohos_shared_library("form_utils") {
     "-Wl,--icf=all",
   ]
   include_dirs = [
+    "common/include",
     "services/include",
     "services/common/include",
+    "interfaces/inner_api/include",
   ]
   sources = [
-    "interfaces/inner_api/src/form_event_report.cpp",
+    "common/src/form_hisysevent_wrapper.cpp",
     "interfaces/inner_api/src/form_file_util.cpp",
+    "interfaces/inner_api/src/form_event_report.cpp",
   ]
  
   public_configs = [

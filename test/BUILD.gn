@@ -171,6 +171,7 @@ group("unittest") {
     "unittest/form_custom_config_test:unittest",
     "unittest/fms_form_lifecycle_adapter_test:unittest",
     "unittest/fms_sign_tools_test:unittest",
+    "unittest/fms_form_hisysevent_wrapper_test:unittest",
   ]
 }
 

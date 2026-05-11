@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,6 +63,15 @@ public:
 
 private:
     static std::string ConvertEventName(const FormEventName &eventName);
+    static void SendDeleteInvalidFormEvent(const std::string &name, HiSysEventType type);
+    static void SendAcquireFormStateEvent(const std::string &name, HiSysEventType type,
+        const FormEventInfo &eventInfo);
+    static void SendMessageEventFormEvent(const std::string &name, HiSysEventType type,
+        const FormEventInfo &eventInfo);
+    static void SendAddFormEventInner(const std::string &name, HiSysEventType type,
+        const FormEventInfo &eventInfo);
+    static void SendRouteEventFormEvent(const std::string &name, HiSysEventType type,
+        const FormEventInfo &eventInfo);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

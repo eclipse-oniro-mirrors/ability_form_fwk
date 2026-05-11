@@ -737,6 +737,10 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     if (formHostRecords.size() != 0) {
         eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
     }
+    FormRecord formRecord;
+    if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        eventInfo.formLocation = static_cast<int32_t>(formRecord.formLocation);
+    }
     FormEventReport::SendFormEvent(FormEventName::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapterFacade::GetInstance().RouterEvent(formId, want, callerToken);
 }
