@@ -2097,5 +2097,386 @@ HWTEST_F(FmsFormCallbackAdapterTest, SceneAnimationCheck_005, TestSize.Level1)
     GTEST_LOG_(INFO) << "SceneAnimationCheck_005 end";
 }
 
+// ========== RegisterFormWantCallback Tests ==========
+
+/**
+ * @tc.name: RegisterFormWantCallback_001
+ * @tc.desc: Verify null callerToken returns ERR_APPEXECFWK_FORM_COMMON_CODE
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RegisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RegisterFormWantCallback_001 start";
+
+    sptr<IRemoteObject> callerToken = nullptr;
+    auto result = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "RegisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: RegisterFormWantCallback_002
+ * @tc.desc: Verify valid registration returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RegisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RegisterFormWantCallback_002 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    auto *mockCaller = static_cast<MockIRemoteObject *>(callerToken.GetRefPtr());
+    EXPECT_CALL(*mockCaller, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+
+    auto result = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Verify proxy is stored
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(storedProxy, callerToken);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "RegisterFormWantCallback_002 end";
+}
+
+/**
+ * @tc.name: RegisterFormWantCallback_003
+ * @tc.desc: Verify re-registration with same uid succeeds and updates proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RegisterFormWantCallback_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RegisterFormWantCallback_003 start";
+
+    // First registration
+    sptr<IRemoteObject> callerToken1 = new MockIRemoteObject();
+    auto *mockCaller1 = static_cast<MockIRemoteObject *>(callerToken1.GetRefPtr());
+    EXPECT_CALL(*mockCaller1, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+
+    auto result1 = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken1);
+    EXPECT_EQ(result1, ERR_OK);
+
+    // Re-registration with same uid
+    sptr<IRemoteObject> callerToken2 = new MockIRemoteObject();
+    auto *mockCaller2 = static_cast<MockIRemoteObject *>(callerToken2.GetRefPtr());
+    EXPECT_CALL(*mockCaller2, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+
+    auto result2 = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken2);
+    EXPECT_EQ(result2, ERR_OK);
+
+    // Verify proxy is updated
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(storedProxy, callerToken2);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "RegisterFormWantCallback_003 end";
+}
+
+// ========== UnregisterFormWantCallback Tests ==========
+
+/**
+ * @tc.name: UnregisterFormWantCallback_001
+ * @tc.desc: Verify unregister without prior registration returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UnregisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UnregisterFormWantCallback_001 start";
+
+    // Clear registry to ensure no prior registration
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+
+    auto result = FormCallbackAdapter::GetInstance().UnregisterFormWantCallback(TEST_CALLING_UID);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UnregisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: UnregisterFormWantCallback_002
+ * @tc.desc: Verify unregister after registration returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UnregisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UnregisterFormWantCallback_002 start";
+
+    // Register first
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    auto *mockCaller = static_cast<MockIRemoteObject *>(callerToken.GetRefPtr());
+    EXPECT_CALL(*mockCaller, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+
+    auto regResult = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken);
+    ASSERT_EQ(regResult, ERR_OK);
+
+    // Then unregister
+    auto unregResult = FormCallbackAdapter::GetInstance().UnregisterFormWantCallback(TEST_CALLING_UID);
+    EXPECT_EQ(unregResult, ERR_OK);
+
+    // Verify proxy is removed
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Get(TEST_CALLING_UID, storedProxy),
+        ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "UnregisterFormWantCallback_002 end";
+}
+
+// ========== GetWantCallbackProxy Tests ==========
+
+/**
+ * @tc.name: GetWantCallbackProxy_001
+ * @tc.desc: Verify get without registration returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetWantCallbackProxy_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_001 start";
+
+    // Clear registry to ensure no prior registration
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+
+    sptr<IRemoteObject> proxy;
+    auto result = FormCallbackAdapter::GetInstance().GetWantCallbackProxy(TEST_CALLING_UID, proxy);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+    EXPECT_EQ(proxy, nullptr);
+
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_001 end";
+}
+
+/**
+ * @tc.name: GetWantCallbackProxy_002
+ * @tc.desc: Verify get after registration returns ERR_OK with valid proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetWantCallbackProxy_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_002 start";
+
+    // Register first
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    auto *mockCaller = static_cast<MockIRemoteObject *>(callerToken.GetRefPtr());
+    EXPECT_CALL(*mockCaller, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+
+    auto regResult = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken);
+    ASSERT_EQ(regResult, ERR_OK);
+
+    // Get proxy
+    sptr<IRemoteObject> proxy;
+    auto result = FormCallbackAdapter::GetInstance().GetWantCallbackProxy(TEST_CALLING_UID, proxy);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(proxy, callerToken);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_002 end";
+}
+
+/**
+ * @tc.name: GetWantCallbackProxy_003
+ * @tc.desc: Verify get after unregister returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetWantCallbackProxy_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_003 start";
+
+    // Register first
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    auto *mockCaller = static_cast<MockIRemoteObject *>(callerToken.GetRefPtr());
+    EXPECT_CALL(*mockCaller, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+
+    auto regResult = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken);
+    ASSERT_EQ(regResult, ERR_OK);
+
+    // Unregister
+    auto unregResult = FormCallbackAdapter::GetInstance().UnregisterFormWantCallback(TEST_CALLING_UID);
+    ASSERT_EQ(unregResult, ERR_OK);
+
+    // Get proxy should fail
+    sptr<IRemoteObject> proxy;
+    auto result = FormCallbackAdapter::GetInstance().GetWantCallbackProxy(TEST_CALLING_UID, proxy);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_003 end";
+}
+
+/**
+ * @tc.name: GetWantCallbackProxy_004
+ * @tc.desc: Verify get with different uid returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetWantCallbackProxy_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_004 start";
+
+    // Register with TEST_CALLING_UID
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    auto *mockCaller = static_cast<MockIRemoteObject *>(callerToken.GetRefPtr());
+    EXPECT_CALL(*mockCaller, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+
+    auto regResult = FormCallbackAdapter::GetInstance().RegisterFormWantCallback(TEST_CALLING_UID, callerToken);
+    ASSERT_EQ(regResult, ERR_OK);
+
+    // Get with different uid should fail
+    sptr<IRemoteObject> proxy;
+    auto result = FormCallbackAdapter::GetInstance().GetWantCallbackProxy(INVALID_UID, proxy);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "GetWantCallbackProxy_004 end";
+}
+
+// ========== UnregisterFormRouterProxy Additional Tests ==========
+
+/**
+ * @tc.name: UnregisterFormRouterProxy_004
+ * @tc.desc: Verify providerUserId mismatch returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UnregisterFormRouterProxy_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UnregisterFormRouterProxy_004 start";
+
+    std::vector<int64_t> formIds = { TEST_FORM_ID };
+
+    FormRecord record;
+    record.providerUserId = TEST_USER_ID + 1;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormCallbackAdapter::GetInstance().UnregisterFormRouterProxy(formIds);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "UnregisterFormRouterProxy_004 end";
+}
+
+/**
+ * @tc.name: UnregisterFormRouterProxy_005
+ * @tc.desc: Verify happy path with valid formId and self-owned record returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UnregisterFormRouterProxy_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UnregisterFormRouterProxy_005 start";
+
+    std::vector<int64_t> formIds = { TEST_FORM_ID };
+
+    FormRecord record;
+    record.providerUserId = TEST_USER_ID;
+    record.formUserUids = { TEST_CALLING_UID };
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormCallbackAdapter::GetInstance().UnregisterFormRouterProxy(formIds);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UnregisterFormRouterProxy_005 end";
+}
+
+// ========== RegisterPublishFormInterceptor Additional Tests ==========
+
+/**
+ * @tc.name: RegisterPublishFormInterceptor_002
+ * @tc.desc: Verify setting interceptor via SetFormPublishInterceptor and getting it back
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RegisterPublishFormInterceptor_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RegisterPublishFormInterceptor_002 start";
+
+    // Clear any existing interceptor
+    FormCallbackAdapter::GetInstance().SetFormPublishInterceptor(nullptr);
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().GetFormPublishInterceptor(), nullptr);
+
+    GTEST_LOG_(INFO) << "RegisterPublishFormInterceptor_002 end";
+}
+
+// ========== UpdateTemplateFormDetailInfo Additional Tests ==========
+
+/**
+ * @tc.name: UpdateTemplateFormDetailInfo_002
+ * @tc.desc: Verify UpdateTemplateFormDetailInfo succeeds with registered proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_002 start";
+
+    // Register mock delegate in template form detail info registry
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->templateFormResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    std::vector<TemplateFormDetailInfo> templateFormInfo;
+    auto result = FormCallbackAdapter::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_002 end";
+}
+
+/**
+ * @tc.name: UpdateTemplateFormDetailInfo_003
+ * @tc.desc: Verify UpdateTemplateFormDetailInfo returns error when proxy returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_003 start";
+
+    // Register mock delegate that returns error
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->templateFormResult_ = ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    std::vector<TemplateFormDetailInfo> templateFormInfo;
+    auto result = FormCallbackAdapter::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_003 end";
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

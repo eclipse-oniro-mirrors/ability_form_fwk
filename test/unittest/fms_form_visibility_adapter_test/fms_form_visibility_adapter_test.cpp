@@ -1014,5 +1014,339 @@ HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherFormsVisible_002, TestSize.L
     GTEST_LOG_(INFO) << "NotifyWhetherFormsVisible_002 end";
 }
 
+// ========== HasFormVisible Tests ==========
+
+/**
+ * @tc.name: HasFormVisible_001
+ * @tc.desc: Verify invalid tokenId (AccessTokenKit fails) returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HasFormVisible_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HasFormVisible_001 start";
+    // AccessTokenKit::GetHapTokenInfo will fail with test tokenId
+    bool result = FormVisibilityAdapter::GetInstance().HasFormVisible(0);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "HasFormVisible_001 end";
+}
+
+/**
+ * @tc.name: HasFormVisible_002
+ * @tc.desc: Verify GetFormRecord returns empty → returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HasFormVisible_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HasFormVisible_002 start";
+    // Using a valid-looking token ID. AccessTokenKit will fail, returning false.
+    bool result = FormVisibilityAdapter::GetInstance().HasFormVisible(999999);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "HasFormVisible_002 end";
+}
+
+// ========== SetVisibleChange Tests ==========
+
+/**
+ * @tc.name: SetVisibleChange_001
+ * @tc.desc: Verify invalid formId (<=0) → no calls to SetFormVisible
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetVisibleChange_001 start";
+    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(_, _))
+        .Times(0);
+    FormVisibilityAdapter::GetInstance().SetVisibleChange(0, Constants::FORM_VISIBLE, TEST_USER_ID);
+    GTEST_LOG_(INFO) << "SetVisibleChange_001 end";
+}
+
+/**
+ * @tc.name: SetVisibleChange_002
+ * @tc.desc: Verify invalid formVisibleType → early return
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetVisibleChange_002 start";
+    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(_, _))
+        .Times(0);
+    FormVisibilityAdapter::GetInstance().SetVisibleChange(TEST_FORM_ID, 999, TEST_USER_ID);
+    GTEST_LOG_(INFO) << "SetVisibleChange_002 end";
+}
+
+/**
+ * @tc.name: SetVisibleChange_003
+ * @tc.desc: Verify FORM_VISIBLE calls SetFormVisible and SetExpectRecycledStatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetVisibleChange_003 start";
+    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(TEST_FORM_ID, true))
+        .Times(1);
+    EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatus(TEST_FORM_ID, false))
+        .Times(1);
+    FormVisibilityAdapter::GetInstance().SetVisibleChange(TEST_FORM_ID, Constants::FORM_VISIBLE, TEST_USER_ID);
+    GTEST_LOG_(INFO) << "SetVisibleChange_003 end";
+}
+
+/**
+ * @tc.name: SetVisibleChange_004
+ * @tc.desc: Verify FORM_INVISIBLE calls SetFormVisible but NOT SetExpectRecycledStatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetVisibleChange_004 start";
+    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(TEST_FORM_ID, false))
+        .Times(1);
+    EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatus(_, _))
+        .Times(0);
+    FormVisibilityAdapter::GetInstance().SetVisibleChange(TEST_FORM_ID, Constants::FORM_INVISIBLE, TEST_USER_ID);
+    GTEST_LOG_(INFO) << "SetVisibleChange_004 end";
+}
+
+// ========== isFormShouldUpdateProviderInfoToHost Tests ==========
+
+/**
+ * @tc.name: IsFormShouldUpdateProviderInfoToHost_001
+ * @tc.desc: Verify GetFormRecord fails returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, IsFormShouldUpdateProviderInfoToHost_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_001 start";
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord formRecord;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(Return(false));
+
+    bool result = FormVisibilityAdapter::GetInstance().isFormShouldUpdateProviderInfoToHost(
+        TEST_FORM_ID, TEST_USER_ID, callerToken, formRecord);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_001 end";
+}
+
+/**
+ * @tc.name: IsFormShouldUpdateProviderInfoToHost_002
+ * @tc.desc: Verify providerUserId mismatch returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, IsFormShouldUpdateProviderInfoToHost_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_002 start";
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord formRecord;
+    formRecord.providerUserId = 999; // mismatch with TEST_USER_ID
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+
+    bool result = FormVisibilityAdapter::GetInstance().isFormShouldUpdateProviderInfoToHost(
+        TEST_FORM_ID, TEST_USER_ID, callerToken, formRecord);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_002 end";
+}
+
+/**
+ * @tc.name: IsFormShouldUpdateProviderInfoToHost_003
+ * @tc.desc: Verify GetMatchedHostClient fails or form not belong returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, IsFormShouldUpdateProviderInfoToHost_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_003 start";
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord formRecord;
+    formRecord.providerUserId = TEST_USER_ID;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetMatchedHostClient(_, _))
+        .WillOnce(Return(false));
+
+    bool result = FormVisibilityAdapter::GetInstance().isFormShouldUpdateProviderInfoToHost(
+        TEST_FORM_ID, TEST_USER_ID, callerToken, formRecord);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_003 end";
+}
+
+/**
+ * @tc.name: IsFormShouldUpdateProviderInfoToHost_004
+ * @tc.desc: Verify all conditions met returns true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, IsFormShouldUpdateProviderInfoToHost_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_004 start";
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord formRecord;
+    formRecord.providerUserId = TEST_USER_ID;
+
+    FormHostRecord hostRecord;
+    hostRecord.AddForm(TEST_FORM_ID);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetMatchedHostClient(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(hostRecord), Return(true)));
+
+    bool result = FormVisibilityAdapter::GetInstance().isFormShouldUpdateProviderInfoToHost(
+        TEST_FORM_ID, TEST_USER_ID, callerToken, formRecord);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "IsFormShouldUpdateProviderInfoToHost_004 end";
+}
+
+// ========== HandleEventNotify Tests ==========
+
+/**
+ * @tc.name: HandleEventNotify_003
+ * @tc.desc: Verify valid providerKey with ConnectServiceAbility success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HandleEventNotify_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleEventNotify_003 start";
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    std::string providerKey = "com.test.bundle::MainAbility::entry";
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormVisibilityAdapter::GetInstance().HandleEventNotify(
+        providerKey, formIds, Constants::FORM_VISIBLE);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "HandleEventNotify_003 end";
+}
+
+/**
+ * @tc.name: HandleEventNotify_004
+ * @tc.desc: Verify valid providerKey with ConnectServiceAbility failure returns ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HandleEventNotify_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleEventNotify_004 start";
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    std::string providerKey = "com.test.bundle::MainAbility::entry";
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+
+    auto result = FormVisibilityAdapter::GetInstance().HandleEventNotify(
+        providerKey, formIds, Constants::FORM_VISIBLE);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "HandleEventNotify_004 end";
+}
+
+// ========== PaddingNotifyVisibleFormsMap Tests ==========
+
+/**
+ * @tc.name: PaddingNotifyVisibleFormsMap_002
+ * @tc.desc: Verify formVisibleType differs from formInstance → processes formInstance maps
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, PaddingNotifyVisibleFormsMap_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "PaddingNotifyVisibleFormsMap_002 start";
+    int32_t formVisibleType = Constants::FORM_VISIBLE;
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+
+    FormInstance instance;
+    instance.formVisiblity = FormVisibilityType::INVISIBLE; // differs from FORM_VISIBLE
+    instance.formHostName = "com.test.host";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormInstanceById3(TEST_FORM_ID, false, _))
+        .WillOnce(DoAll(SetArgReferee<2>(instance), Return(ERR_OK)));
+
+    // GetFormObservers() returns empty map, so no entries added to formInstanceMaps
+    FormVisibilityAdapter::GetInstance().PaddingNotifyVisibleFormsMap(
+        formVisibleType, TEST_FORM_ID, formInstanceMaps);
+    // With no formObservers, no entries should be added even though types differ
+    EXPECT_TRUE(formInstanceMaps.empty());
+    GTEST_LOG_(INFO) << "PaddingNotifyVisibleFormsMap_002 end";
+}
+
+// ========== HandlerNotifyWhetherVisibleForms Tests ==========
+
+/**
+ * @tc.name: HandlerNotifyWhetherVisibleForms_001
+ * @tc.desc: Verify empty maps and INVISIBLE type → no crash, DisableSubscribeFormData called
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HandlerNotifyWhetherVisibleForms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandlerNotifyWhetherVisibleForms_001 start";
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    // Should not crash with empty maps
+    FormVisibilityAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(
+        formIds, formInstanceMaps, eventMaps, Constants::FORM_INVISIBLE, callerToken);
+    GTEST_LOG_(INFO) << "HandlerNotifyWhetherVisibleForms_001 end";
+}
+
+/**
+ * @tc.name: HandlerNotifyWhetherVisibleForms_002
+ * @tc.desc: Verify with eventMaps containing valid providerKey → HandleEventNotify called
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, HandlerNotifyWhetherVisibleForms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandlerNotifyWhetherVisibleForms_002 start";
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    std::unordered_map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::unordered_map<std::string, std::vector<int64_t>> eventMaps;
+    eventMaps["com.test.bundle::MainAbility::entry"] = {TEST_FORM_ID};
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(Return(false)); // FilterEventMapsByVisibleType: GetFormRecord fails → kept
+
+    // Will call HandleEventNotify which calls ConnectServiceAbility
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    FormVisibilityAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(
+        formIds, formInstanceMaps, eventMaps, Constants::FORM_VISIBLE, callerToken);
+    GTEST_LOG_(INFO) << "HandlerNotifyWhetherVisibleForms_002 end";
+}
+
+// ========== NotifyFormsVisible negative path Tests ==========
+
+/**
+ * @tc.name: NotifyFormsVisible_002
+ * @tc.desc: Verify delegates to FormDataMgr::NotifyFormsVisible and returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, NotifyFormsVisible_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "NotifyFormsVisible_002 start";
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, NotifyFormsVisible(_, false, _, TEST_USER_ID))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+
+    auto result = FormVisibilityAdapter::GetInstance().NotifyFormsVisible(
+        formIds, false, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "NotifyFormsVisible_002 end";
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

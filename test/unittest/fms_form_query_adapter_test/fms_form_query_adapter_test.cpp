@@ -1022,5 +1022,264 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_005, TestSize.Level1)
     GTEST_LOG_(INFO) << "AcquireFormData_005 end";
 }
 
+// ========== GetFormInstanceById Success Path Tests ==========
+
+/**
+ * @tc.name: GetFormInstanceById_003
+ * @tc.desc: Verify FormDataMgr::GetFormInstanceById (2-param) success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetFormInstanceById_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInstanceById_003 start";
+
+    FormInstance formInstance;
+    formInstance.formId = TEST_FORM_ID;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormInstanceById2(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInstance), Return(ERR_OK)));
+
+    FormInstance resultInstance;
+    auto result = FormQueryAdapter::GetInstance().GetFormInstanceById(TEST_FORM_ID, resultInstance);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(resultInstance.formId, TEST_FORM_ID);
+
+    GTEST_LOG_(INFO) << "GetFormInstanceById_003 end";
+}
+
+/**
+ * @tc.name: GetFormInstanceById_004
+ * @tc.desc: Verify FormDataMgr::GetFormInstanceById (3-param) success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetFormInstanceById_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInstanceById_004 start";
+
+    FormInstance formInstance;
+    formInstance.formId = TEST_FORM_ID;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormInstanceById3(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInstance), Return(ERR_OK)));
+
+    FormInstance resultInstance;
+    auto result = FormQueryAdapter::GetInstance().GetFormInstanceById(
+        TEST_FORM_ID, true, resultInstance);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(resultInstance.formId, TEST_FORM_ID);
+
+    GTEST_LOG_(INFO) << "GetFormInstanceById_004 end";
+}
+
+// ========== GetRunningFormInfos Success Path Tests ==========
+
+/**
+ * @tc.name: GetRunningFormInfos_002
+ * @tc.desc: Verify FormDataMgr::GetRunningFormInfos success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetRunningFormInfos_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetRunningFormInfos_002 start";
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    RunningFormInfo info;
+    std::vector<RunningFormInfo> testInfos = {info};
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetRunningFormInfos(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(testInfos), Return(ERR_OK)));
+
+    auto result = FormQueryAdapter::GetInstance().GetRunningFormInfos(
+        false, runningFormInfos, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(runningFormInfos.size(), 1u);
+
+    GTEST_LOG_(INFO) << "GetRunningFormInfos_002 end";
+}
+
+// ========== GetAllTemplateFormsInfo Success Path Tests ==========
+
+/**
+ * @tc.name: GetAllTemplateFormsInfo_002
+ * @tc.desc: Verify FormInfoMgr::GetAllTemplateFormsInfo success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetAllTemplateFormsInfo_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetAllTemplateFormsInfo_002 start";
+
+    std::vector<FormInfo> formInfos;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetAllTemplateFormsInfo(_, _))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto result = FormQueryAdapter::GetInstance().GetAllTemplateFormsInfo(formInfos);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "GetAllTemplateFormsInfo_002 end";
+}
+
+// ========== GetTemplateFormsInfoByApp Success Path Tests ==========
+
+/**
+ * @tc.name: GetTemplateFormsInfoByApp_002
+ * @tc.desc: Verify FormInfoMgr::GetTemplateFormsInfoByBundle success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetTemplateFormsInfoByApp_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetTemplateFormsInfoByApp_002 start";
+
+    std::string bundleName = "com.test.bundle";
+    std::vector<FormInfo> formInfos;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetTemplateFormsInfoByBundle(_, _, _))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto result = FormQueryAdapter::GetInstance().GetTemplateFormsInfoByApp(bundleName, formInfos);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "GetTemplateFormsInfoByApp_002 end";
+}
+
+// ========== GetTemplateFormsInfoByModule Success Path Tests ==========
+
+/**
+ * @tc.name: GetTemplateFormsInfoByModule_002
+ * @tc.desc: Verify FormInfoMgr::GetTemplateFormsInfoByModule success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetTemplateFormsInfoByModule_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetTemplateFormsInfoByModule_002 start";
+
+    std::string bundleName = "com.test.bundle";
+    std::string moduleName = "entry";
+    std::vector<FormInfo> formInfos;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetTemplateFormsInfoByModule(_, _, _, _))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto result = FormQueryAdapter::GetInstance().GetTemplateFormsInfoByModule(
+        bundleName, moduleName, formInfos);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "GetTemplateFormsInfoByModule_002 end";
+}
+
+// ========== GetHostFormsCount Success Path Tests ==========
+
+/**
+ * @tc.name: GetHostFormsCount_002
+ * @tc.desc: Verify FormDataMgr::GetHostFormsCount success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetHostFormsCount_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetHostFormsCount_002 start";
+
+    std::string bundleName = "com.test.bundle";
+    int32_t formCount = 0;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetHostFormsCount(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormQueryAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "GetHostFormsCount_002 end";
+}
+
+// ========== GetRunningFormInfosByBundleName Success Path Tests ==========
+
+/**
+ * @tc.name: GetRunningFormInfosByBundleName_002
+ * @tc.desc: Verify FormDataMgr::GetRunningFormInfosByBundleName success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetRunningFormInfosByBundleName_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetRunningFormInfosByBundleName_002 start";
+
+    std::string bundleName = "com.test.bundle";
+    std::vector<RunningFormInfo> runningFormInfos;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetRunningFormInfosByBundleName(_, _, _, _))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto result = FormQueryAdapter::GetInstance().GetRunningFormInfosByBundleName(
+        bundleName, false, runningFormInfos);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "GetRunningFormInfosByBundleName_002 end";
+}
+
+// ========== GetFormInstancesByFilter Success Path Tests ==========
+
+/**
+ * @tc.name: GetFormInstancesByFilter_002
+ * @tc.desc: Verify FormDataMgr::GetFormInstancesByFilter success returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, GetFormInstancesByFilter_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInstancesByFilter_002 start";
+
+    FormInstancesFilter filter;
+    std::vector<FormInstance> formInstances;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormInstancesByFilter(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormQueryAdapter::GetInstance().GetFormInstancesByFilter(filter, formInstances);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "GetFormInstancesByFilter_002 end";
+}
+
+// ========== AcquireFormState additional branch Tests ==========
+
+/**
+ * @tc.name: AcquireFormState_006
+ * @tc.desc: Verify AcquireFormState with non-empty moduleName sets module name on targetWant
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormState_006 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetModuleName("entry");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    FormStateInfo stateInfo;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    FormInfo matchFormInfo;
+    matchFormInfo.abilityName = "MainAbility";
+    matchFormInfo.name = "widget";
+    matchFormInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
+    std::vector<FormInfo> formInfos = {matchFormInfo};
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(2)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormStateRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormQueryAdapter::GetInstance().AcquireFormState(
+        want, callerToken, stateInfo);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(stateInfo.state, FormState::DEFAULT);
+
+    GTEST_LOG_(INFO) << "AcquireFormState_006 end";
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
