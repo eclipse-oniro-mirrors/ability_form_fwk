@@ -1224,7 +1224,7 @@ HWTEST_F(FmsFormVisibilityAdapterTest, HandleEventNotify_003, TestSize.Level1)
 
 /**
  * @tc.name: HandleEventNotify_004
- * @tc.desc: Verify valid providerKey with ConnectServiceAbility failure returns ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
+ * @tc.desc: Verify valid providerKey with ConnectServiceAbility failure return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormVisibilityAdapterTest, HandleEventNotify_004, TestSize.Level1)
