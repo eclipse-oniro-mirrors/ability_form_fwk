@@ -16,7 +16,6 @@
 #ifndef OHOS_FORM_FWK_NET_CONN_CALLBACK_MANAGER_H
 #define OHOS_FORM_FWK_NET_CONN_CALLBACK_MANAGER_H
 
-#include <memory>
 #include <singleton.h>
 
 #include "form_observer/net_conn_callback_observer.h"
@@ -35,15 +34,25 @@ public:
 
     /**
      * @brief Register network connection callback
+     */
+    void RegisterNetConnCallback();
+
+    /**
+     * @brief Internal register implementation
      * @return Returns ERR_OK on success, error code on failure
      */
-    int32_t RegisterNetConnCallback();
+    int32_t RegisterNetConnCallbackInternal();
 
     /**
      * @brief Unregister network connection callback
+     */
+    void UnregisterNetConnCallback();
+
+    /**
+     * @brief Internal unregister implementation
      * @return Returns ERR_OK on success, error code on failure
      */
-    int32_t UnregisterNetConnCallback();
+    int32_t UnregisterNetConnCallbackInternal();
 
 private:
     /**

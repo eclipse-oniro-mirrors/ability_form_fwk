@@ -37,10 +37,19 @@ NetConnCallbackManager::NetConnCallbackManager()
 
 NetConnCallbackManager::~NetConnCallbackManager()
 {
-    UnregisterNetConnCallback();
+    UnregisterNetConnCallbackInternal();
 }
 
-int32_t NetConnCallbackManager::RegisterNetConnCallback()
+void NetConnCallbackManager::RegisterNetConnCallback()
+{
+    HILOG_DEBUG("Register NetConn begin, post to queue");
+    auto task = []() {
+        NetConnCallbackManager::GetInstance().RegisterNetConnCallbackInternal();
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
+}
+
+int32_t NetConnCallbackManager::RegisterNetConnCallbackInternal()
 {
     HILOG_INFO("Register NetConn begin");
 
@@ -77,7 +86,16 @@ int32_t NetConnCallbackManager::RegisterNetConnCallback()
     return result;
 }
 
-int32_t NetConnCallbackManager::UnregisterNetConnCallback()
+void NetConnCallbackManager::UnregisterNetConnCallback()
+{
+    HILOG_DEBUG("Unregister NetConn begin, post to queue");
+    auto task = []() {
+        NetConnCallbackManager::GetInstance().UnregisterNetConnCallbackInternal();
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
+}
+
+int32_t NetConnCallbackManager::UnregisterNetConnCallbackInternal()
 {
     HILOG_INFO("Unregister NetConn begin");
 
@@ -97,7 +115,7 @@ void NetConnCallbackManager::PostConnectNetWork()
     HILOG_DEBUG("start");
 
     auto connectNetWork = []() {
-        NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
+        NetConnCallbackManager::GetInstance().RegisterNetConnCallbackInternal();
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
     HILOG_DEBUG("end");
