@@ -998,9 +998,7 @@ HWTEST_F(FmsFormDataAdapterTest, InnerAcquireProviderFormInfoAsync_003, TestSize
 
     auto result = FormDataAdapter::GetInstance().InnerAcquireProviderFormInfoAsync(
         TEST_FORM_ID, info, wantParams);
-    // ConnectServiceAbilityWithUserId uses default mock returning ERR_OK or actual impl
-    // Either way, the function should return ERR_OK or ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
-    EXPECT_TRUE(result == ERR_OK || result == ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "InnerAcquireProviderFormInfoAsync_003 end";
 }
@@ -1051,9 +1049,7 @@ HWTEST_F(FmsFormDataAdapterTest, AcquireProviderFormInfoAsync_002, TestSize.Leve
 
     auto result = FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(
         TEST_FORM_ID, info, wantParams);
-    // Result depends on GetIsSecondMounted: if false �?NOT_EXIST_ID, if true �?delegates to Inner
-    EXPECT_TRUE(result == ERR_APPEXECFWK_FORM_NOT_EXIST_ID || result == ERR_OK
-        || result == ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 
     GTEST_LOG_(INFO) << "AcquireProviderFormInfoAsync_002 end";
 }
@@ -1082,8 +1078,7 @@ HWTEST_F(FmsFormDataAdapterTest, AcquireProviderFormInfoAsync_003, TestSize.Leve
 
     auto result = FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(
         TEST_FORM_ID, info, wantParams);
-    // Depending on GetIsSecondMounted: if false �?ERR_OK (task added), if true �?delegates to Inner
-    EXPECT_TRUE(result == ERR_OK || result == ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "AcquireProviderFormInfoAsync_003 end";
 }
@@ -1364,7 +1359,7 @@ HWTEST_F(FmsFormDataAdapterTest, ReloadForms_002, TestSize.Level1)
         .WillRepeatedly(Return(TEST_CALLING_UID));
 
     auto result = FormDataAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
-    // With no mock AppMgr, CheckUIAbilityContext fails �?ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY
+    // With no mock AppMgr, CheckUIAbilityContext fails -> ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY
     EXPECT_EQ(result, ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY);
 
     GTEST_LOG_(INFO) << "ReloadForms_002 end";
