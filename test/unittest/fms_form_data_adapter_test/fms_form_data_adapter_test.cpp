@@ -856,8 +856,8 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormRenderParam_001, TestSize.Level1)
     Want want;
     want.SetParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY, true);
 
-    FormDataAdapter::GetInstance().UpdateFormRenderParam(TEST_FORM_ID, callerToken, want);
-    EXPECT_TRUE(true) << "completed without crash";
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().UpdateFormRenderParam(TEST_FORM_ID, callerToken, want));
 
     GTEST_LOG_(INFO) << "UpdateFormRenderParam_001 end";
 }
@@ -875,8 +875,8 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormRenderParam_002, TestSize.Level1)
     Want want;
     want.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, std::string("#FF000000"));
 
-    FormDataAdapter::GetInstance().UpdateFormRenderParam(TEST_FORM_ID, callerToken, want);
-    EXPECT_TRUE(true) << "completed without crash";
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().UpdateFormRenderParam(TEST_FORM_ID, callerToken, want));
 
     GTEST_LOG_(INFO) << "UpdateFormRenderParam_002 end";
 }
@@ -894,8 +894,8 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormRenderParam_003, TestSize.Level1)
     Want want;
     // No transparency key set - should trigger DelHostTransparentFormColor path
 
-    FormDataAdapter::GetInstance().UpdateFormRenderParam(TEST_FORM_ID, callerToken, want);
-    EXPECT_TRUE(true) << "completed without crash";
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().UpdateFormRenderParam(TEST_FORM_ID, callerToken, want));
 
     GTEST_LOG_(INFO) << "UpdateFormRenderParam_003 end";
 }
@@ -1105,9 +1105,8 @@ HWTEST_F(FmsFormDataAdapterTest, DelayRefreshFormsOnAppUpgrade_001, TestSize.Lev
     std::vector<FormRecord> updatedForms = {record1};
     Want want;
 
-    // ScheduleTask is mocked to return false and not execute the lambda
-    FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want); 
-    EXPECT_TRUE(true) << "completed without crash";
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want));
 
     GTEST_LOG_(INFO) << "DelayRefreshFormsOnAppUpgrade_001 end";
 }
@@ -1124,8 +1123,8 @@ HWTEST_F(FmsFormDataAdapterTest, DelayRefreshFormsOnAppUpgrade_002, TestSize.Lev
     std::vector<FormRecord> updatedForms;
     Want want;
 
-    FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want); 
-    EXPECT_TRUE(true) << "completed without crash";
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want));
 
     GTEST_LOG_(INFO) << "DelayRefreshFormsOnAppUpgrade_002 end";
 }
@@ -1234,19 +1233,19 @@ HWTEST_F(FmsFormDataAdapterTest, OnNotifyRefreshForm_004, TestSize.Level1)
 
 /**
  * @tc.name: GetUpdateDurationFromAdditionalInfo_002
- * @tc.desc: Verify GetUpdateDurationFromAdditionalInfo with valid level string returns duration
+ * @tc.desc: Verify GetUpdateDurationFromAdditionalInfo with valid formUpdateLevel string returns duration
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormDataAdapterTest, GetUpdateDurationFromAdditionalInfo_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetUpdateDurationFromAdditionalInfo_002 start";
 
-    // Test with a valid additional info containing update levels
-    auto result = FormDataAdapter::GetInstance().GetUpdateDurationFromAdditionalInfo("1:30,2:60,3:120");
-    // Result depends on ParseFormUpdateLevels implementation
-    // If it parses correctly, returns last_value * TIME_CONVERSION
-    // If parsing fails, returns 0
-    EXPECT_TRUE(result >= 0);
+    // Test with valid additional info matching regex "formUpdateLevel:(\d+)"
+    // ParseFormUpdateLevels extracts values between MIN_CONFIG_DURATION(1) and MAX_CONFIG_DURATION(336)
+    // Returns last_value * TIME_CONVERSION = 2 * 1800000 = 3600000
+    auto result = FormDataAdapter::GetInstance().GetUpdateDurationFromAdditionalInfo(
+        "formUpdateLevel:1,formUpdateLevel:2");
+    EXPECT_EQ(result, 2 * Constants::TIME_CONVERSION);
 
     GTEST_LOG_(INFO) << "GetUpdateDurationFromAdditionalInfo_002 end";
 }
@@ -1279,9 +1278,8 @@ HWTEST_F(FmsFormDataAdapterTest, DeleteInvalidFormCacheIfNeed_001, TestSize.Leve
 {
     GTEST_LOG_(INFO) << "DeleteInvalidFormCacheIfNeed_001 start";
 
-    // ScheduleTask is mocked to return false and not execute
-    FormDataAdapter::GetInstance().DeleteInvalidFormCacheIfNeed(); 
-    EXPECT_TRUE(true) << "completed without crash";
+    // ScheduleTask is mocked to return false, so the lambda body is never executed
+    EXPECT_NO_FATAL_FAILURE(FormDataAdapter::GetInstance().DeleteInvalidFormCacheIfNeed());
 
     GTEST_LOG_(INFO) << "DeleteInvalidFormCacheIfNeed_001 end";
 }
@@ -1416,8 +1414,8 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormRenderParamsAfterReload_001, TestSize
     GTEST_LOG_(INFO) << "UpdateFormRenderParamsAfterReload_001 start";
 
     // GetFormUpgradeInfo always returns false in mock, so this should return early
-    FormDataAdapter::GetInstance().UpdateFormRenderParamsAfterReload(TEST_FORM_ID); 
-    EXPECT_TRUE(true) << "completed without crash";
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().UpdateFormRenderParamsAfterReload(TEST_FORM_ID));
 
     GTEST_LOG_(INFO) << "UpdateFormRenderParamsAfterReload_001 end";
 }
