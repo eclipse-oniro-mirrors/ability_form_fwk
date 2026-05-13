@@ -454,7 +454,6 @@ ohos_shared_library("fmskit_native") {
     "-Wl,--as-needed",
     "-Wl,--sort-common",
     "-Wl,--relax",
-    "-Wl,-Bsymbolic",
     "-Wl,-z,now",
     "-Wl,--icf=all",
   ]
@@ -540,7 +539,6 @@ ohos_shared_library("fmskit_provider_client") {
     "-Wl,--as-needed",
     "-Wl,--sort-common",
     "-Wl,--relax",
-    "-Wl,-Bsymbolic",
     "-Wl,-z,now",
     "-Wl,--icf=all",
   ]
@@ -623,7 +621,6 @@ ohos_shared_library("form_manager") {
     "-Wl,--as-needed",
     "-Wl,--sort-common",
     "-Wl,--relax",
-    "-Wl,-Bsymbolic",
     "-Wl,-z,now",
     "-Wl,--icf=all",
   ]
@@ -706,7 +703,6 @@ ohos_shared_library("form_utils") {
     "-Wl,--as-needed",
     "-Wl,--sort-common",
     "-Wl,--relax",
-    "-Wl,-Bsymbolic",
     "-Wl,-z,now",
     "-Wl,--icf=all",
   ]
@@ -763,7 +759,6 @@ ohos_shared_library("form_common_info") {
     "-Wl,--as-needed",
     "-Wl,--sort-common",
     "-Wl,--relax",
-    "-Wl,-Bsymbolic",
     "-Wl,-z,now",
     "-Wl,--icf=all",
   ]

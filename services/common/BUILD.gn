@@ -56,7 +56,6 @@ ohos_shared_library("libform_common") {
     "-Wl,--as-needed",
     "-Wl,--sort-common",
     "-Wl,--relax",
-    "-Wl,-Bsymbolic",
     "-Wl,-z,now",
     "-Wl,--icf=all",
   ]
