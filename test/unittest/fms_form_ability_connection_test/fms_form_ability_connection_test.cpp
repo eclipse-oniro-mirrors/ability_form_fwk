@@ -203,6 +203,9 @@ void FmsFormAbilityConnectionTest::TearDown()
     testing::Mock::VerifyAndClearExpectations(mockFormDataMgr_.get());
     testing::Mock::VerifyAndClearExpectations(mockFormMgrAdapterFacade_.get());
     testing::Mock::VerifyAndClearExpectations(mockFormRenderMgr_.get());
+    if (connection_ != nullptr && connection_->GetConnectId() != 0) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connection_->GetConnectId());
+    }
     connection_.reset();
     mockFormDataMgr_.reset();
     mockFormMgrAdapterFacade_.reset();

@@ -1825,6 +1825,7 @@ HWTEST_F(FmsFormProviderDataTest, WriteAshmemDataToParcel_LargeData_001, TestSiz
 
     int fd = formProviderData.ReadFileDescriptor(parcel);
     ASSERT_GE(fd, 0);
+    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
     int32_t ashmemSize = AshmemGetSize(fd);
     EXPECT_EQ(ashmemSize, static_cast<int32_t>(size));
     fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);

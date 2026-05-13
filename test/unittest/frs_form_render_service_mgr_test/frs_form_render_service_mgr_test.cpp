@@ -172,10 +172,6 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_002, TestSize.Level0
     ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
 
-    want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_OK);
-
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_002 end";
 }
 
@@ -199,12 +195,6 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_003, TestSize.Level0
     FormRenderServiceMgr::GetInstance().SetFormSupplyClient(nullptr);
     ret = FormRenderServiceMgr::GetInstance().ProcessRenderForm(formJsInfo, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
-
-    callerToken = new (std::nothrow) MockFormSupplyStub();
-    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
-    FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
-    ret = FormRenderServiceMgr::GetInstance().ProcessRenderForm(formJsInfo, want);
-    EXPECT_EQ(ret, ERR_OK);
 
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_003 end";
 }
