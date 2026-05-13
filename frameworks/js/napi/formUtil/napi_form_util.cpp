@@ -387,25 +387,25 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         resourceName,
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
-            AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
+            AsyncErrMsgCallbackInfo *callbackInfo = static_cast<AsyncErrMsgCallbackInfo*>(data);
             HILOG_INFO("complete");
-            if (asyncCallbackInfo->callback != nullptr) {
+            if (callbackInfo->callback != nullptr) {
                 napi_value callback;
                 napi_value undefined;
                 napi_value result[ARGS_SIZE_TWO] = {0};
-                InnerCreateCallbackRetMsg(env, asyncCallbackInfo->code, result);
+                InnerCreateCallbackRetMsg(env, callbackInfo->code, result);
                 napi_get_undefined(env, &undefined);
-                napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+                napi_get_reference_value(env, callbackInfo->callback, &callback);
                 napi_value callResult;
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
-                napi_delete_reference(env, asyncCallbackInfo->callback);
+                napi_delete_reference(env, callbackInfo->callback);
             }
-            if (asyncCallbackInfo->asyncWork != nullptr) {
-                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            if (callbackInfo->asyncWork != nullptr) {
+                napi_delete_async_work(env, callbackInfo->asyncWork);
             }
-            delete asyncCallbackInfo;
+            delete callbackInfo;
         },
-        (void *)asyncCallbackInfo,
+        static_cast<void *>(asyncCallbackInfo),
         &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
@@ -438,16 +438,16 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("promise complete");
-            AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
+            AsyncErrMsgCallbackInfo *callbackInfo = static_cast<AsyncErrMsgCallbackInfo*>(data);
             napi_value result;
-            InnerCreatePromiseRetMsg(env, asyncCallbackInfo->code, &result);
-            napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
-            if (asyncCallbackInfo->asyncWork != nullptr) {
-                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            InnerCreatePromiseRetMsg(env, callbackInfo->code, &result);
+            napi_reject_deferred(env, callbackInfo->deferred, result);
+            if (callbackInfo->asyncWork != nullptr) {
+                napi_delete_async_work(env, callbackInfo->asyncWork);
             }
-            delete asyncCallbackInfo;
+            delete callbackInfo;
         },
-        (void *)asyncCallbackInfo,
+        static_cast<void *>(asyncCallbackInfo),
         &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
@@ -504,7 +504,8 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     napi_set_named_property(env, result, "formId", CreateJsValue(env, std::to_string(runningFormInfo.formId)));
     napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
     napi_set_named_property(env, result, "hostBundleName", CreateJsValue(env, runningFormInfo.hostBundleName));
-    napi_set_named_property(env, result, "visibilityType", CreateJsValue(env, (int32_t)runningFormInfo.formVisiblity));
+    napi_set_named_property(env, result, "visibilityType", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formVisiblity)));
     napi_set_named_property(env, result, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
     napi_set_named_property(env, result, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
     napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
@@ -512,7 +513,8 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     napi_set_named_property(env, result, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, result, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
     napi_set_named_property(env, result, "formDescription", CreateJsValue(env, runningFormInfo.description));
-    napi_set_named_property(env, result, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
+    napi_set_named_property(env, result, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)
@@ -615,7 +617,8 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
     napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
-    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
 
     return objContext;
 }
@@ -645,7 +648,8 @@ napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &running
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
     napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
-    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
  
     return objContext;
 }

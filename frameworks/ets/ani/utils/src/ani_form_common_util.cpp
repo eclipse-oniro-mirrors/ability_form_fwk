@@ -1190,7 +1190,7 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
     }
 
     ani_enum_item item;
-    status = env->Enum_GetEnumItemByIndex(formState, static_cast<ani_size>(((int)state) + 1), &item);
+    status = env->Enum_GetEnumItemByIndex(formState, static_cast<ani_size>(static_cast<int>(state) + 1), &item);
     if (status != ANI_OK) {
         HILOG_INFO("Cannot get enum item");
         return nullptr;

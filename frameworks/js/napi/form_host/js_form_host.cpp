@@ -870,7 +870,6 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
-        HILOG_DEBUG("OnNotifyVisibleForms end");
     }
 
     napi_value OnNotifyInvisibleForms(napi_env env, size_t argc, napi_value* argv)
@@ -907,7 +906,6 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
-        HILOG_DEBUG("OnNotifyInvisibleForms end");
     }
 
     napi_value OnEnableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
@@ -943,7 +941,6 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
-        HILOG_DEBUG("OnEnableFormsUpdate end");
     }
 
     napi_value OnDisableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
@@ -3433,10 +3430,11 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
 void JsFormRouterProxyMgr::GetTemplateFormInfoArray(
     const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo, napi_value &templateFormInfoArray)
 {
-    auto setStringProperty = [&](napi_value obj, const char* key, const std::string &value) {
+    auto setStringProperty = [env = templateFormDetailInfoChangeEnv_](napi_value obj, const char* key,
+        const std::string &value) {
         napi_value jsValue;
-        napi_create_string_utf8(templateFormDetailInfoChangeEnv_, value.c_str(), NAPI_AUTO_LENGTH, &jsValue);
-        napi_set_named_property(templateFormDetailInfoChangeEnv_, obj, key, jsValue);
+        napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &jsValue);
+        napi_set_named_property(env, obj, key, jsValue);
     };
 
     for (size_t i = 0; i < templateFormInfo.size(); ++i) {

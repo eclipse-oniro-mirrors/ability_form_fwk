@@ -265,7 +265,7 @@ void JsFormStateObserver::DelFormAddCallbackByBundle(const napi_value callback, 
         HILOG_INFO("no formAddCallback registered with this bundleName");
     } else {
         auto &callbacks = formAddCallbacks->second;
-        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&](const auto &cb) {
+        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&callback](const auto &cb) {
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
@@ -316,7 +316,7 @@ void JsFormStateObserver::DelFormRemoveCallbackByBundle(const napi_value callbac
         HILOG_INFO("no formRemoveCallback registered with this bundleName");
     } else {
         auto &callbacks = formRemoveCallbacks->second;
-        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&](const auto &cb) {
+        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&callback](const auto &cb) {
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
