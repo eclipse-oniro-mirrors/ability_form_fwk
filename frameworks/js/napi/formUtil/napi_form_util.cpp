@@ -504,7 +504,8 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     napi_set_named_property(env, result, "formId", CreateJsValue(env, std::to_string(runningFormInfo.formId)));
     napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
     napi_set_named_property(env, result, "hostBundleName", CreateJsValue(env, runningFormInfo.hostBundleName));
-    napi_set_named_property(env, result, "visibilityType", CreateJsValue(env, static_cast<int32_t>(runningFormInfo.formVisiblity)));
+    napi_set_named_property(env, result, "visibilityType", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formVisiblity)));
     napi_set_named_property(env, result, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
     napi_set_named_property(env, result, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
     napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
@@ -512,7 +513,8 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     napi_set_named_property(env, result, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, result, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
     napi_set_named_property(env, result, "formDescription", CreateJsValue(env, runningFormInfo.description));
-    napi_set_named_property(env, result, "formLocation", CreateJsValue(env, static_cast<int32_t>(runningFormInfo.formLocation)));
+    napi_set_named_property(env, result, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)
@@ -615,7 +617,8 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
     napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
-    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, static_cast<int32_t>(runningFormInfo.formLocation)));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
 
     return objContext;
 }
@@ -645,7 +648,8 @@ napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &running
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
     napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
-    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, static_cast<int32_t>(runningFormInfo.formLocation)));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
  
     return objContext;
 }
