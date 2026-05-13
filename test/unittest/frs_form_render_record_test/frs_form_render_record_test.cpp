@@ -3951,7 +3951,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ParseFormLocationMap_001, Te
     ASSERT_NE(formRenderRecordPtr_, nullptr);
 
     std::vector<std::string> formNames;
-    std::vector<int32_t> formLocations;
+    std::vector<uint32_t> formLocations;
     formRenderRecordPtr_->formLocationMap_.clear();
     formRenderRecordPtr_->ParseFormLocationMap(formNames, formLocations);
     EXPECT_EQ(formNames.size(), 0);
@@ -3971,7 +3971,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ParseFormLocationMap_002, Te
     ASSERT_NE(formRenderRecordPtr_, nullptr);
 
     std::vector<std::string> formNames;
-    std::vector<int32_t> formLocations;
+    std::vector<uint32_t> formLocations;
     formRenderRecordPtr_->formLocationMap_.clear();
     FormLocationInfo location1;
     location1.formName = "form1";
