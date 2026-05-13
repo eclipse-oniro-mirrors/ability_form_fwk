@@ -768,5 +768,186 @@ HWTEST_F(FmsFormPublishAdapterTest, CancelAddFormRequestTimeOutTask_003, TestSiz
     GTEST_LOG_(INFO) << "CancelAddFormRequestTimeOutTask_003 end";
 }
 
+// ========== AcquireAddFormResult Tests ==========
+
+/**
+ * @tc.name: AcquireAddFormResult_001
+ * @tc.desc: Verify formId with SUCCESS state returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, AcquireAddFormResult_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_001 start";
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
+
+    auto result = FormPublishAdapter::GetInstance().AcquireAddFormResult(TEST_FORM_ID);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_001 end";
+}
+
+/**
+ * @tc.name: AcquireAddFormResult_002
+ * @tc.desc: Verify formId with FAILED state returns ERR_APPEXECFWK_FORM_COMMON_CODE
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, AcquireAddFormResult_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_002 start";
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::FAILED;
+
+    auto result = FormPublishAdapter::GetInstance().AcquireAddFormResult(TEST_FORM_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_002 end";
+}
+
+/**
+ * @tc.name: AcquireAddFormResult_003
+ * @tc.desc: Verify formId with TIMEOUT state returns ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, AcquireAddFormResult_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_003 start";
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::TIMEOUT;
+
+    auto result = FormPublishAdapter::GetInstance().AcquireAddFormResult(TEST_FORM_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT);
+
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_003 end";
+}
+
+/**
+ * @tc.name: AcquireAddFormResult_005
+ * @tc.desc: Verify formId NOT in map returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, AcquireAddFormResult_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_005 start";
+
+    auto result = FormPublishAdapter::GetInstance().AcquireAddFormResult(TEST_FORM_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    GTEST_LOG_(INFO) << "AcquireAddFormResult_005 end";
+}
+
+// ========== RequestPublishFormCrossUser Tests ==========
+
+/**
+ * @tc.name: RequestPublishFormCrossUser_001
+ * @tc.desc: Verify RequestPublishFormCommon failure propagates error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormCrossUser_001 start";
+
+    Want want;
+    int64_t formId = 0;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
+        .WillOnce(Return(-1));
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormCrossUser(want, TEST_USER_ID, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormCrossUser_001 end";
+}
+
+/**
+ * @tc.name: RequestPublishFormCrossUser_002
+ * @tc.desc: Verify AddRequestPublishFormInfo failure propagates error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormCrossUser_002 start";
+
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+    int64_t formId = 0;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AddRequestPublishFormInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormCrossUser(want, TEST_USER_ID, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormCrossUser_002 end";
+}
+
+// ========== QueryPublishFormToHost(userId) Tests ==========
+
+/**
+ * @tc.name: QueryPublishFormToHost_006
+ * @tc.desc: Verify QueryPublishFormToHost with userId overload, action disallowed returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_006 start";
+
+    Want wantToHost;
+    wantToHost.SetAction(TEST_INVALID_ACTION);
+
+    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_006 end";
+}
+
+/**
+ * @tc.name: QueryPublishFormToHost_007
+ * @tc.desc: Verify QueryPublishFormToHost with userId, GetAbilityInfoByAction fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_007 start";
+
+    Want wantToHost;
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_007 end";
+}
+
+/**
+ * @tc.name: QueryPublishFormToHost_008
+ * @tc.desc: Verify QueryPublishFormToHost with userId, success with ability info
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_008 start";
+
+    Want wantToHost;
+
+    AbilityInfo abilityInfo;
+    abilityInfo.name = TEST_ABILITY_NAME;
+    abilityInfo.bundleName = TEST_BUNDLE_NAME;
+    ExtensionAbilityInfo emptyExtAbilityInfo;
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(abilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
+            Return(true)));
+
+    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_008 end";
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

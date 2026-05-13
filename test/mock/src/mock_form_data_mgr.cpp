@@ -414,12 +414,6 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
     return ERR_OK;
 }
 
-bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const
-{
-    GTEST_LOG_(INFO) << "GetFormRecordByCondition called";
-    return false;
-}
-
 ErrCode FormDataMgr::SetRefreshDuringDisableForm(const int64_t formId, const bool enable)
 {
     GTEST_LOG_(INFO) << "SetRefreshDuringDisableForm called";

@@ -30,6 +30,7 @@ ohos_unittest("FmsFormQueryAdapterTest") {
     "${form_fwk_path}/interfaces/inner_api/src/form_info_filter.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_instance.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_instances_filter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/running_form_info.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_info_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_bms_helper.cpp",
