@@ -30,6 +30,7 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
     "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_form_util.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_mgr_adapter_facade.cpp",
   ]
 
   include_dirs = [
@@ -70,6 +71,7 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "googletest:gmock_main",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
