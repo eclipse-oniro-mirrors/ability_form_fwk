@@ -3592,7 +3592,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateContextConfiguration_0
     ASSERT_NE(formRenderRecordPtr_, nullptr);
 
     formRenderRecordPtr_->configuration_ = nullptr;
-    formRenderRecordPtr_->UpdateContextConfiguration();
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->UpdateContextConfiguration());
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateContextConfiguration_001 end";
 }
@@ -3610,7 +3610,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateContextConfiguration_0
     auto config = std::make_shared<Configuration>();
     formRenderRecordPtr_->configuration_ = config;
     formRenderRecordPtr_->contextsMapForModuleName_.clear();
-    formRenderRecordPtr_->UpdateContextConfiguration();
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->UpdateContextConfiguration());
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateContextConfiguration_002 end";
 }
@@ -4076,7 +4076,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleReleaseAllRendererInJs
     int64_t formId = 100;
     formRenderRecordPtr_->formRendererGroupMap_.clear();
     formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
-    formRenderRecordPtr_->HandleReleaseAllRendererInJsThread();
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->HandleReleaseAllRendererInJsThread());
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleReleaseAllRendererInJsThread_002 end";
 }
@@ -4116,7 +4116,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleReleaseInJsThread_001,
     ASSERT_NE(formRenderRecordPtr_, nullptr);
 
     formRenderRecordPtr_->runtime_ = nullptr;
-    formRenderRecordPtr_->HandleReleaseInJsThread();
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->HandleReleaseInJsThread());
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleReleaseInJsThread_001 end";
 }
@@ -4239,7 +4239,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleUpdateRenderRecord_001
     sptr<IFormSupply> formSupplyClient = nullptr;
     int32_t renderType = Constants::RENDER_FORM;
     formRenderRecordPtr_->formRendererGroupMap_.clear();
-    formRenderRecordPtr_->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType);
+    EXPECT_NO_FATAL_FAILURE(
+        formRenderRecordPtr_->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType));
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleUpdateRenderRecord_001 end";
 }
@@ -4259,7 +4260,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleUpdateRenderRecord_002
     Want want;
     sptr<IFormSupply> formSupplyClient = nullptr;
     int32_t renderType = Constants::UPDATE_RENDERING_FORM;
-    formRenderRecordPtr_->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType);
+    EXPECT_NO_FATAL_FAILURE(
+        formRenderRecordPtr_->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType));
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleUpdateRenderRecord_002 end";
 }
