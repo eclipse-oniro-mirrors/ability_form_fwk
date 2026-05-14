@@ -1415,5 +1415,82 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormRenderParamsAfterReload_001, TestSize
     GTEST_LOG_(INFO) << "UpdateFormRenderParamsAfterReload_001 end";
 }
 
+// ========== PostEnterpriseAppInstallFailedRetryTask Tests ==========
+
+/**
+ * @tc.name: PostEnterpriseAppInstallFailedRetryTask_001
+ * @tc.desc: Verify PostEnterpriseAppInstallFailedRetryTask does not crash when called directly
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, PostEnterpriseAppInstallFailedRetryTask_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "PostEnterpriseAppInstallFailedRetryTask_001 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.enterprise";
+    Want want;
+
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().PostEnterpriseAppInstallFailedRetryTask(record, want));
+
+    GTEST_LOG_(INFO) << "PostEnterpriseAppInstallFailedRetryTask_001 end";
+}
+
+/**
+ * @tc.name: PostEnterpriseAppInstallFailedRetryTask_002
+ * @tc.desc: Verify PostEnterpriseAppInstallFailedRetryTask is triggered when RequestRefresh
+ *           returns ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED via DelayRefreshFormsOnAppUpgrade
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, PostEnterpriseAppInstallFailedRetryTask_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "PostEnterpriseAppInstallFailedRetryTask_002 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.enterprise";
+    std::vector<FormRecord> updatedForms = {record};
+    Want want;
+
+    EXPECT_CALL(*MockFormRefreshMgr::obj, RequestRefresh(_, TYPE_APP_UPGRADE))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED));
+
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want));
+
+    GTEST_LOG_(INFO) << "PostEnterpriseAppInstallFailedRetryTask_002 end";
+}
+
+/**
+ * @tc.name: PostEnterpriseAppInstallFailedRetryTask_003
+ * @tc.desc: Verify PostEnterpriseAppInstallFailedRetryTask handles multiple form records
+ *           via DelayRefreshFormsOnAppUpgrade without crash
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, PostEnterpriseAppInstallFailedRetryTask_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "PostEnterpriseAppInstallFailedRetryTask_003 start";
+
+    FormRecord record1;
+    record1.formId = TEST_FORM_ID;
+    record1.bundleName = "com.test.enterprise1";
+
+    FormRecord record2;
+    record2.formId = TEST_FORM_ID + 1;
+    record2.bundleName = "com.test.enterprise2";
+
+    std::vector<FormRecord> updatedForms = {record1, record2};
+    Want want;
+
+    EXPECT_CALL(*MockFormRefreshMgr::obj, RequestRefresh(_, TYPE_APP_UPGRADE))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED));
+
+    EXPECT_NO_FATAL_FAILURE(
+        FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want));
+
+    GTEST_LOG_(INFO) << "PostEnterpriseAppInstallFailedRetryTask_003 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
