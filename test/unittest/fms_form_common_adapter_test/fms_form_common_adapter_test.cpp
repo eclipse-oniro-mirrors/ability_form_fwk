@@ -3921,7 +3921,6 @@ HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_004, TestSize.Level1)
     auto result = FormCommonAdapter::GetInstance().IsDimensionValid(formInfo, 109);
     EXPECT_FALSE(result);
 
-    // Target dimension is within MAX_LAYOUT
     auto result2 = FormCommonAdapter::GetInstance().IsDimensionValid(formInfo, 102);
     EXPECT_TRUE(result2);
 
