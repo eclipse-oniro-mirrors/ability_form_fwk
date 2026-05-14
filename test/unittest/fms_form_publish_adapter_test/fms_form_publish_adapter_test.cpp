@@ -49,6 +49,7 @@
 #include "mock_form_callback_adapter.h"
 #include "mock_form_ams_helper.h"
 #include "mock_form_ecological_rule_client.h"
+#include "form_adapter_constants.h"
 
 using namespace testing;
 using namespace testing::ext;
