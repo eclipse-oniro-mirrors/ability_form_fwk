@@ -431,7 +431,7 @@ void FormDataMgr::DelHostTransparentFormColor(const int64_t formId)
 }
 
 bool FormDataMgr::AllotFormHostRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
- 	     const int64_t formId, const int callingUid)
+    const int64_t formId, const int callingUid)
 {
     GTEST_LOG_(INFO) << "AllotFormHostRecord called";
     if (AppExecFwk::MockFormDataMgr::obj) {
