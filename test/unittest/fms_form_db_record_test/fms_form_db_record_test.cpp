@@ -635,4 +635,24 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_GetFormCountsByHostBundleName_
     EXPECT_EQ(0, FormDbCache::GetInstance().GetFormCountsByHostBundleName(hostBundleName));
     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_GetFormCountsByHostBundleName_003 end";
 }
+
+/**
+ * @tc.number: FmsFormDbRecordTest_UpdateDBRecord_001
+ * @tc.name: UpdateDBRecord
+ * @tc.desc: Verify that UpdateDBRecord refuses to save temporary form.
+ * @tc.details: Verify that the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM
+ *               when formTempFlag is true.
+ */
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_UpdateDBRecord_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_UpdateDBRecord_001 start";
+    InitFormRecord();
+    formRecord_.formTempFlag = true;
+
+    // Verify that the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+              FormDbCache::GetInstance().UpdateDBRecord(0, formRecord_));
+
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_UpdateDBRecord_001 end";
+}
 }

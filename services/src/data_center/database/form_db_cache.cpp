@@ -228,6 +228,11 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormDBInfo &record) const
  */
 ErrCode FormDbCache::UpdateDBRecord(const int64_t formId, const FormRecord &record) const
 {
+    if (record.formTempFlag) {
+        HILOG_ERROR("refusing to save temp form to db: %{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
     FormDBInfo formDBInfo(formId, record);
     return FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
 }
