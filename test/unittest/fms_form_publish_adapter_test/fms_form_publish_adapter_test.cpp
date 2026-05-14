@@ -1607,7 +1607,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_008, TestSize.Level
         .WillOnce(Return(nullptr));
 
     FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
-
     auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want, TEST_USER_ID);
     EXPECT_EQ(result, ERR_OK);
 
