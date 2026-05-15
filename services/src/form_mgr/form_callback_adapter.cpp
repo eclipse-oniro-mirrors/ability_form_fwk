@@ -18,6 +18,7 @@
 #include "app_mgr_interface.h"
 #include "app_state_data.h"
 #include "form_info.h"
+#include "iform_host_delegate.h"
 #include "iform_provider_delegate.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"

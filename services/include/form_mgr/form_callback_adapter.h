@@ -34,7 +34,6 @@
 
 #include "app_mgr_interface.h"
 #include "form_mgr_errors.h"
-#include "iform_host_delegate.h"
 #include "form_publish_interceptor_interface.h"
 #include "fms_log_wrapper.h"
 #include "common/util/form_proxy_registry.h"
@@ -48,6 +47,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+class IFormHostDelegate;
 using Want = OHOS::AAFwk::Want;
 
 class FormCommonAdapter;
