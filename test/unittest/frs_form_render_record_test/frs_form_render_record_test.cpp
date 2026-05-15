@@ -4233,6 +4233,10 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleUpdateRenderRecord_001
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleUpdateRenderRecord_001 start";
     ASSERT_NE(formRenderRecordPtr_, nullptr);
 
+    auto eventRunner = EventRunner::Create("bundleName");
+    formRenderRecordPtr_->eventRunner_ = eventRunner;
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+
     FormJsInfo formJsInfo;
     formJsInfo.formId = 100;
     Want want;
@@ -4254,6 +4258,10 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleUpdateRenderRecord_002
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleUpdateRenderRecord_002 start";
     ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    auto eventRunner = EventRunner::Create("bundleName");
+    formRenderRecordPtr_->eventRunner_ = eventRunner;
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
 
     FormJsInfo formJsInfo;
     formJsInfo.formId = 100;
