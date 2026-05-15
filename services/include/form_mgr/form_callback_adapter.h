@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_CALLBACK_ADAPTER_H
 #define OHOS_FORM_FWK_FORM_CALLBACK_ADAPTER_H
 
+#include <functional>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -24,6 +25,7 @@
 #include <singleton.h>
 
 #include "form_info.h"
+#include "form_custom_config.h"
 #include "form_provider_data.h"
 #include "iremote_object.h"
 #include "ipc_skeleton.h"
@@ -32,6 +34,7 @@
 
 #include "app_mgr_interface.h"
 #include "form_mgr_errors.h"
+#include "iform_host_delegate.h"
 #include "form_publish_interceptor_interface.h"
 #include "fms_log_wrapper.h"
 #include "common/util/form_proxy_registry.h"
@@ -100,6 +103,12 @@ public:
 
     ErrCode UpdateTemplateFormDetailInfo(const std::vector<TemplateFormDetailInfo> &templateFormInfo);
 
+    ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterUpdateFormsConfigCallback();
+
+    ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs);
+
     ErrCode RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken);
 
     ErrCode UnregisterFormWantCallback(int32_t callingUid);
@@ -111,11 +120,19 @@ public:
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
 
 private:
+    ErrCode NotifyAllHosts(FormProxyRegistry &registry, const std::string &tag,
+        const std::function<ErrCode(const sptr<IFormHostDelegate> &)> &callback);
+
     ErrCode CallerCheck(const int64_t formId, const int32_t callingUid);
 
     ErrCode SceneAnimationCheck(const int64_t formId, const int32_t callingUid);
 
     bool IsForegroundApp();
+
+    void NotifyCachedFormConfigs(const sptr<IRemoteObject> &callerToken);
+
+    std::vector<FormCustomConfig> formCustomConfigCache_;
+    mutable std::mutex formCustomConfigCacheMutex_;
 
     FormProxyRegistry overflowRegistry_{"Overflow"};
     FormProxyRegistry sceneAnimationRegistry_{"SceneAnimation"};
@@ -123,6 +140,7 @@ private:
     FormProxyRegistry liveFormStatusRegistry_{"LiveFormStatus"};
     FormProxyRegistry crossBundleControlRegistry_{"CrossBundleControl"};
     FormProxyRegistry templateFormDetailInfoRegistry_{"TemplateFormDetailInfo"};
+    FormProxyRegistry updateFormsConfigRegistry_{"UpdateFormsConfig"};
     FormProxyRegistry wantCallbackRegistry_{"WantCallback"};
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
 

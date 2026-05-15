@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -459,6 +459,16 @@ public:
     static napi_value UnregisterTemplateFormDetailInfoObserver(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterTemplateFormDetailInfoObserver);
+    }
+
+    static napi_value RegisterUpdateFormsConfigCallbackObserver(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRegisterUpdateFormsConfigCallbackObserver);
+    }
+
+    static napi_value UnregisterUpdateFormsConfigCallbackObserver(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterUpdateFormsConfigCallbackObserver);
     }
 
     static napi_value GetFormIdsByFormLocation(napi_env env, napi_callback_info info)
@@ -2357,6 +2367,102 @@ private:
         return CreateJsValue(env, ret);
     }
 
+    napi_value OnRegisterUpdateFormsConfigCallbackObserver(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_INFO("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+        if (argc != ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+            return CreateJsUndefined(env);
+        }
+        napi_valuetype type = napi_undefined;
+        napi_typeof(env, argv[PARAM0], &type);
+        if (type != napi_function) {
+            HILOG_ERROR("callback is not function");
+            NapiFormUtil::ThrowParamTypeError(env, "callback", "function");
+            return CreateJsUndefined(env);
+        }
+        napi_ref callbackRef = nullptr;
+        napi_status status = napi_create_reference(env, argv[PARAM0], REF_COUNT, &callbackRef);
+        if (status != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            return CreateJsUndefined(env);
+        }
+        return OnRegisterUpdateFormsConfigCb(env, callbackRef);
+    }
+
+    napi_value OnUnregisterUpdateFormsConfigCallbackObserver(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_INFO("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+        if (argc > ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
+            return CreateJsUndefined(env);
+        }
+        if (argc == ARGS_ONE) {
+            napi_valuetype type = napi_undefined;
+            napi_typeof(env, argv[PARAM0], &type);
+            if (type != napi_function) {
+                HILOG_ERROR("callback is not function");
+                NapiFormUtil::ThrowParamTypeError(env, "callback", "function");
+                return CreateJsUndefined(env);
+            }
+        }
+        return OnUnregisterUpdateFormsConfigCb(env);
+    }
+
+    napi_value OnRegisterUpdateFormsConfigCb(napi_env env, napi_ref callbackRef)
+    {
+        HILOG_INFO("call");
+        bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterUpdateFormsConfigCallback(env, callbackRef);
+        if (!ret) {
+            HILOG_ERROR("RegisterUpdateFormsConfigCallback failed");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            return CreateJsUndefined(env);
+        }
+        ErrCode result = FormMgr::GetInstance().RegisterUpdateFormsConfigCallback(
+            JsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
+            JsFormRouterProxyMgr::GetInstance()->UnregisterUpdateFormsConfigCallback();
+            if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
+                result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+                NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            } else {
+                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            }
+            return CreateJsUndefined(env);
+        }
+        return CreateJsValue(env, ret);
+    }
+
+    napi_value OnUnregisterUpdateFormsConfigCb(napi_env env)
+    {
+        HILOG_INFO("call");
+        ErrCode result = FormMgr::GetInstance().UnregisterUpdateFormsConfigCallback();
+        if (result != ERR_OK) {
+            if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
+                result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+                NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            } else {
+                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            }
+            return CreateJsUndefined(env);
+        }
+        bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterUpdateFormsConfigCallback();
+        return CreateJsValue(env, ret);
+    }
+
     napi_value OnGetFormIdsByFormLocation(napi_env env, size_t argc, napi_value *argv)
     {
         HILOG_DEBUG("call");
@@ -2492,56 +2598,61 @@ private:
     }
 };
 
+namespace {
+const std::pair<const char *, napi_callback> JS_FORM_HOST_BINDINGS[] = {
+    { "deleteForm", JsFormHost::DeleteForm },
+    { "releaseForm", JsFormHost::ReleaseForm },
+    { "requestForm", JsFormHost::RequestForm },
+    { "requestFormWithParams", JsFormHost::RequestFormWithParams },
+    { "castTempForm", JsFormHost::CastTempForm },
+    { "castToNormalForm", JsFormHost::CastTempForm },
+    { "notifyVisibleForms", JsFormHost::NotifyVisibleForms },
+    { "notifyInvisibleForms", JsFormHost::NotifyInvisibleForms },
+    { "enableFormsUpdate", JsFormHost::EnableFormsUpdate },
+    { "disableFormsUpdate", JsFormHost::DisableFormsUpdate },
+    { "isSystemReady", JsFormHost::IsSystemReady },
+    { "deleteInvalidForms", JsFormHost::DeleteInvalidForms },
+    { "acquireFormState", JsFormHost::AcquireFormState },
+    { "on", JsFormHost::RegisterFormObserver },
+    { "off", JsFormHost::UnregisterFormObserver },
+    { "notifyFormsVisible", JsFormHost::NotifyFormsVisible },
+    { "notifyFormsEnableUpdate", JsFormHost::NotifyFormsEnableUpdate },
+    { "getAllFormsInfo", JsFormHost::GetAllFormsInfo },
+    { "getAllTemplateFormsInfo", JsFormHost::GetAllTemplateFormsInfo },
+    { "getFormsInfo", JsFormHost::GetFormsInfo },
+    { "getTemplateFormsInfo", JsFormHost::GetTemplateFormsInfo },
+    { "shareForm", JsFormHost::ShareForm },
+    { "notifyFormsPrivacyProtected", JsFormHost::NotifyFormsPrivacyProtected },
+    { "acquireFormData", JsFormHost::AcquireFormData },
+    { "setRouterProxy", JsFormHost::SetRouterProxy },
+    { "clearRouterProxy", JsFormHost::ClearRouterProxy },
+    { "setFormsRecyclable", JsFormHost::SetFormsRecyclable },
+    { "recoverForms", JsFormHost::RecoverForms },
+    { "recycleForms", JsFormHost::RecycleForms },
+    { "updateFormLocation", JsFormHost::UpdateFormLocation },
+    { "setPublishFormResult", JsFormHost::SetPublishFormResult },
+    { "addForm", JsFormHost::AddForm },
+    { "updateFormLockedState", JsFormHost::UpdateFormLockedState },
+    { "updateFormSize", JsFormHost::UpdateFormSize },
+    { "onTemplateFormDetailInfoChange", JsFormHost::RegisterTemplateFormDetailInfoObserver },
+    { "offTemplateFormDetailInfoChange", JsFormHost::UnregisterTemplateFormDetailInfoObserver },
+    { "onUpdateFormsConfigCallback", JsFormHost::RegisterUpdateFormsConfigCallbackObserver },
+    { "offUpdateFormsConfigCallback", JsFormHost::UnregisterUpdateFormsConfigCallbackObserver },
+    { "getFormIdsByFormLocation", JsFormHost::GetFormIdsByFormLocation },
+    { "onGetWantParamsCallback", JsFormHost::RegisterGetWantParamsCallback },
+    { "offGetWantParamsCallback", JsFormHost::UnregisterGetWantParamsCallback },
+};
+}
+
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
 {
     std::unique_ptr<JsFormHost> jsFormHost = std::make_unique<JsFormHost>();
     napi_wrap(env, exportObj, jsFormHost.release(), JsFormHost::Finalizer, nullptr, nullptr);
 
     const char *moduleName = "JsFormHost";
-    BindNativeFunction(env, exportObj, "deleteForm", moduleName, JsFormHost::DeleteForm);
-    BindNativeFunction(env, exportObj, "releaseForm", moduleName, JsFormHost::ReleaseForm);
-    BindNativeFunction(env, exportObj, "requestForm", moduleName, JsFormHost::RequestForm);
-    BindNativeFunction(env, exportObj, "requestFormWithParams", moduleName, JsFormHost::RequestFormWithParams);
-    BindNativeFunction(env, exportObj, "castTempForm", moduleName, JsFormHost::CastTempForm);
-    BindNativeFunction(env, exportObj, "castToNormalForm", moduleName, JsFormHost::CastTempForm);
-    BindNativeFunction(env, exportObj, "notifyVisibleForms", moduleName, JsFormHost::NotifyVisibleForms);
-    BindNativeFunction(env, exportObj, "notifyInvisibleForms", moduleName, JsFormHost::NotifyInvisibleForms);
-    BindNativeFunction(env, exportObj, "enableFormsUpdate", moduleName, JsFormHost::EnableFormsUpdate);
-    BindNativeFunction(env, exportObj, "disableFormsUpdate", moduleName, JsFormHost::DisableFormsUpdate);
-    BindNativeFunction(env, exportObj, "isSystemReady", moduleName, JsFormHost::IsSystemReady);
-    BindNativeFunction(env, exportObj, "deleteInvalidForms", moduleName, JsFormHost::DeleteInvalidForms);
-    BindNativeFunction(env, exportObj, "acquireFormState", moduleName, JsFormHost::AcquireFormState);
-    BindNativeFunction(env, exportObj, "on", moduleName, JsFormHost::RegisterFormObserver);
-    BindNativeFunction(env, exportObj, "off", moduleName, JsFormHost::UnregisterFormObserver);
-    BindNativeFunction(env, exportObj, "notifyFormsVisible", moduleName, JsFormHost::NotifyFormsVisible);
-    BindNativeFunction(env, exportObj, "notifyFormsEnableUpdate", moduleName, JsFormHost::NotifyFormsEnableUpdate);
-    BindNativeFunction(env, exportObj, "getAllFormsInfo", moduleName, JsFormHost::GetAllFormsInfo);
-    BindNativeFunction(env, exportObj, "getAllTemplateFormsInfo", moduleName, JsFormHost::GetAllTemplateFormsInfo);
-    BindNativeFunction(env, exportObj, "getFormsInfo", moduleName, JsFormHost::GetFormsInfo);
-    BindNativeFunction(env, exportObj, "getTemplateFormsInfo", moduleName, JsFormHost::GetTemplateFormsInfo);
-    BindNativeFunction(env, exportObj, "shareForm", moduleName, JsFormHost::ShareForm);
-    BindNativeFunction(env, exportObj, "notifyFormsPrivacyProtected", moduleName,
-        JsFormHost::NotifyFormsPrivacyProtected);
-    BindNativeFunction(env, exportObj, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
-    BindNativeFunction(env, exportObj, "setRouterProxy", moduleName, JsFormHost::SetRouterProxy);
-    BindNativeFunction(env, exportObj, "clearRouterProxy", moduleName, JsFormHost::ClearRouterProxy);
-    BindNativeFunction(env, exportObj, "setFormsRecyclable", moduleName, JsFormHost::SetFormsRecyclable);
-    BindNativeFunction(env, exportObj, "recoverForms", moduleName, JsFormHost::RecoverForms);
-    BindNativeFunction(env, exportObj, "recycleForms", moduleName, JsFormHost::RecycleForms);
-    BindNativeFunction(env, exportObj, "updateFormLocation", moduleName, JsFormHost::UpdateFormLocation);
-    BindNativeFunction(env, exportObj, "setPublishFormResult", moduleName, JsFormHost::SetPublishFormResult);
-    BindNativeFunction(env, exportObj, "addForm", moduleName, JsFormHost::AddForm);
-    BindNativeFunction(env, exportObj, "updateFormLockedState", moduleName, JsFormHost::UpdateFormLockedState);
-    BindNativeFunction(env, exportObj, "updateFormSize", moduleName, JsFormHost::UpdateFormSize);
-    BindNativeFunction(env, exportObj, "onTemplateFormDetailInfoChange", moduleName,
-        JsFormHost::RegisterTemplateFormDetailInfoObserver);
-    BindNativeFunction(env, exportObj, "offTemplateFormDetailInfoChange", moduleName,
-        JsFormHost::UnregisterTemplateFormDetailInfoObserver);
-    BindNativeFunction(env, exportObj, "getFormIdsByFormLocation", moduleName, JsFormHost::GetFormIdsByFormLocation);
-    BindNativeFunction(env, exportObj, "onGetWantParamsCallback", moduleName,
-        JsFormHost::RegisterGetWantParamsCallback);
-    BindNativeFunction(env, exportObj, "offGetWantParamsCallback", moduleName,
-        JsFormHost::UnregisterGetWantParamsCallback);
+    for (const auto &[name, callback] : JS_FORM_HOST_BINDINGS) {
+        BindNativeFunction(env, exportObj, name, moduleName, callback);
+    }
 
     return CreateJsUndefined(env);
 }
@@ -3477,6 +3588,165 @@ void PromiseCallbackInfo::Destroy(PromiseCallbackInfo *callbackInfo)
 std::shared_ptr<LiveFormInterfaceParam> PromiseCallbackInfo::GetJsCallBackParam()
 {
     return liveFormInterfaceParam_;
+}
+
+bool JsFormRouterProxyMgr::RegisterUpdateFormsConfigCallback(napi_env env, napi_ref callbackRef)
+{
+    HILOG_INFO("call");
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("callbackRef is null");
+        return false;
+    }
+    napi_value callback = nullptr;
+    napi_status status = napi_get_reference_value(env, callbackRef, &callback);
+    if (status != napi_ok || callback == nullptr) {
+        HILOG_ERROR("get reference value failed, status:%{public}d", static_cast<int>(status));
+        return false;
+    }
+    napi_valuetype type = napi_undefined;
+    status = napi_typeof(env, callback, &type);
+    if (status != napi_ok || type != napi_function) {
+        HILOG_ERROR("callback is not function, napi_typeof status: %{public}d", static_cast<int>(status));
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
+    if (updateFormsConfigCallbackRef_ != nullptr) {
+        napi_delete_reference(updateFormsConfigEnv_, updateFormsConfigCallbackRef_);
+    }
+    updateFormsConfigCallbackRef_ = callbackRef;
+    updateFormsConfigEnv_ = env;
+    return true;
+}
+
+bool JsFormRouterProxyMgr::UnregisterUpdateFormsConfigCallback()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
+    if (updateFormsConfigCallbackRef_ != nullptr) {
+        napi_delete_reference(updateFormsConfigEnv_, updateFormsConfigCallbackRef_);
+        updateFormsConfigCallbackRef_ = nullptr;
+    }
+    updateFormsConfigEnv_ = nullptr;
+    return true;
+}
+
+ErrCode JsFormRouterProxyMgr::UpdateFormsConfigCallback(
+    const std::vector<AppExecFwk::FormCustomConfig> &configs)
+{
+    HILOG_DEBUG("call");
+    std::shared_ptr<AppExecFwk::EventHandler> mainHandler =
+        std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    bool result = false;
+    std::function<void()> executeFunc = [configs, &result]() {
+        result = JsFormRouterProxyMgr::GetInstance()->UpdateFormsConfigCallbackInner(configs);
+    };
+    mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::UpdateFormsConfigCallback");
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+bool JsFormRouterProxyMgr::GetValidCallback(napi_env env, napi_ref callbackRef, napi_value &callback)
+{
+    napi_status status = napi_get_reference_value(env, callbackRef, &callback);
+    if (status != napi_ok || callback == nullptr) {
+        HILOG_ERROR("napi_get_reference_value failed, status: %{public}d", static_cast<int>(status));
+        return false;
+    }
+    napi_valuetype type = napi_undefined;
+    status = napi_typeof(env, callback, &type);
+    if (status != napi_ok || type != napi_function) {
+        HILOG_ERROR("callback is not function, napi_typeof status: %{public}d", static_cast<int>(status));
+        return false;
+    }
+    return true;
+}
+
+bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
+    const std::vector<AppExecFwk::FormCustomConfig> &configs)
+{
+    HILOG_DEBUG("call, config size: %{public}zu", configs.size());
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(updateFormsConfigEnv_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
+    if (updateFormsConfigCallbackRef_ == nullptr) {
+        HILOG_WARN("callback is null");
+        napi_close_handle_scope(updateFormsConfigEnv_, scope);
+        return false;
+    }
+
+    napi_value callback = nullptr;
+    if (!GetValidCallback(updateFormsConfigEnv_, updateFormsConfigCallbackRef_, callback)) {
+        napi_close_handle_scope(updateFormsConfigEnv_, scope);
+        return false;
+    }
+
+    napi_value configArray = nullptr;
+    napi_status status = napi_create_array(updateFormsConfigEnv_, &configArray);
+    if (status != napi_ok) {
+        HILOG_ERROR("create array failed, status:%{public}d", static_cast<int>(status));
+        napi_close_handle_scope(updateFormsConfigEnv_, scope);
+        return false;
+    }
+    if (!GetFormCustomConfigArray(configs, configArray)) {
+        HILOG_ERROR("GetFormCustomConfigArray failed");
+        napi_close_handle_scope(updateFormsConfigEnv_, scope);
+        return false;
+    }
+
+    napi_value undefined = nullptr;
+    napi_get_undefined(updateFormsConfigEnv_, &undefined);
+    status = napi_call_function(updateFormsConfigEnv_, undefined, callback, ARGS_ONE, &configArray, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_call_function failed, status: %{public}d", static_cast<int>(status));
+        napi_close_handle_scope(updateFormsConfigEnv_, scope);
+        return false;
+    }
+
+    napi_close_handle_scope(updateFormsConfigEnv_, scope);
+    return true;
+}
+
+bool JsFormRouterProxyMgr::GetFormCustomConfigArray(
+    const std::vector<AppExecFwk::FormCustomConfig> &configs, napi_value &configArray)
+{
+    HILOG_DEBUG("call, config size: %{public}zu", configs.size());
+    auto setStringProperty = [this](napi_value obj, const char *key, const std::string &value) {
+        napi_value jsValue = nullptr;
+        napi_create_string_utf8(updateFormsConfigEnv_, value.c_str(), NAPI_AUTO_LENGTH, &jsValue);
+        napi_set_named_property(updateFormsConfigEnv_, obj, key, jsValue);
+    };
+    auto setBoolProperty = [this](napi_value obj, const char *key, bool value) {
+        napi_value jsValue = nullptr;
+        napi_get_boolean(updateFormsConfigEnv_, value, &jsValue);
+        napi_set_named_property(updateFormsConfigEnv_, obj, key, jsValue);
+    };
+    for (size_t i = 0; i < configs.size(); ++i) {
+        const auto &config = configs[i];
+        napi_value jsConfig = nullptr;
+        napi_status status = napi_create_object(updateFormsConfigEnv_, &jsConfig);
+        if (status != napi_ok || jsConfig == nullptr) {
+            HILOG_ERROR("napi_create_object failed, status: %{public}d", static_cast<int>(status));
+            return false;
+        }
+        setStringProperty(jsConfig, "bundleName", config.bundleName);
+        setStringProperty(jsConfig, "moduleName", config.moduleName);
+        setStringProperty(jsConfig, "abilityName", config.abilityName);
+        setStringProperty(jsConfig, "formName", config.formName);
+        setBoolProperty(jsConfig, "isShowInFormCenter", config.isShowInFormCenter);
+        setStringProperty(jsConfig, "relatedBundleName", config.relatedBundleName);
+        setBoolProperty(jsConfig, "isRepeatAdditionSupported", config.isRepeatAdditionSupported);
+        status = napi_set_element(updateFormsConfigEnv_, configArray, static_cast<uint32_t>(i), jsConfig);
+        if (status != napi_ok) {
+            HILOG_ERROR("napi_set_element failed, index: %{public}zu, status: %{public}d", i, static_cast<int>(status));
+            return false;
+        }
+    }
+    return true;
 }
 
 void JsFormRouterProxyMgr::RegisterFormWantCallbackListener(napi_env env, napi_ref callbackRef)

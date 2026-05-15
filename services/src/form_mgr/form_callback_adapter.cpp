@@ -18,7 +18,6 @@
 #include "app_mgr_interface.h"
 #include "app_state_data.h"
 #include "form_info.h"
-#include "iform_host_delegate.h"
 #include "iform_provider_delegate.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
@@ -459,6 +458,74 @@ ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
     return result;
 }
 
+ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    ErrCode result = updateFormsConfigRegistry_.Register(callingUid, callerToken);
+    if (result == ERR_OK) {
+        NotifyCachedFormConfigs(callerToken);
+    }
+    return result;
+}
+
+ErrCode FormCallbackAdapter::UnregisterUpdateFormsConfigCallback()
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return updateFormsConfigRegistry_.Unregister(callingUid);
+}
+
+ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
+{
+    HILOG_DEBUG("call, config size: %{public}zu", configs.size());
+    {
+        std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
+        formCustomConfigCache_ = configs;
+    }
+    ErrCode persistResult = FormInfoMgr::GetInstance().UpdateFormShowConfigs(configs);
+    if (persistResult != ERR_OK) {
+        HILOG_ERROR("UpdateFormShowConfigs failed, err:%{public}d", persistResult);
+    }
+    ErrCode notifyResult = NotifyAllHosts(updateFormsConfigRegistry_, "UpdateFormsConfig",
+        [&configs](const sptr<IFormHostDelegate> &proxy) {
+            return proxy->UpdateFormsConfigCallback(configs);
+        });
+    return notifyResult != ERR_OK ? notifyResult : persistResult;
+}
+
+ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const std::string &tag,
+    const std::function<ErrCode(const sptr<IFormHostDelegate> &)> &callback)
+{
+    std::vector<std::pair<int32_t, sptr<IRemoteObject>>> entries;
+    ErrCode ret = registry.GetAllWithKeys(entries);
+    if (ret != ERR_OK) {
+        HILOG_WARN("no host registered for %{public}s", tag.c_str());
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    ErrCode result = ERR_OK;
+    for (const auto &[callingUid, callerToken] : entries) {
+        int32_t userId = FormUtil::GetCallerUserId(callingUid);
+        std::string bundleName;
+        FormBmsHelper::GetInstance().GetBundleNameByUid(callingUid, bundleName);
+        sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
+        if (proxy == nullptr) {
+            HILOG_ERROR("iface_cast failed, %{public}s, userId=%{public}d, bundleName=%{public}s",
+                tag.c_str(), userId, bundleName.c_str());
+            result = ERR_APPEXECFWK_FORM_COMMON_CODE;
+            continue;
+        }
+        ErrCode notifyRet = callback(proxy);
+        if (notifyRet != ERR_OK) {
+            HILOG_ERROR("notify failed, %{public}s, userId=%{public}d, bundleName=%{public}s, ret=%{public}d",
+                tag.c_str(), userId, bundleName.c_str(), notifyRet);
+            result = ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+    }
+    HILOG_INFO("%{public}s notified %{public}zu hosts, result=%{public}d", tag.c_str(), entries.size(), result);
+    return result;
+}
+
 ErrCode FormCallbackAdapter::CallerCheck(const int64_t formId, const int32_t callingUid)
 {
     HILOG_INFO("call");
@@ -645,6 +712,27 @@ bool FormCallbackAdapter::IsForegroundApp()
         }
     }
     return checkFlag;
+}
+
+void FormCallbackAdapter::NotifyCachedFormConfigs(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    std::vector<FormCustomConfig> cached;
+    {
+        std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
+        if (formCustomConfigCache_.empty()) {
+            HILOG_INFO("no cached form configs");
+            return;
+        }
+        cached = formCustomConfigCache_;
+    }
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(callerToken);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("remoteFormHostDelegateProxy is nullptr");
+        return;
+    }
+    ErrCode ret = remoteFormHostDelegateProxy->UpdateFormsConfigCallback(cached);
+    HILOG_INFO("notify cached configs result:%{public}d", ret);
 }
 
 ErrCode FormCallbackAdapter::RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken)

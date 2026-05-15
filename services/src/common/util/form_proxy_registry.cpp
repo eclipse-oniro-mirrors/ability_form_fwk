@@ -99,6 +99,19 @@ ErrCode FormProxyRegistry::GetAll(std::vector<sptr<IRemoteObject>> &proxies)
     return ERR_OK;
 }
 
+ErrCode FormProxyRegistry::GetAllWithKeys(std::vector<std::pair<int32_t, sptr<IRemoteObject>>> &entries)
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    for (auto &pair : proxies_) {
+        entries.push_back({pair.first, pair.second});
+    }
+    if (entries.empty()) {
+        HILOG_ERROR("%{public}s: no proxies registered", tag_.c_str());
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode FormProxyRegistry::GetByUserId(int32_t userId, std::vector<sptr<IRemoteObject>> &proxies)
 {
     std::shared_lock<std::shared_mutex> lock(mutex_);

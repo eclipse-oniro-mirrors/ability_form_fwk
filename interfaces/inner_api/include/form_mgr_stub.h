@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -722,6 +722,16 @@ private:
     int OnRemoteRequestSixth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     /**
+     * @brief the seventh part of handle remote request.
+     * @param code ipc code.
+     * @param data input param.
+     * @param reply output param.
+     * @param option message option.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+    /**
      * @brief Handle update form size.
      * @param data input param.
      * @param reply output param.
@@ -919,6 +929,30 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleGetFormIdsByFormLocation(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle register update forms config callback.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterUpdateFormsConfigCallback(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister update forms config callback.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterUpdateFormsConfigCallback(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle update form config.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUpdateFormsConfig(MessageParcel &data, MessageParcel &reply);
 
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);

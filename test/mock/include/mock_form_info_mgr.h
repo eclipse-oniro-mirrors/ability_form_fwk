@@ -21,6 +21,7 @@
 #include "gmock/gmock.h"
 #include "form_info.h"
 #include "form_info_filter.h"
+#include "form_custom_config.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -44,6 +45,7 @@ public:
         const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId) = 0;
     virtual ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
         int32_t providerUserId, bool &appFormVisibleNotify) = 0;
+    virtual ErrCode UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs) = 0;
 };
 
 class MockFormInfoMgr : public AbstractMockFormInfoMgr {
@@ -68,6 +70,7 @@ public:
         const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId));
     MOCK_METHOD3(GetAppFormVisibleNotifyByBundleName, ErrCode(const std::string &bundleName,
         int32_t providerUserId, bool &appFormVisibleNotify));
+    MOCK_METHOD1(UpdateFormShowConfigs, ErrCode(const std::vector<FormCustomConfig> &configs));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -906,6 +906,26 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds) override;
+
+    /**
+     * @brief Register update forms config callback in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister update forms config callback in fms.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterUpdateFormsConfigCallback() override;
+
+    /**
+     * @brief Update form config.
+     * @param configs The form custom configs to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs) override;
 
 private:
     template<typename T>

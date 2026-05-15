@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2452,6 +2452,46 @@ ErrCode FormMgrService::UpdateTemplateFormDetailInfo(
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
     return FormMgrAdapterFacade::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+}
+
+ErrCode FormMgrService::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    return FormMgrAdapterFacade::GetInstance().RegisterUpdateFormsConfigCallback(callerToken);
+}
+
+ErrCode FormMgrService::UnregisterUpdateFormsConfigCallback()
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    return FormMgrAdapterFacade::GetInstance().UnregisterUpdateFormsConfigCallback();
+}
+
+ErrCode FormMgrService::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_FORM_CUSTOM_CONFIG)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG;
+    }
+    if (configs.empty()) {
+        HILOG_ERROR("configs is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return FormMgrAdapterFacade::GetInstance().UpdateFormsConfig(configs);
 }
 
 ErrCode FormMgrService::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)

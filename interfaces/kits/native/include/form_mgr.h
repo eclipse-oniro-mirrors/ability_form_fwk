@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -973,6 +973,26 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds);
+
+    /**
+     * @brief Register update form config callback.
+     * @param callerToken The caller token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister update form config callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterUpdateFormsConfigCallback();
+
+    /**
+     * @brief Update form config.
+     * @param configs The form custom configs to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs);
 
 private:
     /**

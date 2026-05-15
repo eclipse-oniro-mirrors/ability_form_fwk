@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License")_;
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -726,6 +726,33 @@ void FormInfoMgr::ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
         bundleVersionMap.erase(bundleVersionPair);
         needUpdateBundleNames.push_back(bundleName);
     }
+}
+
+ErrCode FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
+{
+    HILOG_DEBUG("call, config size:%{public}zu", configs.size());
+    // Group configs by bundleName
+    std::unordered_map<std::string, std::vector<FormCustomConfig>> bundleConfigsMap;
+    for (const auto &config : configs) {
+        bundleConfigsMap[config.bundleName].push_back(config);
+    }
+
+    ErrCode errCode = ERR_OK;
+    std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+    for (const auto &[bundleName, bundleConfigs] : bundleConfigsMap) {
+        auto iter = bundleFormInfoMap_.find(bundleName);
+        if (iter == bundleFormInfoMap_.end() || iter->second == nullptr) {
+            HILOG_WARN("no BundleFormInfo for %{public}s", bundleName.c_str());
+            continue;
+        }
+        ErrCode ret = iter->second->UpdateFormShowConfigs(bundleConfigs);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("UpdateFormShowConfigs failed for %{public}s, err:%{public}d",
+                bundleName.c_str(), ret);
+            errCode = ret;
+        }
+    }
+    return errCode;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

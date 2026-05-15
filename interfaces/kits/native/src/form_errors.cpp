@@ -296,6 +296,13 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     {
         ERR_APPEXECFWK_FORM_LOCATION_INVALID,
         { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID, "The location of the widget is invalid." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG,
+        {
+            ERR_FORM_EXTERNAL_PERMISSION_DENIED,
+            "check permission deny, need to request ohos.permission.FORM_CUSTOM_CONFIG."
+        }
     }
 };
 
