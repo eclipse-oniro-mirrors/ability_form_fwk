@@ -492,31 +492,31 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("runnning");
-            auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
-            if (asyncCallbackInfo == nullptr) {
+            auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
+            if (callbackInfo == nullptr) {
                 HILOG_ERROR("null asyncCallbackInfo");
                 return;
             }
-            InnerAcquireFormState(env, asyncCallbackInfo);
+            InnerAcquireFormState(env, callbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("complete");
-            auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
-            if (asyncCallbackInfo == nullptr) {
+            auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
+            if (callbackInfo == nullptr) {
                 HILOG_ERROR("null asyncCallbackInfo");
                 return;
             }
             // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
-            napi_async_work asyncWork = asyncCallbackInfo->asyncWork;
+            napi_async_work asyncWork = callbackInfo->asyncWork;
             // When the result is not ERR_OK, OnAcquireState will be called here,
             // else OnAcquireState will be called after the form state is acquired.
-            if (asyncCallbackInfo->result != ERR_OK) {
-                FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, asyncCallbackInfo->want);
+            if (callbackInfo->result != ERR_OK) {
+                FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, callbackInfo->want);
             }
             if (asyncWork != nullptr) {
                 napi_delete_async_work(env, asyncWork);
             }
-        }, (void *) asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
+        }, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
