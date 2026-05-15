@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this is file except in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -18,6 +18,7 @@
 
 #include "gmock/gmock.h"
 #include "data_center/form_record/form_record.h"
+#include "form_provider_data.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -25,6 +26,8 @@ class AbstractMockFormMgrAdapterFacade {
 public:
     virtual ~AbstractMockFormMgrAdapterFacade() = default;
     virtual bool IsDeleteCacheInUpgradeScene(const FormRecord &record) = 0;
+    virtual int UpdateForm(int64_t formId, int32_t callingUid,
+        const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies) = 0;
 };
 
 class MockFormMgrAdapterFacade : public AbstractMockFormMgrAdapterFacade {
@@ -33,6 +36,7 @@ public:
     MockFormMgrAdapterFacade() = default;
     ~MockFormMgrAdapterFacade() override = default;
     MOCK_METHOD1(IsDeleteCacheInUpgradeScene, bool(const FormRecord &record));
+    MOCK_METHOD4(UpdateForm, int(int64_t, int32_t, const FormProviderData&, const std::vector<FormDataProxy>&));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -31,5 +31,16 @@ bool FormMgrAdapterFacade::IsDeleteCacheInUpgradeScene(const FormRecord &record)
     }
     return false;
 }
+
+int FormMgrAdapterFacade::UpdateForm(int64_t formId, int32_t callingUid,
+    const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapterFacade::UpdateForm called, formId:" << formId;
+    if (AppExecFwk::MockFormMgrAdapterFacade::obj) {
+        return AppExecFwk::MockFormMgrAdapterFacade::obj->UpdateForm(
+            formId, callingUid, formProviderData, formDataProxies);
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
