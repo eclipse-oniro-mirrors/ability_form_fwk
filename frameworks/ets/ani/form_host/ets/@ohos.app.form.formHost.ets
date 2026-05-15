@@ -101,6 +101,8 @@ export default namespace formHost {
   export native function nativeOffTemplateFormDetailInfoChange(callback?: TemplateFormDetailInfoChangeCallbackWrapper): void;
   export native function nativeOnGetWantParamsCallback(callback: GetWantParamsCallbackWrapper): void;
   export native function nativeOffGetWantParamsCallback(callback?: GetWantParamsCallbackWrapper): void;
+  export native function nativeOnUpdateFormsConfigCallback(callback: CallbackWrapper<Array<formInfo.FormCustomConfig>>): void;
+  export native function nativeOffUpdateFormsConfigCallback(callback?: CallbackWrapper<Array<formInfo.FormCustomConfig>>): void;
   export native function nativeUpdateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void;
 
   const ERR_OK: int = 0;
@@ -1119,6 +1121,19 @@ export default namespace formHost {
       myCall = new GetWantParamsCallbackWrapper(callback);
     }
     formHost.nativeOffGetWantParamsCallback(myCall);
+  }
+
+  function onUpdateFormsConfigCallback(callback: formInfo.UpdateFormsConfigCallback): void {
+    let myCall = new CallbackWrapper<Array<formInfo.FormCustomConfig>>(callback);
+    formHost.nativeOnUpdateFormsConfigCallback(myCall);
+  }
+
+  function offUpdateFormsConfigCallback(callback?: formInfo.UpdateFormsConfigCallback): void {
+    let myCall: CallbackWrapper<Array<formInfo.FormCustomConfig>> | undefined = undefined;
+    if (callback) {
+      myCall = new CallbackWrapper<Array<formInfo.FormCustomConfig>>(callback);
+    }
+    formHost.nativeOffUpdateFormsConfigCallback(myCall);
   }
 
   function updateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void {

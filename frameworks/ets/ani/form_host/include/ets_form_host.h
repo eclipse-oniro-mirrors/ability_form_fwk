@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #include "form_instance.h"
 #include "form_mgr.h"
 #include "fms_log_wrapper.h"
+#include "form_custom_config.h"
 #include "template_form_detail_info.h"
 
 namespace OHOS {
@@ -111,6 +112,10 @@ public:
 
     void UnregisterTemplateFormDetailInfoChange();
 
+    void RegisterUpdateFormsConfigCallback(ani_vm* ani_vm, ani_object callback);
+
+    void UnregisterUpdateFormsConfigCallback();
+
     void RegisterFormWantCallbackListener(ani_vm *vm, ani_object callback);
     void UnregisterFormWantCallbackListener();
 
@@ -155,7 +160,7 @@ private:
 
     mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
     ani_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
-    ani_vm* templateFormDetailInfoChangeVM;
+    ani_vm* templateFormDetailInfoChangeVM_ = nullptr;
     ani_env* GetTemplateFormDetailInfoChangeEnv();
     void SetTemplateFormDetailInfoChangeVM(ani_vm* ani_vm);
 
@@ -165,6 +170,17 @@ private:
     void GetTemplateFormInfoArray(ani_env* env,
         const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
         ani_array &templateFormInfoArray);
+
+    mutable std::mutex registerUpdateFormsConfigCallbackMutex_;
+    ani_ref updateFormsConfigCallbackRef_ = nullptr;
+    ani_vm* updateFormsConfigCallbackVM_ = nullptr;
+    ani_env* GetUpdateFormsConfigCallbackEnv();
+    void SetUpdateFormsConfigCallbackVM(ani_vm* ani_vm);
+
+    ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool UpdateFormsConfigCallbackInner(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool GetFormCustomConfigArray(ani_env* env,
+        const std::vector<AppExecFwk::FormCustomConfig> &configs, ani_array &configArray);
 
     ani_ref formWantCallbackRef_ = nullptr;
     ani_vm *formWantCallbackVM_ = nullptr;
