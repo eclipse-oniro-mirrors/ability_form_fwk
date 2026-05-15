@@ -168,6 +168,7 @@ group("unittest") {
     "unittest/fms_form_publish_adapter_test:unittest",
     "unittest/fms_form_data_adapter_test:unittest",
     "unittest/fms_form_lifecycle_adapter_test:unittest",
+    "unittest/fms_sign_tools_test:unittest",
   ]
 }
 
