@@ -429,5 +429,49 @@ void FormDataMgr::DelHostTransparentFormColor(const int64_t formId)
 {
     GTEST_LOG_(INFO) << "DelHostTransparentFormColor called";
 }
+
+bool FormDataMgr::AllotFormHostRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
+    const int64_t formId, const int callingUid)
+{
+    GTEST_LOG_(INFO) << "AllotFormHostRecord called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->AllotFormHostRecord(info, callerToken, formId, callingUid);
+    }
+    return false;
+}
+
+void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo)
+{
+    GTEST_LOG_(INFO) << "CreateFormJsInfo(3-param) called";
+}
+
+void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record,
+    const FormProviderData &formProviderData, FormJsInfo &formInfo)
+{
+    GTEST_LOG_(INFO) << "CreateFormJsInfo(4-param) called";
+}
+
+FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int callingUid,
+    const int32_t userId)
+{
+    GTEST_LOG_(INFO) << "AllotFormRecord called";
+    return FormRecord();
+}
+
+bool FormDataMgr::AddFormUserUid(const int64_t formId, const int formUserUid)
+{
+    GTEST_LOG_(INFO) << "AddFormUserUid called";
+    return true;
+}
+
+void FormDataMgr::SetNeedAddForm(const int64_t formId, const bool needAddForm)
+{
+    GTEST_LOG_(INFO) << "SetNeedAddForm called";
+}
+
+void FormDataMgr::SetFormCacheInited(const int64_t formId, const bool isInited)
+{
+    GTEST_LOG_(INFO) << "SetFormCacheInited called";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

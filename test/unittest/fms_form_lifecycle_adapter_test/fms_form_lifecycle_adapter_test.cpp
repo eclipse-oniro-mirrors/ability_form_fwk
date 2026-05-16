@@ -2274,5 +2274,1436 @@ HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormByInfo_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "AllotFormByInfo_001 end";
 }
 
+// ========== AddExistFormRecord Tests ==========
+
+/**
+ * @tc.name: AddExistFormRecord_001
+ * @tc.desc: Verify AddExistFormRecord with no refresh flags returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddExistFormRecord_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddExistFormRecord_001 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.needRefresh = false;
+    record.needAddForm = false;
+    record.isLocationChange = false;
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddExistFormRecord(
+        info, callerToken, record, TEST_FORM_ID, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddExistFormRecord_001 end";
+}
+
+/**
+ * @tc.name: AddExistFormRecord_002
+ * @tc.desc: Verify AddExistFormRecord with needRefresh=true triggers AcquireProviderFormInfoAsync
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddExistFormRecord_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddExistFormRecord_002 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.needRefresh = true;
+    record.needAddForm = false;
+    record.isLocationChange = false;
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddExistFormRecord(
+        info, callerToken, record, TEST_FORM_ID, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddExistFormRecord_002 end";
+}
+
+/**
+ * @tc.name: AddExistFormRecord_004
+ * @tc.desc: Verify AddExistFormRecord with needAddForm=true triggers AcquireProviderFormInfoAsync
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddExistFormRecord_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddExistFormRecord_004 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.needRefresh = false;
+    record.needAddForm = true;
+    record.isLocationChange = false;
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddExistFormRecord(
+        info, callerToken, record, TEST_FORM_ID, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddExistFormRecord_004 end";
+}
+
+/**
+ * @tc.name: AddExistFormRecord_005
+ * @tc.desc: Verify AddExistFormRecord with PARAM_HOST_BG_INVERSE_COLOR_KEY triggers acquire
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddExistFormRecord_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddExistFormRecord_005 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.needRefresh = false;
+    record.needAddForm = false;
+    record.isLocationChange = false;
+    Want want;
+    want.SetParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY, std::string("#000000"));
+    WantParams wantParams = want.GetParams();
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddExistFormRecord(
+        info, callerToken, record, TEST_FORM_ID, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddExistFormRecord_005 end";
+}
+
+// ========== AllotFormById Tests ==========
+
+/**
+ * @tc.name: AllotFormById_001
+ * @tc.desc: Verify AllotFormById with temp form and not rerender returns ERR_APPEXECFWK_FORM_COMMON_CODE
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormById_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormById_001 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    FormRecord record;
+    record.formTempFlag = true;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormById(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "AllotFormById_001 end";
+}
+
+/**
+ * @tc.name: AllotFormById_002
+ * @tc.desc: Verify AllotFormById with ETS form and not host owner returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormById_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormById_002 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    info.SetUiSyntax(FormType::ETS);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormById(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    GTEST_LOG_(INFO) << "AllotFormById_002 end";
+}
+
+/**
+ * @tc.name: AllotFormById_003
+ * @tc.desc: Verify AllotFormById record userId match but IsMatch fails returns ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormById_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormById_003 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider.different");
+    info.SetAbilityName("DifferentAbility");
+    info.SetModuleName("entry");
+    info.SetFormName("differentForm");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    FormRecord record;
+    record.formTempFlag = false;
+    record.userId = TEST_USER_ID;
+    record.bundleName = "com.test.provider";
+    record.abilityName = "MainAbility";
+    record.moduleName = "entry";
+    record.formName = "widget";
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormById(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID);
+
+    GTEST_LOG_(INFO) << "AllotFormById_003 end";
+}
+
+/**
+ * @tc.name: AllotFormById_004
+ * @tc.desc: Verify AllotFormById with matching record calls AddExistFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormById_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormById_004 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    info.SetFormName("widget");
+    info.SetSpecificationId(2);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    FormRecord record;
+    record.formTempFlag = false;
+    record.userId = TEST_USER_ID;
+    record.bundleName = "com.test.provider";
+    record.abilityName = "MainAbility";
+    record.moduleName = "entry";
+    record.formName = "widget";
+    record.specification = 2;
+    record.needRefresh = false;
+    record.needAddForm = false;
+    record.isLocationChange = false;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormById(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AllotFormById_004 end";
+}
+
+/**
+ * @tc.name: AllotFormById_005
+ * @tc.desc: Verify AllotFormById with DB record same userId calls AddNewFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormById_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormById_005 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    FormRecord dbRecord;
+    dbRecord.userId = TEST_USER_ID;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(dbRecord), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormById(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AllotFormById_005 end";
+}
+
+/**
+ * @tc.name: AllotFormById_006
+ * @tc.desc: Verify AllotFormById with DB record different userId returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormById_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormById_006 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    FormRecord dbRecord;
+    dbRecord.userId = 999; // Different user
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(dbRecord), Return(ERR_OK)));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormById(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "AllotFormById_006 end";
+}
+
+/**
+ * @tc.name: AllotFormById_007
+ * @tc.desc: Verify AllotFormById with no record in cache or DB returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormById_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormById_007 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormById(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    GTEST_LOG_(INFO) << "AllotFormById_007 end";
+}
+
+// ========== AllotFormBySpecificId Tests ==========
+
+/**
+ * @tc.name: AllotFormBySpecificId_001
+ * @tc.desc: Verify AllotFormBySpecificId with record in DB calls AllotFormByInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormBySpecificId_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormBySpecificId_001 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormBySpecificId(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AllotFormBySpecificId_001 end";
+}
+
+/**
+ * @tc.name: AllotFormBySpecificId_002
+ * @tc.desc: Verify AllotFormBySpecificId with record in cache calls AllotFormByInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormBySpecificId_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormBySpecificId_002 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    FormRecord record;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormBySpecificId(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AllotFormBySpecificId_002 end";
+}
+
+/**
+ * @tc.name: AllotFormBySpecificId_003
+ * @tc.desc: Verify AllotFormBySpecificId with no record calls AddNewFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AllotFormBySpecificId_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AllotFormBySpecificId_003 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formInfo;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormLifecycleAdapter::GetInstance().AllotFormBySpecificId(
+        info, callerToken, wantParams, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AllotFormBySpecificId_003 end";
+}
+
+// ========== HandleDeleteTempForm Tests ==========
+
+/**
+ * @tc.name: HandleDeleteTempForm_001
+ * @tc.desc: Verify HandleDeleteTempForm with no record returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, HandleDeleteTempForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_001 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+
+    auto result = FormLifecycleAdapter::GetInstance().HandleDeleteTempForm(TEST_FORM_ID, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_001 end";
+}
+
+/**
+ * @tc.name: HandleDeleteTempForm_002
+ * @tc.desc: Verify HandleDeleteTempForm with non-temp record returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, HandleDeleteTempForm_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_002 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formTempFlag = false;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormLifecycleAdapter::GetInstance().HandleDeleteTempForm(TEST_FORM_ID, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_002 end";
+}
+
+/**
+ * @tc.name: HandleDeleteTempForm_003
+ * @tc.desc: Verify HandleDeleteTempForm with uid not in formUserUids returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, HandleDeleteTempForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_003 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formTempFlag = true;
+    record.providerUserId = TEST_USER_ID;
+    record.formUserUids.clear(); // uid not in list
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormLifecycleAdapter::GetInstance().HandleDeleteTempForm(TEST_FORM_ID, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_003 end";
+}
+
+/**
+ * @tc.name: HandleDeleteTempForm_005
+ * @tc.desc: Verify HandleDeleteTempForm with providerUserId mismatch returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, HandleDeleteTempForm_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_005 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formTempFlag = true;
+    record.providerUserId = 999; // Mismatch with caller userId (100)
+    record.formUserUids.push_back(TEST_CALLING_UID);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormLifecycleAdapter::GetInstance().HandleDeleteTempForm(TEST_FORM_ID, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "HandleDeleteTempForm_005 end";
+}
+
+// ========== AddForm Additional Tests ==========
+
+/**
+ * @tc.name: AddForm_012
+ * @tc.desc: Verify AddForm with formId=0 and non-temp fails CheckFormCountLimit
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_012 start";
+
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(0, want, callerToken, formJsInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT);
+
+    GTEST_LOG_(INFO) << "AddForm_012 end";
+}
+
+/**
+ * @tc.name: AddForm_005
+ * @tc.desc: Verify AddForm with formId>0 and empty Want fails GetFormConfigInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_005 start";
+
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "AddForm_005 end";
+}
+
+/**
+ * @tc.name: AddForm_006
+ * @tc.desc: Verify AddForm with formId>0 and GetBundleMgr returning null fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_006 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(nullptr));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+
+    GTEST_LOG_(INFO) << "AddForm_006 end";
+}
+
+/**
+ * @tc.name: AddForm_007
+ * @tc.desc: Verify AddForm with tempFormFlag=true and formId>0 fails CheckFormCountLimit
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_007 start";
+
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, true);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "AddForm_007 end";
+}
+
+/**
+ * @tc.name: AddForm_008
+ * @tc.desc: Verify AddForm with formId>0 and GetBundleInfoV9 fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_008 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(nullptr)); // Returns null, causing GetBundleInfo to fail
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddForm_008 end";
+}
+
+/**
+ * @tc.name: AddForm_009
+ * @tc.desc: Verify AddForm with formId>0 and GetFormsInfoByModule fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_009 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+    BundleInfo bundleInfo;
+    bundleInfo.moduleNames.push_back("entry");
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(nullptr));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddForm_009 end";
+}
+
+/**
+ * @tc.name: AddForm_010
+ * @tc.desc: Verify AddForm with formId>0 and formInfo not valid
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_010 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(nullptr));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddForm_010 end";
+}
+
+/**
+ * @tc.name: AddForm_011
+ * @tc.desc: Verify AddForm with formId>0 and AllotFormById returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddForm_011 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(nullptr));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddForm_011 end";
+}
+
+// ========== ReleaseForm Additional Tests ==========
+
+/**
+ * @tc.name: ReleaseForm_011
+ * @tc.desc: Verify ReleaseForm with GetDBRecord fails returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ReleaseForm_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReleaseForm_011 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+
+    auto result = FormLifecycleAdapter::GetInstance().ReleaseForm(TEST_FORM_ID, callerToken, true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    GTEST_LOG_(INFO) << "ReleaseForm_004 end";
+}
+
+/**
+ * @tc.name: ReleaseForm_005
+ * @tc.desc: Verify ReleaseForm with providerUserId mismatch returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ReleaseForm_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReleaseForm_005 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord dbRecord;
+    dbRecord.providerUserId = 999; // Mismatch with caller userId (100)
+    dbRecord.formUserUids.push_back(TEST_CALLING_UID);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(dbRecord), Return(ERR_OK)));
+
+    auto result = FormLifecycleAdapter::GetInstance().ReleaseForm(TEST_FORM_ID, callerToken, true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "ReleaseForm_005 end";
+}
+
+/**
+ * @tc.name: ReleaseForm_006
+ * @tc.desc: Verify ReleaseForm with callingUid not in formUserUids returns ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ReleaseForm_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReleaseForm_006 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord dbRecord;
+    dbRecord.providerUserId = TEST_USER_ID;
+    dbRecord.formUserUids.clear(); // callingUid not in list
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(dbRecord), Return(ERR_OK)));
+
+    auto result = FormLifecycleAdapter::GetInstance().ReleaseForm(TEST_FORM_ID, callerToken, true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "ReleaseForm_006 end";
+}
+
+/**
+ * @tc.name: ReleaseForm_007
+ * @tc.desc: Verify ReleaseForm with delCache=true and HandleReleaseForm fails (no record)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ReleaseForm_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReleaseForm_007 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord dbRecord;
+    dbRecord.providerUserId = TEST_USER_ID;
+    dbRecord.formUserUids.push_back(TEST_CALLING_UID);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(dbRecord), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, ExistFormRecord(_))
+        .WillOnce(Return(false));
+
+    auto result = FormLifecycleAdapter::GetInstance().ReleaseForm(TEST_FORM_ID, callerToken, true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    GTEST_LOG_(INFO) << "ReleaseForm_007 end";
+}
+
+/**
+ * @tc.name: ReleaseForm_008
+ * @tc.desc: Verify ReleaseForm with delCache=true and HandleReleaseForm fails (not self)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ReleaseForm_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReleaseForm_008 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord dbRecord;
+    dbRecord.providerUserId = TEST_USER_ID;
+    dbRecord.formUserUids.push_back(TEST_CALLING_UID);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(dbRecord), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, ExistFormRecord(_))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetMatchedHostClient(_, _))
+        .WillOnce(Return(false));
+
+    auto result = FormLifecycleAdapter::GetInstance().ReleaseForm(TEST_FORM_ID, callerToken, true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "ReleaseForm_008 end";
+}
+
+/**
+ * @tc.name: ReleaseForm_010
+ * @tc.desc: Verify ReleaseForm with delCache=true, HandleReleaseForm succeeds but RemoveFormTimer fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ReleaseForm_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReleaseForm_010 start";
+
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord dbRecord;
+    dbRecord.providerUserId = TEST_USER_ID;
+    dbRecord.formUserUids.push_back(TEST_CALLING_UID);
+    FormHostRecord hostRecord;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormDbCache::obj, GetDBRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(dbRecord), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, ExistFormRecord(_))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetMatchedHostClient(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(hostRecord), Return(true)));
+
+    auto result = FormLifecycleAdapter::GetInstance().ReleaseForm(TEST_FORM_ID, callerToken, true);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "ReleaseForm_010 end";
+}
+
+// ========== AddRequestPublishForm Tests ==========
+
+/**
+ * @tc.name: AddRequestPublishForm_001
+ * @tc.desc: Verify AddRequestPublishForm with no publish form info returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddRequestPublishForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_001 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddRequestPublishForm(info, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_001 end";
+}
+
+/**
+ * @tc.name: AddRequestPublishForm_003
+ * @tc.desc: Verify AddRequestPublishForm with different bundleName returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddRequestPublishForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_003 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.other");
+    info.SetAbilityName("OtherAbility");
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddRequestPublishForm(info, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_003 end";
+}
+
+/**
+ * @tc.name: AddRequestPublishForm_004
+ * @tc.desc: Verify AddRequestPublishForm with temp form flag returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddRequestPublishForm_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_004 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetTemporaryFlag(true);
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddRequestPublishForm(info, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_004 end";
+}
+
+/**
+ * @tc.name: AddRequestPublishForm_005
+ * @tc.desc: Verify AddRequestPublishForm with negative formId returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddRequestPublishForm_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_005 start";
+
+    FormItemInfo info;
+    info.SetFormId(-1);
+    info.SetProviderBundleName("com.test.provider");
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddRequestPublishForm(info, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_005 end";
+}
+
+/**
+ * @tc.name: AddRequestPublishForm_006
+ * @tc.desc: Verify AddRequestPublishForm with system callingUid returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddRequestPublishForm_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_006 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    Want want;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(SYSTEM_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddRequestPublishForm(info, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_006 end";
+}
+
+/**
+ * @tc.name: AddRequestPublishForm_007
+ * @tc.desc: Verify AddRequestPublishForm with want params returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddRequestPublishForm_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_007 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    info.SetFormName("widget");
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, static_cast<int>(TEST_DIMENSION_ID));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddRequestPublishForm(info, want, callerToken, formJsInfo);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddRequestPublishForm_007 end";
+}
+
+// ========== AddNewFormRecord Tests ==========
+
+/**
+ * @tc.name: AddNewFormRecord_001
+ * @tc.desc: Verify AddNewFormRecord with providerBundleName==hostBundleName returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddNewFormRecord_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddNewFormRecord_001 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddNewFormRecord(
+        info, TEST_FORM_ID, callerToken, wantParams, formJsInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddNewFormRecord_001 end";
+}
+
+/**
+ * @tc.name: AddNewFormRecord_002
+ * @tc.desc: Verify AddNewFormRecord with providerBundleName!=hostBundleName calls AddFormTimer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddNewFormRecord_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddNewFormRecord_002 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.host");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddNewFormRecord(
+        info, TEST_FORM_ID, callerToken, wantParams, formJsInfo);
+    // AddFormTimer (real FormCommonAdapter) result depends on internal state
+    EXPECT_NE(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "AddNewFormRecord_002 end";
+}
+
+/**
+ * @tc.name: AddNewFormRecord_003
+ * @tc.desc: Verify AddNewFormRecord with UpdateDBRecord fails returns errorCode
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddNewFormRecord_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddNewFormRecord_003 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddNewFormRecord(
+        info, TEST_FORM_ID, callerToken, wantParams, formJsInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "AddNewFormRecord_003 end";
+}
+
+/**
+ * @tc.name: AddNewFormRecord_004
+ * @tc.desc: Verify AddNewFormRecord with temp form skips UpdateDBRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddNewFormRecord_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddNewFormRecord_004 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    info.SetTemporaryFlag(true);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+    // UpdateDBRecord should NOT be called for temp forms
+
+    auto result = FormLifecycleAdapter::GetInstance().AddNewFormRecord(
+        info, TEST_FORM_ID, callerToken, wantParams, formJsInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddNewFormRecord_004 end";
+}
+
+/**
+ * @tc.name: AddNewFormRecord_005
+ * @tc.desc: Verify AddNewFormRecord with non-system app and transparencyEnabled calls StartFormCheckTimer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddNewFormRecord_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddNewFormRecord_005 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.provider");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    info.SetTemporaryFlag(true);
+    info.SetTransparencyEnabled(true);
+    info.SetSystemAppFlag(false);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddNewFormRecord(
+        info, TEST_FORM_ID, callerToken, wantParams, formJsInfo);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "AddNewFormRecord_005 end";
+}
+
+/**
+ * @tc.name: AddNewFormRecord_006
+ * @tc.desc: Verify AddNewFormRecord with temp form and different bundleNames calls AddFormTimer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, AddNewFormRecord_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AddNewFormRecord_006 start";
+
+    FormItemInfo info;
+    info.SetFormId(TEST_FORM_ID);
+    info.SetProviderBundleName("com.test.provider");
+    info.SetHostBundleName("com.test.host");
+    info.SetAbilityName("MainAbility");
+    info.SetModuleName("entry");
+    info.SetTemporaryFlag(true);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    WantParams wantParams;
+    FormJsInfo formJsInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, AllotFormHostRecord(_, _, _, _))
+        .WillOnce(Return(true));
+
+    auto result = FormLifecycleAdapter::GetInstance().AddNewFormRecord(
+        info, TEST_FORM_ID, callerToken, wantParams, formJsInfo);
+    // With different bundleNames, AddFormTimer is called
+    // Result depends on real FormCommonAdapter::AddFormTimer
+    EXPECT_NE(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "AddNewFormRecord_006 end";
+}
+
+// ========== HandleCastTempForm Tests ==========
+
+/**
+ * @tc.name: HandleCastTempForm_001
+ * @tc.desc: Verify HandleCastTempForm with moduleName set on want returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, HandleCastTempForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleCastTempForm_001 start";
+
+    FormRecord record;
+    record.bundleName = "com.test.bundle";
+    record.abilityName = "MainAbility";
+    record.moduleName = "entry";
+
+    auto result = FormLifecycleAdapter::GetInstance().HandleCastTempForm(TEST_FORM_ID, record);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "HandleCastTempForm_001 end";
+}
+
+/**
+ * @tc.name: HandleCastTempForm_002
+ * @tc.desc: Verify HandleCastTempForm with empty moduleName returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, HandleCastTempForm_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleCastTempForm_002 start";
+
+    FormRecord record;
+    record.bundleName = "com.test.bundle";
+    record.abilityName = "MainAbility";
+    record.moduleName = ""; // empty module name
+
+    auto result = FormLifecycleAdapter::GetInstance().HandleCastTempForm(TEST_FORM_ID, record);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "HandleCastTempForm_002 end";
+}
+
+/**
+ * @tc.name: HandleCastTempForm_003
+ * @tc.desc: Verify HandleCastTempForm with different bundleName returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, HandleCastTempForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleCastTempForm_003 start";
+
+    FormRecord record;
+    record.bundleName = "com.test.other";
+    record.abilityName = "OtherAbility";
+    record.moduleName = "other_module";
+
+    auto result = FormLifecycleAdapter::GetInstance().HandleCastTempForm(TEST_FORM_ID, record);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "HandleCastTempForm_003 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

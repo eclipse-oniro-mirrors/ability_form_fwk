@@ -98,6 +98,8 @@ public:
     static std::shared_ptr<MockFormDataMgr> obj;
     MockFormDataMgr() = default;
     ~MockFormDataMgr() override = default;
+    MOCK_METHOD4(AllotFormHostRecord, bool(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
+        const int64_t formId, const int callingUid));
     MOCK_METHOD2(GetFormRecord, bool(const int64_t formId, FormRecord &formRecord));
     MOCK_METHOD1(CheckForms, void(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(MergeFormWant, void(const Want &newWant, Want &oldWant));
