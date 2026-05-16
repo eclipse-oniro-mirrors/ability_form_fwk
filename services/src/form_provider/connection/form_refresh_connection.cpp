@@ -57,7 +57,7 @@ void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IR
     if (want.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
         std::string message = want.GetStringParam(Constants::PARAM_MESSAGE_KEY);
         FormProviderTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, want, remoteObject);
-    } else if (want.HasParameter(Constants::ACQUIRE_TYPE)) {
+    } else if (want.HasParameter(Constants::RECREATE_FORM_KEY)) {
         FormProviderTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
     } else {
         FormProviderTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
