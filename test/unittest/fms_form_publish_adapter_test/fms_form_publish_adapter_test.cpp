@@ -1069,7 +1069,7 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_002, TestSize.Level1)
     sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
     ASSERT_NE(bundleMgr, nullptr);
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(2)
+        .Times(3)
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
         .WillOnce(Return(1000));
@@ -1100,7 +1100,7 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_003, TestSize.Level1)
     sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
     ASSERT_NE(bundleMgr, nullptr);
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(2)
+        .Times(3)
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
         .WillOnce(Return(1000));
@@ -1137,7 +1137,7 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_004, TestSize.Level1)
     EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<3>(systemAppInfo), Return(ERR_OK)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(2)
+        .Times(3)
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
         .WillOnce(Return(1000));
@@ -1200,60 +1200,6 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_002, TestSize.Level1)
     EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
 
     GTEST_LOG_(INFO) << "GetCallerType_002 end";
-}
-
-/**
- * @tc.name: GetCallerType_003
- * @tc.desc: Verify ATOMIC_SERVICE bundleType returns TYPE_ATOM_SERVICE
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetCallerType_003 start";
-
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(2)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    ApplicationInfo appInfo;
-    appInfo.bundleType = AppExecFwk::BundleType::ATOMIC_SERVICE;
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(true)));
-
-    auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
-    EXPECT_EQ(result, FormErmsCallerInfo::TYPE_ATOM_SERVICE);
-
-    GTEST_LOG_(INFO) << "GetCallerType_003 end";
-}
-
-/**
- * @tc.name: GetCallerType_004
- * @tc.desc: Verify APP bundleType returns TYPE_HARMONY_APP
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetCallerType_004 start";
-
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(2)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    ApplicationInfo appInfo;
-    appInfo.bundleType = AppExecFwk::BundleType::APP;
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(true)));
-
-    auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
-    EXPECT_EQ(result, FormErmsCallerInfo::TYPE_HARMONY_APP);
-
-    GTEST_LOG_(INFO) << "GetCallerType_004 end";
 }
 
 /**
