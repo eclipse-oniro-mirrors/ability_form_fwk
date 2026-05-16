@@ -36,7 +36,7 @@ int64_t FormTimeUtil::GetBootTimeMs()
         auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
         return std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
     }
-    timeNow = static_cast<uint64_t>(tv.tv_sec) * NANO_PER_SECOND + tv.tv_nsec;
+    timeNow = static_cast<uint64_t>(tv.tv_sec) * NANO_PER_SECOND + static_cast<uint64_t>(tv.tv_nsec);
     std::chrono::steady_clock::time_point tpEpoch((std::chrono::nanoseconds(timeNow)));
     auto timeSinceEpoch = tpEpoch.time_since_epoch();
     return std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
