@@ -3286,9 +3286,9 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
 }
 
     HILOG_INFO("formId:%{public}" PRId64 ",needRefresh:%{public}d,formVisibleType:%{public}d,"
-        "isTimerRefresh:%{public}d,wantCacheMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
+        "isTimerRefresh:%{public}d,refreshWantMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
-        (int)formRecord.wantCacheMap.size(), formRecord.isHostRefresh);
+        (int)formRecord.refreshWantMap.size(), formRecord.isHostRefresh);
 
     if (!formRecord.needRefresh || formVisibleType != Constants::FORM_VISIBLE ||
         formRecord.isTimerRefresh || formRecord.isHostRefresh) {

@@ -101,7 +101,7 @@ public:
     bool protectForm = false;
     std::vector<int32_t> conditionUpdate;
     FormWant hostWant; // Host call parameter cache
-    std::map<int64_t, Want> wantCacheMap;
+    std::map<int64_t, FormWant> refreshWantMap;
     bool isLocationChange = false;
     bool isExistRecycleTask = false;
     bool isDataProxyUpdate = false;

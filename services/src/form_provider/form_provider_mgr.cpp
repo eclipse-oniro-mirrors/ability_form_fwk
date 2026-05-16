@@ -107,26 +107,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     return ERR_OK;
 }
 
-void FormProviderMgr::MergeWant(const Want &newWant, Want &oldWant)
-{
-    std::map<std::string, sptr<IInterface>> newWantMap;
-    WantParams newWantParams = newWant.GetParams();
-    WantParams oldWantParams = oldWant.GetParams();
-    newWantMap = newWantParams.GetParams();
-    for (auto it = newWantMap.begin(); it != newWantMap.end(); it++) {
-        oldWantParams.SetParam(it->first, it->second);
-    }
-    oldWant.SetParams(oldWantParams);
-}
 
-void FormProviderMgr::UpdateWant(const int64_t formId, const Want &want, FormRecord &record)
-{
-    if (record.wantCacheMap.size() != 0) {
-        MergeWant(want, record.wantCacheMap[formId]);
-        return;
-    }
-    record.wantCacheMap[formId] = want;
-}
 
 void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate)
 {
@@ -210,7 +191,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     bool isHicar = (record.moduleName == HICAR_FORM);
     if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
-        UpdateWant(formId, want, record);
+        FormDataMgr::GetInstance().UpdateRefreshWant(formId, want, record);
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
         FormDataMgr::GetInstance().SetHostRefresh(formId, true);
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);

@@ -144,7 +144,7 @@ public:
      * @return Returns true if execute success, false otherwise.
      */
     int MessageEvent(const int64_t formId, const FormRecord &record, const Want &want);
-    void MergeWant(const Want &newWant, Want &oldWant);
+    
 
     /**
      * @brief Connect ams for refresh form location
@@ -182,7 +182,7 @@ private:
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
-    void UpdateWant(const int64_t formId, const Want &want, FormRecord &record);
+    
     void DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate);
     void PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh);
 };

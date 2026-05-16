@@ -962,7 +962,7 @@ public:
      * @param want new want.
      * @param record form record info.
      */
-    void UpdateFormWant(const int64_t formId, const Want &want, FormRecord &record);
+    void UpdateRefreshWant(const int64_t formId, const Want &want, FormRecord &record);
 
     /**
      * @brief Get all formRecord by userId.

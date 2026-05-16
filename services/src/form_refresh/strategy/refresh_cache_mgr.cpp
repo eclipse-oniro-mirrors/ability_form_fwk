@@ -125,9 +125,9 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
             want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
         }
         if (record.isHostRefresh) {
-            auto it = record.wantCacheMap.find(formId);
-            if (it != record.wantCacheMap.end()) {
-                FormWant::MergeWantParams(want, it->second);
+            auto it = record.refreshWantMap.find(formId);
+            if (it != record.refreshWantMap.end()) {
+                FormWant::MergeWantParams(want, it->second.GetWant());
             }
         }
         RefreshData data;
@@ -145,7 +145,7 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
 void RefreshCacheMgr::AddFlagByScreenOff(const int64_t formId, const Want &want, FormRecord &record)
 {
     HILOG_WARN("add screen off formId:%{public}" PRId64, formId);
-    FormDataMgr::GetInstance().UpdateFormWant(formId, want, record);
+    FormDataMgr::GetInstance().UpdateRefreshWant(formId, want, record);
     FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
     FormDataMgr::GetInstance().SetHostRefresh(formId, true);
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
@@ -233,22 +233,11 @@ Want RefreshCacheMgr::CreateWant(const std::vector<FormRecord>::iterator &record
     want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(record->renderingMode));
     want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, record->isDynamic);
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, record->formTempFlag);
-    auto it = record->wantCacheMap.find(record->formId);
-    if (it == record->wantCacheMap.end()) {
+    auto it = record->refreshWantMap.find(record->formId);
+    if (it == record->refreshWantMap.end()) {
         return want;
     }
-    WantParams cacheWantParams = it->second.GetParams();
-    WantParams wantParams = want.GetParams();
-    for (auto paramKey : Constants::FORM_HOST_PARAM_NAMES) {
-        if (!cacheWantParams.HasParam(paramKey)) {
-            continue;
-        }
-        auto paramValue = cacheWantParams.GetParam(paramKey);
-        if (paramValue != nullptr) {
-            wantParams.SetParam(paramKey, paramValue);
-        }
-    }
-    want.SetParams(wantParams);
+    it->second.ExtractHostParamsToWant(want);  // 复用FormWant::ExtractHostParamsToWant
     return want;
 }
 
@@ -263,8 +252,8 @@ void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId, const int32_t
     HILOG_INFO("formId:%{public}" PRId64", isHostRefresh:%{public}d", formId, record.isHostRefresh);
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-    if (record.isHostRefresh && record.wantCacheMap.find(formId) != record.wantCacheMap.end()) {
-        FormWant::MergeWantParams(want, record.wantCacheMap[formId]);
+    if (record.isHostRefresh && record.refreshWantMap.find(formId) != record.refreshWantMap.end()) {
+        FormWant::MergeWantParams(want, record.refreshWantMap[formId].GetWant());
     }
     RefreshData data;
     data.formId = formId;

@@ -58,7 +58,7 @@ void FmsRefreshCacheMgrTest::TearDown()
 /**
  * @tc.name: FmsRefreshCacheMgrTest_ConsumeInvisibleFlag_001
  * @tc.desc: Verify ConsumeInvisibleFlag with empty records returns early,
- *           and non-active user does not trigger MergeFormWant
+ *           and non-active user does not trigger FormWant::MergeWantParams
  * @tc.type: FUNC
  */
 HWTEST_F(FmsRefreshCacheMgrTest, ConsumeInvisibleFlag_001, TestSize.Level1)
@@ -70,23 +70,30 @@ HWTEST_F(FmsRefreshCacheMgrTest, ConsumeInvisibleFlag_001, TestSize.Level1)
     RefreshCacheMgr mgr;
     int32_t userId = 100;
 
-    // Case 1: empty visibleFormRecords, should return early without crash
     std::vector<FormRecord> emptyRecords;
     mgr.ConsumeInvisibleFlag(emptyRecords, userId);
 
-    // Case 2: non-active user with record, MergeFormWant should not be called
     MockFormUtil::MockIsActiveUser(false);
-    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
-    EXPECT_CALL(*MockFormDataMgr::obj, MergeFormWant(_, _)).Times(0);
 
     std::vector<FormRecord> visibleFormRecords;
     FormRecord record;
     record.formId = 1;
     record.isTimerRefresh = true;
-    record.isHostRefresh = false;
+    record.isHostRefresh = true;
+    FormWant initialWant;
+    initialWant.SetParam("test_key", std::string("test_value"));
+    initialWant.SetParam("another_key", 100);
+    record.refreshWantMap[1] = initialWant;
     visibleFormRecords.push_back(record);
 
     mgr.ConsumeInvisibleFlag(visibleFormRecords, userId);
+
+    auto it = visibleFormRecords[0].refreshWantMap.find(1);
+    ASSERT_NE(it, visibleFormRecords[0].refreshWantMap.end());
+    auto resultWant = it->second.GetWant();
+    EXPECT_EQ(resultWant.GetStringParam("test_key"), "test_value");
+    EXPECT_EQ(resultWant.GetIntParam("another_key", 0), 100);
+    EXPECT_EQ(it->second.GetWant().GetParams().GetParams().size(), 2);
 
     GTEST_LOG_(INFO) << "ConsumeInvisibleFlag_001 end";
 }

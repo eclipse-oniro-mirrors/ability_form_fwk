@@ -38,7 +38,7 @@ FormHostRefreshImpl::~FormHostRefreshImpl() {}
 
 int FormHostRefreshImpl::DoControlCheck(RefreshData &data)
 {
-    FormDataMgr::GetInstance().UpdateFormWant(data.formId, data.want, data.record);
+    FormDataMgr::GetInstance().UpdateRefreshWant(data.formId, data.want, data.record);
     FormDataMgr::GetInstance().UpdateFormRecord(data.formId, data.record);
     FormDataMgr::GetInstance().SetHostRefresh(data.formId, true);
     // Execute base class control checks

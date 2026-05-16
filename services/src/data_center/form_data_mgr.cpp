@@ -1399,7 +1399,7 @@ void FormDataMgr::ClearWantCache(const int64_t formId)
         HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
         return;
     }
-    itFormRecord->second.wantCacheMap.clear();
+    itFormRecord->second.refreshWantMap.clear();
 }
 
 /**
@@ -1417,7 +1417,7 @@ void FormDataMgr::ClearHostRefreshFlag(const int64_t formId)
     if (itFormRecord->second.isHostRefresh) {
         HILOG_INFO("clean host refresh flag, form:%{public}" PRId64, formId);
         itFormRecord->second.isHostRefresh = false;
-        itFormRecord->second.wantCacheMap.clear();
+        itFormRecord->second.refreshWantMap.clear();
     }
 }
 
@@ -3256,13 +3256,14 @@ bool FormDataMgr::GetFormCanUpdate(int64_t formId)
     return search->second;
 }
 
-void FormDataMgr::UpdateFormWant(const int64_t formId, const Want &want, FormRecord &record)
+void FormDataMgr::UpdateRefreshWant(const int64_t formId, const Want &want, FormRecord &record)
 {
-    if (record.wantCacheMap.size() != 0) {
-        FormWant::MergeWantParams(record.wantCacheMap[formId], want);
+    auto it = record.refreshWantMap.find(formId);
+    if (it != record.refreshWantMap.end()) {
+        it->second.MergeFrom(want);
         return;
     }
-    record.wantCacheMap[formId] = want;
+    record.refreshWantMap[formId] = FormWant(want);
 }
 
 void FormDataMgr::GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords)
