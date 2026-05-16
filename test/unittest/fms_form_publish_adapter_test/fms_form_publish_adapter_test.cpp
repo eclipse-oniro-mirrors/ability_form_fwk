@@ -49,13 +49,26 @@
 #include "mock_form_callback_adapter.h"
 #include "mock_form_ams_helper.h"
 #include "mock_form_ecological_rule_client.h"
+#include "form_adapter_constants.h"
 
 using namespace testing;
 using namespace testing::ext;
+using namespace OHOS::AppExecFwk::FormAdapterConstants;
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
+class MockFormPublishInterceptor : public IRemoteStub<IFormPublishInterceptor> {
+public:
+    MockFormPublishInterceptor() = default;
+    ~MockFormPublishInterceptor() override = default;
+    MOCK_METHOD1(ProcessPublishForm, int32_t(const Want &want));
+    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override
+    {
+        return 0;
+    }
+};
+
 constexpr int32_t TEST_USER_ID = 100;
 constexpr int32_t TEST_CALLING_UID = 20000000;
 constexpr int64_t TEST_FORM_ID = 123456789L;
@@ -949,5 +962,607 @@ HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_008, TestSize.Level1)
     GTEST_LOG_(INFO) << "QueryPublishFormToHost_008 end";
 }
 
+// ========== CheckIsSystemAppByBundleName Tests ==========
+
+/**
+ * @tc.name: CheckIsSystemAppByBundleName_001
+ * @tc.desc: Verify GetApplicationInfoV9 fails returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, CheckIsSystemAppByBundleName_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_001 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_INVALID_PARAM));
+
+    auto result = FormPublishAdapter::GetInstance().CheckIsSystemAppByBundleName(
+        bundleMgr, TEST_USER_ID, TEST_BUNDLE_NAME);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_001 end";
+}
+
+/**
+ * @tc.name: CheckIsSystemAppByBundleName_002
+ * @tc.desc: Verify isSystemApp=true returns true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, CheckIsSystemAppByBundleName_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_002 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+
+    auto result = FormPublishAdapter::GetInstance().CheckIsSystemAppByBundleName(
+        bundleMgr, TEST_USER_ID, TEST_BUNDLE_NAME);
+    EXPECT_TRUE(result);
+
+    GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_002 end";
+}
+
+/**
+ * @tc.name: CheckIsSystemAppByBundleName_003
+ * @tc.desc: Verify isSystemApp=false returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, CheckIsSystemAppByBundleName_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_003 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    ApplicationInfo appInfo;
+    appInfo.isSystemApp = false;
+    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+
+    auto result = FormPublishAdapter::GetInstance().CheckIsSystemAppByBundleName(
+        bundleMgr, TEST_USER_ID, TEST_BUNDLE_NAME);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_003 end";
+}
+
+// ========== IsValidPublishEvent Tests ==========
+
+/**
+ * @tc.name: IsValidPublishEvent_001
+ * @tc.desc: Verify needCheckFormPermission=true and not system app returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_001 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_INVALID_PARAM));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    Want want;
+    auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
+        bundleMgr, TEST_BUNDLE_NAME, want, true);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_001 end";
+}
+
+/**
+ * @tc.name: IsValidPublishEvent_002
+ * @tc.desc: Verify needCheckFormPermission=false skips system check, IsErmsSupport returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_002 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(3)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
+        .WillOnce(Return(1000));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(false), Return(ERR_OK)));
+
+    Want want;
+    auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
+        bundleMgr, TEST_BUNDLE_NAME, want, false);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_002 end";
+}
+
+/**
+ * @tc.name: IsValidPublishEvent_003
+ * @tc.desc: Verify needCheckFormPermission=false and IsErmsSupport returns true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_003 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(3)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
+        .WillOnce(Return(1000));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    ApplicationInfo callerAppInfo;
+    callerAppInfo.bundleType = AppExecFwk::BundleType::APP;
+    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(callerAppInfo), Return(true)));
+    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(true), Return(ERR_OK)));
+
+    Want want;
+    auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
+        bundleMgr, TEST_BUNDLE_NAME, want, false);
+    EXPECT_TRUE(result);
+
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_003 end";
+}
+
+/**
+ * @tc.name: IsValidPublishEvent_004
+ * @tc.desc: Verify needCheckFormPermission=true, system app, IsErmsSupport returns true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_004 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    ApplicationInfo systemAppInfo;
+    systemAppInfo.isSystemApp = true;
+    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(systemAppInfo), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(3)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
+        .WillOnce(Return(1000));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    ApplicationInfo callerAppInfo;
+    callerAppInfo.bundleType = AppExecFwk::BundleType::APP;
+    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(callerAppInfo), Return(true)));
+    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(true), Return(ERR_OK)));
+
+    Want want;
+    auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
+        bundleMgr, TEST_BUNDLE_NAME, want, true);
+    EXPECT_TRUE(result);
+
+    GTEST_LOG_(INFO) << "IsValidPublishEvent_004 end";
+}
+
+// ========== GetCallerType Tests ==========
+
+/**
+ * @tc.name: GetCallerType_001
+ * @tc.desc: Verify null IBundleMgr returns TYPE_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetCallerType_001 start";
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(nullptr));
+
+    auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
+    EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
+
+    GTEST_LOG_(INFO) << "GetCallerType_001 end";
+}
+
+/**
+ * @tc.name: GetCallerType_002
+ * @tc.desc: Verify GetApplicationInfo fails returns TYPE_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetCallerType_002 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
+    EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
+
+    GTEST_LOG_(INFO) << "GetCallerType_002 end";
+}
+
+/**
+ * @tc.name: GetCallerType_005
+ * @tc.desc: Verify default bundleType returns TYPE_INVALID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetCallerType_005 start";
+
+    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
+    ASSERT_NE(bundleMgr, nullptr);
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    ApplicationInfo appInfo;
+    appInfo.bundleType = static_cast<AppExecFwk::BundleType>(99);
+    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(true)));
+
+    auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
+    EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
+
+    GTEST_LOG_(INFO) << "GetCallerType_005 end";
+}
+
+// ========== IncreaseAddFormRequestTimeOutTask Tests ==========
+
+/**
+ * @tc.name: IncreaseAddFormRequestTimeOutTask_001
+ * @tc.desc: Verify null serialQueue_ returns early without crash
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IncreaseAddFormRequestTimeOutTask_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IncreaseAddFormRequestTimeOutTask_001 start";
+
+    auto origQueue = std::move(FormPublishAdapter::GetInstance().serialQueue_);
+    FormPublishAdapter::GetInstance().serialQueue_ = nullptr;
+
+    FormPublishAdapter::GetInstance().IncreaseAddFormRequestTimeOutTask(TEST_FORM_ID);
+    EXPECT_EQ(FormPublishAdapter::GetInstance().formIdMap_.size(), 0u);
+
+    FormPublishAdapter::GetInstance().serialQueue_ = std::move(origQueue);
+
+    GTEST_LOG_(INFO) << "IncreaseAddFormRequestTimeOutTask_001 end";
+}
+
+/**
+ * @tc.name: IncreaseAddFormRequestTimeOutTask_002
+ * @tc.desc: Verify serialQueue_ is valid and task is scheduled without crash
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IncreaseAddFormRequestTimeOutTask_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IncreaseAddFormRequestTimeOutTask_002 start";
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::UNKNOWN;
+
+    auto &instance = FormPublishAdapter::GetInstance();
+    ASSERT_NE(instance.serialQueue_, nullptr);
+
+    instance.IncreaseAddFormRequestTimeOutTask(TEST_FORM_ID);
+
+    // Verify the formIdMap_ still contains the entry (timer hasn't fired yet)
+    auto iter = instance.formIdMap_.find(TEST_FORM_ID);
+    ASSERT_NE(iter, instance.formIdMap_.end());
+    EXPECT_EQ(iter->second, AddFormResultErrorCodes::UNKNOWN);
+
+    // Clean up: cancel the pending timer to avoid interference with other tests
+    instance.serialQueue_->CancelDelayTask(
+        std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), TEST_FORM_ID));
+
+    GTEST_LOG_(INFO) << "IncreaseAddFormRequestTimeOutTask_002 end";
+}
+
+/**
+ * @tc.name: IncreaseAddFormRequestTimeOutTask_003
+ * @tc.desc: Verify formId NOT in formIdMap_ does not change state
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IncreaseAddFormRequestTimeOutTask_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IncreaseAddFormRequestTimeOutTask_003 start";
+
+    auto &instance = FormPublishAdapter::GetInstance();
+    ASSERT_NE(instance.serialQueue_, nullptr);
+    EXPECT_EQ(instance.formIdMap_.size(), 0u);
+
+    instance.IncreaseAddFormRequestTimeOutTask(TEST_FORM_ID);
+
+    EXPECT_EQ(instance.formIdMap_.size(), 0u);
+
+    GTEST_LOG_(INFO) << "IncreaseAddFormRequestTimeOutTask_003 end";
+}
+
+// ========== RequestPublishForm Tests ==========
+/**
+ * @tc.name: RequestPublishForm_001
+ * @tc.desc: Verify CheckPublishForm fails returns error code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishForm_001 start";
+
+    Want want;
+    want.SetBundle(TEST_BUNDLE_NAME);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
+    std::unique_ptr<FormProviderData> formBindingData = std::make_unique<FormProviderData>();
+    int64_t formId = 0;
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishForm(
+        want, true, formBindingData, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+
+    GTEST_LOG_(INFO) << "RequestPublishForm_001 end";
+}
+
+// ========== RequestPublishFormToHost (1-arg) Tests ==========
+
+/**
+ * @tc.name: RequestPublishFormToHost_001
+ * @tc.desc: Verify StartAbility fails returns error code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_001 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    AbilityInfo abilityInfo;
+    abilityInfo.name = TEST_ABILITY_NAME;
+    abilityInfo.bundleName = "com.host.bundle";
+    ExtensionAbilityInfo emptyExtAbilityInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(abilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
+            Return(true)));
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
+        .WillRepeatedly(Return(nullptr));
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_001 end";
+}
+
+/**
+ * @tc.name: RequestPublishFormToHost_002
+ * @tc.desc: Verify formId parse fails returns ERR_APPEXECFWK_FORM_INVALID_PARAM
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_002 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::string("invalid_form_id"));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_002 end";
+}
+
+/**
+ * @tc.name: RequestPublishFormToHost_003
+ * @tc.desc: Verify interceptor nullptr calls AcquireAddFormResult
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_003 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
+        .WillOnce(Return(nullptr));
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_003 end";
+}
+
+/**
+ * @tc.name: RequestPublishFormToHost_004
+ * @tc.desc: Verify interceptor ProcessPublishForm succeeds calls AcquireAddFormResult
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_004 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(false));
+
+    sptr<MockFormPublishInterceptor> mockInterceptor = new (std::nothrow) MockFormPublishInterceptor();
+    ASSERT_NE(mockInterceptor, nullptr);
+    EXPECT_CALL(*mockInterceptor, ProcessPublishForm(_))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
+        .WillOnce(Return(mockInterceptor));
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_004 end";
+}
+
+/**
+ * @tc.name: RequestPublishFormToHost_005
+ * @tc.desc: Verify success path with QueryPublishFormToHost and StartAbility succeeding
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_005 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    AbilityInfo abilityInfo;
+    abilityInfo.name = TEST_ABILITY_NAME;
+    abilityInfo.bundleName = "com.host.bundle";
+    ExtensionAbilityInfo emptyExtAbilityInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(abilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
+            Return(true)));
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
+        .WillOnce(Return(nullptr));
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_005 end";
+}
+
+// ========== RequestPublishFormToHost (2-arg) Tests ==========
+
+/**
+ * @tc.name: RequestPublishFormToHost_006
+ * @tc.desc: Verify 2-arg overload with QueryPublishFormToHost success and StartAbility fail
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_006 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+
+    AbilityInfo abilityInfo;
+    abilityInfo.name = TEST_ABILITY_NAME;
+    abilityInfo.bundleName = "com.host.bundle";
+    ExtensionAbilityInfo emptyExtAbilityInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(abilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
+            Return(true)));
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
+        .WillRepeatedly(Return(nullptr));
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want, TEST_USER_ID);
+    EXPECT_NE(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_006 end";
+}
+
+/**
+ * @tc.name: RequestPublishFormToHost_007
+ * @tc.desc: Verify 2-arg overload with formId parse failure
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_007 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::string("invalid_id"));
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(false));
+
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_007 end";
+}
+
+/**
+ * @tc.name: RequestPublishFormToHost_008
+ * @tc.desc: Verify 2-arg overload success path with interceptor nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_008 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
+        .WillOnce(Return(nullptr));
+
+    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "RequestPublishFormToHost_008 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
