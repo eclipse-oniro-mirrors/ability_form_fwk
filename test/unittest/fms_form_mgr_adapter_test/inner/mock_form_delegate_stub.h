@@ -51,17 +51,19 @@ public:
     ErrCode RequestFormWants(const std::vector<FormInfo> &formInfos,
         std::vector<AAFwk::WantParams> &wantParamsList) override
     {
-        return ERR_OK;
+        return requestFormWantsResult_;
     }
-    ErrCode UpdateFormsConfigCallback(const std::vector<FormCustomConfig> configs) override
+    ErrCode UpdateFormsConfigCallback(const std::vector<FormCustomConfig> &configs) override
     {
-        retrun ERR_OK;
+        return updateFormsConfigResult_;
     }
     ErrCode requestOverflowResult_ = ERR_OK;
     ErrCode changeSceneResult_ = ERR_OK;
     ErrCode getFormRectResult_ = ERR_OK;
     ErrCode getLiveFormStatusResult_ = ERR_OK;
     ErrCode templateFormResult_ = ERR_OK;
+    ErrCode requestFormWantsResult_ = ERR_OK;
+    ErrCode updateFormsConfigResult_ = ERR_OK;
 };
 
 class MockFormProviderDelegateStub : public FormProviderDelegateStub {
