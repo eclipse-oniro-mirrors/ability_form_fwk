@@ -392,6 +392,7 @@ void BundleFormInfo::UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bo
 
 bool BundleFormInfo::ApplyConfigToStorages(const FormCustomConfig &config)
 {
+    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     bool updated = false;
     for (auto &storage : formInfoStorages_) {
         for (auto &formInfo : storage.formInfos) {
@@ -407,7 +408,6 @@ bool BundleFormInfo::ApplyConfigToStorages(const FormCustomConfig &config)
 ErrCode BundleFormInfo::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
 {
     HILOG_DEBUG("call, bundleName:%{public}s", bundleName_.c_str());
-    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     bool needUpdate = false;
     for (const auto &config : configs) {
         needUpdate = ApplyConfigToStorages(config) || needUpdate;

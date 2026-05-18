@@ -102,7 +102,7 @@ ErrCode FormProxyRegistry::GetAll(std::vector<sptr<IRemoteObject>> &proxies)
 ErrCode FormProxyRegistry::GetAllWithKeys(std::vector<std::pair<int32_t, sptr<IRemoteObject>>> &entries)
 {
     std::shared_lock<std::shared_mutex> lock(mutex_);
-    for (auto &pair : proxies_) {
+    for (const auto &pair : proxies_) {
         entries.push_back({pair.first, pair.second});
     }
     if (entries.empty()) {

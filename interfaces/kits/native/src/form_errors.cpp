@@ -40,7 +40,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         {
             ERR_FORM_EXTERNAL_PERMISSION_DENIED,
-            "check permission deny, need to request ohos.permission.REQUIRE_FORM or "
+            "check permission denied, need to request ohos.permission.REQUIRE_FORM or "
             "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS."
         }
     },
@@ -48,7 +48,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
         {
             ERR_FORM_EXTERNAL_NOT_SYSTEM_APP,
-            "The application is not a system application, check permission deny, need system permission."
+            "The application is not a system application, check permission denied, need system permission."
         }
     },
     {
@@ -228,7 +228,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
         {
             ERR_FORM_EXTERNAL_PERMISSION_DENIED,
-            "check permission deny, need to request ohos.permission.GET_BUNDLE_INFO_PRIVILEGED."
+            "check permission denied, need to request ohos.permission.GET_BUNDLE_INFO_PRIVILEGED."
         }
     },
     {
@@ -301,7 +301,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG,
         {
             ERR_FORM_EXTERNAL_PERMISSION_DENIED,
-            "check permission deny, need to request ohos.permission.FORM_CUSTOM_CONFIG."
+            "check permission denied, need to request ohos.permission.FORM_CUSTOM_CONFIG."
         }
     }
 };

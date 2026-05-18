@@ -2394,7 +2394,19 @@ private:
             NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
             return CreateJsUndefined(env);
         }
-        return OnRegisterUpdateFormsConfigCb(env, callbackRef);
+        JsFormRouterProxyMgr::GetInstance()->RegisterUpdateFormsConfigCallback(env, callbackRef);
+        ErrCode result = FormMgr::GetInstance().RegisterUpdateFormsConfigCallback(
+            JsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
+            JsFormRouterProxyMgr::GetInstance()->UnregisterUpdateFormsConfigCallback();
+            if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
+                result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+                NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            } else {
+                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            }
+        }
+        return CreateJsUndefined(env);
     }
 
     napi_value OnUnregisterUpdateFormsConfigCallbackObserver(napi_env env, size_t argc, napi_value *argv)
@@ -2410,45 +2422,6 @@ private:
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
             return CreateJsUndefined(env);
         }
-        if (argc == ARGS_ONE) {
-            napi_valuetype type = napi_undefined;
-            napi_typeof(env, argv[PARAM0], &type);
-            if (type != napi_function) {
-                HILOG_ERROR("callback is not function");
-                NapiFormUtil::ThrowParamTypeError(env, "callback", "function");
-                return CreateJsUndefined(env);
-            }
-        }
-        return OnUnregisterUpdateFormsConfigCb(env);
-    }
-
-    napi_value OnRegisterUpdateFormsConfigCb(napi_env env, napi_ref callbackRef)
-    {
-        HILOG_INFO("call");
-        bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterUpdateFormsConfigCallback(env, callbackRef);
-        if (!ret) {
-            HILOG_ERROR("RegisterUpdateFormsConfigCallback failed");
-            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
-            return CreateJsUndefined(env);
-        }
-        ErrCode result = FormMgr::GetInstance().RegisterUpdateFormsConfigCallback(
-            JsFormRouterProxyMgr::GetInstance());
-        if (result != ERR_OK) {
-            JsFormRouterProxyMgr::GetInstance()->UnregisterUpdateFormsConfigCallback();
-            if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
-                result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
-                NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            } else {
-                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
-            }
-            return CreateJsUndefined(env);
-        }
-        return CreateJsValue(env, ret);
-    }
-
-    napi_value OnUnregisterUpdateFormsConfigCb(napi_env env)
-    {
-        HILOG_INFO("call");
         ErrCode result = FormMgr::GetInstance().UnregisterUpdateFormsConfigCallback();
         if (result != ERR_OK) {
             if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
@@ -2459,8 +2432,8 @@ private:
             }
             return CreateJsUndefined(env);
         }
-        bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterUpdateFormsConfigCallback();
-        return CreateJsValue(env, ret);
+        JsFormRouterProxyMgr::GetInstance()->UnregisterUpdateFormsConfigCallback();
+        return CreateJsUndefined(env);
     }
 
     napi_value OnGetFormIdsByFormLocation(napi_env env, size_t argc, napi_value *argv)
@@ -3590,35 +3563,19 @@ std::shared_ptr<LiveFormInterfaceParam> PromiseCallbackInfo::GetJsCallBackParam(
     return liveFormInterfaceParam_;
 }
 
-bool JsFormRouterProxyMgr::RegisterUpdateFormsConfigCallback(napi_env env, napi_ref callbackRef)
+void JsFormRouterProxyMgr::RegisterUpdateFormsConfigCallback(napi_env env, napi_ref callbackRef)
 {
     HILOG_INFO("call");
-    if (callbackRef == nullptr) {
-        HILOG_ERROR("callbackRef is null");
-        return false;
-    }
-    napi_value callback = nullptr;
-    napi_status status = napi_get_reference_value(env, callbackRef, &callback);
-    if (status != napi_ok || callback == nullptr) {
-        HILOG_ERROR("get reference value failed, status:%{public}d", static_cast<int>(status));
-        return false;
-    }
-    napi_valuetype type = napi_undefined;
-    status = napi_typeof(env, callback, &type);
-    if (status != napi_ok || type != napi_function) {
-        HILOG_ERROR("callback is not function, napi_typeof status: %{public}d", static_cast<int>(status));
-        return false;
-    }
     std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
     if (updateFormsConfigCallbackRef_ != nullptr) {
         napi_delete_reference(updateFormsConfigEnv_, updateFormsConfigCallbackRef_);
+        updateFormsConfigCallbackRef_ = nullptr;
     }
     updateFormsConfigCallbackRef_ = callbackRef;
     updateFormsConfigEnv_ = env;
-    return true;
 }
 
-bool JsFormRouterProxyMgr::UnregisterUpdateFormsConfigCallback()
+void JsFormRouterProxyMgr::UnregisterUpdateFormsConfigCallback()
 {
     HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
@@ -3627,7 +3584,6 @@ bool JsFormRouterProxyMgr::UnregisterUpdateFormsConfigCallback()
         updateFormsConfigCallbackRef_ = nullptr;
     }
     updateFormsConfigEnv_ = nullptr;
-    return true;
 }
 
 ErrCode JsFormRouterProxyMgr::UpdateFormsConfigCallback(
@@ -3665,6 +3621,7 @@ bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
 {
     HILOG_DEBUG("call, config size: %{public}zu", configs.size());
 
+    std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(updateFormsConfigEnv_, &scope);
     if (scope == nullptr) {
@@ -3672,7 +3629,6 @@ bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
         return false;
     }
 
-    std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
     if (updateFormsConfigCallbackRef_ == nullptr) {
         HILOG_WARN("callback is null");
         napi_close_handle_scope(updateFormsConfigEnv_, scope);

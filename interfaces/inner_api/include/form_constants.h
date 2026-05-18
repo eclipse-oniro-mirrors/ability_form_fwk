@@ -453,6 +453,8 @@ namespace Constants {
     constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
     // Form info max num
     constexpr const int32_t FORM_INFO_MAX_NUM = 16;
+    // Update form config max num
+    constexpr const int32_t UPDATE_FORM_CONFIG_MAX_NUM = 64;
     // Form version code
     constexpr const int32_t FORM_VERSION_CODE = 100003;
     // Form domain id

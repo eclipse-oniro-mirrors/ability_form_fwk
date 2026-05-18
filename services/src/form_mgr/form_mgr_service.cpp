@@ -2487,10 +2487,6 @@ ErrCode FormMgrService::UpdateFormsConfig(const std::vector<FormCustomConfig> &c
     if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_FORM_CUSTOM_CONFIG)) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG;
     }
-    if (configs.empty()) {
-        HILOG_ERROR("configs is empty");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
     return FormMgrAdapterFacade::GetInstance().UpdateFormsConfig(configs);
 }
 

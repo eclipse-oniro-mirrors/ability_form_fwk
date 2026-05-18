@@ -508,7 +508,9 @@ ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const s
     for (const auto &[callingUid, callerToken] : entries) {
         int32_t userId = FormUtil::GetCallerUserId(callingUid);
         std::string bundleName;
-        FormBmsHelper::GetInstance().GetBundleNameByUid(callingUid, bundleName);
+        if (FormBmsHelper::GetInstance().GetBundleNameByUid(callingUid, bundleName) != ERR_OK) {
+            HILOG_WARN("get bundleName failed, %{public}s, uid=%{public}d", tag.c_str(), callingUid);
+        }
         sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
         if (proxy == nullptr) {
             HILOG_ERROR("iface_cast failed, %{public}s, userId=%{public}d, bundleName=%{public}s",

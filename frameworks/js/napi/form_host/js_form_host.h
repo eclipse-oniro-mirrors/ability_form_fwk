@@ -78,9 +78,9 @@ public:
 
     bool UnregisterTemplateFormDetailInfoChange();
 
-    bool RegisterUpdateFormsConfigCallback(napi_env env, napi_ref callback);
+    void RegisterUpdateFormsConfigCallback(napi_env env, napi_ref callback);
 
-    bool UnregisterUpdateFormsConfigCallback();
+    void UnregisterUpdateFormsConfigCallback();
 
     void RegisterFormWantCallbackListener(napi_env env, napi_ref callback);
 

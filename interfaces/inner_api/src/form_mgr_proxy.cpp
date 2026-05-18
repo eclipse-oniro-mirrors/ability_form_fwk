@@ -3505,6 +3505,15 @@ ErrCode FormMgrProxy::UnregisterUpdateFormsConfigCallback()
 ErrCode FormMgrProxy::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
 {
     HILOG_DEBUG("call");
+    if (configs.empty()) {
+        HILOG_WARN("configs is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (static_cast<int32_t>(configs.size()) > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
+        HILOG_ERROR("configs size %{public}zu exceeds max %{public}d", configs.size(),
+            Constants::UPDATE_FORM_CONFIG_MAX_NUM);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed.");

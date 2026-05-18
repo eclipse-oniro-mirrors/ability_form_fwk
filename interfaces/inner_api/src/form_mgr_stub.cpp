@@ -2435,8 +2435,8 @@ ErrCode FormMgrStub::HandleUpdateFormsConfig(MessageParcel &data, MessageParcel 
 {
     HILOG_DEBUG("call");
     int32_t size = data.ReadInt32();
-    if (size < 0) {
-        HILOG_ERROR("invalid size: %{public}d", size);
+    if (size <= 0 || size > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
+        HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
         if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_COMMON_CODE)) {
             HILOG_ERROR("write error code failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
