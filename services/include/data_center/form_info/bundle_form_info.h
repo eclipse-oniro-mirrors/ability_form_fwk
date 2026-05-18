@@ -76,7 +76,7 @@ private:
     void ClearDistributedFormInfos(int32_t userId);
 
     bool IsFormInfoMatched(const FormInfo &formInfo, const FormCustomConfig &config) const;
-    void UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow) const;
+    void UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow);
     bool ApplyConfigToStorages(const FormCustomConfig &config);
 
     std::string bundleName_ {};

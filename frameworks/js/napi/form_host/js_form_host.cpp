@@ -2394,6 +2394,7 @@ private:
             NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
             return CreateJsUndefined(env);
         }
+
         JsFormRouterProxyMgr::GetInstance()->RegisterUpdateFormsConfigCallback(env, callbackRef);
         ErrCode result = FormMgr::GetInstance().RegisterUpdateFormsConfigCallback(
             JsFormRouterProxyMgr::GetInstance());
@@ -2422,6 +2423,7 @@ private:
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
             return CreateJsUndefined(env);
         }
+
         ErrCode result = FormMgr::GetInstance().UnregisterUpdateFormsConfigCallback();
         if (result != ERR_OK) {
             if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||

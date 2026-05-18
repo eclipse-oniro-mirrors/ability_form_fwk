@@ -378,7 +378,7 @@ bool BundleFormInfo::IsFormInfoMatched(const FormInfo &formInfo, const FormCusto
     return true;
 }
 
-void BundleFormInfo::UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow) const
+void BundleFormInfo::UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow)
 {
     std::string value = isShow ? "true" : "false";
     for (auto &data : formInfo.customizeDatas) {

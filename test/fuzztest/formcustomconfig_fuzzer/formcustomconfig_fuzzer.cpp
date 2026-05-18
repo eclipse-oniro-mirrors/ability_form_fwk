@@ -30,18 +30,22 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t BUNDLE_NAME_MAX_LEN = 32;
+constexpr size_t MODULE_NAME_MAX_LEN = 16;
+constexpr size_t ABILITY_NAME_MAX_LEN = 16;
+constexpr size_t FORM_NAME_MAX_LEN = 16;
+constexpr size_t RELATED_BUNDLE_NAME_MAX_LEN = 32;
 
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    // Fuzz Marshalling
     FormCustomConfig config;
-    config.bundleName = std::string(data, std::min(size, static_cast<size_t>(32)));
-    config.moduleName = std::string(data, std::min(size, static_cast<size_t>(16)));
-    config.abilityName = std::string(data, std::min(size, static_cast<size_t>(16)));
-    config.formName = std::string(data, std::min(size, static_cast<size_t>(16)));
-    config.relatedBundleName = std::string(data, std::min(size, static_cast<size_t>(32)));
+    config.bundleName = std::string(data, std::min(size, BUNDLE_NAME_MAX_LEN));
+    config.moduleName = std::string(data, std::min(size, MODULE_NAME_MAX_LEN));
+    config.abilityName = std::string(data, std::min(size, ABILITY_NAME_MAX_LEN));
+    config.formName = std::string(data, std::min(size, FORM_NAME_MAX_LEN));
+    config.relatedBundleName = std::string(data, std::min(size, RELATED_BUNDLE_NAME_MAX_LEN));
     config.isShowInFormCenter = (data[0] % 2) == 0;
-    config.isRepeatAdditionSupported = (data[0] % 2) == 1;
+    config.isRepeatAdditionSupported = (data[1] % 2) == 0;
 
     Parcel parcel;
     config.Marshalling(parcel);

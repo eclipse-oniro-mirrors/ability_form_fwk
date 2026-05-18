@@ -53,6 +53,10 @@ public:
     {
         return ERR_OK;
     }
+    ErrCode UpdateFormsConfigCallback(const std::vector<FormCustomConfig> configs) override
+    {
+        retrun ERR_OK;
+    }
     ErrCode requestOverflowResult_ = ERR_OK;
     ErrCode changeSceneResult_ = ERR_OK;
     ErrCode getFormRectResult_ = ERR_OK;

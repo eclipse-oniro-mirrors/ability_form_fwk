@@ -60,6 +60,10 @@ public:
     {
         return ERR_OK;
     }
+    ErrCode UpdateFormsConfigCallback(const std::vector<FormCustomConfig> configs) override
+    {
+        retrun ERR_OK;
+    }
 };
 uint32_t GetU32Data(const char* ptr)
 {
