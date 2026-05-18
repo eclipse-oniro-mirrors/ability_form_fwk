@@ -5336,6 +5336,8 @@ void FormMgrAdapter::CheckIsAddFormByHost(const FormRecord &formRecord, Want &al
     formRecord.hostWant.ExtractHostParamsToWant(allotFormWant);
     FormInfo formInfo;
     FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
+
+    allotFormWant.SetParam(Constants::PARAM_FONT_FOLLOW_SYSTEM_KEY, formInfo.fontScaleFollowSystem);
     if (formInfo.enableBlurBackground) {
         allotFormWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, true);
     }
