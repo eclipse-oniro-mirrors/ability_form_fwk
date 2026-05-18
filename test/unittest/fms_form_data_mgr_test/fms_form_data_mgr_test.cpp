@@ -7868,6 +7868,11 @@ HWTEST_F(FmsFormDataMgrTest, FormDataMgr_UpdateHostWantSize_001, TestSize.Level1
     auto formRecord = formDataMgr_.formRecords_.find(formId);
     ASSERT_NE(formRecord, formDataMgr_.formRecords_.end());
     Want resultWant = formRecord->second.hostWant.GetWant();
+    // 先确认参数存在，再验证值，避免默认值导致的虚假通过
+    EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_WIDTH_KEY));
+    EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_HEIGHT_KEY));
+    EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_BORDER_WIDTH_KEY));
+    EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_VIEW_SCALE));
     EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0.0), static_cast<double>(width));
     EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_HEIGHT_KEY, 0.0), static_cast<double>(height));
     EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_BORDER_WIDTH_KEY, 0.0), static_cast<double>(borderWidth));

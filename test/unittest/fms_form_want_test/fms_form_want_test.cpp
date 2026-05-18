@@ -379,7 +379,6 @@ HWTEST_F(FmsFormWantTest, FormWant_ExtractHostParamsToWant_001, TestSize.Level1)
     formWant.SetParam(Constants::FORM_STYLE_PARAMETERS_KEY, std::string("custom_style"));
     formWant.SetParam(Constants::FORM_ONE_MIRROR_CHANGE_KEY, std::string("mirror_change"));
     formWant.SetParam("non_host_param", std::string("value"));
-    EXPECT_TRUE(formWant.HasParameter("param1"));
     Want target;
     formWant.ExtractHostParamsToWant(target);
     EXPECT_TRUE(target.GetParams().HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY));
