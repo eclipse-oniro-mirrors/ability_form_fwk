@@ -14,7 +14,10 @@
  */
 #include <gtest/gtest.h>
 #include "form_constants.h"
+
+#define private public
 #include "feature/param_update/param_control.h"
+#undef private
 
 using namespace testing::ext;
 
@@ -103,6 +106,31 @@ public:
         }
         json += ",\"policy\":\"" + policy + "\"}]}";
         return json;
+    }
+
+    ParamCtrl CreateParamCtrl(
+        const std::string& bundleName,
+        const std::string& moduleName,
+        int32_t updateDuration = 10)
+    {
+        ParamCtrl paramCtrl;
+        paramCtrl.bundleName = bundleName;
+        paramCtrl.moduleName = moduleName;
+        paramCtrl.updateDuration = updateDuration;
+        return paramCtrl;
+    }
+
+    FormRecord CreateFullFormRecord(
+        const std::string& bundleName,
+        const std::string& moduleName)
+    {
+        FormRecord formRecord;
+        formRecord.bundleName = bundleName;
+        formRecord.moduleName = moduleName;
+        formRecord.isEnableUpdate = true;
+        formRecord.updateDuration = Constants::TIME_CONVERSION;
+        formRecord.formId = 1;
+        return formRecord;
     }
 };
 
@@ -759,6 +787,787 @@ HWTEST_F(FmsParamControlTest, fmsParamControl_040, TestSize.Level1)
     formRecord.lastVersionCode = 0;
     EXPECT_TRUE(paramControl.IsFormRemove(formRecord));
     GTEST_LOG_(INFO) << "FmsParamControlTest fmsParamControl_040 end";
+}
+
+/**
+ * @tc.name: IsSameUpdateDuration_001
+ * @tc.desc: test IsSameUpdateDuration with empty compareCtrls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSameUpdateDuration_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_001 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry");
+    std::vector<ParamCtrl> compareCtrls;
+    bool result = paramControl.IsSameUpdateDuration(formRecord, paramCtrl, compareCtrls);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_001 end";
+}
+
+/**
+ * @tc.name: IsSameUpdateDuration_002
+ * @tc.desc: test IsSameUpdateDuration with matching item and same updateDuration.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSameUpdateDuration_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_002 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl compareItem = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    compareCtrls.push_back(compareItem);
+    bool result = paramControl.IsSameUpdateDuration(formRecord, paramCtrl, compareCtrls);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_002 end";
+}
+
+/**
+ * @tc.name: IsSameUpdateDuration_003
+ * @tc.desc: test IsSameUpdateDuration with matching item but different updateDuration.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSameUpdateDuration_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_003 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl compareItem = CreateParamCtrl("com.example.duedemo", "entry", 20);
+    compareCtrls.push_back(compareItem);
+    bool result = paramControl.IsSameUpdateDuration(formRecord, paramCtrl, compareCtrls);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_003 end";
+}
+
+/**
+ * @tc.name: IsSameUpdateDuration_004
+ * @tc.desc: test IsSameUpdateDuration with multiple items, first mismatch but later match.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSameUpdateDuration_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_004 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl item1 = CreateParamCtrl("com.example.other", "entry", 10);
+    ParamCtrl item2 = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    compareCtrls.push_back(item1);
+    compareCtrls.push_back(item2);
+    bool result = paramControl.IsSameUpdateDuration(formRecord, paramCtrl, compareCtrls);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_004 end";
+}
+
+/**
+ * @tc.name: IsSameUpdateDuration_005
+ * @tc.desc: test IsSameUpdateDuration with matching bundleName/moduleName but different updateDuration.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSameUpdateDuration_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_005 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.abilityName = "AbilityA";
+    formRecord.formName = "FormA";
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 5);
+    paramCtrl.abilityName = "AbilityA";
+    paramCtrl.formName = "FormA";
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl compareItem = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    compareItem.abilityName = "AbilityA";
+    compareItem.formName = "FormA";
+    compareCtrls.push_back(compareItem);
+    bool result = paramControl.IsSameUpdateDuration(formRecord, paramCtrl, compareCtrls);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSameUpdateDuration_005 end";
+}
+
+/**
+ * @tc.name: IsSamePolicy_001
+ * @tc.desc: test IsSamePolicy with empty compareCtrls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSamePolicy_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_001 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("", "", 0);
+    paramCtrl.policy = "disable";
+    std::vector<ParamCtrl> compareCtrls;
+    bool result = paramControl.IsSamePolicy(formRecord, paramCtrl, compareCtrls);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_001 end";
+}
+
+/**
+ * @tc.name: IsSamePolicy_002
+ * @tc.desc: test IsSamePolicy with matching item and same policy.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSamePolicy_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_002 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    paramCtrl.policy = "disable";
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl compareItem = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    compareItem.policy = "disable";
+    compareCtrls.push_back(compareItem);
+    bool result = paramControl.IsSamePolicy(formRecord, paramCtrl, compareCtrls);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_002 end";
+}
+
+/**
+ * @tc.name: IsSamePolicy_003
+ * @tc.desc: test IsSamePolicy with matching item but different policy.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSamePolicy_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_003 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    paramCtrl.policy = "disable";
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl compareItem = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    compareItem.policy = "remove";
+    compareCtrls.push_back(compareItem);
+    bool result = paramControl.IsSamePolicy(formRecord, paramCtrl, compareCtrls);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_003 end";
+}
+
+/**
+ * @tc.name: IsSamePolicy_004
+ * @tc.desc: test IsSamePolicy with multiple items, first mismatch but later match.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSamePolicy_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_004 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    paramCtrl.policy = "disable";
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl item1 = CreateParamCtrl("com.example.other", "entry", 0);
+    item1.policy = "disable";
+    ParamCtrl item2 = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item2.policy = "disable";
+    compareCtrls.push_back(item1);
+    compareCtrls.push_back(item2);
+    bool result = paramControl.IsSamePolicy(formRecord, paramCtrl, compareCtrls);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_004 end";
+}
+
+/**
+ * @tc.name: IsSamePolicy_005
+ * @tc.desc: test IsSamePolicy with matching formInfo but different policy.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, IsSamePolicy_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_005 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.abilityName = "AbilityA";
+    formRecord.formName = "FormA";
+    ParamCtrl paramCtrl = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    paramCtrl.abilityName = "AbilityA";
+    paramCtrl.formName = "FormA";
+    paramCtrl.policy = "remove";
+    std::vector<ParamCtrl> compareCtrls;
+    ParamCtrl compareItem = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    compareItem.abilityName = "AbilityA";
+    compareItem.formName = "FormA";
+    compareItem.policy = "disable";
+    compareCtrls.push_back(compareItem);
+    bool result = paramControl.IsSamePolicy(formRecord, paramCtrl, compareCtrls);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest IsSamePolicy_005 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_001
+ * @tc.desc: test ShouldProcessForm with isEnableUpdate false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_001 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.isEnableUpdate = false;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry");
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_001 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_002
+ * @tc.desc: test ShouldProcessForm with updateDuration zero.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_002 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.updateDuration = 0;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry");
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_002 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_003
+ * @tc.desc: test ShouldProcessForm with IsFormInfoMatch fail due to bundleName mismatch.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_003 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl item = CreateParamCtrl("com.example.other", "entry");
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_003 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_004
+ * @tc.desc: test ShouldProcessForm with IsFormInfoMatch fail due to moduleName mismatch.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_004 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "other");
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_004 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_005
+ * @tc.desc: test ShouldProcessForm with abilityName mismatch when paramCtrl has abilityName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_005 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.abilityName = "AbilityA";
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry");
+    item.abilityName = "AbilityB";
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_005 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_006
+ * @tc.desc: test ShouldProcessForm with formName mismatch when paramCtrl has formName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_006 start";
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.formName = "FormA";
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry");
+    item.formName = "FormB";
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_006 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_007
+ * @tc.desc: test ShouldProcessForm with isAppUpgrade true and matches both old and new version.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_007 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.versionCode = 5;
+    formRecord.lastVersionCode = 5;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    item.appVersionStart = 1;
+    item.appVersionEnd = 10;
+    paramControl.nextUpdateDurationCtrl_.push_back(item);
+    paramControl.preUpdateDurationCtrl_.push_back(item);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, true);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_007 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_008
+ * @tc.desc: test ShouldProcessForm with isAppUpgrade false and IsSameUpdateDuration true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_008 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    paramControl.preUpdateDurationCtrl_.push_back(item);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_008 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_009
+ * @tc.desc: test ShouldProcessForm with isApply true and item.updateDuration zero.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_009 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.updateDuration = Constants::TIME_CONVERSION;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_009 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_010
+ * @tc.desc: test ShouldProcessForm with formRecord.updateDuration >= item.updateDuration * TIME_CONVERSION.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_010 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.updateDuration = Constants::TIME_CONVERSION * 10;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_010 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_011
+ * @tc.desc: test ShouldProcessForm with formRecord.updateDuration > item.updateDuration * TIME_CONVERSION.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_011 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.updateDuration = Constants::TIME_CONVERSION * 15;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_011 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_012
+ * @tc.desc: test ShouldProcessForm with all conditions satisfied.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_012 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.updateDuration = Constants::TIME_CONVERSION * 5;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, true, false);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_012 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_013
+ * @tc.desc: test ShouldProcessForm with isApply false and not appUpgrade.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_013 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.updateDuration = Constants::TIME_CONVERSION * 5;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    ParamCtrl nextItem = CreateParamCtrl("com.example.duedemo", "entry", 5);
+    paramControl.nextUpdateDurationCtrl_.push_back(nextItem);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, false, false);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_013 end";
+}
+
+/**
+ * @tc.name: ShouldProcessForm_014
+ * @tc.desc: test ShouldProcessForm with isApply false and IsSameUpdateDuration matches nextUpdateDurationCtrl.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ShouldProcessForm_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_014 start";
+    paramControl.DealDueParam("{}");
+    FormRecord formRecord = CreateFullFormRecord("com.example.duedemo", "entry");
+    formRecord.updateDuration = Constants::TIME_CONVERSION * 5;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    ParamCtrl nextItem = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    paramControl.nextUpdateDurationCtrl_.push_back(nextItem);
+    bool result = paramControl.ShouldProcessForm(formRecord, item, false, false);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsParamControlTest ShouldProcessForm_014 end";
+}
+
+/**
+ * @tc.name: ExecUpdateDurationCtrl_001
+ * @tc.desc: test ExecUpdateDurationCtrl with empty paramCtrls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecUpdateDurationCtrl_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_001 start";
+    std::vector<ParamCtrl> paramCtrls;
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecUpdateDurationCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_001 end";
+}
+
+/**
+ * @tc.name: ExecUpdateDurationCtrl_002
+ * @tc.desc: test ExecUpdateDurationCtrl with empty paramCtrls and isAppUpgrade true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecUpdateDurationCtrl_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_002 start";
+    std::vector<ParamCtrl> paramCtrls;
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecUpdateDurationCtrl(true, paramCtrls, true));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_002 end";
+}
+
+/**
+ * @tc.name: ExecUpdateDurationCtrl_003
+ * @tc.desc: test ExecUpdateDurationCtrl with isApply false and empty paramCtrls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecUpdateDurationCtrl_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_003 start";
+    std::vector<ParamCtrl> paramCtrls;
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecUpdateDurationCtrl(false, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_003 end";
+}
+
+/**
+ * @tc.name: ExecUpdateDurationCtrl_004
+ * @tc.desc: test ExecUpdateDurationCtrl with paramCtrls containing one item.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecUpdateDurationCtrl_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_004 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecUpdateDurationCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_004 end";
+}
+
+/**
+ * @tc.name: ExecUpdateDurationCtrl_005
+ * @tc.desc: test ExecUpdateDurationCtrl with multiple items in paramCtrls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecUpdateDurationCtrl_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_005 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item1 = CreateParamCtrl("com.example.duedemo", "entry", 10);
+    ParamCtrl item2 = CreateParamCtrl("com.example.other", "entry", 20);
+    paramCtrls.push_back(item1);
+    paramCtrls.push_back(item2);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecUpdateDurationCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecUpdateDurationCtrl_005 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_001
+ * @tc.desc: test ExecDisableCtrl with empty paramCtrls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_001 start";
+    std::vector<ParamCtrl> paramCtrls;
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_001 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_002
+ * @tc.desc: test ExecDisableCtrl with empty paramCtrls and isAppUpgrade true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_002 start";
+    std::vector<ParamCtrl> paramCtrls;
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, true));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_002 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_003
+ * @tc.desc: test ExecDisableCtrl with isApply false and empty paramCtrls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_003 start";
+    std::vector<ParamCtrl> paramCtrls;
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(false, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_003 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_004
+ * @tc.desc: test ExecDisableCtrl with paramCtrls containing one disable policy item.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_004 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "disable";
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_004 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_005
+ * @tc.desc: test ExecDisableCtrl with paramCtrls containing one remove policy item.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_005 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "remove";
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_005 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_006
+ * @tc.desc: test ExecDisableCtrl with multiple items with different policies.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_006 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item1 = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item1.policy = "disable";
+    ParamCtrl item2 = CreateParamCtrl("com.example.other", "entry", 0);
+    item2.policy = "remove";
+    paramCtrls.push_back(item1);
+    paramCtrls.push_back(item2);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_006 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_007
+ * @tc.desc: test ExecDisableCtrl with isApply false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_007 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "disable";
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(false, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_007 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_008
+ * @tc.desc: test ExecDisableCtrl with isAppUpgrade true and isApply true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_008 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "disable";
+    item.appVersionStart = 1;
+    item.appVersionEnd = 10;
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, true));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_008 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_009
+ * @tc.desc: test ExecDisableCtrl with isAppUpgrade true and isApply false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_009 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "disable";
+    item.appVersionStart = 1;
+    item.appVersionEnd = 10;
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(false, paramCtrls, true));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_009 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_010
+ * @tc.desc: test ExecDisableCtrl with IsSamePolicy matching preDisableCtrl.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_010 start";
+    ParamCtrl preItem = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    preItem.policy = "disable";
+    paramControl.preDisableCtrl_.push_back(preItem);
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "disable";
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    paramControl.preDisableCtrl_.clear();
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_010 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_011
+ * @tc.desc: test ExecDisableCtrl with IsSamePolicy matching nextDisableCtrl when isApply false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_011 start";
+    ParamCtrl nextItem = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    nextItem.policy = "disable";
+    paramControl.nextDisableCtrl_.push_back(nextItem);
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "disable";
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(false, paramCtrls, false));
+    paramControl.nextDisableCtrl_.clear();
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_011 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_012
+ * @tc.desc: test ExecDisableCtrl with remove policy and IsSamePolicy not matching.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_012 start";
+    paramControl.DealDueParam("{}");
+    ParamCtrl preItem = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    preItem.policy = "remove";
+    paramControl.preDisableCtrl_.push_back(preItem);
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "remove";
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    paramControl.preDisableCtrl_.clear();
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_012 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_013
+ * @tc.desc: test ExecDisableCtrl with version range matching.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_013 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "disable";
+    item.appVersionStart = 1;
+    item.appVersionEnd = 10;
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_013 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_014
+ * @tc.desc: test ExecDisableCtrl with different bundleName in paramCtrl.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_014 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item1 = CreateParamCtrl("com.example.bundle1", "module1", 0);
+    item1.policy = "disable";
+    ParamCtrl item2 = CreateParamCtrl("com.example.bundle2", "module2", 0);
+    item2.policy = "remove";
+    paramCtrls.push_back(item1);
+    paramCtrls.push_back(item2);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_014 end";
+}
+
+/**
+ * @tc.name: ExecDisableCtrl_015
+ * @tc.desc: test ExecDisableCtrl with invalid policy (not disable or remove).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamControlTest, ExecDisableCtrl_015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_015 start";
+    paramControl.DealDueParam("{}");
+    std::vector<ParamCtrl> paramCtrls;
+    ParamCtrl item = CreateParamCtrl("com.example.duedemo", "entry", 0);
+    item.policy = "invalid_policy";
+    paramCtrls.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(paramControl.ExecDisableCtrl(true, paramCtrls, false));
+    GTEST_LOG_(INFO) << "FmsParamControlTest ExecDisableCtrl_015 end";
 }
 } // namespace AppExecFwk
 } // namespace OHOS
