@@ -28,7 +28,6 @@
 
 #include <sys/mman.h>
 #include "ashmem.h"
-#include "buffer_handle_parcel.h"
 #include "ipc_file_descriptor.h"
 
 namespace OHOS {
