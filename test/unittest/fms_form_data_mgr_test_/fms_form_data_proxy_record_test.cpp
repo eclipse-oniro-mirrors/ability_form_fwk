@@ -857,7 +857,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_038, TestSize.Le
     EXPECT_EQ(subscribedKeys.size(), 0);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_038 end";
 }
- 
+
 /**
  * @tc.name: FmsFormDataProxyRecordTest_039
  * @tc.desc: test PermStateChangeCallback function.
@@ -919,7 +919,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_SetWant_001, Tes
     // Verify that wantCache_ is set correctly
     std::string testValue = testWant.GetStringParam("testKey");
     EXPECT_EQ(testValue, "testValue");
-    
+
     int64_t formIdFromWant = testWant.GetLongParam("formId", 0);
     EXPECT_EQ(formIdFromWant, formId);
 
@@ -948,14 +948,14 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     std::vector<FormDataProxy> unSubscribeFormDataProxies;
 
     // Call GetSubscribeFormDataProxies
-    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy, 
+    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy,
         subscribeFormDataProxies, unSubscribeFormDataProxies);
 
     // Verify that formDataProxy is added to subscribe list
     EXPECT_EQ(subscribeFormDataProxies.size(), 1);
     EXPECT_EQ(subscribeFormDataProxies[0].key, "testUri");
     EXPECT_EQ(subscribeFormDataProxies[0].subscribeId, "12345");
-    
+
     // Verify that unSubscribe list is empty
     EXPECT_EQ(unSubscribeFormDataProxies.size(), 0);
 
@@ -986,7 +986,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" +
         token + "&dstBundleName=" + formRecord.bundleName;
     int64_t subscribeId = 12345;
-    
+
     FormDataProxyRecord::SubscribeResultRecord successRecord{uri, subscribeId, 0, false, 0};
     formDataProxyRecord.rdbSubscribeResultMap_[uri][subscribeId] = successRecord;
 
@@ -995,13 +995,14 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     std::vector<FormDataProxy> unSubscribeFormDataProxies;
 
     // Call GetSubscribeFormDataProxies
-    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy, subscribeFormDataProxies, unSubscribeFormDataProxies);
+    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy,
+        subscribeFormDataProxies, unSubscribeFormDataProxies);
 
     // Verify that formDataProxy is added to unsubscribe list
     EXPECT_EQ(unSubscribeFormDataProxies.size(), 1);
     EXPECT_EQ(unSubscribeFormDataProxies[0].key, "testUri");
     EXPECT_EQ(unSubscribeFormDataProxies[0].subscribeId, "12345");
-    
+
     // Verify that subscribe list is empty
     EXPECT_EQ(subscribeFormDataProxies.size(), 0);
 
@@ -1031,7 +1032,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" +
         token + "&dstBundleName=" + formRecord.bundleName;
     int64_t subscribeId = 12345;
-    
+
     // Set ret to non-zero to indicate failure
     FormDataProxyRecord::SubscribeResultRecord failedRecord{uri, subscribeId, -1, false, 0};
     formDataProxyRecord.rdbSubscribeResultMap_[uri][subscribeId] = failedRecord;
@@ -1041,13 +1042,14 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     std::vector<FormDataProxy> unSubscribeFormDataProxies;
 
     // Call GetSubscribeFormDataProxies
-    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy, subscribeFormDataProxies, unSubscribeFormDataProxies);
+    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy,
+        subscribeFormDataProxies, unSubscribeFormDataProxies);
 
     // Verify that formDataProxy is added to subscribe list
     EXPECT_EQ(subscribeFormDataProxies.size(), 1);
     EXPECT_EQ(subscribeFormDataProxies[0].key, "testUri");
     EXPECT_EQ(subscribeFormDataProxies[0].subscribeId, "12345");
-    
+
     // Verify that unsubscribe list is empty
     EXPECT_EQ(unSubscribeFormDataProxies.size(), 0);
 
@@ -1076,7 +1078,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     std::string token = std::to_string(tokenId);
     std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" +
         token + "&dstBundleName=" + formRecord.bundleName;
-    
+
     // Use formId as the default subscribeId when conversion fails
     FormDataProxyRecord::SubscribeResultRecord record{uri, formId, 0, false, 0};
     formDataProxyRecord.rdbSubscribeResultMap_[uri][formId] = record;
@@ -1092,7 +1094,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     EXPECT_EQ(unSubscribeFormDataProxies.size(), 1);
     EXPECT_EQ(unSubscribeFormDataProxies[0].key, "testUri");
     EXPECT_EQ(unSubscribeFormDataProxies[0].subscribeId, "invalid_subscribe_id");
-    
+
     // Verify that subscribe list is empty
     EXPECT_EQ(subscribeFormDataProxies.size(), 0);
 
