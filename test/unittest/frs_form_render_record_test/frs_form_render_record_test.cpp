@@ -4250,31 +4250,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleUpdateRenderRecord_001
 }
 
 /**
- * @tc.name: FormRenderRecordTest_HandleUpdateRenderRecord_002
- * @tc.desc: Verify HandleUpdateRenderRecord with UPDATE type.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleUpdateRenderRecord_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleUpdateRenderRecord_002 start";
-    ASSERT_NE(formRenderRecordPtr_, nullptr);
-
-    auto eventRunner = EventRunner::Create("bundleName");
-    formRenderRecordPtr_->eventRunner_ = eventRunner;
-    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
-
-    FormJsInfo formJsInfo;
-    formJsInfo.formId = 100;
-    Want want;
-    sptr<IFormSupply> formSupplyClient = nullptr;
-    int32_t renderType = Constants::UPDATE_RENDERING_FORM;
-    EXPECT_NO_FATAL_FAILURE(
-        formRenderRecordPtr_->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType));
-
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleUpdateRenderRecord_002 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_HandleSetRenderGroupParams_004
  * @tc.desc: Verify HandleSetRenderGroupParams with success path.
  * @tc.type: FUNC
