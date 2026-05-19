@@ -514,6 +514,7 @@ HWTEST_F(FormStatusTaskMgrTest, RemoveConnection_001, TestSize.Level1)
     ASSERT_NE(formTaskMgr, nullptr);
     int32_t connectId = 123;
     formTaskMgr->RemoveConnection(connectId);
+    EXPECT_TRUE(formTaskMgr != nullptr);
     GTEST_LOG_(INFO) << "RemoveConnection_001 end";
 }
 
@@ -531,6 +532,7 @@ HWTEST_F(FormStatusTaskMgrTest, RestoreFormRecycledStatus_001, TestSize.Level1)
     formRecord.formId = 123;
     sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr->RestoreFormRecycledStatus(formRecord, remoteObject);
+    EXPECT_TRUE(formTaskMgr != nullptr);
     GTEST_LOG_(INFO) << "RestoreFormRecycledStatus_001 end";
 }
 
@@ -547,7 +549,9 @@ HWTEST_F(FormStatusTaskMgrTest, RestoreFormRecycledStatus_002, TestSize.Level1)
     FormRecord formRecord;
     formRecord.formId = 123;
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(remoteObject, nullptr);
     formTaskMgr->RestoreFormRecycledStatus(formRecord, remoteObject);
+    EXPECT_TRUE(formTaskMgr != nullptr);
     GTEST_LOG_(INFO) << "RestoreFormRecycledStatus_002 end";
 }
 
@@ -566,6 +570,7 @@ HWTEST_F(FormStatusTaskMgrTest, PostRecycleForms_001, TestSize.Level1)
     sptr<IRemoteObject> remoteObjectOfHost = nullptr;
     sptr<IRemoteObject> remoteObjectOfRender = nullptr;
     formTaskMgr->PostRecycleForms(formIds, want, remoteObjectOfHost, remoteObjectOfRender);
+    EXPECT_TRUE(formTaskMgr != nullptr);
     GTEST_LOG_(INFO) << "PostRecycleForms_001 end";
 }
 
@@ -584,6 +589,7 @@ HWTEST_F(FormStatusTaskMgrTest, PostRecoverForm_001, TestSize.Level1)
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr->PostRecoverForm(record, want, remoteObject);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "PostRecoverForm_001 end";
 }
 
@@ -602,6 +608,7 @@ HWTEST_F(FormStatusTaskMgrTest, PostRenderForm_001, TestSize.Level1)
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr->PostRenderForm(formRecord, want, remoteObject);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "PostRenderForm_001 end";
 }
 
@@ -620,6 +627,7 @@ HWTEST_F(FormStatusTaskMgrTest, PostStopRenderingForm_001, TestSize.Level1)
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr->PostStopRenderingForm(formRecord, want, remoteObject);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "PostStopRenderingForm_001 end";
 }
 
@@ -638,6 +646,7 @@ HWTEST_F(FormStatusTaskMgrTest, PostReleaseRenderer_001, TestSize.Level1)
     std::string uid = "test_uid";
     sptr<IRemoteObject> remoteObject = nullptr;
     formTaskMgr->PostReleaseRenderer(formId, compId, uid, remoteObject, false);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "PostReleaseRenderer_001 end";
 }
 
@@ -654,7 +663,9 @@ HWTEST_F(FormStatusTaskMgrTest, RecycleForm_001, TestSize.Level1)
     int64_t formId = 123456;
     sptr<IRemoteObject> remoteObjectOfHost = nullptr;
     sptr<IRemoteObject> remoteObjectOfRender = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(remoteObjectOfRender, nullptr);
     formTaskMgr->RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "RecycleForm_001 end";
 }
 
@@ -675,7 +686,9 @@ HWTEST_F(FormStatusTaskMgrTest, RecoverForm_001, TestSize.Level1)
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, 100);
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(remoteObject, nullptr);
     formTaskMgr->RecoverForm(record, want, remoteObject);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "RecoverForm_001 end";
 }
 
@@ -693,7 +706,9 @@ HWTEST_F(FormStatusTaskMgrTest, ReleaseRenderer_001, TestSize.Level1)
     std::string compId = "test_comp_id";
     std::string uid = "test_uid";
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(remoteObject, nullptr);
     formTaskMgr->ReleaseRenderer(formId, compId, uid, remoteObject);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "ReleaseRenderer_001 end";
 }
 
@@ -712,7 +727,9 @@ HWTEST_F(FormStatusTaskMgrTest, StopRenderingForm_001, TestSize.Level1)
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, 100);
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(remoteObject, nullptr);
     formTaskMgr->StopRenderingForm(formRecord, want, remoteObject);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "StopRenderingForm_001 end";
 }
 
@@ -733,7 +750,9 @@ HWTEST_F(FormStatusTaskMgrTest, RenderForm_001, TestSize.Level1)
     want.SetParam(Constants::FORM_CONNECT_ID, 100);
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(remoteObject, nullptr);
     formTaskMgr->RenderForm(formRecord, want, remoteObject);
+    EXPECT_EQ(record.formId, 123456);
     GTEST_LOG_(INFO) << "RenderForm_001 end";
 }
 }
