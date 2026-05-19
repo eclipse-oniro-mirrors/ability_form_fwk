@@ -374,4 +374,130 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_017, TestSize.Level0)
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_017 end";
 }
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_018
+ * @tc.desc: Verify InnerGetImageData with empty json imgCache returns true.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_018, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_018 start");
+    FormCache formCache;
+    formCache.imgCache = "{}";
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.InnerGetImageData(formCache, imageDataMap));
+    EXPECT_TRUE(imageDataMap.empty());
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_018 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_019
+ * @tc.desc: Verify InnerGetImageData with invalid json returns false.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_019, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_019 start");
+    FormCache formCache;
+    formCache.imgCache = "invalid_json";
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_FALSE(formCacheMgr_.InnerGetImageData(formCache, imageDataMap));
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_019 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_020
+ * @tc.desc: Verify AddImgData with existing imgCache enters delete branch.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_020, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_020 start");
+    FormProviderData formProviderData;
+    FormCache formCache;
+    formCache.imgCache = "{\"test_key\":123}";
+    EXPECT_TRUE(formCacheMgr_.AddImgData(formProviderData, formCache));
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_020 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_021
+ * @tc.desc: Verify AddImgData with invalid imgCache json returns false.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_021, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_021 start");
+    FormProviderData formProviderData;
+    nlohmann::json dataResult = R"({"a":"1"})"_json;
+    formProviderData.UpdateData(dataResult);
+    sptr<FormAshmem> formAshmemPtr = new (std::nothrow) FormAshmem();
+    ASSERT_NE(formAshmemPtr, nullptr);
+    formProviderData.imageDataMap_["test"] = std::make_pair(formAshmemPtr, 1);
+    FormCache formCache;
+    formCache.imgCache = "invalid_json";
+    EXPECT_FALSE(formCacheMgr_.AddImgData(formProviderData, formCache));
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_021 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_022
+ * @tc.desc: Verify AddImgDataToDb with empty imageDataMap returns true.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_022, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_022 start");
+    FormProviderData formProviderData;
+    nlohmann::json imgDataJson;
+    EXPECT_TRUE(formCacheMgr_.AddImgDataToDb(formProviderData, imgDataJson));
+    EXPECT_TRUE(imgDataJson.empty());
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_022 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_023
+ * @tc.desc: Verify GetImageDataFromAshmem with valid ashmem and valid data.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_023, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_023 start");
+    std::string picName = "test_pic";
+    std::string testData = "test_data_content";
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem("test_ashmem", testData.size());
+    ASSERT_NE(ashmem, nullptr);
+    bool mapRet = ashmem->MapReadAndWriteAshmem();
+    ASSERT_TRUE(mapRet);
+    bool writeRet = ashmem->WriteToAshmem(testData.c_str(), testData.size(), 0);
+    ASSERT_TRUE(writeRet);
+    ashmem->UnmapAshmem();
+    std::vector<uint8_t> value;
+    EXPECT_TRUE(formCacheMgr_.GetImageDataFromAshmem(picName, ashmem, testData.size(), value));
+    EXPECT_EQ(value.size(), testData.size());
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_023 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_024
+ * @tc.desc: Verify AddImgData with empty imgCache and valid newImgDbData.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_024, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_024 start");
+    FormProviderData formProviderData;
+    FormCache formCache;
+    formCache.imgCache = "";
+    EXPECT_TRUE(formCacheMgr_.AddImgData(formProviderData, formCache));
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_024 end";
+}
 }

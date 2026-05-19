@@ -107,4 +107,165 @@ HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_DeleteForms_001, TestSiz
     
     GTEST_LOG_(INFO) << "FmsThemeFormClientTest_DeleteForms_001 end";
 }
+
+/**
+ * @tc.name: FmsThemeFormClientTest_DeleteForms_002
+ * @tc.desc: Test DeleteForms with mock object returning NO_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_DeleteForms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_DeleteForms_002 start";
+    
+    auto mockObj = std::make_shared<MockThemeFormClient>();
+    MockThemeFormClient::obj = mockObj;
+    
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    
+    EXPECT_CALL(*mockObj, DeleteForms(_))
+        .WillOnce(Return(static_cast<int32_t>(NO_ERROR)));
+    
+    auto result = ThemeFormClient::GetInstance().DeleteForms(formIds);
+    EXPECT_EQ(result, static_cast<int32_t>(NO_ERROR));
+    
+    MockThemeFormClient::obj = nullptr;
+    
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_DeleteForms_002 end";
+}
+
+/**
+ * @tc.name: FmsThemeFormClientTest_CleanResource_001
+ * @tc.desc: Test CleanResource with both proxy and deathRecipient nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_CleanResource_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_CleanResource_001 start";
+    
+#define private public
+    auto& client = ThemeFormClient::GetInstance();
+    client.themeSvcProxy_ = nullptr;
+    client.deathRecipient_ = nullptr;
+#undef private
+    
+    EXPECT_NO_FATAL_FAILURE(client.CleanResource());
+    
+#define private public
+    EXPECT_EQ(client.themeSvcProxy_, nullptr);
+    EXPECT_EQ(client.deathRecipient_, nullptr);
+#undef private
+    
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_CleanResource_001 end";
+}
+
+/**
+ * @tc.name: FmsThemeFormClientTest_CleanResource_002
+ * @tc.desc: Test CleanResource with proxy nullptr and deathRecipient non-null.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_CleanResource_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_CleanResource_002 start";
+    
+#define private public
+    auto& client = ThemeFormClient::GetInstance();
+    client.themeSvcProxy_ = nullptr;
+    client.deathRecipient_ = new ThemeFormDeathRecipient();
+#undef private
+    
+    EXPECT_NO_FATAL_FAILURE(client.CleanResource());
+    
+#define private public
+    EXPECT_EQ(client.themeSvcProxy_, nullptr);
+#undef private
+    
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_CleanResource_002 end";
+}
+
+/**
+ * @tc.name: FmsThemeFormClientTest_CleanResource_003
+ * @tc.desc: Test CleanResource with proxy non-null and deathRecipient nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_CleanResource_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_CleanResource_003 start";
+    
+#define private public
+    auto& client = ThemeFormClient::GetInstance();
+    sptr<IRemoteObject> remoteObj = nullptr;
+    client.themeSvcProxy_ = new ThemeFormServiceProxy(remoteObj);
+    client.deathRecipient_ = nullptr;
+#undef private
+    
+    EXPECT_NO_FATAL_FAILURE(client.CleanResource());
+    
+#define private public
+    EXPECT_EQ(client.themeSvcProxy_, nullptr);
+#undef private
+    
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_CleanResource_003 end";
+}
+
+/**
+ * @tc.name: FmsThemeFormClientTest_DeleteForm_001
+ * @tc.desc: Test ThemeFormServiceProxy DeleteForm with nullptr remote.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_DeleteForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_DeleteForm_001 start";
+    
+    sptr<IRemoteObject> remoteObj = nullptr;
+    ThemeFormServiceProxy proxy(remoteObj);
+    
+    std::vector<long> formIds = {TEST_FORM_ID};
+    auto result = proxy.DeleteForm(formIds);
+    EXPECT_EQ(result, static_cast<ErrCode>(ERR_FAILED));
+    
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_DeleteForm_001 end";
+}
+
+/**
+ * @tc.name: FmsThemeFormClientTest_ConvertIntToErrorCode_001
+ * @tc.desc: Test ConvertIntToErrorCode with valid error code.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_ConvertIntToErrorCode_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_ConvertIntToErrorCode_001 start";
+    
+#define private public
+    auto& client = ThemeFormClient::GetInstance();
+    auto result = client.ConvertIntToErrorCode(static_cast<int32_t>(NO_ERROR));
+    EXPECT_EQ(result, NO_ERROR);
+    
+    result = client.ConvertIntToErrorCode(static_cast<int32_t>(NO_PERMISSION));
+    EXPECT_EQ(result, NO_PERMISSION);
+    
+    result = client.ConvertIntToErrorCode(999999);
+    EXPECT_EQ(result, E_UNKNOWN);
+#undef private
+    
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_ConvertIntToErrorCode_001 end";
+}
+
+/**
+ * @tc.name: FmsThemeFormClientTest_OnRemoteSaDied_001
+ * @tc.desc: Test OnRemoteSaDied calls CleanResource.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsThemeFormClientTest, FmsThemeFormClientTest_OnRemoteSaDied_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_OnRemoteSaDied_001 start";
+    
+    wptr<IRemoteObject> object(nullptr);
+    EXPECT_NO_FATAL_FAILURE(ThemeFormClient::GetInstance().OnRemoteSaDied(object));
+    
+#define private public
+    EXPECT_EQ(ThemeFormClient::GetInstance().themeSvcProxy_, nullptr);
+#undef private
+    
+    GTEST_LOG_(INFO) << "FmsThemeFormClientTest_OnRemoteSaDied_001 end";
+}
 #endif
