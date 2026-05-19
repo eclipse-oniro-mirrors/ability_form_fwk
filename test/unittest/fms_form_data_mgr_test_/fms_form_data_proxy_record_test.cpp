@@ -948,7 +948,8 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     std::vector<FormDataProxy> unSubscribeFormDataProxies;
 
     // Call GetSubscribeFormDataProxies
-    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy, subscribeFormDataProxies, unSubscribeFormDataProxies);
+    formDataProxyRecord.GetSubscribeFormDataProxies(formDataProxy, 
+        subscribeFormDataProxies, unSubscribeFormDataProxies);
 
     // Verify that formDataProxy is added to subscribe list
     EXPECT_EQ(subscribeFormDataProxies.size(), 1);
@@ -964,7 +965,8 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
 /**
  * @tc.number: FmsFormDataProxyRecordTest_GetSubscribeFormDataProxies_002
  * @tc.name: GetSubscribeFormDataProxies_RecordExistsAndSuccess
- * @tc.desc: Verify that when subscribe record exists and is successful (ret=0), formDataProxy is added to unsubscribe list.
+ * @tc.desc: Verify that when subscribe record exists and is successful (ret=0),
+    formDataProxy is added to unsubscribe list.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeFormDataProxies_002, TestSize.Level1)
@@ -981,7 +983,8 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     // Manually add a successful subscribe record
     std::string userId = "1";
     std::string token = std::to_string(tokenId);
-    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + formRecord.bundleName;
+    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" +
+        token + "&dstBundleName=" + formRecord.bundleName;
     int64_t subscribeId = 12345;
     
     FormDataProxyRecord::SubscribeResultRecord successRecord{uri, subscribeId, 0, false, 0};
@@ -1025,7 +1028,8 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     // Manually add a failed subscribe record
     std::string userId = "1";
     std::string token = std::to_string(tokenId);
-    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + formRecord.bundleName;
+    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" +
+        token + "&dstBundleName=" + formRecord.bundleName;
     int64_t subscribeId = 12345;
     
     // Set ret to non-zero to indicate failure
@@ -1070,7 +1074,8 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_GetSubscribeForm
     // Manually add a subscribe record with default formId
     std::string userId = "1";
     std::string token = std::to_string(tokenId);
-    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + formRecord.bundleName;
+    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" +
+        token + "&dstBundleName=" + formRecord.bundleName;
     
     // Use formId as the default subscribeId when conversion fails
     FormDataProxyRecord::SubscribeResultRecord record{uri, formId, 0, false, 0};
