@@ -61,7 +61,6 @@ HWTEST_F(FmsFormWantTest, FormWant_Constructor_Default_001, TestSize.Level1)
     EXPECT_FALSE(formWant.HasParameter("another_key"));
     Want want = formWant.GetWant();
     EXPECT_TRUE(want.GetParams().GetParams().empty());
-    EXPECT_EQ(want.GetParams().GetParams().size(), 0);
     GTEST_LOG_(INFO) << "FormWant_Constructor_Default_001 end";
 }
 
@@ -120,9 +119,9 @@ HWTEST_F(FmsFormWantTest, FormWant_SetParam_Long_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormWant_SetParam_Long_001 start";
     FormWant formWant;
-    formWant.SetParam(Constants::FORM_SUPPLY_UID, 99999L);
+    formWant.SetParam(Constants::FORM_SUPPLY_UID, static_cast<int64_t>(99999));
     EXPECT_EQ(formWant.GetLongParam(Constants::FORM_SUPPLY_UID, 0L), 99999L);
-    formWant.SetParam("external_long", 12345L);
+    formWant.SetParam("external_long", static_cast<int64_t>(12345));
     EXPECT_EQ(formWant.GetLongParam("external_long", 0L), 12345L);
     GTEST_LOG_(INFO) << "FormWant_SetParam_Long_001 end";
 }
@@ -217,6 +216,7 @@ HWTEST_F(FmsFormWantTest, FormWant_GetFilteredWant_001, TestSize.Level1)
     EXPECT_FALSE(filtered.GetParams().HasParam(Constants::FORM_CONNECT_ID));
     EXPECT_FALSE(filtered.GetParams().HasParam(Constants::ACQUIRE_TYPE));
     EXPECT_TRUE(filtered.GetParams().HasParam("user_param"));
+    EXPECT_EQ(filtered.GetStringParam("user_param"), "value");
     GTEST_LOG_(INFO) << "FormWant_GetFilteredWant_001 end";
 }
 
@@ -232,6 +232,7 @@ HWTEST_F(FmsFormWantTest, FormWant_GetFilteredWant_Compatible_001, TestSize.Leve
     EXPECT_TRUE(filtered.GetParams().HasParam(Constants::PROVIDER_FLAG));
     EXPECT_TRUE(filtered.GetParams().HasParam(Constants::FORM_SUPPLY_UID));
     EXPECT_TRUE(filtered.GetParams().HasParam("user_param"));
+    EXPECT_EQ(filtered.GetStringParam("user_param"), "value");
     GTEST_LOG_(INFO) << "FormWant_GetFilteredWant_Compatible_001 end";
 }
 
@@ -282,7 +283,7 @@ HWTEST_F(FmsFormWantTest, FormWant_GetParam_001, TestSize.Level1)
     FormWant formWant;
     formWant.SetParam("test_key", 123);
     EXPECT_TRUE(formWant.HasParameter("test_key"));
-    EXPECT_TRUE(formWant.HasParameter("test_key"));
+    EXPECT_EQ(formWant.GetIntParam("test_key", 0), 123);
     GTEST_LOG_(INFO) << "FormWant_GetParam_001 end";
 }
 
@@ -398,7 +399,7 @@ HWTEST_F(FmsFormWantTest, FormWant_RemoveParam_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormWant_RemoveParam_002 start";
     FormWant formWant;
     formWant.SetParam(Constants::FORM_CONNECT_ID, 1);
-    formWant.SetParam(Constants::FORM_SUPPLY_UID, 100L);
+    formWant.SetParam(Constants::FORM_SUPPLY_UID, static_cast<int64_t>(100));
     formWant.SetParam("external_param", std::string("value"));
     EXPECT_TRUE(formWant.HasParameter(Constants::FORM_CONNECT_ID));
     EXPECT_TRUE(formWant.HasParameter(Constants::FORM_SUPPLY_UID));
@@ -411,6 +412,28 @@ HWTEST_F(FmsFormWantTest, FormWant_RemoveParam_002, TestSize.Level1)
     EXPECT_FALSE(formWant.HasParameter("external_param"));
     EXPECT_TRUE(formWant.HasParameter(Constants::FORM_SUPPLY_UID));
     GTEST_LOG_(INFO) << "FormWant_RemoveParam_002 end";
+}
+
+HWTEST_F(FmsFormWantTest, FormWant_GetDoubleParam_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormWant_GetDoubleParam_001 start";
+    FormWant formWant;
+    EXPECT_EQ(formWant.GetDoubleParam("nonexistent", 0.0), 0.0);
+    EXPECT_EQ(formWant.GetDoubleParam("nonexistent", 1.5), 1.5);
+    formWant.SetParam(Constants::PARAM_FORM_WIDTH_KEY, static_cast<double>(100.5));
+    EXPECT_EQ(formWant.GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0.0), 100.5);
+    GTEST_LOG_(INFO) << "FormWant_GetDoubleParam_001 end";
+}
+
+HWTEST_F(FmsFormWantTest, FormWant_GetFloatParam_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormWant_GetFloatParam_001 start";
+    FormWant formWant;
+    EXPECT_EQ(formWant.GetFloatParam("nonexistent", 0.0f), 0.0f);
+    EXPECT_EQ(formWant.GetFloatParam("nonexistent", 1.5f), 1.5f);
+    formWant.SetParam(Constants::PARAM_FORM_VIEW_SCALE, static_cast<float>(2.5f));
+    EXPECT_EQ(formWant.GetFloatParam(Constants::PARAM_FORM_VIEW_SCALE, 1.0f), 2.5f);
+    GTEST_LOG_(INFO) << "FormWant_GetFloatParam_001 end";
 }
 
 HWTEST_F(FmsFormWantTest, FormWant_GetRemoteObject_001, TestSize.Level1)

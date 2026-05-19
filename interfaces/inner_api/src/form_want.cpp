@@ -36,7 +36,7 @@ const std::unordered_set<std::string> FormWant::FILTER_INTERNAL_PARAMS_ = {
     Constants::IS_ADD_FORM_BY_HOST,
     Constants::PARAM_DELETE_BACKGROUND_IMAGE,
     Constants::PARAM_FORM_COLOR_MODE_KEY,
-    Constants::CONNECT_TO_RENDER,  // form_fwk新增：渲染连接标识
+    Constants::CONNECT_TO_RENDER,
 };
 
 FormWant::FormWant()
@@ -46,9 +46,7 @@ FormWant::FormWant()
 
 FormWant::FormWant(const FormWant &other)
 {
-    std::lock(mutex_, other.mutex_);
-    std::lock_guard<std::shared_mutex> lock1(mutex_, std::adopt_lock);
-    std::lock_guard<std::shared_mutex> lock2(other.mutex_, std::adopt_lock);
+    std::shared_lock<std::shared_mutex> lock(other.mutex_);
     want_ = other.want_;
 }
 
@@ -85,7 +83,7 @@ FormWant &FormWant::SetParam(const std::string &key, int value)
     return *this;
 }
 
-FormWant &FormWant::SetParam(const std::string &key, long value)
+FormWant &FormWant::SetParam(const std::string &key, int64_t value)
 {
     std::unique_lock<std::shared_mutex> lock(mutex_);
     want_.SetParam(key, value);
@@ -133,7 +131,7 @@ int FormWant::GetIntParam(const std::string &key, int defaultValue) const
     return want_.GetIntParam(key, defaultValue);
 }
 
-long FormWant::GetLongParam(const std::string &key, long defaultValue) const
+int64_t FormWant::GetLongParam(const std::string &key, int64_t defaultValue) const
 {
     std::shared_lock<std::shared_mutex> lock(mutex_);
     return want_.GetLongParam(key, defaultValue);
@@ -149,6 +147,18 @@ bool FormWant::GetBoolParam(const std::string &key, bool defaultValue) const
 {
     std::shared_lock<std::shared_mutex> lock(mutex_);
     return want_.GetBoolParam(key, defaultValue);
+}
+
+double FormWant::GetDoubleParam(const std::string &key, double defaultValue) const
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return want_.GetDoubleParam(key, defaultValue);
+}
+
+float FormWant::GetFloatParam(const std::string &key, float defaultValue) const
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return want_.GetFloatParam(key, defaultValue);
 }
 
 sptr<IRemoteObject> FormWant::GetRemoteObject(const std::string &key) const
@@ -189,7 +199,8 @@ FormWant &FormWant::MergeFrom(const Want &want)
     std::unique_lock<std::shared_mutex> lock(mutex_);
     WantParams currentParams = want_.GetParams();
     WantParams newParams = want.GetParams();
-    for (const auto &[key, value] : newParams.GetParams()) {
+    auto newParamsMap = newParams.GetParams();
+    for (const auto &[key, value] : newParamsMap) {
         currentParams.SetParam(key, value);
     }
     want_.SetParams(currentParams);
@@ -200,7 +211,8 @@ void FormWant::MergeWantParams(Want &target, const Want &source)
 {
     WantParams targetParams = target.GetParams();
     WantParams sourceParams = source.GetParams();
-    for (const auto &[key, value] : sourceParams.GetParams()) {
+    auto sourceParamsMap = sourceParams.GetParams();
+    for (const auto &[key, value] : sourceParamsMap) {
         targetParams.SetParam(key, value);
     }
     target.SetParams(targetParams);

@@ -476,8 +476,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormInfo_001, TestSize.Lev
  * @tc.number: FmsFormDataMgrTest_CheckTempEnoughForm_001
  * @tc.name: CheckTempEnoughForm
  * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *      tempForms_ is empty.
+ * @tc.details: tempForms_ is empty.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckTempEnoughForm_001, TestSize.Level0)
 {
@@ -2520,8 +2519,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
     int32_t userId = 100;
-    EXPECT_EQ(
-        ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos, userId));
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos,
+        userId));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004 end";
 }
@@ -4410,7 +4409,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearWantCache_002, TestSize.Lev
     formDataMgr_.formRecords_.emplace(formId, formRecord);
     formDataMgr_.ClearWantCache(formId);
     auto itFormRecord = formDataMgr_.formRecords_.find(formId);
-    EXPECT_EQ(itFormRecord->second.refreshWantMap.size(), 0);
+    EXPECT_TRUE(itFormRecord->second.refreshWantMap.empty());
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_002 end";
 }
 
@@ -5372,7 +5371,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearWantCache_004, TestSize.Lev
     formDataMgr_.formRecords_.emplace(formId, formRecord);
     formDataMgr_.ClearWantCache(formId);
     auto itFormRecord = formDataMgr_.formRecords_.find(formId);
-    EXPECT_EQ(itFormRecord->second.refreshWantMap.size(), 0);
+    EXPECT_TRUE(itFormRecord->second.refreshWantMap.empty());
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_004 end";
 }
 
@@ -7868,7 +7867,7 @@ HWTEST_F(FmsFormDataMgrTest, FormDataMgr_UpdateHostWantSize_001, TestSize.Level1
     auto formRecord = formDataMgr_.formRecords_.find(formId);
     ASSERT_NE(formRecord, formDataMgr_.formRecords_.end());
     Want resultWant = formRecord->second.hostWant.GetWant();
-    // 先确认参数存在，再验证值，避免默认值导致的虚假通过
+    // Verify parameter existence first, then validate value to avoid false pass caused by default value
     EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_WIDTH_KEY));
     EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_HEIGHT_KEY));
     EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_BORDER_WIDTH_KEY));

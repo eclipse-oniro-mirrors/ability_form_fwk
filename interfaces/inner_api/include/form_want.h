@@ -90,12 +90,12 @@ public:
     FormWant &SetParam(const std::string &key, int value);
 
     /**
-     * @brief Set long type parameter (auto write lock)
+     * @brief Set int64_t type parameter (auto write lock)
      * @param key Parameter name
      * @param value Parameter value
      * @return FormWant reference (supports chain calls)
      */
-    FormWant &SetParam(const std::string &key, long value);
+    FormWant &SetParam(const std::string &key, int64_t value);
 
     /**
      * @brief Set string type parameter (auto write lock)
@@ -146,12 +146,12 @@ public:
     int GetIntParam(const std::string &key, int defaultValue) const;
 
     /**
-     * @brief Get long type parameter (auto read lock)
+     * @brief Get int64_t type parameter (auto read lock)
      * @param key Parameter name
      * @param defaultValue Default value
      * @return Parameter value
      */
-    long GetLongParam(const std::string &key, long defaultValue) const;
+    int64_t GetLongParam(const std::string &key, int64_t defaultValue) const;
 
     /**
      * @brief Get string type parameter (auto read lock)
@@ -169,6 +169,22 @@ public:
     bool GetBoolParam(const std::string &key, bool defaultValue) const;
 
     /**
+     * @brief Get double type parameter (auto read lock)
+     * @param key Parameter name
+     * @param defaultValue Default value
+     * @return Parameter value
+     */
+    double GetDoubleParam(const std::string &key, double defaultValue) const;
+
+    /**
+     * @brief Get float type parameter (auto read lock)
+     * @param key Parameter name
+     * @param defaultValue Default value
+     * @return Parameter value
+     */
+    float GetFloatParam(const std::string &key, float defaultValue) const;
+
+    /**
      * @brief Get IRemoteObject type parameter (auto read lock)
      * @param key Parameter name
      * @return Parameter value
@@ -182,6 +198,10 @@ public:
      */
     bool HasParameter(const std::string &key) const;
 
+    /**
+     * @brief Remove parameter (auto write lock)
+     * @param key Parameter name
+     */
     void RemoveParam(const std::string &key);
 
     /**

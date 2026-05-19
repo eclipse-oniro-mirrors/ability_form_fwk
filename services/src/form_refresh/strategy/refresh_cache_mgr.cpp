@@ -237,7 +237,7 @@ Want RefreshCacheMgr::CreateWant(const std::vector<FormRecord>::iterator &record
     if (it == record->refreshWantMap.end()) {
         return want;
     }
-    it->second.ExtractHostParamsToWant(want);  // 复用FormWant::ExtractHostParamsToWant
+    it->second.ExtractHostParamsToWant(want);
     return want;
 }
 
