@@ -25,7 +25,6 @@
 #include <string>
 #include <thread>
 
-#include "buffer_handle_parcel.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "ipc_file_descriptor.h"
