@@ -45,6 +45,7 @@ ohos_unittest("FmsFormStatusTaskMgrTest") {
     "${form_fwk_path}/test:formmgr_test_config",
   ]
   cflags = []
+  cflags_cc = [ "-Wno-string-conversion" ]
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
