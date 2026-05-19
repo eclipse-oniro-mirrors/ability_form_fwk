@@ -4273,3 +4273,303 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleUpdateRenderRecord_002
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleUpdateRenderRecord_002 end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_HandleSetRenderGroupParams_004
+ * @tc.desc: Verify HandleSetRenderGroupParams with success path.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleSetRenderGroupParams_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleSetRenderGroupParams_004 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 100;
+    Want want;
+    std::string value = "test";
+    want.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, value);
+    Ace::FormRequest request;
+    std::unordered_map<std::string, Ace::FormRequest> innerMap;
+    innerMap.emplace("comp1", request);
+    formRenderRecordPtr_->formRequests_.clear();
+    formRenderRecordPtr_->formRequests_.emplace(formId, innerMap);
+    
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
+    
+    EXPECT_EQ(formRenderRecordPtr_->HandleSetRenderGroupParams(formId, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleSetRenderGroupParams_004 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_UpdateContextConfiguration_003
+ * @tc.desc: Verify UpdateContextConfiguration with context nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateContextConfiguration_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateContextConfiguration_003 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<Configuration>();
+    config->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    formRenderRecordPtr_->SetConfiguration(config);
+    formRenderRecordPtr_->contextsMapForModuleName_.clear();
+    formRenderRecordPtr_->contextsMapForModuleName_.emplace("testModule", nullptr);
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->UpdateContextConfiguration());
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateContextConfiguration_003 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_UpdateContextConfiguration_004
+ * @tc.desc: Verify UpdateContextConfiguration with valid config and context.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateContextConfiguration_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateContextConfiguration_004 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<Configuration>();
+    config->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    formRenderRecordPtr_->SetConfiguration(config);
+    formRenderRecordPtr_->contextsMapForModuleName_.clear();
+    
+    std::shared_ptr<AbilityRuntime::Context> context = std::make_shared<AbilityRuntime::ContextImpl>();
+    ASSERT_NE(context, nullptr);
+    formRenderRecordPtr_->contextsMapForModuleName_.emplace("testModule", context);
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->UpdateContextConfiguration());
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateContextConfiguration_004 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_GetRuntimeMemory_001
+ * @tc.desc: Verify GetRuntimeMemory with eventHandler nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_GetRuntimeMemory_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetRuntimeMemory_001 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    std::string bundleName;
+    uint64_t runtimeSize = 0;
+    std::vector<std::string> formNames;
+    std::vector<uint32_t> formLocations;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->GetRuntimeMemory(bundleName, runtimeSize, formNames, formLocations));
+    EXPECT_EQ(runtimeSize, 0);
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetRuntimeMemory_001 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_GetRuntimeMemory_002
+ * @tc.desc: Verify GetRuntimeMemory with runtime nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_GetRuntimeMemory_002, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetRuntimeMemory_002 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    std::string bundleName = "testBundle";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    formRenderRecordPtr_->runtime_ = nullptr;
+    
+    std::string resultBundleName;
+    uint64_t runtimeSize = 0;
+    std::vector<std::string> formNames;
+    std::vector<uint32_t> formLocations;
+    EXPECT_NO_FATAL_FAILURE(
+        formRenderRecordPtr_->GetRuntimeMemory(resultBundleName, runtimeSize, formNames, formLocations));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetRuntimeMemory_002 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_GetRuntimeMemory_003
+ * @tc.desc: Verify GetRuntimeMemory with valid handler.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_GetRuntimeMemory_003, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetRuntimeMemory_003 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    std::string bundleName = "testBundle";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    
+    std::string resultBundleName;
+    uint64_t runtimeSize = 0;
+    std::vector<std::string> formNames;
+    std::vector<uint32_t> formLocations;
+    EXPECT_NO_FATAL_FAILURE(
+        formRenderRecordPtr_->GetRuntimeMemory(resultBundleName, runtimeSize, formNames, formLocations));
+    EXPECT_EQ(resultBundleName, formRenderRecordPtr_->bundleName_);
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_GetRuntimeMemory_003 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ReAddStaticRecycledForms_001
+ * @tc.desc: Verify ReAddStaticRecycledForms with GetEventHandler nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddStaticRecycledForms_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_001 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 100;
+    FormJsInfo formJsInfo;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->ReAddStaticRecycledForms(formId, formJsInfo));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_001 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ReAddStaticRecycledForms_002
+ * @tc.desc: Verify ReAddStaticRecycledForms with GetFormRequestByFormId failed.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddStaticRecycledForms_002, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_002 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 100;
+    FormJsInfo formJsInfo;
+    auto eventRunner = EventRunner::Create("bundleName");
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    formRenderRecordPtr_->formRequests_.clear();
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->ReAddStaticRecycledForms(formId, formJsInfo));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_002 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ReAddStaticRecycledForms_003
+ * @tc.desc: Verify ReAddStaticRecycledForms with isDynamic true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddStaticRecycledForms_003, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_003 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 100;
+    FormJsInfo formJsInfo;
+    auto eventRunner = EventRunner::Create("bundleName");
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    
+    Ace::FormRequest request;
+    request.isDynamic = true;
+    request.hasRelease = true;
+    std::unordered_map<std::string, Ace::FormRequest> innerMap;
+    innerMap.emplace("comp1", request);
+    formRenderRecordPtr_->formRequests_.clear();
+    formRenderRecordPtr_->formRequests_.emplace(formId, innerMap);
+    
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->ReAddStaticRecycledForms(formId, formJsInfo));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_003 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ReAddStaticRecycledForms_004
+ * @tc.desc: Verify ReAddStaticRecycledForms with hasRelease false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddStaticRecycledForms_004, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_004 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 100;
+    FormJsInfo formJsInfo;
+    auto eventRunner = EventRunner::Create("bundleName");
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    
+    Ace::FormRequest request;
+    request.isDynamic = false;
+    request.hasRelease = false;
+    std::unordered_map<std::string, Ace::FormRequest> innerMap;
+    innerMap.emplace("comp1", request);
+    formRenderRecordPtr_->formRequests_.clear();
+    formRenderRecordPtr_->formRequests_.emplace(formId, innerMap);
+    
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->ReAddStaticRecycledForms(formId, formJsInfo));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_004 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ReAddStaticRecycledForms_005
+ * @tc.desc: Verify ReAddStaticRecycledForms with static recycled form.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddStaticRecycledForms_005, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_005 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 100;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    auto eventRunner = EventRunner::Create("bundleName");
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    
+    Ace::FormRequest request;
+    request.isDynamic = false;
+    request.hasRelease = true;
+    request.compId = "comp1";
+    std::unordered_map<std::string, Ace::FormRequest> innerMap;
+    innerMap.emplace("comp1", request);
+    formRenderRecordPtr_->formRequests_.clear();
+    formRenderRecordPtr_->formRequests_.emplace(formId, innerMap);
+    
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->ReAddStaticRecycledForms(formId, formJsInfo));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddStaticRecycledForms_005 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_UpdateFormSizeOfGroups_005
+ * @tc.desc: Verify UpdateFormSizeOfGroups with formRendererGroupMap not found.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateFormSizeOfGroups_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateFormSizeOfGroups_005 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 100;
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 10.0f;
+    formSurfaceInfo.height = 20.0f;
+    formSurfaceInfo.borderWidth = 1.0f;
+    formSurfaceInfo.formViewScale = 1.0f;
+    
+    FormJsInfo formJsInfo;
+    Ace::FormRequest request;
+    std::unordered_map<std::string, Ace::FormRequest> innerMap;
+    innerMap.emplace("comp1", request);
+    formRenderRecordPtr_->formRequests_.clear();
+    formRenderRecordPtr_->formRequests_.emplace(formId, innerMap);
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, formSurfaceInfo, formJsInfo));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateFormSizeOfGroups_005 end";
+}
