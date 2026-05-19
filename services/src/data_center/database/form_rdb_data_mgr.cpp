@@ -79,8 +79,8 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnOpen(NativeRdb::RdbStore &rdbStor
 
 int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFile)
 {
-    FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-        static_cast<int64_t>(CallDbFailedErrorType::DATABASE_EXIT_ABNORMAL));
+    FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, databaseFile, "",
+        static_cast<int32_t>(CallDbFailedErrorType::DATABASE_EXIT_ABNORMAL), ERR_APPEXECFWK_FORM_RDB_CORRUPTION);
     return NativeRdb::E_OK;
 }
 
@@ -734,8 +734,8 @@ std::shared_ptr<NativeRdb::RdbStore> FormRdbDataMgr::LoadRdbStore()
         rdbDataCallBack, errCode);
     if (errCode != NativeRdb::E_OK) {
         HILOG_ERROR("Form rdb store init fail, err code is %{public}" PRId32 "", errCode);
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_RESET_CONNECT_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_NAME, "",
+            static_cast<int32_t>(CallDbFailedErrorType::DATABASE_RESET_CONNECT_FAILED), errCode);
         rdbStore_ = nullptr;
     }
     return rdbStore_;

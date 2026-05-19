@@ -527,6 +527,9 @@ ErrCode FormDataAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info
         delayAcquireProviderFormInfoTime = LAST_RECONNECT_RETRY_DELAY_TIME;
     } else {
         formReconnectMap_.erase(formId);
+        FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
+            info.GetProviderBundleName(), "", static_cast<int32_t>(ConnectFormAbilityErrorType::UPDATE_FORM_FAILED),
+            ERR_APPEXECFWK_CONNECT_PROVIDER_TIMEOUT);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     auto delayAcquireProviderFormInfo = [info, wantParams]() {
