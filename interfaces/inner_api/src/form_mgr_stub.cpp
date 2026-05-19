@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -376,6 +376,28 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleUpdateTemplateFormDetailInfo(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION):
             return HandleGetFormIdsByFormLocation(data, reply);
+        default:
+            return OnRemoteRequestSeventh(code, data, reply, option);
+    }
+}
+
+/**
+ * @brief the seventh part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK):
+            return HandleRegisterUpdateFormsConfigCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_UPDATE_FORMS_CONFIG_CALLBACK):
+            return HandleUnregisterUpdateFormsConfigCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORMS_CONFIG):
+            return HandleUpdateFormsConfig(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -2379,6 +2401,67 @@ ErrCode FormMgrStub::HandleGetFormIdsByFormLocation(MessageParcel &data, Message
         }
     }
 
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterUpdateFormsConfigCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("read callerToken failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterUpdateFormsConfigCallback(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write request result failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterUpdateFormsConfigCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    ErrCode result = UnregisterUpdateFormsConfigCallback();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write request result failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUpdateFormsConfig(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int32_t size = data.ReadInt32();
+    if (size <= 0 || size > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
+        HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
+        if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_COMMON_CODE)) {
+            HILOG_ERROR("write error code failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
+    std::vector<FormCustomConfig> configs;
+    configs.reserve(size);
+    for (int32_t i = 0; i < size; i++) {
+        std::unique_ptr<FormCustomConfig> config(data.ReadParcelable<FormCustomConfig>());
+        if (config == nullptr) {
+            HILOG_ERROR("read config failed at index %{public}d.", i);
+            if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
+                HILOG_ERROR("write error code failed");
+                return ERR_APPEXECFWK_PARCEL_ERROR;
+            }
+            return ERR_OK;
+        }
+        configs.push_back(*config);
+    }
+    ErrCode result = UpdateFormsConfig(configs);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed, result=%{public}d", result);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return ERR_OK;
 }
 

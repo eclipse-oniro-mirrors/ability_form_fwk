@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@ namespace Constants {
     constexpr const char* PERMISSION_START_ABILITIES_FROM_BACKGROUND =
         "ohos.permission.START_ABILITIES_FROM_BACKGROUND";
     constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE = "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE";
+    constexpr const char* PERMISSION_FORM_CUSTOM_CONFIG = "ohos.permission.FORM_CUSTOM_CONFIG";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
     constexpr const char* PARAM_FORM_MANUAL_CLICK_KEY = "ohos.extra.param.key.manually_click";
@@ -452,12 +453,16 @@ namespace Constants {
     constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
     // Form info max num
     constexpr const int32_t FORM_INFO_MAX_NUM = 16;
+    // Update form config max num
+    constexpr const int32_t UPDATE_FORM_CONFIG_MAX_NUM = 64;
     // Form version code
     constexpr const int32_t FORM_VERSION_CODE = 100003;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
     // Is delete cache in upgrade scene
     constexpr const char* IS_DELETE_CACHE_IN_UPGRADE_SCENE = "isDeleteCacheInUpgradeScene";
+    // Is show in form center
+    constexpr const char* IS_SHOW_IN_FORM_CENTER = "isShowInFormCenter";
     // Is form need the addition process on request form
     constexpr const char* IS_NEED_ADDFORM_ON_REQUEST = "isNeedAddForm";
     // Default transparency color

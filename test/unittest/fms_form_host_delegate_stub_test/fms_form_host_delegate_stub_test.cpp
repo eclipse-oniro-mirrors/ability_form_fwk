@@ -112,6 +112,11 @@ public:
         return ERR_OK;
     }
 
+    ErrCode UpdateFormsConfigCallback(const std::vector<FormCustomConfig> &configs) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 

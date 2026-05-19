@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@
 #include "form_lock_info.h"
 #include "form_major_info.h"
 #include "template_form_detail_info.h"
+#include "form_custom_config.h"
 
 #include "want.h"
 
@@ -1099,6 +1100,35 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Register update form config callback.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Unregister update form config callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterUpdateFormsConfigCallback()
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Update form config.
+     * @param configs The form custom configs to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1222,6 +1252,9 @@ public:
         FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER,
         FORM_MGR_REGISTER_FORM_WANT_CALLBACK,
         FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK,
+        FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
+        FORM_MGR_UNREGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
+        FORM_MGR_UPDATE_FORMS_CONFIG,
     };
 };
 }  // namespace AppExecFwk

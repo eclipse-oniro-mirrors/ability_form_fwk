@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "napi/native_node_api.h"
 #include "napi_common_want.h"
 #include "form_instance.h"
+#include "form_custom_config.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -77,6 +78,10 @@ public:
 
     bool UnregisterTemplateFormDetailInfoChange();
 
+    void RegisterUpdateFormsConfigCallback(napi_env env, napi_ref callback);
+
+    void UnregisterUpdateFormsConfigCallback();
+
     void RegisterFormWantCallbackListener(napi_env env, napi_ref callback);
 
     void UnregisterFormWantCallbackListener();
@@ -119,6 +124,15 @@ private:
     void GetTemplateFormInfoArray(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
         napi_value &templateFormInfoArray);
 
+    napi_ref updateFormsConfigCallbackRef_ = nullptr;
+    napi_env updateFormsConfigEnv_ = nullptr;
+    ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool UpdateFormsConfigCallbackInner(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool GetFormCustomConfigArray(const std::vector<AppExecFwk::FormCustomConfig> &configs,
+        napi_value &configArray);
+
+    static bool GetValidCallback(napi_env env, napi_ref callbackRef, napi_value &callback);
+
     napi_ref formWantCallbackRef_ = nullptr;
     napi_env formWantCallbackEnv_ = nullptr;
     ErrCode RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
@@ -132,6 +146,7 @@ private:
     mutable std::mutex registerGetFormRectProxyMutex_;
     mutable std::mutex registerGetLiveFormStatusProxyMutex_;
     mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
+    mutable std::mutex registerUpdateFormsConfigMutex_;
     mutable std::mutex registerFormWantCallbackMutex_;
 };
 

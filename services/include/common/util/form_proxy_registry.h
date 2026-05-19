@@ -89,6 +89,13 @@ public:
     ErrCode GetAll(std::vector<sptr<IRemoteObject>> &proxies);
 
     /**
+     * @brief Get all registered proxy entries with their keys (callingUid).
+     * @param[out] entries All registered uid-proxy pairs.
+     * @return ERR_OK on success, ERR_APPEXECFWK_FORM_GET_HOST_FAILED if none registered.
+     */
+    ErrCode GetAllWithKeys(std::vector<std::pair<int32_t, sptr<IRemoteObject>>> &entries);
+
+    /**
      * @brief Get all proxies matching a given userId by iterating all UIDs.
      * UIDs are system callingUids (e.g. 20000001). userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR.
      * @param userId Target userId.
