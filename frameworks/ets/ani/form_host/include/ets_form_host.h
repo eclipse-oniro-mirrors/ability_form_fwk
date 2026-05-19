@@ -173,6 +173,8 @@ private:
         std::vector<AAFwk::WantParams> &wantParamsList);
     bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
         std::vector<AAFwk::WantParams> &wantParamsList);
+
+    ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 
 #include "appexecfwk_errors.h"
 #include "bundle_form_info.h"
+#include "form_custom_config.h"
 #include "bundle_info.h"
 #include "form_info.h"
 #include "form_info_filter.h"
@@ -89,6 +90,8 @@ public:
     bool IsTemplateFormImperativeFwkValid(const FormInfo &formInfo);
 
     bool IsDeleteCacheInUpgradeScene(const FormInfo &formInfo);
+
+    ErrCode UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs);
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);

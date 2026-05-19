@@ -740,6 +740,24 @@ ErrCode FormMgrAdapterFacade::UpdateTemplateFormDetailInfo(
     return FormCallbackAdapter::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
 }
 
+ErrCode FormMgrAdapterFacade::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("FormMgrAdapterFacade::RegisterUpdateFormsConfigCallback called");
+    return FormCallbackAdapter::GetInstance().RegisterUpdateFormsConfigCallback(callerToken);
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterUpdateFormsConfigCallback()
+{
+    HILOG_INFO("FormMgrAdapterFacade::UnregisterUpdateFormsConfigCallback called");
+    return FormCallbackAdapter::GetInstance().UnregisterUpdateFormsConfigCallback();
+}
+
+ErrCode FormMgrAdapterFacade::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
+{
+    HILOG_INFO("FormMgrAdapterFacade::UpdateFormsConfig called");
+    return FormCallbackAdapter::GetInstance().UpdateFormsConfig(configs);
+}
+
 ErrCode FormMgrAdapterFacade::StartAbilityByFms(const Want &want)
 {
     HILOG_INFO("FormMgrAdapterFacade::StartAbilityByFms called");

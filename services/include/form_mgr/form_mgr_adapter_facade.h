@@ -31,6 +31,7 @@
 #include "form_mgr_interface.h"
 #include "running_form_info.h"
 #include "template_form_detail_info.h"
+#include "form_custom_config.h"
 
 #include "fms_log_wrapper.h"
 #include "form_mgr/form_callback_adapter.h"
@@ -328,6 +329,12 @@ public:
     ErrCode UnregisterTemplateFormDetailInfoChange();
 
     ErrCode UpdateTemplateFormDetailInfo(const std::vector<TemplateFormDetailInfo> &templateFormInfo);
+
+    ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterUpdateFormsConfigCallback();
+
+    ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs);
 
     ErrCode RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken);
 

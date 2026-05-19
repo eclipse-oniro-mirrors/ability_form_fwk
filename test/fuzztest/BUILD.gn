@@ -125,6 +125,7 @@ group("fuzztest") {
     "signtools_fuzzer:fuzztest",
     "providerconnectproxy_fuzzer:fuzztest",
     "providerconnectstub_fuzzer:fuzztest",
+    "formcustomconfig_fuzzer:fuzztest",
   ]
 
   if (ability_runtime_graphics) {

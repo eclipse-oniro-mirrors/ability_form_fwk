@@ -360,3 +360,56 @@ HWTEST_F(FmsFormProxyRegistryTest, FmsFormProxyRegistryTest_GetByUserId_0004, Te
     EXPECT_EQ(proxySystem.GetRefPtr(), proxies[0].GetRefPtr());
     GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_GetByUserId_0004 end";
 }
+
+// ======== GetAllWithKeys tests ========
+
+/**
+ * @tc.name: FmsFormProxyRegistryTest_GetAllWithKeys_0001
+ * @tc.desc: test GetAllWithKeys with empty registry returns error.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProxyRegistryTest, FmsFormProxyRegistryTest_GetAllWithKeys_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_GetAllWithKeys_0001 start";
+    std::vector<std::pair<int32_t, sptr<IRemoteObject>>> entries;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, registry_.GetAllWithKeys(entries));
+    EXPECT_TRUE(entries.empty());
+    GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_GetAllWithKeys_0001 end";
+}
+
+/**
+ * @tc.name: FmsFormProxyRegistryTest_GetAllWithKeys_0002
+ * @tc.desc: test GetAllWithKeys returns uid-proxy pairs.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProxyRegistryTest, FmsFormProxyRegistryTest_GetAllWithKeys_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_GetAllWithKeys_0002 start";
+    sptr<IRemoteObject> proxyA = new (std::nothrow) MockIRemoteObject();
+    sptr<IRemoteObject> proxyB = new (std::nothrow) MockIRemoteObject();
+    ASSERT_EQ(ERR_OK, registry_.Register(UID_A, proxyA));
+    ASSERT_EQ(ERR_OK, registry_.Register(UID_B, proxyB));
+
+    std::vector<std::pair<int32_t, sptr<IRemoteObject>>> entries;
+    EXPECT_EQ(ERR_OK, registry_.GetAllWithKeys(entries));
+    EXPECT_EQ(2u, entries.size());
+    GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_GetAllWithKeys_0002 end";
+}
+
+/**
+ * @tc.name: FmsFormProxyRegistryTest_GetAllWithKeys_0003
+ * @tc.desc: test GetAllWithKeys after unregister returns error.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProxyRegistryTest, FmsFormProxyRegistryTest_GetAllWithKeys_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_GetAllWithKeys_0003 start";
+    sptr<IRemoteObject> proxyA = new (std::nothrow) MockIRemoteObject();
+    ASSERT_EQ(ERR_OK, registry_.Register(UID_A, proxyA));
+    ASSERT_EQ(ERR_OK, registry_.Unregister(UID_A));
+
+    std::vector<std::pair<int32_t, sptr<IRemoteObject>>> entries;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, registry_.GetAllWithKeys(entries));
+    EXPECT_TRUE(entries.empty());
+    GTEST_LOG_(INFO) << "FmsFormProxyRegistryTest_GetAllWithKeys_0003 end";
+}

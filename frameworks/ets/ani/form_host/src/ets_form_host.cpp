@@ -3183,6 +3183,11 @@ bool EtsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::
     }
     return true;
 }
+
+ErrCode EtsFormRouterProxyMgr::UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs)
+{
+    return ERR_OK;
+}
 }
 }
 }

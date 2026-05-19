@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -124,6 +124,7 @@ enum {
     ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_PARAMS_ERROR, // 2293850
     ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER,
     ERR_APPEXECFWK_FORM_LOCATION_INVALID,
+    ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG,
 };
 
 // External Error Code
