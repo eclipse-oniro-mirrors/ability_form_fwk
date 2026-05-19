@@ -3543,6 +3543,92 @@ ErrCode FormMgrProxy::UpdateFormsConfig(const std::vector<FormCustomConfig> &con
     return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::UnregisterDeleteFormsCallback()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::DeleteForms(const std::vector<FormRecordFilter> &filters)
+{
+    HILOG_DEBUG("call");
+    if (filters.empty()) {
+        HILOG_WARN("filters is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (static_cast<int32_t>(filters.size()) > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
+        HILOG_ERROR("filters size %{public}zu exceeds max %{public}d", filters.size(),
+            Constants::DELETE_FORMS_FILTER_MAX_NUM);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt32(static_cast<int32_t>(filters.size()))) {
+        HILOG_ERROR("write size failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    for (const auto &filter : filters) {
+        if (!data.WriteParcelable(&filter)) {
+            HILOG_ERROR("write filter failed.");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_DELETE_FORMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 ErrCode FormMgrProxy::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
 {
     MessageParcel data;

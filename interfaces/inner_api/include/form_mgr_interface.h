@@ -33,6 +33,7 @@
 #include "form_major_info.h"
 #include "template_form_detail_info.h"
 #include "form_custom_config.h"
+#include "form_record_filter.h"
 
 #include "want.h"
 
@@ -1129,6 +1130,35 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Register delete forms callback.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Unregister delete forms callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterDeleteFormsCallback()
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Delete forms by filters.
+     * @param filters The form record filters to match forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1255,6 +1285,9 @@ public:
         FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
         FORM_MGR_UNREGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
         FORM_MGR_UPDATE_FORMS_CONFIG,
+        FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK,
+        FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK,
+        FORM_MGR_DELETE_FORMS,
     };
 };
 }  // namespace AppExecFwk

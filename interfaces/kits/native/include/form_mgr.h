@@ -995,6 +995,26 @@ public:
      */
     ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs);
 
+    /**
+     * @brief Register delete forms callback.
+     * @param callerToken The caller token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister delete forms callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterDeleteFormsCallback();
+
+    /**
+     * @brief Delete forms by filters.
+     * @param filters The form record filters.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters);
+
 private:
     /**
      * @brief Connect form manager service.

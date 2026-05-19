@@ -168,9 +168,13 @@ group("unittest") {
     "unittest/fms_form_publish_adapter_test:unittest",
     "unittest/fms_form_data_adapter_test:unittest",
     "unittest/form_custom_config_test:unittest",
-    "unittest/fms_form_lifecycle_adapter_test:unittest",
+"unittest/fms_form_lifecycle_adapter_test:unittest",
     "unittest/fms_sign_tools_test:unittest",
+<<<<<<< HEAD
     "unittest/fms_form_hisysevent_wrapper_test:unittest",
+=======
+    "unittest/form_record_filter_test:unittest",
+>>>>>>> ecb6f78b (feat: add DeleteForms API and comprehensive test coverage)
   ]
 }
 

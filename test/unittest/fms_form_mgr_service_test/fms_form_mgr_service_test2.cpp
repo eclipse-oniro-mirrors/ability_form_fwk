@@ -2626,6 +2626,174 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_004, 
     MockUnregisterFormWantCallback(ERR_OK);
     ErrCode ret = formMgrService.UnregisterFormWantCallback();
     EXPECT_EQ(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 end";
+GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 end";
+}
+
+/**
+ * @tc.number: FormMgrService_RegisterDeleteFormsCallback_001
+ * @tc.name: test RegisterDeleteFormsCallback function.
+ * @tc.desc: Verify that the RegisterDeleteFormsCallback returns permission denied when not system app.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterDeleteFormsCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_001 start";
+    FormMgrService formMgrService;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.RegisterDeleteFormsCallback(callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_RegisterDeleteFormsCallback_002
+ * @tc.name: test RegisterDeleteFormsCallback function.
+ * @tc.desc: Verify that the RegisterDeleteFormsCallback returns permission denied when no bundle permission.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterDeleteFormsCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_002 start";
+    FormMgrService formMgrService;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(false);
+    ErrCode ret = formMgrService.RegisterDeleteFormsCallback(callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_RegisterDeleteFormsCallback_003
+ * @tc.name: test RegisterDeleteFormsCallback function.
+ * @tc.desc: Verify that the RegisterDeleteFormsCallback returns ERR_OK when permission check passes.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterDeleteFormsCallback_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_003 start";
+    FormMgrService formMgrService;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockRegisterDeleteFormsCallback(ERR_OK);
+    ErrCode ret = formMgrService.RegisterDeleteFormsCallback(callerToken);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_003 end";
+}
+
+/**
+ * @tc.number: FormMgrService_UnregisterDeleteFormsCallback_001
+ * @tc.name: test UnregisterDeleteFormsCallback function.
+ * @tc.desc: Verify that the UnregisterDeleteFormsCallback returns permission denied when not system app.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterDeleteFormsCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_001 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.UnregisterDeleteFormsCallback();
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_UnregisterDeleteFormsCallback_002
+ * @tc.name: test UnregisterDeleteFormsCallback function.
+ * @tc.desc: Verify that the UnregisterDeleteFormsCallback returns permission denied when no bundle permission.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterDeleteFormsCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_002 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(false);
+    ErrCode ret = formMgrService.UnregisterDeleteFormsCallback();
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_UnregisterDeleteFormsCallback_003
+ * @tc.name: test UnregisterDeleteFormsCallback function.
+ * @tc.desc: Verify that the UnregisterDeleteFormsCallback returns ERR_OK when permission check passes.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterDeleteFormsCallback_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_003 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockUnregisterDeleteFormsCallback(ERR_OK);
+    ErrCode ret = formMgrService.UnregisterDeleteFormsCallback();
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_003 end";
+}
+
+/**
+ * @tc.number: FormMgrService_DeleteForms_001
+ * @tc.name: test DeleteForms function.
+ * @tc.desc: Verify that the DeleteForms returns permission denied when not system app.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_001 start";
+    FormMgrService formMgrService;
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filters.push_back(filter);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.DeleteForms(filters);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_DeleteForms_002
+ * @tc.name: test DeleteForms function.
+ * @tc.desc: Verify that the DeleteForms returns permission denied when no custom config permission.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_002 start";
+    FormMgrService formMgrService;
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filters.push_back(filter);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(false);
+    ErrCode ret = formMgrService.DeleteForms(filters);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG);
+    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_DeleteForms_003
+ * @tc.name: test DeleteForms function.
+ * @tc.desc: Verify that the DeleteForms returns ERR_OK when permission check passes.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_003 start";
+    FormMgrService formMgrService;
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filters.push_back(filter);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockDeleteForms(ERR_OK);
+    ErrCode ret = formMgrService.DeleteForms(filters);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_003 end";
 }
 }

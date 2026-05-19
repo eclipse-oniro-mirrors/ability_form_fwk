@@ -175,6 +175,7 @@ private:
         std::vector<AAFwk::WantParams> &wantParamsList);
 
     ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

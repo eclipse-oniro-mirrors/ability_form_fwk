@@ -3194,6 +3194,11 @@ ErrCode EtsFormRouterProxyMgr::UpdateFormsConfigCallback(const std::vector<AppEx
 {
     return ERR_OK;
 }
+
+ErrCode EtsFormRouterProxyMgr::DeleteFormsCallback(const std::vector<std::string> &formIds)
+{
+    return ERR_OK;
+}
 }
 }
 }

@@ -471,6 +471,16 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterUpdateFormsConfigCallbackObserver);
     }
 
+    static napi_value RegisterDeleteFormsCallbackObserver(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRegisterDeleteFormsCallbackObserver);
+    }
+
+    static napi_value UnregisterDeleteFormsCallbackObserver(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterDeleteFormsCallbackObserver);
+    }
+
     static napi_value GetFormIdsByFormLocation(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormIdsByFormLocation);
@@ -2435,6 +2445,77 @@ private:
         return CreateJsUndefined(env);
     }
 
+    napi_value OnRegisterDeleteFormsCallbackObserver(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_INFO("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+        if (argc != ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+            return CreateJsUndefined(env);
+        }
+        napi_valuetype type = napi_undefined;
+        napi_typeof(env, argv[PARAM0], &type);
+        if (type != napi_function) {
+            HILOG_ERROR("callback is not function");
+            NapiFormUtil::ThrowParamTypeError(env, "callback", "function");
+            return CreateJsUndefined(env);
+        }
+        napi_ref callbackRef = nullptr;
+        napi_status status = napi_create_reference(env, argv[PARAM0], REF_COUNT, &callbackRef);
+        if (status != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            return CreateJsUndefined(env);
+        }
+
+        JsFormRouterProxyMgr::GetInstance()->RegisterDeleteFormsCallback(env, callbackRef);
+        ErrCode result = FormMgr::GetInstance().RegisterDeleteFormsCallback(
+            JsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
+            JsFormRouterProxyMgr::GetInstance()->UnregisterDeleteFormsCallback();
+            if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
+                result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+                NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            } else {
+                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            }
+        }
+        return CreateJsUndefined(env);
+    }
+
+    napi_value OnUnregisterDeleteFormsCallbackObserver(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_INFO("call");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the application not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+        if (argc > ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
+            return CreateJsUndefined(env);
+        }
+
+        ErrCode result = FormMgr::GetInstance().UnregisterDeleteFormsCallback();
+        if (result != ERR_OK) {
+            if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
+                result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+                NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            } else {
+                NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            }
+            return CreateJsUndefined(env);
+        }
+        JsFormRouterProxyMgr::GetInstance()->UnregisterDeleteFormsCallback();
+        return CreateJsUndefined(env);
+    }
+
     napi_value OnGetFormIdsByFormLocation(napi_env env, size_t argc, napi_value *argv)
     {
         HILOG_DEBUG("call");
@@ -2610,6 +2691,8 @@ const std::pair<const char *, napi_callback> JS_FORM_HOST_BINDINGS[] = {
     { "offTemplateFormDetailInfoChange", JsFormHost::UnregisterTemplateFormDetailInfoObserver },
     { "onUpdateFormsConfigCallback", JsFormHost::RegisterUpdateFormsConfigCallbackObserver },
     { "offUpdateFormsConfigCallback", JsFormHost::UnregisterUpdateFormsConfigCallbackObserver },
+    { "onDeleteFormsCallback", JsFormHost::RegisterDeleteFormsCallbackObserver },
+    { "offDeleteFormsCallback", JsFormHost::UnregisterDeleteFormsCallbackObserver },
     { "getFormIdsByFormLocation", JsFormHost::GetFormIdsByFormLocation },
     { "onGetWantParamsCallback", JsFormHost::RegisterGetWantParamsCallback },
     { "offGetWantParamsCallback", JsFormHost::UnregisterGetWantParamsCallback },
@@ -3616,6 +3699,25 @@ bool JsFormRouterProxyMgr::GetValidCallback(napi_env env, napi_ref callbackRef, 
     return true;
 }
 
+bool JsFormRouterProxyMgr::CreateStringArray(const std::vector<std::string> &strings, napi_value &array)
+{
+    napi_status status = napi_create_array(deleteFormsCallbackEnv_, &array);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_create_array failed, status: %{public}d", static_cast<int>(status));
+        return false;
+    }
+    for (size_t i = 0; i < strings.size(); ++i) {
+        napi_value jsValue = nullptr;
+        status = napi_create_string_utf8(deleteFormsCallbackEnv_, strings[i].c_str(), NAPI_AUTO_LENGTH, &jsValue);
+        if (status != napi_ok || jsValue == nullptr) {
+            HILOG_ERROR("create string failed at index %{public}zu", i);
+            return false;
+        }
+        napi_set_element(deleteFormsCallbackEnv_, array, static_cast<uint32_t>(i), jsValue);
+    }
+    return true;
+}
+
 bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
     const std::vector<AppExecFwk::FormCustomConfig> &configs)
 {
@@ -3702,6 +3804,86 @@ bool JsFormRouterProxyMgr::GetFormCustomConfigArray(
             return false;
         }
     }
+    return true;
+}
+
+void JsFormRouterProxyMgr::RegisterDeleteFormsCallback(napi_env env, napi_ref callbackRef)
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
+    if (deleteFormsCallbackRef_ != nullptr) {
+        napi_delete_reference(deleteFormsCallbackEnv_, deleteFormsCallbackRef_);
+        deleteFormsCallbackRef_ = nullptr;
+    }
+    deleteFormsCallbackRef_ = callbackRef;
+    deleteFormsCallbackEnv_ = env;
+}
+
+void JsFormRouterProxyMgr::UnregisterDeleteFormsCallback()
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
+    if (deleteFormsCallbackRef_ != nullptr) {
+        napi_delete_reference(deleteFormsCallbackEnv_, deleteFormsCallbackRef_);
+        deleteFormsCallbackRef_ = nullptr;
+    }
+    deleteFormsCallbackEnv_ = nullptr;
+}
+
+ErrCode JsFormRouterProxyMgr::DeleteFormsCallback(const std::vector<std::string> &formIds)
+{
+    HILOG_DEBUG("call");
+    std::shared_ptr<AppExecFwk::EventHandler> mainHandler =
+        std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    bool result = false;
+    std::function<void()> executeFunc = [formIds, &result]() {
+        result = JsFormRouterProxyMgr::GetInstance()->DeleteFormsCallbackInner(formIds);
+    };
+    mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::DeleteFormsCallback");
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::string> &formIds)
+{
+    HILOG_DEBUG("call, formIds size: %{public}zu", formIds.size());
+
+    napi_handle_scope scope = nullptr;
+    std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
+    napi_open_handle_scope(deleteFormsCallbackEnv_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return false;
+    }
+
+    if (deleteFormsCallbackRef_ == nullptr) {
+        HILOG_WARN("callback is null");
+        napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
+        return false;
+    }
+
+    napi_value callback = nullptr;
+    if (!GetValidCallback(deleteFormsCallbackEnv_, deleteFormsCallbackRef_, callback)) {
+        napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
+        return false;
+    }
+
+    napi_value formIdArray = nullptr;
+    if (!CreateStringArray(formIds, formIdArray)) {
+        napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
+        return false;
+    }
+
+    napi_value undefined = nullptr;
+    napi_get_undefined(deleteFormsCallbackEnv_, &undefined);
+    napi_status status = napi_call_function(
+        deleteFormsCallbackEnv_, undefined, callback, ARGS_ONE, &formIdArray, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_call_function failed, status: %{public}d", static_cast<int>(status));
+        napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
+        return false;
+    }
+
+    napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
     return true;
 }
 

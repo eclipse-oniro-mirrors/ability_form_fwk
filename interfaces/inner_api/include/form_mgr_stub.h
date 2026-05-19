@@ -955,6 +955,30 @@ private:
      */
     ErrCode HandleUpdateFormsConfig(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle register delete forms callback.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterDeleteFormsCallback(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister delete forms callback.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterDeleteFormsCallback(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle delete forms.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleDeleteForms(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 
