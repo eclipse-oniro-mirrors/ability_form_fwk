@@ -450,6 +450,7 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_
         case FormEventName::FORM_EVENT_QUEUE_OVER_LIMIT:
         case FormEventName::FORM_DUE_CONTROL:
         case FormEventName::FORM_EXCEEDS_DISTRIBUTION:
+        case FormEventName::CALLEN_DB_FAILED:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER, FORM_ERROR,
                 HiSysEventType::FAULT,

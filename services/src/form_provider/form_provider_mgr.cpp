@@ -337,11 +337,11 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRe
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(connectWant, formRefreshConnection,
         record.providerUserId);
     if (errorCode != ERR_OK) {
-        errorCode = (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) ?
-            ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED : ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
         HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
         FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
             record.bundleName, "", static_cast<int32_t>(ConnectFormAbilityErrorType::UPDATE_FORM_FAILED), errorCode);
+        errorCode = (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) ?
+            ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED : ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
         return errorCode;
     }
 

@@ -57,8 +57,8 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
     ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_INFO_PREFIX, value);
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            FORM_INFO_PREFIX, static_cast<int32_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -132,8 +132,8 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
     result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_ID_PREFIX, value);
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            FORM_ID_PREFIX, static_cast<int32_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     SaveEntries(value, innerFormInfos);
@@ -151,8 +151,8 @@ ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFor
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
     if (result != ERR_OK) {
         HILOG_ERROR("put innerFormInfo to RdbStore error");
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
@@ -177,8 +177,8 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     ErrCode result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     if (result != ERR_OK) {
         HILOG_ERROR("delete key error");
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_DELETE_FORMID_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_DELETE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -186,8 +186,8 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     if (result != ERR_OK) {
         HILOG_ERROR("delete status data of %{public}s failed", formId.c_str());
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_DELETE_FORMID_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_DELETE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -208,8 +208,8 @@ ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::st
     result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, statusData);
     if (result != ERR_OK) {
         HILOG_ERROR("load status data of %{public}s failed, code is %{public}d", formId.c_str(), result);
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_QUERY_FORMID_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_QUERY_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -255,8 +255,8 @@ ErrCode FormInfoRdbStorageMgr::UpdateFormVersionCode()
         std::to_string(Constants::FORM_VERSION_CODE));
     if (result != ERR_OK) {
         HILOG_ERROR("update form version code to rdbstore failed, code is %{public}d", result);
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            FORM_VERSION_KEY, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
@@ -283,8 +283,8 @@ ErrCode FormInfoRdbStorageMgr::UpdateMultiAppFormVersionCode(const std::string &
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, versionCode);
     if (result != ERR_OK) {
         HILOG_ERROR("update multi app form version code to rdbstore failed, code is %{public}d", result);
-        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            static_cast<int64_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED));
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
+            key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
