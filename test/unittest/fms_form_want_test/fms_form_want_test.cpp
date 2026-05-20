@@ -294,9 +294,9 @@ HWTEST_F(FmsFormWantTest, FormWant_SetParam_Double_001, TestSize.Level1)
     FormWant formWant;
     formWant.SetParam(Constants::FORM_CONNECT_ID, 123.456);
     EXPECT_TRUE(formWant.HasParameter(Constants::FORM_CONNECT_ID));
-    EXPECT_EQ(formWant.GetIntParam(Constants::FORM_CONNECT_ID, 0), 123);
+    EXPECT_EQ(formWant.GetDoubleParam(Constants::FORM_CONNECT_ID, 0.0), 123.456);
     formWant.SetParam("external_double", 789.012);
-    EXPECT_EQ(formWant.GetIntParam("external_double", 0), 789);
+    EXPECT_EQ(formWant.GetDoubleParam("external_double", 0.0), 789.012);
     GTEST_LOG_(INFO) << "FormWant_SetParam_Double_001 end";
 }
 
@@ -305,9 +305,9 @@ HWTEST_F(FmsFormWantTest, FormWant_SetParam_Float_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormWant_SetParam_Float_001 start";
     FormWant formWant;
     formWant.SetParam(Constants::PARAM_FORM_COLOR_MODE_KEY, 123.456f);
-    EXPECT_EQ(formWant.GetStringParam(Constants::PARAM_FORM_COLOR_MODE_KEY), "123.456");
+    EXPECT_EQ(formWant.GetFloatParam(Constants::PARAM_FORM_COLOR_MODE_KEY, 0.0f), 123.456f);
     formWant.SetParam("external_float", 789.012f);
-    EXPECT_EQ(formWant.GetStringParam("external_float"), "789.012");
+    EXPECT_EQ(formWant.GetFloatParam("external_float", 0.0f), 789.012f);
     GTEST_LOG_(INFO) << "FormWant_SetParam_Float_001 end";
 }
 

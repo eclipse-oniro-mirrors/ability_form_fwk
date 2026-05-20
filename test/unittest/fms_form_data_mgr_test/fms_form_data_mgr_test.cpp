@@ -7874,8 +7874,8 @@ HWTEST_F(FmsFormDataMgrTest, FormDataMgr_UpdateHostWantSize_001, TestSize.Level1
     EXPECT_TRUE(resultWant.GetParams().HasParam(Constants::PARAM_FORM_VIEW_SCALE));
     EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_WIDTH_KEY, 0.0), static_cast<double>(width));
     EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_HEIGHT_KEY, 0.0), static_cast<double>(height));
-    EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_BORDER_WIDTH_KEY, 0.0), static_cast<double>(borderWidth));
-    EXPECT_EQ(resultWant.GetDoubleParam(Constants::PARAM_FORM_VIEW_SCALE, 0.0), static_cast<double>(formViewScale));
+    EXPECT_EQ(resultWant.GetFloatParam(Constants::PARAM_FORM_BORDER_WIDTH_KEY, 0.0f), borderWidth);
+    EXPECT_EQ(resultWant.GetFloatParam(Constants::PARAM_FORM_VIEW_SCALE, 1.0f), formViewScale);
 
     GTEST_LOG_(INFO) << "FormDataMgr_UpdateHostWantSize_001 end";
 }
