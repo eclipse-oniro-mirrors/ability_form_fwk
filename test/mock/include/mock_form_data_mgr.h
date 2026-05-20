@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ public:
     virtual ~AbstractMockFormDataMgr() = default;
     virtual bool GetFormRecord(const int64_t formId, FormRecord &formRecord) = 0;
     virtual void CheckForms(const std::vector<int64_t> &formIds) = 0;
-    virtual void MergeFormWant(const Want &newWant, Want &oldWant) = 0;
+    // MergeFormWant removed - FormWant::MergeFrom is used directly now
     virtual void SetNeedRefresh(const int64_t formId, const bool needRefresh) = 0;
     virtual bool GetUpdatedForm(const FormRecord &record, const std::vector<FormInfo> &targetForms,
         FormInfo &updatedForm) = 0;
@@ -102,7 +102,6 @@ public:
         const int64_t formId, const int callingUid));
     MOCK_METHOD2(GetFormRecord, bool(const int64_t formId, FormRecord &formRecord));
     MOCK_METHOD1(CheckForms, void(const std::vector<int64_t> &formIds));
-    MOCK_METHOD2(MergeFormWant, void(const Want &newWant, Want &oldWant));
     MOCK_METHOD2(SetNeedRefresh, void(const int64_t formId, const bool needRefresh));
     MOCK_METHOD3(GetUpdatedForm, bool(const FormRecord &record, const std::vector<FormInfo> &targetForms,
         FormInfo &updatedForm));

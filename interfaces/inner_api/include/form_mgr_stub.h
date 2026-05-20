@@ -144,6 +144,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleRequestForm(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle NotifyWhetherVisibleForms message.
      * @param data input param.

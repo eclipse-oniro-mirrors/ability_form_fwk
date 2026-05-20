@@ -59,6 +59,7 @@ namespace Constants {
     constexpr const char* PARAM_LAYOUT_WIDTH_KEY = "ohos.extra.param.key.layout_width";
     constexpr const char* PARAM_LAYOUT_HEIGHT_KEY = "ohos.extra.param.key.layout_height";
     constexpr const char* PARAM_FORM_VIEW_SCALE = "ohos.extra.param.key.form_view_scale";
+    constexpr const char* CONNECT_TO_RENDER = "ohos.connect.to.render";
     constexpr const char* PARAM_JSON_WANT_KEY = "ohos.extra.param.key.json_want";
     constexpr const char* PARAM_LIVE_FORM_ID_KEY = "ohos.extra.param.key.live_form_id";
     constexpr int32_t ONE_HOST_MAX_FORM_SIZE = 256;
@@ -497,6 +498,9 @@ namespace Constants {
         "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL";
 
     // When adding Form, distinguish whether the want parameter comes from the host.
+    // Used to distinguish FormComponent from other AddForm scenarios
+    // true: Host actively adds card via FormComponent (update hostWant cache)
+    // false: Other AddForm scenarios (extract hostWant parameters)
     constexpr const char* IS_ADD_FORM_BY_HOST = "isAddFormByHost";
 
     constexpr const int32_t TEMPLATE_FORM_MAX_SIZE = 20;

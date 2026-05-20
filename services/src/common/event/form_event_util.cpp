@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -603,7 +603,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, reCreateRecord.formTempFlag);
     want.SetParam(Constants::RECREATE_FORM_KEY, true);
     want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, (int)record.renderingMode);
-    FormDataMgr::GetInstance().GetFormHostParams(formId, want);
+    record.hostWant.ExtractHostParamsToWant(want);
     FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want);
 }
 
@@ -839,7 +839,7 @@ void FormEventUtil::ApplyWantParams(const std::vector<FormRecord> &records,
         }
         AAFwk::Want hostWant;
         hostWant.SetParams(params);
-        FormDataMgr::GetInstance().UpdateFormHostParams(record.formId, hostWant);
+        FormDataMgr::GetInstance().UpdateHostWant(record.formId, hostWant, true);
         ErrCode ret = FormMgrAdapterFacade::GetInstance().AcquireProviderFormInfoByFormRecord(record, params);
         HILOG_INFO("onAddForm via want callback, formId:%{public}" PRId64 ", ret:%{public}d", record.formId, ret);
     }

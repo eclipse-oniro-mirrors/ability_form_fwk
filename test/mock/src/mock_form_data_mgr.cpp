@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -378,9 +378,9 @@ ErrCode FormDataMgr::RemoveRequestPublishFormInfo(int64_t formId)
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-void FormDataMgr::UpdateFormHostParams(const int64_t formId, const Want &want)
+void FormDataMgr::UpdateHostWant(const int64_t formId, const Want &want, bool shouldMerge)
 {
-    GTEST_LOG_(INFO) << "UpdateFormHostParams called";
+    GTEST_LOG_(INFO) << "UpdateHostWant called";
 }
 
 bool FormDataMgr::GetFormUpgradeInfo(const int64_t formId, FormUpgradeInfo &formUpgradeInfo) const

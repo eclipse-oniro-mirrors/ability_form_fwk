@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,12 +17,14 @@
 #define OHOS_FORM_FWK_FORM_RECORD_H
 
 #include <vector>
+#include <map>
 #include "form_constants.h"
 #include "form_info_base.h"
 #include "form_instance.h"
 #include "form_provider_info.h"
 #include "application_info.h"
 #include "want.h"
+#include "form_want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -98,7 +100,8 @@ public:
     bool lockForm = false;
     bool protectForm = false;
     std::vector<int32_t> conditionUpdate;
-    std::map<int64_t, Want> wantCacheMap;
+    FormWant hostWant; // Host call parameter cache
+    std::map<int64_t, FormWant> refreshWantMap;
     bool isLocationChange = false;
     bool isExistRecycleTask = false;
     bool isDataProxyUpdate = false;
@@ -112,7 +115,6 @@ public:
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool addFormFinish = false;
     bool isNeedUpdateFormOnAddFormFinish = false;
-    AAFwk::WantParams formHostParams;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

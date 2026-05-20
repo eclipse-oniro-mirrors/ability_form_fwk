@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -394,7 +394,7 @@ public:
     */
     void ClearHostRefreshFlag(const int64_t formId);
 
-    /**
+/**
      * @brief Get updated form info.
      * @param record FormRecord.
      * @param targetForms Target forms.
@@ -957,19 +957,12 @@ public:
     bool GetFormCanUpdate(int64_t formId);
 
     /**
-     * @brief merge form new want to old want.
-     * @param newWant new want info.
-     * @param oldWant old want info.
-     */
-    void MergeFormWant(const Want &newWant, Want &oldWant);
-
-    /**
      * @brief Update form want.
      * @param formId form id.
      * @param want new want.
      * @param record form record info.
      */
-    void UpdateFormWant(const int64_t formId, const Want &want, FormRecord &record);
+    void UpdateRefreshWant(const int64_t formId, const Want &want, FormRecord &record);
 
     /**
      * @brief Get all formRecord by userId.
@@ -1128,18 +1121,22 @@ public:
     bool MergeFormData(const int64_t formId, FormProviderData &formProviderData);
 
     /**
-     * @brief Update form host params.
+     * @brief Update hostWant cache with parameter control.
      * @param formId form id.
-     * @param want want.
+     * @param want Want parameters.
+     * @param shouldMerge true-merge parameters (RequestForm), false-assign update (AddForm).
      */
-    void UpdateFormHostParams(const int64_t formId, const Want &want);
+    void UpdateHostWant(const int64_t formId, const Want &want, bool shouldMerge = false);
 
     /**
-     * @brief Get form host params.
+     * @brief Update hostWant size parameters only (partial update).
      * @param formId form id.
-     * @param want want.
+     * @param width form width.
+     * @param height form height.
+     * @param borderWidth border width.
+     * @param formViewScale view scale.
      */
-    void GetFormHostParams(const int64_t formId, Want &want);
+    void UpdateHostWantSize(const int64_t formId, float width, float height, float borderWidth, float formViewScale);
 
 private:
     /**

@@ -151,21 +151,27 @@ ErrCode FormLifecycleAdapter::AllotForm(const int64_t formId, const Want &want,
         }
     }
 
-    FormDataMgr::GetInstance().UpdateFormHostParams(formJsInfo.formId, want);
+    bool isAddFormByHost = want.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false);
+    if (isAddFormByHost) {
+        FormDataMgr::GetInstance().UpdateHostWant(formJsInfo.formId, want);
+    }
     return ret;
 }
 
 void FormLifecycleAdapter::CheckIsAddFormByHost(const FormRecord &formRecord, Want &allotFormWant)
 {
     bool isAddFormByHost = allotFormWant.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false);
+    int64_t formId = formRecord.formId;
     if (isAddFormByHost) {
+        HILOG_INFO("formId: %{public}" PRId64 " is add form by host.", formId);
         return;
     }
-    int64_t formId = formRecord.formId;
-    HILOG_INFO("formId: %{public}" PRId64 " is not add form by host, update want.", formId);
-    FormDataMgr::GetInstance().GetFormHostParams(formId, allotFormWant);
+    HILOG_INFO("formId: %{public}" PRId64 " is not add form by host, extract params.", formId);
+    formRecord.hostWant.ExtractHostParamsToWant(allotFormWant);
     FormInfo formInfo;
     FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
+
+    allotFormWant.SetParam(Constants::PARAM_FONT_FOLLOW_SYSTEM_KEY, formInfo.fontScaleFollowSystem);
     if (formInfo.enableBlurBackground) {
         allotFormWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, true);
     }

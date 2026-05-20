@@ -783,6 +783,7 @@ public:
      */
     int32_t UpdateFormSize(const int64_t formId, float width, float height, float borderWidth,
         float formViewScale);
+
     /**
      * @brief Open the form edit ability.
      * @param abilityName The form edit ability name.
