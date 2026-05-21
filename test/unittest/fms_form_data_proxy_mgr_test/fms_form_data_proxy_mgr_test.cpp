@@ -276,7 +276,7 @@ HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_005, TestSize.Level0)
 
 /**
  * @tc.name: FmsFormDataProxyMgrTest_006
- * @tc.desc: Verify RetrySubscribeProxy functions
+ * @tc.desc: Verify RetrySubscribeProxy functions.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_006, TestSize.Level0)
