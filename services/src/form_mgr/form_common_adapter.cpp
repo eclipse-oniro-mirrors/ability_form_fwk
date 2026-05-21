@@ -702,7 +702,7 @@ ErrCode FormCommonAdapter::AddFormTimer(const FormRecord &formRecord)
             return ERR_OK;
         }
         int64_t dueDuration = static_cast<int64_t>(duration) * static_cast<int64_t>(Constants::TIME_CONVERSION);
-        updateDuration = std::max(updateDuration, dueDuration * Constants::TIME_CONVERSION);
+        updateDuration = std::max(updateDuration, dueDuration);
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
         HILOG_WARN("add interval timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
