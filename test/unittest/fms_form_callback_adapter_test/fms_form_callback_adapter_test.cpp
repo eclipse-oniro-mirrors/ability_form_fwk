@@ -105,6 +105,10 @@ public:
     {
         return updateFormsConfigResult_;
     }
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds) override
+    {
+        return deleteFormsResult_;
+    }
     ErrCode requestOverflowResult_ = ERR_OK;
     ErrCode changeSceneResult_ = ERR_OK;
     ErrCode getFormRectResult_ = ERR_OK;
@@ -112,6 +116,7 @@ public:
     ErrCode templateFormResult_ = ERR_OK;
     ErrCode requestFormWantsResult_ = ERR_OK;
     ErrCode updateFormsConfigResult_ = ERR_OK;
+    ErrCode deleteFormsResult_ = ERR_OK;
     std::unordered_map<std::string, std::string> liveFormStatusData_;
 };
 }

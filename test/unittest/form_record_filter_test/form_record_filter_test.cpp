@@ -22,6 +22,7 @@
 #undef protected
 
 #include "message_parcel.h"
+#include "string_ex.h"
 
 using namespace testing::ext;
 using namespace OHOS;
