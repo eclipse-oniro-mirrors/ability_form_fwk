@@ -3713,7 +3713,11 @@ bool JsFormRouterProxyMgr::CreateStringArray(const std::vector<std::string> &str
             HILOG_ERROR("create string failed at index %{public}zu", i);
             return false;
         }
-        napi_set_element(deleteFormsCallbackEnv_, array, static_cast<uint32_t>(i), jsValue);
+        status = napi_set_element(deleteFormsCallbackEnv_, array, static_cast<uint32_t>(i), jsValue);
+        if (status != napi_ok) {
+            HILOG_ERROR("napi_set_element failed, index: %{public}zu, status: %{public}d", i, static_cast<int>(status));
+            return false;
+        }
     }
     return true;
 }

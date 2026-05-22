@@ -530,10 +530,9 @@ void FormCallbackAdapter::GetMatchedFormIds(
         std::vector<FormRecord> records;
         FormDataMgr::GetInstance().GetFormRecord(filter.bundleName, records);
         for (const auto &record : records) {
-            if (record.bundleName != filter.bundleName &&
-                record.moduleName != filter.moduleName &&
-                record.abilityName != filter.abilityName &&
-                record.formName != filter.formName) {
+            if (record.moduleName == filter.moduleName &&
+                record.abilityName == filter.abilityName &&
+                record.formName == filter.formName) {
                 formIds.push_back(std::to_string(record.formId));
             }
         }
@@ -567,7 +566,7 @@ ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const s
         if (notifyRet != ERR_OK) {
             HILOG_ERROR("notify failed, %{public}s, userId=%{public}d, bundleName=%{public}s, ret=%{public}d",
                 tag.c_str(), userId, bundleName.c_str(), notifyRet);
-            result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+            result = notifyRet;
         }
     }
     HILOG_INFO("%{public}s notified %{public}zu hosts, result=%{public}d", tag.c_str(), entries.size(), result);
