@@ -342,3 +342,19 @@ HWTEST_F(FormRecordFilterTest, ReadFromParcel_007, TestSize.Level1)
     EXPECT_FALSE(filter.ReadFromParcel(parcel));
     GTEST_LOG_(INFO) << "ReadFromParcel_007 ends";
 }
+
+/**
+ * @tc.name: ReadFromParcel_008
+ * @tc.desc: Test ReadFromParcel fails when bundleName read fails (empty parcel).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordFilterTest, ReadFromParcel_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_008 starts";
+    Parcel parcel;
+    // bundleName missing - should fail
+
+    FormRecordFilter filter;
+    EXPECT_FALSE(filter.ReadFromParcel(parcel));
+    GTEST_LOG_(INFO) << "ReadFromParcel_008 ends";
+}

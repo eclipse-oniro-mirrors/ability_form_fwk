@@ -2502,8 +2502,14 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterDeleteFormsCallback_001, TestSize.L
         .WillOnce(Return(TEST_CALLING_UID));
 
     auto mockDelegate = new MockFormHostDelegateStub();
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Register(
-        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+    sptr<IRemoteObject> callerToken(mockDelegate);
+    auto result = FormCallbackAdapter::GetInstance().RegisterDeleteFormsCallback(callerToken);
+    ASSERT_EQ(result, ERR_OK);
+
+    // Verify proxy is stored
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(storedProxy, callerToken);
 
     GTEST_LOG_(INFO) << "RegisterDeleteFormsCallback_001 end";
 }
@@ -2517,11 +2523,22 @@ HWTEST_F(FmsFormCallbackAdapterTest, UnregisterDeleteFormsCallback_001, TestSize
 {
     GTEST_LOG_(INFO) << "UnregisterDeleteFormsCallback_001 start";
 
+    // Register first
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
+    auto mockDelegate = new MockFormHostDelegateStub();
+    sptr<IRemoteObject> callerToken(mockDelegate);
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().RegisterDeleteFormsCallback(callerToken), ERR_OK);
 
+    // Unregister
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
     auto result = FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
     EXPECT_EQ(result, ERR_OK);
+
+    // Verify proxy is removed
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_NE(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
 
     GTEST_LOG_(INFO) << "UnregisterDeleteFormsCallback_001 end";
 }
@@ -2555,7 +2572,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeleteForms_002 start";
 
-    FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
 
     std::vector<FormRecordFilter> filters;
     FormRecordFilter filter;
@@ -2598,7 +2615,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_003, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
 
     GTEST_LOG_(INFO) << "DeleteForms_003 end";
 }
