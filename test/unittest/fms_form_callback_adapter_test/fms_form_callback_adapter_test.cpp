@@ -2585,10 +2585,10 @@ HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_003, TestSize.Level1)
 
     std::vector<FormRecordFilter> filters;
     FormRecordFilter filter;
-    filter.bundleName = BUNDLE_NAME;
-    filter.moduleName = MODULE_NAME;
-    filter.abilityName = ABILITY_NAME;
-    filter.formName = FORM_NAME;
+    filter.bundleName = TEST_BUNDLE_NAME;
+    filter.moduleName = TEST_MODULE_NAME;
+    filter.abilityName = TEST_ABILITY_NAME;
+    filter.formName = TEST_FORM_NAME;
     filters.push_back(filter);
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())

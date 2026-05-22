@@ -3873,10 +3873,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_002, TestS
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_003, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_003 starts";
     EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK);
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteRemoteObject(nullptr);
     auto errCode = mockFormMgrService->HandleRegisterDeleteFormsCallback(data, reply);
