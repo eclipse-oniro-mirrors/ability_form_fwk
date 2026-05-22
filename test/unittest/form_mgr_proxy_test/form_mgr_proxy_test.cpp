@@ -3542,7 +3542,7 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_GetFormIdsByFormLocation_004, TestSi
     EXPECT_EQ(result, ERR_OK);
     EXPECT_EQ(formIds.size(), expectedFormIds.size());
     EXPECT_THAT(formIds, ContainerEq(expectedFormIds));
-GTEST_LOG_(INFO) << "FormMgrProxyTest_GetFormIdsByFormLocation_004 ends";
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetFormIdsByFormLocation_004 ends";
 }
 
 /**

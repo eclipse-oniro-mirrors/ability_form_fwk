@@ -3821,7 +3821,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterFormWantCallback_002, TestSi
     MessageOption option{MessageOption::TF_SYNC};
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 ends";
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 ends";
 }
 
 /**

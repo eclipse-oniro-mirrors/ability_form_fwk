@@ -2481,7 +2481,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_003, TestSize.
     // Cleanup
     FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
 
-GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_003 end";
+    GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_003 end";
 }
 
 /**

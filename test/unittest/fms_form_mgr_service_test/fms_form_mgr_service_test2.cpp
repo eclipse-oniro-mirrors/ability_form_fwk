@@ -2626,7 +2626,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_004, 
     MockUnregisterFormWantCallback(ERR_OK);
     ErrCode ret = formMgrService.UnregisterFormWantCallback();
     EXPECT_EQ(ret, ERR_OK);
-GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 end";
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 end";
 }
 
 /**
