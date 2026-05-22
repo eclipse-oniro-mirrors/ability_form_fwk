@@ -84,6 +84,9 @@ namespace {
     int g_registerFormWantCallback = OHOS::ERR_OK;
     int g_unregisterFormWantCallback = OHOS::ERR_OK;
     int g_getWantCallbackProxy = OHOS::ERR_OK;
+    int g_registerDeleteFormsCallback = OHOS::ERR_OK;
+    int g_unregisterDeleteFormsCallback = OHOS::ERR_OK;
+    int g_deleteForms = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -256,6 +259,21 @@ void MockRegisterFormWantCallback(int mockRet)
 void MockUnregisterFormWantCallback(int mockRet)
 {
     g_unregisterFormWantCallback = mockRet;
+}
+
+void MockRegisterDeleteFormsCallback(int mockRet)
+{
+    g_registerDeleteFormsCallback = mockRet;
+}
+
+void MockUnregisterDeleteFormsCallback(int mockRet)
+{
+    g_unregisterDeleteFormsCallback = mockRet;
+}
+
+void MockDeleteForms(int mockRet)
+{
+    g_deleteForms = mockRet;
 }
 
 int FormMgrAdapterFacade::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
@@ -593,6 +611,21 @@ ErrCode FormMgrAdapterFacade::UnregisterFormWantCallback(int32_t callingUid)
 ErrCode FormMgrAdapterFacade::GetWantCallbackProxy(int32_t callingUid, sptr<IRemoteObject> &proxy)
 {
     return g_getWantCallbackProxy;
+}
+
+ErrCode FormMgrAdapterFacade::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerDeleteFormsCallback;
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterDeleteFormsCallback()
+{
+    return g_unregisterDeleteFormsCallback;
+}
+
+ErrCode FormMgrAdapterFacade::DeleteForms(const std::vector<FormRecordFilter> &filters)
+{
+    return g_deleteForms;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

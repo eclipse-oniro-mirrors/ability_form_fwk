@@ -40,6 +40,9 @@ void MockHasFormVisible(bool mockRet);
 void MockEnableForms(int mockRet);
 void MockRegisterFormWantCallback(int mockRet);
 void MockUnregisterFormWantCallback(int mockRet);
+void MockRegisterDeleteFormsCallback(int mockRet);
+void MockUnregisterDeleteFormsCallback(int mockRet);
+void MockDeleteForms(int mockRet);
 
 }  // namespace AppExecFwk
 }  // namespace OHOS

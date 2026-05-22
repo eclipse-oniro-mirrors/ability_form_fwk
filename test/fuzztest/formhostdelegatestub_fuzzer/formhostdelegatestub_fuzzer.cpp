@@ -64,6 +64,10 @@ public:
     {
         return ERR_OK;
     }
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds) override
+    {
+        return ERR_OK;
+    }
 };
 uint32_t GetU32Data(const char* ptr)
 {
