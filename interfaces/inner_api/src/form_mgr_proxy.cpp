@@ -3400,7 +3400,8 @@ ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
         HILOG_ERROR("write interface token failed.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (templateFormInfo.size() > static_cast<size_t>(Constants::TEMPLATE_FORM_MAX_SIZE) || !data.WriteInt32(templateFormInfo.size())) {
+    if (templateFormInfo.size() > static_cast<size_t>(Constants::TEMPLATE_FORM_MAX_SIZE) ||
+        !data.WriteInt32(templateFormInfo.size())) {
         HILOG_ERROR("size limit or write templateFormInfo size failed.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
