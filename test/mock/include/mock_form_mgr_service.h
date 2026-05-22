@@ -146,6 +146,9 @@ public:
     MOCK_METHOD2(GetFormIdsByFormLocation, ErrCode(int32_t formLocation, std::vector<std::string> &formIds));
     MOCK_METHOD1(RegisterFormWantCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(UnregisterFormWantCallback, ErrCode());
+    MOCK_METHOD1(RegisterDeleteFormsCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterDeleteFormsCallback, ErrCode());
+    MOCK_METHOD1(DeleteForms, ErrCode(const std::vector<FormRecordFilter> &filters));
 };
 }
 }

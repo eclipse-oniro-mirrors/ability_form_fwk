@@ -3400,7 +3400,7 @@ ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
         HILOG_ERROR("write interface token failed.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (templateFormInfo.size() > Constants::TEMPLATE_FORM_MAX_SIZE || !data.WriteInt32(templateFormInfo.size())) {
+    if (templateFormInfo.size() > static_cast<size_t>(Constants::TEMPLATE_FORM_MAX_SIZE) || !data.WriteInt32(templateFormInfo.size())) {
         HILOG_ERROR("size limit or write templateFormInfo size failed.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -3509,7 +3509,7 @@ ErrCode FormMgrProxy::UpdateFormsConfig(const std::vector<FormCustomConfig> &con
         HILOG_WARN("configs is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (configs.size() > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
+    if (configs.size() > static_cast<size_t>(Constants::UPDATE_FORM_CONFIG_MAX_NUM)) {
         HILOG_ERROR("configs size %{public}zu exceeds max %{public}d", configs.size(),
             Constants::UPDATE_FORM_CONFIG_MAX_NUM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -3595,7 +3595,7 @@ ErrCode FormMgrProxy::DeleteForms(const std::vector<FormRecordFilter> &filters)
         HILOG_WARN("filters is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (filters.size() > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
+    if (filters.size() > static_cast<size_t>(Constants::DELETE_FORMS_FILTER_MAX_NUM)) {
         HILOG_ERROR("filters size %{public}zu exceeds max %{public}d", filters.size(),
             Constants::DELETE_FORMS_FILTER_MAX_NUM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
