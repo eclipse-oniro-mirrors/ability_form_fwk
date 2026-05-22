@@ -2619,13 +2619,24 @@ HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_003, TestSize.Level1)
     filter.formName = TEST_FORM_NAME;
     filters.push_back(filter);
 
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillRepeatedly(Return(TEST_CALLING_UID));
+    // Mock form records matching the filter
+    FormRecord matchedRecord;
+    matchedRecord.formId = TEST_FORM_ID;
+    matchedRecord.moduleName = TEST_MODULE_NAME;
+    matchedRecord.abilityName = TEST_ABILITY_NAME;
+    matchedRecord.formName = TEST_FORM_NAME;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(StrEq(TEST_BUNDLE_NAME), _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<FormRecord>{matchedRecord}), Return(true)));
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(nullptr));
 
     auto result = FormCallbackAdapter::GetInstance().DeleteForms(filters);
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
     FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
 
     GTEST_LOG_(INFO) << "DeleteForms_003 end";
