@@ -23,19 +23,19 @@ namespace AppExecFwk {
 bool FormRecordFilter::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString16(Str8ToStr16(bundleName))) {
-        HILOG_ERROR("marshall bundleName failed");
+        HILOG_ERROR("marshal bundleName failed");
         return false;
     }
     if (!parcel.WriteString16(Str8ToStr16(moduleName))) {
-        HILOG_ERROR("marshall moduleName failed");
+        HILOG_ERROR("marshal moduleName failed");
         return false;
     }
     if (!parcel.WriteString16(Str8ToStr16(abilityName))) {
-        HILOG_ERROR("marshall abilityName failed");
+        HILOG_ERROR("marshal abilityName failed");
         return false;
     }
     if (!parcel.WriteString16(Str8ToStr16(formName))) {
-        HILOG_ERROR("marshall formName failed");
+        HILOG_ERROR("marshal formName failed");
         return false;
     }
     return true;

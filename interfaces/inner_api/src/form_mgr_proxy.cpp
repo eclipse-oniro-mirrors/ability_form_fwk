@@ -3509,7 +3509,7 @@ ErrCode FormMgrProxy::UpdateFormsConfig(const std::vector<FormCustomConfig> &con
         HILOG_WARN("configs is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (static_cast<int32_t>(configs.size()) > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
+    if (configs.size() > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
         HILOG_ERROR("configs size %{public}zu exceeds max %{public}d", configs.size(),
             Constants::UPDATE_FORM_CONFIG_MAX_NUM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -3595,7 +3595,7 @@ ErrCode FormMgrProxy::DeleteForms(const std::vector<FormRecordFilter> &filters)
         HILOG_WARN("filters is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (static_cast<int32_t>(filters.size()) > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
+    if (filters.size() > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
         HILOG_ERROR("filters size %{public}zu exceeds max %{public}d", filters.size(),
             Constants::DELETE_FORMS_FILTER_MAX_NUM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

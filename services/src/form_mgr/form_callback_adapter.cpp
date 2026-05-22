@@ -460,7 +460,7 @@ ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
 
 ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     ErrCode result = updateFormsConfigRegistry_.Register(callingUid, callerToken);
     if (result == ERR_OK) {
@@ -471,14 +471,14 @@ ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemot
 
 ErrCode FormCallbackAdapter::UnregisterUpdateFormsConfigCallback()
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return updateFormsConfigRegistry_.Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_DEBUG("call, config size: %{public}zu", configs.size());
+    HILOG_INFO("call, config size: %{public}zu", configs.size());
     {
         std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
         formCustomConfigCache_ = configs;
@@ -496,21 +496,21 @@ ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfi
 
 ErrCode FormCallbackAdapter::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return deleteFormsRegistry_.Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterDeleteFormsCallback()
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return deleteFormsRegistry_.Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::DeleteForms(const std::vector<FormRecordFilter> &filters)
 {
-    HILOG_DEBUG("call, filter size: %{public}zu", filters.size());
+    HILOG_INFO("call, filter size: %{public}zu", filters.size());
     std::vector<std::string> matchedFormIds;
     GetMatchedFormIds(filters, matchedFormIds);
     if (matchedFormIds.empty()) {
