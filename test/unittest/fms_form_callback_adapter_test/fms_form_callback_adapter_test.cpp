@@ -2565,19 +2565,30 @@ HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_001, TestSize.Level1)
 
 /**
  * @tc.name: DeleteForms_002
- * @tc.desc: Verify DeleteForms returns ERR_OK when registry has no hosts
+ * @tc.desc: Verify DeleteForms returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED when registry has no hosts
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeleteForms_002 start";
 
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
     FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
 
+    // Mock form records to match the filter so DeleteForms reaches NotifyAllHosts
     std::vector<FormRecordFilter> filters;
     FormRecordFilter filter;
     filter.bundleName = "com.test.bundle";
     filters.push_back(filter);
+
+    FormRecord matchedRecord;
+    matchedRecord.formId = TEST_FORM_ID;
+    matchedRecord.moduleName = "";
+    matchedRecord.abilityName = "";
+    matchedRecord.formName = "";
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(StrEq("com.test.bundle"), _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<FormRecord>{matchedRecord}), Return(true)));
 
     auto result = FormCallbackAdapter::GetInstance().DeleteForms(filters);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
