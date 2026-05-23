@@ -1511,4 +1511,145 @@ HWTEST_F(FormRenderMgrTest, DeleteRenderInner_001, TestSize.Level0)
     EXPECT_FALSE(formRenderMgr.GetFormRenderMgrInner(userId, renderInner));
     GTEST_LOG_(INFO) << "DeleteRenderInner_001 end";
 }
+
+/**
+ * @tc.name: InitRenderInner_001
+ * @tc.desc: Test InitRenderInner creates renderInners_ entry for non-sandbox mode.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, InitRenderInner_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InitRenderInner_001 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    EXPECT_TRUE(formRenderMgr.renderInners_.empty());
+    formRenderMgr.InitRenderInner(false, userId);
+    EXPECT_EQ(formRenderMgr.renderInners_.size(), 1u);
+    EXPECT_TRUE(formRenderMgr.renderInners_.count(userId) > 0);
+    EXPECT_TRUE(formRenderMgr.sandboxInners_.empty());
+    GTEST_LOG_(INFO) << "InitRenderInner_001 end";
+}
+
+/**
+ * @tc.name: InitRenderInner_002
+ * @tc.desc: Test InitRenderInner creates sandboxInners_ entry for sandbox mode.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, InitRenderInner_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InitRenderInner_002 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 200;
+    EXPECT_TRUE(formRenderMgr.sandboxInners_.empty());
+    formRenderMgr.InitRenderInner(true, userId);
+    EXPECT_EQ(formRenderMgr.sandboxInners_.size(), 1u);
+    EXPECT_TRUE(formRenderMgr.sandboxInners_.count(userId) > 0);
+    EXPECT_TRUE(formRenderMgr.renderInners_.empty());
+    GTEST_LOG_(INFO) << "InitRenderInner_002 end";
+}
+
+/**
+ * @tc.name: InitRenderInner_003
+ * @tc.desc: Test InitRenderInner does not duplicate entry if already exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, InitRenderInner_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InitRenderInner_003 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    formRenderMgr.InitRenderInner(false, userId);
+    EXPECT_EQ(formRenderMgr.renderInners_.size(), 1u);
+    formRenderMgr.InitRenderInner(false, userId);
+    EXPECT_EQ(formRenderMgr.renderInners_.size(), 1u);
+    GTEST_LOG_(INFO) << "InitRenderInner_003 end";
+}
+
+/**
+ * @tc.name: GetFRSDiedInLowMemoryByUid_001
+ * @tc.desc: Test GetFRSDiedInLowMemoryByUid returns false when no renderInner exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, GetFRSDiedInLowMemoryByUid_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetFRSDiedInLowMemoryByUid_001 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    EXPECT_FALSE(formRenderMgr.GetFRSDiedInLowMemoryByUid(userId));
+    GTEST_LOG_(INFO) << "GetFRSDiedInLowMemoryByUid_001 end";
+}
+
+/**
+ * @tc.name: GetFRSDiedInLowMemoryByUid_002
+ * @tc.desc: Test GetFRSDiedInLowMemoryByUid returns the inner state when renderInner exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, GetFRSDiedInLowMemoryByUid_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetFRSDiedInLowMemoryByUid_002 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    formRenderMgr.InitRenderInner(false, userId);
+    EXPECT_FALSE(formRenderMgr.GetFRSDiedInLowMemoryByUid(userId));
+    auto iter = formRenderMgr.renderInners_.find(userId);
+    ASSERT_TRUE(iter != formRenderMgr.renderInners_.end());
+    iter->second->isFrsDiedInLowMemory_ = true;
+    EXPECT_TRUE(formRenderMgr.GetFRSDiedInLowMemoryByUid(userId));
+    GTEST_LOG_(INFO) << "GetFRSDiedInLowMemoryByUid_002 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_001
+ * @tc.desc: Test SetRenderGroupEnableFlag when no renderInner exists for current userId, maps unchanged.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, SetRenderGroupEnableFlag_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_001 start";
+    FormRenderMgr formRenderMgr;
+    MockGetCurrentAccountIdRet(200);
+    formRenderMgr.InitRenderInner(false, 100);
+    EXPECT_EQ(formRenderMgr.renderInners_.size(), 1u);
+    formRenderMgr.SetRenderGroupEnableFlag(1, true);
+    EXPECT_EQ(formRenderMgr.renderInners_.size(), 1u);
+    EXPECT_TRUE(formRenderMgr.sandboxInners_.empty());
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_001 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_002
+ * @tc.desc: Test SetRenderGroupEnableFlag with matching userId, inner remains valid after call.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, SetRenderGroupEnableFlag_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_002 start";
+    FormRenderMgr formRenderMgr;
+    MockGetCurrentAccountIdRet(100);
+    formRenderMgr.InitRenderInner(false, 100);
+    formRenderMgr.InitRenderInner(true, 100);
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    EXPECT_TRUE(formRenderMgr.GetFormRenderMgrInner(100, renderInner));
+    formRenderMgr.SetRenderGroupEnableFlag(1, true);
+    EXPECT_TRUE(formRenderMgr.GetFormRenderMgrInner(100, renderInner));
+    formRenderMgr.SetRenderGroupEnableFlag(1, false);
+    EXPECT_TRUE(formRenderMgr.GetFormRenderMgrInner(100, renderInner));
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_002 end";
+}
+
+/**
+ * @tc.name: CheckMultiAppFormVersionCode_001
+ * @tc.desc: Test CheckMultiAppFormVersionCode with empty bundleName returns false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, CheckMultiAppFormVersionCode_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "CheckMultiAppFormVersionCode_001 start";
+    FormRenderMgr formRenderMgr;
+    FormRecord formRecord;
+    formRecord.bundleName = "";
+    formRecord.isSystemApp = false;
+    EXPECT_FALSE(formRenderMgr.CheckMultiAppFormVersionCode(formRecord));
+    GTEST_LOG_(INFO) << "CheckMultiAppFormVersionCode_001 end";
+}
 }

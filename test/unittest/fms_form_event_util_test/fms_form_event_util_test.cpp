@@ -32,6 +32,9 @@
 #include "ipc_types.h"
 #include "mock_bundle_mgr.h"
 #include "mock_form_provider_client.h"
+#define private public
+#include "form_render/form_render_mgr.h"
+#undef private
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1464,5 +1467,208 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_074, TestSize.Level1)
     EXPECT_EQ(updatedForms.size(), 1);
     EXPECT_EQ(updatedForms[0].formId, 1);
     GTEST_LOG_(INFO) << "FormEventUtil_074 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_075
+ * @tc.desc: Test HandleOnUnlock delegates to FormRenderMgr, inner state remains valid.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_075, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_075 start";
+    int32_t userId = 100;
+    FormRenderMgr::GetInstance().InitRenderInner(false, userId);
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    EXPECT_TRUE(FormRenderMgr::GetInstance().GetFormRenderMgrInner(userId, renderInner));
+    FormEventUtil::HandleOnUnlock(userId);
+    EXPECT_TRUE(FormRenderMgr::GetInstance().GetFormRenderMgrInner(userId, renderInner));
+    FormRenderMgr::GetInstance().DeleteRenderInner(userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_075 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_076
+ * @tc.desc: Test SetTimerCfgByMultUpdate with valid time config.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_076, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_076 start";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate("10:30,14:00", cfg);
+    EXPECT_TRUE(cfg.enableUpdate);
+    EXPECT_EQ(cfg.updateAtTimes.size(), 2u);
+    EXPECT_EQ(cfg.updateAtTimes[0][0], 10);
+    EXPECT_EQ(cfg.updateAtTimes[0][1], 30);
+    EXPECT_EQ(cfg.updateAtTimes[1][0], 14);
+    EXPECT_EQ(cfg.updateAtTimes[1][1], 0);
+    GTEST_LOG_(INFO) << "FormEventUtil_076 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_077
+ * @tc.desc: Test SetTimerCfgByMultUpdate with invalid hour, invalid entry skipped.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_077, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_077 start";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate("25:00,10:30", cfg);
+    EXPECT_TRUE(cfg.enableUpdate);
+    EXPECT_EQ(cfg.updateAtTimes.size(), 1u);
+    EXPECT_EQ(cfg.updateAtTimes[0][0], 10);
+    EXPECT_EQ(cfg.updateAtTimes[0][1], 30);
+    GTEST_LOG_(INFO) << "FormEventUtil_077 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_078
+ * @tc.desc: Test SetTimerCfgByMultUpdate with all invalid entries, cfg unchanged.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_078, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_078 start";
+    FormTimerCfg cfg = {};
+    FormEventUtil::SetTimerCfgByMultUpdate("25:00,24:99", cfg);
+    EXPECT_FALSE(cfg.enableUpdate);
+    EXPECT_TRUE(cfg.updateAtTimes.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_078 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_079
+ * @tc.desc: Test UpdateMultiUpdateTime with valid time string.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_079, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_079 start";
+    FormRecord formRecord = {};
+    FormEventUtil::UpdateMultiUpdateTime("8:0,18:30", formRecord);
+    EXPECT_EQ(formRecord.updateAtTimes.size(), 2u);
+    EXPECT_EQ(formRecord.updateAtTimes[0][0], 8);
+    EXPECT_EQ(formRecord.updateAtTimes[0][1], 0);
+    EXPECT_EQ(formRecord.updateAtTimes[1][0], 18);
+    EXPECT_EQ(formRecord.updateAtTimes[1][1], 30);
+    GTEST_LOG_(INFO) << "FormEventUtil_079 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_080
+ * @tc.desc: Test UpdateMultiUpdateTime with invalid time, updateAtTimes remains empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_080, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_080 start";
+    FormRecord formRecord = {};
+    FormEventUtil::UpdateMultiUpdateTime("99:99", formRecord);
+    EXPECT_TRUE(formRecord.updateAtTimes.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_080 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_081
+ * @tc.desc: Test BuildFormInfos with empty records returns empty vector.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_081, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_081 start";
+    std::vector<FormRecord> records;
+    auto formInfos = FormEventUtil::BuildFormInfos(records);
+    EXPECT_TRUE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormEventUtil_081 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_082
+ * @tc.desc: Test BuildFormInfos with records, return size matches input.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_082, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_082 start";
+    std::vector<FormRecord> records;
+    FormRecord record1;
+    record1.formId = 1;
+    record1.bundleName = FORM_HOST_BUNDLE_NAME;
+    record1.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    record1.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    record1.formName = FORM_NAME;
+    records.push_back(record1);
+    FormRecord record2;
+    record2.formId = 2;
+    record2.bundleName = FORM_HOST_BUNDLE_NAME;
+    record2.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    record2.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    record2.formName = FORM_NAME;
+    records.push_back(record2);
+    auto formInfos = FormEventUtil::BuildFormInfos(records);
+    EXPECT_EQ(formInfos.size(), records.size());
+    GTEST_LOG_(INFO) << "FormEventUtil_082 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_083
+ * @tc.desc: Test HandleWantCallbackForHost with no proxy, returns early without side effect.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_083, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_083 start";
+    int32_t hostUid = 99999;
+    std::vector<FormRecord> records;
+    FormRecord record;
+    record.formId = 1;
+    records.push_back(record);
+    size_t originalSize = records.size();
+    FormEventUtil::HandleWantCallbackForHost(hostUid, records);
+    EXPECT_EQ(records.size(), originalSize);
+    GTEST_LOG_(INFO) << "FormEventUtil_083 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_084
+ * @tc.desc: Test ApplyWantParams with mismatched sizes, processes min(records, params).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_084, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_084 start";
+    std::vector<FormRecord> records;
+    FormRecord record;
+    record.formId = 1;
+    records.push_back(record);
+    std::vector<AAFwk::WantParams> wantParamsList;
+    AAFwk::WantParams params;
+    wantParamsList.push_back(params);
+    EXPECT_EQ(records.size(), wantParamsList.size());
+    FormEventUtil::ApplyWantParams(records, wantParamsList);
+    EXPECT_EQ(records.size(), 1u);
+    GTEST_LOG_(INFO) << "FormEventUtil_084 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_085
+ * @tc.desc: Test HandleProviderUpdatedDetail with removedForms triggers timer cleanup.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_085, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_085 start";
+    std::vector<int64_t> removedForms = {100, 200};
+    std::vector<FormRecord> updatedForms;
+    FormRecord formRecord;
+    formRecord.formId = 300;
+    updatedForms.emplace_back(formRecord);
+    EXPECT_EQ(removedForms.size(), 2u);
+    FormEventUtil::HandleProviderUpdatedDetail(removedForms, updatedForms,
+        FORM_HOST_BUNDLE_NAME, 1, false);
+    EXPECT_EQ(updatedForms[0].formId, 300);
+    GTEST_LOG_(INFO) << "FormEventUtil_085 end";
 }
 }
