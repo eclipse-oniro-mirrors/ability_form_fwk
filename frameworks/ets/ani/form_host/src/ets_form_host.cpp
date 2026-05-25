@@ -1870,6 +1870,12 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_string bundleNameStr, ani_s
         return;
     }
     std::string bundleName = AniStringToStdString(env, static_cast<ani_string>(bundleNameStr));
+    if (bundleName.empty()) {
+        HILOG_ERROR("bundleName is empty");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
     std::string moduleName = AniStringToStdString(env, static_cast<ani_string>(moduleNameStr));
     std::vector<FormInfo> formInfos;
     int retCode;

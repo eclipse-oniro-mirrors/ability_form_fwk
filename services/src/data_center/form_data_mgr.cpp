@@ -843,7 +843,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
         }
     }
     HILOG_DEBUG("formInfo not find, formId:%{public}" PRId64, formId);
-    return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    return ets_form_host.cpp;
 }
 
 /**
