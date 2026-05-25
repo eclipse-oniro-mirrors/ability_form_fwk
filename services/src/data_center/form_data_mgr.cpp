@@ -833,7 +833,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
         if (formId == itFormRecord->second.formId &&
             (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
             if (bundleName != itFormRecord->second.bundleName) {
-                HILOG_DEBUG("formId exist but bundleName not match, formId:%{public}" PRId64, formId);
+                HILOG_WARN("formId exist but bundleName not match, formId:%{public}" PRId64, formId);
                 return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
             }
             formInfo.formId = itFormRecord->second.formId;
@@ -842,7 +842,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
             return ERR_OK;
         }
     }
-    HILOG_DEBUG("formInfo not find, formId:%{public}" PRId64, formId);
+    HILOG_WARN("formInfo not find, formId:%{public}" PRId64, formId);
     return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
 
