@@ -34,7 +34,6 @@
 #include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "feature/route_proxy/form_router_proxy_mgr.h"
 #include "form_mgr/form_common_adapter.h"
-#include "form_mgr/form_mgr_adapter.h"
 #include "form_mgr/form_publish_adapter.h"
 #include "form_mgr_errors.h"
 #include "form_event_report.h"

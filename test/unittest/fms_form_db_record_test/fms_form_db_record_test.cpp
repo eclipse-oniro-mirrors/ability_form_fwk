@@ -18,7 +18,6 @@
 #include <thread>
 #define private public
 #include "data_center/database/form_db_cache.h"
-#include "form_mgr/form_mgr_adapter.h"
 #undef private
 #include "data_center/form_record/form_record.h"
 #include "fms_log_wrapper.h"
@@ -35,7 +34,6 @@ public:
     void InitFormRecord();
     void TearDown();
     FormRecord formRecord_;
-    FormMgrAdapter formMgrAdapter_;
 };
 
 void FmsFormDbRecordTest::InitFormRecord()

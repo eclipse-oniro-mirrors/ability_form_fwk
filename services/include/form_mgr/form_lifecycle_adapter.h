@@ -34,7 +34,6 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_js_info.h"
-#include "form_mgr/form_mgr_adapter.h"
 #include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "common/event/form_event_notify_connection.h"

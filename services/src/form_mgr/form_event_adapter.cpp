@@ -48,9 +48,8 @@ namespace OHOS {
 namespace AppExecFwk {
 using namespace FormAdapterConstants;
 namespace {
-// Local-only constants (different value from form_mgr_adapter.cpp)
-constexpr int64_t MAX_NUMBER_OF_JS = 100000000000000L;
-constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.extra.param.key.free_install_calling_uid";
+constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
+constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 } // namespace
 
 FormEventAdapter::FormEventAdapter()

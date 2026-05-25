@@ -24,7 +24,6 @@
 #include "form_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
-#include "form_mgr/form_mgr_adapter.h"
 #include "form_mgr/form_mgr_service.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
