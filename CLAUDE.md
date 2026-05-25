@@ -96,7 +96,7 @@ graph TB
 
 ### 服务入口点
 - `services/src/form_mgr/form_mgr_service.cpp` - FormMgrService 主服务类
-- `services/src/form_mgr/form_mgr_adapter.cpp` - FormMgrAdapter 适配器
+- `services/src/form_mgr/form_mgr_adapter_facade.cpp` - FormMgrAdapter 适配器
 - `services/src/form_mgr/form_mgr_queue.cpp` - FormMgrQueue 队列管理
 
 ### 核心管理器

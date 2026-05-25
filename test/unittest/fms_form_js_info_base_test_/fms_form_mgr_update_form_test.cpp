@@ -24,7 +24,7 @@
 #include "form_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
 #include "form_mgr/form_mgr_service.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
@@ -185,7 +185,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
 
     // test exec
-    EXPECT_EQ(ERR_OK, FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
+    EXPECT_EQ(ERR_OK, FormMgrAdapterFacade::GetInstance().UpdateForm(formId, callingUid, formProviderData));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_003 end";
 }

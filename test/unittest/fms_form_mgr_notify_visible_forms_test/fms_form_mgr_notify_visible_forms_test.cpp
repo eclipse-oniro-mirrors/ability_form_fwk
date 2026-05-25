@@ -26,7 +26,6 @@
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_service.h"
-#include "form_mgr/form_mgr_adapter.h"
 #undef private
 #include "fms_log_wrapper.h"
 #include "mock_bundle_manager.h"

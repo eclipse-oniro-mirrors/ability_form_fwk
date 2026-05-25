@@ -234,7 +234,6 @@ ohos_shared_library("libfms") {
     "services/src/form_mgr/form_edit_service.cpp",
     "services/src/form_mgr/form_event_adapter.cpp",
     "services/src/form_mgr/form_lifecycle_adapter.cpp",
-    "services/src/form_mgr/form_mgr_adapter.cpp",
     "services/src/form_mgr/form_mgr_adapter_facade.cpp",
     "services/src/form_mgr/form_mgr_service.cpp",
     "services/src/form_mgr/form_observer_adapter.cpp",
