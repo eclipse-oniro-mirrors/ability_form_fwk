@@ -19,6 +19,7 @@ config("formrender_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "include",
+    "${form_fwk_path}/common/include",
     "${form_fwk_path}/services/common/include",
   ]
   cflags = []
@@ -113,6 +114,7 @@ ohos_shared_library("formrender") {
   }
 
   deps = [
+    "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_common_info",
@@ -202,6 +204,7 @@ ohos_shared_library("formrender_service") {
 
   deps = [
     ":formrender",
+    "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_common_info",
