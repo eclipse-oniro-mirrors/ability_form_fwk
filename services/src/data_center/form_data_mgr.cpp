@@ -838,7 +838,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
             return ERR_OK;
         }
     }
-    HILOG_WARN("formInfo not find");
+    HILOG_WARN("formInfo not find, formId:%{public}" PRId64, formId);
     return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 
