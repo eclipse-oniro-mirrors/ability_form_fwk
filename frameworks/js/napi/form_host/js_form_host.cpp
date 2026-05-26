@@ -25,6 +25,7 @@
 #include "form_host_client.h"
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
+#include "form_histogram_utils.h"
 #include "ipc_skeleton.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
@@ -60,6 +61,7 @@ namespace {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
     constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
+    constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -1703,6 +1705,7 @@ private:
 
     napi_value OnShareForm(napi_env env, size_t argc, napi_value* argv)
     {
+        FormHistogramUtils::ReportHistogramBoolean("Form.Host.shareForm", HISTOGRAM_BOOLEAN_SAMPLE);
         HILOG_DEBUG("call");
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
             HILOG_ERROR("invalid argc");
@@ -1805,6 +1808,7 @@ private:
 
     napi_value OnNotifyFormsPrivacyProtected(napi_env env, size_t argc, napi_value* argv)
     {
+        FormHistogramUtils::ReportHistogramBoolean("Form.Host.notifyFormsPrivacyProtected", HISTOGRAM_BOOLEAN_SAMPLE);
         HILOG_INFO("call");
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
             HILOG_ERROR("invalid argc");
@@ -2160,6 +2164,7 @@ private:
 
     napi_value OnUpdateFormSize(napi_env env, size_t argc, napi_value* argv)
     {
+        FormHistogramUtils::ReportHistogramBoolean("Form.Host.updateFormSize", HISTOGRAM_BOOLEAN_SAMPLE);
         HILOG_DEBUG("call");
         if (argc != ARGS_THREE) {
             HILOG_ERROR("invalid argc");
@@ -2273,6 +2278,8 @@ private:
 
     napi_value OnRegisterTemplateFormDetailInfoObserver(napi_env env, size_t argc, napi_value* argv)
     {
+        FormHistogramUtils::ReportHistogramBoolean(
+            "Form.Host.onTemplateFormDetailInfoChange", HISTOGRAM_BOOLEAN_SAMPLE);
         HILOG_DEBUG("call");
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("the app not system-app,can't use system-api");
@@ -2302,6 +2309,8 @@ private:
 
     napi_value OnUnregisterTemplateFormDetailInfoObserver(napi_env env, size_t argc, napi_value* argv)
     {
+        FormHistogramUtils::ReportHistogramBoolean(
+            "Form.Host.offTemplateFormDetailInfoChange", HISTOGRAM_BOOLEAN_SAMPLE);
         HILOG_DEBUG("call");
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("the app not system-app,can't use system-api");

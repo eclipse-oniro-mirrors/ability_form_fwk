@@ -27,6 +27,7 @@
 #include "ets_error_utils.h"
 #include "ets_context_utils.h"
 #include "ets_extension_context.h"
+#include "form_histogram_utils.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -36,6 +37,7 @@ constexpr const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "application.UIE
 constexpr const char *AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER =
     "application.FormEditExtensionContext.AsyncCallbackWrapper";
 constexpr const char *ERR_MSG_INTERNAL_ERROR = "Internal error";
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 } // namespace
 using namespace OHOS::AppExecFwk;
 
@@ -183,6 +185,8 @@ void EtsFormEditExtensionContext::Clean(ani_env *env, ani_object object)
 void EtsFormEditExtensionContext::StartSecondPage(ani_env *env, ani_object aniObj,
     ani_object aniWant, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean(
+        "Form.EditExtensionContext.startSecondPage", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("called");
     if (env == nullptr) {
         HILOG_ERROR("null env");

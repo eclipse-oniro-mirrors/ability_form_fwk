@@ -181,6 +181,7 @@ ohos_shared_library("libfms") {
     "services/src/common/util/form_dump_mgr.cpp",
     "services/src/common/util/form_proxy_registry.cpp",
     "services/src/common/util/form_report.cpp",
+    "services/src/common/util/form_histogram_utils.cpp",
     "services/src/common/util/form_serial_queue.cpp",
     "services/src/common/util/form_trust_mgr.cpp",
     "services/src/common/util/form_util.cpp",
@@ -400,6 +401,11 @@ ohos_shared_library("libfms") {
 
   if (build_variant == "root") {
     defines += [ "FORM_EVENT_FOR_TEST" ]
+  }
+
+  if (form_fwk_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
   }
 
   subsystem_name = "ability"

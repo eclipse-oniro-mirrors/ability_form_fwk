@@ -28,10 +28,12 @@ ohos_shared_library("formHost_ani") {
     "./include",
     "${form_fwk_path}/frameworks/ets/ani/utils/include",
     "${form_fwk_path}/frameworks/ets/ani/form_util/include",
+    "${form_fwk_path}/services/include/common/util",
   ]
 
   sources = [
     "src/ets_form_host.cpp",
+    "${form_fwk_path}/services/src/common/util/form_histogram_utils.cpp",
   ]
 
   deps = [
@@ -43,6 +45,7 @@ ohos_shared_library("formHost_ani") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -61,6 +64,12 @@ ohos_shared_library("formHost_ani") {
     "runtime_core:ani",
     "runtime_core:libarkruntime",
   ]
+
+  defines = []
+  if (form_fwk_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
+  }
 
   subsystem_name = "ability"
   part_name = "form_fwk"

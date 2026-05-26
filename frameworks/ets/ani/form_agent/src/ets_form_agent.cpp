@@ -24,6 +24,7 @@
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
 #include "form_provider_info.h"
+#include "form_histogram_utils.h"
 #include "ipc_skeleton.h"
 #include "nlohmann/json.hpp"
 #include "runtime.h"
@@ -39,6 +40,7 @@ namespace {
 const std::string IS_FORM_AGENT = "isFormAgent";
 constexpr const char *ETS_FORM_AGENT_NAME = "@ohos.app.form.formAgent.formAgent";
 constexpr const char *AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "@ohos.app.form.formAgent.AsyncCallbackWrapper";
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 struct RequestPublishFormCallbackInfo {
     Want want {};
     bool withFormBindingData = false;
@@ -48,6 +50,7 @@ struct RequestPublishFormCallbackInfo {
 
 void RequestPublishForm(ani_env *env, ani_object aniWant, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Agent.requestPublishForm", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");

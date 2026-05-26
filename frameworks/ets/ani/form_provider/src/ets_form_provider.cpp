@@ -25,6 +25,7 @@
 #include "ani_form_error_util.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr.h"
+#include "form_histogram_utils.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -51,6 +52,7 @@ constexpr const char *ETS_PUBLISHFORMCROSSBUNDLEINFO_NAME =
     "@ohos.app.form.formInfo.formInfo.PublishFormCrossBundleInfoInner";
 constexpr const char *ETS_FORM_PUBLISH_FORM_CROSS_CALLBACK =
     "@ohos.app.form.formProvider.formProvider.PublishFormCrossBundleControlCallbackWrapper";
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 
 enum class ActivationState : int32_t {
     DEACTIVATED = 0,
@@ -328,6 +330,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
 void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
     ani_string formId, ani_boolean isMainPage)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormEditAbility", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("Call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -375,6 +378,7 @@ void CloseFormEditAbility(ani_env *env, ani_boolean isMainPage)
 
 void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormManager", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("Call");
     CheckIfRefValidOrThrow(env, wantObj);
     Want want;
@@ -462,6 +466,7 @@ void GetFormRect(ani_env *env, ani_string formId, ani_object callback)
 
 void CancelOverflow(ani_env *env, ani_string formId, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.cancelOverflow", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -501,6 +506,7 @@ void CancelOverflow(ani_env *env, ani_string formId, ani_object callback)
 void RequestOverflow(ani_env *env, ani_string formId,
     ani_object aniOverflowInfo, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.requestOverflow", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -543,6 +549,7 @@ void RequestOverflow(ani_env *env, ani_string formId,
 
 void DeactivateSceneAnimation(ani_env *env, ani_string formId, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.deactivateSceneAnimation", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -574,6 +581,7 @@ void DeactivateSceneAnimation(ani_env *env, ani_string formId, ani_object callba
 
 void ActivateSceneAnimation(ani_env *env, ani_string formId, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.activateSceneAnimation", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -605,6 +613,7 @@ void ActivateSceneAnimation(ani_env *env, ani_string formId, ani_object callback
 
 void OpenFormManagerCrossBundle(ani_env *env, ani_object aniWant)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormManagerCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -637,6 +646,7 @@ void OpenFormManagerCrossBundle(ani_env *env, ani_object aniWant)
 void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, ani_boolean withFormBindingData,
     ani_string dataObjStr, ani_object proxies)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.requestPublishForm", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("Call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -686,6 +696,7 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
 
 void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.getPublishedFormInfos", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("Call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -721,6 +732,7 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
 
 void GetPublishedFormInfoById(ani_env* env, ani_string formId, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.getPublishedFormInfoById", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("Call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");

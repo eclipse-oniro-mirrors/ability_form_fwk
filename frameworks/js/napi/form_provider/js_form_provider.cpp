@@ -26,6 +26,7 @@
 #include "form_instance.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
+#include "form_histogram_utils.h"
 #include "running_form_info.h"
 #include "js_runtime_utils.h"
 #include "ipc_skeleton.h"
@@ -50,6 +51,7 @@ constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr size_t ARGS_SIZE_THREE = 3;
 constexpr size_t ARGS_SIZE_FOUR = 4;
 constexpr int REF_COUNT = 1;
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 const std::string IS_FORM_AGENT = "isFormAgent";
 enum class ActivationState : int32_t {
     Deactivated = 0,
@@ -289,6 +291,7 @@ napi_value JsFormProvider::GetPublishedFormInfoById(napi_env env, napi_callback_
 
 napi_value JsFormProvider::OnGetPublishedFormInfoById(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.getPublishedFormInfoById", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
     if (CheckParamNum(env, argc, ARGS_SIZE_ONE, ARGS_SIZE_TWO) == false) {
         return CreateJsUndefined(env);
@@ -338,6 +341,7 @@ napi_value JsFormProvider::GetPublishedFormInfos(napi_env env, napi_callback_inf
 
 napi_value JsFormProvider::OnGetPublishedFormInfos(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.getPublishedFormInfos", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
 
     NapiAsyncTask::CompleteCallback complete =
@@ -363,6 +367,7 @@ napi_value JsFormProvider::OpenFormManager(napi_env env, napi_callback_info info
 
 napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormManager", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
     Want want;
     if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], want)) {
@@ -416,6 +421,7 @@ napi_value JsFormProvider::OpenFormManagerCrossBundle(napi_env env, napi_callbac
 
 napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormManagerCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
 #ifdef NO_RUNTIME_EMULATOR
     int64_t processorId = FormEventHiAppEvent::AddProcessor();
@@ -613,6 +619,7 @@ napi_value JsFormProvider::RequestPublishForm(napi_env env, napi_callback_info i
 
 napi_value JsFormProvider::OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.requestPublishForm", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
     if (CheckParamNum(env, argc, ARGS_SIZE_ONE, ARGS_SIZE_THREE) == false) {
         return CreateJsUndefined(env);
@@ -742,6 +749,7 @@ napi_value JsFormProvider::OpenFormEditAbility(napi_env env, napi_callback_info 
 
 napi_value JsFormProvider::OnOpenFormEditAbility(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormEditAbility", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
     if (!CheckParamNum(env, argc, ARGS_SIZE_TWO, ARGS_SIZE_THREE)) {
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2 or 3");
@@ -812,6 +820,7 @@ napi_value JsFormProvider::RequestOverflow(napi_env env, napi_callback_info info
 
 napi_value JsFormProvider::OnRequestOverflow(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.requestOverflow", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("Call");
     if (argc != ARGS_SIZE_TWO) {
         HILOG_ERROR("Wrong number of arguments");
@@ -856,6 +865,7 @@ napi_value JsFormProvider::CancelOverflow(napi_env env, napi_callback_info info)
 
 napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.cancelOverflow", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (argc != ARGS_SIZE_ONE) {
         HILOG_ERROR("wrong number of arguments");
@@ -905,6 +915,7 @@ napi_value JsFormProvider::ActivateSceneAnimation(napi_env env, napi_callback_in
 
 napi_value JsFormProvider::OnActivateSceneAnimation(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.activateSceneAnimation", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (argc != ARGS_SIZE_ONE) {
         HILOG_ERROR("OnActivateSceneAnimation wrong number of arguments.");
@@ -950,6 +961,7 @@ napi_value JsFormProvider::DeactivateSceneAnimation(napi_env env, napi_callback_
 
 napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Provider.deactivateSceneAnimation", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (argc != ARGS_SIZE_ONE) {
         HILOG_ERROR("OnDeactivateSceneAnimation wrong number of arguments");
