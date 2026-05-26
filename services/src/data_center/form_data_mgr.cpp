@@ -830,20 +830,16 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
     HILOG_DEBUG("get form record by bundleName & formId");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-        if (formId == itFormRecord->second.formId &&
+        if (bundleName == itFormRecord->second.bundleName && formId == itFormRecord->second.formId &&
             (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
-            if (bundleName != itFormRecord->second.bundleName) {
-                HILOG_WARN("formId exist but bundleName not match, formId:%{public}" PRId64, formId);
-                return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-            }
             formInfo.formId = itFormRecord->second.formId;
             FillBasicRunningFormInfoByFormRecord(itFormRecord->second, formInfo);
             HILOG_DEBUG("GetPublishedFormInfoById success, formId:%{public}" PRId64, formId);
             return ERR_OK;
         }
     }
-    HILOG_WARN("formInfo not find, formId:%{public}" PRId64, formId);
-    return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    HILOG_WARN("formInfo not find");
+    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 
 /**

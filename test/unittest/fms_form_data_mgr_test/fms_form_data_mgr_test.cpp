@@ -4536,9 +4536,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_003, TestSize.Level0)
     EXPECT_EQ(runningFormInfo.formId, formId1);
     EXPECT_EQ(formDataMgr_.GetPublishedFormInfoById("testBundle2", runningFormInfo, formId2, formId2), ERR_OK);
     EXPECT_EQ(formDataMgr_.GetPublishedFormInfoById("testBundle2", runningFormInfo, formId1, formId2),
-        ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+        ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
     EXPECT_EQ(formDataMgr_.GetPublishedFormInfoById("testBundle2", runningFormInfo, formId2, formId1),
-        ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+        ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
 
     EXPECT_EQ(formDataMgr_.GetPublishedFormInfos("testBundle1", runningFormInfos, formId1), ERR_OK);
     EXPECT_EQ(formDataMgr_.GetPublishedFormInfos("testBundle1", runningFormInfos, -1), ERR_OK);
