@@ -15,6 +15,7 @@
 
 #include "js_form_edit_extension_context.h"
 #include "hilog_tag_wrapper.h"
+#include "form_histogram_utils.h"
 #include "hitrace_meter.h"
 #include "js_extension_context.h"
 #include "js_runtime.h"
@@ -37,6 +38,7 @@ constexpr const char *ERR_MSG_INTERNAL_ERROR = "Internal error";
 constexpr const char *ERR_MSG_CONTEXT_RELEASED = "context has released";
 constexpr const char *ERR_MSG_PARSE_WANT_FAILED = "Parse param want failed, want must be Want";
 constexpr int32_t INDEX_ONE = 1;
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 } // namespace
 using namespace OHOS::AppExecFwk;
 
@@ -83,6 +85,7 @@ napi_value JsFormEditExtensionContext::StartUIAbility(napi_env env, napi_callbac
 
 napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallbackInfo &info)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.EditExtensionContext.startSecondPage", HISTOGRAM_BOOLEAN_SAMPLE);
     TAG_LOGD(AAFwkTag::UI_EXT, "called: param size: %{public}d", static_cast<int32_t>(info.argc));
     if (info.argc != ARGC_TWO) {
         ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);

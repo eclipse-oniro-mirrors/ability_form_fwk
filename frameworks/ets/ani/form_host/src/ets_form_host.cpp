@@ -34,6 +34,7 @@
 #include "form_errors.h"
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
+#include "form_histogram_utils.h"
 #include "runtime.h"
 
 namespace OHOS {
@@ -77,8 +78,8 @@ constexpr const char *FORM_HOST_OVERFLOWINFO_DURATION = "duration";
 constexpr const char *FORM_HOST_OVERFLOWINFO_USEDEFAULTANIMATION = "useDefaultAnimation";
 constexpr const char *FORM_HOST_UPDATEFORMSIZE =
     "C{std.core.String}C{@ohos.app.form.formInfo.formInfo.FormDimension}C{@ohos.app.form.formInfo.formInfo.Rect}:";
-
 constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 
 void CallBackReturn(const Rect &item, LiveFormInterfaceParam* liveFormInterfaceParam, bool ret)
 {
@@ -146,6 +147,8 @@ public:
     }
     static void OnRegisterTemplateFormDetailInfoChange(ani_env* env, ani_object callback)
     {
+        FormHistogramUtils::ReportHistogramBoolean(
+            "Form.Host.onTemplateFormDetailInfoChange", HISTOGRAM_BOOLEAN_SAMPLE);
         HILOG_INFO("OnRegisterTemplateFormDetailInfoChange Call");
         if (!FormAniUtil::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
@@ -169,6 +172,8 @@ public:
 
     static void OffRegisterTemplateFormDetailInfoChange(ani_env* env, ani_object callback)
     {
+        FormHistogramUtils::ReportHistogramBoolean(
+            "Form.Host.offTemplateFormDetailInfoChange", HISTOGRAM_BOOLEAN_SAMPLE);
         HILOG_INFO("OffRegisterTemplateFormDetailInfoChange Call");
         if (!FormAniUtil::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
@@ -1580,6 +1585,7 @@ void InnerShareForm(ani_vm* vm, ani_ref callBackGlobRef, int32_t code)
 
 void ShareForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string deviceId, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Host.shareForm", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("Call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -2275,6 +2281,7 @@ void NotifyInvisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, an
 void NotifyFormsPrivacyProtected([[maybe_unused]] ani_env *env, ani_object arrayObj,
     ani_boolean isProtected, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Host.notifyFormsPrivacyProtected", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("Call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -2779,6 +2786,7 @@ void ClearRouterProxy(ani_env *env, ani_object arrayObj, ani_object callback)
 
 void UpdateFormSize(ani_env *env, ani_string aniFormId, ani_object aniNewDimension, ani_object aniNewRect)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Host.updateFormSize", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");

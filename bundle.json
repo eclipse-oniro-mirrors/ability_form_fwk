@@ -20,7 +20,8 @@
           "form_fwk_form_dimension_3_3",
           "form_fwk_watch_api_disable",
           "form_fwk_dynamic_support",
-          "form_fwk_with_distributed_capability"
+          "form_fwk_with_distributed_capability",
+          "form_fwk_support_api_metrics"
         ],
         "adapted_system_type": [
             "standard"
@@ -33,6 +34,7 @@
         "deps": {
           "components": [
               "ability_runtime",
+              "api_metrics",
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",

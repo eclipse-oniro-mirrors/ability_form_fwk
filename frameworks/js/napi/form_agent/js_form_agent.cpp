@@ -21,6 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
+#include "form_histogram_utils.h"
 #include "ipc_skeleton.h"
 #include "js_runtime_utils.h"
 #include "napi_common_util.h"
@@ -38,6 +39,7 @@ using namespace OHOS::AppExecFwk;
 namespace {
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 const std::string IS_FORM_AGENT = "isFormAgent";
 }
 
@@ -54,6 +56,7 @@ napi_value JsFormAgent::RequestPublishForm(napi_env env, napi_callback_info info
 
 napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Agent.requestPublishForm", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr || argc < ARGS_SIZE_ONE || argc > ARGS_SIZE_TWO) {
         HILOG_ERROR("invalid argc");
