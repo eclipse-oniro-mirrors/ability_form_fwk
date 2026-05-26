@@ -419,6 +419,11 @@ void IsRequestPublishFormSupported(ani_env *env, ani_object callback)
         HILOG_ERROR("env is nullptr");
         return;
     }
+    if (!FormAniUtil::CheckCallerIsSystemApp()) {
+        HILOG_ERROR("The app not system-app,can't use system-api.");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+        return;
+    }
     bool supported = FormMgr::GetInstance().IsRequestPublishFormSupported();
     HILOG_INFO("IsRequestPublishFormSupported End, supported: %{public}d", supported);
     ani_object callbackArg = CreateBool(env, supported);
