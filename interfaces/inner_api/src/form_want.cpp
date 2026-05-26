@@ -21,6 +21,17 @@ namespace AppExecFwk {
 
 using WantParams = OHOS::AAFwk::WantParams;
 
+namespace {
+constexpr const char *FORM_HOST_PARAM_NAMES[] = {
+    Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY,
+    Constants::PARAM_VISUAL_EFFECT_TYPE_KEY,
+    Constants::PARAM_FORM_DISABLE_UIFIRST_KEY,
+    Constants::FORM_ENABLE_MATERIAL_BACKGROUND_KEY,
+    Constants::FORM_STYLE_PARAMETERS_KEY,
+    Constants::FORM_ONE_MIRROR_CHANGE_KEY
+};
+}
+
 const std::unordered_set<std::string> FormWant::FILTER_INTERNAL_PARAMS_ = {
     Constants::FORM_CONNECT_ID,
     Constants::ACQUIRE_TYPE,
@@ -223,7 +234,7 @@ void FormWant::ExtractHostParamsToWant(Want &target) const
     std::shared_lock<std::shared_mutex> lock(mutex_);
     WantParams sourceParams = want_.GetParams();
     WantParams targetParams = target.GetParams();
-    for (const auto &paramKey : Constants::FORM_HOST_PARAM_NAMES) {
+    for (const auto &paramKey : FORM_HOST_PARAM_NAMES) {
         if (!sourceParams.HasParam(paramKey)) {
             continue;
         }

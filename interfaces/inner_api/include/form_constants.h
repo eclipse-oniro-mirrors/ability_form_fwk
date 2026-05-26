@@ -16,8 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_CONSTANTS_H
 #define OHOS_FORM_FWK_FORM_CONSTANTS_H
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 
 namespace OHOS {
@@ -118,7 +118,7 @@ namespace Constants {
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
-    const long ABS_REFRESH_MS = 2500;
+    constexpr long ABS_REFRESH_MS = 2500;
     constexpr const char* PARAM_HOST_BG_INVERSE_COLOR_KEY = "ohos.extra.param.key.host_bg_inverse_color";
     constexpr const char* PARAM_FONT_FOLLOW_SYSTEM_KEY = "ohos.inner.key.font_follow_system";
     constexpr const char* PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY = "ohos.inner.key.enable_blur_background";
@@ -195,14 +195,14 @@ namespace Constants {
     constexpr int32_t MIN_PER_HOUR = 60;
     constexpr int32_t SEC_PER_MIN = 60;
     constexpr int32_t MS_PER_DAY = 24 * 60 * 60 * 1000;
-    const long TIME_1000 = 1000;
-    const long TIME_1000000 = 1000000;
-    const long TIME_CONVERSION = 30 * 60 * TIME_1000;
+    constexpr long TIME_1000 = 1000;
+    constexpr long TIME_1000000 = 1000000;
+    constexpr long TIME_CONVERSION = 30 * 60 * TIME_1000;
     constexpr int32_t MIN_CONFIG_DURATION = 1; // 1 means 30 min
     constexpr int32_t MAX_CONFIG_DURATION = 2 * 24 * 7; // one week
-    const long MIN_PERIOD = MIN_CONFIG_DURATION * TIME_CONVERSION; // 30 min in ms unit
-    const long MAX_PERIOD = MAX_CONFIG_DURATION * TIME_CONVERSION; // 1 week in ms unit
-    const long ABS_TIME = 30 * TIME_1000; // 30s abs time
+    constexpr long MIN_PERIOD = MIN_CONFIG_DURATION * TIME_CONVERSION;
+    constexpr long MAX_PERIOD = MAX_CONFIG_DURATION * TIME_CONVERSION;
+    constexpr long ABS_TIME = 30 * TIME_1000;
     constexpr const char* TIME_DELIMETER = ":";
     constexpr const char* TIMES_DELIMETER = ",";
     constexpr int32_t UPDATE_AT_CONFIG_COUNT = 2;
@@ -246,7 +246,7 @@ namespace Constants {
     constexpr const char* FORM_STATUS_EVENT = "form_status_event";
     constexpr const char* FORM_STATUS_EVENT_ID = "form_status_event_id";
 
-    const size_t MAX_LAYOUT = 8;
+    constexpr size_t MAX_LAYOUT = 8;
     constexpr int32_t MAX_FORMS = 512;
     constexpr int32_t MAX_RECORD_PER_HOST = 256;
     constexpr int32_t MAX_RECORD_PER_USER = 256;
@@ -304,7 +304,7 @@ namespace Constants {
         CIRCLE
     };
 
-    const std::map<Dimension, std::string> DIMENSION_MAP = {
+    inline const std::unordered_map<Dimension, std::string> DIMENSION_MAP = {
         {Dimension::DIMENSION_1_2, "1*2"},
         {Dimension::DIMENSION_2_2, "2*2"},
         {Dimension::DIMENSION_2_4, "2*4"},
@@ -321,7 +321,7 @@ namespace Constants {
         bool isSupportLauncher;
     };
 
-    const std::map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
+    inline const std::unordered_map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
         {"00", {"INACTIVE", false}},
         {"01", {"INACTIVE", true}},
         {"10", {"PAUSE", false}},
@@ -391,8 +391,8 @@ namespace Constants {
     constexpr int32_t ADD_UPDATE = 1;
 
     // rdb
-    const std::string FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
-    const std::string FORM_RDB_NAME = "/formdb.db";
+    constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
+    constexpr const char* FORM_RDB_NAME = "/formdb.db";
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
     constexpr const char* FORM_SYNC_MODE = "FULL";
@@ -447,9 +447,9 @@ namespace Constants {
     // Allow form update and refresh
     constexpr const char* FORM_ENABLE_UPDATE_REFRESH_KEY = "enableFormUpdateRefresh";
     // Is form contains multiple app
-    const std::string IS_MULTI_APP_FORM = "isMultiAppForm";
+    constexpr const char* IS_MULTI_APP_FORM = "isMultiAppForm";
     // form contains multi app is true
-    const std::string IS_MULTI_APP_FORM_TRUE = "true";
+    constexpr const char* IS_MULTI_APP_FORM_TRUE = "true";
     // Form data update type
     constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
     // Form info max num
@@ -469,9 +469,10 @@ namespace Constants {
     // Default transparency color
     constexpr const char* DEFAULT_TRANSPARENCY_COLOR = "#FFFFFFFF";
 
-    const std::string FORM_MGR_CONFIG_DIR = "/data/service/el1/public/update/param_service/install/system/etc/FormMgrConfig/";
+    constexpr const char* FORM_MGR_CONFIG_DIR =
+        "/data/service/el1/public/update/param_service/install/system/etc/FormMgrConfig/";
 
-    const std::string VERSION_FILE_NAME = "version.txt";
+    constexpr const char* VERSION_FILE_NAME = "version.txt";
 
     constexpr const char* FMC_DEFAULT_VERSION = "10.10.25.100";
     constexpr const char* FORM_IS_VISIBLE = "ohos.extra.param.key.form_is_visible";
@@ -486,7 +487,7 @@ namespace Constants {
         OPEN_APP_LINKING = 1,
         OPEN_ATOMIC_SERVICE = 2,
     };
-    const std::string PARAM_OPEN_TYPE = "ohos.form.action.key.open_type";
+    constexpr const char* PARAM_OPEN_TYPE = "ohos.form.action.key.open_type";
 
     constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
 
@@ -515,13 +516,9 @@ namespace Constants {
 
     constexpr const char* FORM_ONE_MIRROR_CHANGE_KEY = "ONE_MIRROR_CHANGE";
 
-    constexpr const char *FORM_HOST_PARAM_NAMES[] = {PARAM_HOST_BG_INVERSE_COLOR_KEY, PARAM_VISUAL_EFFECT_TYPE_KEY,
-        PARAM_FORM_DISABLE_UIFIRST_KEY, FORM_ENABLE_MATERIAL_BACKGROUND_KEY, FORM_STYLE_PARAMETERS_KEY,
-        FORM_ONE_MIRROR_CHANGE_KEY};
-
     constexpr const int32_t DELAY_REFRESH_PER_BATCH = 6;
 
-    const std::unordered_set<int32_t> CONDITION_REFRESHTYPE_SET = {
+    inline const std::unordered_set<int32_t> CONDITION_REFRESHTYPE_SET = {
         REFRESHTYPE_NETWORKCHANGED,
     };
 }  // namespace Constants

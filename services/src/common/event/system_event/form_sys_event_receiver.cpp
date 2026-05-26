@@ -40,6 +40,7 @@ namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
 constexpr int32_t TASK_DELAY_TIME = 30; // ms
+constexpr const char *KEY_USER_ID = "userId";
 const std::unordered_set<std::string> actionSet {
     EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED,
     EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED,

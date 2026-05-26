@@ -125,7 +125,7 @@ ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableC
         if (rdbStore_ != nullptr) {
             return ERR_OK;
         }
-        std::string rdbPath = Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME;
+        std::string rdbPath = std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME;
         NativeRdb::RdbStoreConfig rdbStoreConfig(
             rdbPath,
             NativeRdb::StorageMode::MODE_DISK,
