@@ -927,6 +927,26 @@ public:
      */
     ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs) override;
 
+    /**
+     * @brief Register delete forms callback in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister delete forms callback in fms.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterDeleteFormsCallback() override;
+
+    /**
+     * @brief Delete forms by filters.
+     * @param filters The form record filters to match forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters) override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

@@ -460,7 +460,7 @@ ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
 
 ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     ErrCode result = updateFormsConfigRegistry_.Register(callingUid, callerToken);
     if (result == ERR_OK) {
@@ -471,14 +471,14 @@ ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemot
 
 ErrCode FormCallbackAdapter::UnregisterUpdateFormsConfigCallback()
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return updateFormsConfigRegistry_.Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_DEBUG("call, config size: %{public}zu", configs.size());
+    HILOG_INFO("call, config size: %{public}zu", configs.size());
     {
         std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
         formCustomConfigCache_ = configs;
@@ -494,6 +494,51 @@ ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfi
     return notifyResult != ERR_OK ? notifyResult : persistResult;
 }
 
+ErrCode FormCallbackAdapter::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return deleteFormsRegistry_.Register(callingUid, callerToken);
+}
+
+ErrCode FormCallbackAdapter::UnregisterDeleteFormsCallback()
+{
+    HILOG_DEBUG("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return deleteFormsRegistry_.Unregister(callingUid);
+}
+
+ErrCode FormCallbackAdapter::DeleteForms(const std::vector<FormRecordFilter> &filters)
+{
+    HILOG_INFO("call, filter size: %{public}zu", filters.size());
+    std::vector<std::string> matchedFormIds;
+    GetMatchedFormIds(filters, matchedFormIds);
+    if (matchedFormIds.empty()) {
+        HILOG_INFO("no forms matched");
+        return ERR_OK;
+    }
+    return NotifyAllHosts(deleteFormsRegistry_, "DeleteForms",
+        [&matchedFormIds](const sptr<IFormHostDelegate> &proxy) {
+            return proxy->DeleteFormsCallback(matchedFormIds);
+        });
+}
+
+void FormCallbackAdapter::GetMatchedFormIds(
+    const std::vector<FormRecordFilter> &filters, std::vector<std::string> &formIds)
+{
+    for (const auto &filter : filters) {
+        std::vector<FormRecord> records;
+        FormDataMgr::GetInstance().GetFormRecord(filter.bundleName, records);
+        for (const auto &record : records) {
+            if (record.moduleName == filter.moduleName &&
+                record.abilityName == filter.abilityName &&
+                record.formName == filter.formName) {
+                formIds.push_back(std::to_string(record.formId));
+            }
+        }
+    }
+}
+
 ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const std::string &tag,
     const std::function<ErrCode(const sptr<IFormHostDelegate> &)> &callback)
 {
@@ -501,7 +546,7 @@ ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const s
     ErrCode ret = registry.GetAllWithKeys(entries);
     if (ret != ERR_OK) {
         HILOG_WARN("no host registered for %{public}s", tag.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     ErrCode result = ERR_OK;
     for (const auto &[callingUid, callerToken] : entries) {
@@ -514,14 +559,14 @@ ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const s
         if (proxy == nullptr) {
             HILOG_ERROR("iface_cast failed, %{public}s, userId=%{public}d, bundleName=%{public}s",
                 tag.c_str(), userId, bundleName.c_str());
-            result = ERR_APPEXECFWK_FORM_COMMON_CODE;
+            result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
             continue;
         }
         ErrCode notifyRet = callback(proxy);
         if (notifyRet != ERR_OK) {
             HILOG_ERROR("notify failed, %{public}s, userId=%{public}d, bundleName=%{public}s, ret=%{public}d",
                 tag.c_str(), userId, bundleName.c_str(), notifyRet);
-            result = ERR_APPEXECFWK_FORM_COMMON_CODE;
+            result = notifyRet;
         }
     }
     HILOG_INFO("%{public}s notified %{public}zu hosts, result=%{public}d", tag.c_str(), entries.size(), result);

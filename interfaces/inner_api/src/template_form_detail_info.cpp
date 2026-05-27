@@ -21,42 +21,42 @@ namespace AppExecFwk {
 bool TemplateFormDetailInfo::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString16(Str8ToStr16(bundleName))) {
-        HILOG_ERROR("marshall bundleName failed");
+        HILOG_ERROR("marshal bundleName failed");
         return false;
     }
 
     if (!parcel.WriteString16(Str8ToStr16(moduleName))) {
-        HILOG_ERROR("marshall moduleName failed");
+        HILOG_ERROR("marshal moduleName failed");
         return false;
     }
  
     if (!parcel.WriteString16(Str8ToStr16(abilityName))) {
-        HILOG_ERROR("marshall abilityName failed");
+        HILOG_ERROR("marshal abilityName failed");
         return false;
     }
  
     if (!parcel.WriteString16(Str8ToStr16(formName))) {
-        HILOG_ERROR("marshall formName failed");
+        HILOG_ERROR("marshal formName failed");
         return false;
     }
 
     if (!parcel.WriteInt32(dimension)) {
-        HILOG_ERROR("marshall dimension failed");
+        HILOG_ERROR("marshal dimension failed");
         return false;
     }
  
     if (!parcel.WriteString16(Str8ToStr16(detailId))) {
-        HILOG_ERROR("marshall detailId failed");
+        HILOG_ERROR("marshal detailId failed");
         return false;
     }
  
     if (!parcel.WriteString16(Str8ToStr16(displayName))) {
-        HILOG_ERROR("marshall displayName failed");
+        HILOG_ERROR("marshal displayName failed");
         return false;
     }
  
     if (!parcel.WriteString16(Str8ToStr16(description))) {
-        HILOG_ERROR("marshall description failed");
+        HILOG_ERROR("marshal description failed");
         return false;
     }
  

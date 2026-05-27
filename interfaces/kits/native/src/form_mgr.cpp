@@ -2757,6 +2757,54 @@ ErrCode FormMgr::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
     return remoteProxy_->UpdateFormsConfig(configs);
 }
 
+ErrCode FormMgr::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RegisterDeleteFormsCallback(callerToken);
+}
+
+ErrCode FormMgr::UnregisterDeleteFormsCallback()
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UnregisterDeleteFormsCallback();
+}
+
+ErrCode FormMgr::DeleteForms(const std::vector<FormRecordFilter> &filters)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->DeleteForms(filters);
+}
+
 ErrCode FormMgr::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");

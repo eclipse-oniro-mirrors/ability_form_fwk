@@ -758,6 +758,24 @@ ErrCode FormMgrAdapterFacade::UpdateFormsConfig(const std::vector<FormCustomConf
     return FormCallbackAdapter::GetInstance().UpdateFormsConfig(configs);
 }
 
+ErrCode FormMgrAdapterFacade::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("FormMgrAdapterFacade::RegisterDeleteFormsCallback called");
+    return FormCallbackAdapter::GetInstance().RegisterDeleteFormsCallback(callerToken);
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterDeleteFormsCallback()
+{
+    HILOG_INFO("FormMgrAdapterFacade::UnregisterDeleteFormsCallback called");
+    return FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
+}
+
+ErrCode FormMgrAdapterFacade::DeleteForms(const std::vector<FormRecordFilter> &filters)
+{
+    HILOG_INFO("FormMgrAdapterFacade::DeleteForms called");
+    return FormCallbackAdapter::GetInstance().DeleteForms(filters);
+}
+
 ErrCode FormMgrAdapterFacade::StartAbilityByFms(const Want &want)
 {
     HILOG_INFO("FormMgrAdapterFacade::StartAbilityByFms called");

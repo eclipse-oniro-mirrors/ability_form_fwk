@@ -2494,6 +2494,42 @@ ErrCode FormMgrService::UpdateFormsConfig(const std::vector<FormCustomConfig> &c
     return FormMgrAdapterFacade::GetInstance().UpdateFormsConfig(configs);
 }
 
+ErrCode FormMgrService::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    return FormMgrAdapterFacade::GetInstance().RegisterDeleteFormsCallback(callerToken);
+}
+
+ErrCode FormMgrService::UnregisterDeleteFormsCallback()
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    return FormMgrAdapterFacade::GetInstance().UnregisterDeleteFormsCallback();
+}
+
+ErrCode FormMgrService::DeleteForms(const std::vector<FormRecordFilter> &filters)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_FORM_CUSTOM_CONFIG)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG;
+    }
+    return FormMgrAdapterFacade::GetInstance().DeleteForms(filters);
+}
+
 ErrCode FormMgrService::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");

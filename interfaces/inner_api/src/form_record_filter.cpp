@@ -12,54 +12,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "form_custom_config.h"
+
+#include "form_record_filter.h"
 #include "fms_log_wrapper.h"
 #include "string_ex.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-bool FormCustomConfig::Marshalling(Parcel &parcel) const
+bool FormRecordFilter::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString16(Str8ToStr16(bundleName))) {
         HILOG_ERROR("marshal bundleName failed");
         return false;
     }
-
     if (!parcel.WriteString16(Str8ToStr16(moduleName))) {
         HILOG_ERROR("marshal moduleName failed");
         return false;
     }
-
     if (!parcel.WriteString16(Str8ToStr16(abilityName))) {
         HILOG_ERROR("marshal abilityName failed");
         return false;
     }
-
     if (!parcel.WriteString16(Str8ToStr16(formName))) {
         HILOG_ERROR("marshal formName failed");
         return false;
     }
-
-    if (!parcel.WriteString16(Str8ToStr16(relatedBundleName))) {
-        HILOG_ERROR("marshal relatedBundleName failed");
-        return false;
-    }
-
-    if (!parcel.WriteBool(isShowInFormCenter)) {
-        HILOG_ERROR("marshal isShowInFormCenter failed");
-        return false;
-    }
-
-    if (!parcel.WriteBool(isRepeatAdditionSupported)) {
-        HILOG_ERROR("marshal isRepeatAdditionSupported failed");
-        return false;
-    }
-
     return true;
 }
 
-bool FormCustomConfig::ReadFromParcel(Parcel &parcel)
+bool FormRecordFilter::ReadFromParcel(Parcel &parcel)
 {
     std::u16string str;
     if (!parcel.ReadString16(str)) {
@@ -82,29 +64,16 @@ bool FormCustomConfig::ReadFromParcel(Parcel &parcel)
         return false;
     }
     formName = Str16ToStr8(str);
-    if (!parcel.ReadString16(str)) {
-        HILOG_ERROR("read relatedBundleName failed");
-        return false;
-    }
-    relatedBundleName = Str16ToStr8(str);
-    if (!parcel.ReadBool(isShowInFormCenter)) {
-        HILOG_ERROR("read isShowInFormCenter failed");
-        return false;
-    }
-    if (!parcel.ReadBool(isRepeatAdditionSupported)) {
-        HILOG_ERROR("read isRepeatAdditionSupported failed");
-        return false;
-    }
     return true;
 }
 
-FormCustomConfig *FormCustomConfig::Unmarshalling(Parcel &parcel)
+FormRecordFilter *FormRecordFilter::Unmarshalling(Parcel &parcel)
 {
-    std::unique_ptr<FormCustomConfig> config = std::make_unique<FormCustomConfig>();
-    if (!config->ReadFromParcel(parcel)) {
+    std::unique_ptr<FormRecordFilter> filter = std::make_unique<FormRecordFilter>();
+    if (!filter->ReadFromParcel(parcel)) {
         return nullptr;
     }
-    return config.release();
+    return filter.release();
 }
 
 } // namespace AppExecFwk

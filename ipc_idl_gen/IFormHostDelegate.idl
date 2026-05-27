@@ -23,4 +23,5 @@ interface OHOS.AppExecFwk.IFormHostDelegate {
     [ipccode 4007] void TemplateFormDetailInfoChange([in] TemplateFormDetailInfo[] templateFormDetailInfo);
     [ipccode 4008] void RequestFormWants([in] FormInfo[] formInfos, [out] WantParams[] wantParamsList);
     [ipccode 4009] void UpdateFormsConfigCallback([in] FormCustomConfig[] formCustomConfigs);
+    [ipccode 4010] void DeleteFormsCallback([in] String[] formIds);
 }

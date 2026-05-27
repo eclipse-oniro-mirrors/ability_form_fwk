@@ -32,6 +32,7 @@
 #include "running_form_info.h"
 #include "template_form_detail_info.h"
 #include "form_custom_config.h"
+#include "form_record_filter.h"
 
 #include "fms_log_wrapper.h"
 #include "form_mgr/form_callback_adapter.h"
@@ -335,6 +336,12 @@ public:
     ErrCode UnregisterUpdateFormsConfigCallback();
 
     ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs);
+
+    ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterDeleteFormsCallback();
+
+    ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters);
 
     ErrCode RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken);
 

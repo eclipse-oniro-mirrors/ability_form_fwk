@@ -3823,4 +3823,322 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterFormWantCallback_002, TestSi
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_001
+ * @tc.name: Verify OnRemoteRequest HandleRegisterDeleteFormsCallback
+ * @tc.desc: When the parameter code is FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterDeleteFormsCallback(_)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_002
+ * @tc.name: Verify HandleRegisterDeleteFormsCallback with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_003
+ * @tc.name: Verify HandleRegisterDeleteFormsCallback with nullptr callerToken
+ * @tc.desc: When callerToken is nullptr, return ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteRemoteObject(nullptr);
+    auto errCode = mockFormMgrService->HandleRegisterDeleteFormsCallback(data, reply);
+    EXPECT_EQ(errCode, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_004
+ * @tc.name: Verify HandleRegisterDeleteFormsCallback service error
+ * @tc.desc: When service returns error, verify result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_004 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterDeleteFormsCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
+    auto errCode = mockFormMgrService->HandleRegisterDeleteFormsCallback(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterDeleteFormsCallback_001
+ * @tc.name: Verify OnRemoteRequest HandleUnregisterDeleteFormsCallback
+ * @tc.desc: When the parameter code is FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterDeleteFormsCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    EXPECT_CALL(*mockFormMgrService, UnregisterDeleteFormsCallback()).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterDeleteFormsCallback_002
+ * @tc.name: Verify HandleUnregisterDeleteFormsCallback with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterDeleteFormsCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterDeleteFormsCallback_003
+ * @tc.name: Verify HandleUnregisterDeleteFormsCallback service error
+ * @tc.desc: When service returns error, verify result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterDeleteFormsCallback_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, UnregisterDeleteFormsCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
+    auto errCode = mockFormMgrService->HandleUnregisterDeleteFormsCallback(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_001
+ * @tc.name: Verify OnRemoteRequest HandleDeleteForms
+ * @tc.desc: When the parameter code is FORM_MGR_DELETE_FORMS, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filter.moduleName = "module";
+    filter.abilityName = "ability";
+    filter.formName = "form";
+    filters.push_back(filter);
+    
+    data.WriteInt32(filters.size());
+    for (const auto &f : filters) {
+        data.WriteParcelable(&f);
+    }
+    
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_002
+ * @tc.name: Verify HandleDeleteForms with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_003
+ * @tc.name: Verify HandleDeleteForms with invalid size (zero)
+ * @tc.desc: When size is 0, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_004
+ * @tc.name: Verify HandleDeleteForms with invalid size (exceeds max)
+ * @tc.desc: When size exceeds max, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_004 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(Constants::DELETE_FORMS_FILTER_MAX_NUM + 1);
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_005
+ * @tc.name: Verify HandleDeleteForms with nullptr filter
+ * @tc.desc: When filter is nullptr, return ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_005 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(1);
+    // Write nullptr for filter
+    data.WriteParcelable(nullptr);
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_005 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_006
+ * @tc.name: Verify HandleDeleteForms service error
+ * @tc.desc: When service returns error, verify result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_006 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filters.push_back(filter);
+    
+    data.WriteInt32(filters.size());
+    for (const auto &f : filters) {
+        data.WriteParcelable(&f);
+    }
+    
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG));
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_006 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_007
+ * @tc.name: Verify HandleDeleteForms with multiple filters
+ * @tc.desc: Test HandleDeleteForms with multiple valid filters.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_007 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    
+    std::vector<FormRecordFilter> filters;
+    for (int i = 0; i < Constants::DELETE_FORMS_FILTER_MAX_NUM; ++i) {
+        FormRecordFilter filter;
+        filter.bundleName = "bundle" + std::to_string(i);
+        filter.moduleName = "module" + std::to_string(i);
+        filter.abilityName = "ability" + std::to_string(i);
+        filter.formName = "form" + std::to_string(i);
+        filters.push_back(filter);
+    }
+    
+    data.WriteInt32(filters.size());
+    for (const auto &f : filters) {
+        data.WriteParcelable(&f);
+    }
+    
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_)).Times(1).WillOnce(Return(ERR_OK));
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_007 ends";
+}
 }

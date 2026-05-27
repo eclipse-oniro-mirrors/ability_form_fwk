@@ -117,6 +117,11 @@ public:
         return ERR_OK;
     }
 
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 

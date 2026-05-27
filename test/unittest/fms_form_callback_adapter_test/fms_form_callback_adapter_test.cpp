@@ -105,6 +105,10 @@ public:
     {
         return updateFormsConfigResult_;
     }
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds) override
+    {
+        return deleteFormsResult_;
+    }
     ErrCode requestOverflowResult_ = ERR_OK;
     ErrCode changeSceneResult_ = ERR_OK;
     ErrCode getFormRectResult_ = ERR_OK;
@@ -112,6 +116,7 @@ public:
     ErrCode templateFormResult_ = ERR_OK;
     ErrCode requestFormWantsResult_ = ERR_OK;
     ErrCode updateFormsConfigResult_ = ERR_OK;
+    ErrCode deleteFormsResult_ = ERR_OK;
     std::unordered_map<std::string, std::string> liveFormStatusData_;
 };
 }
@@ -2482,6 +2487,159 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_003, TestSize.
     FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
 
     GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_003 end";
+}
+
+/**
+ * @tc.name: RegisterDeleteFormsCallback_001
+ * @tc.desc: Verify RegisterDeleteFormsCallback returns ERR_OK with valid callerToken
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RegisterDeleteFormsCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RegisterDeleteFormsCallback_001 start";
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto mockDelegate = new MockFormHostDelegateStub();
+    sptr<IRemoteObject> callerToken(mockDelegate);
+    auto result = FormCallbackAdapter::GetInstance().RegisterDeleteFormsCallback(callerToken);
+    ASSERT_EQ(result, ERR_OK);
+
+    // Verify proxy is stored
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(storedProxy, callerToken);
+
+    GTEST_LOG_(INFO) << "RegisterDeleteFormsCallback_001 end";
+}
+
+/**
+ * @tc.name: UnregisterDeleteFormsCallback_001
+ * @tc.desc: Verify UnregisterDeleteFormsCallback returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UnregisterDeleteFormsCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UnregisterDeleteFormsCallback_001 start";
+
+    // Register first
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    auto mockDelegate = new MockFormHostDelegateStub();
+    sptr<IRemoteObject> callerToken(mockDelegate);
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().RegisterDeleteFormsCallback(callerToken), ERR_OK);
+
+    // Unregister
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    auto result = FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
+    EXPECT_EQ(result, ERR_OK);
+
+    // Verify proxy is removed
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_NE(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+
+    GTEST_LOG_(INFO) << "UnregisterDeleteFormsCallback_001 end";
+}
+
+/**
+ * @tc.name: DeleteForms_001
+ * @tc.desc: Verify DeleteForms returns ERR_OK when no forms matched
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeleteForms_001 start";
+
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.nonexistent";
+    filters.push_back(filter);
+
+    auto result = FormCallbackAdapter::GetInstance().DeleteForms(filters);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "DeleteForms_001 end";
+}
+
+/**
+ * @tc.name: DeleteForms_002
+ * @tc.desc: Verify DeleteForms returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED when registry has no hosts
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeleteForms_002 start";
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
+
+    // Mock form records to match the filter so DeleteForms reaches NotifyAllHosts
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filters.push_back(filter);
+
+    FormRecord matchedRecord;
+    matchedRecord.formId = TEST_FORM_ID;
+    matchedRecord.moduleName = "";
+    matchedRecord.abilityName = "";
+    matchedRecord.formName = "";
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(StrEq("com.test.bundle"), _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<FormRecord>{matchedRecord}), Return(true)));
+
+    auto result = FormCallbackAdapter::GetInstance().DeleteForms(filters);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "DeleteForms_002 end";
+}
+
+/**
+ * @tc.name: DeleteForms_003
+ * @tc.desc: Verify DeleteForms with matched forms and registered host
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeleteForms_003 start";
+
+    // Setup mock delegate
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->deleteFormsResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = TEST_BUNDLE_NAME;
+    filter.moduleName = TEST_MODULE_NAME;
+    filter.abilityName = TEST_ABILITY_NAME;
+    filter.formName = TEST_FORM_NAME;
+    filters.push_back(filter);
+
+    // Mock form records matching the filter
+    FormRecord matchedRecord;
+    matchedRecord.formId = TEST_FORM_ID;
+    matchedRecord.moduleName = TEST_MODULE_NAME;
+    matchedRecord.abilityName = TEST_ABILITY_NAME;
+    matchedRecord.formName = TEST_FORM_NAME;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(StrEq(TEST_BUNDLE_NAME), _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<FormRecord>{matchedRecord}), Return(true)));
+
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(nullptr));
+
+    auto result = FormCallbackAdapter::GetInstance().DeleteForms(filters);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    FormCallbackAdapter::GetInstance().UnregisterDeleteFormsCallback();
+
+    GTEST_LOG_(INFO) << "DeleteForms_003 end";
 }
 
 }  // namespace AppExecFwk

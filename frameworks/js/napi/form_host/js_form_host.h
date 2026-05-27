@@ -82,6 +82,10 @@ public:
 
     void UnregisterUpdateFormsConfigCallback();
 
+    void RegisterDeleteFormsCallback(napi_env env, napi_ref callback);
+
+    void UnregisterDeleteFormsCallback();
+
     void RegisterFormWantCallbackListener(napi_env env, napi_ref callback);
 
     void UnregisterFormWantCallbackListener();
@@ -131,6 +135,11 @@ private:
     bool GetFormCustomConfigArray(const std::vector<AppExecFwk::FormCustomConfig> &configs,
         napi_value &configArray);
 
+    napi_ref deleteFormsCallbackRef_ = nullptr;
+    napi_env deleteFormsCallbackEnv_ = nullptr;
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds);
+    bool DeleteFormsCallbackInner(const std::vector<std::string> &formIds);
+    bool CreateStringArray(const std::vector<std::string> &strings, napi_value &array);
     static bool GetValidCallback(napi_env env, napi_ref callbackRef, napi_value &callback);
 
     napi_ref formWantCallbackRef_ = nullptr;
@@ -147,6 +156,7 @@ private:
     mutable std::mutex registerGetLiveFormStatusProxyMutex_;
     mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
     mutable std::mutex registerUpdateFormsConfigMutex_;
+    mutable std::mutex registerDeleteFormsMutex_;
     mutable std::mutex registerFormWantCallbackMutex_;
 };
 

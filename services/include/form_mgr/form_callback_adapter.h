@@ -26,6 +26,7 @@
 
 #include "form_info.h"
 #include "form_custom_config.h"
+#include "form_record_filter.h"
 #include "form_provider_data.h"
 #include "iremote_object.h"
 #include "ipc_skeleton.h"
@@ -109,6 +110,12 @@ public:
 
     ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs);
 
+    ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterDeleteFormsCallback();
+
+    ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters);
+
     ErrCode RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken);
 
     ErrCode UnregisterFormWantCallback(int32_t callingUid);
@@ -120,6 +127,7 @@ public:
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
 
 private:
+    void GetMatchedFormIds(const std::vector<FormRecordFilter> &filters, std::vector<std::string> &formIds);
     ErrCode NotifyAllHosts(FormProxyRegistry &registry, const std::string &tag,
         const std::function<ErrCode(const sptr<IFormHostDelegate> &)> &callback);
 
@@ -141,6 +149,7 @@ private:
     FormProxyRegistry crossBundleControlRegistry_{"CrossBundleControl"};
     FormProxyRegistry templateFormDetailInfoRegistry_{"TemplateFormDetailInfo"};
     FormProxyRegistry updateFormsConfigRegistry_{"UpdateFormsConfig"};
+    FormProxyRegistry deleteFormsRegistry_{"DeleteForms"};
     FormProxyRegistry wantCallbackRegistry_{"WantCallback"};
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
 
