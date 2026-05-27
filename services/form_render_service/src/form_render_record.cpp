@@ -1281,14 +1281,26 @@ int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &form
         if (!GetFormRequestByFormId(form.formId, formRequests)) {
             continue;
         }
-
-        for (const auto &formRequest : formRequests) {
-            if (!formRequest.second.hasRelease) {
+        bool isNeedUpdate = false;
+        auto lastReleasedFormRequest = formRequests.begin();
+        for (auto iter = formRequests.begin(); iter != formRequests.end(); ++iter) {
+            HILOG_INFO("formId: %{public}" PRId64 ", compId: %{public}s, hasRelease: %{public}d.",
+                form.formId, iter->first.c_str(), iter->second.hasRelease);
+            if (!iter->second.hasRelease) {
                 continue;
             }
-
-            UpdateFormRequest(form, formRequest.second.want);
-            PostReAddRecycledForms(form, formRequest.second.want);
+            if (!isNeedUpdate) {
+                lastReleasedFormRequest = iter;
+                isNeedUpdate = true;
+                continue;
+            }
+            if (iter->first > lastReleasedFormRequest->first) {
+                lastReleasedFormRequest = iter;
+            }
+        }
+        if (isNeedUpdate) {
+            UpdateFormRequest(form, lastReleasedFormRequest->second.want);
+            PostReAddRecycledForms(form, lastReleasedFormRequest->second.want);
         }
     }
 
