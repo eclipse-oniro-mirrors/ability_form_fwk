@@ -2936,7 +2936,7 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     }
     HILOG_INFO("RequestOverflowInner fail");
     dataParam->result = false;
-    dataParam->errCode = ERR_GET_INFO_FAILED;
+    dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (status == napi_pending_exception) {
         dataParam->errCode = NapiFormUtil::CatchErrorCode(overflowEnv_);
     }
@@ -3025,7 +3025,7 @@ ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, in
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::ChangeSceneAnimationState");
     HILOG_INFO("call ChangeSceneAnimationState end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 void JsFormRouterProxyMgr::ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
@@ -3134,7 +3134,7 @@ ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect
     HILOG_INFO("call GetFormRect end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
     rect = dataParam->formRect;
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 void CallBackReturn(const Rect &item, std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam, bool ret)
@@ -3367,7 +3367,7 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
         lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam)
@@ -3940,7 +3940,7 @@ ErrCode JsFormRouterProxyMgr::RequestFormWants(const std::vector<AppExecFwk::For
         wantParamsList = std::move(*resultList);
         return ERR_OK;
     }
-    return ERR_GET_INFO_FAILED;
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,

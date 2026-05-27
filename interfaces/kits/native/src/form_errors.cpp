@@ -197,7 +197,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT, { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT, "" }
     },
     {
-        ERR_APPEXECFWK_FORM_STATUS_TIMIE_OUT, { ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT, "" }
+        ERR_APPEXECFWK_FORM_STATUS_TIME_OUT, { ERR_FORM_EXTERNAL_FORM_STATUS_TIME_OUT, "" }
     },
     {
         ERR_APPEXECFWK_FORM_SET_OPERATION_FAILED, { ERR_FORM_EXTERNAL_SET_OPERATION_FAILED, "" }
@@ -217,7 +217,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_DIMENSION_ERROR, { ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR, "" }
     },
     {
-        ERR_APPEXECFWK_FORM_LIVE_OP_PAGE_INFO_MISTMATCH,
+        ERR_APPEXECFWK_FORM_LIVE_OP_PAGE_INFO_MISMATCH,
         {
             ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,
             "The form can not support this operation, please check if page information specified in want belongs to "
@@ -328,7 +328,7 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_RENDER_DIED,                  "FormRenderService is dead, please reconnect." },
     { ERR_FORM_EXTERNAL_FORM_NOT_TRUST,               "Form is not trust." },
     { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT,            "Waiting for the form addition to the desktop timed out." },
-    { ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT,        "form status timeout, try reAddForm." },
+    { ERR_FORM_EXTERNAL_FORM_STATUS_TIME_OUT,        "form status timeout, try reAddForm." },
     { ERR_FORM_EXTERNAL_SET_OPERATION_FAILED,         "Failed to set the live form background image." },
     { ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,          "The form can not support this operation, Please check whether "
         "the configuration information of sceneAnimationParams in your form_config is correct."},
