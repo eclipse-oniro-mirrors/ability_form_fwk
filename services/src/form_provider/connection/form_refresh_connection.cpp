@@ -42,7 +42,6 @@ Want FormRefreshConnection::OnBuildTaskWant()
         return msgWant;
     } else if (want_.HasParameter(Constants::RECREATE_FORM_KEY)) {
         Want cloneWant = Want(want_);
-        cloneWant.RemoveParam(Constants::RECREATE_FORM_KEY);
         cloneWant.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_RECREATE_FORM);
         cloneWant.SetParam(Constants::FORM_CONNECT_ID, GetConnectId());
         return cloneWant;
