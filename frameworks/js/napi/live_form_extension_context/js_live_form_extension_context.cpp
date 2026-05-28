@@ -430,7 +430,7 @@ void JsLiveFormExtensionContext::HandleErrorCode(napi_env env, NapiAsyncTask &ta
         task.ResolveWithNoError(env, CreateJsUndefined(env));
     } else if (errCode == ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME) {
         task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED),
-            FormErrors::GetInstance().QueryExternalErrorMessage(ERR_APPEXECFWK_FORM_LIVE_OP_PAGE_INFO_MISTMATCH,
+            FormErrors::GetInstance().QueryExternalErrorMessage(ERR_APPEXECFWK_FORM_LIVE_OP_PAGE_INFO_MISMATCH,
                 ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED)));
     } else if (errCode == ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED) {
         task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED),

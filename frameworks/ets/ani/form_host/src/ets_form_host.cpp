@@ -557,7 +557,7 @@ ErrCode EtsFormRouterProxyMgr::ChangeSceneAnimationState(int64_t formId, int32_t
     mainHandler->PostSyncTask(executeFunc, "EtsFormRouterProxyMgr::ChangeSceneAnimationState");
     HILOG_INFO("call ChangeSceneAnimationState end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 void EtsFormRouterProxyMgr::ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
@@ -599,7 +599,7 @@ ErrCode EtsFormRouterProxyMgr::GetFormRect(int64_t formId, AppExecFwk::Rect &rec
     };
     if (dataParam == nullptr) {
         HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_ptr<AppExecFwk::EventHandler> mainHandler =
         std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
@@ -611,7 +611,7 @@ ErrCode EtsFormRouterProxyMgr::GetFormRect(int64_t formId, AppExecFwk::Rect &rec
     bool result = dataParam->result;
     rect = std::move(dataParam->formRect);
     delete dataParam;
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 bool EtsFormRouterProxyMgr::bindNativeMethod(ani_env* env, ani_class cls, LiveFormInterfaceParam *dataParam)
@@ -788,7 +788,7 @@ ErrCode EtsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string,
         lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 void EtsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam)
@@ -836,7 +836,7 @@ ErrCode EtsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppEx
     };
     if (dataParam == nullptr) {
         HILOG_ERROR("Failed to new dataParam, formId:%{public}" PRId64 ".", formId);
-        return ERR_GET_INFO_FAILED;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_ptr<AppExecFwk::EventHandler> mainHandler =
         std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
@@ -847,7 +847,7 @@ ErrCode EtsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppEx
     HILOG_INFO("call RequestOverflow end, result:%{public}d", dataParam->result);
     bool result = dataParam->result;
     delete dataParam;
-    return result ? ERR_OK : ERR_GET_INFO_FAILED;
+    return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 
@@ -3142,7 +3142,7 @@ ErrCode EtsFormRouterProxyMgr::RequestFormWants(const std::vector<AppExecFwk::Fo
     if (success) {
         wantParamsList = std::move(*resultList);
     }
-    return success ? ERR_OK : ERR_GET_INFO_FAILED;
+    return success ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 bool EtsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,

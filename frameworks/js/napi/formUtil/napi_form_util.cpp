@@ -888,7 +888,7 @@ int NapiFormUtil::CatchErrorCode(napi_env env)
             return errCodeInt;
         }
     }
-    return ERR_GET_INFO_FAILED;
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS
