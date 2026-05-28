@@ -15,6 +15,8 @@
 
 #include "form_refresh/refresh_impl/form_timer_refresh_impl.h"
 
+#include <unordered_map>
+
 #include "ffrt.h"
 #include "form_refresh/strategy/refresh_check_mgr.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
@@ -24,15 +26,16 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
-FormTimerRefreshImpl::FormTimerRefreshImpl() {}
-FormTimerRefreshImpl::~FormTimerRefreshImpl() {}
-
-const static std::map<int32_t, int32_t> refreshTypeMap = {
+namespace {
+const std::unordered_map<int32_t, int32_t> REFRESH_TYPE_MAP = {
     { RefreshType::TYPE_INTERVAL, Constants::REFRESHTYPE_INTERVAL },
     { RefreshType::TYPE_UPDATETIMES, Constants::REFRESHTYPE_UPDATETIMES },
     { RefreshType::TYPE_UPDATENEXTTIME, Constants::REFRESHTYPE_UPDATENEXTTIME },
 };
+}
+
+FormTimerRefreshImpl::FormTimerRefreshImpl() {}
+FormTimerRefreshImpl::~FormTimerRefreshImpl() {}
 
 int FormTimerRefreshImpl::RefreshFormRequest(RefreshData &data)
 {
@@ -144,8 +147,8 @@ void FormTimerRefreshImpl::BuildTimerWant(const FormTimer &timerTask, Want &want
     if (FormUtil::IsActiveUser(timerTask.userId)) {
         want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
     }
-    auto it = refreshTypeMap.find(timerTask.refreshType);
-    if (it != refreshTypeMap.end()) {
+    auto it = REFRESH_TYPE_MAP.find(timerTask.refreshType);
+    if (it != REFRESH_TYPE_MAP.end()) {
         want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, it->second);
     }
 }

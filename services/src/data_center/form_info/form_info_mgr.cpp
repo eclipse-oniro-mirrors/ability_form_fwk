@@ -634,7 +634,8 @@ bool FormInfoMgr::IsMultiAppForm(const FormInfo &formInfo)
 {
     bool isMultiAppForm = false;
     for (auto dataIter = formInfo.customizeDatas.begin(); dataIter != formInfo.customizeDatas.end();) {
-        if (Constants::IS_MULTI_APP_FORM == dataIter->name && Constants::IS_MULTI_APP_FORM_TRUE == dataIter->value) {
+        if (std::string(Constants::IS_MULTI_APP_FORM) == dataIter->name &&
+            std::string(Constants::IS_MULTI_APP_FORM_TRUE) == dataIter->value) {
             isMultiAppForm = true;
             break;
         }

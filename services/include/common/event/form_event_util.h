@@ -28,8 +28,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-const std::string KEY_UID = "uid";
-const std::string KEY_USER_ID = "userId";
 class FormEventUtil {
 public:
     static void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId, bool &needReload);

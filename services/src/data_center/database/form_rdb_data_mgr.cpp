@@ -692,7 +692,7 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
             // 删库，避免拿到缓存的开库信息
             HILOG_WARN("Need rdb clear cache, delete db");
             std::unique_lock<std::shared_mutex> lock(rdbStoreMutex_);
-            std::string rdbPath = Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME;
+            std::string rdbPath = std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME;
             NativeRdb::RdbHelper::DeleteRdbStore(rdbPath);
         }
     }
@@ -714,7 +714,7 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
 std::shared_ptr<NativeRdb::RdbStore> FormRdbDataMgr::LoadRdbStore()
 {
     std::unique_lock<std::shared_mutex> lock(rdbStoreMutex_);
-    std::string rdbPath = Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME;
+    std::string rdbPath = std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME;
     NativeRdb::RdbStoreConfig rdbStoreConfig(
         rdbPath,
         NativeRdb::StorageMode::MODE_DISK,

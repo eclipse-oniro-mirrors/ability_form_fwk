@@ -24,6 +24,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr const char *BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
+constexpr const char *KEY_USER_ID = "userId";
 } // namespace
 
 FormBundleEventCallback::FormBundleEventCallback()

@@ -103,7 +103,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_001, TestSize.Level1)
     FormRdbTableConfig formRdbTableConfig;
     auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
     rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
-        Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+        std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_001 end";
 }
@@ -181,7 +181,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_006, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_006 start";
     if (rdbDataCallBack_ == nullptr) {
         rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
-            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+            std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME);
     }
     auto result = rdbDataCallBack_->OnCreate(*(FormRdbDataMgr::GetInstance().rdbStore_.get()));
     EXPECT_EQ(result, ERR_OK);
@@ -201,7 +201,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_007, TestSize.Level1)
     int targetVersion = 2;
     if (rdbDataCallBack_ == nullptr) {
         rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
-            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+            std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME);
     }
     auto result = rdbDataCallBack_->OnUpgrade(*(FormRdbDataMgr::GetInstance().rdbStore_.get()),
         currentVersion, targetVersion);
@@ -223,7 +223,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_008, TestSize.Level1)
     int targetVersion = 1;
     if (rdbDataCallBack_ == nullptr) {
         rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
-            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+            std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME);
     }
     auto result = rdbDataCallBack_->OnDowngrade(*(FormRdbDataMgr::GetInstance().rdbStore_.get()),
         currentVersion, targetVersion);
@@ -243,7 +243,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_009, TestSize.Level1)
     std::string data = "testKey";
     if (rdbDataCallBack_ == nullptr) {
         rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
-            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+            std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME);
     }
     auto result = rdbDataCallBack_->onCorruption(data);
     EXPECT_EQ(result, ERR_OK);
@@ -365,7 +365,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_014, TestSize.Level1)
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_015, TestSize.Level1)
 {
-    RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(Constants::FORM_MANAGER_SERVICE_PATH +
+    RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(std::string(Constants::FORM_MANAGER_SERVICE_PATH) +
         Constants::FORM_RDB_NAME);
     auto result = rdbDataCallBack_.onCorruption(Constants::FORM_RDB_TABLE_NAME);
     EXPECT_EQ(result, NativeRdb::E_OK);
@@ -381,7 +381,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_016, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_016 start";
     if (rdbDataCallBack_ == nullptr) {
         rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
-        Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+        std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME);
     }
     ASSERT_NE(nullptr, rdbDataCallBack_);
     auto result = rdbDataCallBack_->OnOpen(*(FormRdbDataMgr::GetInstance().rdbStore_.get()));
