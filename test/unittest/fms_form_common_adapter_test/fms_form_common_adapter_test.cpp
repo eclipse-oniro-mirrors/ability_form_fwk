@@ -314,8 +314,6 @@ HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_004, TestSize.Level1)
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
 
     auto result = FormCommonAdapter::GetInstance().GetBundleInfo(want, bundleInfo, packageName);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);

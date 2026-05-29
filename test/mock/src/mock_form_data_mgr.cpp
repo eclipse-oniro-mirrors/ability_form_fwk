@@ -473,5 +473,23 @@ void FormDataMgr::SetFormCacheInited(const int64_t formId, const bool isInited)
 {
     GTEST_LOG_(INFO) << "SetFormCacheInited called";
 }
+
+bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const
+{
+    GTEST_LOG_(INFO) << "GetFormRecordByCondition called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormRecordByCondition(conditionType, formInfos);
+    }
+    return false;
+}
+
+ErrCode FormDataMgr::HandleFormRemoveObserver(const std::string hostBundleName, const RunningFormInfo runningFormInfo)
+{
+    GTEST_LOG_(INFO) << "HandleFormRemoveObserver called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->HandleFormRemoveObserver(hostBundleName, runningFormInfo);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
