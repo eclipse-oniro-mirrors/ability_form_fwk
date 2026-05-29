@@ -36,6 +36,8 @@ idl_gen_interface("form_host_delegate_interface") {
 }
 
 ohos_source_set("form_host_delegate_proxy") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -59,6 +61,8 @@ ohos_source_set("form_host_delegate_proxy") {
 }
 
 ohos_source_set("form_host_delegate_stub") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -89,6 +93,8 @@ idl_gen_interface("form_provider_delegate_interface") {
 }
 
 ohos_source_set("form_provider_delegate_proxy") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -112,6 +118,8 @@ ohos_source_set("form_provider_delegate_proxy") {
 }
 
 ohos_source_set("form_provider_delegate_stub") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
