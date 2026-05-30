@@ -1259,19 +1259,17 @@ private:
             return CreateJsUndefined(env);
         }
         napi_value callback = argv[PARAM1];
-        napi_ref callbackRef;
-        napi_create_reference(env, callback, REF_COUNT, &callbackRef);
         if (type == FORM_UNINSTALL) {
             FormHostClient::GetInstance()->RegisterUninstallCallback(FormUninstallCallback);
-            AddFormUninstallCallback(env, argv[PARAM1]);
+            AddFormUninstallCallback(env, callback);
         } else if (type == FORM_OVERFLOW) {
-            return OnRegisterOverflowListener(env, callbackRef);
+            return OnRegisterOverflowListener(env, callback);
         } else if (type == CHANGE_SCENE_ANIMATION_STATE) {
-            return OnRegisterChangeSceneAnimationStateListener(env, callbackRef);
+            return OnRegisterChangeSceneAnimationStateListener(env, callback);
         } else if (type == GET_FORM_RECT) {
-            return OnRegisterGetFormRectListener(env, callbackRef);
+            return OnRegisterGetFormRectListener(env, callback);
         } else if (type == GET_LIVE_FORM_STATUS) {
-            return OnRegisterGetLiveFormStatusListener(env, callbackRef);
+            return OnRegisterGetLiveFormStatusListener(env, callback);
         }
         return CreateJsUndefined(env);
     }
@@ -2096,11 +2094,18 @@ private:
         return CreateJsUndefined(env);
     }
 
-    napi_value OnRegisterOverflowListener(napi_env env, napi_ref callbackRef)
+    napi_value OnRegisterOverflowListener(napi_env env, napi_value callback)
     {
         HILOG_INFO("call");
+        napi_ref callbackRef = nullptr;
+        napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+        if (refStatus != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            return CreateJsUndefined(env);
+        }
         ErrCode result = FormMgr::GetInstance().RegisterOverflowProxy(JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
+            napi_delete_reference(env, callbackRef);
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -2120,12 +2125,19 @@ private:
         return CreateJsValue(env, ret);
     }
 
-    napi_value OnRegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
+    napi_value OnRegisterChangeSceneAnimationStateListener(napi_env env, napi_value callback)
     {
         HILOG_INFO("call");
+        napi_ref callbackRef = nullptr;
+        napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+        if (refStatus != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            return CreateJsUndefined(env);
+        }
         ErrCode result = FormMgr::GetInstance().RegisterChangeSceneAnimationStateProxy(
             JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
+            napi_delete_reference(env, callbackRef);
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -2146,12 +2158,19 @@ private:
         return CreateJsValue(env, ret);
     }
 
-    napi_value OnRegisterGetFormRectListener(napi_env env, napi_ref callbackRef)
+    napi_value OnRegisterGetFormRectListener(napi_env env, napi_value callback)
     {
         HILOG_INFO("call");
+        napi_ref callbackRef = nullptr;
+        napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+        if (refStatus != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            return CreateJsUndefined(env);
+        }
         ErrCode result = FormMgr::GetInstance().RegisterGetFormRectProxy(
             JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
+            napi_delete_reference(env, callbackRef);
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -2260,12 +2279,19 @@ private:
         return true;
     }
 
-    napi_value OnRegisterGetLiveFormStatusListener(napi_env env, napi_ref callbackRef)
+    napi_value OnRegisterGetLiveFormStatusListener(napi_env env, napi_value callback)
     {
         HILOG_INFO("call");
+        napi_ref callbackRef = nullptr;
+        napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+        if (refStatus != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            return CreateJsUndefined(env);
+        }
         ErrCode result = FormMgr::GetInstance().RegisterGetLiveFormStatusProxy(
             JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
+            napi_delete_reference(env, callbackRef);
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
@@ -2311,9 +2337,7 @@ private:
             return CreateJsUndefined(env);
         }
         napi_value callback = argv[PARAM0];
-        napi_ref callbackRef;
-        napi_create_reference(env, callback, REF_COUNT, &callbackRef);
-        OnRegisterTemplateFormDetailInfoChange(env, callbackRef);
+        OnRegisterTemplateFormDetailInfoChange(env, callback);
         return CreateJsUndefined(env);
     }
 
@@ -2347,9 +2371,15 @@ private:
         return CreateJsUndefined(env);
     }
 
-    napi_value OnRegisterTemplateFormDetailInfoChange(napi_env env, napi_ref callbackRef)
+    napi_value OnRegisterTemplateFormDetailInfoChange(napi_env env, napi_value callback)
     {
         HILOG_INFO("call");
+        napi_ref callbackRef = nullptr;
+        napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+        if (refStatus != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            return CreateJsUndefined(env);
+        }
         ErrCode result = FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(
             JsFormRouterProxyMgr::GetInstance());
         if (result != ERR_OK) {
@@ -2358,6 +2388,7 @@ private:
                 result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
                 result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
             }
+            napi_delete_reference(env, callbackRef);
             NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
