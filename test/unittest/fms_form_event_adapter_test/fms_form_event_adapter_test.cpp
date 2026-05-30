@@ -360,7 +360,7 @@ HWTEST_F(FmsFormEventAdapterTest, SetFreeInstallFlag_001, TestSize.Level1)
     Want want;
 
     FormEventAdapter::GetInstance().SetFreeInstallFlag(record, want);
-    EXPECT_FALSE(want.HasParameter("ohos.extra.param.key.free_install_calling_uid"));
+    EXPECT_FALSE(want.HasParameter("ohos.freeinstall.params.callingUid"));
 
     GTEST_LOG_(INFO) << "SetFreeInstallFlag_001 end";
 }
@@ -381,7 +381,7 @@ HWTEST_F(FmsFormEventAdapterTest, SetFreeInstallFlag_002, TestSize.Level1)
     want.SetFlags(Want::FLAG_INSTALL_ON_DEMAND);
 
     FormEventAdapter::GetInstance().SetFreeInstallFlag(record, want);
-    EXPECT_TRUE(want.HasParameter("ohos.extra.param.key.free_install_calling_uid"));
+    EXPECT_TRUE(want.HasParameter("ohos.freeinstall.params.callingUid"));
     EXPECT_NE(want.GetFlags() & Want::FLAG_INSTALL_ON_DEMAND, 0);
 
     GTEST_LOG_(INFO) << "SetFreeInstallFlag_002 end";

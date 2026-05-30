@@ -91,6 +91,7 @@ public:
     virtual ErrCode AddRequestPublishFormInfo(int64_t formId, const Want &want,
         std::unique_ptr<FormProviderData> &formProviderData) = 0;
     virtual ErrCode RemoveRequestPublishFormInfo(int64_t formId) = 0;
+    virtual ErrCode HandleFormRemoveObserver(const std::string &, const RunningFormInfo &) = 0;
 };
 
 class MockFormDataMgr : public AbstractMockFormDataMgr {
@@ -156,7 +157,7 @@ public:
     MOCK_METHOD3(AddRequestPublishFormInfo, ErrCode(int64_t formId, const Want &want,
         std::unique_ptr<FormProviderData> &formProviderData));
     MOCK_METHOD1(RemoveRequestPublishFormInfo, ErrCode(int64_t formId));
-    MOCK_METHOD2(HandleFormRemoveObserver, void(const std::string &, const RunningFormInfo &));
+    MOCK_METHOD2(HandleFormRemoveObserver, ErrCode(const std::string &, const RunningFormInfo &));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
