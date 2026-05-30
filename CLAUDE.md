@@ -295,8 +295,9 @@ HiviewDFX::XCollie::GetInstance().SetTimer(...)
 
 ## 相关仓库
 
-- [interface_sdk-js](https://gitee.com/openharmony/interface_sdk-js) - ArkTS API 接口
-- [ability_base](https://gitee.com/openharmony/ability_ability_base) - 能力基础库
-- [ability_runtime](https://gitee.com/openharmony/ability_ability_runtime) - 能力运行时
-- [dmsfwk](https://gitee.com/openharmony/ability_dmsfwk) - 分布式管理框架
-- [arkui_ace_engine](https://gitee.com/openharmony/arkui_ace_engine) - ArkUI 引擎
+- [interface_sdk-js](https://gitcode.com/openharmony/interface_sdk-js) - ArkTS API 接口
+- [ability_base](https://gitcode.com/openharmony/ability_ability_base) - 能力基础库
+- [ability_runtime](https://gitcode.com/openharmony/ability_ability_runtime) - 能力运行时
+- [dmsfwk](https://gitcode.com/openharmony/ability_dmsfwk) - 分布式管理框架
+- [arkui_ace_engine](https://gitcode.com/openharmony/arkui_ace_engine) - ArkUI 引擎
+- [bundlemanager_bundle_framework](https://gitcode.com/openharmony/bundlemanager_bundle_framework) - 包管理框架
