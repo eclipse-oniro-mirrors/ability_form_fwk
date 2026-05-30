@@ -41,6 +41,7 @@ HiSysEventParam *FindParamByName(std::vector<HiSysEventParam> &params, const std
 
 void VerifyParamCommon(const HiSysEventParam &param, const std::string &key, HiSysEventParamType type)
 {
+    ASSERT_TRUE(memchr(param.name, '\0', MAX_LENGTH_OF_PARAM_NAME) != nullptr);
     EXPECT_EQ(std::string(param.name), key);
     EXPECT_EQ(param.t, type);
     EXPECT_EQ(param.arraySize, 0);
@@ -199,6 +200,7 @@ void VerifyStringArrayParam(const HiSysEventParam &param, const std::string &key
     if (!expectedValues.empty()) {
         char** arr = static_cast<char**>(param.v.array);
         for (size_t i = 0; i < expectedValues.size(); ++i) {
+            ASSERT_NE(arr[i], nullptr) << "Null pointer at array index " << i;
             EXPECT_EQ(std::string(arr[i]), expectedValues[i]) << "Array element mismatch at index " << i;
         }
     }
@@ -915,6 +917,9 @@ HWTEST_F(FmsFormHiSysEventWrapperTest, Builder_LongKey_001, TestSize.Level1)
     if (expectedKey.length() >= MAX_LENGTH_OF_PARAM_NAME) {
         expectedKey = expectedKey.substr(0, MAX_LENGTH_OF_PARAM_NAME - 1);
     }
+    HiSysEventParam *foundParam = FindParamByName(builder.params_, expectedKey);
+    ASSERT_NE(foundParam, nullptr);
+    EXPECT_EQ(foundParam, &builder.params_[0]);
     EXPECT_EQ(std::string(builder.params_[0].name), expectedKey);
     EXPECT_EQ(strlen(builder.params_[0].name), MAX_LENGTH_OF_PARAM_NAME - 1);
     EXPECT_EQ(builder.params_[0].t, HISYSEVENT_INT64);
@@ -1030,6 +1035,7 @@ HWTEST_F(FmsFormHiSysEventWrapperTest, Builder_MaxKeyLength_001, TestSize.Level1
     HiSysEventParam *param = FindParamByName(builder.params_, maxKey);
     ASSERT_NE(param, nullptr);
     EXPECT_EQ(std::string(param->name), maxKey);
+    ASSERT_TRUE(memchr(param->name, '\0', MAX_LENGTH_OF_PARAM_NAME) != nullptr);
     EXPECT_EQ(strlen(param->name), MAX_LENGTH_OF_PARAM_NAME - 1);
 
     WriteAndVerify(builder, "FORM", "TEST_MAXKEY");
@@ -1199,16 +1205,17 @@ HWTEST_F(FmsFormHiSysEventWrapperTest, Builder_StringArrayWithEmptyStrings_001, 
 }
 
 /**
- * @tc.name: Builder_MaxParamsMinusOne_001
- * @tc.desc: test InsertParam with MAX_PARAM_COUNT-1 params (just below limit).
+ * @tc.name: Builder_MaxParamsReach_001
+ * @tc.desc: test InsertParam reaching exactly MAX_PARAM_COUNT params (fill up to limit).
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHiSysEventWrapperTest, Builder_MaxParamsMinusOne_001, TestSize.Level1)
+HWTEST_F(FmsFormHiSysEventWrapperTest, Builder_MaxParamsReach_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "Builder_MaxParamsMinusOne_001 start";
+    GTEST_LOG_(INFO) << "Builder_MaxParamsReach_001 start";
     FormHiSysEventBuilder builder;
     for (size_t i = 0; i < MAX_PARAM_COUNT - 1; ++i) {
         builder.InsertParam("param" + std::to_string(i), static_cast<int64_t>(i));
+        ASSERT_EQ(builder.params_.size(), i + 1);
     }
     EXPECT_EQ(builder.params_.size(), MAX_PARAM_COUNT - 1);
 
@@ -1220,7 +1227,7 @@ HWTEST_F(FmsFormHiSysEventWrapperTest, Builder_MaxParamsMinusOne_001, TestSize.L
     EXPECT_EQ(builder.params_.size(), MAX_PARAM_COUNT);
     FindAndVerifyInt64Param(builder.params_, "lastParam", 999);
     WriteAndVerify(builder, "FORM", "TEST_MAXMINUS");
-    GTEST_LOG_(INFO) << "Builder_MaxParamsMinusOne_001 end";
+    GTEST_LOG_(INFO) << "Builder_MaxParamsReach_001 end";
 }
 }
 }
