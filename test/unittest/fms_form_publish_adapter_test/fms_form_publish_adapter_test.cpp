@@ -1564,5 +1564,122 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_008, TestSize.Level
 
     GTEST_LOG_(INFO) << "RequestPublishFormToHost_008 end";
 }
+
+// ========== GetBundleName Additional Tests ==========
+ 
+/**
+ * @tc.name: GetBundleName_002
+ * @tc.desc: Verify non-system app with needCheckFormPermission=true returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, GetBundleName_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetBundleName_002 start";
+ 
+    std::string bundleName;
+    sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
+ 
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*bundleMgr, CheckIsSystemAppByUid(TEST_CALLING_UID))
+        .WillOnce(Return(false));
+ 
+    auto result = FormPublishAdapter::GetInstance().GetBundleName(bundleName, true);
+    EXPECT_FALSE(result);
+ 
+    GTEST_LOG_(INFO) << "GetBundleName_002 end";
+}
+ 
+/**
+ * @tc.name: GetBundleName_003
+ * @tc.desc: Verify GetNameForUid failure returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, GetBundleName_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetBundleName_003 start";
+ 
+    std::string bundleName;
+    sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
+ 
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(SYSTEM_UID));
+    EXPECT_CALL(*bundleMgr, CheckIsSystemAppByUid(SYSTEM_UID))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*bundleMgr, GetNameForUid(SYSTEM_UID, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+ 
+    auto result = FormPublishAdapter::GetInstance().GetBundleName(bundleName, true);
+    EXPECT_FALSE(result);
+ 
+    GTEST_LOG_(INFO) << "GetBundleName_003 end";
+}
+ 
+/**
+ * @tc.name: GetBundleName_004
+ * @tc.desc: Verify success returns true and sets bundleName
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, GetBundleName_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetBundleName_004 start";
+ 
+    std::string bundleName;
+    sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
+ 
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(SYSTEM_UID));
+    EXPECT_CALL(*bundleMgr, CheckIsSystemAppByUid(SYSTEM_UID))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*bundleMgr, GetNameForUid(SYSTEM_UID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+ 
+    auto result = FormPublishAdapter::GetInstance().GetBundleName(bundleName, true);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(bundleName, TEST_BUNDLE_NAME);
+ 
+    GTEST_LOG_(INFO) << "GetBundleName_004 end";
+}
+ 
+// ========== IsRequestPublishFormSupported Additional Tests ==========
+ 
+/**
+ * @tc.name: IsRequestPublishFormSupported_002
+ * @tc.desc: Verify IsErmsSupportPublishForm returns false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, IsRequestPublishFormSupported_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsRequestPublishFormSupported_002 start";
+ 
+    sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
+ 
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(3)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
+        .WillOnce(Return(1000));
+    EXPECT_CALL(*bundleMgr, CheckIsSystemAppByUid(TEST_CALLING_UID))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*bundleMgr, GetNameForUid(TEST_CALLING_UID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(false), Return(ERR_OK)));
+ 
+    auto result = FormPublishAdapter::GetInstance().IsRequestPublishFormSupported();
+    EXPECT_FALSE(result);
+ 
+    GTEST_LOG_(INFO) << "IsRequestPublishFormSupported_002 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

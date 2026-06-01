@@ -21,6 +21,7 @@
 #include <vector>
 #include "gmock/gmock.h"
 #include "form_refresh/refresh_impl/form_refresh_interface.h"
+#include "form_refresh/batch_refresh/batch_refresh_mgr.h"
 #include "form_mgr_errors.h"
 
 namespace OHOS {
@@ -29,6 +30,8 @@ class AbstractMockFormRefreshMgr {
 public:
     virtual ~AbstractMockFormRefreshMgr() = default;
     virtual int RequestRefresh(RefreshData &data, const int32_t refreshType) = 0;
+    virtual int32_t BatchRequestRefresh(const int32_t refreshType,
+        const StaggerStrategyType strategyType, std::vector<RefreshData> &batch) = 0;
 };
 
 class MockFormRefreshMgr : public AbstractMockFormRefreshMgr {
@@ -37,6 +40,8 @@ public:
     MockFormRefreshMgr() = default;
     ~MockFormRefreshMgr() override = default;
     MOCK_METHOD2(RequestRefresh, int(RefreshData &data, const int32_t refreshType));
+    MOCK_METHOD3(BatchRequestRefresh, int32_t(const int32_t refreshType,
+        const StaggerStrategyType strategyType, std::vector<RefreshData> &batch));
 
     static void MockBatchRequestRefresh(const std::vector<int32_t> &errorCodes);
 };

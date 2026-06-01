@@ -46,6 +46,7 @@
 #include "mock_i_remote_object.h"
 #include "mock_ipc_skeleton.h"
 #include "mock_bundle_mgr.h"
+#include "mock_theme_form_client.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -3705,5 +3706,67 @@ HWTEST_F(FmsFormLifecycleAdapterTest, HandleCastTempForm_003, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "HandleCastTempForm_003 end";
 }
+
+// ========== DeleteThemeForm Tests ==========
+ 
+#ifdef THEME_MGR_ENABLE
+/**
+ * @tc.name: DeleteThemeForm_001
+ * @tc.desc: Verify DeleteThemeForm returns error when ThemeFormClient.DeleteForms fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeleteThemeForm_001 start";
+ 
+    EXPECT_CALL(*MockThemeFormClient::obj, DeleteForms(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+ 
+    auto result = FormLifecycleAdapter::GetInstance().DeleteThemeForm(TEST_FORM_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+ 
+    GTEST_LOG_(INFO) << "DeleteThemeForm_001 end";
+}
+ 
+/**
+ * @tc.name: DeleteThemeForm_002
+ * @tc.desc: Verify DeleteThemeForm returns error when DeleteFormInfo fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeleteThemeForm_002 start";
+ 
+    EXPECT_CALL(*MockThemeFormClient::obj, DeleteForms(_))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockFormDbCache::obj, DeleteFormInfo(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+ 
+    auto result = FormLifecycleAdapter::GetInstance().DeleteThemeForm(TEST_FORM_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+ 
+    GTEST_LOG_(INFO) << "DeleteThemeForm_002 end";
+}
+ 
+/**
+ * @tc.name: DeleteThemeForm_003
+ * @tc.desc: Verify DeleteThemeForm returns ERR_OK on success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeleteThemeForm_003 start";
+ 
+    EXPECT_CALL(*MockThemeFormClient::obj, DeleteForms(_))
+        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockFormDbCache::obj, DeleteFormInfo(_))
+        .WillOnce(Return(ERR_OK));
+ 
+    auto result = FormLifecycleAdapter::GetInstance().DeleteThemeForm(TEST_FORM_ID);
+    EXPECT_EQ(result, ERR_OK);
+ 
+    GTEST_LOG_(INFO) << "DeleteThemeForm_003 end";
+}
+#endif
 }  // namespace AppExecFwk
 }  // namespace OHOS
