@@ -537,32 +537,35 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
         return;
     }
 
-    if (renderDeathRecipient_ == nullptr) {
-        renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([weak = weak_from_this()]() {
-            auto renderMgrInner = weak.lock();
-            if (renderMgrInner == nullptr) {
-                HILOG_ERROR("null renderMgrInner");
-                return;
-            }
-            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
-                renderMgrInner->userId_,
-                renderMgrInner->isActiveUser_);
-            if (renderMgrInner->isActiveUser_) {
-                renderMgrInner->RerenderAllForms();
-            } else {
-                std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
-                renderMgrInner->renderRemoteObj_ = nullptr;
-            }
-            std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
-            if (renderMgrInner->formResSched_) {
-                renderMgrInner->formResSched_->ReportFormLayoutEnd();
-                renderMgrInner->formResSched_ = nullptr;
-            }
-        });
-    }
-    if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
-        HILOG_ERROR("AddDeathRecipient failed");
-        return;
+    {
+        std::lock_guard<std::mutex> lock(renderDeathRecipientMutex_);
+        if (renderDeathRecipient_ == nullptr) {
+            renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([weak = weak_from_this()]() {
+                auto renderMgrInner = weak.lock();
+                if (renderMgrInner == nullptr) {
+                    HILOG_ERROR("null renderMgrInner");
+                    return;
+                }
+                HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
+                    renderMgrInner->userId_,
+                    renderMgrInner->isActiveUser_);
+                if (renderMgrInner->isActiveUser_) {
+                    renderMgrInner->RerenderAllForms();
+                } else {
+                    std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
+                    renderMgrInner->renderRemoteObj_ = nullptr;
+                }
+                std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
+                if (renderMgrInner->formResSched_) {
+                    renderMgrInner->formResSched_->ReportFormLayoutEnd();
+                    renderMgrInner->formResSched_ = nullptr;
+                }
+            });
+        }
+        if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
+            HILOG_ERROR("AddDeathRecipient failed");
+            return;
+        }
     }
     SetRenderRemoteObj(renderRemoteObj);
     ExecOnUnlockTask(remoteObject);
@@ -729,6 +732,7 @@ void FormRenderMgrInner::NotifyHostRenderServiceIsDead() const
 
 sptr<IFormRender> FormRenderMgrInner::GetRenderRemoteObj() const
 {
+    std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
     return renderRemoteObj_;
 }
 

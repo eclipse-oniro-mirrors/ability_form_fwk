@@ -184,7 +184,7 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
         temptaskInfoQueue.pop();
         formEventQueue->PushFormEvent(eventTaskInfo);
     }
-    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueue().size()));
+    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 
     FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
 }
@@ -219,7 +219,7 @@ void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEven
         }
     }
     formEventQueue->PushFormEvent(taskInfo);
-    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueue().size()));
+    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 }
 
 void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)

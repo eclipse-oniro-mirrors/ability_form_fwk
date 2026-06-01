@@ -225,6 +225,13 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA = {
         FormFsmProcessType::PROCESS_TASK_RETRY,
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
+    {
+        FormFsmStatus::RECYCLING_DATA,
+        FormFsmEvent::RECYCLE_FORM_FAIL,
+        FormFsmStatus::UNPROCESSABLE,
+        FormFsmProcessType::PROCESS_TASK_DIRECT,
+        FormEventTimeout::TIMEOUT_NO_NEED,
+    },
 };
 
 const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING = {

@@ -150,7 +150,7 @@ ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFor
     std::string value = innerFormInfo.ToString();
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
     if (result != ERR_OK) {
-        HILOG_ERROR("put innerFormInfo to RdbStore error");
+        HILOG_ERROR("put innerFormInfo of formId[%{public}s] into RdbStore failed", formId.c_str());
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
             key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -176,7 +176,7 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     std::string key = std::string().append(FORM_ID_PREFIX).append(formId);
     ErrCode result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     if (result != ERR_OK) {
-        HILOG_ERROR("delete key error");
+        HILOG_ERROR("delete the key of formId[%{public}s] failed", formId.c_str());
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
             key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_DELETE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

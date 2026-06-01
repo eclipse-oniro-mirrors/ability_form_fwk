@@ -76,10 +76,10 @@ bool FormEventQueue::IsEventQueueEmpty()
     return false;
 }
 
-const std::queue<FormEventTaskInfo> &FormEventQueue::GetEventQueue()
+size_t FormEventQueue::GetEventQueueSize()
 {
     std::lock_guard<std::mutex> lock(eventQueueMutex_);
-    return eventQueue_;
+    return eventQueue_.size();
 }
 
 bool FormEventQueue::ReportQueueOverLimit(const int64_t formId)
