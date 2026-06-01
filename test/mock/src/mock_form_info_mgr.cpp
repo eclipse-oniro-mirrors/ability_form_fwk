@@ -133,6 +133,9 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
 ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &record, FormInfo &formInfo)
 {
     GTEST_LOG_(INFO) << "GetFormsInfoByRecord called";
+    if (AppExecFwk::MockFormInfoMgr::obj) {
+        return AppExecFwk::MockFormInfoMgr::obj->GetFormsInfoByRecord(record, formInfo);
+    }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 

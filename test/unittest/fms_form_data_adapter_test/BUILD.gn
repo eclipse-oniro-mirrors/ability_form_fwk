@@ -26,6 +26,7 @@ ohos_unittest("FmsFormDataAdapterTest") {
     "${form_fwk_path}/interfaces/inner_api/src/form_provider_data.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_provider_info.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_ashmem.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_instance.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/provider_connect_stub.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_info_mgr.cpp",

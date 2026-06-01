@@ -45,6 +45,9 @@ int32_t FormRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
     const StaggerStrategyType strategyType, std::vector<RefreshData> &batch)
 {
     GTEST_LOG_(INFO) << "FormRefreshMgr::BatchRequestRefresh called, batch size: " << batch.size();
+    if (MockFormRefreshMgr::obj) {
+        return MockFormRefreshMgr::obj->BatchRequestRefresh(refreshType, strategyType, batch);
+    }
     for (size_t i = 0; i < batch.size() && i < g_mockBatchRequestRefreshErrorCodes.size(); ++i) {
         batch[i].errorCode = g_mockBatchRequestRefreshErrorCodes[i];
     }
