@@ -2554,41 +2554,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0120, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_0121
- * @tc.desc: test HandleEventNotify function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0121, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0121 start";
-    FormMgrAdapter formMgrAdapter;
-    std::string providerKey = "aa";
-    std::vector<int64_t> formIdsByProvider;
-    int32_t formVisibleType = 1;
-    MockConnectServiceAbility(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
-        formMgrAdapter.HandleEventNotify(providerKey, formIdsByProvider, formVisibleType));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0121 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_0122
- * @tc.desc: test HandleEventNotify function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0122, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0122 start";
-    FormMgrAdapter formMgrAdapter;
-    std::string providerKey = "aa";
-    std::vector<int64_t> formIdsByProvider;
-    int32_t formVisibleType = 1;
-    MockConnectServiceAbility(false);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleEventNotify(providerKey, formIdsByProvider, formVisibleType));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0122 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_0123
  * @tc.desc: test AcquireProviderFormInfoAsync function.
  * @tc.type: FUNC

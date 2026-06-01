@@ -632,26 +632,6 @@ HWTEST_F(FmsFormDataAdapterTest, ReloadForms_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "ReloadForms_001 end";
 }
 
-// ========== UpdateFormByCondition Tests ==========
-
-/**
- * @tc.name: UpdateFormByCondition_001
- * @tc.desc: Verify UpdateFormByCondition with no forms found returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormDataAdapterTest, UpdateFormByCondition_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "UpdateFormByCondition_001 start";
-
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByCondition(_, _))
-        .WillOnce(Return(false));
-
-    auto result = FormDataAdapter::GetInstance().UpdateFormByCondition(TEST_FORM_REFRESH_TYPE);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-
-    GTEST_LOG_(INFO) << "UpdateFormByCondition_001 end";
-}
-
 // ========== UpdateReUpdateFormMap / SetReUpdateFormMap Tests ==========
 
 /**

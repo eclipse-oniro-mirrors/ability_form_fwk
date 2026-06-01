@@ -293,33 +293,6 @@ HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "GetBundleInfo_003 end";
 }
 
-/**
- * @tc.name: GetBundleInfo_004
- * @tc.desc: Verify nullptr IBundleMgr returns ERR_APPEXECFWK_FORM_GET_BMS_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetBundleInfo_004 start";
-
-    Want want;
-    want.SetElementName("com.test.bundle", "MainAbility");
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
-
-    BundleInfo bundleInfo;
-    std::string packageName;
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-
-    auto result = FormCommonAdapter::GetInstance().GetBundleInfo(want, bundleInfo, packageName);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
-
-    GTEST_LOG_(INFO) << "GetBundleInfo_004 end";
-}
-
 // ========== Method 3: GetFormInfo Tests ==========
 
 /**

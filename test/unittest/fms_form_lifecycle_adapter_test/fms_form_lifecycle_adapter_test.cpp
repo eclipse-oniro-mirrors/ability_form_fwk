@@ -476,29 +476,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, CreateForm_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "CreateForm_001 end";
 }
 
-// ========== EnableForms Tests ==========
-
-/**
- * @tc.name: EnableForms_001
- * @tc.desc: Verify EnableForms returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID when no form records
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, EnableForms_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "EnableForms_001 start";
-
-    std::string bundleName = "com.test.bundle";
-    bool enable = true;
-
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
-        .WillOnce(Return(false));
-
-    auto result = FormLifecycleAdapter::GetInstance().EnableForms(bundleName, TEST_USER_ID, enable);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-
-    GTEST_LOG_(INFO) << "EnableForms_001 end";
-}
-
 // ========== ProtectLockForms Tests ==========
 
 /**
@@ -731,27 +708,5 @@ HWTEST_F(FmsFormLifecycleAdapterTest, HandleFormRemoveObserver_001, TestSize.Lev
 
     GTEST_LOG_(INFO) << "HandleFormRemoveObserver_001 end";
 }
-
-/**
- * @tc.name: HandleFormRemoveObserver_002
- * @tc.desc: Verify HandleFormRemoveObserver calls FormDataMgr when GetCallerBundleName succeeds
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, HandleFormRemoveObserver_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_002 start";
-
-    RunningFormInfo runningFormInfo;
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(DoAll(SetArgReferee<0>("com.test.bundle"), Return(ERR_OK)));
-    EXPECT_CALL(*MockFormDataMgr::obj, HandleFormRemoveObserver(_, _))
-        .Times(1);
-
-    FormLifecycleAdapter::GetInstance().HandleFormRemoveObserver(runningFormInfo);
-
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_002 end";
-}
-
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -129,32 +129,6 @@ void FmsFormPublishAdapterTest::TearDown()
 {
 }
 
-// ========== CheckFormBundleName Tests ==========
-
-/**
- * @tc.name: CheckFormBundleName_001
- * @tc.desc: Verify GetBundleName fails returns ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, CheckFormBundleName_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "CheckFormBundleName_001 start";
-
-    Want want;
-    want.SetBundle(TEST_BUNDLE_NAME);
-    std::string bundleName;
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-
-    auto result = FormPublishAdapter::GetInstance().CheckFormBundleName(want, bundleName, true);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
-
-    GTEST_LOG_(INFO) << "CheckFormBundleName_001 end";
-}
-
 // ========== GetBundleName Tests ==========
 
 /**

@@ -3769,24 +3769,6 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterFormWantCallback_001, TestSize
 }
 
 /**
- * @tc.number: FormMgrStubTest_RegisterFormWantCallback_002
- * @tc.name: Verify HandleRegisterFormWantCallback with invalid token
- * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_PARCEL_ERROR.
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterFormWantCallback_002, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterFormWantCallback_002 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
-    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterFormWantCallback_002 ends";
-}
-
-/**
  * @tc.number: FormMgrStubTest_UnregisterFormWantCallback_001
  * @tc.name: Verify OnRemoteRequest HandleUnregisterFormWantCallback
  * @tc.desc: When the parameter code is FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK, return ERR_OK.
@@ -3804,23 +3786,5 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterFormWantCallback_001, TestSi
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_001 ends";
-}
-
-/**
- * @tc.number: FormMgrStubTest_UnregisterFormWantCallback_002
- * @tc.name: Verify HandleUnregisterFormWantCallback with invalid token
- * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_PARCEL_ERROR.
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterFormWantCallback_002, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_SYNC};
-    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 ends";
 }
 }

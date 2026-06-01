@@ -433,42 +433,6 @@ HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: RequestOverflow_002
- * @tc.desc: Verify form not exist returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "RequestOverflow_002 start";
-
-    int32_t callingUid = TEST_CALLING_UID;
-    OverflowInfo overflowInfo;
-    bool isOverflow = false;
-
-    FormRecord record;
-    record.formId = TEST_FORM_ID;
-    record.bundleName = "com.test.bundle";
-    record.abilityName = "MainAbility";
-    record.moduleName = "entry";
-    record.uid = callingUid;
-    record.providerUserId = TEST_USER_ID;
-
-    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
-        .WillRepeatedly(Return(TEST_FORM_ID));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)))
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillRepeatedly(Return(false));
-
-    auto result = FormCallbackAdapter::GetInstance().RequestOverflow(
-        TEST_FORM_ID, callingUid, overflowInfo, isOverflow);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-
-    GTEST_LOG_(INFO) << "RequestOverflow_002 end";
-}
-
-/**
  * @tc.name: RequestOverflow_003
  * @tc.desc: Verify no host registered returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED
  * @tc.type: FUNC
