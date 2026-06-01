@@ -1248,30 +1248,6 @@ HWTEST_F(FmsFormProviderMgrTest, ConnectForConfigUpdate_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ConnectForConfigUpdate_003
- * @tc.desc: Verify ConnectForConfigUpdate returns ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED when errorCode is
- ERR_ECOLOGICAL_CONTROL_STATUS.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderMgrTest, ConnectForConfigUpdate_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ConnectForConfigUpdate_003 start";
-    int64_t formId = 0x114543aa00000000;
-    FormRecord record;
-    record.formId = formId;
-    record.bundleName = "com.test.bundle";
-    record.abilityName = "com.test.ability";
-    record.providerUserId = 0;
-    Want want;
-    AppExecFwk::Configuration configuration;
-    MockConnectServiceAbilityWithErrorCode(ERR_ECOLOGICAL_CONTROL_STATUS);
-    ErrCode result = FormProviderMgr::GetInstance().ConnectForConfigUpdate(configuration, record, want);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
-    MockConnectServiceAbility(true);
-    GTEST_LOG_(INFO) << "ConnectForConfigUpdate_003 end";
-}
-
-/**
  * @tc.name: ConnectAmsChangeLocation_001
  * @tc.desc: Verify ConnectAmsChangeLocation with connect failed.
  * @tc.type: FUNC

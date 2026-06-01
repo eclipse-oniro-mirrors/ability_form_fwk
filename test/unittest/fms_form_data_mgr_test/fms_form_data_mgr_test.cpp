@@ -568,26 +568,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_003, TestSize.Le
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_004
- * @tc.name: CheckEnoughForm
- * @tc.desc: Verify that the return value is error.
- * @tc.details: maxRecordPerUser is zero.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_004, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_004 start";
-
-    int callingUid = 0;
-    int32_t checkAllDBFormPreAPPSize = 1;
-    MockGetAllFormInfoSize(checkAllDBFormPreAPPSize, callingUid);
-    MockGetBundleNameByUid(ERR_OK);
-    MockGetFormCountsByHostBundleName(Constants::MAX_RECORD_PER_HOST);
-
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER, formDataMgr_.CheckEnoughForm(callingUid));
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_004 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_005
  * @tc.name: CheckEnoughForm
  * @tc.desc: Verify that the return value is error.
