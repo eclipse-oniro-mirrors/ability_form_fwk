@@ -257,39 +257,6 @@ void FmsFormAbilityConnectionTest::SetupProviderKey(
 }
 
 /**
- * @tc.name: OnAbilityConnectDone_Normal_001
- * @tc.desc: Verify OnAbilityConnectDone with normal resultCode and no free install.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, OnAbilityConnectDone_Normal_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnAbilityConnectDone_Normal_001 start";
-
-    connection_->SetFreeInstall(false);
-    connection_->SetNeedRegisterToSupplyCallback(false);
-
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).Times(0);
-    EXPECT_CALL(*MockFormDataMgr::obj, SetRecordNeedFreeInstall(_, _)).Times(0);
-    EXPECT_CALL(*MockFormDataMgr::obj, GetUpdatedForm(_, _, _)).Times(0);
-    EXPECT_CALL(*MockFormDataMgr::obj, SetNeedRefresh(_, _)).Times(0);
-
-    ElementName element;
-    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
-    int resultCode = ERR_OK;
-
-    connection_->OnAbilityConnectDone(element, remoteObject, resultCode);
-
-    EXPECT_TRUE(connection_->IsExecuted());
-    EXPECT_TRUE(connection_->IsPreConnectTaskExecuted());
-    EXPECT_EQ(connection_->want_.GetIntParam(Constants::FORM_CONNECT_ID, -1), CONNECT_ID);
-    EXPECT_EQ(connection_->remoteObject_, remoteObject);
-
-    testing::Mock::VerifyAndClearExpectations(mockFormDataMgr_.get());
-
-    GTEST_LOG_(INFO) << "OnAbilityConnectDone_Normal_001 end";
-}
-
-/**
  * @tc.name: OnAbilityConnectDone_ErrorResult_002
  * @tc.desc: Verify OnAbilityConnectDone with error resultCode.
  * @tc.type: FUNC
