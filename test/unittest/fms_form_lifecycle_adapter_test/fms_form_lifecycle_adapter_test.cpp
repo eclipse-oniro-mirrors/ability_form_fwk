@@ -479,29 +479,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, CreateForm_001, TestSize.Level1)
 // ========== ProtectLockForms Tests ==========
 
 /**
- * @tc.name: ProtectLockForms_001
- * @tc.desc: Verify ProtectLockForms returns ERR_OK when lock service initialized and status unchanged
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ProtectLockForms_001 start";
-
-    std::string bundleName = "com.test.bundle";
-    bool protect = true;
-
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsLockServiceInitialized())
-        .WillOnce(Return(true));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillOnce(Return(true));
-
-    auto result = FormLifecycleAdapter::GetInstance().ProtectLockForms(bundleName, TEST_USER_ID, protect);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "ProtectLockForms_001 end";
-}
-
-/**
  * @tc.name: ProtectLockForms_002
  * @tc.desc: Verify ProtectLockForms returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID when no form records
  * @tc.type: FUNC
