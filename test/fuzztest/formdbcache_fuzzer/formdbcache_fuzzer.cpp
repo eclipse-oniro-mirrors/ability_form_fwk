@@ -32,6 +32,8 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr int32_t INDEX_MAX = 5;
 const nlohmann::json JSON_FORMS = R"({})"_json;
+constexpr int32_t RANGE_MIN = -1;
+constexpr int32_t RANGE_MAX = 8;
 
 void GenerateMapData(FuzzedDataProvider *fdp, std::set<int64_t> &matchedFormIds,
     std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap, std::map<int64_t, bool> &foundFormsMap)
@@ -181,7 +183,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds3, removedFormsMap);
 
     // Cover UpdateFormLocation (not in original fuzzer)
-    int32_t formLocation = fdp->ConsumeIntegral<int32_t>();
+    int32_t formLocation = fdp->ConsumeIntegralInRange<int32_t>(RANGE_MIN, RANGE_MAX);
     formDbCache.UpdateFormLocation(formId, formLocation);
 
     // Cover private method SaveFormInfoNolock (not in original fuzzer)

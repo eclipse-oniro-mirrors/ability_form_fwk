@@ -67,7 +67,21 @@ void FormParallelizeFuzzUtil::FillRunningFormInfo(FuzzedDataProvider &provider, 
 
 void FormParallelizeFuzzUtil::FillFormProviderData(FuzzedDataProvider &provider, FormProviderData &data)
 {
-    std::string jsonStr = "{\"key\":\"" + provider.ConsumeRandomLengthString(NUMBER_32) + "\"}";
+    std::string randomData = provider.ConsumeRandomLengthString(NUMBER_32);
+    std::string escapedData;
+    for (char d : randomData) {
+        switch (d) {
+            case '"': escapedData += "\\\""; break;
+            case '\\': escapedData += "\\\\"; break;
+            case '\b': escapedData += "\\b"; break;
+            case '\f': escapedData += "\\f"; break;
+            case '\n': escapedData += "\\n"; break;
+            case '\r': escapedData += "\\r"; break;
+            case '\t': escapedData += "\\t"; break;
+            default: escapedData += d; break;
+        }
+    }
+    std::string jsonStr = "{\"key\":\"" + escapedData + "\"}";
     data = FormProviderData(jsonStr);
 }
 
