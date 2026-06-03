@@ -126,8 +126,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formAbilityConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
     formAbilityConnection->onFormAppConnect();
     formAbilityConnection->ReportFormAppUnbindEvent();
-    std::string getBundleName = formAbilityConnection->GetBundleName();
-    int32_t getAppFormPid = formAbilityConnection->GetAppFormPid();
+    formAbilityConnection->GetBundleName();
+    formAbilityConnection->GetAppFormPid();
     formAbilityConnection->OnAbilityDisconnectDone(element, resultCode);
     wptr<IRemoteObject> remoteObject1;
     formAbilityConnection->OnConnectDied(remoteObject1);
