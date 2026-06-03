@@ -27,23 +27,23 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
   liveFormInfo = undefined;
 
   onSessionCreate(want, session) {
-    hilog.slogI(domainID, TAG, 'onSessionCreate');
+    hilog.sLogI(domainID, TAG, 'onSessionCreate');
     if (!want.parameters) {
-      hilog.slogE(domainID, TAG, 'null parameters');
+      hilog.sLogE(domainID, TAG, 'null parameters');
       this.onDestroy();
       return;
     }
 
     let extraInfo = want.parameters.extraInfo;
     if (!extraInfo) {
-      hilog.slogE(domainID, TAG, 'null extraInfo');
+      hilog.sLogE(domainID, TAG, 'null extraInfo');
       this.onDestroy();
       return;
     }
 
     this.liveFormInfo = extraInfo.formInfo;
     if (!this.liveFormInfo) {
-      hilog.slogE(domainID, TAG, 'null liveFormInfo');
+      hilog.sLogE(domainID, TAG, 'null liveFormInfo');
       this.onDestroy();
       return;
     }
@@ -51,10 +51,10 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
     this.context.formId = this.liveFormInfo.formId;
     this.context.setWindowBackgroundColor()
       .then(() => {
-          hilog.slogI(domainID, TAG, 'setWindowBackgroundColor succeed');
+          hilog.sLogI(domainID, TAG, 'setWindowBackgroundColor succeed');
       })
       .catch((err) => {
-        hilog.slogE(domainID, TAG, `setWindowBackgroundColor failed, code is ${err?.code}, message is ${err?.message}`);
+        hilog.sLogE(domainID, TAG, `setWindowBackgroundColor failed, code is ${err?.code}, message is ${err?.message}`);
       });
 
     let layoutScale = want.parameters[FORM_LAYOUT_SCALE];
@@ -97,15 +97,15 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
   }
 
   onLiveFormCreate(liveFormInfo, session) {
-    hilog.slogI(domainID, TAG, 'onLiveFormCreate');
+    hilog.sLogI(domainID, TAG, 'onLiveFormCreate');
   }
 
   onDestroy() {
-    hilog.slogI(domainID, TAG, 'onDestroy');
+    hilog.sLogI(domainID, TAG, 'onDestroy');
     this.onLiveFormDestroy(this.liveFormInfo);
   }
 
   onLiveFormDestroy(liveFormInfo) {
-    hilog.slogI(domainID, TAG, 'onLiveFormDestroy');
+    hilog.sLogI(domainID, TAG, 'onLiveFormDestroy');
   }
 }
