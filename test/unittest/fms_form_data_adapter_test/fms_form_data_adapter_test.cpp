@@ -417,8 +417,6 @@ HWTEST_F(FmsFormDataAdapterTest, DisableUpdateForm_002, TestSize.Level1)
 
 // ========== HandleUpdateFormFlag Tests ==========
 
-
-
 /**
  * @tc.name: HandleUpdateFormFlag_002
  * @tc.desc: Verify HandleUpdateFormFlag returns error when UpdateHostFormFlag fails
@@ -439,8 +437,6 @@ HWTEST_F(FmsFormDataAdapterTest, HandleUpdateFormFlag_002, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "HandleUpdateFormFlag_002 end";
 }
-
-
 
 // ========== SetNextRefreshTime Tests ==========
 
