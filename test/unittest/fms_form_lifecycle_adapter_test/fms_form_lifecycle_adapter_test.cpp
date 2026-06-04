@@ -476,8 +476,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, CreateForm_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "CreateForm_001 end";
 }
 
-
-
 // ========== SwitchLockForms Tests ==========
 
 /**
@@ -613,9 +611,5 @@ HWTEST_F(FmsFormLifecycleAdapterTest, RecoverForms_002, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "RecoverForms_002 end";
 }
-
-
-
-
 }  // namespace AppExecFwk
 }  // namespace OHOS
