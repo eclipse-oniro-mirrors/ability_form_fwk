@@ -581,8 +581,6 @@ HWTEST_F(FmsFormAbilityConnectionTest, GetAppFormPid_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GetAppFormPid_001 end";
 }
 
-
-
 /**
  * @tc.name: OnPreConnectTask_001
  * @tc.desc: Verify OnPreConnectTask default implementation does nothing and does not throw.
