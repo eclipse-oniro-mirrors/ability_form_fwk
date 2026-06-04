@@ -276,8 +276,6 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckSnapshotWant_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "CheckSnapshotWant_003 end";
 }
 
-
-
 // ========== QueryPublishFormToHost Tests ==========
 
 /**
