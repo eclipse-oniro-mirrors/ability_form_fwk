@@ -167,6 +167,7 @@ private:
     std::function<void(const sptr<IRemoteObject> &remoteObject)> onUnlockTask_ = nullptr;
     mutable std::mutex formResSchedMutex_;
     std::unique_ptr<FormResSched> formResSched_ = nullptr;
+    mutable std::mutex renderDeathRecipientMutex_;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
     // userId_ is Active User

@@ -117,10 +117,7 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 {
     HILOG_INFO("form: %{public}" PRId64, formId);
     DeleteFormDBInfoCache(formId);
-    if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId)) == ERR_OK) {
-        return ERR_OK;
-    }
-    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    return FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId));
 }
 /**
  * @brief Delete form data in DbCache and DB with formId.

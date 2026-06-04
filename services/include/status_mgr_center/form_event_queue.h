@@ -79,10 +79,10 @@ public:
     bool IsEventQueueEmpty();
 
     /**
-     * @brief Get the event queue
-     * @return Returns the reference to the event queue
+     * @brief Get the event queue size
+     * @return Returns the size of the event queue
      */
-    const std::queue<FormEventTaskInfo> &GetEventQueue();
+    size_t GetEventQueueSize();
 
 private:
     bool ReportQueueOverLimit(const int64_t formId);
