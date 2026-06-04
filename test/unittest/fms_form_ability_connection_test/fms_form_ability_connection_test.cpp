@@ -289,8 +289,6 @@ HWTEST_F(FmsFormAbilityConnectionTest, OnAbilityConnectDone_ErrorResult_002, Tes
     GTEST_LOG_(INFO) << "OnAbilityConnectDone_ErrorResult_002 end";
 }
 
-
-
 /**
  * @tc.name: ProcessFreeInstall_NotFreeInstall_001
  * @tc.desc: Verify ProcessFreeInstall when isFreeInstall is false.
