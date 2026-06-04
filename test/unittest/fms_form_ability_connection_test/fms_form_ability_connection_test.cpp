@@ -316,10 +316,6 @@ HWTEST_F(FmsFormAbilityConnectionTest, ProcessFreeInstall_NotFreeInstall_001, Te
     GTEST_LOG_(INFO) << "ProcessFreeInstall_NotFreeInstall_001 end";
 }
 
-
-
-
-
 /**
  * @tc.name: OnBuildTaskWant_Normal_001
  * @tc.desc: Verify OnBuildTaskWant returns Want with correct connectId.
