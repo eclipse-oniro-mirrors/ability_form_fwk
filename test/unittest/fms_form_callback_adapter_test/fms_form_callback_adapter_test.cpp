@@ -549,8 +549,6 @@ HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_001, TestSize.Lev
     GTEST_LOG_(INFO) << "ChangeSceneAnimationState_001 end";
 }
 
-
-
 // ========== RegisterGetFormRectProxy Tests ==========
 
 /**
