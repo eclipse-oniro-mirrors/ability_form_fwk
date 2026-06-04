@@ -52,8 +52,19 @@ namespace {
 constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.watermark";
 constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
 constexpr const char *FORM_STANDBY_CAPABILITY_PARAM_NAME = "const.form.standby.capability";
+constexpr const char *RERENDER_ALL_FORMS_TASK_NAME = "RerenderAllForms";
 constexpr int32_t CONDITION_NETWORK = 1;
 static bool g_hasReportedExceedsDistribution = false;
+constexpr int32_t RERENDER_ALL_FORMS_DELAY_TIME = 120 * 1000; // 2 minutes in milliseconds
+
+static void RerenderAllFormsImmediate()
+{
+    std::vector<int32_t> foregroundList;
+    FormUtil::GetForegroundUsers(foregroundList);
+    for (const int32_t userId : foregroundList) {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+    }
+}
 
 static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_unused]] void *context)
 {
@@ -63,10 +74,9 @@ static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_
     if (isLowMemory) {
         return;
     }
-    std::vector<int32_t> foregroundList;
-    FormUtil::GetForegroundUsers(foregroundList);
-    for (const int32_t userId : foregroundList) {
-        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+    RerenderAllFormsImmediate();
+    if (!FormDataMgr::GetInstance().ScheduleRerenderAllFormsDelayTask()) {
+        HILOG_ERROR("Failed to schedule delayed memory watermark rerender task");
     }
 }
 
@@ -3689,6 +3699,38 @@ ErrCode FormDataMgr::CheckEnoughFormOnDevice(const int callingUid, const int32_t
     }
 
     return ERR_OK;
+}
+
+/**
+ * @brief Cancel rerender all forms delayed task.
+ */
+void FormDataMgr::CancelRerenderAllFormsDelayTask()
+{
+    if (!FormMgrQueue::GetInstance().CancelDelayTask(RERENDER_ALL_FORMS_TASK_NAME)) {
+        HILOG_WARN("Rerender all forms delayed task cancellation failed or task already executed");
+        return;
+    }
+    HILOG_INFO("Rerender all forms delayed task cancelled successfully");
+}
+
+/**
+ * @brief Schedule rerender all forms delayed task.
+ * @return Returns true if scheduled successfully, false otherwise.
+ */
+bool FormDataMgr::ScheduleRerenderAllFormsDelayTask()
+{
+    std::function<void()> delayedTask = []() {
+        HILOG_INFO("Rerender all forms delayed task start");
+        RerenderAllFormsImmediate();
+    };
+    CancelRerenderAllFormsDelayTask(); // ensure only one task in queue
+    if (!FormMgrQueue::GetInstance().ScheduleDelayTask(RERENDER_ALL_FORMS_TASK_NAME,
+        RERENDER_ALL_FORMS_DELAY_TIME, delayedTask)) {
+        HILOG_ERROR("Rerender all forms delayed task scheduling failed");
+        return false;
+    }
+    HILOG_INFO("Rerender all forms delayed task scheduled successfully");
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
