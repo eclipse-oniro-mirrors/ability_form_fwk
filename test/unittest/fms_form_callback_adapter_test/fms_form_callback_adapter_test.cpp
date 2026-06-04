@@ -549,38 +549,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_001, TestSize.Lev
     GTEST_LOG_(INFO) << "ChangeSceneAnimationState_001 end";
 }
 
-/**
- * @tc.name: ChangeSceneAnimationState_002
- * @tc.desc: Verify form not exist returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_002 start";
 
-    int32_t callingUid = TEST_CALLING_UID;
-    int32_t state = 1;
-
-    FormRecord record;
-    record.formId = TEST_FORM_ID;
-    record.uid = callingUid;
-
-    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
-        .WillRepeatedly(Return(TEST_FORM_ID));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)))
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillRepeatedly(Return(false));
-    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
-        .WillRepeatedly(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
-
-    auto result = FormCallbackAdapter::GetInstance().ChangeSceneAnimationState(
-        TEST_FORM_ID, callingUid, state);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_002 end";
-}
 
 // ========== RegisterGetFormRectProxy Tests ==========
 

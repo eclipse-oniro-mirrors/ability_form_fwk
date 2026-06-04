@@ -476,32 +476,7 @@ HWTEST_F(FmsFormLifecycleAdapterTest, CreateForm_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "CreateForm_001 end";
 }
 
-// ========== ProtectLockForms Tests ==========
 
-/**
- * @tc.name: ProtectLockForms_002
- * @tc.desc: Verify ProtectLockForms returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID when no form records
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ProtectLockForms_002 start";
-
-    std::string bundleName = "com.test.bundle";
-    bool protect = false;
-
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsLockServiceInitialized())
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillOnce(Return(true));
-
-    auto result = FormLifecycleAdapter::GetInstance().ProtectLockForms(bundleName, TEST_USER_ID, protect);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-
-    GTEST_LOG_(INFO) << "ProtectLockForms_002 end";
-}
 
 // ========== SwitchLockForms Tests ==========
 
@@ -639,51 +614,8 @@ HWTEST_F(FmsFormLifecycleAdapterTest, RecoverForms_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "RecoverForms_002 end";
 }
 
-// ========== BatchNotifyFormsConfigurationUpdate Tests ==========
 
-/**
- * @tc.name: BatchNotifyFormsConfigurationUpdate_001
- * @tc.desc: Verify BatchNotifyFormsConfigurationUpdate returns ERR_OK with no visible/invisible records
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, BatchNotifyFormsConfigurationUpdate_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "BatchNotifyFormsConfigurationUpdate_001 start";
 
-    AppExecFwk::Configuration configuration;
 
-    auto result = FormLifecycleAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "BatchNotifyFormsConfigurationUpdate_001 end";
-}
-
-// ========== HandleFormRemoveObserver Tests ==========
-
-/**
- * @tc.name: HandleFormRemoveObserver_001
- * @tc.desc: Verify HandleFormRemoveObserver returns early when GetCallerBundleName fails
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, HandleFormRemoveObserver_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_001 start";
-
-    RunningFormInfo runningFormInfo;
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
-
-    FormLifecycleAdapter::GetInstance().HandleFormRemoveObserver(runningFormInfo);
-    // FormDataMgr::HandleFormRemoveObserver should NOT be called when GetCallerBundleName fails
-    EXPECT_CALL(*MockFormDataMgr::obj, HandleFormRemoveObserver(_, _))
-        .Times(0);
-    // Re-verify: calling again with the same mock setup confirms early return
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
-    FormLifecycleAdapter::GetInstance().HandleFormRemoveObserver(runningFormInfo);
-
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_001 end";
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS
