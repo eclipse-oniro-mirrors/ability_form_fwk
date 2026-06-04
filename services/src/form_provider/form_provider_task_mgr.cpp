@@ -16,6 +16,7 @@
 #include "form_provider/form_provider_task_mgr.h"
 #include "form_provider_interface.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_queue.h"
 #include "data_center/form_data_mgr.h"
@@ -278,13 +279,17 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
         return;
     }
     int error = formProviderProxy->NotifyFormUpdate(formId, want, FormSupplyCallback::GetInstance());
-    if (error != ERR_OK) {
-        RemoveConnection(connectId);
-        HILOG_ERROR("fail notify form update");
+    if (error == ERR_OK) {
+        FormProviderErrorHandlerFactory::GetRefreshHandler()->RemoveRetryPolicy(formId);
+        DelayedFormExitDetect(connectId);
         return;
     }
-
-    DelayedFormExitDetect(connectId);
+    HILOG_ERROR("fail notify form update, error:%{public}d", error);
+    bool handled = FormProviderErrorHandlerFactory::GetRefreshHandler()
+        ->HandleSendRequestFailed(formId, error, want);
+    if (!handled) {
+        RemoveConnection(connectId);
+    }
 }
 
 /**

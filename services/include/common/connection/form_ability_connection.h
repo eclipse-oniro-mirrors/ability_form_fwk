@@ -24,6 +24,13 @@ namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
+enum class ConnectState {
+    DISCONNECTED,
+    CONNECTING,
+    CONNECTED,
+};
+
+constexpr int32_t DISCONNECT_ERROR = -1;
 
 /**
  * @class FormAbilityConnection
@@ -51,12 +58,6 @@ public:
      * @param resultCode ERR_OK on success, others on failure.
      */
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
-
-    /**
-     * @brief remote object died event.
-     * @param remoteObject the remote object of service ability.
-     */
-    void OnConnectDied(const wptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief onFormAppConnect, when ability connectDone.

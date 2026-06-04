@@ -21,6 +21,7 @@
 #include "form_constants.h"
 #include "form_provider/form_provider_task_mgr.h"
 #include "data_center/form_data_mgr.h"
+#include "form_provider/form_supply_callback.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -61,6 +62,25 @@ void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IR
     } else {
         FormProviderTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
         FormDataMgr::GetInstance().ClearHostRefreshFlag(GetFormId());
+    }
+}
+
+void FormRefreshConnection::OnPreConnectTask()
+{
+    connectState_ = ConnectState::CONNECTED;
+}
+
+void FormRefreshConnection::OnAbilityDisconnectDone(
+    const AppExecFwk::ElementName &element, int resultCode)
+{
+    HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+        GetFormId(), resultCode, static_cast<int32_t>(connectState_));
+
+    FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
+
+    if (resultCode == DISCONNECT_ERROR && connectState_ == ConnectState::CONNECTED) {
+        FormProviderErrorHandlerFactory::GetRefreshHandler()
+            ->HandleDisconnectError(GetFormId(), resultCode, want_);
     }
 }
 

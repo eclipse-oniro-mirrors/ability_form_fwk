@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
 
 #include "common/connection/form_ability_connection.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -40,6 +41,12 @@ protected:
     bool NeedFreeInstallProcessing() const override { return true; }
 
     /**
+     * @brief Pre-processing after connection success.
+     *        Marks connected state for dual-signal precondition check.
+     */
+    void OnPreConnectTask() override;
+
+    /**
      * @brief Build task Want parameter based on refresh type.
      * @return Built Want object.
      */
@@ -53,8 +60,15 @@ protected:
      */
     void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
 
+    /**
+     * @brief Override: DISCONNECT_ERROR+CONNECTED triggers HandleDisconnectError.
+     *        Calls base OnAbilityDisconnectDone first, then checks dual-signal condition.
+     */
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+
 private:
     Want want_;
+    ConnectState connectState_ = ConnectState::DISCONNECTED;
     DISALLOW_COPY_AND_MOVE(FormRefreshConnection);
 };
 }  // namespace AppExecFwk

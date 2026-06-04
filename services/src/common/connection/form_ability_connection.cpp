@@ -139,16 +139,6 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
     ReportFormAppUnbindEvent();
 }
 
-void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObject)
-{
-    if (connectId_ != 0) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
-        connectId_ = 0;
-    } else {
-        HILOG_ERROR("connectId_ invalidate. connectId_:%{public}d", connectId_);
-    }
-}
-
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()
 {
     sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
