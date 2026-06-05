@@ -22,5 +22,7 @@ FormReport::FormReport() {}
 FormReport::~FormReport() {}
 
 void FormReport::SetStartBindTime(int64_t formId, int64_t startTime) {}
+
+void FormReport::RemoveFormId(int64_t formId) {}
 } // namespace AppExecFwk
 } // namespace OHOS

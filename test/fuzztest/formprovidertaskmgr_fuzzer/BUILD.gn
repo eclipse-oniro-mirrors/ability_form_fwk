@@ -25,6 +25,7 @@ ohos_fuzztest("FormProviderTaskMgrFuzzTest") {
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/services/common/include",
   ]
@@ -37,6 +38,9 @@ ohos_fuzztest("FormProviderTaskMgrFuzzTest") {
   sources = [
     "formprovidertaskmgr_fuzzer.cpp",
     "${form_fwk_path}/services/src/form_provider/form_provider_task_mgr.cpp",
+    "${form_fwk_path}/services/src/common/retry_policy/retry_policy.cpp",
+    "${form_fwk_path}/services/src/form_provider/error_handler/provider_connection_error_handler.cpp",
+    "${form_fwk_path}/services/src/form_provider/error_handler/provider_refresh_error_handler.cpp",
     "${form_fwk_path}/services/src/common/util/form_report.cpp",
     "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
     "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
@@ -46,6 +50,7 @@ ohos_fuzztest("FormProviderTaskMgrFuzzTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:libfms",
+    "${form_fwk_path}/services/common:libform_common",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

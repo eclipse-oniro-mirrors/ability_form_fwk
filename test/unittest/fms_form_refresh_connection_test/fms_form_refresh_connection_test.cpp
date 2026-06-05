@@ -23,6 +23,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
+#define protected public
 #include "form_provider/connection/form_acquire_connection.h"
 #include "form_provider/connection/form_acquire_state_connection.h"
 #include "bms_mgr/form_bundle_event_callback.h"
@@ -39,22 +40,32 @@
 #include "form_provider/form_supply_callback.h"
 #include "common/util/form_util.h"
 #include "feature/free_install/free_install_status_callback_stub.h"
+#include "mock_form_provider_task_mgr.h"
+#include "mock_form_provider_refresh_error_handler.h"
+#include "mock_form_supply_callback.h"
+#include "mock_form_data_mgr.h"
 #undef private
+#undef protected
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
+using ::testing::_;
 
 namespace {
 
 const std::string FORM_MESSAGE_EVENT_VALUE_1 = "event message1";
 const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
+constexpr int32_t DISCONNECT_ERROR = -1;
+constexpr int32_t TEST_CONNECT_ID = 100;
+
 class FmsFormRefreshConnectionTest : public testing::Test {
 public:
     void SetUp();
     void TearDown();
+    sptr<FormRefreshConnection> CreateRefreshConnection(int64_t formId, Want &want);
 };
 
 class MockFreeInstallStatusCallBackStub : public FreeInstallStatusCallBackStub {
@@ -62,15 +73,25 @@ public:
     MockFreeInstallStatusCallBackStub() = default;
     virtual ~MockFreeInstallStatusCallBackStub() = default;
 
-    virtual void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId)
-    {}
+    virtual void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) {}
 };
 
 void FmsFormRefreshConnectionTest::SetUp()
-{}
+{
+    MockFormProviderTaskMgr::obj = std::make_shared<MockFormProviderTaskMgr>();
+    MockFormProviderRefreshErrorHandler::obj = std::make_shared<MockFormProviderRefreshErrorHandler>();
+}
 
 void FmsFormRefreshConnectionTest::TearDown()
-{}
+{
+    MockFormProviderTaskMgr::obj = nullptr;
+    MockFormProviderRefreshErrorHandler::obj = nullptr;
+}
+
+sptr<FormRefreshConnection> FmsFormRefreshConnectionTest::CreateRefreshConnection(int64_t formId, Want &want)
+{
+    return new (std::nothrow) FormRefreshConnection(formId, want, "aa", "bb", false, 100);
+}
 
 /**
  * @tc.name: FormRefreshConnection_001
@@ -173,6 +194,181 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
 }
 
 /**
+ * @tc.name: OnAbilityDisconnectDone_MultiBranch_001
+ * @tc.desc: test OnAbilityDisconnectDone with multiple scenarios:
+ *           (1) DISCONNECT_ERROR + CONNECTED → HandleDisconnectError called
+ *           (2) ERR_OK + CONNECTED → HandleDisconnectError NOT called
+ *           (3) DISCONNECT_ERROR + NOT CONNECTED → HandleDisconnectError NOT called
+ *           (4) Other resultCode + CONNECTED → HandleDisconnectError NOT called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_MultiBranch_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MultiBranch_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+
+    // Segment 1: DISCONNECT_ERROR + CONNECTED → HandleDisconnectError called
+    sptr<FormRefreshConnection> conn1 = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn1);
+    conn1->SetConnectId(TEST_CONNECT_ID);
+    conn1->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(1, DISCONNECT_ERROR, _)).Times(1);
+    conn1->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn1->GetConnectId());
+
+    // Segment 2: ERR_OK + CONNECTED → HandleDisconnectError NOT called
+    sptr<FormRefreshConnection> conn2 = CreateRefreshConnection(2, want);
+    ASSERT_NE(nullptr, conn2);
+    conn2->SetConnectId(TEST_CONNECT_ID);
+    conn2->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _)).Times(0);
+    conn2->OnAbilityDisconnectDone(element, ERR_OK);
+    EXPECT_EQ(0, conn2->GetConnectId());
+
+    // Segment 3: DISCONNECT_ERROR + NOT CONNECTED → HandleDisconnectError NOT called
+    sptr<FormRefreshConnection> conn3 = CreateRefreshConnection(3, want);
+    ASSERT_NE(nullptr, conn3);
+    conn3->SetConnectId(TEST_CONNECT_ID);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _)).Times(0);
+    conn3->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn3->GetConnectId());
+
+    // Segment 4: Other resultCode + CONNECTED → HandleDisconnectError NOT called
+    sptr<FormRefreshConnection> conn4 = CreateRefreshConnection(4, want);
+    ASSERT_NE(nullptr, conn4);
+    conn4->SetConnectId(TEST_CONNECT_ID);
+    conn4->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _)).Times(0);
+    conn4->OnAbilityDisconnectDone(element, -2);
+    EXPECT_EQ(0, conn4->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MultiBranch_001 end";
+}
+
+/**
+ * @tc.name: OnBuildTaskWant_MultiBranch_001
+ * @tc.desc: test OnBuildTaskWant with multiple scenarios:
+ *           (1) PARAM_MESSAGE_KEY → has FORM_CONNECT_ID and PARAM_MESSAGE_KEY
+ *           (2) RECREATE_FORM_KEY → has ACQUIRE_TYPE and FORM_CONNECT_ID
+ *           (3) No special keys → only FORM_CONNECT_ID
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_MultiBranch_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_MultiBranch_001 start";
+
+    // Segment 1: PARAM_MESSAGE_KEY → has FORM_CONNECT_ID and PARAM_MESSAGE_KEY
+    Want want1;
+    const std::string message1 = "test_message";
+    want1.SetParam(Constants::PARAM_MESSAGE_KEY, message1);
+    sptr<FormRefreshConnection> conn1 = CreateRefreshConnection(1, want1);
+    ASSERT_NE(nullptr, conn1);
+    conn1->SetConnectId(TEST_CONNECT_ID);
+    Want result1 = conn1->OnBuildTaskWant();
+    EXPECT_TRUE(result1.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result1.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_TRUE(result1.HasParameter(Constants::PARAM_MESSAGE_KEY));
+
+    // Segment 2: RECREATE_FORM_KEY → has ACQUIRE_TYPE and FORM_CONNECT_ID
+    Want want2;
+    const std::string recreateFlag1 = "true";
+    want2.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag1);
+    sptr<FormRefreshConnection> conn2 = CreateRefreshConnection(2, want2);
+    ASSERT_NE(nullptr, conn2);
+    conn2->SetConnectId(TEST_CONNECT_ID);
+    Want result2 = conn2->OnBuildTaskWant();
+    EXPECT_TRUE(result2.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result2.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_TRUE(result2.HasParameter(Constants::ACQUIRE_TYPE));
+    EXPECT_EQ(Constants::ACQUIRE_TYPE_RECREATE_FORM, result2.GetIntParam(Constants::ACQUIRE_TYPE, 0));
+    EXPECT_TRUE(result2.HasParameter(Constants::RECREATE_FORM_KEY));
+
+    // Segment 3: No special keys → only FORM_CONNECT_ID
+    Want want3;
+    sptr<FormRefreshConnection> conn3 = CreateRefreshConnection(3, want3);
+    ASSERT_NE(nullptr, conn3);
+    conn3->SetConnectId(TEST_CONNECT_ID);
+    Want result3 = conn3->OnBuildTaskWant();
+    EXPECT_TRUE(result3.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result3.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_FALSE(result3.HasParameter(Constants::PARAM_MESSAGE_KEY));
+    EXPECT_FALSE(result3.HasParameter(Constants::RECREATE_FORM_KEY));
+    EXPECT_FALSE(result3.HasParameter(Constants::ACQUIRE_TYPE));
+
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_MultiBranch_001 end";
+}
+
+/**
+ * @tc.name: OnExecuteConnectTask_MultiBranch_001
+ * @tc.desc: test OnExecuteConnectTask with multiple scenarios:
+ *           (1) PARAM_MESSAGE_KEY → PostFormEventTask called
+ *           (2) RECREATE_FORM_KEY → PostAcquireTask called
+ *           (3) No special keys → PostRefreshTask called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_MultiBranch_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MultiBranch_001 start";
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    // Segment 1: PARAM_MESSAGE_KEY → PostFormEventTask called
+    Want want1;
+    const std::string message2 = "test_message";
+    want1.SetParam(Constants::PARAM_MESSAGE_KEY, message2);
+    sptr<FormRefreshConnection> conn1 = CreateRefreshConnection(1, want1);
+    ASSERT_NE(nullptr, conn1);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(1, "test_message", _, remoteObject)).Times(1);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(_, _, _)).Times(0);
+    conn1->OnExecuteConnectTask(want1, remoteObject);
+
+    // Segment 2: RECREATE_FORM_KEY → PostAcquireTask called
+    Want want2;
+    const std::string recreateFlag2 = "true";
+    want2.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag2);
+    sptr<FormRefreshConnection> conn2 = CreateRefreshConnection(2, want2);
+    ASSERT_NE(nullptr, conn2);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(2, _, remoteObject)).Times(1);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
+    conn2->OnExecuteConnectTask(want2, remoteObject);
+
+    // Segment 3: No special keys → PostRefreshTask called
+    Want want3;
+    sptr<FormRefreshConnection> conn3 = CreateRefreshConnection(3, want3);
+    ASSERT_NE(nullptr, conn3);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(3, _, remoteObject)).Times(1);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(_, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
+    conn3->OnExecuteConnectTask(want3, remoteObject);
+
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MultiBranch_001 end";
+}
+
+/**
+ * @tc.name: OnPreConnectTask_001
+ * @tc.desc: test OnPreConnectTask.
+ *           Verify connectState_ is set to CONNECTED.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnPreConnectTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnPreConnectTask_001 start";
+    Want want;
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, connection);
+    EXPECT_EQ(ConnectState::DISCONNECTED, connection->connectState_);
+    connection->OnPreConnectTask();
+    EXPECT_EQ(ConnectState::CONNECTED, connection->connectState_);
+    GTEST_LOG_(INFO) << "OnPreConnectTask_001 end";
+}
+
+/**
  * @tc.name: FormUtil_001
  * @tc.desc: test PaddingUdidHash function.
  * @tc.type: FUNC
@@ -246,8 +442,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
     std::string deviceId = "cc";
     int64_t formShareRequestCode = 2;
     int32_t userId = 100;
-    sptr<FormShareConnection> formShareConnection = new (std::nothrow) FormShareConnection(formId, bundleName,
-        abilityName, deviceId, formShareRequestCode, userId);
+    sptr<FormShareConnection> formShareConnection =
+        new (std::nothrow) FormShareConnection(formId, bundleName, abilityName, deviceId, formShareRequestCode, userId);
     ASSERT_NE(nullptr, formShareConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -855,8 +1051,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_004, TestSi
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_001 start";
-    std::shared_ptr<FormBundleEventCallback> formBundleEventCallback =
-        std::make_shared<FormBundleEventCallback>();
+    std::shared_ptr<FormBundleEventCallback> formBundleEventCallback = std::make_shared<FormBundleEventCallback>();
     ASSERT_NE(nullptr, formBundleEventCallback);
     EventFwk::CommonEventData eventData;
     formBundleEventCallback->OnReceiveEvent(eventData);
@@ -1175,7 +1370,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_005, TestSize.Level
     sptr<FormAcquireConnection> formAcquireConnection =
         new (std::nothrow) FormAcquireConnection(formId, info, wantParams, hostToken);
     ASSERT_NE(nullptr, formAcquireConnection);
-    auto&& connectCallback = [](const std::string &bundleName) {};
+    auto &&connectCallback = [](const std::string &bundleName) {};
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
     formAcquireConnection->OnFormAbilityConnectDoneCallback();
     formAcquireConnection->SetFormAbilityConnectCb(nullptr);

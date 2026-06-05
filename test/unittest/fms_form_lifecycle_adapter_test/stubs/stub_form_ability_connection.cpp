@@ -16,8 +16,6 @@ void FormAbilityConnection::OnAbilityConnectDone(
 void FormAbilityConnection::OnAbilityDisconnectDone(
     const AppExecFwk::ElementName &element, int resultCode) {}
 
-void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObject) {}
-
 void FormAbilityConnection::SetFormId(int64_t formId)
 {
     formId_ = formId;

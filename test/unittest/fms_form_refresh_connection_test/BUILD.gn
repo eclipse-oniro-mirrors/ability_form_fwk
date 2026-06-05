@@ -19,11 +19,36 @@ module_output_path = "form_fwk/form_fwk/form_mgr_service"
 ohos_unittest("FmsFormRefreshConnectionTest") {
   module_out_path = module_output_path
 
-  sources = [ "${form_fwk_path}/test/unittest/fms_form_refresh_connection_test/fms_form_refresh_connection_test.cpp" ]
+  sources = [
+    "${form_fwk_path}/services/src/common/connection/form_ability_connection.cpp",
+    "${form_fwk_path}/services/src/form_provider/connection/form_refresh_connection.cpp",
+    "${form_fwk_path}/services/common/src/util/form_time_util.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_mgr_adapter_facade.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_render_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_provider_task_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_provider_refresh_error_handler.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_supply_callback.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_report.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_refresh_connection_test/fms_form_refresh_connection_test.cpp",
+  ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/include/common/connection",
+    "${form_fwk_path}/services/include/data_center",
+    "${form_fwk_path}/services/include/data_center/database",
+    "${form_fwk_path}/services/include/data_center/form_info",
+    "${form_fwk_path}/services/include/form_provider",
+    "${form_fwk_path}/services/include/form_provider/connection",
+    "${form_fwk_path}/services/include/form_provider/error_handler",
+    "${form_fwk_path}/services/include/common/timer_mgr",
+    "${form_fwk_path}/services/include/common/util",
+    "${form_fwk_path}/services/include/common/retry_policy",
+    "${form_fwk_path}/services/common/include",
+    "${form_fwk_path}/test/mock/include",
+    "${form_fwk_path}/test/unittest/form_mgr_test",
   ]
 
   configs = []
@@ -31,6 +56,7 @@ ohos_unittest("FmsFormRefreshConnectionTest") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
@@ -38,6 +64,7 @@ ohos_unittest("FmsFormRefreshConnectionTest") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:form_manager",
   ]
 
   external_deps = [
@@ -51,16 +78,22 @@ ohos_unittest("FmsFormRefreshConnectionTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "libxml2:libxml2",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "googletest:gmock_main",
   ]
+
   if (device_manager_enable) {
     external_deps += [ "device_manager:devicemanagersdk" ]
   }

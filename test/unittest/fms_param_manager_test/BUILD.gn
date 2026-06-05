@@ -29,6 +29,9 @@ ohos_unittest("FmsParamManagerTest") {
     "${form_fwk_path}/services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
     "${form_fwk_path}/services/src/form_refresh/form_refresh_mgr.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/base_form_refresh.cpp",
+    "${form_fwk_path}/services/src/common/retry_policy/retry_policy.cpp",
+    "${form_fwk_path}/services/src/form_provider/error_handler/provider_connection_error_handler.cpp",
+    "${form_fwk_path}/services/src/form_provider/error_handler/provider_refresh_error_handler.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_data_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_force_refresh_impl.cpp",
     "${form_fwk_path}/services/src/form_refresh/refresh_impl/form_host_refresh_impl.cpp",
@@ -62,6 +65,7 @@ ohos_unittest("FmsParamManagerTest") {
   ]
 
   include_dirs = [
+    "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/services/common/include",
   ]
@@ -72,6 +76,7 @@ ohos_unittest("FmsParamManagerTest") {
   }
   deps = [
     "${form_fwk_path}:libfms",
+    "${form_fwk_path}/services/common:libform_common",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
