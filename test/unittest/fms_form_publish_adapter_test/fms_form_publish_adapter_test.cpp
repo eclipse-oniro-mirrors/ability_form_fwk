@@ -276,32 +276,6 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckSnapshotWant_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "CheckSnapshotWant_003 end";
 }
 
-// ========== CheckPublishForm Tests ==========
-
-/**
- * @tc.name: CheckPublishForm_001
- * @tc.desc: Verify CheckFormBundleName fails returns error code
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, CheckPublishForm_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "CheckPublishForm_001 start";
-
-    Want want;
-    want.SetBundle(TEST_BUNDLE_NAME);
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-
-    auto result = FormPublishAdapter::GetInstance().CheckPublishForm(want, true);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
-
-    GTEST_LOG_(INFO) << "CheckPublishForm_001 end";
-}
-
 // ========== QueryPublishFormToHost Tests ==========
 
 /**

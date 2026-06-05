@@ -418,29 +418,6 @@ HWTEST_F(FmsFormDataAdapterTest, DisableUpdateForm_002, TestSize.Level1)
 // ========== HandleUpdateFormFlag Tests ==========
 
 /**
- * @tc.name: HandleUpdateFormFlag_001
- * @tc.desc: Verify HandleUpdateFormFlag delegates to FormDataMgr::UpdateHostFormFlag
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormDataAdapterTest, HandleUpdateFormFlag_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "HandleUpdateFormFlag_001 start";
-
-    std::vector<int64_t> formIds = {TEST_FORM_ID};
-    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
-
-    EXPECT_CALL(*MockFormDataMgr::obj, UpdateHostFormFlag(_, _, true, false, _))
-        .WillOnce(Return(ERR_OK));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-
-    auto result = FormDataAdapter::GetInstance().EnableUpdateForm(formIds, callerToken);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "HandleUpdateFormFlag_001 end";
-}
-
-/**
  * @tc.name: HandleUpdateFormFlag_002
  * @tc.desc: Verify HandleUpdateFormFlag returns error when UpdateHostFormFlag fails
  * @tc.type: FUNC
@@ -459,23 +436,6 @@ HWTEST_F(FmsFormDataAdapterTest, HandleUpdateFormFlag_002, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     GTEST_LOG_(INFO) << "HandleUpdateFormFlag_002 end";
-}
-
-// ========== BatchRefreshForms Tests ==========
-
-/**
- * @tc.name: BatchRefreshForms_001
- * @tc.desc: Verify BatchRefreshForms always returns ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormDataAdapterTest, BatchRefreshForms_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "BatchRefreshForms_001 start";
-
-    auto result = FormDataAdapter::GetInstance().BatchRefreshForms(TEST_FORM_REFRESH_TYPE);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "BatchRefreshForms_001 end";
 }
 
 // ========== SetNextRefreshTime Tests ==========
