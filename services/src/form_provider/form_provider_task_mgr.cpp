@@ -15,6 +15,7 @@
 
 #include "form_provider/form_provider_task_mgr.h"
 #include "form_provider_interface.h"
+#include "fms_log_wrapper.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
 #include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_provider/form_supply_callback.h"
@@ -22,7 +23,6 @@
 #include "data_center/form_data_mgr.h"
 #include "common/util/form_report.h"
 #include "common/util/form_util.h"
-#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

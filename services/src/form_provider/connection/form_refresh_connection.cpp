@@ -54,6 +54,7 @@ Want FormRefreshConnection::OnBuildTaskWant()
 
 void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
+    SetProviderToken(remoteObject);
     if (want.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
         std::string message = want.GetStringParam(Constants::PARAM_MESSAGE_KEY);
         FormProviderTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, want, remoteObject);
@@ -80,7 +81,7 @@ void FormRefreshConnection::OnAbilityDisconnectDone(
 
     if (resultCode == DISCONNECT_ERROR && connectState_ == ConnectState::CONNECTED) {
         FormProviderErrorHandlerFactory::GetRefreshHandler()
-            ->HandleDisconnectError(GetFormId(), resultCode, want_);
+            ->HandleDisconnectError(GetFormId(), GetProviderToken(), want_, connectState_);
     }
 }
 

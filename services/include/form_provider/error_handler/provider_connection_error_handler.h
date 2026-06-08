@@ -20,6 +20,7 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "common/connection/form_ability_connection.h"
 #include "common/retry_policy/retry_policy.h"
 #include "want.h"
 
@@ -34,19 +35,17 @@ public:
     static bool ShouldRetry(int errorCode);
     static bool IsRemoteDead(int errorCode);
 
-    virtual bool HandleConnectError(int64_t formId,
-        const sptr<IRemoteObject> &remoteObject, const Want &want) = 0;
+    virtual bool HandleConnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want) = 0;
 
-    virtual bool HandleSendRequestFailed(int64_t formId,
-        int errorCode, const Want &want) = 0;
+    virtual bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) = 0;
 
-    virtual bool HandleDisconnectError(int64_t formId,
-        int resultCode, const Want &want) = 0;
+    virtual bool HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want,
+        ConnectState state) = 0;
 
     void RemoveRetryPolicy(int64_t formId);
 
-    virtual void ScheduleRetry(int64_t formId, const Want &want,
-        const RetryPolicy &policy, std::function<void()> retryFunc);
+    virtual void ScheduleRetry(int64_t formId, const Want &want, const RetryPolicy &policy,
+        std::function<void()> retryFunc);
 
 protected:
     static constexpr int32_t IPC_ERR_DEAD_OBJECT = 32;

@@ -194,111 +194,175 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
 }
 
 /**
- * @tc.name: OnAbilityDisconnectDone_MultiBranch_001
- * @tc.desc: test OnAbilityDisconnectDone with multiple scenarios:
- *           (1) DISCONNECT_ERROR + CONNECTED → HandleDisconnectError called
- *           (2) ERR_OK + CONNECTED → HandleDisconnectError NOT called
- *           (3) DISCONNECT_ERROR + NOT CONNECTED → HandleDisconnectError NOT called
- *           (4) Other resultCode + CONNECTED → HandleDisconnectError NOT called
+ * @tc.name: OnAbilityDisconnectDone_DisconnectError_001
+ * @tc.desc: test OnAbilityDisconnectDone when DISCONNECT_ERROR and CONNECTED state
+ *           HandleDisconnectError should be called
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
-HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_MultiBranch_001, TestSize.Level0)
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DisconnectError_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MultiBranch_001 start";
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DisconnectError_001 start";
     AppExecFwk::ElementName element;
     Want want;
 
-    // Segment 1: DISCONNECT_ERROR + CONNECTED → HandleDisconnectError called
-    sptr<FormRefreshConnection> conn1 = CreateRefreshConnection(1, want);
-    ASSERT_NE(nullptr, conn1);
-    conn1->SetConnectId(TEST_CONNECT_ID);
-    conn1->OnPreConnectTask();
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(1, DISCONNECT_ERROR, _)).Times(1);
-    conn1->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
-    EXPECT_EQ(0, conn1->GetConnectId());
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(1, _, _, _)).Times(1);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
 
-    // Segment 2: ERR_OK + CONNECTED → HandleDisconnectError NOT called
-    sptr<FormRefreshConnection> conn2 = CreateRefreshConnection(2, want);
-    ASSERT_NE(nullptr, conn2);
-    conn2->SetConnectId(TEST_CONNECT_ID);
-    conn2->OnPreConnectTask();
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _)).Times(0);
-    conn2->OnAbilityDisconnectDone(element, ERR_OK);
-    EXPECT_EQ(0, conn2->GetConnectId());
-
-    // Segment 3: DISCONNECT_ERROR + NOT CONNECTED → HandleDisconnectError NOT called
-    sptr<FormRefreshConnection> conn3 = CreateRefreshConnection(3, want);
-    ASSERT_NE(nullptr, conn3);
-    conn3->SetConnectId(TEST_CONNECT_ID);
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _)).Times(0);
-    conn3->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
-    EXPECT_EQ(0, conn3->GetConnectId());
-
-    // Segment 4: Other resultCode + CONNECTED → HandleDisconnectError NOT called
-    sptr<FormRefreshConnection> conn4 = CreateRefreshConnection(4, want);
-    ASSERT_NE(nullptr, conn4);
-    conn4->SetConnectId(TEST_CONNECT_ID);
-    conn4->OnPreConnectTask();
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _)).Times(0);
-    conn4->OnAbilityDisconnectDone(element, -2);
-    EXPECT_EQ(0, conn4->GetConnectId());
-
-    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MultiBranch_001 end";
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DisconnectError_001 end";
 }
 
 /**
- * @tc.name: OnBuildTaskWant_MultiBranch_001
- * @tc.desc: test OnBuildTaskWant with multiple scenarios:
- *           (1) PARAM_MESSAGE_KEY → has FORM_CONNECT_ID and PARAM_MESSAGE_KEY
- *           (2) RECREATE_FORM_KEY → has ACQUIRE_TYPE and FORM_CONNECT_ID
- *           (3) No special keys → only FORM_CONNECT_ID
+ * @tc.name: OnAbilityDisconnectDone_ErrOk_001
+ * @tc.desc: test OnAbilityDisconnectDone when ERR_OK and CONNECTED state
+ *           HandleDisconnectError should NOT be called
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
-HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_MultiBranch_001, TestSize.Level0)
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_ErrOk_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "OnBuildTaskWant_MultiBranch_001 start";
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_ErrOk_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
 
-    // Segment 1: PARAM_MESSAGE_KEY → has FORM_CONNECT_ID and PARAM_MESSAGE_KEY
-    Want want1;
-    const std::string message1 = "test_message";
-    want1.SetParam(Constants::PARAM_MESSAGE_KEY, message1);
-    sptr<FormRefreshConnection> conn1 = CreateRefreshConnection(1, want1);
-    ASSERT_NE(nullptr, conn1);
-    conn1->SetConnectId(TEST_CONNECT_ID);
-    Want result1 = conn1->OnBuildTaskWant();
-    EXPECT_TRUE(result1.HasParameter(Constants::FORM_CONNECT_ID));
-    EXPECT_EQ(TEST_CONNECT_ID, result1.GetIntParam(Constants::FORM_CONNECT_ID, 0));
-    EXPECT_TRUE(result1.HasParameter(Constants::PARAM_MESSAGE_KEY));
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(2, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, ERR_OK);
+    EXPECT_EQ(0, conn->GetConnectId());
 
-    // Segment 2: RECREATE_FORM_KEY → has ACQUIRE_TYPE and FORM_CONNECT_ID
-    Want want2;
-    const std::string recreateFlag1 = "true";
-    want2.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag1);
-    sptr<FormRefreshConnection> conn2 = CreateRefreshConnection(2, want2);
-    ASSERT_NE(nullptr, conn2);
-    conn2->SetConnectId(TEST_CONNECT_ID);
-    Want result2 = conn2->OnBuildTaskWant();
-    EXPECT_TRUE(result2.HasParameter(Constants::FORM_CONNECT_ID));
-    EXPECT_EQ(TEST_CONNECT_ID, result2.GetIntParam(Constants::FORM_CONNECT_ID, 0));
-    EXPECT_TRUE(result2.HasParameter(Constants::ACQUIRE_TYPE));
-    EXPECT_EQ(Constants::ACQUIRE_TYPE_RECREATE_FORM, result2.GetIntParam(Constants::ACQUIRE_TYPE, 0));
-    EXPECT_TRUE(result2.HasParameter(Constants::RECREATE_FORM_KEY));
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_ErrOk_001 end";
+}
 
-    // Segment 3: No special keys → only FORM_CONNECT_ID
-    Want want3;
-    sptr<FormRefreshConnection> conn3 = CreateRefreshConnection(3, want3);
-    ASSERT_NE(nullptr, conn3);
-    conn3->SetConnectId(TEST_CONNECT_ID);
-    Want result3 = conn3->OnBuildTaskWant();
-    EXPECT_TRUE(result3.HasParameter(Constants::FORM_CONNECT_ID));
-    EXPECT_EQ(TEST_CONNECT_ID, result3.GetIntParam(Constants::FORM_CONNECT_ID, 0));
-    EXPECT_FALSE(result3.HasParameter(Constants::PARAM_MESSAGE_KEY));
-    EXPECT_FALSE(result3.HasParameter(Constants::RECREATE_FORM_KEY));
-    EXPECT_FALSE(result3.HasParameter(Constants::ACQUIRE_TYPE));
+/**
+ * @tc.name: OnAbilityDisconnectDone_NotConnected_001
+ * @tc.desc: test OnAbilityDisconnectDone when DISCONNECT_ERROR and NOT CONNECTED state
+ *           HandleDisconnectError should NOT be called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_NotConnected_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_NotConnected_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
 
-    GTEST_LOG_(INFO) << "OnBuildTaskWant_MultiBranch_001 end";
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(3, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_NotConnected_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_OtherResultCode_001
+ * @tc.desc: test OnAbilityDisconnectDone when other resultCode and CONNECTED state
+ *           HandleDisconnectError should NOT be called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_OtherResultCode_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_OtherResultCode_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(4, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, -2);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_OtherResultCode_001 end";
+}
+
+/**
+ * @tc.name: OnBuildTaskWant_ParamMessageKey_001
+ * @tc.desc: test OnBuildTaskWant when PARAM_MESSAGE_KEY is set
+ *           result should have FORM_CONNECT_ID and PARAM_MESSAGE_KEY
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_ParamMessageKey_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_ParamMessageKey_001 start";
+
+    Want want;
+    const std::string message = "test_message";
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, message);
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    Want result = conn->OnBuildTaskWant();
+    EXPECT_TRUE(result.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_TRUE(result.HasParameter(Constants::PARAM_MESSAGE_KEY));
+
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_ParamMessageKey_001 end";
+}
+
+/**
+ * @tc.name: OnBuildTaskWant_RecreateFormKey_001
+ * @tc.desc: test OnBuildTaskWant when RECREATE_FORM_KEY is set
+ *           result should have ACQUIRE_TYPE and FORM_CONNECT_ID
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_RecreateFormKey_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_RecreateFormKey_001 start";
+
+    Want want;
+    const std::string recreateFlag = "true";
+    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(2, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    Want result = conn->OnBuildTaskWant();
+    EXPECT_TRUE(result.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_TRUE(result.HasParameter(Constants::ACQUIRE_TYPE));
+    EXPECT_EQ(Constants::ACQUIRE_TYPE_RECREATE_FORM, result.GetIntParam(Constants::ACQUIRE_TYPE, 0));
+    EXPECT_TRUE(result.HasParameter(Constants::RECREATE_FORM_KEY));
+
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_RecreateFormKey_001 end";
+}
+
+/**
+ * @tc.name: OnBuildTaskWant_NoSpecialKeys_001
+ * @tc.desc: test OnBuildTaskWant when no special keys are set
+ *           result should only have FORM_CONNECT_ID
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_NoSpecialKeys_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_NoSpecialKeys_001 start";
+
+    Want want;
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(3, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    Want result = conn->OnBuildTaskWant();
+    EXPECT_TRUE(result.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_FALSE(result.HasParameter(Constants::PARAM_MESSAGE_KEY));
+    EXPECT_FALSE(result.HasParameter(Constants::RECREATE_FORM_KEY));
+    EXPECT_FALSE(result.HasParameter(Constants::ACQUIRE_TYPE));
+
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_NoSpecialKeys_001 end";
 }
 
 /**

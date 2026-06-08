@@ -27,7 +27,7 @@ namespace AppExecFwk {
 class FormProviderErrorHandlerFactory {
 public:
     static std::shared_ptr<FormProviderRefreshErrorHandler> GetRefreshHandler() {
-        static auto instance = std::make_shared<FormProviderRefreshErrorHandler>();
+        static auto instance = FormProviderRefreshErrorHandler::Create();
         return instance;
     }
 

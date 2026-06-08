@@ -26,19 +26,19 @@ namespace AppExecFwk {
 class FormProviderRefreshErrorHandler : public FormProviderConnectionErrorHandler,
     public std::enable_shared_from_this<FormProviderRefreshErrorHandler> {
 public:
-    FormProviderRefreshErrorHandler() = default;
     DISALLOW_COPY_AND_MOVE(FormProviderRefreshErrorHandler);
 
-    bool HandleConnectError(int64_t formId,
-        const sptr<IRemoteObject> &remoteObject, const Want &want) override;
+    static std::shared_ptr<FormProviderRefreshErrorHandler> Create();
 
-    bool HandleSendRequestFailed(int64_t formId,
-        int errorCode, const Want &want) override;
+    bool HandleConnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want) override;
 
-    bool HandleDisconnectError(int64_t formId,
-        int resultCode, const Want &want) override;
+    bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override;
+
+    bool HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want,
+        ConnectState state) override;
 
 private:
+    FormProviderRefreshErrorHandler() = default;
     void ExecuteRefreshRetry(int64_t formId, const Want &want);
 };
 

@@ -30,11 +30,6 @@ bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)
     return errorCode == IPC_ERR_DEAD_OBJECT || errorCode == IPC_ERR_SERVICE_DIED;
 }
 
-bool FormProviderConnectionErrorHandler::ShouldRetry(int errorCode)
-{
-    return IsRemoteDead(errorCode);
-}
-
 RetryPolicy FormProviderConnectionErrorHandler::GetDefaultRetryPolicy() const
 {
     return RetryPolicy();

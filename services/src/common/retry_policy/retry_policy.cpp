@@ -82,8 +82,13 @@ const RetryPolicyConfig &RetryPolicy::GetConfig() const
 }
 
 void RetryPolicy::SetConfig(const RetryPolicyConfig &config)
-{
-    config_ = config;
+{   
+    config_ = {
+        std::max(config.maxRetryCount, 0),
+        config.strategyType,
+        std::max(config.baseDelayMs, 0),
+        std::max(config.maxDelayMs, 0),
+    };
 }
 
 bool RetryPolicy::IsSendRequestFailed() const

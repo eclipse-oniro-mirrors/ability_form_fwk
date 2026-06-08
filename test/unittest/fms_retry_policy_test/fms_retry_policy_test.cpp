@@ -192,20 +192,16 @@ HWTEST_F(FmsRetryPolicyTest, IncrementRetryCount_AndReset_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: CalculateNextDelay_AllStrategies_001
- * @tc.desc: Verify CalculateNextDelay for IMMEDIATE(returns 0), FIXED_INTERVAL(returns
- *           baseDelay regardless of count), LINEAR(baseDelay*count capped at maxDelay),
- *           and EXPONENTIAL(baseDelay*2^(count-1) capped at maxDelay).
+ * @tc.name: CalculateNextDelay_Immediate_001
+ * @tc.desc: Verify CalculateNextDelay for IMMEDIATE strategy returns 0 regardless of count.
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
-HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_AllStrategies_001, TestSize.Level1)
+HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Immediate_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "CalculateNextDelay_AllStrategies_001 start";
+    GTEST_LOG_(INFO) << "CalculateNextDelay_Immediate_001 start";
 
     RetryPolicy policy;
-
-    // IMMEDIATE: always returns 0
     RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::IMMEDIATE;
     cfg.baseDelayMs = 1000;
@@ -214,8 +210,25 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_AllStrategies_001, TestSize.Leve
     policy.retryCount_ = 1;
     EXPECT_EQ(policy.CalculateNextDelay(), 0);
 
-    // FIXED_INTERVAL: always returns baseDelayMs regardless of count
+    GTEST_LOG_(INFO) << "CalculateNextDelay_Immediate_001 end";
+}
+
+/**
+ * @tc.name: CalculateNextDelay_FixedInterval_001
+ * @tc.desc: Verify CalculateNextDelay for FIXED_INTERVAL strategy always returns baseDelayMs
+ *           regardless of retry count.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_FixedInterval_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CalculateNextDelay_FixedInterval_001 start";
+
+    RetryPolicy policy;
+    RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::FIXED_INTERVAL;
+    cfg.baseDelayMs = 1000;
+    cfg.maxDelayMs = 4000;
     policy.SetConfig(cfg);
     policy.retryCount_ = 1;
     EXPECT_EQ(policy.CalculateNextDelay(), 1000);
@@ -224,8 +237,25 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_AllStrategies_001, TestSize.Leve
     policy.retryCount_ = 3;
     EXPECT_EQ(policy.CalculateNextDelay(), 1000);
 
-    // LINEAR: baseDelay * count, capped at maxDelay
+    GTEST_LOG_(INFO) << "CalculateNextDelay_FixedInterval_001 end";
+}
+
+/**
+ * @tc.name: CalculateNextDelay_Linear_001
+ * @tc.desc: Verify CalculateNextDelay for LINEAR strategy: baseDelay*count capped at maxDelay.
+ *           count=1→1000ms, count=2→2000ms, count=5→4000ms(capped).
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Linear_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CalculateNextDelay_Linear_001 start";
+
+    RetryPolicy policy;
+    RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::LINEAR;
+    cfg.baseDelayMs = 1000;
+    cfg.maxDelayMs = 4000;
     policy.SetConfig(cfg);
     policy.retryCount_ = 1;
     EXPECT_EQ(policy.CalculateNextDelay(), 1000);
@@ -234,8 +264,25 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_AllStrategies_001, TestSize.Leve
     policy.retryCount_ = 5;
     EXPECT_EQ(policy.CalculateNextDelay(), 4000); // capped: 1000*5=5000>4000
 
-    // EXPONENTIAL: baseDelay * 2^(count-1), capped at maxDelay
+    GTEST_LOG_(INFO) << "CalculateNextDelay_Linear_001 end";
+}
+
+/**
+ * @tc.name: CalculateNextDelay_Exponential_001
+ * @tc.desc: Verify CalculateNextDelay for EXPONENTIAL strategy: baseDelay*2^(count-1) capped at maxDelay.
+ *           count=0→1000ms, count=1→1000ms, count=2→2000ms, count=3→4000ms, count=4→4000ms(capped).
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Exponential_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CalculateNextDelay_Exponential_001 start";
+
+    RetryPolicy policy;
+    RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::EXPONENTIAL;
+    cfg.baseDelayMs = 1000;
+    cfg.maxDelayMs = 4000;
     policy.SetConfig(cfg);
     policy.retryCount_ = 0;
     EXPECT_EQ(policy.CalculateNextDelay(), 1000);
@@ -248,7 +295,7 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_AllStrategies_001, TestSize.Leve
     policy.retryCount_ = 4;
     EXPECT_EQ(policy.CalculateNextDelay(), 4000); // capped: delay>maxDelayMs/2 early return
 
-    GTEST_LOG_(INFO) << "CalculateNextDelay_AllStrategies_001 end";
+    GTEST_LOG_(INFO) << "CalculateNextDelay_Exponential_001 end";
 }
 
 /**

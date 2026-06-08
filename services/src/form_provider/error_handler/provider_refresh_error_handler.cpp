@@ -25,6 +25,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 
+std::shared_ptr<FormProviderRefreshErrorHandler> FormProviderRefreshErrorHandler::Create()
+{
+    return std::shared_ptr<FormProviderRefreshErrorHandler>(new FormProviderRefreshErrorHandler());
+}
+
 bool FormProviderRefreshErrorHandler::HandleConnectError(
     int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
 {
@@ -45,16 +50,17 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     auto &policy = EnsureRetryPolicy(formId);
     policy.SetSendRequestFailed(true);
-    policy.IncrementRetryCount();
 
-    if (policy.IsRetryLimitReached()) {
-        HILOG_WARN("Retry limit reached for formId %{public}" PRId64, formId);
-        retryPolicyMap_.erase(formId);
-        return false;
+    if (!policy.IsDisconnectFailed()) {
+        HILOG_INFO("Waiting for AMS disconnect confirmation, formId %{public}" PRId64, formId);
+        return true;
     }
 
     if (policy.NeedRetry()) {
         HILOG_INFO("Scheduling retry from HandleSendRequestFailed, formId %{public}" PRId64, formId);
+        policy.IncrementRetryCount();
+        policy.SetDisconnectFailed(false);
+        policy.SetSendRequestFailed(false);
         ScheduleRetry(formId, want, policy,
             [formId, want, weakPtr = weak_from_this()]() {
                 auto handler = weakPtr.lock();
@@ -64,16 +70,22 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
                 }
                 handler->ExecuteRefreshRetry(formId, want);
             });
-        return true;
+        return false;
     }
 
-    HILOG_INFO("Waiting for AMS disconnect confirmation, formId %{public}" PRId64, formId);
-    return true;
+    HILOG_WARN("Retry limit reached formId %{public}" PRId64, formId);
+    retryPolicyMap_.erase(formId);
+    return false;
 }
 
-bool FormProviderRefreshErrorHandler::HandleDisconnectError(
-    int64_t formId, int resultCode, const Want &want)
+bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject,
+    const Want &want, ConnectState state)
 {
+    if (state != ConnectState::CONNECTED) {
+        HILOG_WARN("state not connected, not handled");
+        return false;
+    }
+
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     auto &policy = EnsureRetryPolicy(formId);
     policy.SetDisconnectFailed(true);
@@ -85,6 +97,9 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(
 
     if (policy.NeedRetry()) {
         HILOG_INFO("Dual-signal confirmed, scheduling retry for formId %{public}" PRId64, formId);
+        policy.IncrementRetryCount();
+        policy.SetDisconnectFailed(false);
+        policy.SetSendRequestFailed(false);
         ScheduleRetry(formId, want, policy,
             [formId, want, weakPtr = weak_from_this()]() {
                 auto handler = weakPtr.lock();

@@ -14,34 +14,24 @@
 #include "gmock/gmock.h"
 #include "iremote_object.h"
 #include "want.h"
+#include "common/connection/form_ability_connection.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 
-class AbstractMockFormProviderRefreshErrorHandler {
-public:
-    virtual ~AbstractMockFormProviderRefreshErrorHandler() = default;
-    virtual bool HandleConnectError(int64_t formId,
-        const sptr<IRemoteObject> &remoteObject, const Want &want) = 0;
-    virtual bool HandleSendRequestFailed(int64_t formId,
-        int errorCode, const Want &want) = 0;
-    virtual bool HandleDisconnectError(int64_t formId,
-        int resultCode, const Want &want) = 0;
-};
-
-class MockFormProviderRefreshErrorHandler : public AbstractMockFormProviderRefreshErrorHandler {
+class MockFormProviderRefreshErrorHandler {
 public:
     static std::shared_ptr<MockFormProviderRefreshErrorHandler> obj;
     MockFormProviderRefreshErrorHandler() = default;
-    ~MockFormProviderRefreshErrorHandler() override = default;
+    virtual ~MockFormProviderRefreshErrorHandler() = default;
 
-    MOCK_METHOD3(HandleConnectError, bool(int64_t formId,
-        const sptr<IRemoteObject> &remoteObject, const Want &want));
-    MOCK_METHOD3(HandleSendRequestFailed, bool(int64_t formId,
-        int errorCode, const Want &want));
-    MOCK_METHOD3(HandleDisconnectError, bool(int64_t formId,
-        int resultCode, const Want &want));
+    MOCK_METHOD(bool, HandleConnectError, (int64_t formId,
+        (const sptr<IRemoteObject> &remoteObject), (const Want &want)));
+    MOCK_METHOD(bool, HandleSendRequestFailed, (int64_t formId,
+        (int errorCode), (const Want &want)));
+    MOCK_METHOD(bool, HandleDisconnectError, (int64_t formId,
+        (const sptr<IRemoteObject> &remoteObject), (const Want &want), (ConnectState state)));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -82,7 +82,6 @@ protected:
     void VerifyPolicyExists(int64_t formId);
     void VerifyPolicyNotExists(int64_t formId);
     void VerifyRemoteDead(int32_t errorCode, bool expectedResult);
-    void VerifyShouldRetry(int32_t errorCode, bool expectedResult);
 };
 
 void FmsProviderConnectionErrorHandlerTest::SetUpTestCase() {}
@@ -126,12 +125,6 @@ void FmsProviderConnectionErrorHandlerTest::VerifyRemoteDead(int32_t errorCode, 
     EXPECT_EQ(result, expectedResult);
 }
 
-void FmsProviderConnectionErrorHandlerTest::VerifyShouldRetry(int32_t errorCode, bool expectedResult)
-{
-    bool result = FormProviderConnectionErrorHandler::ShouldRetry(errorCode);
-    EXPECT_EQ(result, expectedResult);
-}
-
 /**
  * @tc.name: IsRemoteDead_AllErrorCodes_001
  * @tc.desc: Verify IsRemoteDead returns true for IPC_ERR_DEAD_OBJECT (32) and IPC_ERR_SERVICE_DIED (29189),
@@ -155,30 +148,6 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, IsRemoteDead_AllErrorCodes_001, 
     VerifyRemoteDead(LARGE_ERROR_CODE, false);
 
     GTEST_LOG_(INFO) << "IsRemoteDead_AllErrorCodes_001 end";
-}
-
-/**
- * @tc.name: ShouldRetry_AllErrorCodes_001
- * @tc.desc: Verify ShouldRetry returns true for IPC_ERR_DEAD_OBJECT (32) and IPC_ERR_SERVICE_DIED (29189),
- *           returns false for other error codes (0, 1, -1, 99999).
- * @tc.type: FUNC
- * @tc.require: issueI5T4GJ
- */
-HWTEST_F(FmsProviderConnectionErrorHandlerTest, ShouldRetry_AllErrorCodes_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ShouldRetry_AllErrorCodes_001 start";
-
-    // Test true conditions: ShouldRetry delegates to IsRemoteDead
-    VerifyShouldRetry(IPC_ERR_DEAD_OBJECT, true);
-    VerifyShouldRetry(IPC_ERR_SERVICE_DIED, true);
-
-    // Test false conditions: other error codes
-    VerifyShouldRetry(OTHER_ERROR_CODE, false);
-    VerifyShouldRetry(ERROR_CODE_ONE, false);
-    VerifyShouldRetry(NEGATIVE_ERROR_CODE, false);
-    VerifyShouldRetry(LARGE_ERROR_CODE, false);
-
-    GTEST_LOG_(INFO) << "ShouldRetry_AllErrorCodes_001 end";
 }
 
 /**

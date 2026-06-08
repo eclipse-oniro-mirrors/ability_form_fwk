@@ -20,6 +20,12 @@ namespace AppExecFwk {
 std::shared_ptr<MockFormProviderRefreshErrorHandler> MockFormProviderRefreshErrorHandler::obj = nullptr;
 
 // --- FormProviderRefreshErrorHandler (derived class overrides) ---
+std::shared_ptr<FormProviderRefreshErrorHandler> FormProviderRefreshErrorHandler::Create()
+{
+    GTEST_LOG_(INFO) << "FormProviderRefreshErrorHandler::Create called";
+    return std::shared_ptr<FormProviderRefreshErrorHandler>(new FormProviderRefreshErrorHandler());
+}
+
 bool FormProviderRefreshErrorHandler::HandleConnectError(
     int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
 {
@@ -41,12 +47,11 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
 }
 
 bool FormProviderRefreshErrorHandler::HandleDisconnectError(
-    int64_t formId, int resultCode, const Want &want)
+    int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want, ConnectState state)
 {
-    GTEST_LOG_(INFO) << "HandleDisconnectError called formId:" << formId
-        << " resultCode:" << resultCode;
+    GTEST_LOG_(INFO) << "HandleDisconnectError called formId:" << formId;
     if (MockFormProviderRefreshErrorHandler::obj) {
-        return MockFormProviderRefreshErrorHandler::obj->HandleDisconnectError(formId, resultCode, want);
+        return MockFormProviderRefreshErrorHandler::obj->HandleDisconnectError(formId, remoteObject, want, state);
     }
     return false;
 }
@@ -66,12 +71,6 @@ void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId, const Wan
 void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
 {
     GTEST_LOG_(INFO) << "RemoveRetryPolicy stub called";
-}
-
-bool FormProviderConnectionErrorHandler::ShouldRetry(int errorCode)
-{
-    GTEST_LOG_(INFO) << "ShouldRetry stub called";
-    return false;
 }
 
 bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)

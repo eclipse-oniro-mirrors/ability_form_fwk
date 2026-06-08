@@ -19,6 +19,7 @@
 #define private public
 #define protected public
 #include "form_provider/error_handler/provider_refresh_error_handler.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "data_center/form_data_mgr.h"
 #include "form_provider/form_provider_mgr.h"
 #include "common/retry_policy/retry_policy.h"
@@ -78,7 +79,7 @@ void FmsProviderRefreshErrorHandlerTest::TearDownTestCase() {}
 
 void FmsProviderRefreshErrorHandlerTest::SetUp()
 {
-    handler_ = std::make_shared<FormProviderRefreshErrorHandler>();
+    handler_ = FormProviderErrorHandlerFactory::GetRefreshHandler();
     mockFormDataMgr_ = std::make_shared<MockFormDataMgr>();
     mockFormProviderMgr_ = std::make_shared<MockFormProviderMgr>();
     MockFormDataMgr::obj = mockFormDataMgr_;
@@ -271,9 +272,11 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, HandleDisconnectError_AllBranches_0
     GTEST_LOG_(INFO) << "HandleDisconnectError_AllBranches_001 start";
 
     Want want;
+    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
+    ConnectState state = ConnectState::CONNECTED;
 
     // Branch: no prior SendRequest → returns false, policy created with disconnectFailed=true
-    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, false, true, 0, false);
 
     handler_->RemoveRetryPolicy(FORM_ID);
@@ -281,7 +284,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, HandleDisconnectError_AllBranches_0
 
     // Branch: sendRequestFailed=true, NeedRetry=true → dual-signal confirmed, return true
     SetupPolicyState(FORM_ID, true, false, true);
-    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, true, true, 0, true);
 
     handler_->RemoveRetryPolicy(FORM_ID);
@@ -290,7 +293,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, HandleDisconnectError_AllBranches_0
     // Branch: sendRequestFailed=true, retryLimitReached → erase policy, return true
     SetupPolicyState(FORM_ID, true, false, false);
     SetRetryCountToMax(FORM_ID, 3);
-    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyNoPolicy(FORM_ID);
 
     GTEST_LOG_(INFO) << "HandleDisconnectError_AllBranches_001 end";
@@ -309,18 +312,20 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSi
     GTEST_LOG_(INFO) << "DualSignal_AllScenarios_001 start";
 
     Want want;
+    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
+    ConnectState state = ConnectState::CONNECTED;
 
     // Scenario 1: send first → disconnect → dual-signal confirmed
     EXPECT_TRUE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
     VerifyRetryPolicy(FORM_ID, true, false, 1, false);
-    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, true, true, 1, true);
 
     handler_->RemoveRetryPolicy(FORM_ID);
     VerifyNoPolicy(FORM_ID);
 
     // Scenario 2: disconnect first → returns false; then send → dual-signal confirmed
-    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, false, true, 0, false);
     EXPECT_TRUE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
     VerifyRetryPolicy(FORM_ID, true, true, 1, true);
@@ -335,7 +340,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSi
     }
     EXPECT_FALSE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
     VerifyNoPolicy(FORM_ID);
-    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, false, true, 0, false);
 
     handler_->RemoveRetryPolicy(FORM_ID);
@@ -346,7 +351,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSi
     VerifyRetryPolicy(FORM_ID, true, false, 1, false);
     handler_->RemoveRetryPolicy(FORM_ID);
     VerifyNoPolicy(FORM_ID);
-    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, false, true, 0, false);
 
     GTEST_LOG_(INFO) << "DualSignal_AllScenarios_001 end";
@@ -487,7 +492,9 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, MultipleFormIds_001, TestSize.Level
     EXPECT_EQ(handler_->retryPolicyMap_.size(), 2);
 
     // Disconnect for FORM_ID=100 → dual-signal confirmed
-    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, DISCONNECT_ERROR, want));
+    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
+    ConnectState state = ConnectState::CONNECTED;
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, true, true, 1, true);
 
     // FORM_ID=200 still unaffected
