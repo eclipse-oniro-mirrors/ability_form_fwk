@@ -107,6 +107,8 @@ public:
     void PostSetRenderGroupParamsTask(const int64_t formId, const Want &want);
 
 private:
+    bool RegisterRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject);
+
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection, int32_t level) const;
 
     void DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const;

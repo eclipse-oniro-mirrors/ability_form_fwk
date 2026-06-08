@@ -43,6 +43,7 @@
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "feature/memory_mgr/form_render_report.h"
 #include "form_surface_info.h"
+#include "ability_manager_errors.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -536,36 +537,10 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
         HILOG_ERROR("null renderRemoteObj");
         return;
     }
+    FormDataMgr::GetInstance().CancelRerenderAllFormsDelayTask();
 
-    {
-        std::lock_guard<std::mutex> lock(renderDeathRecipientMutex_);
-        if (renderDeathRecipient_ == nullptr) {
-            renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([weak = weak_from_this()]() {
-                auto renderMgrInner = weak.lock();
-                if (renderMgrInner == nullptr) {
-                    HILOG_ERROR("null renderMgrInner");
-                    return;
-                }
-                HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
-                    renderMgrInner->userId_,
-                    renderMgrInner->isActiveUser_);
-                if (renderMgrInner->isActiveUser_) {
-                    renderMgrInner->RerenderAllForms();
-                } else {
-                    std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
-                    renderMgrInner->renderRemoteObj_ = nullptr;
-                }
-                std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
-                if (renderMgrInner->formResSched_) {
-                    renderMgrInner->formResSched_->ReportFormLayoutEnd();
-                    renderMgrInner->formResSched_ = nullptr;
-                }
-            });
-        }
-        if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
-            HILOG_ERROR("AddDeathRecipient failed");
-            return;
-        }
+    if (!RegisterRenderDeathRecipient(remoteObject)) {
+        return;
     }
     SetRenderRemoteObj(renderRemoteObj);
     ExecOnUnlockTask(remoteObject);
@@ -573,6 +548,38 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
     std::lock_guard<std::mutex> lock(formResSchedMutex_);
     formResSched_ = std::make_unique<FormResSched>(GetUserId());
     formResSched_->ReportFormLayoutStart();
+}
+
+bool FormRenderMgrInner::RegisterRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject)
+{
+    std::lock_guard<std::mutex> lock(renderDeathRecipientMutex_);
+    if (renderDeathRecipient_ == nullptr) {
+        renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([weak = weak_from_this()]() {
+            auto renderMgrInner = weak.lock();
+            if (renderMgrInner == nullptr) {
+                HILOG_ERROR("null renderMgrInner");
+                return;
+            }
+            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
+                renderMgrInner->userId_, renderMgrInner->isActiveUser_);
+            if (renderMgrInner->isActiveUser_) {
+                renderMgrInner->RerenderAllForms();
+            } else {
+                std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
+                renderMgrInner->renderRemoteObj_ = nullptr;
+            }
+            std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
+            if (renderMgrInner->formResSched_) {
+                renderMgrInner->formResSched_->ReportFormLayoutEnd();
+                renderMgrInner->formResSched_ = nullptr;
+            }
+        });
+    }
+    if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
+        HILOG_ERROR("AddDeathRecipient failed");
+        return false;
+    }
+    return true;
 }
 
 inline ErrCode FormRenderMgrInner::ConnectRenderService(
@@ -590,7 +597,15 @@ inline ErrCode FormRenderMgrInner::ConnectRenderService(
         want.SetParam(Constants::FRS_APP_INDEX, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX);
     }
     connection->SetStateConnecting();
-    return FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(want, connection, GetUserId());
+    auto ret = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(want, connection, GetUserId());
+    if (ret != ERR_OK) {
+        connection->SetStateDisconnected();
+        if (ret == OHOS::AAFwk::ERR_ALL_APP_START_BLOCKED) {
+            FormDataMgr::GetInstance().ScheduleRerenderAllFormsDelayTask();
+        }
+    }
+    
+    return ret;
 }
 
 void FormRenderMgrInner::SetUserId(int32_t userId)
@@ -606,10 +621,13 @@ int32_t FormRenderMgrInner::GetUserId() const
 void FormRenderMgrInner::RerenderAllFormsImmediate()
 {
     HILOG_INFO("Called");
-    isActiveUser_ = true;
-    if (etsHosts_.empty()) {
-        HILOG_WARN("All hosts died, no need to rerender.");
-        return;
+    {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        isActiveUser_ = true;
+        if (etsHosts_.empty()) {
+            HILOG_WARN("All hosts died, no need to rerender.");
+            return;
+        }
     }
     NotifyHostRenderServiceIsDead();
 }

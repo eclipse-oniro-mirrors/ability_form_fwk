@@ -1138,6 +1138,17 @@ public:
      */
     void UpdateHostWantSize(const int64_t formId, float width, float height, float borderWidth, float formViewScale);
 
+    /**
+     * @brief Cancel rerender all forms delayed task.
+     */
+    void CancelRerenderAllFormsDelayTask();
+
+    /**
+     * @brief Schedule rerender all forms delayed task.
+     * @return Returns true if scheduled successfully, false otherwise.
+     */
+    bool ScheduleRerenderAllFormsDelayTask();
+
 private:
     /**
      * @brief Create form record.
