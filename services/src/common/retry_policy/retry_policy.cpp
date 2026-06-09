@@ -65,30 +65,15 @@ int32_t RetryPolicy::CalculateNextDelay() const
     // EXPONENTIAL: base * 2^(retryCount-1)
     int32_t delay = config_.baseDelayMs;
     for (int32_t i = 1; i < retryCount_; i++) {
-        if (delay > config_.maxDelayMs / 2) {
+        if (delay > config_.maxDelayMs / EXPONENTIAL_MULTIPLIER) {
             return config_.maxDelayMs;
         }
-        delay *= 2;
+        delay *= EXPONENTIAL_MULTIPLIER;
         if (delay > config_.maxDelayMs) {
             return config_.maxDelayMs;
         }
     }
     return delay > config_.maxDelayMs ? config_.maxDelayMs : delay;
-}
-
-const RetryPolicyConfig &RetryPolicy::GetConfig() const
-{
-    return config_;
-}
-
-void RetryPolicy::SetConfig(const RetryPolicyConfig &config)
-{   
-    config_ = {
-        std::max(config.maxRetryCount, 0),
-        config.strategyType,
-        std::max(config.baseDelayMs, 0),
-        std::max(config.maxDelayMs, 0),
-    };
 }
 
 bool RetryPolicy::IsSendRequestFailed() const

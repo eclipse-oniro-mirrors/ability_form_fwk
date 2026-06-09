@@ -61,11 +61,6 @@ HWTEST_F(FmsRetryPolicyTest, Constructor_DefaultAndCustom_001, TestSize.Level1)
     EXPECT_EQ(defaultPolicy.GetRetryCount(), 0);
     EXPECT_FALSE(defaultPolicy.IsSendRequestFailed());
     EXPECT_FALSE(defaultPolicy.IsDisconnectFailed());
-    auto defaultCfg = defaultPolicy.GetConfig();
-    EXPECT_EQ(defaultCfg.maxRetryCount, 3);
-    EXPECT_EQ(defaultCfg.strategyType, RetryStrategyType::EXPONENTIAL);
-    EXPECT_EQ(defaultCfg.baseDelayMs, 1000);
-    EXPECT_EQ(defaultCfg.maxDelayMs, 4000);
 
     // Custom constructor
     RetryPolicyConfig customCfg;
@@ -77,11 +72,6 @@ HWTEST_F(FmsRetryPolicyTest, Constructor_DefaultAndCustom_001, TestSize.Level1)
     EXPECT_EQ(customPolicy.GetRetryCount(), 0);
     EXPECT_FALSE(customPolicy.IsSendRequestFailed());
     EXPECT_FALSE(customPolicy.IsDisconnectFailed());
-    auto retrievedCfg = customPolicy.GetConfig();
-    EXPECT_EQ(retrievedCfg.maxRetryCount, 5);
-    EXPECT_EQ(retrievedCfg.strategyType, RetryStrategyType::LINEAR);
-    EXPECT_EQ(retrievedCfg.baseDelayMs, 500);
-    EXPECT_EQ(retrievedCfg.maxDelayMs, 2000);
 
     GTEST_LOG_(INFO) << "Constructor_DefaultAndCustom_001 end";
 }
@@ -201,12 +191,11 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Immediate_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "CalculateNextDelay_Immediate_001 start";
 
-    RetryPolicy policy;
     RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::IMMEDIATE;
     cfg.baseDelayMs = 1000;
     cfg.maxDelayMs = 4000;
-    policy.SetConfig(cfg);
+    RetryPolicy policy(cfg);
     policy.retryCount_ = 1;
     EXPECT_EQ(policy.CalculateNextDelay(), 0);
 
@@ -224,12 +213,11 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_FixedInterval_001, TestSize.Leve
 {
     GTEST_LOG_(INFO) << "CalculateNextDelay_FixedInterval_001 start";
 
-    RetryPolicy policy;
     RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::FIXED_INTERVAL;
     cfg.baseDelayMs = 1000;
     cfg.maxDelayMs = 4000;
-    policy.SetConfig(cfg);
+    RetryPolicy policy(cfg);
     policy.retryCount_ = 1;
     EXPECT_EQ(policy.CalculateNextDelay(), 1000);
     policy.retryCount_ = 2;
@@ -251,12 +239,11 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Linear_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "CalculateNextDelay_Linear_001 start";
 
-    RetryPolicy policy;
     RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::LINEAR;
     cfg.baseDelayMs = 1000;
     cfg.maxDelayMs = 4000;
-    policy.SetConfig(cfg);
+    RetryPolicy policy(cfg);
     policy.retryCount_ = 1;
     EXPECT_EQ(policy.CalculateNextDelay(), 1000);
     policy.retryCount_ = 2;
@@ -278,12 +265,11 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Exponential_001, TestSize.Level1
 {
     GTEST_LOG_(INFO) << "CalculateNextDelay_Exponential_001 start";
 
-    RetryPolicy policy;
     RetryPolicyConfig cfg;
     cfg.strategyType = RetryStrategyType::EXPONENTIAL;
     cfg.baseDelayMs = 1000;
     cfg.maxDelayMs = 4000;
-    policy.SetConfig(cfg);
+    RetryPolicy policy(cfg);
     policy.retryCount_ = 0;
     EXPECT_EQ(policy.CalculateNextDelay(), 1000);
     policy.retryCount_ = 1;
@@ -296,40 +282,6 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Exponential_001, TestSize.Level1
     EXPECT_EQ(policy.CalculateNextDelay(), 4000); // capped: delay>maxDelayMs/2 early return
 
     GTEST_LOG_(INFO) << "CalculateNextDelay_Exponential_001 end";
-}
-
-/**
- * @tc.name: SetConfig_RoundTrip_001
- * @tc.desc: Verify SetConfig and GetConfig round-trip correctly, including all fields.
- * @tc.type: FUNC
- * @tc.require: issueI5T4GJ
- */
-HWTEST_F(FmsRetryPolicyTest, SetConfig_RoundTrip_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "SetConfig_RoundTrip_001 start";
-
-    RetryPolicy policy;
-
-    // Verify default config
-    auto defaultCfg = policy.GetConfig();
-    EXPECT_EQ(defaultCfg.maxRetryCount, 3);
-    EXPECT_EQ(defaultCfg.strategyType, RetryStrategyType::EXPONENTIAL);
-
-    // Set custom config and verify round-trip
-    RetryPolicyConfig customCfg;
-    customCfg.maxRetryCount = 10;
-    customCfg.strategyType = RetryStrategyType::FIXED_INTERVAL;
-    customCfg.baseDelayMs = 2000;
-    customCfg.maxDelayMs = 8000;
-    policy.SetConfig(customCfg);
-
-    auto retrievedCfg = policy.GetConfig();
-    EXPECT_EQ(retrievedCfg.maxRetryCount, 10);
-    EXPECT_EQ(retrievedCfg.strategyType, RetryStrategyType::FIXED_INTERVAL);
-    EXPECT_EQ(retrievedCfg.baseDelayMs, 2000);
-    EXPECT_EQ(retrievedCfg.maxDelayMs, 8000);
-
-    GTEST_LOG_(INFO) << "SetConfig_RoundTrip_001 end";
 }
 
 /**

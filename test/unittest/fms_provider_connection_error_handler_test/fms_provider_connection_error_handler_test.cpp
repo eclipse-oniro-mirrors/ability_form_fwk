@@ -169,13 +169,6 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicy_NewFormId_001,
     VerifyMapSize(1);
     VerifyPolicyExists(FORM_ID);
 
-    // Verify default configuration
-    const RetryPolicyConfig &config = policy.GetConfig();
-    EXPECT_EQ(config.maxRetryCount, DEFAULT_MAX_RETRY_COUNT);
-    EXPECT_EQ(config.strategyType, RetryStrategyType::EXPONENTIAL);
-    EXPECT_EQ(config.baseDelayMs, DEFAULT_BASE_DELAY_MS);
-    EXPECT_EQ(config.maxDelayMs, DEFAULT_MAX_DELAY_MS);
-
     // Verify initial state
     EXPECT_EQ(policy.GetRetryCount(), RETRY_COUNT_ZERO);
     EXPECT_FALSE(policy.sendRequestFailed_);
@@ -283,13 +276,6 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, GetDefaultRetryPolicy_AllFields_
     GTEST_LOG_(INFO) << "GetDefaultRetryPolicy_AllFields_001 start";
 
     RetryPolicy policy = handler_->GetDefaultRetryPolicy();
-
-    // Verify default configuration
-    const RetryPolicyConfig &config = policy.GetConfig();
-    EXPECT_EQ(config.maxRetryCount, DEFAULT_MAX_RETRY_COUNT);
-    EXPECT_EQ(config.strategyType, RetryStrategyType::EXPONENTIAL);
-    EXPECT_EQ(config.baseDelayMs, DEFAULT_BASE_DELAY_MS);
-    EXPECT_EQ(config.maxDelayMs, DEFAULT_MAX_DELAY_MS);
 
     // Verify retry count
     EXPECT_EQ(policy.GetRetryCount(), RETRY_COUNT_ZERO);

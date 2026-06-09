@@ -60,6 +60,7 @@ const std::string FORM_MESSAGE_EVENT_VALUE_1 = "event message1";
 const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
 constexpr int32_t DISCONNECT_ERROR = -1;
 constexpr int32_t TEST_CONNECT_ID = 100;
+constexpr int32_t TEST_USER_ID = 100;
 
 class FmsFormRefreshConnectionTest : public testing::Test {
 public:
@@ -90,7 +91,7 @@ void FmsFormRefreshConnectionTest::TearDown()
 
 sptr<FormRefreshConnection> FmsFormRefreshConnectionTest::CreateRefreshConnection(int64_t formId, Want &want)
 {
-    return new (std::nothrow) FormRefreshConnection(formId, want, "aa", "bb", false, 100);
+    return new (std::nothrow) FormRefreshConnection(formId, want, "aa", "bb", false, TEST_USER_ID);
 }
 
 /**
@@ -106,7 +107,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_001, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
@@ -130,7 +131,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
@@ -156,7 +157,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
@@ -182,7 +183,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     bool isFreeInstall = false;
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
     ASSERT_NE(nullptr, formRefreshConnection);
@@ -505,7 +506,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
     std::string abilityName = "bb";
     std::string deviceId = "cc";
     int64_t formShareRequestCode = 2;
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormShareConnection> formShareConnection =
         new (std::nothrow) FormShareConnection(formId, bundleName, abilityName, deviceId, formShareRequestCode, userId);
     ASSERT_NE(nullptr, formShareConnection);
@@ -741,7 +742,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_001, TestSize.Leve
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormCastTempConnection> formCastTempConnection =
         new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formCastTempConnection);
@@ -763,7 +764,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_001, TestSize.Level0
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormDeleteConnection> formDeleteConnection =
         new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formDeleteConnection);
@@ -1316,7 +1317,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0001, TestSize.Lev
     Want want;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     std::shared_ptr<FormMsgEventConnection> formMsgEventConnection =
         std::make_shared<FormMsgEventConnection>(formId, want, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formMsgEventConnection);
@@ -1340,7 +1341,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireStateConnection_0001, TestSize
     std::string abilityName = "bb";
     Want want;
     std::string state = "cc";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     std::shared_ptr<FormAcquireStateConnection> formAcquireStateConnection =
         std::make_shared<FormAcquireStateConnection>(bundleName, abilityName, want, state, userId);
     ASSERT_NE(nullptr, formAcquireStateConnection);
@@ -1457,7 +1458,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_002, TestSize.Level0
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormDeleteConnection> formDeleteConnection =
         new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formDeleteConnection);
@@ -1479,7 +1480,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_002, TestSize.Leve
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormCastTempConnection> formCastTempConnection =
         new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formCastTempConnection);

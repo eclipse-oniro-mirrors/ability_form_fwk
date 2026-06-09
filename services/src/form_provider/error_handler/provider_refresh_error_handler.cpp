@@ -52,7 +52,7 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     policy.SetSendRequestFailed(true);
 
     if (!policy.IsDisconnectFailed()) {
-        HILOG_INFO("Waiting for AMS disconnect confirmation, formId %{public}" PRId64, formId);
+        HILOG_INFO("Waiting for connection disconnect callback, formId %{public}" PRId64, formId);
         return true;
     }
 
@@ -120,21 +120,21 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId, cons
 void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(
     int64_t formId, const Want &want)
 {
+    FormRecord record;
+    bool success = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     {
         std::lock_guard<std::mutex> lock(retryPolicyMutex_);
         if (retryPolicyMap_.find(formId) == retryPolicyMap_.end()) {
             HILOG_INFO("Retry policy already removed, skip retry for formId %{public}" PRId64, formId);
             return;
         }
+        if (!success) {
+            retryPolicyMap_.erase(formId);
+            HILOG_WARN("FormRecord not found, abort retry for formId %{public}" PRId64, formId);
+            return;
+        }
     }
 
-    FormRecord record;
-    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
-        std::lock_guard<std::mutex> lock(retryPolicyMutex_);
-        retryPolicyMap_.erase(formId);
-        HILOG_WARN("FormRecord not found, abort retry for formId %{public}" PRId64, formId);
-        return;
-    }
     FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, record, want);
 }
 

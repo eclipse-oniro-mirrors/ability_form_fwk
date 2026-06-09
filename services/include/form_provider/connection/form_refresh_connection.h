@@ -16,6 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
 
+#include <atomic>
+
 #include "common/connection/form_ability_connection.h"
 #include "form_provider/error_handler/provider_error_handler_factory.h"
 
@@ -68,7 +70,7 @@ protected:
 
 private:
     Want want_;
-    ConnectState connectState_ = ConnectState::DISCONNECTED;
+    std::atomic<ConnectState> connectState_{ConnectState::DISCONNECTED};
     DISALLOW_COPY_AND_MOVE(FormRefreshConnection);
 };
 }  // namespace AppExecFwk

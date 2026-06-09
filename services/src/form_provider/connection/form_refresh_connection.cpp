@@ -68,20 +68,21 @@ void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IR
 
 void FormRefreshConnection::OnPreConnectTask()
 {
-    connectState_ = ConnectState::CONNECTED;
+    connectState_.store(ConnectState::CONNECTED);
 }
 
 void FormRefreshConnection::OnAbilityDisconnectDone(
     const AppExecFwk::ElementName &element, int resultCode)
 {
+    ConnectState state = connectState_.load();
     HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
-        GetFormId(), resultCode, static_cast<int32_t>(connectState_));
+        GetFormId(), resultCode, static_cast<int32_t>(state));
 
     FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
 
-    if (resultCode == DISCONNECT_ERROR && connectState_ == ConnectState::CONNECTED) {
+    if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED) {
         FormProviderErrorHandlerFactory::GetRefreshHandler()
-            ->HandleDisconnectError(GetFormId(), GetProviderToken(), want_, connectState_);
+            ->HandleDisconnectError(GetFormId(), GetProviderToken(), want_, state);
     }
 }
 

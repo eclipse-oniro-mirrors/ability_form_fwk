@@ -395,15 +395,14 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, ExecuteRefreshRetry_AllBranches_001
 }
 
 /**
- * @tc.name: StaticMethods_IsRemoteDeadAndShouldRetry_001
- * @tc.desc: Verify IsRemoteDead returns true for 32/29189 and false for others;
- *           ShouldRetry delegates to IsRemoteDead.
+ * @tc.name: StaticMethods_IsRemoteDead_001
+ * @tc.desc: Verify IsRemoteDead returns true for 32/29189 and false for others.
  * @tc.type: FUNC
  * @tc.require: issueI5NQJG
  */
-HWTEST_F(FmsProviderRefreshErrorHandlerTest, StaticMethods_IsRemoteDeadAndShouldRetry_001, TestSize.Level1)
+HWTEST_F(FmsProviderRefreshErrorHandlerTest, StaticMethods_IsRemoteDead_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "StaticMethods_IsRemoteDeadAndShouldRetry_001 start";
+    GTEST_LOG_(INFO) << "StaticMethods_IsRemoteDead_001 start";
 
     // IsRemoteDead: death codes → true
     EXPECT_TRUE(FormProviderConnectionErrorHandler::IsRemoteDead(IPC_ERR_DEAD_OBJECT));
@@ -413,13 +412,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, StaticMethods_IsRemoteDeadAndShould
     EXPECT_FALSE(FormProviderConnectionErrorHandler::IsRemoteDead(-1));
     EXPECT_FALSE(FormProviderConnectionErrorHandler::IsRemoteDead(999));
 
-    // ShouldRetry: delegates to IsRemoteDead
-    EXPECT_TRUE(FormProviderConnectionErrorHandler::ShouldRetry(IPC_ERR_DEAD_OBJECT));
-    EXPECT_TRUE(FormProviderConnectionErrorHandler::ShouldRetry(IPC_ERR_SERVICE_DIED));
-    EXPECT_FALSE(FormProviderConnectionErrorHandler::ShouldRetry(0));
-    EXPECT_FALSE(FormProviderConnectionErrorHandler::ShouldRetry(-1));
-
-    GTEST_LOG_(INFO) << "StaticMethods_IsRemoteDeadAndShouldRetry_001 end";
+    GTEST_LOG_(INFO) << "StaticMethods_IsRemoteDead_001 end";
 }
 
 /**

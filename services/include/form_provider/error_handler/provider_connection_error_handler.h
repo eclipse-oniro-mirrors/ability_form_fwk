@@ -32,7 +32,6 @@ class FormProviderConnectionErrorHandler {
 public:
     virtual ~FormProviderConnectionErrorHandler() = default;
 
-    static bool ShouldRetry(int errorCode);
     static bool IsRemoteDead(int errorCode);
 
     virtual bool HandleConnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want) = 0;

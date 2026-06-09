@@ -21,6 +21,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 
+constexpr int32_t EXPONENTIAL_MULTIPLIER = 2;
+
 enum class RetryStrategyType {
     IMMEDIATE,
     FIXED_INTERVAL,
@@ -46,9 +48,6 @@ public:
     void Reset();
     bool IsRetryLimitReached() const;
     int32_t CalculateNextDelay() const;
-
-    const RetryPolicyConfig &GetConfig() const;
-    void SetConfig(const RetryPolicyConfig &config);
 
     bool IsSendRequestFailed() const;
     void SetSendRequestFailed(bool failed);
