@@ -26,16 +26,6 @@ std::shared_ptr<FormProviderRefreshErrorHandler> FormProviderRefreshErrorHandler
     return std::shared_ptr<FormProviderRefreshErrorHandler>(new FormProviderRefreshErrorHandler());
 }
 
-bool FormProviderRefreshErrorHandler::HandleConnectError(
-    int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
-{
-    GTEST_LOG_(INFO) << "HandleConnectError called";
-    if (MockFormProviderRefreshErrorHandler::obj) {
-        return MockFormProviderRefreshErrorHandler::obj->HandleConnectError(formId, remoteObject, want);
-    }
-    return false;
-}
-
 bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     int64_t formId, int errorCode, const Want &want)
 {

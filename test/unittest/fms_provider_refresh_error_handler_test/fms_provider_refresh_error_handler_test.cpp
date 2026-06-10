@@ -148,40 +148,6 @@ void FmsProviderRefreshErrorHandlerTest::VerifyNoPolicy(int64_t formId)
 }
 
 /**
- * @tc.name: HandleConnectError_AllBranches_001
- * @tc.desc: Verify HandleConnectError returns false for null, dead, and valid remoteObject,
- *           never creates retry policy.
- * @tc.type: FUNC
- * @tc.require: issueI5NQJG
- */
-HWTEST_F(FmsProviderRefreshErrorHandlerTest, HandleConnectError_AllBranches_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "HandleConnectError_AllBranches_001 start";
-
-    Want want;
-
-    // Branch: null remote → false, no policy
-    EXPECT_FALSE(handler_->HandleConnectError(FORM_ID, nullptr, want));
-    EXPECT_EQ(handler_->retryPolicyMap_.size(), 0);
-
-    // Branch: dead remote → false, no policy
-    sptr<MockIRemoteObject> deadRemote = new MockIRemoteObject();
-    ASSERT_NE(deadRemote, nullptr);
-    EXPECT_CALL(*deadRemote, IsObjectDead()).WillOnce(Return(true));
-    EXPECT_FALSE(handler_->HandleConnectError(FORM_ID, deadRemote, want));
-    EXPECT_EQ(handler_->retryPolicyMap_.size(), 0);
-    testing::Mock::VerifyAndClearExpectations(deadRemote);
-
-    // Branch: valid remote → false, no policy
-    sptr<MockIRemoteObject> validRemote = new MockIRemoteObject();
-    ASSERT_NE(validRemote, nullptr);
-    EXPECT_FALSE(handler_->HandleConnectError(FORM_ID, validRemote, want));
-    EXPECT_EQ(handler_->retryPolicyMap_.size(), 0);
-
-    GTEST_LOG_(INFO) << "HandleConnectError_AllBranches_001 end";
-}
-
-/**
  * @tc.name: HandleSendRequestFailed_NonDeathError_001
  * @tc.desc: Verify HandleSendRequestFailed returns false for non-death error codes
  *           (0, -1, 999) without creating retry policy.

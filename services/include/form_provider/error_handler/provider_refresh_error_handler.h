@@ -30,8 +30,6 @@ public:
 
     static std::shared_ptr<FormProviderRefreshErrorHandler> Create();
 
-    bool HandleConnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want) override;
-
     bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override;
 
     bool HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want,

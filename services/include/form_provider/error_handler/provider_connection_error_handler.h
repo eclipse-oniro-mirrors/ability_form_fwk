@@ -34,8 +34,6 @@ public:
 
     static bool IsRemoteDead(int errorCode);
 
-    virtual bool HandleConnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want) = 0;
-
     virtual bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) = 0;
 
     virtual bool HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want,

@@ -26,8 +26,6 @@ public:
     MockFormProviderRefreshErrorHandler() = default;
     virtual ~MockFormProviderRefreshErrorHandler() = default;
 
-    MOCK_METHOD(bool, HandleConnectError, (int64_t formId,
-        (const sptr<IRemoteObject> &remoteObject), (const Want &want)));
     MOCK_METHOD(bool, HandleSendRequestFailed, (int64_t formId,
         (int errorCode), (const Want &want)));
     MOCK_METHOD(bool, HandleDisconnectError, (int64_t formId,

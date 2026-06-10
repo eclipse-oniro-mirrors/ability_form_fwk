@@ -30,15 +30,6 @@ std::shared_ptr<FormProviderRefreshErrorHandler> FormProviderRefreshErrorHandler
     return std::shared_ptr<FormProviderRefreshErrorHandler>(new FormProviderRefreshErrorHandler());
 }
 
-bool FormProviderRefreshErrorHandler::HandleConnectError(
-    int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
-{
-    if (remoteObject == nullptr || remoteObject->IsObjectDead()) {
-        HILOG_WARN("ConnectServiceAbility failed, remote dead, formId %{public}" PRId64, formId);
-    }
-    return false;
-}
-
 bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     int64_t formId, int errorCode, const Want &want)
 {

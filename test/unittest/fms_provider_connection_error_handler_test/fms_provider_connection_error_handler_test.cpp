@@ -50,11 +50,6 @@ public:
     TestConnectionErrorHandler() = default;
     virtual ~TestConnectionErrorHandler() = default;
 
-    bool HandleConnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want) override
-    {
-        return true;
-    }
-
     bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override
     {
         return true;
