@@ -22,6 +22,7 @@
 #include <set>
 #include <singleton.h>
 #include <string>
+#include <unordered_map>
 
 #include "bundle_pack_info.h"
 #include "form_constants.h"
@@ -490,7 +491,7 @@ public:
      * @param noHostTempFormsMap no host temp forms.
      * @param foundFormsMap Form Id list.
      */
-    void GetNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
+    void GetNoHostTempForms(const int uid, std::unordered_map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
         std::map<int64_t, bool> &foundFormsMap);
 
     /**
@@ -514,7 +515,7 @@ public:
      * @param foundFormsMap The map of the found forms.
      */
     void GetNoHostInvalidTempForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
-                                   std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
+                                   std::unordered_map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
                                    std::map<int64_t, bool> &foundFormsMap);
 
     /**
@@ -523,7 +524,7 @@ public:
      * @param noHostTempFormsMap The map of the no host forms.
      * @param foundFormsMap The map of the found forms.
      */
-    void BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
+    void BatchDeleteNoHostTempForms(int32_t callingUid, std::unordered_map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
                                     std::map<int64_t, bool> &foundFormsMap);
 
     /**

@@ -405,7 +405,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_006, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormDbCache_006 start";
     FormDbCache formDbCache;
     int uid = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDBList;
     std::map<int64_t, bool> foundFormsMap;
     FormDBInfo formDBInfo;
     formDBInfo.userId = 1;
@@ -424,7 +424,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_007, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormDbCache_007 start";
     FormDbCache formDbCache;
     int uid = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDBList;
     std::map<int64_t, bool> foundFormsMap;
     FormDBInfo formDBInfo;
     formDBInfo.userId = 2;
@@ -503,7 +503,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_011, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     FormDBInfo formDBInfo;
     formDBInfo.userId = 2;
@@ -524,7 +524,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_012, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     FormDBInfo formDBInfo;
     formDBInfo.userId = 1;
@@ -545,7 +545,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_013, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     FormDBInfo formDBInfo;
     formDBInfo.userId = 1;
@@ -569,7 +569,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_014, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     int64_t formIds = 3;
     matchedFormIds.insert(formIds);
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     FormDBInfo formDBInfo;
     formDBInfo.formId = 3;
@@ -594,7 +594,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_015, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     int64_t formIds = 4;
     matchedFormIds.insert(formIds);
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     FormDBInfo formDBInfo;
     formDBInfo.formId = 3;
@@ -629,7 +629,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_016, TestSize.Level0)
     formDBInfo.formUserUids.emplace_back(2);
     formDbCache.formDBInfos_.emplace_back(formDBInfo);
     // set noHostDBFormsMap
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     FormIdKey formIdKey(formDBInfo.bundleName, formDBInfo.abilityName);
     std::set<int64_t> host;
     host.insert(formIds);
@@ -653,7 +653,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_017, TestSize.Level0)
     formDBInfo.formId = 2;
     formDBInfo.bundleName = "com.form.start";
     formDBInfo.abilityName = "bbbbbb";
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     FormIdKey formIdKey(formDBInfo.bundleName, formDBInfo.abilityName);
     std::set<int64_t> host;
     int64_t formId = 2;
@@ -681,7 +681,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_018, TestSize.Level0)
     formDBInfo.formId = 2;
     formDBInfo.bundleName = "com.form.start";
     formDBInfo.abilityName = "bbbbbb";
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     FormIdKey formIdKey(formDBInfo.bundleName, formDBInfo.abilityName);
     std::set<int64_t> host;
     int64_t formId = 3;
@@ -709,7 +709,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_019, TestSize.Level0)
     formDBInfo.formId = 2;
     formDBInfo.bundleName = "com.form.start";
     formDBInfo.abilityName = "bbbbbb";
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap;
     FormIdKey formIdKey(formDBInfo.bundleName, formDBInfo.abilityName);
     std::set<int64_t> host;
     int64_t formId = 2;

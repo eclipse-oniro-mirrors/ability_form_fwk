@@ -18,6 +18,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_map>
 
 #include "bundle_info.h"
 #include "bundle_pack_info.h"
@@ -44,7 +45,7 @@ public:
         const BundleInfo &bundleInfo);
     static void ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
     static void ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
-    static void BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
+    static void BatchDeleteNoHostTempForms(const int uid, std::unordered_map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
         std::map<int64_t, bool> &foundFormsMap);
     static void GetTimerCfg(const bool updateEnabled, const int updateDuration, const std::string &configUpdateAt,
         FormTimerCfg &cfg);
@@ -53,7 +54,7 @@ public:
         const FormTimerCfg &timerCfg);
     static void HandleTimerUpdate(const int64_t formId, const FormRecord &record, const FormTimerCfg &timerCfg);
     static void ReCreateForm(const int64_t formId);
-    static void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
+    static void BatchDeleteNoHostDBForms(const int uid, std::unordered_map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
         std::map<int64_t, bool> &removedFormsMap);
     static void HandleOnUnlock(int32_t userId);
     static bool HandleAdditionalInfoChanged(const std::string &bundleName);

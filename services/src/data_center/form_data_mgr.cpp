@@ -1813,7 +1813,7 @@ void FormDataMgr::ClearHostDataByUId(const int uId)
  * @param foundFormsMap Form Id list.
  */
 void FormDataMgr::GetNoHostTempForms(
-    const int uid, std::map<FormIdKey,
+    const int uid, std::unordered_map<FormIdKey,
     std::set<int64_t>> &noHostTempFormsMap,
     std::map<int64_t, bool> &foundFormsMap)
 {
@@ -2196,7 +2196,7 @@ void FormDataMgr::ClearFormRecords()
  * @param foundFormsMap The map of the found forms.
  */
 void FormDataMgr::GetNoHostInvalidTempForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
-                                            std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
+                                            std::unordered_map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
                                             std::map<int64_t, bool> &foundFormsMap)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -2242,7 +2242,7 @@ void FormDataMgr::GetNoHostInvalidTempForms(int32_t userId, int32_t callingUid, 
  * @param noHostTempFormsMap The map of the no host forms.
  * @param foundFormsMap The map of the found forms.
  */
-void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormIdKey,
+void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::unordered_map<FormIdKey,
                                              std::set<int64_t>> &noHostTempFormsMap,
                                              std::map<int64_t, bool> &foundFormsMap)
 {
@@ -2289,7 +2289,7 @@ int32_t FormDataMgr::DeleteInvalidTempForms(int32_t userId, int32_t callingUid, 
 {
     HILOG_INFO("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
     std::map<int64_t, bool> foundFormsMap {};
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap {};
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap {};
     GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
     HILOG_DEBUG("foundFormsMap size:%{public}zu", foundFormsMap.size());

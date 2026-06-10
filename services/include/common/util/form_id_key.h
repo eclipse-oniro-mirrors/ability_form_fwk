@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_ID_KEY_H
 
 #include <string>
+#include <functional>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -44,30 +45,23 @@ public:
             && abilityName == formIdKey.abilityName
             && formName == formIdKey.formName;
     }
-    /**
-     * @brief overloaded == for Indicates the formDBInfo by formId
-     * @return Returns true if the data equal; returns false otherwise.
-     */
-    bool operator< (const FormIdKey &formIdKey) const
-    {
-        return specificationId != formIdKey.specificationId
-            || orientation != formIdKey.orientation
-            || bundleName != formIdKey.bundleName
-            || moduleName != formIdKey.moduleName
-            || abilityName != formIdKey.abilityName
-            || formName != formIdKey.formName;
-    }
-    int hashCode()
-    {
-        return std::hash<std::string>()(bundleName)
-            + std::hash<std::string>()(moduleName)
-            + std::hash<std::string>()(abilityName)
-            + std::hash<std::string>()(formName)
-            + std::hash<int>()(specificationId)
-            + std::hash<int>()(orientation);
-    }
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
+
+namespace std {
+template<>
+struct hash<OHOS::AppExecFwk::FormIdKey> {
+    size_t operator()(const OHOS::AppExecFwk::FormIdKey &key) const
+    {
+        return hash<string>()(key.bundleName)
+            ^ (hash<string>()(key.moduleName) << 1)
+            ^ (hash<string>()(key.abilityName) << 2)
+            ^ (hash<string>()(key.formName) << 3)
+            ^ (hash<int>()(key.specificationId) << 4)
+            ^ (hash<int>()(key.orientation) << 5);
+    }
+};
+}
 
 #endif // OHOS_FORM_FWK_FORM_ID_KEY_H

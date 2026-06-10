@@ -52,7 +52,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     FormIdKey formIdKey(bundleName, abilityName);
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDBList;
     noHostFormDBList.emplace(formIdKey, formNums);
     std::map<int64_t, bool> foundFormsMap;
     bool flag = *data % ENABLE;

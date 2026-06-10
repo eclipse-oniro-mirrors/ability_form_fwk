@@ -68,7 +68,7 @@ int FormDbCache::GetMatchCount(const std::string &bundleName, const std::string 
     return 0;
 }
 
-ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
+ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::unordered_map<FormIdKey,
     std::set<int64_t>> &noHostFormDBList, std::map<int64_t, bool> &foundFormsMap)
 {
     int64_t formIds[2] = { 1, 2 };

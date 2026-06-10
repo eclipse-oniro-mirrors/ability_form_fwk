@@ -52,7 +52,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormIdKey formIdKey(bundleName, abilityName);
     std::set<int64_t> formNums;
     formNums.insert(formId);
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     noHostFormDbMap.emplace(formIdKey, formNums);
     FormEventUtil::BatchDeleteNoHostDBForms(uid, noHostFormDbMap, removedFormsMap);
     FormEventUtil::BatchDeleteNoHostTempForms(uid, noHostFormDbMap, removedFormsMap);

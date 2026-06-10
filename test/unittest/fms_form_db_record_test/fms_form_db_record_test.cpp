@@ -278,7 +278,7 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_010, TestSize.Level0)
 
     const int uid1 = 1;
     const int uid2 = 2;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDBList;
     std::map<int64_t, bool> foundFormsMap;
     EXPECT_EQ(ERR_OK, FormDbCache::GetInstance().GetNoHostDBForms(uid2, noHostFormDBList, foundFormsMap));
     EXPECT_EQ(ERR_OK, FormDbCache::GetInstance().GetNoHostDBForms(uid1, noHostFormDBList, foundFormsMap));
@@ -326,7 +326,7 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_012, TestSize.Level0)
     int32_t callingUid1 = 102;
     int32_t callingUid2 = 1;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDBList;
     std::map<int64_t, bool> foundFormsMap;
     FormDbCache::GetInstance().GetNoHostInvalidDBForms(userId1, callingUid2, matchedFormIds,
                                                        noHostFormDBList, foundFormsMap);

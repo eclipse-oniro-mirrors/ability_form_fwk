@@ -337,7 +337,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
 void FormEventUtil::ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap)
 {
     std::map<int64_t, bool> foundFormsMap;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     FormDbCache::GetInstance().GetNoHostDBForms(uid, noHostFormDbMap, foundFormsMap);
     if (!foundFormsMap.empty()) {
         for (const auto &element : foundFormsMap) {
@@ -358,7 +358,7 @@ void FormEventUtil::ClearFormDBRecordData(const int uid, std::map<int64_t, bool>
 void FormEventUtil::ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap)
 {
     std::map<int64_t, bool> foundFormsMap;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     FormDataMgr::GetInstance().GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
     HILOG_DEBUG("noHostTempFormsMap size:%{public}zu", noHostTempFormsMap.size());
     if (!noHostTempFormsMap.empty()) {
@@ -369,7 +369,7 @@ void FormEventUtil::ClearTempFormRecordData(const int uid, std::map<int64_t, boo
     }
 }
 
-void FormEventUtil::BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey,
+void FormEventUtil::BatchDeleteNoHostTempForms(const int uid, std::unordered_map<FormIdKey,
     std::set<int64_t>> &noHostTempFormsMap, std::map<int64_t, bool> &foundFormsMap)
 {
     for (const auto &element : noHostTempFormsMap) {
@@ -607,7 +607,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want);
 }
 
-void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
+void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::unordered_map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
     std::map<int64_t, bool> &removedFormsMap)
 {
     std::set<FormIdKey> removableModuleSet;

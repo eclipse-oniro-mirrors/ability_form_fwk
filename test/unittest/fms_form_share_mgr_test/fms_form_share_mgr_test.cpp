@@ -2229,7 +2229,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0007 start";
     int uid = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2253,7 +2253,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0008 start";
     int uid = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2277,7 +2277,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0009 start";
     int uid = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2672,7 +2672,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0029, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2691,7 +2691,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0030, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2717,7 +2717,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0031, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2743,7 +2743,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0032, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2769,7 +2769,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0033, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2795,7 +2795,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0034, TestSize.Level0)
     int32_t userId = 1;
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2824,7 +2824,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0035, TestSize.Level0)
     int64_t formIds = 1;
     std::set<int64_t> matchedFormIds;
     matchedFormIds.insert(formIds);
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
@@ -2864,7 +2864,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0036, TestSize.Level0)
     formDataMgr->formRecords_.emplace(formIds, formInfo);
     // set noHostTempFormsMap
     FormIdKey formIdKey(formInfo.bundleName, formInfo.abilityName);
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
     formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0036 end";
@@ -2879,7 +2879,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0037, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0037 start";
     int32_t callingUid = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
     FormDataMgr formDataMgr;
     formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
@@ -2903,7 +2903,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0038, TestSize.Level0)
     formInfo.abilityName = "bbbbbb";
     FormIdKey formIdKey(formInfo.bundleName, formInfo.abilityName);
     std::set<int64_t> matchedFormIds;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
     formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0038 end";
@@ -2928,7 +2928,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0039, TestSize.Level0)
     int64_t formIds = 1;
     std::set<int64_t> matchedFormIds;
     matchedFormIds.insert(formIds);
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
     formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0039 end";

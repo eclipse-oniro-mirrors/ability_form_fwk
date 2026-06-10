@@ -240,7 +240,7 @@ ErrCode FormDbCache::UpdateDBRecord(const int64_t formId, const FormRecord &reco
  * @param foundFormsMap Form Id list.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
+ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::unordered_map<FormIdKey,
     std::set<int64_t>> &noHostFormDBList, std::map<int64_t, bool> &foundFormsMap)
 {
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
@@ -312,11 +312,12 @@ void FormDbCache::DeleteDBFormsByUserId(const int32_t userId)
  * @param foundFormsMap The map of the found forms.
  */
 void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
-                                          std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
+                                          std::unordered_map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
                                           std::map<int64_t, bool> &foundFormsMap)
 {
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    for (auto &formRecord: formDBInfos_) {
+    for (size_t i = 0; i < formDBInfos_.size(); ++i) {
+        FormDBInfo &formRecord = formDBInfos_[i];
         int64_t formId = formRecord.formId;
         // check UID
         auto iter = std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(), callingUid);
@@ -358,7 +359,7 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
  * @param noHostFormDbMap The map of the no host forms.
  * @param foundFormsMap The map of the found forms.
  */
-void FormDbCache::BatchDeleteNoHostDBForms(int32_t callingUid, std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
+void FormDbCache::BatchDeleteNoHostDBForms(int32_t callingUid, std::unordered_map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
                                            std::map<int64_t, bool> &foundFormsMap)
 {
     std::set<FormIdKey> removableModuleSet;
@@ -406,7 +407,7 @@ ErrCode FormDbCache::DeleteInvalidDBForms(int32_t userId, int32_t callingUid, st
 {
     HILOG_INFO("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
     std::map<int64_t, bool> foundFormsMap {};
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap {};
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap {};
 
     GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostDBFormsMap, foundFormsMap);
 

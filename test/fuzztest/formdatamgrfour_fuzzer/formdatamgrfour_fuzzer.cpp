@@ -47,7 +47,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::string bundleName = fdp->ConsumeRandomLengthString();
     std::string abilityName = fdp->ConsumeRandomLengthString();
     FormIdKey formIdKey(bundleName, abilityName);
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
     std::map<int64_t, bool> foundFormsMap;
     bool flag = fdp->ConsumeBool();

@@ -3815,7 +3815,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetNoHostTempForms_001, TestSize
     record.formTempFlag = true;
     formDataMgr_.formRecords_.emplace(formRecordKey2, record);
     std::map<int64_t, bool> foundFormsMap;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     int uid = FORM_USER_UIDS_ZERO;
     formDataMgr_.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
     EXPECT_EQ(foundFormsMap.find(formRecordKey1), foundFormsMap.end());
@@ -3841,7 +3841,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetNoHostTempForms_002, TestSize
     formDataMgr_.formRecords_.emplace(formRecordKey, record);
     FormIdKey formIdKey(record.bundleName, record.abilityName);
     std::map<int64_t, bool> foundFormsMap;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::set<int64_t> vector;
     noHostTempFormsMap.emplace(formIdKey, vector);
     int uid = FORM_USER_UIDS_ZERO;
@@ -3870,7 +3870,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetNoHostTempForms_003, TestSize
     formDataMgr_.formRecords_.emplace(formRecordKey, record);
     FormIdKey formIdKey(record.bundleName, record.abilityName);
     std::map<int64_t, bool> foundFormsMap;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     int uid = FORM_USER_UIDS_ZERO;
     formDataMgr_.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
     auto iter = noHostTempFormsMap.find(formIdKey);
@@ -4644,7 +4644,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_005, TestSize.Level0)
 
     std::set<int64_t> matchedFormIds = { formId1 };
     std::map<int64_t, bool> foundFormsMap{};
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
 
     formDataMgr_.GetNoHostInvalidTempForms(
         providerUserId2, callingUid1, matchedFormIds, noHostTempFormsMap, foundFormsMap);
@@ -5003,7 +5003,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_012, TestSize.Level0)
 
     std::set<int64_t> matchedFormIds = { formId1 };
     std::map<int64_t, bool> foundFormsMap{};
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
 
     formDataMgr_.GetNoHostInvalidTempForms(
         providerUserId2, callingUid1, matchedFormIds, noHostTempFormsMap, foundFormsMap);
@@ -5606,7 +5606,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_019, TestSize.Level0)
 
     std::set<int64_t> matchedFormIds = { formId1 };
     std::map<int64_t, bool> foundFormsMap{};
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
 
     formDataMgr_.GetNoHostInvalidTempForms(
         providerUserId2, callingUid1, matchedFormIds, noHostTempFormsMap, foundFormsMap);
@@ -5965,7 +5965,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_026, TestSize.Level0)
 
     std::set<int64_t> matchedFormIds = { formId1 };
     std::map<int64_t, bool> foundFormsMap{};
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap{};
 
     formDataMgr_.GetNoHostInvalidTempForms(
         providerUserId2, callingUid1, matchedFormIds, noHostTempFormsMap, foundFormsMap);

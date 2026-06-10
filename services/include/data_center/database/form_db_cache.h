@@ -19,6 +19,7 @@
 #include <mutex>
 #include <set>
 #include <singleton.h>
+#include <unordered_map>
 #include <vector>
 
 #include "common/util/form_id_key.h"
@@ -120,15 +121,15 @@ public:
     ErrCode DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
         std::vector<FormDBInfo> &removedDBForms);
 
-    /**
+/**
      * @brief Get no host db record.
      * @param uid The caller uid.
      * @param noHostFormDBList no host db record list.
      * @param foundFormsMap Form Id list.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDBList,
-        std::map<int64_t, bool> &foundFormsMap);
+    ErrCode GetNoHostDBForms(const int uid, std::unordered_map<FormIdKey,
+        std::set<int64_t>> &noHostFormDBList, std::map<int64_t, bool> &foundFormsMap);
 
     /**
      * @brief Get match count by bundleName and moduleName.
@@ -153,7 +154,7 @@ public:
      * @param foundFormsMap The map of the found forms.
      */
     void GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
-                                 std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
+                                 std::unordered_map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
                                  std::map<int64_t, bool> &foundFormsMap);
 
     /**
@@ -162,7 +163,7 @@ public:
      * @param noHostDBFormsMap The map of the no host forms.
      * @param foundFormsMap The map of the found forms.
      */
-    void BatchDeleteNoHostDBForms(int32_t callingUid, std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
+    void BatchDeleteNoHostDBForms(int32_t callingUid, std::unordered_map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap,
                                   std::map<int64_t, bool> &foundFormsMap);
 
     /**

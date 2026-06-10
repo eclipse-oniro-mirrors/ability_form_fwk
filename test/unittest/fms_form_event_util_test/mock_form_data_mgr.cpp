@@ -125,7 +125,7 @@ bool FormDataMgr::GetPackageForm(const FormRecord &record, const BundlePackInfo 
 }
 
 void FormDataMgr::GetNoHostTempForms(
-    const int uid, std::map<FormIdKey,
+    const int uid, std::unordered_map<FormIdKey,
     std::set<int64_t>> &noHostTempFormsMap,
     std::map<int64_t, bool> &foundFormsMap)
 {

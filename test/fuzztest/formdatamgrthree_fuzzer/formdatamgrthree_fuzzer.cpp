@@ -56,7 +56,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formDataMgr.FindMatchedFormId(formId);
     int uId = static_cast<int>(GetU32Data(data));
     formDataMgr.ClearHostDataByUId(uId);
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     FormIdKey formIdKey(bundleName, abilityName);

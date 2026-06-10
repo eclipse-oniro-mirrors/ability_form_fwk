@@ -34,7 +34,7 @@ constexpr int32_t INDEX_MAX = 5;
 const nlohmann::json JSON_FORMS = R"({})"_json;
 
 void GenerateMapData(FuzzedDataProvider *fdp, std::set<int64_t> &matchedFormIds,
-    std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap, std::map<int64_t, bool> &foundFormsMap)
+    std::unordered_map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap, std::map<int64_t, bool> &foundFormsMap)
 {
     int32_t index = fdp->ConsumeIntegralInRange(0, INDEX_MAX);
     for (int32_t i = 0; i < index; i++) {
@@ -138,7 +138,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.GetDBRecord(formId, record);
     formDbCache.GetMatchCount(bundleName, moduleName);
     std::set<int64_t> matchedFormIds = {};
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap = {};
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap = {};
     std::map<int64_t, bool> foundFormsMap = {};
     OHOS::GenerateMapData(fdp, matchedFormIds, noHostDBFormsMap, foundFormsMap);
     formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostDBFormsMap, foundFormsMap);
@@ -162,7 +162,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.UpdateDBRecord(formId, record);
 
     // Cover GetNoHostDBForms (not in original fuzzer)
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDBList;
     std::map<int64_t, bool> foundFormsMap2;
     formDbCache.GetNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap2);
 
@@ -171,7 +171,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     // Cover GetNoHostInvalidDBForms (not in original fuzzer)
     std::set<int64_t> matchedFormIds2;
-    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap2;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostDBFormsMap2;
     std::map<int64_t, bool> foundFormsMap3;
     formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds2, noHostDBFormsMap2, foundFormsMap3);
 

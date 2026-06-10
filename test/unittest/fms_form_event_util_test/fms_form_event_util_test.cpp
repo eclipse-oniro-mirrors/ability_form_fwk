@@ -535,7 +535,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormEventUtil_027 start";
     int32_t userId = 1;
     std::map<int64_t, bool> foundFormsMap;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     int64_t formIds[2] = { 1, 2 };
     std::string bundleName[2] = { "com.form.start", "com.form.start2" };
     std::string abilityName[2] = { "bbbbbb", "bbbbbb2" };
@@ -980,7 +980,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_052 start";
     int32_t userId = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     std::map<int64_t, bool> removedFormsMap;
     int64_t formIds[2] = { 1, 2 };
     std::string bundleName[2] = { "com.form.start", "com.form.start2" };
@@ -1007,7 +1007,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_053 start";
     int32_t userId = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     std::map<int64_t, bool> removedFormsMap;
     int64_t formIds[2] = { 1, 2 };
     std::string bundleName[2] = { "com.form.start", "com.form.start2" };
@@ -1035,7 +1035,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_054 start";
     int32_t userId = 1;
-    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     std::map<int64_t, bool> removedFormsMap;
     int64_t formIds[2] = { 1, 2 };
     std::string bundleName[2] = { "com.form.start", "com.form.start2" };
@@ -1064,7 +1064,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormEventUtil_055 start";
     int32_t userId = 1;
     std::map<int64_t, bool> foundFormsMap;
-    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::unordered_map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     int64_t formIds[2] = { 1, 2 };
     std::string bundleName[2] = { "com.form.start", "com.form.start2" };
     std::string abilityName[2] = { "bbbbbb", "bbbbbb2" };
