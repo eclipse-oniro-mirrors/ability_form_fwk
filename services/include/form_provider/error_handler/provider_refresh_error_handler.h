@@ -32,12 +32,10 @@ public:
 
     bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override;
 
-    bool HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want,
-        ConnectState state) override;
+    bool HandleDisconnectError(int64_t formId, const sptr<FormAbilityConnection> &connection) override;
 
 private:
-    FormProviderRefreshErrorHandler() = default;
-    void ExecuteRefreshRetry(int64_t formId, const Want &want);
+    void ExecuteRefreshRetry(int64_t formId, sptr<FormAbilityConnection> originalConnection);
 };
 
 }  // namespace AppExecFwk

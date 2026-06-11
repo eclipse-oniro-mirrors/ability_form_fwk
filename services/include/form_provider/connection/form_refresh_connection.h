@@ -19,6 +19,7 @@
 #include <atomic>
 
 #include "common/connection/form_ability_connection.h"
+#include "data_center/form_record/form_record.h"
 #include "form_provider/error_handler/provider_error_handler_factory.h"
 
 namespace OHOS {
@@ -30,9 +31,15 @@ namespace AppExecFwk {
  */
 class FormRefreshConnection : public FormAbilityConnection {
 public:
-    FormRefreshConnection(const int64_t formId, const Want &want, const std::string &bundleName,
-        const std::string &abilityName, bool isFreeInstall, const int32_t userId);
+    FormRefreshConnection(const int64_t formId, const Want &want, const FormRecord &record);
     virtual ~FormRefreshConnection() = default;
+
+    /**
+     * @brief Clone connection for retry policy.
+     *        Creates a new FormRefreshConnection with same formId, want, and record.
+     * @return Cloned FormRefreshConnection object (sptr<FormAbilityConnection>).
+     */
+    sptr<FormAbilityConnection> Clone() const override;
 
 protected:
     /**
@@ -70,7 +77,7 @@ protected:
 
 private:
     Want want_;
-    std::atomic<ConnectState> connectState_{ConnectState::DISCONNECTED};
+    FormRecord record_;
     DISALLOW_COPY_AND_MOVE(FormRefreshConnection);
 };
 }  // namespace AppExecFwk

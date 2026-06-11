@@ -23,7 +23,8 @@ enum class TaskType : int64_t {
     RENDER_FORM,
     DELETE_FORM_HOST_RECORD = 10000, // add form_host type base 10000
     UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
-    REFRESH_RETRY_TASK = 20001, // Refresh retry delay task key (same 20000 range as SUBSCRIBE_PROXY_RETRY_TASK)
+    SUBSCRIBE_PROXY_RETRY_TASK = 20000,
+    REFRESH_RETRY_TASK = 20001,
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms

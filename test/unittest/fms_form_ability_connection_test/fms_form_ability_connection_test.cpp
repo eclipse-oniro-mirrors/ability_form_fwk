@@ -975,4 +975,93 @@ HWTEST_F(FmsFormAbilityConnectionTest, NeedRegisterToSupplyCallback_001, TestSiz
 
     GTEST_LOG_(INFO) << "NeedRegisterToSupplyCallback_001 end";
 }
+
+/**
+ * @tc.name: SetModuleName_001
+ * @tc.desc: Verify SetModuleName when moduleName is empty string.
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormAbilityConnectionTest, SetModuleName_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetModuleName_001 start";
+    
+    std::string emptyModuleName = "";
+    
+    connection_->SetModuleName(emptyModuleName);
+    
+    EXPECT_EQ(connection_->moduleName_, emptyModuleName);
+    
+    GTEST_LOG_(INFO) << "SetModuleName_001 end";
+}
+
+/**
+ * @tc.name: SetModuleName_002
+ * @tc.desc: Verify SetModuleName when moduleName is non-empty string.
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormAbilityConnectionTest, SetModuleName_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetModuleName_002 start";
+    
+    std::string moduleName = "test_module";
+    
+    connection_->SetModuleName(moduleName);
+    
+    EXPECT_EQ(connection_->moduleName_, moduleName);
+    
+    GTEST_LOG_(INFO) << "SetModuleName_002 end";
+}
+
+/**
+ * @tc.name: ModuleName_Default_001
+ * @tc.desc: Verify moduleName_ is empty by default (no dependency on other test cases).
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormAbilityConnectionTest, ModuleName_Default_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ModuleName_Default_001 start";
+    
+    // Fresh connection from SetUp() has default empty moduleName_
+    EXPECT_TRUE(connection_->moduleName_.empty());
+    
+    GTEST_LOG_(INFO) << "ModuleName_Default_001 end";
+}
+
+/**
+ * @tc.name: ModuleName_AfterSet_002
+ * @tc.desc: Verify moduleName_ is set correctly (independent test, sets moduleName internally).
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormAbilityConnectionTest, ModuleName_AfterSet_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ModuleName_AfterSet_002 start";
+    
+    std::string moduleName = "test_module";
+    connection_->SetModuleName(moduleName);
+    
+    EXPECT_EQ(connection_->moduleName_, moduleName);
+    
+    GTEST_LOG_(INFO) << "ModuleName_AfterSet_002 end";
+}
+
+/**
+ * @tc.name: Clone_001
+ * @tc.desc: Verify Clone returns nullptr for base class.
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormAbilityConnectionTest, Clone_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "Clone_001 start";
+    
+    sptr<FormAbilityConnection> cloned = connection_->Clone();
+    
+    EXPECT_EQ(cloned, nullptr);
+    
+    GTEST_LOG_(INFO) << "Clone_001 end";
+}
 }  // namespace

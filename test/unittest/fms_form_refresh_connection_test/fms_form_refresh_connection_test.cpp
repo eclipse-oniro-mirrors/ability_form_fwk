@@ -28,6 +28,7 @@
 #include "form_provider/connection/form_acquire_state_connection.h"
 #include "bms_mgr/form_bundle_event_callback.h"
 #include "data_center/form_cache_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "form_provider/connection/form_cast_temp_connection.h"
 #include "form_provider/connection/form_delete_connection.h"
 #include "common/event/form_event_handler.h"
@@ -91,7 +92,14 @@ void FmsFormRefreshConnectionTest::TearDown()
 
 sptr<FormRefreshConnection> FmsFormRefreshConnectionTest::CreateRefreshConnection(int64_t formId, Want &want)
 {
-    return new (std::nothrow) FormRefreshConnection(formId, want, "aa", "bb", false, TEST_USER_ID);
+    FormRecord record;
+    record.formId = formId;
+    record.bundleName = "aa";
+    record.abilityName = "bb";
+    record.moduleName = "";
+    record.providerUserId = TEST_USER_ID;
+    record.needFreeInstall = false;
+    return new (std::nothrow) FormRefreshConnection(formId, want, record);
 }
 
 /**
@@ -104,12 +112,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_001, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_001 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = TEST_USER_ID;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -128,12 +131,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_002 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = TEST_USER_ID;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -154,12 +152,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_003 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = TEST_USER_ID;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -180,12 +173,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_004 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = TEST_USER_ID;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;

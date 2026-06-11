@@ -15,6 +15,7 @@
 
 #include "common/retry_policy/retry_policy.h"
 
+#include "common/connection/form_ability_connection.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -94,6 +95,16 @@ bool RetryPolicy::IsDisconnectFailed() const
 void RetryPolicy::SetDisconnectFailed(bool failed)
 {
     disconnectFailed_ = failed;
+}
+
+sptr<FormAbilityConnection> RetryPolicy::GetOriginalConnection() const
+{
+    return originalConnection_;
+}
+
+void RetryPolicy::SetOriginalConnection(const sptr<FormAbilityConnection> &connection)
+{
+    originalConnection_ = connection;
 }
 
 }  // namespace AppExecFwk

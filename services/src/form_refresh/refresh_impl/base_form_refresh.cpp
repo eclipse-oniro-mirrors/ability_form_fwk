@@ -22,7 +22,6 @@
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "form_refresh/strategy/refresh_exec_mgr.h"
 #include "fms_log_wrapper.h"
-#include "form_provider/error_handler/provider_error_handler_factory.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -129,8 +128,6 @@ int BaseFormRefresh::DoControlCheck(RefreshData &data)
 
 int BaseFormRefresh::DoRefresh(RefreshData &data)
 {
-    FormProviderErrorHandlerFactory::GetRefreshHandler()->RemoveRetryPolicy(data.formId);
-
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
     ErrCode ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, data.want);
     if (ret != ERR_OK) {

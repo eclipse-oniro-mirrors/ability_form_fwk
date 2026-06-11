@@ -18,17 +18,13 @@
 #include <cinttypes>
 #include <memory>
 
+#include "ams_mgr/form_ams_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_provider/form_provider_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-
-std::shared_ptr<FormProviderRefreshErrorHandler> FormProviderRefreshErrorHandler::Create()
-{
-    return std::shared_ptr<FormProviderRefreshErrorHandler>(new FormProviderRefreshErrorHandler());
-}
 
 bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     int64_t formId, int errorCode, const Want &want)
@@ -47,19 +43,27 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
         return true;
     }
 
+    if (policy.GetOriginalConnection() == nullptr) {
+        HILOG_ERROR("No connection in retryPolicy, abort retry for formId %{public}" PRId64, formId);
+        retryPolicyMap_.erase(formId);
+        return false;
+    }
+
     if (policy.NeedRetry()) {
         HILOG_INFO("Scheduling retry from HandleSendRequestFailed, formId %{public}" PRId64, formId);
+        sptr<FormAbilityConnection> connection = policy.GetOriginalConnection();
         policy.IncrementRetryCount();
         policy.SetDisconnectFailed(false);
         policy.SetSendRequestFailed(false);
-        ScheduleRetry(formId, want, policy,
-            [formId, want, weakPtr = weak_from_this()]() {
+        policy.SetOriginalConnection(nullptr);
+        ScheduleRetry(formId, policy,
+            [formId, connection, weakPtr = weak_from_this()]() {
                 auto handler = weakPtr.lock();
                 if (handler == nullptr) {
                     HILOG_INFO("Handler destroyed, skip retry for formId %{public}" PRId64, formId);
                     return;
                 }
-                handler->ExecuteRefreshRetry(formId, want);
+                handler->ExecuteRefreshRetry(formId, connection);
             });
         return false;
     }
@@ -69,9 +73,10 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     return false;
 }
 
-bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject,
-    const Want &want, ConnectState state)
+bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId,
+    const sptr<FormAbilityConnection> &connection)
 {
+    ConnectState state = connection->GetConnectState();
     if (state != ConnectState::CONNECTED) {
         HILOG_WARN("state not connected, not handled");
         return false;
@@ -79,6 +84,7 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId, cons
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     auto &policy = EnsureRetryPolicy(formId);
+    policy.SetOriginalConnection(connection);
     policy.SetDisconnectFailed(true);
 
     if (!policy.IsSendRequestFailed()) {
@@ -91,14 +97,15 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId, cons
         policy.IncrementRetryCount();
         policy.SetDisconnectFailed(false);
         policy.SetSendRequestFailed(false);
-        ScheduleRetry(formId, want, policy,
-            [formId, want, weakPtr = weak_from_this()]() {
+        policy.SetOriginalConnection(nullptr);
+        ScheduleRetry(formId, policy,
+            [formId, connection, weakPtr = weak_from_this()]() {
                 auto handler = weakPtr.lock();
                 if (handler == nullptr) {
                     HILOG_INFO("Handler destroyed, skip retry for formId %{public}" PRId64, formId);
                     return;
                 }
-                handler->ExecuteRefreshRetry(formId, want);
+                handler->ExecuteRefreshRetry(formId, connection);
             });
         return true;
     }
@@ -109,7 +116,7 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId, cons
 }
 
 void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(
-    int64_t formId, const Want &want)
+    int64_t formId, sptr<FormAbilityConnection> originalConnection)
 {
     FormRecord record;
     bool success = FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -126,7 +133,22 @@ void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(
         }
     }
 
-    FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, record, want);
+    sptr<FormAbilityConnection> clonedConnection = originalConnection->Clone();
+    if (clonedConnection == nullptr) {
+        HILOG_ERROR("Clone connection failed, abort retry for formId %{public}" PRId64, formId);
+        std::lock_guard<std::mutex> lock(retryPolicyMutex_);
+        retryPolicyMap_.erase(formId);
+        return;
+    }
+    
+    Want connectWant = clonedConnection->CreateConnectWant();
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        connectWant, clonedConnection, clonedConnection->GetUserId());
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("Retry connect failed, errorCode:%{public}d", errorCode);
+        std::lock_guard<std::mutex> lock(retryPolicyMutex_);
+        retryPolicyMap_.erase(formId);
+    }
 }
 
 }  // namespace AppExecFwk

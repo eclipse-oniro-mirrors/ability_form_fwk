@@ -20,6 +20,7 @@
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_data_proxy_record.h"
 #include "common/util/form_util.h"
+#include "common/util/form_task_common.h"
 #include "form_event_report.h"
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_queue.h"
@@ -29,7 +30,6 @@ namespace AppExecFwk {
 namespace {
 constexpr int SUBSCRIBE_PROXY_RETRY_TIMES = 3;
 constexpr int SUBSCRIBE_PROXY_RETRY_DELAY_TIME_MS = 30000;
-constexpr int64_t SUBSCRIBE_PROXY_RETRY_TASK = 20000; // task type base
 }
 FormDataProxyMgr::FormDataProxyMgr()
 {}
@@ -92,7 +92,8 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
     UnsubscribeFormDataById(formId);
     // cancel delay subscribe task
-    FormMgrQueue::GetInstance().CancelDelayTask(std::make_pair(SUBSCRIBE_PROXY_RETRY_TASK, formId));
+    FormMgrQueue::GetInstance().CancelDelayTask(
+        std::make_pair(static_cast<int64_t>(TaskType::SUBSCRIBE_PROXY_RETRY_TASK), formId));
     return ERR_OK;
 }
 
@@ -221,7 +222,8 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
     };
 
     HILOG_INFO("post subs proxy task, formId:%{public}" PRId64, formId);
-    FormMgrQueue::GetInstance().ScheduleDelayTask(std::make_pair(SUBSCRIBE_PROXY_RETRY_TASK, formId),
+    FormMgrQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair(static_cast<int64_t>(TaskType::SUBSCRIBE_PROXY_RETRY_TASK), formId),
         SUBSCRIBE_PROXY_RETRY_DELAY_TIME_MS, delaySubsProxyTask);
 }
 } // namespace AppExecFwk

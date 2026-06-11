@@ -17,22 +17,28 @@
 
 #include <cinttypes>
 
+#include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "data_center/form_data_mgr.h"
 #include "form_provider/form_supply_callback.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want &want,
-    const std::string &bundleName, const std::string &abilityName, bool isFreeInstall, const int32_t userId)
-    : want_(want)
+FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want &want, const FormRecord &record)
+    : want_(want), record_(record)
 {
     SetFormId(formId);
-    SetFreeInstall(isFreeInstall);
-    SetProviderKey(bundleName, abilityName, userId);
+    SetFreeInstall(record.needFreeInstall);
+    SetProviderKey(record.bundleName, record.abilityName, record.providerUserId);
+    SetModuleName(record.moduleName);
+}
+
+sptr<FormAbilityConnection> FormRefreshConnection::Clone() const
+{
+    sptr<FormRefreshConnection> clone = new FormRefreshConnection(GetFormId(), want_, record_);
+    return clone;
 }
 
 Want FormRefreshConnection::OnBuildTaskWant()
@@ -81,8 +87,9 @@ void FormRefreshConnection::OnAbilityDisconnectDone(
     FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
 
     if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED) {
+        sptr<FormAbilityConnection> connection = this;
         FormProviderErrorHandlerFactory::GetRefreshHandler()
-            ->HandleDisconnectError(GetFormId(), GetProviderToken(), want_, state);
+            ->HandleDisconnectError(GetFormId(), connection);
     }
 }
 

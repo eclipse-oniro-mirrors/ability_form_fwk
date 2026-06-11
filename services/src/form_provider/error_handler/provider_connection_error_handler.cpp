@@ -54,7 +54,7 @@ void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
     HILOG_INFO("Removed retry policy for formId %{public}" PRId64, formId);
 }
 
-void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId, const Want &want,
+void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId,
     const RetryPolicy &policy, std::function<void()> retryFunc)
 {
     int32_t delayMs = policy.CalculateNextDelay();

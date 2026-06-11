@@ -17,9 +17,13 @@
 #define OHOS_FORM_FWK_RETRY_POLICY_H
 
 #include <cstdint>
+#include "refbase.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
+// Forward declaration to avoid circular dependency
+class FormAbilityConnection;
 
 constexpr int32_t EXPONENTIAL_MULTIPLIER = 2;
 
@@ -54,11 +58,15 @@ public:
     bool IsDisconnectFailed() const;
     void SetDisconnectFailed(bool failed);
 
+    sptr<FormAbilityConnection> GetOriginalConnection() const;
+    void SetOriginalConnection(const sptr<FormAbilityConnection> &connection);
+
 private:
     bool sendRequestFailed_ = false;
     bool disconnectFailed_ = false;
     RetryPolicyConfig config_;
     int32_t retryCount_ = 0;
+    sptr<FormAbilityConnection> originalConnection_;
 };
 
 }  // namespace AppExecFwk
