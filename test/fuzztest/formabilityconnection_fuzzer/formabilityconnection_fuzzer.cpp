@@ -94,43 +94,43 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
         return true;
     }
 
-    MockFormAbilityConnection formAbilityConnection;
+    sptr<MockFormAbilityConnection> formAbilityConnection = new MockFormAbilityConnection();
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObjects = nullptr;
     int resultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     bool isFreeInstall = fdp->ConsumeBool();
-    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    formAbilityConnection->SetFreeInstall(isFreeInstall);
     
     int32_t connectId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
-    formAbilityConnection.SetConnectId(connectId);
-    formAbilityConnection.GetConnectId();
+    formAbilityConnection->SetConnectId(connectId);
+    int32_t getConnectId = formAbilityConnection->GetConnectId();
     
     int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
-    formAbilityConnection.SetFormId(formId);
-    formAbilityConnection.GetFormId();
+    formAbilityConnection->SetFormId(formId);
+    int64_t getFormId = formAbilityConnection->GetFormId();
     
     std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     std::string abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
-    formAbilityConnection.SetProviderKey(bundleName, abilityName, userId);
-    formAbilityConnection.GetProviderKey();
+    formAbilityConnection->SetProviderKey(bundleName, abilityName, userId);
+    std::string getProviderKey = formAbilityConnection->GetProviderKey();
     
     sptr<IRemoteObject> hostToken = nullptr;
-    formAbilityConnection.SetHostToken(hostToken);
-    formAbilityConnection.GetHostToken();
+    formAbilityConnection->SetHostToken(hostToken);
+    formAbilityConnection->GetHostToken();
     
     sptr<IRemoteObject> providerToken = nullptr;
-    formAbilityConnection.SetProviderToken(providerToken);
-    formAbilityConnection.GetProviderToken();
+    formAbilityConnection->SetProviderToken(providerToken);
+    sptr<IRemoteObject> getProviderToken = formAbilityConnection->GetProviderToken();
     
-    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
-    formAbilityConnection.onFormAppConnect();
-    formAbilityConnection.ReportFormAppUnbindEvent();
-    formAbilityConnection.GetBundleName();
-    formAbilityConnection.GetAppFormPid();
-    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    formAbilityConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection->onFormAppConnect();
+    formAbilityConnection->ReportFormAppUnbindEvent();
+    formAbilityConnection->GetBundleName();
+    formAbilityConnection->GetAppFormPid();
+    formAbilityConnection->OnAbilityDisconnectDone(element, resultCode);
     wptr<IRemoteObject> remoteObject1;
-    formAbilityConnection.OnConnectDied(remoteObject1);
+    formAbilityConnection->OnConnectDied(remoteObject1);
     
     DoSomethingInterestingPart2(fdp);
     

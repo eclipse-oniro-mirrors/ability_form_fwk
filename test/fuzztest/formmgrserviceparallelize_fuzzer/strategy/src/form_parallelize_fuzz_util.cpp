@@ -16,6 +16,8 @@
 #include "../include/form_parallelize_fuzz_util.h"
 #include "../include/form_constants_fuzzer.h"
 
+#include <sstream>
+
 using namespace OHOS::FuzzerConstants;
 
 namespace OHOS {
@@ -67,7 +69,37 @@ void FormParallelizeFuzzUtil::FillRunningFormInfo(FuzzedDataProvider &provider, 
 
 void FormParallelizeFuzzUtil::FillFormProviderData(FuzzedDataProvider &provider, FormProviderData &data)
 {
-    std::string jsonStr = "{\"key\":\"" + provider.ConsumeRandomLengthString(NUMBER_32) + "\"}";
+    std::string randomData = provider.ConsumeRandomLengthString(NUMBER_32);
+    std::ostringstream escapedStream;
+    for (char d : randomData) {
+        switch (d) {
+            case '"':
+                escapedStream << "\\\"";
+                break;
+            case '\\':
+                escapedStream << "\\\\";
+                break;
+            case '\b':
+                escapedStream << "\\b";
+                break;
+            case '\f':
+                escapedStream << "\\f";
+                break;
+            case '\n':
+                escapedStream << "\\n";
+                break;
+            case '\r':
+                escapedStream << "\\r";
+                break;
+            case '\t':
+                escapedStream << "\\t";
+                break;
+            default:
+                escapedStream << d;
+                break;
+        }
+    }
+    std::string jsonStr = "{\"key\":\"" + escapedStream.str() + "\"}";
     data = FormProviderData(jsonStr);
 }
 
