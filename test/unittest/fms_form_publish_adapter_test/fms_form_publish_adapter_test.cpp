@@ -71,6 +71,7 @@ public:
 
 constexpr int32_t TEST_USER_ID = 100;
 constexpr int32_t TEST_CALLING_UID = 20000000;
+constexpr int32_t TEST_CALLING_PID = 1234;
 constexpr int64_t TEST_FORM_ID = 123456789L;
 constexpr int32_t TEST_DIMENSION_ID = 2;
 constexpr int32_t SYSTEM_UID = 1000;
@@ -140,6 +141,20 @@ void FmsFormPublishAdapterTest::SetUp()
 
 void FmsFormPublishAdapterTest::TearDown()
 {
+    testing::Mock::VerifyAndClear(MockFormDataMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormInfoMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBmsHelper::obj.get());
+    testing::Mock::VerifyAndClear(MockFormTimerMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormDbCache::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBundleForbidMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBundleLockMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormExemptLockMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormDistributedMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockParamControl::obj.get());
+    testing::Mock::VerifyAndClear(MockIPCSkeleton::obj);
+    testing::Mock::VerifyAndClear(MockFormCallbackAdapter::obj.get());
+    testing::Mock::VerifyAndClear(MockFormAmsHelper::obj.get());
+    testing::Mock::VerifyAndClear(MockFormEcologicalRuleClient::obj.get());
 }
 
 // ========== CheckFormBundleName Tests ==========
@@ -1043,7 +1058,11 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_001, TestSize.Level1)
     EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_INVALID_PARAM));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
+        .WillRepeatedly(Return(TEST_CALLING_PID));
+    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(false), Return(ERR_OK)));
 
     Want want;
     auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
@@ -1086,6 +1105,8 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_002, TestSize.Level1)
     ASSERT_NE(bundleMgr, nullptr);
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
 
     auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
     EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
@@ -1106,6 +1127,8 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_005, TestSize.Level1)
     ASSERT_NE(bundleMgr, nullptr);
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
 
     auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
     EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);

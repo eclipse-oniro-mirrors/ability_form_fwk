@@ -108,6 +108,17 @@ void FmsFormLifecycleAdapterTest::SetUp()
 
 void FmsFormLifecycleAdapterTest::TearDown()
 {
+    testing::Mock::VerifyAndClear(MockFormDataMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormInfoMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBmsHelper::obj.get());
+    testing::Mock::VerifyAndClear(MockFormTimerMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormDbCache::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBundleForbidMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBundleLockMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormExemptLockMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormDistributedMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockParamControl::obj.get());
+    testing::Mock::VerifyAndClear(MockIPCSkeleton::obj);
 }
 
 // ========== AddForm Tests ==========
