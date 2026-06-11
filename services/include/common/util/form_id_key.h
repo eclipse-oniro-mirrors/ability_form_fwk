@@ -45,17 +45,27 @@ public:
             && formName == formIdKey.formName;
     }
     /**
-     * @brief overloaded == for Indicates the formDBInfo by formId
-     * @return Returns true if the data equal; returns false otherwise.
+     * @brief overloaded < for comparing FormIdKey with dictionary order
+     * @return Returns true if this object is less than the other; returns false otherwise.
      */
     bool operator< (const FormIdKey &formIdKey) const
     {
-        return specificationId != formIdKey.specificationId
-            || orientation != formIdKey.orientation
-            || bundleName != formIdKey.bundleName
-            || moduleName != formIdKey.moduleName
-            || abilityName != formIdKey.abilityName
-            || formName != formIdKey.formName;
+        if (bundleName != formIdKey.bundleName) {
+            return bundleName < formIdKey.bundleName;
+        }
+        if (moduleName != formIdKey.moduleName) {
+            return moduleName < formIdKey.moduleName;
+        }
+        if (abilityName != formIdKey.abilityName) {
+            return abilityName < formIdKey.abilityName;
+        }
+        if (formName != formIdKey.formName) {
+            return formName < formIdKey.formName;
+        }
+        if (specificationId != formIdKey.specificationId) {
+            return specificationId < formIdKey.specificationId;
+        }
+        return orientation < formIdKey.orientation;
     }
     int hashCode()
     {
