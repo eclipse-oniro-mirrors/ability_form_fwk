@@ -1506,7 +1506,7 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormSize_Int32_001, TestSize.Level1)
  
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
         .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
-  
+
     auto result = FormDataAdapter::GetInstance().UpdateFormSize(TEST_FORM_ID, TEST_DIMENSION_ID, newRect);
     EXPECT_NE(result, ERR_OK);
  
@@ -1533,7 +1533,7 @@ HWTEST_F(FmsFormDataAdapterTest, ReloadForms_003, TestSize.Level1)
         .WillRepeatedly(Return(TEST_CALLING_PID));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
-  
+
     FormDataAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
     // Note: In actual test, CheckUIAbilityContext fails, so this test may not reach BatchRequestRefresh
     // The test verifies the logic flow when conditions are met
