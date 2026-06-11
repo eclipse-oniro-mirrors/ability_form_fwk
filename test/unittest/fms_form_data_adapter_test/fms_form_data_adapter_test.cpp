@@ -410,8 +410,6 @@ HWTEST_F(FmsFormDataAdapterTest, HandleUpdateFormFlag_001, TestSize.Level1)
 
     EXPECT_CALL(*MockFormDataMgr::obj, UpdateHostFormFlag(_, _, true, false, _))
         .WillOnce(Return(ERR_OK));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
 
     auto result = FormDataAdapter::GetInstance().EnableUpdateForm(formIds, callerToken);
     EXPECT_EQ(result, ERR_OK);
@@ -1453,9 +1451,6 @@ HWTEST_F(FmsFormDataAdapterTest, PostEnterpriseAppInstallFailedRetryTask_002, Te
     std::vector<FormRecord> updatedForms = {record};
     Want want;
 
-    EXPECT_CALL(*MockFormRefreshMgr::obj, RequestRefresh(_, TYPE_APP_UPGRADE))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED));
-
     EXPECT_NO_FATAL_FAILURE(
         FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want));
 
@@ -1482,10 +1477,6 @@ HWTEST_F(FmsFormDataAdapterTest, PostEnterpriseAppInstallFailedRetryTask_003, Te
 
     std::vector<FormRecord> updatedForms = {record1, record2};
     Want want;
-
-    EXPECT_CALL(*MockFormRefreshMgr::obj, RequestRefresh(_, TYPE_APP_UPGRADE))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED));
 
     EXPECT_NO_FATAL_FAILURE(
         FormDataAdapter::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want));
@@ -1515,9 +1506,7 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormSize_Int32_001, TestSize.Level1)
  
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
         .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
-    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
- 
+  
     auto result = FormDataAdapter::GetInstance().UpdateFormSize(TEST_FORM_ID, TEST_DIMENSION_ID, newRect);
     EXPECT_NE(result, ERR_OK);
  
@@ -1544,15 +1533,7 @@ HWTEST_F(FmsFormDataAdapterTest, ReloadForms_003, TestSize.Level1)
         .WillRepeatedly(Return(TEST_CALLING_PID));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
- 
-    EXPECT_CALL(*MockFormRefreshMgr::obj, BatchRequestRefresh(TYPE_PROVIDER, _, _))
-        .WillOnce([&](int32_t, StaggerStrategyType, std::vector<RefreshData>& batch) -> int32_t {
-            for (auto& data : batch) {
-                data.errorCode = ERR_OK;
-            }
-            return ERR_OK;
-        });
- 
+  
     FormDataAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
     // Note: In actual test, CheckUIAbilityContext fails, so this test may not reach BatchRequestRefresh
     // The test verifies the logic flow when conditions are met

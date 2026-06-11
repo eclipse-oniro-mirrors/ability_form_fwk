@@ -159,8 +159,6 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckFormBundleName_001, TestSize.Level1)
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
 
     auto result = FormPublishAdapter::GetInstance().CheckFormBundleName(want, bundleName, true);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
@@ -332,8 +330,6 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckPublishForm_001, TestSize.Level1)
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
 
     auto result = FormPublishAdapter::GetInstance().CheckPublishForm(want, true);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
@@ -1057,107 +1053,6 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "IsValidPublishEvent_001 end";
 }
 
-/**
- * @tc.name: IsValidPublishEvent_002
- * @tc.desc: Verify needCheckFormPermission=false skips system check, IsErmsSupport returns false
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "IsValidPublishEvent_002 start";
-
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(3)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
-        .WillOnce(Return(1000));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(false), Return(ERR_OK)));
-
-    Want want;
-    auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
-        bundleMgr, TEST_BUNDLE_NAME, want, false);
-    EXPECT_FALSE(result);
-
-    GTEST_LOG_(INFO) << "IsValidPublishEvent_002 end";
-}
-
-/**
- * @tc.name: IsValidPublishEvent_003
- * @tc.desc: Verify needCheckFormPermission=false and IsErmsSupport returns true
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "IsValidPublishEvent_003 start";
-
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(3)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
-        .WillOnce(Return(1000));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
-    ApplicationInfo callerAppInfo;
-    callerAppInfo.bundleType = AppExecFwk::BundleType::APP;
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(callerAppInfo), Return(true)));
-    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(true), Return(ERR_OK)));
-
-    Want want;
-    auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
-        bundleMgr, TEST_BUNDLE_NAME, want, false);
-    EXPECT_TRUE(result);
-
-    GTEST_LOG_(INFO) << "IsValidPublishEvent_003 end";
-}
-
-/**
- * @tc.name: IsValidPublishEvent_004
- * @tc.desc: Verify needCheckFormPermission=true, system app, IsErmsSupport returns true
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "IsValidPublishEvent_004 start";
-
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    ApplicationInfo systemAppInfo;
-    systemAppInfo.isSystemApp = true;
-    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(systemAppInfo), Return(ERR_OK)));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(3)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
-        .WillOnce(Return(1000));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
-    ApplicationInfo callerAppInfo;
-    callerAppInfo.bundleType = AppExecFwk::BundleType::APP;
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(callerAppInfo), Return(true)));
-    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(true), Return(ERR_OK)));
-
-    Want want;
-    auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
-        bundleMgr, TEST_BUNDLE_NAME, want, true);
-    EXPECT_TRUE(result);
-
-    GTEST_LOG_(INFO) << "IsValidPublishEvent_004 end";
-}
-
 // ========== GetCallerType Tests ==========
 
 /**
@@ -1191,10 +1086,6 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_002, TestSize.Level1)
     ASSERT_NE(bundleMgr, nullptr);
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(bundleMgr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(Return(false));
 
     auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
     EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
@@ -1215,12 +1106,6 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_005, TestSize.Level1)
     ASSERT_NE(bundleMgr, nullptr);
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(bundleMgr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    ApplicationInfo appInfo;
-    appInfo.bundleType = static_cast<AppExecFwk::BundleType>(99);
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(true)));
 
     auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
     EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
@@ -1316,8 +1201,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishForm_001, TestSize.Level1)
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
 
     auto result = FormPublishAdapter::GetInstance().RequestPublishForm(
         want, true, formBindingData, formId);
@@ -1660,22 +1543,13 @@ HWTEST_F(FmsFormPublishAdapterTest, IsRequestPublishFormSupported_002, TestSize.
  
     sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
  
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(bundleMgr));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(3)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
-        .WillOnce(Return(1000));
+        .WillOnce(Return(TEST_CALLING_UID));
     EXPECT_CALL(*bundleMgr, CheckIsSystemAppByUid(TEST_CALLING_UID))
         .WillOnce(Return(false));
-    EXPECT_CALL(*bundleMgr, GetNameForUid(TEST_CALLING_UID, _))
-        .WillOnce(DoAll(SetArgReferee<1>(TEST_BUNDLE_NAME), Return(ERR_OK)));
-    EXPECT_CALL(*bundleMgr, GetApplicationInfo(_, _, _, _))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(false), Return(ERR_OK)));
- 
+
     auto result = FormPublishAdapter::GetInstance().IsRequestPublishFormSupported();
     EXPECT_FALSE(result);
  

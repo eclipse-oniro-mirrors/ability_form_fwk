@@ -151,6 +151,24 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName,
     return false;
 }
 
+ErrCode FormDataMgr::SetFormLock(const int64_t formId, const bool lock)
+{
+    GTEST_LOG_(INFO) << "SetFormLock called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->SetFormLock(formId, lock);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+bool FormDataMgr::ExistTempForm(const int64_t formId) const
+{
+    GTEST_LOG_(INFO) << "ExistTempForm called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->ExistTempForm(formId);
+    }
+    return false;
+}
+
 void FormDataMgr::GetFormHostRecord(const int64_t formId,
     std::vector<FormHostRecord> &formHostRecords) const
 {
