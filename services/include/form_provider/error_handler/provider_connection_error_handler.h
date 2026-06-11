@@ -20,6 +20,7 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "refbase.h"
 #include "common/connection/form_ability_connection.h"
 #include "common/retry_policy/retry_policy.h"
 #include "want.h"
@@ -28,7 +29,7 @@ namespace OHOS {
 namespace AppExecFwk {
 using Want = AAFwk::Want;
 
-class FormProviderConnectionErrorHandler {
+class FormProviderConnectionErrorHandler : public RefBase {
 public:
     virtual ~FormProviderConnectionErrorHandler() = default;
 
@@ -36,12 +37,11 @@ public:
 
     virtual bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) = 0;
 
-    virtual bool HandleDisconnectError(int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want,
-        ConnectState state) = 0;
+    virtual bool HandleDisconnectError(int64_t formId, const sptr<FormAbilityConnection> &connection) = 0;
 
     void RemoveRetryPolicy(int64_t formId);
 
-    virtual void ScheduleRetry(int64_t formId, const Want &want, const RetryPolicy &policy,
+    virtual void ScheduleRetry(int64_t formId, const RetryPolicy &policy,
         std::function<void()> retryFunc);
 
 protected:

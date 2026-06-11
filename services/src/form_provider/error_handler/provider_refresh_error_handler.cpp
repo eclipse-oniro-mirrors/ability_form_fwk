@@ -57,8 +57,8 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
         policy.SetSendRequestFailed(false);
         policy.SetOriginalConnection(nullptr);
         ScheduleRetry(formId, policy,
-            [formId, connection, weakPtr = weak_from_this()]() {
-                auto handler = weakPtr.lock();
+            [formId, connection, weakHandler = wptr<FormProviderRefreshErrorHandler>(this)]() {
+                sptr<FormProviderRefreshErrorHandler> handler = weakHandler.promote();
                 if (handler == nullptr) {
                     HILOG_INFO("Handler destroyed, skip retry for formId %{public}" PRId64, formId);
                     return;
@@ -99,8 +99,8 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId,
         policy.SetSendRequestFailed(false);
         policy.SetOriginalConnection(nullptr);
         ScheduleRetry(formId, policy,
-            [formId, connection, weakPtr = weak_from_this()]() {
-                auto handler = weakPtr.lock();
+            [formId, connection, weakHandler = wptr<FormProviderRefreshErrorHandler>(this)]() {
+                sptr<FormProviderRefreshErrorHandler> handler = weakHandler.promote();
                 if (handler == nullptr) {
                     HILOG_INFO("Handler destroyed, skip retry for formId %{public}" PRId64, formId);
                     return;

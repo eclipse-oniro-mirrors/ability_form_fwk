@@ -16,19 +16,15 @@
 #ifndef OHOS_FORM_FWK_PROVIDER_REFRESH_ERROR_HANDLER_H
 #define OHOS_FORM_FWK_PROVIDER_REFRESH_ERROR_HANDLER_H
 
-#include <memory>
-
 #include "form_provider/error_handler/provider_connection_error_handler.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-class FormProviderRefreshErrorHandler : public FormProviderConnectionErrorHandler,
-    public std::enable_shared_from_this<FormProviderRefreshErrorHandler> {
+class FormProviderRefreshErrorHandler : public FormProviderConnectionErrorHandler {
 public:
+    FormProviderRefreshErrorHandler() = default;
     DISALLOW_COPY_AND_MOVE(FormProviderRefreshErrorHandler);
-
-    static std::shared_ptr<FormProviderRefreshErrorHandler> Create();
 
     bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override;
 

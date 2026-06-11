@@ -485,3 +485,23 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, RetryCountIncrement_001, TestSize.L
 
     GTEST_LOG_(INFO) << "RetryCountIncrement_001 end";
 }
+/**
+ * @tc.name: WptrCapture_001
+ * @tc.desc: Verify wptr capture works correctly with RefBase inheritance.
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsProviderRefreshErrorHandlerTest, WptrCapture_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "WptrCapture_001 start";
+    
+    sptr<FormProviderRefreshErrorHandler> handler = FormProviderErrorHandlerFactory::GetRefreshHandler();
+    wptr<FormProviderRefreshErrorHandler> weakHandler = handler;
+    
+    sptr<FormProviderRefreshErrorHandler> promoted = weakHandler.promote();
+    EXPECT_NE(promoted, nullptr);
+    EXPECT_EQ(promoted, handler);
+    
+    GTEST_LOG_(INFO) << "WptrCapture_001 end";
+}
+}  // namespace

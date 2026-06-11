@@ -20,12 +20,6 @@ namespace AppExecFwk {
 std::shared_ptr<MockFormProviderRefreshErrorHandler> MockFormProviderRefreshErrorHandler::obj = nullptr;
 
 // --- FormProviderRefreshErrorHandler (derived class overrides) ---
-std::shared_ptr<FormProviderRefreshErrorHandler> FormProviderRefreshErrorHandler::Create()
-{
-    GTEST_LOG_(INFO) << "FormProviderRefreshErrorHandler::Create called";
-    return std::shared_ptr<FormProviderRefreshErrorHandler>(new FormProviderRefreshErrorHandler());
-}
-
 bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     int64_t formId, int errorCode, const Want &want)
 {
@@ -37,22 +31,29 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
 }
 
 bool FormProviderRefreshErrorHandler::HandleDisconnectError(
-    int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want, ConnectState state)
+    int64_t formId, const sptr<FormAbilityConnection> &connection)
 {
     GTEST_LOG_(INFO) << "HandleDisconnectError called formId:" << formId;
     if (MockFormProviderRefreshErrorHandler::obj) {
-        return MockFormProviderRefreshErrorHandler::obj->HandleDisconnectError(formId, remoteObject, want, state);
+        return MockFormProviderRefreshErrorHandler::obj->HandleDisconnectError(formId, connection);
     }
     return false;
 }
 
-void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(int64_t formId, const Want &want)
+void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(int64_t formId,
+    sptr<FormAbilityConnection> originalConnection)
 {
-    GTEST_LOG_(INFO) << "ExecuteRefreshRetry called";
+    GTEST_LOG_(INFO) << "ExecuteRefreshRetry called (private stub)";
 }
 
 // --- FormProviderConnectionErrorHandler (base class methods) ---
-void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId, const Want &want,
+bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)
+{
+    GTEST_LOG_(INFO) << "IsRemoteDead stub called";
+    return false;
+}
+
+void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId,
     const RetryPolicy &policy, std::function<void()> retryFunc)
 {
     GTEST_LOG_(INFO) << "ScheduleRetry stub called";
@@ -63,10 +64,17 @@ void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
     GTEST_LOG_(INFO) << "RemoveRetryPolicy stub called";
 }
 
-bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)
+RetryPolicy FormProviderConnectionErrorHandler::GetDefaultRetryPolicy() const
 {
-    GTEST_LOG_(INFO) << "IsRemoteDead stub called";
-    return false;
+    GTEST_LOG_(INFO) << "GetDefaultRetryPolicy stub called";
+    return RetryPolicy();
+}
+
+RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formId)
+{
+    GTEST_LOG_(INFO) << "EnsureRetryPolicy stub called";
+    static RetryPolicy defaultPolicy;
+    return defaultPolicy;
 }
 
 }  // namespace AppExecFwk

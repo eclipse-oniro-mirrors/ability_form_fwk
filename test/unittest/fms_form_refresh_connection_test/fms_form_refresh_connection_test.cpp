@@ -199,7 +199,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DisconnectError_0
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
     conn->OnPreConnectTask();
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(1, _, _, _)).Times(1);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(1, _)).Times(1);
     conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
     EXPECT_EQ(0, conn->GetConnectId());
 
@@ -223,7 +223,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_ErrOk_001, TestSi
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
     conn->OnPreConnectTask();
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
     conn->OnAbilityDisconnectDone(element, ERR_OK);
     EXPECT_EQ(0, conn->GetConnectId());
 
@@ -246,7 +246,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_NotConnected_001,
     sptr<FormRefreshConnection> conn = CreateRefreshConnection(3, want);
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
     conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
     EXPECT_EQ(0, conn->GetConnectId());
 
@@ -270,7 +270,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_OtherResultCode_0
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
     conn->OnPreConnectTask();
-    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
     conn->OnAbilityDisconnectDone(element, -2);
     EXPECT_EQ(0, conn->GetConnectId());
 

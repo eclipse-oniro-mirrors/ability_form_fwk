@@ -29,7 +29,7 @@ public:
     MOCK_METHOD(bool, HandleSendRequestFailed, (int64_t formId,
         (int errorCode), (const Want &want)));
     MOCK_METHOD(bool, HandleDisconnectError, (int64_t formId,
-        (const sptr<IRemoteObject> &remoteObject), (const Want &want), (ConnectState state)));
+        (const sptr<FormAbilityConnection> &connection)));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
