@@ -163,12 +163,12 @@ FormItemInfo GenerateFormItemInfo(FuzzedDataProvider *fdp)
     formInfo.SetDescription(description);
     
     formInfo.SetFormLocation(static_cast<OHOS::AppExecFwk::Constants::FormLocation>(
-        fdp->ConsumeIntegralInRange<int32_t>(0, 4)));
+        fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_LOCATION)));
     formInfo.SetIsThemeForm(fdp->ConsumeBool());
-    formInfo.SetFormBundleType(static_cast<BundleType>(fdp->ConsumeIntegralInRange<int32_t>(0, 2)));
+    formInfo.SetFormBundleType(static_cast<BundleType>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_BUNDLE_TYPE)));
     formInfo.SetEnableForm(fdp->ConsumeBool());
     formInfo.SetRenderingMode(static_cast<OHOS::AppExecFwk::Constants::RenderingMode>(
-        fdp->ConsumeIntegralInRange<int32_t>(0, 2)));
+        fdp->ConsumeIntegralInRange<int32_t>(0, MAX_RENDERING_MODE)));
     formInfo.SetLockForm(fdp->ConsumeBool());
     formInfo.SetProtectForm(fdp->ConsumeBool());
     formInfo.SetDataProxyIgnoreFormVisibility(fdp->ConsumeBool());
@@ -259,7 +259,6 @@ std::vector<FormDataProxy> GenerateFormDataProxies(FuzzedDataProvider *fdp)
     for (int32_t i = 0; i < size; i++) {
         std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
         std::string abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-        
         if (!bundleName.empty() && !abilityName.empty()) {
             FormDataProxy proxy(bundleName, abilityName);
             proxies.push_back(proxy);

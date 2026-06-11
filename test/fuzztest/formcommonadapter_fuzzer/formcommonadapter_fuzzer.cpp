@@ -134,7 +134,8 @@ FormRecord GenerateFormRecord(FuzzedDataProvider *fdp)
     record.providerUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
     record.isDataProxy = fdp->ConsumeBool();
     record.isSystemApp = fdp->ConsumeBool();
-    record.formLocation = static_cast<Constants::FormLocation>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_LOCATION));
+    record.formLocation = static_cast<Constants::FormLocation>(fdp->ConsumeIntegralInRange<int32_t>(0,
+        MAX_FORM_LOCATION));
     return record;
 }
 
