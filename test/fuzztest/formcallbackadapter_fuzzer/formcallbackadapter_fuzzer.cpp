@@ -51,7 +51,7 @@ Want GenerateWant(FuzzedDataProvider *fdp)
 {
     Want want;
     want.SetElementName(fdp->ConsumeRandomLengthString(MAX_LENGTH),
-                        fdp->ConsumeRandomLengthString(MAX_LENGTH));
+        fdp->ConsumeRandomLengthString(MAX_LENGTH));
     want.SetAction(fdp->ConsumeRandomLengthString(MAX_LENGTH));
     return want;
 }
@@ -59,7 +59,7 @@ Want GenerateWant(FuzzedDataProvider *fdp)
 std::vector<int64_t> GenerateFormIds(FuzzedDataProvider *fdp)
 {
     std::vector<int64_t> formIds;
-    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_VECTOR_SIZE);
+    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_VECTOR_SIZE);
     for (int32_t i = 0; i < size; i++) {
         formIds.push_back(fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID));
     }
@@ -95,7 +95,7 @@ TemplateFormDetailInfo GenerateTemplateFormDetailInfo(FuzzedDataProvider *fdp)
 std::vector<TemplateFormDetailInfo> GenerateTemplateFormDetailInfos(FuzzedDataProvider *fdp)
 {
     std::vector<TemplateFormDetailInfo> infos;
-    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_VECTOR_SIZE);
+    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_VECTOR_SIZE);
     for (int32_t i = 0; i < size; i++) {
         infos.push_back(GenerateTemplateFormDetailInfo(fdp));
     }
@@ -118,7 +118,7 @@ FormCustomConfig GenerateFormCustomConfig(FuzzedDataProvider *fdp)
 std::vector<FormCustomConfig> GenerateFormCustomConfigs(FuzzedDataProvider *fdp)
 {
     std::vector<FormCustomConfig> configs;
-    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_VECTOR_SIZE);
+    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_VECTOR_SIZE);
     for (int32_t i = 0; i < size; i++) {
         configs.push_back(GenerateFormCustomConfig(fdp));
     }
@@ -138,7 +138,7 @@ FormRecordFilter GenerateFormRecordFilter(FuzzedDataProvider *fdp)
 std::vector<FormRecordFilter> GenerateFormRecordFilters(FuzzedDataProvider *fdp)
 {
     std::vector<FormRecordFilter> filters;
-    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_VECTOR_SIZE);
+    int32_t size = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_VECTOR_SIZE);
     for (int32_t i = 0; i < size; i++) {
         filters.push_back(GenerateFormRecordFilter(fdp));
     }

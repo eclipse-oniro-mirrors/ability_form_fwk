@@ -15,6 +15,7 @@
 
 #include "formcommonadapter_fuzzer.h"
 
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
@@ -44,44 +45,74 @@ constexpr int32_t MAX_DIMENSION_ID = 10;
 constexpr int32_t MIN_DIMENSION_ID = 0;
 constexpr int32_t MAX_CALLING_UID = 10000;
 constexpr int32_t MIN_CALLING_UID = 0;
+constexpr int32_t MAX_UPDATE_DURATION = 3600;
+constexpr int32_t MAX_HOUR = 23;
+constexpr int32_t MAX_MINUTE = 59;
+constexpr int32_t MAX_VERSION_CODE = 1000;
+constexpr int32_t MIN_VERSION_CODE = 1;
+constexpr int32_t MAX_COMPATIBLE_VERSION = 100;
+constexpr int32_t MIN_COMPATIBLE_VERSION = 1;
+constexpr int32_t MAX_FORM_TYPE = 2;
+constexpr int32_t MAX_PRIVACY_LEVEL = 3;
+constexpr int32_t MAX_FORM_LOCATION = 4;
+constexpr int32_t MAX_FORM_LOCATION_TYPE = 5;
+constexpr int32_t MAX_STRING_LENGTH_16 = 16;
+constexpr int32_t MAX_STRING_LENGTH_32 = 32;
+constexpr int32_t MAX_STRING_LENGTH_64 = 64;
+constexpr int32_t MAX_STRING_LENGTH_256 = 256;
+constexpr int32_t MAX_BUNDLE_TYPE = 2;
+constexpr int32_t MAX_RENDERING_MODE = 2;
+
+std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
+{
+    std::string result = fdp->ConsumeRandomLengthString(maxLength);
+    std::string safeResult;
+    for (char c : result) {
+        if (std::isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+            safeResult += c;
+        } else {
+            safeResult += '_';
+        }
+    }
+    return safeResult.empty() ? "default" : safeResult;
+}
 
 Want GenerateWant(FuzzedDataProvider *fdp)
 {
     Want want;
-    want.SetElementName(fdp->ConsumeRandomLengthString(MAX_LENGTH),
-                        fdp->ConsumeRandomLengthString(MAX_LENGTH));
-    want.SetAction(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+    want.SetElementName(GenerateSafeString(fdp, MAX_LENGTH), GenerateSafeString(fdp, MAX_LENGTH));
+    want.SetAction(GenerateSafeString(fdp, MAX_LENGTH));
     return want;
 }
 
 FormInfo GenerateFormInfo(FuzzedDataProvider *fdp)
 {
     FormInfo formInfo;
-    formInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.name = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.description = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.type = static_cast<FormType>(fdp->ConsumeIntegral<int32_t>());
-    formInfo.uiSyntax = static_cast<FormType>(fdp->ConsumeIntegral<int32_t>());
+    formInfo.bundleName = GenerateSafeString(fdp, MAX_LENGTH);
+    formInfo.moduleName = GenerateSafeString(fdp, MAX_LENGTH);
+    formInfo.abilityName = GenerateSafeString(fdp, MAX_LENGTH);
+    formInfo.name = GenerateSafeString(fdp, MAX_LENGTH);
+    formInfo.description = GenerateSafeString(fdp, MAX_LENGTH);
+    formInfo.type = static_cast<FormType>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_TYPE));
+    formInfo.uiSyntax = static_cast<FormType>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_TYPE));
     formInfo.defaultDimension = fdp->ConsumeIntegralInRange<int32_t>(MIN_DIMENSION_ID, MAX_DIMENSION_ID);
     formInfo.updateEnabled = fdp->ConsumeBool();
     formInfo.updateDuration = fdp->ConsumeIntegral<int64_t>();
-    formInfo.scheduledUpdateTime = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.scheduledUpdateTime = GenerateSafeString(fdp, MAX_LENGTH);
     formInfo.isDynamic = fdp->ConsumeBool();
     formInfo.isTemplateForm = fdp->ConsumeBool();
     formInfo.transparencyEnabled = fdp->ConsumeBool();
-    formInfo.privacyLevel = fdp->ConsumeIntegral<int32_t>();
+    formInfo.privacyLevel = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_PRIVACY_LEVEL);
     return formInfo;
 }
 
 FormMajorInfo GenerateFormMajorInfo(FuzzedDataProvider *fdp)
 {
     FormMajorInfo majorInfo;
-    majorInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    majorInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    majorInfo.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    majorInfo.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    majorInfo.bundleName = GenerateSafeString(fdp, MAX_LENGTH);
+    majorInfo.moduleName = GenerateSafeString(fdp, MAX_LENGTH);
+    majorInfo.abilityName = GenerateSafeString(fdp, MAX_LENGTH);
+    majorInfo.formName = GenerateSafeString(fdp, MAX_LENGTH);
     majorInfo.dimension = fdp->ConsumeIntegralInRange<int32_t>(MIN_DIMENSION_ID, MAX_DIMENSION_ID);
     return majorInfo;
 }
@@ -90,21 +121,100 @@ FormRecord GenerateFormRecord(FuzzedDataProvider *fdp)
 {
     FormRecord record;
     record.formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
-    record.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    record.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    record.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    record.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    record.bundleName = GenerateSafeString(fdp, MAX_LENGTH);
+    record.moduleName = GenerateSafeString(fdp, MAX_LENGTH);
+    record.abilityName = GenerateSafeString(fdp, MAX_LENGTH);
+    record.formName = GenerateSafeString(fdp, MAX_LENGTH);
     record.specification = fdp->ConsumeIntegralInRange<int32_t>(MIN_DIMENSION_ID, MAX_DIMENSION_ID);
     record.isEnableUpdate = fdp->ConsumeBool();
     record.formTempFlag = fdp->ConsumeBool();
     record.updateDuration = fdp->ConsumeIntegral<int64_t>();
-    record.updateAtHour = fdp->ConsumeIntegralInRange<int32_t>(0, 23);
-    record.updateAtMin = fdp->ConsumeIntegralInRange<int32_t>(0, 59);
+    record.updateAtHour = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_HOUR);
+    record.updateAtMin = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_MINUTE);
     record.providerUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
     record.isDataProxy = fdp->ConsumeBool();
     record.isSystemApp = fdp->ConsumeBool();
-    record.formLocation = static_cast<Constants::FormLocation>(fdp->ConsumeIntegral<int32_t>());
+    record.formLocation = static_cast<Constants::FormLocation>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_LOCATION));
     return record;
+}
+
+HapModuleInfo GenerateHapModuleInfo(FuzzedDataProvider *fdp)
+{
+    HapModuleInfo hapModuleInfo;
+    hapModuleInfo.moduleName = GenerateSafeString(fdp, MAX_LENGTH);
+    hapModuleInfo.packageName = GenerateSafeString(fdp, MAX_LENGTH);
+    hapModuleInfo.hapPath = GenerateSafeString(fdp, MAX_LENGTH);
+    hapModuleInfo.versionCode = fdp->ConsumeIntegralInRange<uint32_t>(MIN_VERSION_CODE, MAX_VERSION_CODE);
+
+    hapModuleInfo.abilityInfos.clear();
+
+    return hapModuleInfo;
+}
+
+FormItemInfo GenerateFormItemInfo(FuzzedDataProvider *fdp)
+{
+    FormItemInfo itemInfo;
+    itemInfo.SetFormId(fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID));
+
+    itemInfo.SetPackageName(GenerateSafeString(fdp, MAX_LENGTH));
+    itemInfo.SetProviderBundleName(GenerateSafeString(fdp, MAX_LENGTH));
+    itemInfo.SetHostBundleName(GenerateSafeString(fdp, MAX_LENGTH));
+    itemInfo.SetModuleName(GenerateSafeString(fdp, MAX_LENGTH));
+    itemInfo.SetAbilityName(GenerateSafeString(fdp, MAX_LENGTH));
+    itemInfo.SetFormName(GenerateSafeString(fdp, MAX_LENGTH));
+
+    itemInfo.SetSpecificationId(fdp->ConsumeIntegralInRange<int32_t>(MIN_DIMENSION_ID, MAX_DIMENSION_ID));
+    itemInfo.SetEnableUpdateFlag(fdp->ConsumeBool());
+    itemInfo.SetUpdateDuration(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_UPDATE_DURATION));
+
+    itemInfo.SetScheduledUpdateTime(GenerateSafeString(fdp, MAX_STRING_LENGTH_16));
+
+    itemInfo.SetTemporaryFlag(fdp->ConsumeBool());
+    itemInfo.SetFormVisibleNotify(fdp->ConsumeBool());
+
+    itemInfo.SetFormSrc(GenerateSafeString(fdp, MAX_LENGTH));
+
+    itemInfo.SetVersionCode(fdp->ConsumeIntegralInRange<uint32_t>(MIN_VERSION_CODE, MAX_VERSION_CODE));
+
+    itemInfo.SetVersionName(GenerateSafeString(fdp, MAX_STRING_LENGTH_32));
+
+    itemInfo.SetCompatibleVersion(fdp->ConsumeIntegralInRange<uint32_t>(MIN_COMPATIBLE_VERSION,
+        MAX_COMPATIBLE_VERSION));
+    itemInfo.SetType(static_cast<FormType>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_TYPE)));
+    itemInfo.SetUiSyntax(static_cast<FormType>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_TYPE)));
+    itemInfo.SetIsDynamic(fdp->ConsumeBool());
+    itemInfo.SetTransparencyEnabled(fdp->ConsumeBool());
+    itemInfo.SetPrivacyLevel(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_PRIVACY_LEVEL));
+
+    itemInfo.SetJsComponentName(GenerateSafeString(fdp, MAX_LENGTH));
+    itemInfo.SetAbilityModuleName(GenerateSafeString(fdp, MAX_LENGTH));
+    itemInfo.SetDeviceId(GenerateSafeString(fdp, MAX_STRING_LENGTH_64));
+
+    itemInfo.SetDataProxyFlag(fdp->ConsumeBool());
+    itemInfo.SetSystemAppFlag(fdp->ConsumeBool());
+    itemInfo.SetProviderUid(fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID));
+
+    itemInfo.SetDescription(GenerateSafeString(fdp, MAX_STRING_LENGTH_256));
+
+    itemInfo.SetFormLocation(static_cast<OHOS::AppExecFwk::Constants::FormLocation>(
+        fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_LOCATION)));
+    itemInfo.SetIsThemeForm(fdp->ConsumeBool());
+    itemInfo.SetFormBundleType(static_cast<BundleType>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_BUNDLE_TYPE)));
+    itemInfo.SetEnableForm(fdp->ConsumeBool());
+    itemInfo.SetRenderingMode(static_cast<OHOS::AppExecFwk::Constants::RenderingMode>(
+        fdp->ConsumeIntegralInRange<int32_t>(0, MAX_RENDERING_MODE)));
+    itemInfo.SetLockForm(fdp->ConsumeBool());
+    itemInfo.SetProtectForm(fdp->ConsumeBool());
+    itemInfo.SetDataProxyIgnoreFormVisibility(fdp->ConsumeBool());
+    itemInfo.SetDistributedForm(fdp->ConsumeBool());
+
+    itemInfo.SetUiModuleName(GenerateSafeString(fdp, MAX_LENGTH));
+
+    itemInfo.SetIsTemplateForm(fdp->ConsumeBool());
+
+    itemInfo.SetTemplateFormImperativeFwk(GenerateSafeString(fdp, MAX_STRING_LENGTH_64));
+
+    return itemInfo;
 }
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
@@ -117,7 +227,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     // Fuzz GetFormConfigInfo
     Want want = GenerateWant(fdp);
-    FormItemInfo formItemInfo;
+    FormItemInfo formItemInfo = GenerateFormItemInfo(fdp);
     adapter.GetFormConfigInfo(want, formItemInfo);
 
     // Fuzz GetBundleInfo
@@ -126,30 +236,28 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     adapter.GetBundleInfo(want, bundleInfo, packageName);
 
     // Fuzz GetFormInfo
-    FormInfo formInfo;
+    FormInfo formInfo = GenerateFormInfo(fdp);
     adapter.GetFormInfo(want, formInfo);
 
     // Fuzz CreateFormItemInfo
     FormInfo fuzzedFormInfo = GenerateFormInfo(fdp);
-    FormItemInfo itemInfo;
+    FormItemInfo itemInfo = GenerateFormItemInfo(fdp);
     adapter.CreateFormItemInfo(bundleInfo, fuzzedFormInfo, itemInfo);
 
     // Fuzz GetFormItemInfo
-    FormItemInfo formItemInfo2;
+    FormItemInfo formItemInfo2 = GenerateFormItemInfo(fdp);
     adapter.GetFormItemInfo(want, bundleInfo, fuzzedFormInfo, formItemInfo2);
 
     // Fuzz SetFormItemInfoParams
     adapter.SetFormItemInfoParams(bundleInfo, fuzzedFormInfo, itemInfo);
 
     // Fuzz SetFormItemModuleInfo
-    HapModuleInfo hapModuleInfo;
-    hapModuleInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    hapModuleInfo.packageName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    hapModuleInfo.hapPath = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    adapter.SetFormItemModuleInfo(hapModuleInfo, fuzzedFormInfo, itemInfo);
+    HapModuleInfo hapModuleInfo = GenerateHapModuleInfo(fdp);
+    FormItemInfo newItemInfo = GenerateFormItemInfo(fdp);
+    adapter.SetFormItemModuleInfo(hapModuleInfo, fuzzedFormInfo, newItemInfo);
 
     // Fuzz SetHostBundleName
-    FormItemInfo hostItemInfo;
+    FormItemInfo hostItemInfo = GenerateFormItemInfo(fdp);
     adapter.SetHostBundleName(want, hostItemInfo);
 
     // Fuzz IsDimensionValid
@@ -158,7 +266,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     // Fuzz GetFormInfoByFormRecord
     FormRecord record = GenerateFormRecord(fdp);
-    FormInfo formInfoByRecord;
+    FormInfo formInfoByRecord = GenerateFormInfo(fdp);
     adapter.GetFormInfoByFormRecord(record, formInfoByRecord);
 
     // Fuzz RegisterAddObserver
@@ -192,15 +300,15 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     // Fuzz SetFormEnableAndLockState
     FormInfo enableFormInfo = GenerateFormInfo(fdp);
-    FormItemInfo enableItemInfo;
-    int32_t formLocation = fdp->ConsumeIntegralInRange<int32_t>(0, 5);
+    FormItemInfo enableItemInfo = GenerateFormItemInfo(fdp);
+    int32_t formLocation = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FORM_LOCATION_TYPE);
     adapter.SetFormEnableAndLockState(enableFormInfo, enableItemInfo, formLocation);
 
     // Fuzz SetLockFormStateOfFormItemInfo
     adapter.SetLockFormStateOfFormItemInfo(enableFormInfo, enableItemInfo);
 
     // Fuzz CheckUpdateFormRecord
-    FormItemInfo checkItemInfo;
+    FormItemInfo checkItemInfo = GenerateFormItemInfo(fdp);
     FormRecord checkRecord = GenerateFormRecord(fdp);
     adapter.CheckUpdateFormRecord(checkRecord.formId, checkItemInfo, checkRecord);
 
