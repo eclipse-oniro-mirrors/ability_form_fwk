@@ -1149,6 +1149,13 @@ public:
      */
     bool ScheduleRerenderAllFormsDelayTask();
 
+    /**
+     * @brief Check if form record exists.
+     * @param formId The Id of the form.
+     * @return Returns true if form record exists; returns false otherwise.
+     */
+    bool HasFormRecord(const int64_t formId) const;
+
 private:
     /**
      * @brief Create form record.

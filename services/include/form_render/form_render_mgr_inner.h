@@ -148,6 +148,10 @@ private:
 
     void ExecOnUnlockTask(const sptr<IRemoteObject> &remoteObject);
 
+    void CollectConnectionsToDisconnect(
+        const std::unordered_set<int64_t> &formIdSet,
+        std::unordered_map<int64_t, sptr<FormRenderConnection>> &connections);
+
 private:
     class RemoteObjHash {
     public:
