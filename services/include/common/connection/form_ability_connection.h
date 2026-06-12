@@ -138,10 +138,11 @@ public:
     Want CreateConnectWant() const;
 
     /**
-     * @brief Clone connection object.
-     * @return Cloned connection object, nullptr for base class.
+     * @brief Create retry connection object for delayed retry policy.
+     *        Base class returns nullptr, subclass overrides to create retry-specific connection.
+     * @return Retry connection object (nullptr for base class).
      */
-    virtual sptr<FormAbilityConnection> Clone() const { return nullptr; }
+    virtual sptr<FormAbilityConnection> CreateRetryConnection() const { return nullptr; }
 
     /**
      * @brief Set host token.

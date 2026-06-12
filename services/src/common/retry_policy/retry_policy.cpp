@@ -63,18 +63,15 @@ int32_t RetryPolicy::CalculateNextDelay() const
         int32_t delay = config_.baseDelayMs * retryCount_;
         return delay > config_.maxDelayMs ? config_.maxDelayMs : delay;
     }
-    // EXPONENTIAL: base * 2^(retryCount-1)
+    // EXPONENTIAL: base * 2^(retryCount-1), loop runs (retryCount-1) times
     int32_t delay = config_.baseDelayMs;
     for (int32_t i = 1; i < retryCount_; i++) {
         if (delay > config_.maxDelayMs / EXPONENTIAL_MULTIPLIER) {
             return config_.maxDelayMs;
         }
         delay *= EXPONENTIAL_MULTIPLIER;
-        if (delay > config_.maxDelayMs) {
-            return config_.maxDelayMs;
-        }
     }
-    return delay > config_.maxDelayMs ? config_.maxDelayMs : delay;
+    return delay;
 }
 
 bool RetryPolicy::IsSendRequestFailed() const

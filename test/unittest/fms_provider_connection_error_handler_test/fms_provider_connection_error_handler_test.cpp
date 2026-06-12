@@ -70,9 +70,9 @@ public:
 
 protected:
     std::shared_ptr<TestConnectionErrorHandler> handler_;
-    
+
     // Helper methods to eliminate repetitive patterns
-    RetryPolicy& EnsurePolicyWithLock(int64_t formId);
+    RetryPolicy &EnsurePolicyWithLock(int64_t formId);
     void VerifyMapSize(size_t expectedSize);
     void VerifyPolicyExists(int64_t formId);
     void VerifyPolicyNotExists(int64_t formId);
@@ -93,7 +93,7 @@ void FmsProviderConnectionErrorHandlerTest::TearDown()
     handler_.reset();
 }
 
-RetryPolicy& FmsProviderConnectionErrorHandlerTest::EnsurePolicyWithLock(int64_t formId)
+RetryPolicy &FmsProviderConnectionErrorHandlerTest::EnsurePolicyWithLock(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(handler_->retryPolicyMutex_);
     return handler_->EnsureRetryPolicy(formId);
@@ -253,7 +253,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, RemoveRetryPolicy_MultipleAndDou
     VerifyMapSize(1);
 
     handler_->RemoveRetryPolicy(FORM_ID_2);  // Double remove
-    VerifyMapSize(1);  // No crash, size unchanged
+    VerifyMapSize(1);                        // No crash, size unchanged
 
     GTEST_LOG_(INFO) << "RemoveRetryPolicy_MultipleAndDoubleRemove_002 end";
 }
@@ -261,7 +261,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, RemoveRetryPolicy_MultipleAndDou
 /**
  * @tc.name: GetDefaultRetryPolicy_AllFields_001
  * @tc.desc: Verify GetDefaultRetryPolicy returns policy with default configuration (maxRetryCount=3,
- *           strategyType=EXPONENTIAL, baseDelayMs=1000, maxDelayMs=4000), retryCount=0,
+ *           strategyType=LINEAR, baseDelayMs=500, maxDelayMs=1500), retryCount=0,
  *           and both signals (sendRequestFailed/disconnectFailed) set to false.
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
@@ -271,6 +271,12 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, GetDefaultRetryPolicy_AllFields_
     GTEST_LOG_(INFO) << "GetDefaultRetryPolicy_AllFields_001 start";
 
     RetryPolicy policy = handler_->GetDefaultRetryPolicy();
+
+    // Verify core configuration parameters
+    EXPECT_EQ(policy.config_.maxRetryCount, 3);
+    EXPECT_EQ(policy.config_.strategyType, RetryStrategyType::LINEAR);
+    EXPECT_EQ(policy.config_.baseDelayMs, 500);
+    EXPECT_EQ(policy.config_.maxDelayMs, 1500);
 
     // Verify retry count
     EXPECT_EQ(policy.GetRetryCount(), RETRY_COUNT_ZERO);

@@ -36,9 +36,9 @@ enum class RetryStrategyType {
 
 struct RetryPolicyConfig {
     int32_t maxRetryCount = 3;
-    RetryStrategyType strategyType = RetryStrategyType::EXPONENTIAL;
-    int32_t baseDelayMs = 1000;
-    int32_t maxDelayMs = 4000;
+    RetryStrategyType strategyType = RetryStrategyType::LINEAR;
+    int32_t baseDelayMs = 500;
+    int32_t maxDelayMs = 1500;
 };
 
 class RetryPolicy {
@@ -51,6 +51,19 @@ public:
     void IncrementRetryCount();
     void Reset();
     bool IsRetryLimitReached() const;
+    /**
+     * @brief Calculate delay before next retry.
+     *
+     * Called AFTER IncrementRetryCount(), so retryCount_ is 1-based:
+     *   retryCount_=1 means 1st retry, retryCount_=2 means 2nd retry, etc.
+     *
+     * Default config (LINEAR, base=500ms, max=1500ms, maxRetry=3):
+     *   retry 1 ->  500ms
+     *   retry 2 -> 1000ms
+     *   retry 3 -> 1500ms
+     *
+     * @return Delay in milliseconds.
+     */
     int32_t CalculateNextDelay() const;
 
     bool IsSendRequestFailed() const;

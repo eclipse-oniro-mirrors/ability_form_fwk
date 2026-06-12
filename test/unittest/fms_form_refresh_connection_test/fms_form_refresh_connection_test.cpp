@@ -355,51 +355,82 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_NoSpecialKeys_001, TestSi
 }
 
 /**
- * @tc.name: OnExecuteConnectTask_MultiBranch_001
- * @tc.desc: test OnExecuteConnectTask with multiple scenarios:
- *           (1) PARAM_MESSAGE_KEY → PostFormEventTask called
- *           (2) RECREATE_FORM_KEY → PostAcquireTask called
- *           (3) No special keys → PostRefreshTask called
+ * @tc.name: OnExecuteConnectTask_MessageParam_001
+ * @tc.desc: Verify OnExecuteConnectTask with PARAM_MESSAGE_KEY → PostFormEventTask called.
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
-HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_MultiBranch_001, TestSize.Level0)
+HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_MessageParam_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MultiBranch_001 start";
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MessageParam_001 start";
     sptr<IRemoteObject> remoteObject = nullptr;
 
-    // Segment 1: PARAM_MESSAGE_KEY → PostFormEventTask called
-    Want want1;
-    const std::string message2 = "test_message";
-    want1.SetParam(Constants::PARAM_MESSAGE_KEY, message2);
-    sptr<FormRefreshConnection> conn1 = CreateRefreshConnection(1, want1);
-    ASSERT_NE(nullptr, conn1);
+    // Test PARAM_MESSAGE_KEY branch
+    Want want;
+    const std::string message = "test_message";
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, message);
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, connection);
+
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(1, "test_message", _, remoteObject)).Times(1);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(_, _, _)).Times(0);
-    conn1->OnExecuteConnectTask(want1, remoteObject);
 
-    // Segment 2: RECREATE_FORM_KEY → PostAcquireTask called
-    Want want2;
-    const std::string recreateFlag2 = "true";
-    want2.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag2);
-    sptr<FormRefreshConnection> conn2 = CreateRefreshConnection(2, want2);
-    ASSERT_NE(nullptr, conn2);
+    connection->OnExecuteConnectTask(want, remoteObject);
+
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MessageParam_001 end";
+}
+
+/**
+ * @tc.name: OnExecuteConnectTask_RecreateForm_001
+ * @tc.desc: Verify OnExecuteConnectTask with RECREATE_FORM_KEY → PostAcquireTask called.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_RecreateForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 start";
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    // Test RECREATE_FORM_KEY branch
+    Want want;
+    const std::string recreateFlag = "true";
+    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(2, want);
+    ASSERT_NE(nullptr, connection);
+
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(2, _, remoteObject)).Times(1);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
-    conn2->OnExecuteConnectTask(want2, remoteObject);
 
-    // Segment 3: No special keys → PostRefreshTask called
-    Want want3;
-    sptr<FormRefreshConnection> conn3 = CreateRefreshConnection(3, want3);
-    ASSERT_NE(nullptr, conn3);
+    connection->OnExecuteConnectTask(want, remoteObject);
+
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 end";
+}
+
+/**
+ * @tc.name: OnExecuteConnectTask_DefaultRefresh_001
+ * @tc.desc: Verify OnExecuteConnectTask with no special keys → PostRefreshTask called.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_DefaultRefresh_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_DefaultRefresh_001 start";
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    // Test default branch (no special keys)
+    Want want;
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(3, want);
+    ASSERT_NE(nullptr, connection);
+
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(3, _, remoteObject)).Times(1);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(_, _, _)).Times(0);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
-    conn3->OnExecuteConnectTask(want3, remoteObject);
 
-    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MultiBranch_001 end";
+    connection->OnExecuteConnectTask(want, remoteObject);
+
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_DefaultRefresh_001 end";
 }
 
 /**

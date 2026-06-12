@@ -62,8 +62,8 @@ public:
     void SetupGetFormRecordMock(const FormRecord &formRecord, bool returnValue = true);
 
     // Helper methods
-    void VerifyRetryPolicy(int64_t formId, bool expectedSend, bool expectedDisconnect,
-                           int expectedRetryCount, bool expectedNeedRetry);
+    void VerifyRetryPolicy(
+        int64_t formId, bool expectedSend, bool expectedDisconnect, int expectedRetryCount, bool expectedNeedRetry);
     void SetupPolicyState(int64_t formId, bool sendFailed, bool disconnectFailed, bool resetCount = true);
     void SetRetryCountToMax(int64_t formId, int maxCount);
     void VerifyNoPolicy(int64_t formId);
@@ -107,11 +107,11 @@ FormRecord FmsProviderRefreshErrorHandlerTest::CreateDefaultFormRecord()
 void FmsProviderRefreshErrorHandlerTest::SetupGetFormRecordMock(const FormRecord &formRecord, bool returnValue)
 {
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-            .WillOnce(DoAll([&](int64_t, FormRecord &record) { record = formRecord; }, Return(returnValue)));
+        .WillOnce(DoAll([&](int64_t, FormRecord &record) { record = formRecord; }, Return(returnValue)));
 }
 
-void FmsProviderRefreshErrorHandlerTest::VerifyRetryPolicy(int64_t formId, bool expectedSend,
-    bool expectedDisconnect, int expectedRetryCount, bool expectedNeedRetry)
+void FmsProviderRefreshErrorHandlerTest::VerifyRetryPolicy(
+    int64_t formId, bool expectedSend, bool expectedDisconnect, int expectedRetryCount, bool expectedNeedRetry)
 {
     auto it = handler_->retryPolicyMap_.find(formId);
     EXPECT_NE(it, handler_->retryPolicyMap_.end());
@@ -121,8 +121,8 @@ void FmsProviderRefreshErrorHandlerTest::VerifyRetryPolicy(int64_t formId, bool 
     EXPECT_EQ(it->second.NeedRetry(), expectedNeedRetry);
 }
 
-void FmsProviderRefreshErrorHandlerTest::SetupPolicyState(int64_t formId, bool sendFailed,
-    bool disconnectFailed, bool resetCount)
+void FmsProviderRefreshErrorHandlerTest::SetupPolicyState(
+    int64_t formId, bool sendFailed, bool disconnectFailed, bool resetCount)
 {
     auto &policy = handler_->EnsureRetryPolicy(formId);
     policy.sendRequestFailed_ = sendFailed;
@@ -160,7 +160,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, HandleSendRequestFailed_NonDeathErr
 
     Want want;
 
-    for (int errorCode : {0, -1, 999}) {
+    for (int errorCode : { 0, -1, 999 }) {
         EXPECT_FALSE(handler_->HandleSendRequestFailed(FORM_ID, errorCode, want));
     }
     EXPECT_EQ(handler_->retryPolicyMap_.size(), 0);
@@ -266,16 +266,14 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, HandleDisconnectError_AllBranches_0
 }
 
 /**
- * @tc.name: DualSignal_AllScenarios_001
- * @tc.desc: Verify dual-signal mechanism: (1) send→disconnect → confirmed;
- *           (2) disconnect→send → confirmed; (3) retry limit across signals;
- *           (4) policy removal between signals.
+ * @tc.name: DualSignal_SendFirst_001
+ * @tc.desc: Verify dual-signal mechanism: send first → disconnect → confirmed.
  * @tc.type: FUNC
  * @tc.require: issueI5NQJG
  */
-HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSize.Level1)
+HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_SendFirst_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DualSignal_AllScenarios_001 start";
+    GTEST_LOG_(INFO) << "DualSignal_SendFirst_001 start";
 
     Want want;
     sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
@@ -290,6 +288,23 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSi
     handler_->RemoveRetryPolicy(FORM_ID);
     VerifyNoPolicy(FORM_ID);
 
+    GTEST_LOG_(INFO) << "DualSignal_SendFirst_001 end";
+}
+
+/**
+ * @tc.name: DualSignal_DisconnectFirst_001
+ * @tc.desc: Verify dual-signal mechanism: disconnect first → returns false; then send → confirmed.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_DisconnectFirst_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DualSignal_DisconnectFirst_001 start";
+
+    Want want;
+    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
+    ConnectState state = ConnectState::CONNECTED;
+
     // Scenario 2: disconnect first → returns false; then send → dual-signal confirmed
     EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, false, true, 0, false);
@@ -298,6 +313,23 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSi
 
     handler_->RemoveRetryPolicy(FORM_ID);
     VerifyNoPolicy(FORM_ID);
+
+    GTEST_LOG_(INFO) << "DualSignal_DisconnectFirst_001 end";
+}
+
+/**
+ * @tc.name: DualSignal_RetryLimit_001
+ * @tc.desc: Verify dual-signal mechanism: retry limit across signals → no more retry scheduling.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_RetryLimit_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DualSignal_RetryLimit_001 start";
+
+    Want want;
+    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
+    ConnectState state = ConnectState::CONNECTED;
 
     // Scenario 3: retry limit across signals → no more retry scheduling
     SetupPolicyState(FORM_ID, false, false, false);
@@ -312,6 +344,23 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSi
     handler_->RemoveRetryPolicy(FORM_ID);
     VerifyNoPolicy(FORM_ID);
 
+    GTEST_LOG_(INFO) << "DualSignal_RetryLimit_001 end";
+}
+
+/**
+ * @tc.name: DualSignal_PolicyRemoval_001
+ * @tc.desc: Verify dual-signal mechanism: policy removal between signals → second signal gets fresh policy.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_PolicyRemoval_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DualSignal_PolicyRemoval_001 start";
+
+    Want want;
+    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
+    ConnectState state = ConnectState::CONNECTED;
+
     // Scenario 4: policy removal between signals → second signal gets fresh policy
     EXPECT_TRUE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
     VerifyRetryPolicy(FORM_ID, true, false, 1, false);
@@ -320,7 +369,10 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, DualSignal_AllScenarios_001, TestSi
     EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, remoteObject, want, state));
     VerifyRetryPolicy(FORM_ID, false, true, 0, false);
 
-    GTEST_LOG_(INFO) << "DualSignal_AllScenarios_001 end";
+    handler_->RemoveRetryPolicy(FORM_ID);
+    VerifyNoPolicy(FORM_ID);
+
+    GTEST_LOG_(INFO) << "DualSignal_PolicyRemoval_001 end";
 }
 
 /**
@@ -494,14 +546,14 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, RetryCountIncrement_001, TestSize.L
 HWTEST_F(FmsProviderRefreshErrorHandlerTest, WptrCapture_001, TestSize.Level2)
 {
     GTEST_LOG_(INFO) << "WptrCapture_001 start";
-    
+
     sptr<FormProviderRefreshErrorHandler> handler = FormProviderErrorHandlerFactory::GetRefreshHandler();
     wptr<FormProviderRefreshErrorHandler> weakHandler = handler;
-    
+
     sptr<FormProviderRefreshErrorHandler> promoted = weakHandler.promote();
     EXPECT_NE(promoted, nullptr);
     EXPECT_EQ(promoted, handler);
-    
+
     GTEST_LOG_(INFO) << "WptrCapture_001 end";
 }
 }  // namespace

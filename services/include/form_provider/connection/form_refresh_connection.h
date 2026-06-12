@@ -35,11 +35,11 @@ public:
     virtual ~FormRefreshConnection() = default;
 
     /**
-     * @brief Clone connection for retry policy.
+     * @brief Create retry connection for delayed retry policy.
      *        Creates a new FormRefreshConnection with same formId, want, and record.
-     * @return Cloned FormRefreshConnection object (sptr<FormAbilityConnection>).
+     * @return Retry FormRefreshConnection object (sptr<FormAbilityConnection>).
      */
-    sptr<FormAbilityConnection> Clone() const override;
+    sptr<FormAbilityConnection> CreateRetryConnection() const override;
 
 protected:
     /**
@@ -72,6 +72,8 @@ protected:
     /**
      * @brief Override: DISCONNECT_ERROR+CONNECTED triggers HandleDisconnectError.
      *        Calls base OnAbilityDisconnectDone first, then checks dual-signal condition.
+     * @param element Element name of the ability.
+     * @param resultCode Result code of disconnect operation.
      */
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 

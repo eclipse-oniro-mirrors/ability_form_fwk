@@ -35,10 +35,10 @@ FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want &w
     SetModuleName(record.moduleName);
 }
 
-sptr<FormAbilityConnection> FormRefreshConnection::Clone() const
+sptr<FormAbilityConnection> FormRefreshConnection::CreateRetryConnection() const
 {
-    sptr<FormRefreshConnection> clone = new FormRefreshConnection(GetFormId(), want_, record_);
-    return clone;
+    sptr<FormRefreshConnection> retryConnection = new FormRefreshConnection(GetFormId(), want_, record_);
+    return retryConnection;
 }
 
 Want FormRefreshConnection::OnBuildTaskWant()
