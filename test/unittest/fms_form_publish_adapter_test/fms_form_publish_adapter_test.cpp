@@ -1061,8 +1061,6 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_001, TestSize.Level1)
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
         .WillRepeatedly(Return(TEST_CALLING_PID));
-    EXPECT_CALL(*MockFormEcologicalRuleClient::obj, IsSupportPublishForm(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(false), Return(ERR_OK)));
 
     Want want;
     auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
