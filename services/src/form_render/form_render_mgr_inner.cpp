@@ -687,10 +687,27 @@ inline void FormRenderMgrInner::AddHostToken(const sptr<IRemoteObject> &host, in
     }
 }
 
+void FormRenderMgrInner::CollectConnectionsToDisconnect(
+    const std::unordered_set<int64_t> &formIdSet,
+    std::unordered_map<int64_t, sptr<FormRenderConnection>> &connections)
+{
+    for (const int64_t formId : formIdSet) {
+        if (!FormDataMgr::GetInstance().HasFormRecord(formId)) {
+            std::lock_guard<std::mutex> lock(resourceMutex_);
+            auto conIter = renderFormConnections_.find(formId);
+            if (conIter != renderFormConnections_.end()) {
+                connections.emplace(formId, conIter->second);
+                renderFormConnections_.erase(conIter);
+            }
+        }
+    }
+}
+
 void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
 {
-    size_t left = 0;
-    std::unordered_map<int64_t, sptr<FormRenderConnection>> connections;
+    size_t renderConnectionSize = 0;
+    std::unordered_set<int64_t> formIdSet;
+    bool disconnectAll = false;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
         auto iter = etsHosts_.find(host);
@@ -698,25 +715,26 @@ void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
             HILOG_ERROR("Can't find host in etsHosts");
             return;
         }
-        auto formIdSet = iter->second;
+        formIdSet = std::move(iter->second);
         etsHosts_.erase(host);
-        if (etsHosts_.empty()) {
-            HILOG_DEBUG("etsHosts is empty, disconnect all connections size:%{public}zu",
-                renderFormConnections_.size());
-            connections.swap(renderFormConnections_);
-        } else {
-            for (const int64_t formId : formIdSet) {
-                FormRecord formRecord;
-                if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-                    connections.emplace(formId, renderFormConnections_[formId]);
-                    renderFormConnections_.erase(formId);
-                }
-            }
-        }
-        left = renderFormConnections_.size();
+        disconnectAll = etsHosts_.empty();
+        renderConnectionSize = renderFormConnections_.size();
     }
+
+    std::unordered_map<int64_t, sptr<FormRenderConnection>> connections;
+
+    if (disconnectAll) {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        HILOG_DEBUG("etsHosts is empty, disconnect all connections size:%{public}zu",
+            renderConnectionSize);
+        connections.swap(renderFormConnections_);
+    } else {
+        CollectConnectionsToDisconnect(formIdSet, connections);
+    }
+
     for (auto iter = connections.begin(); iter != connections.end();) {
-        DisconnectRenderService(iter->second, connections.size() > left ? connections.size() : left);
+        DisconnectRenderService(iter->second, connections.size() > renderConnectionSize ? connections.size() :
+            renderConnectionSize);
         iter = connections.erase(iter);
     }
 }

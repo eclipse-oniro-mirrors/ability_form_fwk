@@ -1523,26 +1523,31 @@ bool FormDataMgr::IsSameForm(const FormRecord &record, const FormInfo &formInfo)
 void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::set<int64_t> &removedForms)
 {
     HILOG_INFO("clean removed form records");
+    std::vector<std::pair<int64_t, FormRecord>> deleteForms;
     bool hadNetCondition = false;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         std::map<int64_t, FormRecord>::iterator itFormRecord;
         for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
             int64_t formId = itFormRecord->first;
-            auto itForm = std::find(removedForms.begin(), removedForms.end(), formId);
-            if (itForm != removedForms.end()) {
-                FormCacheMgr::GetInstance().DeleteData(formId);
-                FormRenderMgr::GetInstance().StopRenderingForm(formId, itFormRecord->second);
+            if (removedForms.find(formId) != removedForms.end()) {
                 if (IsNetworkConditionForm(itFormRecord->second)) {
                     hadNetCondition = true;
                 }
+                deleteForms.emplace_back(formId, itFormRecord->second);
                 itFormRecord = formRecords_.erase(itFormRecord);
-                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
             } else {
                 itFormRecord++;
             }
         }
     }
+
+    for (const auto& [formId, formRecord] : deleteForms) {
+        FormCacheMgr::GetInstance().DeleteData(formId);
+        FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
+        FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
+    }
+
     if (hadNetCondition && !HasNetworkConditionForm()) {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
@@ -3731,6 +3736,17 @@ bool FormDataMgr::ScheduleRerenderAllFormsDelayTask()
     }
     HILOG_INFO("Rerender all forms delayed task scheduled successfully");
     return true;
+}
+
+/**
+ * @brief Check if form record exists.
+ * @param formId The Id of the form.
+ * @return Returns true if form record exists; returns false otherwise.
+ */
+bool FormDataMgr::HasFormRecord(const int64_t formId) const
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    return formRecords_.find(formId) != formRecords_.end();
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
