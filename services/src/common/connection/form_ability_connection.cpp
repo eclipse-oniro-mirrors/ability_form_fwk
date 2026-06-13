@@ -139,16 +139,6 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
     ReportFormAppUnbindEvent();
 }
 
-void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObject)
-{
-    if (connectId_ != 0) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
-        connectId_ = 0;
-    } else {
-        HILOG_ERROR("connectId_ invalidate. connectId_:%{public}d", connectId_);
-    }
-}
-
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()
 {
     sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -235,6 +225,11 @@ void FormAbilityConnection::SetProviderKey(const std::string &bundleName, const 
     userId_ = userId;
 }
 
+void FormAbilityConnection::SetModuleName(const std::string &moduleName)
+{
+    moduleName_ = moduleName;
+}
+
 void FormAbilityConnection::SetFreeInstall(bool isFreeInstall)
 {
     isFreeInstall_ = isFreeInstall;
@@ -248,6 +243,27 @@ void FormAbilityConnection::SetFormId(int64_t formId)
 int64_t FormAbilityConnection::GetFormId() const
 {
     return formId_;
+}
+
+ConnectState FormAbilityConnection::GetConnectState() const
+{
+    return connectState_.load();
+}
+
+int32_t FormAbilityConnection::GetUserId() const
+{
+    return userId_;
+}
+
+Want FormAbilityConnection::CreateConnectWant() const
+{
+    Want connectWant;
+    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connectWant.SetElementName(bundleName_, abilityName_);
+    if (!moduleName_.empty()) {
+        connectWant.SetModuleName(moduleName_);
+    }
+    return connectWant;
 }
 
 void FormAbilityConnection::SetHostToken(const sptr<IRemoteObject> hostToken)

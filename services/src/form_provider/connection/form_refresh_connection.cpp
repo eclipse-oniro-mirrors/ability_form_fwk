@@ -17,21 +17,28 @@
 
 #include <cinttypes>
 
+#include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "data_center/form_data_mgr.h"
+#include "form_provider/form_supply_callback.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want &want,
-    const std::string &bundleName, const std::string &abilityName, bool isFreeInstall, const int32_t userId)
-    : want_(want)
+FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want &want, const FormRecord &record)
+    : want_(want), record_(record)
 {
     SetFormId(formId);
-    SetFreeInstall(isFreeInstall);
-    SetProviderKey(bundleName, abilityName, userId);
+    SetFreeInstall(record.needFreeInstall);
+    SetProviderKey(record.bundleName, record.abilityName, record.providerUserId);
+    SetModuleName(record.moduleName);
+}
+
+sptr<FormAbilityConnection> FormRefreshConnection::CreateRetryConnection() const
+{
+    sptr<FormRefreshConnection> retryConnection = new FormRefreshConnection(GetFormId(), want_, record_);
+    return retryConnection;
 }
 
 Want FormRefreshConnection::OnBuildTaskWant()
@@ -53,6 +60,7 @@ Want FormRefreshConnection::OnBuildTaskWant()
 
 void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
+    SetProviderToken(remoteObject);
     if (want.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
         std::string message = want.GetStringParam(Constants::PARAM_MESSAGE_KEY);
         FormProviderTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, want, remoteObject);
@@ -61,6 +69,27 @@ void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IR
     } else {
         FormProviderTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
         FormDataMgr::GetInstance().ClearHostRefreshFlag(GetFormId());
+    }
+}
+
+void FormRefreshConnection::OnPreConnectTask()
+{
+    connectState_.store(ConnectState::CONNECTED);
+}
+
+void FormRefreshConnection::OnAbilityDisconnectDone(
+    const AppExecFwk::ElementName &element, int resultCode)
+{
+    ConnectState state = connectState_.load();
+    HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+        GetFormId(), resultCode, static_cast<int32_t>(state));
+
+    FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
+
+    if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED) {
+        sptr<FormAbilityConnection> connection = this;
+        FormProviderErrorHandlerFactory::GetRefreshHandler()
+            ->HandleDisconnectError(GetFormId(), connection);
     }
 }
 

@@ -16,7 +16,11 @@
 #ifndef OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
 
+#include <atomic>
+
 #include "common/connection/form_ability_connection.h"
+#include "data_center/form_record/form_record.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -27,9 +31,15 @@ namespace AppExecFwk {
  */
 class FormRefreshConnection : public FormAbilityConnection {
 public:
-    FormRefreshConnection(const int64_t formId, const Want &want, const std::string &bundleName,
-        const std::string &abilityName, bool isFreeInstall, const int32_t userId);
+    FormRefreshConnection(const int64_t formId, const Want &want, const FormRecord &record);
     virtual ~FormRefreshConnection() = default;
+
+    /**
+     * @brief Create retry connection for delayed retry policy.
+     *        Creates a new FormRefreshConnection with same formId, want, and record.
+     * @return Retry FormRefreshConnection object (sptr<FormAbilityConnection>).
+     */
+    sptr<FormAbilityConnection> CreateRetryConnection() const override;
 
 protected:
     /**
@@ -38,6 +48,12 @@ protected:
      * @return true.
      */
     bool NeedFreeInstallProcessing() const override { return true; }
+
+    /**
+     * @brief Pre-processing after connection success.
+     *        Marks connected state for dual-signal precondition check.
+     */
+    void OnPreConnectTask() override;
 
     /**
      * @brief Build task Want parameter based on refresh type.
@@ -53,8 +69,17 @@ protected:
      */
     void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
 
+    /**
+     * @brief Override: DISCONNECT_ERROR+CONNECTED triggers HandleDisconnectError.
+     *        Calls base OnAbilityDisconnectDone first, then checks dual-signal condition.
+     * @param element Element name of the ability.
+     * @param resultCode Result code of disconnect operation.
+     */
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+
 private:
     Want want_;
+    FormRecord record_;
     DISALLOW_COPY_AND_MOVE(FormRefreshConnection);
 };
 }  // namespace AppExecFwk

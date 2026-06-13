@@ -28,6 +28,7 @@
 #include "data_center/database/form_db_cache.h"
 #include "form_mgr_errors.h"
 #include "form_observer/form_observer_record.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_provider/form_provider_mgr.h"
 #include "data_center/form_record/form_record.h"
 #include "form_render/form_render_mgr.h"
@@ -255,6 +256,7 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
     }
     FormUtil::DeleteFormId(formId);
     FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
+    FormProviderErrorHandlerFactory::GetRefreshHandler()->RemoveRetryPolicy(formId);
     auto location = formRecord.formLocation;
     if (location == Constants::FormLocation::DESKTOP || location == Constants::FormLocation::NEGATIVE_SCREEN ||
         location == Constants::FormLocation::SCREEN_LOCK) {

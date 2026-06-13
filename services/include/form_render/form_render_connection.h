@@ -73,12 +73,6 @@ protected:
     void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override {}
 
 private:
-    enum class ConnectState {
-        DISCONNECTED,
-        CONNECTING,
-        CONNECTED,
-    };
-
     FormRecord formRecord_;
     WantParams wantParams_;
     ConnectState connectState_ = ConnectState::DISCONNECTED;

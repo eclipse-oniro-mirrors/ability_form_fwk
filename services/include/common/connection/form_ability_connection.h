@@ -24,6 +24,13 @@ namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
+enum class ConnectState {
+    DISCONNECTED,
+    CONNECTING,
+    CONNECTED,
+};
+
+constexpr int32_t DISCONNECT_ERROR = -1;
 
 /**
  * @class FormAbilityConnection
@@ -51,12 +58,6 @@ public:
      * @param resultCode ERR_OK on success, others on failure.
      */
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
-
-    /**
-     * @brief remote object died event.
-     * @param remoteObject the remote object of service ability.
-     */
-    void OnConnectDied(const wptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief onFormAppConnect, when ability connectDone.
@@ -96,6 +97,12 @@ public:
     void SetProviderKey(const std::string &bundleName, const std::string &abilityName, const int32_t userId);
 
     /**
+     * @brief Set module name.
+     * @param moduleName moduleName.
+     */
+    void SetModuleName(const std::string &moduleName);
+
+    /**
      * @brief Set free install true or false.
      * @param isFreeInstall Indicates the free install flag is true or false.
      */
@@ -111,6 +118,31 @@ public:
      * @brief Get form ID.
      */
     int64_t GetFormId() const;
+
+    /**
+     * @brief Get connection state.
+     * @return Current connection state.
+     */
+    ConnectState GetConnectState() const;
+
+    /**
+     * @brief Get user ID.
+     * @return Current user ID.
+     */
+    int32_t GetUserId() const;
+
+    /**
+     * @brief Create connection Want.
+     * @return Want object with bundleName, abilityName and moduleName set.
+     */
+    Want CreateConnectWant() const;
+
+    /**
+     * @brief Create retry connection object for delayed retry policy.
+     *        Base class returns nullptr, subclass overrides to create retry-specific connection.
+     * @return Retry connection object (nullptr for base class).
+     */
+    virtual sptr<FormAbilityConnection> CreateRetryConnection() const { return nullptr; }
 
     /**
      * @brief Set host token.
@@ -195,6 +227,11 @@ protected:
      */
     virtual bool NeedRegisterToSupplyCallback() const { return true; }
 
+    /**
+     * @brief Connection state (atomic for thread safety).
+     */
+    std::atomic<ConnectState> connectState_{ConnectState::DISCONNECTED};
+
 private:
     /**
      * @brief Get app manager proxy.
@@ -228,6 +265,7 @@ private:
     std::string deviceId_ = "";
     std::string bundleName_ = "";
     std::string abilityName_ = "";
+    std::string moduleName_ = "";
     bool isFreeInstall_ = false;
     int32_t userId_ = 0;
     int32_t connectId_ = 0;

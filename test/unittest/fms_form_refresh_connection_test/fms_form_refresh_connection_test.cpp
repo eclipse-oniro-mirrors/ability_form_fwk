@@ -23,10 +23,12 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
+#define protected public
 #include "form_provider/connection/form_acquire_connection.h"
 #include "form_provider/connection/form_acquire_state_connection.h"
 #include "bms_mgr/form_bundle_event_callback.h"
 #include "data_center/form_cache_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "form_provider/connection/form_cast_temp_connection.h"
 #include "form_provider/connection/form_delete_connection.h"
 #include "common/event/form_event_handler.h"
@@ -39,22 +41,33 @@
 #include "form_provider/form_supply_callback.h"
 #include "common/util/form_util.h"
 #include "feature/free_install/free_install_status_callback_stub.h"
+#include "mock_form_provider_task_mgr.h"
+#include "mock_form_provider_refresh_error_handler.h"
+#include "mock_form_supply_callback.h"
+#include "mock_form_data_mgr.h"
 #undef private
+#undef protected
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
+using ::testing::_;
 
 namespace {
 
 const std::string FORM_MESSAGE_EVENT_VALUE_1 = "event message1";
 const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
+constexpr int32_t DISCONNECT_ERROR = -1;
+constexpr int32_t TEST_CONNECT_ID = 100;
+constexpr int32_t TEST_USER_ID = 100;
+
 class FmsFormRefreshConnectionTest : public testing::Test {
 public:
     void SetUp();
     void TearDown();
+    sptr<FormRefreshConnection> CreateRefreshConnection(int64_t formId, Want &want);
 };
 
 class MockFreeInstallStatusCallBackStub : public FreeInstallStatusCallBackStub {
@@ -62,15 +75,32 @@ public:
     MockFreeInstallStatusCallBackStub() = default;
     virtual ~MockFreeInstallStatusCallBackStub() = default;
 
-    virtual void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId)
-    {}
+    virtual void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) {}
 };
 
 void FmsFormRefreshConnectionTest::SetUp()
-{}
+{
+    MockFormProviderTaskMgr::obj = std::make_shared<MockFormProviderTaskMgr>();
+    MockFormProviderRefreshErrorHandler::obj = std::make_shared<MockFormProviderRefreshErrorHandler>();
+}
 
 void FmsFormRefreshConnectionTest::TearDown()
-{}
+{
+    MockFormProviderTaskMgr::obj = nullptr;
+    MockFormProviderRefreshErrorHandler::obj = nullptr;
+}
+
+sptr<FormRefreshConnection> FmsFormRefreshConnectionTest::CreateRefreshConnection(int64_t formId, Want &want)
+{
+    FormRecord record;
+    record.formId = formId;
+    record.bundleName = "aa";
+    record.abilityName = "bb";
+    record.moduleName = "";
+    record.providerUserId = TEST_USER_ID;
+    record.needFreeInstall = false;
+    return new (std::nothrow) FormRefreshConnection(formId, want, record);
+}
 
 /**
  * @tc.name: FormRefreshConnection_001
@@ -82,12 +112,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_001, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_001 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = 100;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -106,12 +131,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_002 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = 100;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -132,12 +152,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_003 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = 100;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -158,18 +173,283 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
     GTEST_LOG_(INFO) << "FormRefreshConnection_004 start";
     int64_t formId = 1;
     Want want;
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    bool isFreeInstall = false;
-    int32_t userId = 100;
-    sptr<FormRefreshConnection> formRefreshConnection =
-        new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall, userId);
+    sptr<FormRefreshConnection> formRefreshConnection = CreateRefreshConnection(formId, want);
     ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
     formRefreshConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormRefreshConnection_004 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_DisconnectError_001
+ * @tc.desc: test OnAbilityDisconnectDone when DISCONNECT_ERROR and CONNECTED state
+ *           HandleDisconnectError should be called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DisconnectError_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DisconnectError_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(1, _)).Times(1);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DisconnectError_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_ErrOk_001
+ * @tc.desc: test OnAbilityDisconnectDone when ERR_OK and CONNECTED state
+ *           HandleDisconnectError should NOT be called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_ErrOk_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_ErrOk_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(2, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, ERR_OK);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_ErrOk_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_NotConnected_001
+ * @tc.desc: test OnAbilityDisconnectDone when DISCONNECT_ERROR and NOT CONNECTED state
+ *           HandleDisconnectError should NOT be called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_NotConnected_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_NotConnected_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(3, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_NotConnected_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_OtherResultCode_001
+ * @tc.desc: test OnAbilityDisconnectDone when other resultCode and CONNECTED state
+ *           HandleDisconnectError should NOT be called
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_OtherResultCode_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_OtherResultCode_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(4, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->OnPreConnectTask();
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, -2);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_OtherResultCode_001 end";
+}
+
+/**
+ * @tc.name: OnBuildTaskWant_ParamMessageKey_001
+ * @tc.desc: test OnBuildTaskWant when PARAM_MESSAGE_KEY is set
+ *           result should have FORM_CONNECT_ID and PARAM_MESSAGE_KEY
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_ParamMessageKey_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_ParamMessageKey_001 start";
+
+    Want want;
+    const std::string message = "test_message";
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, message);
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    Want result = conn->OnBuildTaskWant();
+    EXPECT_TRUE(result.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_TRUE(result.HasParameter(Constants::PARAM_MESSAGE_KEY));
+
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_ParamMessageKey_001 end";
+}
+
+/**
+ * @tc.name: OnBuildTaskWant_RecreateFormKey_001
+ * @tc.desc: test OnBuildTaskWant when RECREATE_FORM_KEY is set
+ *           result should have ACQUIRE_TYPE and FORM_CONNECT_ID
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_RecreateFormKey_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_RecreateFormKey_001 start";
+
+    Want want;
+    const std::string recreateFlag = "true";
+    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(2, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    Want result = conn->OnBuildTaskWant();
+    EXPECT_TRUE(result.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_TRUE(result.HasParameter(Constants::ACQUIRE_TYPE));
+    EXPECT_EQ(Constants::ACQUIRE_TYPE_RECREATE_FORM, result.GetIntParam(Constants::ACQUIRE_TYPE, 0));
+    EXPECT_TRUE(result.HasParameter(Constants::RECREATE_FORM_KEY));
+
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_RecreateFormKey_001 end";
+}
+
+/**
+ * @tc.name: OnBuildTaskWant_NoSpecialKeys_001
+ * @tc.desc: test OnBuildTaskWant when no special keys are set
+ *           result should only have FORM_CONNECT_ID
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_NoSpecialKeys_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_NoSpecialKeys_001 start";
+
+    Want want;
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(3, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    Want result = conn->OnBuildTaskWant();
+    EXPECT_TRUE(result.HasParameter(Constants::FORM_CONNECT_ID));
+    EXPECT_EQ(TEST_CONNECT_ID, result.GetIntParam(Constants::FORM_CONNECT_ID, 0));
+    EXPECT_FALSE(result.HasParameter(Constants::PARAM_MESSAGE_KEY));
+    EXPECT_FALSE(result.HasParameter(Constants::RECREATE_FORM_KEY));
+    EXPECT_FALSE(result.HasParameter(Constants::ACQUIRE_TYPE));
+
+    GTEST_LOG_(INFO) << "OnBuildTaskWant_NoSpecialKeys_001 end";
+}
+
+/**
+ * @tc.name: OnExecuteConnectTask_MessageParam_001
+ * @tc.desc: Verify OnExecuteConnectTask with PARAM_MESSAGE_KEY → PostFormEventTask called.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_MessageParam_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MessageParam_001 start";
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    // Test PARAM_MESSAGE_KEY branch
+    Want want;
+    const std::string message = "test_message";
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, message);
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, connection);
+
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(1, "test_message", _, remoteObject)).Times(1);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(_, _, _)).Times(0);
+
+    connection->OnExecuteConnectTask(want, remoteObject);
+
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_MessageParam_001 end";
+}
+
+/**
+ * @tc.name: OnExecuteConnectTask_RecreateForm_001
+ * @tc.desc: Verify OnExecuteConnectTask with RECREATE_FORM_KEY → PostAcquireTask called.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_RecreateForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 start";
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    // Test RECREATE_FORM_KEY branch
+    Want want;
+    const std::string recreateFlag = "true";
+    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(2, want);
+    ASSERT_NE(nullptr, connection);
+
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(2, _, remoteObject)).Times(1);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
+
+    connection->OnExecuteConnectTask(want, remoteObject);
+
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 end";
+}
+
+/**
+ * @tc.name: OnExecuteConnectTask_DefaultRefresh_001
+ * @tc.desc: Verify OnExecuteConnectTask with no special keys → PostRefreshTask called.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_DefaultRefresh_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_DefaultRefresh_001 start";
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    // Test default branch (no special keys)
+    Want want;
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(3, want);
+    ASSERT_NE(nullptr, connection);
+
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(3, _, remoteObject)).Times(1);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(_, _, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
+
+    connection->OnExecuteConnectTask(want, remoteObject);
+
+    GTEST_LOG_(INFO) << "OnExecuteConnectTask_DefaultRefresh_001 end";
+}
+
+/**
+ * @tc.name: OnPreConnectTask_001
+ * @tc.desc: test OnPreConnectTask.
+ *           Verify connectState_ is set to CONNECTED.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnPreConnectTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnPreConnectTask_001 start";
+    Want want;
+    sptr<FormRefreshConnection> connection = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, connection);
+    EXPECT_EQ(ConnectState::DISCONNECTED, connection->connectState_);
+    connection->OnPreConnectTask();
+    EXPECT_EQ(ConnectState::CONNECTED, connection->connectState_);
+    GTEST_LOG_(INFO) << "OnPreConnectTask_001 end";
 }
 
 /**
@@ -245,9 +525,9 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
     std::string abilityName = "bb";
     std::string deviceId = "cc";
     int64_t formShareRequestCode = 2;
-    int32_t userId = 100;
-    sptr<FormShareConnection> formShareConnection = new (std::nothrow) FormShareConnection(formId, bundleName,
-        abilityName, deviceId, formShareRequestCode, userId);
+    int32_t userId = TEST_USER_ID;
+    sptr<FormShareConnection> formShareConnection =
+        new (std::nothrow) FormShareConnection(formId, bundleName, abilityName, deviceId, formShareRequestCode, userId);
     ASSERT_NE(nullptr, formShareConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -481,7 +761,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_001, TestSize.Leve
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormCastTempConnection> formCastTempConnection =
         new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formCastTempConnection);
@@ -503,7 +783,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_001, TestSize.Level0
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormDeleteConnection> formDeleteConnection =
         new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formDeleteConnection);
@@ -855,8 +1135,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_004, TestSi
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_001 start";
-    std::shared_ptr<FormBundleEventCallback> formBundleEventCallback =
-        std::make_shared<FormBundleEventCallback>();
+    std::shared_ptr<FormBundleEventCallback> formBundleEventCallback = std::make_shared<FormBundleEventCallback>();
     ASSERT_NE(nullptr, formBundleEventCallback);
     EventFwk::CommonEventData eventData;
     formBundleEventCallback->OnReceiveEvent(eventData);
@@ -1057,7 +1336,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0001, TestSize.Lev
     Want want;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     std::shared_ptr<FormMsgEventConnection> formMsgEventConnection =
         std::make_shared<FormMsgEventConnection>(formId, want, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formMsgEventConnection);
@@ -1081,7 +1360,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireStateConnection_0001, TestSize
     std::string abilityName = "bb";
     Want want;
     std::string state = "cc";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     std::shared_ptr<FormAcquireStateConnection> formAcquireStateConnection =
         std::make_shared<FormAcquireStateConnection>(bundleName, abilityName, want, state, userId);
     ASSERT_NE(nullptr, formAcquireStateConnection);
@@ -1175,7 +1454,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_005, TestSize.Level
     sptr<FormAcquireConnection> formAcquireConnection =
         new (std::nothrow) FormAcquireConnection(formId, info, wantParams, hostToken);
     ASSERT_NE(nullptr, formAcquireConnection);
-    auto&& connectCallback = [](const std::string &bundleName) {};
+    auto &&connectCallback = [](const std::string &bundleName) {};
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
     formAcquireConnection->OnFormAbilityConnectDoneCallback();
     formAcquireConnection->SetFormAbilityConnectCb(nullptr);
@@ -1198,7 +1477,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_002, TestSize.Level0
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormDeleteConnection> formDeleteConnection =
         new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formDeleteConnection);
@@ -1220,7 +1499,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_002, TestSize.Leve
     int64_t formId = 1;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    int32_t userId = 100;
+    int32_t userId = TEST_USER_ID;
     sptr<FormCastTempConnection> formCastTempConnection =
         new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName, userId);
     ASSERT_NE(nullptr, formCastTempConnection);

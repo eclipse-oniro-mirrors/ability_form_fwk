@@ -35,6 +35,7 @@
 #include "common/util/form_report.h"
 #include "data_center/form_record/form_record_report.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
@@ -289,18 +290,18 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRe
         record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall, record.isCountTimerRefresh,
         record.providerUserId);
 
-    sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want,
-        record.bundleName, record.abilityName, record.needFreeInstall, record.providerUserId);
+    sptr<FormAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want, record);
     if (formRefreshConnection == nullptr) {
         HILOG_ERROR("create FormRefreshConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    Want connectWant;
-    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
-    connectWant.SetElementName(record.bundleName, record.abilityName);
-    if (!record.moduleName.empty()) {
-        connectWant.SetModuleName(record.moduleName);
+
+    auto errorHandler = FormProviderErrorHandlerFactory::GetRefreshHandler();
+    if (errorHandler != nullptr) {
+        errorHandler->RemoveRetryPolicy(formId);
     }
+    
+    Want connectWant = formRefreshConnection->CreateConnectWant();
 
     if (record.needFreeInstall) {
         return RebindByFreeInstall(record, connectWant, formRefreshConnection);
@@ -359,19 +360,18 @@ ErrCode FormProviderMgr::ConnectAmsForRefreshPermission(const int64_t formId, Wa
     want.RemoveParam(Constants::KEY_IS_TIMER);
     want.RemoveParam(Constants::KEY_TIMER_REFRESH);
 
-    sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want,
-        record.bundleName, record.abilityName, record.needFreeInstall, record.providerUserId);
+    sptr<FormAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want, record);
     if (formRefreshConnection == nullptr) {
         HILOG_ERROR("create FormRefreshConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    Want connectWant;
-    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
-    connectWant.SetElementName(record.bundleName, record.abilityName);
-    if (!record.moduleName.empty()) {
-        connectWant.SetModuleName(record.moduleName);
+    auto errorHandler = FormProviderErrorHandlerFactory::GetRefreshHandler();
+    if (errorHandler != nullptr) {
+        errorHandler->RemoveRetryPolicy(formId);
     }
+
+    Want connectWant = formRefreshConnection->CreateConnectWant();
 
     if (record.needFreeInstall) {
         connectWant.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);

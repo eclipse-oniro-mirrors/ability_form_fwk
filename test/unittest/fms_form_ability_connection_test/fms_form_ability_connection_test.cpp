@@ -603,48 +603,6 @@ HWTEST_F(FmsFormAbilityConnectionTest, OnAbilityDisconnectDone_InvalidConnectId_
 }
 
 /**
- * @tc.name: OnConnectDied_ValidConnectId_001
- * @tc.desc: Verify OnConnectDied with valid connectId.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, OnConnectDied_ValidConnectId_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnConnectDied_ValidConnectId_001 start";
-
-    connection_->SetConnectId(CONNECT_ID);
-
-    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
-    wptr<IRemoteObject> weakRemoteObject = remoteObject;
-
-    connection_->OnConnectDied(weakRemoteObject);
-
-    EXPECT_EQ(connection_->GetConnectId(), 0);
-
-    GTEST_LOG_(INFO) << "OnConnectDied_ValidConnectId_001 end";
-}
-
-/**
- * @tc.name: OnConnectDied_InvalidConnectId_002
- * @tc.desc: Verify OnConnectDied with invalid connectId.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, OnConnectDied_InvalidConnectId_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnConnectDied_InvalidConnectId_002 start";
-
-    connection_->SetConnectId(0);
-
-    sptr<IRemoteObject> remoteObject = new MockIRemoteObject();
-    wptr<IRemoteObject> weakRemoteObject = remoteObject;
-
-    connection_->OnConnectDied(weakRemoteObject);
-
-    EXPECT_EQ(connection_->GetConnectId(), 0);
-
-    GTEST_LOG_(INFO) << "OnConnectDied_InvalidConnectId_002 end";
-}
-
-/**
  * @tc.name: OnBuildTaskWant_Normal_001
  * @tc.desc: Verify OnBuildTaskWant returns Want with correct connectId.
  * @tc.type: FUNC
@@ -1016,5 +974,54 @@ HWTEST_F(FmsFormAbilityConnectionTest, NeedRegisterToSupplyCallback_001, TestSiz
     EXPECT_TRUE(result);
 
     GTEST_LOG_(INFO) << "NeedRegisterToSupplyCallback_001 end";
+}
+
+/**
+ * @tc.name: SetModuleName_001
+ * @tc.desc: Verify SetModuleName when moduleName is empty string.
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormAbilityConnectionTest, SetModuleName_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetModuleName_001 start";
+
+    std::string emptyModuleName = "";
+
+    connection_->SetModuleName(emptyModuleName);
+
+    EXPECT_EQ(connection_->moduleName_, emptyModuleName);
+
+    GTEST_LOG_(INFO) << "SetModuleName_001 end";
+}
+
+/**
+ * @tc.name: SetModuleName_002
+ * @tc.desc: Verify SetModuleName when moduleName is non-empty string.
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormAbilityConnectionTest, SetModuleName_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetModuleName_002 start";
+
+    std::string moduleName = "test_module";
+
+    connection_->SetModuleName(moduleName);
+
+    EXPECT_EQ(connection_->moduleName_, moduleName);
+
+    GTEST_LOG_(INFO) << "SetModuleName_002 end";
+}
+
+HWTEST_F(FmsFormAbilityConnectionTest, Clone_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "Clone_001 start";
+
+    sptr<FormAbilityConnection> retryConnection = connection_->CreateRetryConnection();
+
+    EXPECT_EQ(retryConnection, nullptr);
+
+    GTEST_LOG_(INFO) << "Clone_001 end";
 }
 }  // namespace

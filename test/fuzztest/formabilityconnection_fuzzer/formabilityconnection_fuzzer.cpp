@@ -129,8 +129,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formAbilityConnection->GetBundleName();
     formAbilityConnection->GetAppFormPid();
     formAbilityConnection->OnAbilityDisconnectDone(element, resultCode);
-    wptr<IRemoteObject> remoteObject1;
-    formAbilityConnection->OnConnectDied(remoteObject1);
     
     DoSomethingInterestingPart2(fdp);
     

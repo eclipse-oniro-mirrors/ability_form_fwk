@@ -13,16 +13,29 @@
  * limitations under the License.
  */
 
-#include "common/util/form_report.h"
+#ifndef OHOS_FORM_FWK_PROVIDER_ERROR_HANDLER_FACTORY_H
+#define OHOS_FORM_FWK_PROVIDER_ERROR_HANDLER_FACTORY_H
+
+#include <memory>
+
+#include "form_provider/error_handler/provider_refresh_error_handler.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-FormReport::FormReport() {}
-FormReport::~FormReport() {}
+class FormProviderErrorHandlerFactory {
+public:
+    static sptr<FormProviderRefreshErrorHandler> GetRefreshHandler()
+    {
+        static sptr<FormProviderRefreshErrorHandler> instance = new FormProviderRefreshErrorHandler();
+        return instance;
+    }
 
-void FormReport::SetStartBindTime(int64_t formId, int64_t startTime) {}
+    DISALLOW_COPY_AND_MOVE(FormProviderErrorHandlerFactory);
+};
 
-void FormReport::RemoveFormId(int64_t formId) {}
-} // namespace AppExecFwk
-} // namespace OHOS
+}  // namespace AppExecFwk
+}  // namespace OHOS
+
+#endif // OHOS_FORM_FWK_PROVIDER_ERROR_HANDLER_FACTORY_H
