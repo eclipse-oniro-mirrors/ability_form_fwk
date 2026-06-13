@@ -58,6 +58,11 @@ struct FormJsInfo : public Parcelable {
     virtual bool Marshalling(Parcel &parcel) const override;
     static FormJsInfo *Unmarshalling(Parcel &parcel);
     bool WriteFormData(Parcel &parcel) const;
+    bool WriteAshmemFormData(Parcel &parcel, int32_t size, const char *dataPtr) const;
+    bool WriteFdToParcel(Parcel &parcel, int fd) const;
+    bool ReadAshmemFormData(Parcel &parcel, int32_t formDataLength, std::string &outFormData);
+    int ReadFdFromParcel(Parcel &parcel);
+    static bool CheckAshmemSize(int fd, int32_t bufferSize);
     bool WriteObjects(Parcel &parcel) const;
     bool WriteImageData(Parcel &parcel) const;
     void ReadImageData(Parcel &parcel);
