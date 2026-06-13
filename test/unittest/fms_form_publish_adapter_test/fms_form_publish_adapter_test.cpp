@@ -1564,7 +1564,7 @@ HWTEST_F(FmsFormPublishAdapterTest, IsRequestPublishFormSupported_002, TestSize.
  
     sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
  
-EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(bundleMgr));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
