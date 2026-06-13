@@ -250,11 +250,17 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
     FormJsInfo formJsInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
     int error = formProviderProxy->AcquireProviderFormInfo(formJsInfo, want, FormSupplyCallback::GetInstance());
-    if (error != ERR_OK) {
-        RemoveConnection(connectId);
-        HILOG_ERROR("fail acquire providerFormInfo");
-    } else {
+    if (error == ERR_OK) {
+        FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(formId);
         DelayedFormExitDetect(connectId);
+        FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
+        return;
+    }
+    HILOG_ERROR("fail acquire providerFormInfo, error:%{public}d", error);
+    bool handled = FormProviderErrorHandlerFactory::GetAcquireHandler()
+        ->HandleSendRequestFailed(formId, error, want);
+    if (!handled) {
+        RemoveConnection(connectId);
     }
     FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
 }

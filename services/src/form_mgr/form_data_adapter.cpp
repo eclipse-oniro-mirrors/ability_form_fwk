@@ -53,6 +53,7 @@
 #include "form_mgr/form_mgr_queue.h"
 #include "form_mgr_errors.h"
 #include "form_provider/connection/form_acquire_connection.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "common/connection/form_ability_connection_reporter.h"
 #include "form_refresh/form_refresh_mgr.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
@@ -465,6 +466,8 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     HILOG_INFO("formId:%{public}" PRId64, formId);
+    // New acquire request: pre-clear any pending retry for this form (superseded).
+    FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(formId);
 
     Want newWant;
     newWant.SetParams(wantParams);
@@ -497,6 +500,7 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         want.SetModuleName(info.GetModuleName());
     }
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    formAcquireConnection->SetConnectState(ConnectState::CONNECTING);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         want, formAcquireConnection, record.providerUserId);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());

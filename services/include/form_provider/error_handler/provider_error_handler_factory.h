@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "form_provider/error_handler/provider_acquire_error_handler.h"
 #include "form_provider/error_handler/provider_refresh_error_handler.h"
 #include "nocopyable.h"
 
@@ -29,6 +30,12 @@ public:
     static sptr<FormProviderRefreshErrorHandler> GetRefreshHandler()
     {
         static sptr<FormProviderRefreshErrorHandler> instance = new FormProviderRefreshErrorHandler();
+        return instance;
+    }
+
+    static sptr<FormProviderAcquireErrorHandler> GetAcquireHandler()
+    {
+        static sptr<FormProviderAcquireErrorHandler> instance = new FormProviderAcquireErrorHandler();
         return instance;
     }
 

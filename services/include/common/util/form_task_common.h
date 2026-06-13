@@ -26,6 +26,7 @@ enum class TaskType : int64_t {
     SUBSCRIBE_PROXY_RETRY_TASK = 20000,
     REFRESH_RETRY_TASK = 20001,
     REFRESH_RETRY_TIMEOUT_TASK = 20002,
+    ACQUIRE_RETRY_TASK = 20003,
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms

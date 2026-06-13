@@ -21,6 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_provider/form_provider_task_mgr.h"
 #include "common/util/form_util.h"
 
@@ -34,20 +35,35 @@ FormAcquireConnection::FormAcquireConnection(const int64_t formId, const FormIte
     SetFormId(formId);
     int32_t userId = FormUtil::GetCallerUserId(info.GetProviderUid());
     SetProviderKey(info.GetProviderBundleName(), info.GetAbilityName(), userId);
+    SetModuleName(info.GetModuleName());
     SetHostToken(hostToken);
+}
+
+sptr<FormAbilityConnection> FormAcquireConnection::CreateRetryConnection() const
+{
+    sptr<FormAcquireConnection> retryConn =
+        new FormAcquireConnection(GetFormId(), info_, wantParams_, GetHostToken());
+    return retryConn;
 }
 
 void FormAcquireConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, isConnected:%{public}d",
-        GetFormId(), resultCode, isConnected_);
-    FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
+    ConnectState state = connectState_.load();
+    HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, state:%{public}d",
+        GetFormId(), resultCode, static_cast<int32_t>(state));
+    // Path A: was connected -> dual-signal handler (BEFORE base: it re-reads GetConnectState).
+    if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED) {
+        sptr<FormAbilityConnection> conn = this;
+        FormProviderErrorHandlerFactory::GetAcquireHandler()->HandleDisconnectError(GetFormId(), conn);
+    }
+    // Path B: was NOT connected -> existing ReAcquire (uses pre-base local state).
+    if (resultCode == DISCONNECT_ERROR && state != ConnectState::CONNECTED) {
+        FormMgrAdapterFacade::GetInstance().ReAcquireProviderFormInfoAsync(info_, wantParams_);
+    }
+    FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode); // base LAST (resets state)
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityDisconnectDoneCallback();
 #endif
-    if (!isConnected_ && resultCode == DISCONNECT_ERROR) {
-        FormMgrAdapterFacade::GetInstance().ReAcquireProviderFormInfoAsync(info_, wantParams_);
-    }
 }
 
 void FormAcquireConnection::SetFormAbilityConnectCb(
@@ -82,8 +98,8 @@ void FormAcquireConnection::OnFormAbilityDisconnectDoneCallback()
 
 void FormAcquireConnection::OnPreConnectTask()
 {
-    isConnected_ = true;
     FormMgrAdapterFacade::GetInstance().ClearReconnectNum(GetFormId());
+    FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(GetFormId());
     FormReport::GetInstance().SetEndBindTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityConnectDoneCallback();

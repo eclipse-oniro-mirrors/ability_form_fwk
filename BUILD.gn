@@ -269,6 +269,7 @@ ohos_shared_library("libfms") {
     "services/src/form_provider/connection/form_update_size_connection.cpp",
     "services/src/form_provider/error_handler/provider_connection_error_handler.cpp",
     "services/src/form_provider/error_handler/provider_refresh_error_handler.cpp",
+    "services/src/form_provider/error_handler/provider_acquire_error_handler.cpp",
     "services/src/form_provider/form_provider_mgr.cpp",
     "services/src/form_provider/form_provider_task_mgr.cpp",
     "services/src/form_provider/form_supply_callback.cpp",

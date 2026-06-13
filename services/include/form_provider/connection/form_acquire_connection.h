@@ -43,6 +43,12 @@ public:
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
     /**
+     * @brief Create a retry connection for delayed retry (clone formId/info/wantParams/hostToken).
+     * @return New FormAcquireConnection for retry.
+     */
+    sptr<FormAbilityConnection> CreateRetryConnection() const override;
+
+    /**
      * @brief Set form ability connection callback.
      */
     void SetFormAbilityConnectCb(std::function<void(const std::string &bundleName)> &&callback);
@@ -85,10 +91,8 @@ protected:
 private:
     FormItemInfo info_;
     WantParams wantParams_;
-    bool isConnected_ = false;
     std::function<void(const std::string &bundleName)> onFormAblityConnectCb_;
     std::function<void(const std::string &bundleName)> onFormAblityDisconnectCb_;
-    static constexpr int32_t DISCONNECT_ERROR = -1;
 
     DISALLOW_COPY_AND_MOVE(FormAcquireConnection);
 };

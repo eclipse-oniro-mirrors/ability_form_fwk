@@ -12,8 +12,10 @@
 #include "fms_log_wrapper.h"
 #include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_provider/error_handler/provider_refresh_error_handler.h"
+#include "form_provider/error_handler/provider_acquire_error_handler.h"
 #include "form_provider/error_handler/provider_connection_error_handler.h"
 #include "common/retry_policy/retry_policy.h"
+#include "common/util/form_task_common.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -76,6 +78,16 @@ RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formI
     static RetryPolicy defaultPolicy;
     return defaultPolicy;
 }
+
+// FormProviderAcquireErrorHandler stubs (vtable + overrides; no heavy deps)
+TaskType FormProviderAcquireErrorHandler::GetRetryTaskType() const
+{
+    return TaskType::ACQUIRE_RETRY_TASK;
+}
+
+void FormProviderAcquireErrorHandler::OnPrepareRetryConnect(sptr<FormAbilityConnection> &) {}
+
+void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t) {}
 
 }  // namespace AppExecFwk
 }  // namespace OHOS
