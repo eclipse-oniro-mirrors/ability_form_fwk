@@ -23,6 +23,7 @@
 #include "refbase.h"
 #include "common/connection/form_ability_connection.h"
 #include "common/retry_policy/retry_policy.h"
+#include "common/util/form_task_common.h"
 #include "want.h"
 
 namespace OHOS {
@@ -54,7 +55,7 @@ public:
      * @return true if handled (waiting for disconnect OR retry already scheduled),
      *         false if unrecoverable (non-dead-error/no-connection/retry-limit-reached).
      */
-    virtual bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) = 0;
+    virtual bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want);
 
     /**
      * @brief Handle disconnect error (second signal in dual-signal mechanism).
@@ -63,7 +64,7 @@ public:
      * @param connection Form ability connection object.
      * @return true if dual-signal confirmed and retry scheduled, false otherwise.
      */
-    virtual bool HandleDisconnectError(int64_t formId, const sptr<FormAbilityConnection> &connection) = 0;
+    virtual bool HandleDisconnectError(int64_t formId, const sptr<FormAbilityConnection> &connection);
 
     /**
      * @brief Remove retry policy for specified form.
@@ -107,13 +108,13 @@ protected:
     /**
      * @brief Start the dual-signal fallback timeout. If the second signal does not arrive
      *        within RETRY_SIGNAL_TIMEOUT_MS, OnSignalTimeout cleans up the stuck policy.
+     *        Common to refresh and acquire (both hit S2 when FormExtension exits after the op).
      * @param formId Form ID.
      */
     void StartSignalTimeout(int64_t formId);
 
     /**
-     * @brief Timeout handler: erase the policy if still stuck in a half-signal state
-     *        (exactly one of sendRequestFailed/disconnectFailed set) to avoid hang.
+     * @brief Timeout handler: erase the policy if still stuck in a half-signal state.
      * @param formId Form ID.
      */
     void OnSignalTimeout(int64_t formId);
@@ -123,6 +124,49 @@ protected:
      * @param formId Form ID.
      */
     void CancelSignalTimeout(int64_t formId);
+
+    // --- Concrete common algorithm (subclasses customize via hooks below, not by overriding) ---
+
+    /**
+     * @brief Execute retry: clone connection and reconnect via AMS.
+     *        Calls OnPrepareRetryConnect before connect; aborts if policy/form gone.
+     * @param formId Form ID.
+     * @param originalConnection Connection captured at dual-signal time (for CreateRetryConnection).
+     */
+    void ExecuteRetry(int64_t formId, sptr<FormAbilityConnection> originalConnection);
+
+    /**
+     * @brief Commit a retry attempt: cancel signal timeout, increment count, reset signals,
+     *        and schedule the retry task (key = GetRetryTaskType()).
+     * @param formId Form ID.
+     * @param policy Retry policy (caller holds retryPolicyMutex_).
+     * @param connection Connection to clone at retry time.
+     */
+    void ScheduleRetryWithReset(int64_t formId, RetryPolicy &policy, sptr<FormAbilityConnection> connection);
+
+    // --- Virtual hooks: subclass variation points ---
+
+    /**
+     * @brief Get the retry delay-task key. Refresh/acquire return their own TaskType so retry
+     *        tasks do not collide (a formId is only ever in one scenario at a time).
+     * @return TaskType for ScheduleDelayTask/CancelDelayTask.
+     */
+    virtual TaskType GetRetryTaskType() const = 0;
+
+    /**
+     * @brief Called when retry limit is reached (terminal failure).
+     *        Default erases the policy; override to add scenario-specific failure reporting
+     *        (e.g. acquire reports SendFormFailedEvent). Called within retryPolicyMutex_.
+     * @param formId Form ID.
+     */
+    virtual void OnRetryLimitReached(int64_t formId);
+
+    /**
+     * @brief Hook invoked after CreateRetryConnection, before ConnectServiceAbility.
+     *        Override to set pre-connect state (e.g. acquire sets CONNECTING). Default no-op.
+     * @param connection Retry connection about to connect.
+     */
+    virtual void OnPrepareRetryConnect(sptr<FormAbilityConnection> &connection) {}
 };
 
 }  // namespace AppExecFwk

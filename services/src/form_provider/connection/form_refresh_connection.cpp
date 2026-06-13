@@ -72,11 +72,6 @@ void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IR
     }
 }
 
-void FormRefreshConnection::OnPreConnectTask()
-{
-    connectState_.store(ConnectState::CONNECTED);
-}
-
 void FormRefreshConnection::OnAbilityDisconnectDone(
     const AppExecFwk::ElementName &element, int resultCode)
 {

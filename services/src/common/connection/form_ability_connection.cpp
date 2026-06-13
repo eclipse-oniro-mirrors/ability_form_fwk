@@ -61,6 +61,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
         RegisterToSupplyCallback();
     }
 
+    connectState_.store(ConnectState::CONNECTED);
     OnPreConnectTask();
 
     Want want = OnBuildTaskWant();
@@ -249,6 +250,11 @@ int64_t FormAbilityConnection::GetFormId() const
 ConnectState FormAbilityConnection::GetConnectState() const
 {
     return connectState_.load();
+}
+
+void FormAbilityConnection::SetConnectState(ConnectState state)
+{
+    connectState_.store(state);
 }
 
 int32_t FormAbilityConnection::GetUserId() const

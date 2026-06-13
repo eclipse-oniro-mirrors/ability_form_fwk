@@ -50,12 +50,6 @@ protected:
     bool NeedFreeInstallProcessing() const override { return true; }
 
     /**
-     * @brief Pre-processing after connection success.
-     *        Marks connected state for dual-signal precondition check.
-     */
-    void OnPreConnectTask() override;
-
-    /**
      * @brief Build task Want parameter based on refresh type.
      * @return Built Want object.
      */

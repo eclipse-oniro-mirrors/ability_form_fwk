@@ -19,8 +19,10 @@ namespace OHOS {
 namespace AppExecFwk {
 std::shared_ptr<MockFormProviderRefreshErrorHandler> MockFormProviderRefreshErrorHandler::obj = nullptr;
 
-// --- FormProviderRefreshErrorHandler (derived class overrides) ---
-bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
+// --- FormProviderConnectionErrorHandler (base class methods) ---
+// HandleSendRequestFailed/HandleDisconnectError moved from refresh subclass to base (refactor);
+// stubs delegate to the gmock object for test expectations. ExecuteRefreshRetry removed.
+bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
     int64_t formId, int errorCode, const Want &want)
 {
     GTEST_LOG_(INFO) << "HandleSendRequestFailed called";
@@ -30,7 +32,7 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     return false;
 }
 
-bool FormProviderRefreshErrorHandler::HandleDisconnectError(
+bool FormProviderConnectionErrorHandler::HandleDisconnectError(
     int64_t formId, const sptr<FormAbilityConnection> &connection)
 {
     GTEST_LOG_(INFO) << "HandleDisconnectError called formId:" << formId;
@@ -40,13 +42,11 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(
     return false;
 }
 
-void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(int64_t formId,
-    sptr<FormAbilityConnection> originalConnection)
+void FormProviderConnectionErrorHandler::OnRetryLimitReached(int64_t formId)
 {
-    GTEST_LOG_(INFO) << "ExecuteRefreshRetry called (private stub)";
+    GTEST_LOG_(INFO) << "OnRetryLimitReached stub called (virtual, required by vtable)";
 }
 
-// --- FormProviderConnectionErrorHandler (base class methods) ---
 bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)
 {
     GTEST_LOG_(INFO) << "IsRemoteDead stub called";

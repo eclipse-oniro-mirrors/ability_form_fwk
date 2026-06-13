@@ -126,6 +126,12 @@ public:
     ConnectState GetConnectState() const;
 
     /**
+     * @brief Set connection state.
+     * @param state Connection state to set.
+     */
+    void SetConnectState(ConnectState state);
+
+    /**
      * @brief Get user ID.
      * @return Current user ID.
      */

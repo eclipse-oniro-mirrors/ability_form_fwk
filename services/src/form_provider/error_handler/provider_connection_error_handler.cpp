@@ -18,7 +18,9 @@
 #include <cinttypes>
 #include <utility>
 
+#include "ams_mgr/form_ams_helper.h"
 #include "common/util/form_task_common.h"
+#include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr/form_mgr_queue.h"
 
@@ -48,7 +50,7 @@ RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formI
 void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
 {
     FormMgrQueue::GetInstance().CancelDelayTask(
-        std::make_pair(static_cast<int64_t>(TaskType::REFRESH_RETRY_TASK), formId));
+        std::make_pair(static_cast<int64_t>(GetRetryTaskType()), formId));
     CancelSignalTimeout(formId);
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     retryPolicyMap_.erase(formId);
@@ -80,16 +82,12 @@ void FormProviderConnectionErrorHandler::OnSignalTimeout(int64_t formId)
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     auto it = retryPolicyMap_.find(formId);
     if (it == retryPolicyMap_.end()) {
-        return; // already resolved or removed
+        return;
     }
     RetryPolicy &policy = it->second;
-    // Stuck half-signal = exactly one of the two signals arrived. Both-set is transient
-    // (retry resets flags to false); neither means idle -> in those cases do nothing.
-    //
-    // FMS and AMS are co-located in the foundation process, so the disconnect callback is
-    // delivered in-process and reliably resolves the sendRequest-first (S1) state within
-    // milliseconds; this timeout therefore only ever fires for S2 (disconnect without a
-    // pending sendRequest, e.g. normal FormExtension exit), cleaning up the lingering policy.
+    // Stuck half-signal = exactly one signal arrived. Both-set is transient (retry resets
+    // flags); neither means idle -> do nothing. Fires mainly for S2 (disconnect without
+    // sendRequest), which both refresh and acquire hit when FormExtension exits after the op.
     if (policy.IsSendRequestFailed() == policy.IsDisconnectFailed()) {
         return;
     }
@@ -103,8 +101,133 @@ void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId,
     int32_t delayMs = policy.CalculateNextDelay();
     HILOG_INFO("Scheduling retry for formId %{public}" PRId64 ", delay=%{public}dms", formId, delayMs);
     FormMgrQueue::GetInstance().ScheduleDelayTask(
-        std::make_pair(static_cast<int64_t>(TaskType::REFRESH_RETRY_TASK), formId),
+        std::make_pair(static_cast<int64_t>(GetRetryTaskType()), formId),
         delayMs, retryFunc);
+}
+
+bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
+    int64_t formId, int errorCode, const Want &want)
+{
+    if (!IsRemoteDead(errorCode)) {
+        HILOG_WARN("Non-remote-dead error %{public}d, caller will RemoveConnection", errorCode);
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(retryPolicyMutex_);
+    auto &policy = EnsureRetryPolicy(formId);
+    policy.SetSendRequestFailed(true);
+
+    if (!policy.IsDisconnectFailed()) {
+        HILOG_INFO("Waiting for connection disconnect callback, formId %{public}" PRId64, formId);
+        StartSignalTimeout(formId); // S1: fallback if disconnect callback is lost (refresh overrides; acquire no-op)
+        return true;
+    }
+
+    if (policy.GetOriginalConnection() == nullptr) {
+        HILOG_ERROR("No connection in retryPolicy, abort retry for formId %{public}" PRId64, formId);
+        retryPolicyMap_.erase(formId);
+        return false;
+    }
+
+    if (policy.NeedRetry()) {
+        HILOG_INFO("Scheduling retry from HandleSendRequestFailed, formId %{public}" PRId64, formId);
+        sptr<FormAbilityConnection> connection = policy.GetOriginalConnection();
+        ScheduleRetryWithReset(formId, policy, connection);
+        return true;
+    }
+
+    HILOG_WARN("Retry limit reached formId %{public}" PRId64, formId);
+    OnRetryLimitReached(formId);
+    return false;
+}
+
+bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
+    const sptr<FormAbilityConnection> &connection)
+{
+    ConnectState state = connection->GetConnectState();
+    if (state != ConnectState::CONNECTED) {
+        HILOG_WARN("state not connected, not handled");
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(retryPolicyMutex_);
+    auto &policy = EnsureRetryPolicy(formId);
+    policy.SetOriginalConnection(connection);
+    policy.SetDisconnectFailed(true);
+
+    if (!policy.IsSendRequestFailed()) {
+        HILOG_WARN("Disconnect without prior SendRequest failure, not handled");
+        StartSignalTimeout(formId); // S2: fallback if no SendRequest follows (refresh overrides; acquire no-op)
+        return false;
+    }
+
+    if (policy.NeedRetry()) {
+        HILOG_INFO("Dual-signal confirmed, scheduling retry for formId %{public}" PRId64, formId);
+        ScheduleRetryWithReset(formId, policy, connection);
+        return true;
+    }
+
+    HILOG_WARN("Retry limit reached on disconnect, formId %{public}" PRId64, formId);
+    OnRetryLimitReached(formId);
+    return true;
+}
+
+void FormProviderConnectionErrorHandler::ScheduleRetryWithReset(int64_t formId, RetryPolicy &policy,
+    sptr<FormAbilityConnection> connection)
+{
+    CancelSignalTimeout(formId); // dual-signal resolved, no need for the fallback timeout
+    policy.IncrementRetryCount();
+    policy.SetDisconnectFailed(false);
+    policy.SetSendRequestFailed(false);
+    policy.SetOriginalConnection(nullptr);
+
+    ScheduleRetry(formId, policy,
+        [formId, connection, weakHandler = wptr<FormProviderConnectionErrorHandler>(this)]() {
+            sptr<FormProviderConnectionErrorHandler> handler = weakHandler.promote();
+            if (handler == nullptr) {
+                HILOG_INFO("Handler destroyed, skip retry for formId %{public}" PRId64, formId);
+                return;
+            }
+            handler->ExecuteRetry(formId, connection);
+        });
+}
+
+void FormProviderConnectionErrorHandler::ExecuteRetry(
+    int64_t formId, sptr<FormAbilityConnection> originalConnection)
+{
+    bool formExist = FormDataMgr::GetInstance().HasFormRecord(formId);
+
+    std::lock_guard<std::mutex> lock(retryPolicyMutex_);
+    if (retryPolicyMap_.find(formId) == retryPolicyMap_.end()) {
+        HILOG_INFO("Retry policy already removed, skip retry for formId %{public}" PRId64, formId);
+        return;
+    }
+    if (!formExist) {
+        retryPolicyMap_.erase(formId);
+        HILOG_WARN("FormRecord not found, abort retry for formId %{public}" PRId64, formId);
+        return;
+    }
+
+    sptr<FormAbilityConnection> retryConnection = originalConnection->CreateRetryConnection();
+    if (retryConnection == nullptr) {
+        HILOG_ERROR("Create retry connection failed, abort retry for formId %{public}" PRId64, formId);
+        retryPolicyMap_.erase(formId);
+        return;
+    }
+    OnPrepareRetryConnect(retryConnection);
+
+    Want connectWant = retryConnection->CreateConnectWant();
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        connectWant, retryConnection, retryConnection->GetUserId());
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("Retry connect failed, errorCode:%{public}d", errorCode);
+        retryPolicyMap_.erase(formId);
+    }
+}
+
+void FormProviderConnectionErrorHandler::OnRetryLimitReached(int64_t formId)
+{
+    retryPolicyMap_.erase(formId);
 }
 
 }  // namespace AppExecFwk
