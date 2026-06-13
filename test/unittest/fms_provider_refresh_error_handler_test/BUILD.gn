@@ -23,6 +23,8 @@ ohos_unittest("FmsProviderRefreshErrorHandlerTest") {
     "${form_fwk_path}/services/src/common/retry_policy/retry_policy.cpp",
     "${form_fwk_path}/services/src/form_provider/error_handler/provider_connection_error_handler.cpp",
     "${form_fwk_path}/services/src/form_provider/error_handler/provider_refresh_error_handler.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
     "${form_fwk_path}/test/unittest/fms_provider_refresh_error_handler_test/fms_provider_refresh_error_handler_test.cpp",
   ]
 

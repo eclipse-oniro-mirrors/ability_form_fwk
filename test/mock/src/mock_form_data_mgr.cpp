@@ -34,6 +34,15 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
     return false;
 }
 
+bool FormDataMgr::HasFormRecord(const int64_t formId) const
+{
+    GTEST_LOG_(INFO) << "HasFormRecord called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->HasFormRecord(formId);
+    }
+    return false;
+}
+
 void FormDataMgr::CheckForms(const std::vector<int64_t> &formIds)
 {
     GTEST_LOG_(INFO) << "CheckForms called";

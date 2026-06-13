@@ -50,14 +50,9 @@ public:
     TestConnectionErrorHandler() = default;
     virtual ~TestConnectionErrorHandler() = default;
 
-    bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override
+    TaskType GetRetryTaskType() const override
     {
-        return true;
-    }
-
-    bool HandleDisconnectError(int64_t formId, int resultCode, const Want &want) override
-    {
-        return true;
+        return TaskType::REFRESH_RETRY_TASK;
     }
 };
 

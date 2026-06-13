@@ -21,6 +21,12 @@ namespace OHOS {
 namespace AppExecFwk {
 std::shared_ptr<MockFormProviderRefreshErrorHandler> MockFormProviderRefreshErrorHandler::obj = nullptr;
 
+// vtable anchor for FormProviderRefreshErrorHandler (refresh handler thinned to GetRetryTaskType only)
+TaskType FormProviderRefreshErrorHandler::GetRetryTaskType() const
+{
+    return TaskType::REFRESH_RETRY_TASK;
+}
+
 // --- FormProviderConnectionErrorHandler (base class methods) ---
 // HandleSendRequestFailed/HandleDisconnectError moved from refresh subclass to base (refactor);
 // stubs delegate to the gmock object for test expectations. ExecuteRefreshRetry removed.
