@@ -37,6 +37,8 @@ class AbstractMockFormDataMgr {
 public:
     virtual ~AbstractMockFormDataMgr() = default;
     virtual bool GetFormRecord(const int64_t formId, FormRecord &formRecord) = 0;
+    virtual bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos,
+        int32_t userId) const = 0;
     virtual void CheckForms(const std::vector<int64_t> &formIds) = 0;
     // MergeFormWant removed - FormWant::MergeFrom is used directly now
     virtual void SetNeedRefresh(const int64_t formId, const bool needRefresh) = 0;
@@ -80,9 +82,11 @@ public:
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate,
         std::vector<int64_t> &refreshForms) = 0;
     virtual void SetFormVisible(int64_t formId, bool isVisible) = 0;
+    virtual ErrCode SetFormLock(const int64_t formId, const bool lock) = 0;
     virtual void SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled) = 0;
     virtual void SetExpectRecycledStatusVec(const std::vector<int64_t> &formIds, bool isExpectRecycled) = 0;
     virtual bool ExistFormRecord(const int64_t formId) const = 0;
+    virtual bool ExistTempForm(const int64_t formId) const = 0;
     virtual ErrCode NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
         const sptr<IRemoteObject> &callerToken, int32_t userId) = 0;
     virtual ErrCode SetFormProtect(const int64_t formId, const bool protect) = 0;
@@ -102,6 +106,8 @@ public:
     MOCK_METHOD4(AllotFormHostRecord, bool(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
         const int64_t formId, const int callingUid));
     MOCK_METHOD2(GetFormRecord, bool(const int64_t formId, FormRecord &formRecord));
+    MOCK_CONST_METHOD3(GetFormRecord, bool(const std::string &bundleName,
+        std::vector<FormRecord> &formInfos, int32_t userId));
     MOCK_METHOD1(CheckForms, void(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(SetNeedRefresh, void(const int64_t formId, const bool needRefresh));
     MOCK_METHOD3(GetUpdatedForm, bool(const FormRecord &record, const std::vector<FormInfo> &targetForms,
@@ -146,9 +152,11 @@ public:
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate,
         std::vector<int64_t> &refreshForms));
     MOCK_METHOD2(SetFormVisible, void(int64_t formId, bool isVisible));
+    MOCK_METHOD2(SetFormLock, ErrCode(const int64_t formId, const bool lock));
     MOCK_METHOD2(SetExpectRecycledStatus, void(int64_t formId, bool isExpectRecycled));
     MOCK_METHOD2(SetExpectRecycledStatusVec, void(const std::vector<int64_t> &formIds, bool isExpectRecycled));
     MOCK_CONST_METHOD1(ExistFormRecord, bool(const int64_t formId));
+    MOCK_CONST_METHOD1(ExistTempForm, bool(const int64_t formId));
     MOCK_METHOD4(NotifyFormsVisible, ErrCode(const std::vector<int64_t> &formIds, bool isVisible,
         const sptr<IRemoteObject> &callerToken, int32_t userId));
     MOCK_METHOD2(SetFormProtect, ErrCode(const int64_t formId, const bool protect));

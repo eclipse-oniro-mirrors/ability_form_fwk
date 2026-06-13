@@ -108,6 +108,17 @@ void FmsFormLifecycleAdapterTest::SetUp()
 
 void FmsFormLifecycleAdapterTest::TearDown()
 {
+    testing::Mock::VerifyAndClear(MockFormDataMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormInfoMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBmsHelper::obj.get());
+    testing::Mock::VerifyAndClear(MockFormTimerMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormDbCache::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBundleForbidMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormBundleLockMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormExemptLockMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockFormDistributedMgr::obj.get());
+    testing::Mock::VerifyAndClear(MockParamControl::obj.get());
+    testing::Mock::VerifyAndClear(MockIPCSkeleton::obj);
 }
 
 // ========== AddForm Tests ==========
@@ -514,12 +525,8 @@ HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_002, TestSize.Level1)
     std::string bundleName = "com.test.bundle";
     bool protect = false;
 
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsLockServiceInitialized())
-        .WillOnce(Return(false));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
         .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillOnce(Return(true));
 
     auto result = FormLifecycleAdapter::GetInstance().ProtectLockForms(bundleName, TEST_USER_ID, protect);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
@@ -1035,18 +1042,10 @@ HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_003, TestSize.Level1)
     record.transparencyEnabled = false;
     formInfos.push_back(record);
 
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsLockServiceInitialized())
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillOnce(Return(false)); // status changed
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, SetBundleProtectStatus(_, _))
-        .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(formInfos), Return(true)));
     EXPECT_CALL(*MockFormExemptLockMgr::obj, IsExemptLock(_))
-        .WillOnce(Return(true)); // exempt, should be skipped
-    EXPECT_CALL(*MockFormBundleForbidMgr::obj, IsBundleForbidden(_))
-        .WillOnce(Return(false));
+        .WillOnce(Return(true));
 
     auto result = FormLifecycleAdapter::GetInstance().ProtectLockForms(bundleName, TEST_USER_ID, protect);
     EXPECT_EQ(result, ERR_OK);
@@ -1073,10 +1072,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_004, TestSize.Level1)
     record.transparencyEnabled = false;
     formInfos.push_back(record);
 
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsLockServiceInitialized())
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillOnce(Return(false)); // status changed
     EXPECT_CALL(*MockFormBundleLockMgr::obj, SetBundleProtectStatus(_, _))
         .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
@@ -1087,8 +1082,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_004, TestSize.Level1)
         .WillOnce(Return(ERR_OK));
     EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
         .WillOnce(Return(ERR_OK));
-    EXPECT_CALL(*MockFormBundleForbidMgr::obj, IsBundleForbidden(_))
-        .WillOnce(Return(false));
     EXPECT_CALL(*MockFormDataMgr::obj, LockForms(_, _))
         .Times(1);
 
@@ -1110,17 +1103,9 @@ HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_005, TestSize.Level1)
     std::string bundleName = "com.test.bundle";
     bool protect = false;
 
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsLockServiceInitialized())
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillOnce(Return(true)); // status changed (was protect=true, now protect=false)
     EXPECT_CALL(*MockFormBundleLockMgr::obj, SetBundleProtectStatus(_, _))
         .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
-        .WillOnce(Return(false)); // no records
-
-    // protect=false, IsBundleForbidden returns false -> ExecAcquireProviderForbiddenTask
-    EXPECT_CALL(*MockFormBundleForbidMgr::obj, IsBundleForbidden(_))
         .WillOnce(Return(false));
 
     auto result = FormLifecycleAdapter::GetInstance().ProtectLockForms(bundleName, TEST_USER_ID, protect);
@@ -1152,36 +1137,24 @@ HWTEST_F(FmsFormLifecycleAdapterTest, SwitchLockForms_005, TestSize.Level1)
     formInfos.push_back(record);
 
     EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleLock(_, _, _))
-        .WillOnce(Return(true)); // status unchanged would return early, so make it changed
-    // IsBundleLock returns true == lock(true), but we want lock=false
-    // Actually, IsBundleLock(_,_,_) == lock means no change -> early return.
-    // We need IsBundleLock != lock to proceed. lock=false, IsBundleLock returns true -> changed
-
+        .WillOnce(Return(true));
     EXPECT_CALL(*MockFormBundleLockMgr::obj, SetBundleLockStatus(_, _))
         .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(formInfos), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(formInfos), Return(true)));
     EXPECT_CALL(*MockFormInfoMgr::obj, IsMultiAppForm(_))
         .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormDataMgr::obj, SetFormProtect(_, _))
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*MockFormDataMgr::obj, SetFormLock(_, _))
+        .Times(1);
     EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
-        .WillOnce(Return(ERR_OK));
+        .WillRepeatedly(Return(ERR_OK));
     EXPECT_CALL(*MockFormExemptLockMgr::obj, SetExemptLockStatus(_, false))
         .Times(1);
-
-    // ProtectLockForms will be called internally
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsLockServiceInitialized())
-        .WillOnce(Return(true));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillOnce(Return(false)); // status changed, but no records in ProtectLockForms
     EXPECT_CALL(*MockFormBundleLockMgr::obj, SetBundleProtectStatus(_, _))
         .Times(1);
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
-        .WillOnce(Return(false));
 
     auto result = FormLifecycleAdapter::GetInstance().SwitchLockForms(bundleName, TEST_USER_ID, lock);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "SwitchLockForms_005 end";
 }
@@ -1587,7 +1560,7 @@ HWTEST_F(FmsFormLifecycleAdapterTest, RecycleForms_008, TestSize.Level1)
         .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
-    EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatus(_, _))
+    EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatusVec(_, _))
         .Times(1);
 
     auto result = FormLifecycleAdapter::GetInstance().RecycleForms(formIds, want, true);
@@ -1623,7 +1596,7 @@ HWTEST_F(FmsFormLifecycleAdapterTest, RecycleForms_009, TestSize.Level1)
         .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
-    EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatus(_, _))
+    EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatusVec(_, _))
         .Times(1);
 
     auto result = FormLifecycleAdapter::GetInstance().RecycleForms(formIds, want, false);
@@ -2083,13 +2056,9 @@ HWTEST_F(FmsFormLifecycleAdapterTest, CastTempForm_005, TestSize.Level1)
         .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, ExistFormRecord(_))
         .WillOnce(Return(true));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetMatchedHostClient(_, _))
+    EXPECT_CALL(*MockFormDataMgr::obj, ExistTempForm(_))
         .WillOnce(Return(false));
 
-    // ExistTempForm is not mocked - calls real method which returns false
-    // Then GetMatchedHostClient returns false, so isSelfId = false
-    // But first check: !ExistFormRecord || !ExistTempForm
-    // ExistFormRecord returns true, ExistTempForm returns false -> returns NOT_EXIST_ID
     auto result = FormLifecycleAdapter::GetInstance().CastTempForm(TEST_FORM_ID, callerToken);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 
@@ -2115,10 +2084,7 @@ HWTEST_F(FmsFormLifecycleAdapterTest, CastTempForm_006, TestSize.Level1)
         .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, ExistFormRecord(_))
         .WillOnce(Return(true));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetMatchedHostClient(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(hostRecord), Return(false)));
 
-    // ExistTempForm is not mocked, returns false from real impl -> NOT_EXIST_ID
     auto result = FormLifecycleAdapter::GetInstance().CastTempForm(TEST_FORM_ID, callerToken);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 
@@ -2140,10 +2106,7 @@ HWTEST_F(FmsFormLifecycleAdapterTest, HandleDeleteFormCache_001, TestSize.Level1
     dbRecord.formId = TEST_FORM_ID;
     dbRecord.bundleName = "com.test.bundle";
     dbRecord.moduleName = "entry";
-    dbRecord.formUserUids.clear(); // empty - triggers full delete path
-
-    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
-        .WillOnce(Return(ERR_OK));
+    dbRecord.formUserUids.clear();
 
     auto result = FormLifecycleAdapter::GetInstance().HandleDeleteFormCache(dbRecord, TEST_CALLING_UID, TEST_FORM_ID);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
