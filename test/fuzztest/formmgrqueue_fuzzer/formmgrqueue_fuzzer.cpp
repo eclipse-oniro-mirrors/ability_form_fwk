@@ -36,10 +36,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
         return true;
     }
 
-    uint64_t ms = fdp->ConsumeIntegral<uint64_t>();
     auto emptyFunc = []() {};
-    FormMgrQueue::GetInstance().ScheduleTask(ms, emptyFunc);
-
     int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
     int64_t userId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
     std::pair<int64_t, int64_t> eventMsg = std::make_pair(formId, userId);
