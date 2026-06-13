@@ -84,13 +84,15 @@ void FormRefreshConnection::OnAbilityDisconnectDone(
     HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
         GetFormId(), resultCode, static_cast<int32_t>(state));
 
-    FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
-
+    // Handle disconnect error BEFORE base cleanup: HandleDisconnectError re-reads GetConnectState()
+    // and expects CONNECTED; the base call resets it to DISCONNECTED.
     if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED) {
         sptr<FormAbilityConnection> connection = this;
         FormProviderErrorHandlerFactory::GetRefreshHandler()
             ->HandleDisconnectError(GetFormId(), connection);
     }
+
+    FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
 }
 
 }  // namespace AppExecFwk

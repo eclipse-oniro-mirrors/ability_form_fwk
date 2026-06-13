@@ -29,6 +29,7 @@ namespace AppExecFwk {
 void FormProviderRefreshErrorHandler::ScheduleRefreshRetry(
     int64_t formId, RetryPolicy &policy, sptr<FormAbilityConnection> connection)
 {
+    CancelSignalTimeout(formId); // dual-signal resolved, no need for the fallback timeout
     policy.IncrementRetryCount();
     policy.SetDisconnectFailed(false);
     policy.SetSendRequestFailed(false);
@@ -59,6 +60,7 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
 
     if (!policy.IsDisconnectFailed()) {
         HILOG_INFO("Waiting for connection disconnect callback, formId %{public}" PRId64, formId);
+        StartSignalTimeout(formId); // S1: fallback if disconnect callback is lost
         return true;
     }
 
@@ -72,7 +74,7 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
         HILOG_INFO("Scheduling retry from HandleSendRequestFailed, formId %{public}" PRId64, formId);
         sptr<FormAbilityConnection> connection = policy.GetOriginalConnection();
         ScheduleRefreshRetry(formId, policy, connection);
-        return false;
+        return true;
     }
 
     HILOG_WARN("Retry limit reached formId %{public}" PRId64, formId);
@@ -96,6 +98,7 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId,
 
     if (!policy.IsSendRequestFailed()) {
         HILOG_WARN("Disconnect without prior SendRequest failure, not handled");
+        StartSignalTimeout(formId); // S2: fallback if no SendRequest follows (e.g. normal exit)
         return false;
     }
 
@@ -113,15 +116,14 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(int64_t formId,
 void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(
     int64_t formId, sptr<FormAbilityConnection> originalConnection)
 {
-    FormRecord record;
-    bool success = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    bool formExist = FormDataMgr::GetInstance().HasFormRecord(formId);
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     if (retryPolicyMap_.find(formId) == retryPolicyMap_.end()) {
         HILOG_INFO("Retry policy already removed, skip retry for formId %{public}" PRId64, formId);
         return;
     }
-    if (!success) {
+    if (!formExist) {
         retryPolicyMap_.erase(formId);
         HILOG_WARN("FormRecord not found, abort retry for formId %{public}" PRId64, formId);
         return;

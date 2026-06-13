@@ -37,8 +37,8 @@ public:
      * @param formId Form ID.
      * @param errorCode IPC error code (must be remote-dead error: 32 or 29189).
      * @param want Want parameter for retry.
-     * @return true if waiting for disconnect callback (first signal only),
-     *         false if non-dead-error/dual-signal-confirmed/retry-limit-reached.
+     * @return true if handled (waiting for disconnect OR retry already scheduled),
+     *         false if unrecoverable (non-dead-error/no-connection/retry-limit-reached).
      */
     bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override;
 

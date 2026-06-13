@@ -49,9 +49,52 @@ void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
 {
     FormMgrQueue::GetInstance().CancelDelayTask(
         std::make_pair(static_cast<int64_t>(TaskType::REFRESH_RETRY_TASK), formId));
+    CancelSignalTimeout(formId);
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     retryPolicyMap_.erase(formId);
     HILOG_INFO("Removed retry policy for formId %{public}" PRId64, formId);
+}
+
+void FormProviderConnectionErrorHandler::CancelSignalTimeout(int64_t formId)
+{
+    FormMgrQueue::GetInstance().CancelDelayTask(
+        std::make_pair(static_cast<int64_t>(TaskType::REFRESH_RETRY_TIMEOUT_TASK), formId));
+}
+
+void FormProviderConnectionErrorHandler::StartSignalTimeout(int64_t formId)
+{
+    FormMgrQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair(static_cast<int64_t>(TaskType::REFRESH_RETRY_TIMEOUT_TASK), formId),
+        RETRY_SIGNAL_TIMEOUT_MS,
+        [formId, weakHandler = wptr<FormProviderConnectionErrorHandler>(this)]() {
+            sptr<FormProviderConnectionErrorHandler> handler = weakHandler.promote();
+            if (handler == nullptr) {
+                return;
+            }
+            handler->OnSignalTimeout(formId);
+        });
+}
+
+void FormProviderConnectionErrorHandler::OnSignalTimeout(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(retryPolicyMutex_);
+    auto it = retryPolicyMap_.find(formId);
+    if (it == retryPolicyMap_.end()) {
+        return; // already resolved or removed
+    }
+    RetryPolicy &policy = it->second;
+    // Stuck half-signal = exactly one of the two signals arrived. Both-set is transient
+    // (retry resets flags to false); neither means idle -> in those cases do nothing.
+    //
+    // FMS and AMS are co-located in the foundation process, so the disconnect callback is
+    // delivered in-process and reliably resolves the sendRequest-first (S1) state within
+    // milliseconds; this timeout therefore only ever fires for S2 (disconnect without a
+    // pending sendRequest, e.g. normal FormExtension exit), cleaning up the lingering policy.
+    if (policy.IsSendRequestFailed() == policy.IsDisconnectFailed()) {
+        return;
+    }
+    HILOG_WARN("Dual-signal timeout, cleaning up stuck half-signal for formId %{public}" PRId64, formId);
+    retryPolicyMap_.erase(it);
 }
 
 void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId,

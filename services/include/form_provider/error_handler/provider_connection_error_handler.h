@@ -51,8 +51,8 @@ public:
      * @param formId Form ID.
      * @param errorCode IPC error code.
      * @param want Want parameter for retry.
-     * @return true if waiting for disconnect callback (first signal only),
-     *         false if non-dead-error/dual-signal-confirmed/retry-limit-reached.
+     * @return true if handled (waiting for disconnect OR retry already scheduled),
+     *         false if unrecoverable (non-dead-error/no-connection/retry-limit-reached).
      */
     virtual bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) = 0;
 
@@ -74,6 +74,8 @@ public:
 protected:
     static constexpr int32_t IPC_ERR_DEAD_OBJECT = 32;
     static constexpr int32_t IPC_ERR_SERVICE_DIED = 29189;
+    // Fallback timeout waiting for the second dual-signal (disconnect or sendRequest).
+    static constexpr int32_t RETRY_SIGNAL_TIMEOUT_MS = 5000; // ms
 
     std::unordered_map<int64_t, RetryPolicy> retryPolicyMap_;
     std::mutex retryPolicyMutex_;
@@ -101,6 +103,26 @@ protected:
      * @return Reference to retry policy in retryPolicyMap_.
      */
     RetryPolicy &EnsureRetryPolicy(int64_t formId);
+
+    /**
+     * @brief Start the dual-signal fallback timeout. If the second signal does not arrive
+     *        within RETRY_SIGNAL_TIMEOUT_MS, OnSignalTimeout cleans up the stuck policy.
+     * @param formId Form ID.
+     */
+    void StartSignalTimeout(int64_t formId);
+
+    /**
+     * @brief Timeout handler: erase the policy if still stuck in a half-signal state
+     *        (exactly one of sendRequestFailed/disconnectFailed set) to avoid hang.
+     * @param formId Form ID.
+     */
+    void OnSignalTimeout(int64_t formId);
+
+    /**
+     * @brief Cancel pending dual-signal timeout task for specified form.
+     * @param formId Form ID.
+     */
+    void CancelSignalTimeout(int64_t formId);
 };
 
 }  // namespace AppExecFwk

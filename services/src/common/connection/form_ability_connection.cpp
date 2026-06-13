@@ -137,6 +137,7 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
         HILOG_ERROR("invalid connectId_:%{public}d", connectId_);
     }
     ReportFormAppUnbindEvent();
+    connectState_.store(ConnectState::DISCONNECTED);
 }
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()

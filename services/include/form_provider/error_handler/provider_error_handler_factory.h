@@ -32,6 +32,8 @@ public:
         return instance;
     }
 
+private:
+    FormProviderErrorHandlerFactory() = default;
     DISALLOW_COPY_AND_MOVE(FormProviderErrorHandlerFactory);
 };
 
