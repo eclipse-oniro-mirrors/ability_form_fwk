@@ -99,7 +99,6 @@ void FormAcquireConnection::OnFormAbilityDisconnectDoneCallback()
 void FormAcquireConnection::OnPreConnectTask()
 {
     FormMgrAdapterFacade::GetInstance().ClearReconnectNum(GetFormId());
-    FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(GetFormId());
     FormReport::GetInstance().SetEndBindTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityConnectDoneCallback();

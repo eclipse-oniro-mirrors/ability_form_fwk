@@ -26,10 +26,8 @@ public:
     MockFormProviderRefreshErrorHandler() = default;
     virtual ~MockFormProviderRefreshErrorHandler() = default;
 
-    MOCK_METHOD(bool, HandleSendRequestFailed, (int64_t formId,
-        (int errorCode), (const Want &want)));
-    MOCK_METHOD(bool, HandleDisconnectError, (int64_t formId,
-        (const sptr<FormAbilityConnection> &connection)));
+    MOCK_METHOD3(HandleSendRequestFailed, bool(int64_t formId, int errorCode, const Want &want));
+    MOCK_METHOD2(HandleDisconnectError, bool(int64_t formId, const sptr<FormAbilityConnection> &connection));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

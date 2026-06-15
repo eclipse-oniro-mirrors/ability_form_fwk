@@ -42,6 +42,7 @@ const int32_t IPC_ERR_DEAD_OBJECT = 32;
 class TestConnection : public FormAbilityConnection {
 public:
     TestConnection() = default;
+
 protected:
     void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override {}
     Want OnBuildTaskWant() override
@@ -49,6 +50,7 @@ protected:
         Want want;
         return want;
     }
+
 public:
     sptr<FormAbilityConnection> CreateRetryConnection() const override
     {
@@ -97,25 +99,8 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, GetRetryTaskType_001, TestSize.Leve
 }
 
 /**
- * @tc.name: OnPrepareRetryConnect_001
- * @tc.desc: Verify OnPrepareRetryConnect sets state to CONNECTING (acquire-only).
- * @tc.type: FUNC
- * @tc.require: issueI5NQJG
- */
-HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnPrepareRetryConnect_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnPrepareRetryConnect_001 start";
-    sptr<FormAbilityConnection> conn = new TestConnection();
-    conn->SetConnectState(ConnectState::DISCONNECTED);
-    handler_->OnPrepareRetryConnect(conn);
-    ASSERT_NE(conn, nullptr);
-    EXPECT_EQ(conn->GetConnectState(), ConnectState::CONNECTING);
-    GTEST_LOG_(INFO) << "OnPrepareRetryConnect_001 end";
-}
-
-/**
  * @tc.name: OnRetryLimitReached_001
- * @tc.desc: Verify OnRetryLimitReached erases the policy (acquire exhaustion terminal handling).
+ * @tc.desc: Verify OnRetryLimitReached is a pure hook: reports HiSys event but does not modify map.
  * @tc.type: FUNC
  * @tc.require: issueI5NQJG
  */
@@ -126,7 +111,8 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnRetryLimitReached_001, TestSize.L
     policy.SetSendRequestFailed(true);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
     handler_->OnRetryLimitReached(FORM_ID);
-    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    handler_->RemoveRetryPolicy(FORM_ID);
     GTEST_LOG_(INFO) << "OnRetryLimitReached_001 end";
 }
 

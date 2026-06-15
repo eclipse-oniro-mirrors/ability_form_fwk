@@ -28,7 +28,6 @@ namespace AppExecFwk {
  * Handles SendRequest failure after successful connect (reuses the base common algorithm,
  * customizes via hooks):
  *  - GetRetryTaskType: ACQUIRE_RETRY_TASK (distinct from refresh).
- *  - OnPrepareRetryConnect: set CONNECTING before AMS connect (acquire-only, completes state machine).
  *  - OnRetryLimitReached: erase + SendFormFailedEvent (aligns with ReAcquire exhaustion).
  *
  * Connect failure (state != CONNECTED) is NOT handled here — it stays in
@@ -42,7 +41,6 @@ public:
 protected:
     TaskType GetRetryTaskType() const override;
     void OnRetryLimitReached(int64_t formId) override;
-    void OnPrepareRetryConnect(sptr<FormAbilityConnection> &connection) override;
 };
 
 }  // namespace AppExecFwk
