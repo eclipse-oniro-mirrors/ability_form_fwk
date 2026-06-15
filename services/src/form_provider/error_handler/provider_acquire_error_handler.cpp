@@ -44,6 +44,7 @@ void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t formId)
     // Align with the existing ReAcquireProviderFormInfoAsync exhaustion handling: erase policy
     // and report a HiSys failed event. No host push-notification exists; no FormRecord cleanup
     // (current acquire-failure handling does not delete the record).
+    CancelPendingTasks(formId);
     retryPolicyMap_.erase(formId);
     HILOG_WARN("Acquire retry limit reached, formId %{public}" PRId64, formId);
     FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,

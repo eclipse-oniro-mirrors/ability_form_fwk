@@ -125,6 +125,13 @@ protected:
      */
     void CancelSignalTimeout(int64_t formId);
 
+    /**
+     * @brief Cancel all pending retry + signal-timeout tasks for specified form.
+     *        Thread-safe (FormMgrQueue handles its own locking); safe to call within retryPolicyMutex_.
+     * @param formId Form ID.
+     */
+    void CancelPendingTasks(int64_t formId);
+
     // --- Concrete common algorithm (subclasses customize via hooks below, not by overriding) ---
 
     /**

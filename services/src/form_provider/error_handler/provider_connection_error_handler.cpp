@@ -47,11 +47,16 @@ RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formI
     return it->second;
 }
 
-void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
+void FormProviderConnectionErrorHandler::CancelPendingTasks(int64_t formId)
 {
     FormMgrQueue::GetInstance().CancelDelayTask(
         std::make_pair(static_cast<int64_t>(GetRetryTaskType()), formId));
     CancelSignalTimeout(formId);
+}
+
+void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
+{
+    CancelPendingTasks(formId);
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     retryPolicyMap_.erase(formId);
     HILOG_INFO("Removed retry policy for formId %{public}" PRId64, formId);
@@ -125,6 +130,7 @@ bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
 
     if (policy.GetOriginalConnection() == nullptr) {
         HILOG_ERROR("No connection in retryPolicy, abort retry for formId %{public}" PRId64, formId);
+        CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
         return false;
     }
@@ -203,6 +209,7 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
         return;
     }
     if (!formExist) {
+        CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
         HILOG_WARN("FormRecord not found, abort retry for formId %{public}" PRId64, formId);
         return;
@@ -211,6 +218,7 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
     sptr<FormAbilityConnection> retryConnection = originalConnection->CreateRetryConnection();
     if (retryConnection == nullptr) {
         HILOG_ERROR("Create retry connection failed, abort retry for formId %{public}" PRId64, formId);
+        CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
         return;
     }
@@ -221,12 +229,14 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
         connectWant, retryConnection, retryConnection->GetUserId());
     if (errorCode != ERR_OK) {
         HILOG_ERROR("Retry connect failed, errorCode:%{public}d", errorCode);
+        CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
     }
 }
 
 void FormProviderConnectionErrorHandler::OnRetryLimitReached(int64_t formId)
 {
+    CancelPendingTasks(formId);
     retryPolicyMap_.erase(formId);
 }
 
