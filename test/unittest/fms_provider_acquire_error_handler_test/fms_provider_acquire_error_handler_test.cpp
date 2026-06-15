@@ -206,3 +206,118 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_RetryLimit_001, TestSize
     EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
     GTEST_LOG_(INFO) << "DualSignal_RetryLimit_001 end";
 }
+
+/**
+ * @tc.name: HandleDisconnectError_NullConnection_001
+ * @tc.desc: Verify HandleDisconnectError returns false for null connection (no crash).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, HandleDisconnectError_NullConnection_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleDisconnectError_NullConnection_001 start";
+    sptr<FormAbilityConnection> nullConn = nullptr;
+    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, nullConn));
+    GTEST_LOG_(INFO) << "HandleDisconnectError_NullConnection_001 end";
+}
+
+/**
+ * @tc.name: HandleSendRequestFailed_NonDeathError_001
+ * @tc.desc: Verify HandleSendRequestFailed returns false for non-death error codes.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, HandleSendRequestFailed_NonDeathError_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleSendRequestFailed_NonDeathError_001 start";
+    Want want;
+    EXPECT_FALSE(handler_->HandleSendRequestFailed(FORM_ID, 0, want));
+    EXPECT_FALSE(handler_->HandleSendRequestFailed(FORM_ID, 999, want));
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "HandleSendRequestFailed_NonDeathError_001 end";
+}
+
+/**
+ * @tc.name: HandleDisconnectError_NoPriorSendRequest_001
+ * @tc.desc: Verify HandleDisconnectError returns false when disconnect arrives without prior SendRequest.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, HandleDisconnectError_NoPriorSendRequest_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleDisconnectError_NoPriorSendRequest_001 start";
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    conn->SetConnectState(ConnectState::CONNECTED);
+    // No prior HandleSendRequestFailed → sendRequestFailed=false → not handled
+    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, conn));
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_TRUE(it->second.IsDisconnectFailed());
+    EXPECT_FALSE(it->second.IsSendRequestFailed());
+    handler_->RemoveRetryPolicy(FORM_ID);
+    GTEST_LOG_(INFO) << "HandleDisconnectError_NoPriorSendRequest_001 end";
+}
+
+/**
+ * @tc.name: DualSignal_DisconnectFirst_001
+ * @tc.desc: Verify dual-signal: disconnect first (returns false) → then sendRequest → confirmed.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_DisconnectFirst_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DualSignal_DisconnectFirst_001 start";
+    Want want;
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    conn->SetConnectState(ConnectState::CONNECTED);
+
+    // Disconnect first: no prior sendRequest → returns false, but sets disconnectFailed
+    EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, conn));
+    // SendRequest arrives: disconnectFailed already set → dual-signal confirmed → schedule retry
+    EXPECT_TRUE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
+
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetRetryCount(), 1);
+    GTEST_LOG_(INFO) << "DualSignal_DisconnectFirst_001 end";
+}
+
+/**
+ * @tc.name: OnSignalTimeout_StuckHalfSignal_001
+ * @tc.desc: Verify OnSignalTimeout erases policy when only one signal arrived.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_StuckHalfSignal_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OnSignalTimeout_StuckHalfSignal_001 start";
+    // Simulate partial state: only sendRequestFailed set (waiting for disconnect that never comes)
+    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    policy.SetSendRequestFailed(true);
+    EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+
+    handler_->OnSignalTimeout(FORM_ID);
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "OnSignalTimeout_StuckHalfSignal_001 end";
+}
+
+/**
+ * @tc.name: OnSignalTimeout_BothSignalsSet_001
+ * @tc.desc: Verify OnSignalTimeout does nothing when both signals set (retry in progress).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_BothSignalsSet_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OnSignalTimeout_BothSignalsSet_001 start";
+    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    policy.SetSendRequestFailed(true);
+    policy.SetDisconnectFailed(true);
+    EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+
+    handler_->OnSignalTimeout(FORM_ID);
+    // Both set = not stuck → policy preserved
+    EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    handler_->RemoveRetryPolicy(FORM_ID);
+    GTEST_LOG_(INFO) << "OnSignalTimeout_BothSignalsSet_001 end";
+}
