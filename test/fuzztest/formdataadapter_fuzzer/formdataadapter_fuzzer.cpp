@@ -64,10 +64,6 @@ constexpr int32_t MAX_RENDERING_MODE = 2;
 constexpr int32_t MAX_STRING_LENGTH_16 = 16;
 constexpr int32_t MAX_STRING_LENGTH_32 = 32;
 constexpr int32_t MAX_STRING_LENGTH_64 = 64;
-constexpr int32_t MAX_STRING_LENGTH_256 = 256;
-constexpr int32_t MAX_FORM_REFRESH_TYPE = 10;
-constexpr int32_t MAX_FORM_LOCATION_TYPE = 5;
-constexpr int32_t MAX_CONDITION_TYPE = 10;
 
 Want GenerateWant(FuzzedDataProvider *fdp)
 {
