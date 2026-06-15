@@ -25,14 +25,13 @@ namespace AppExecFwk {
  * @class FormProviderAcquireErrorHandler
  * Acquire (form creation) error handler for dual-signal confirmed delayed retry.
  *
- * Path A (SendRequest failure after connect) reuses the base common algorithm; only
- * customizes the variation hooks:
+ * Handles SendRequest failure after successful connect (reuses the base common algorithm,
+ * customizes via hooks):
  *  - GetRetryTaskType: ACQUIRE_RETRY_TASK (distinct from refresh).
  *  - OnPrepareRetryConnect: set CONNECTING before AMS connect (acquire-only, completes state machine).
  *  - OnRetryLimitReached: erase + SendFormFailedEvent (aligns with ReAcquire exhaustion).
- * Acquire inherits the base no-op signal-timeout (no waiting half-signal state).
  *
- * Path B (connect failure, !CONNECTED) is NOT handled here — it stays in
+ * Connect failure (state != CONNECTED) is NOT handled here — it stays in
  * FormAcquireConnection::OnAbilityDisconnectDone -> ReAcquireProviderFormInfoAsync.
  */
 class FormProviderAcquireErrorHandler : public FormProviderConnectionErrorHandler {

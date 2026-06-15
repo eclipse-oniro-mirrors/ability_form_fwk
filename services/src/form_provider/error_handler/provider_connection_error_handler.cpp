@@ -87,16 +87,18 @@ void FormProviderConnectionErrorHandler::OnSignalTimeout(int64_t formId)
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     auto it = retryPolicyMap_.find(formId);
     if (it == retryPolicyMap_.end()) {
+        HILOG_INFO("Signal timeout: policy already removed, formId %{public}" PRId64, formId);
         return;
     }
     RetryPolicy &policy = it->second;
-    // Stuck half-signal = exactly one signal arrived. Both-set is transient (retry resets
-    // flags); neither means idle -> do nothing. Fires mainly for S2 (disconnect without
-    // sendRequest), which both refresh and acquire hit when FormExtension exits after the op.
+    // Clean up only if exactly one signal arrived (flags differ). If both are set, a retry
+    // is in progress; if neither, the policy is idle. The common trigger: FormExtension
+    // exits after handling the request, causing a disconnect without a SendRequest failure.
     if (policy.IsSendRequestFailed() == policy.IsDisconnectFailed()) {
+        HILOG_INFO("Signal timeout: both signals match (resolved or idle), formId %{public}" PRId64, formId);
         return;
     }
-    HILOG_WARN("Dual-signal timeout, cleaning up stuck half-signal for formId %{public}" PRId64, formId);
+    HILOG_WARN("Dual-signal timeout, cleaning up partial state for formId %{public}" PRId64, formId);
     retryPolicyMap_.erase(it);
 }
 
@@ -124,7 +126,7 @@ bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
 
     if (!policy.IsDisconnectFailed()) {
         HILOG_INFO("Waiting for connection disconnect callback, formId %{public}" PRId64, formId);
-        StartSignalTimeout(formId); // S1: fallback if disconnect callback is lost (refresh overrides; acquire no-op)
+        StartSignalTimeout(formId); // Fallback if disconnect callback never arrives
         return true;
     }
 
@@ -144,12 +146,18 @@ bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
 
     HILOG_WARN("Retry limit reached formId %{public}" PRId64, formId);
     OnRetryLimitReached(formId);
+    CancelPendingTasks(formId);
+    retryPolicyMap_.erase(formId);
     return false;
 }
 
 bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
     const sptr<FormAbilityConnection> &connection)
 {
+    if (connection == nullptr) {
+        HILOG_ERROR("null connection, abort HandleDisconnectError for formId %{public}" PRId64, formId);
+        return false;
+    }
     ConnectState state = connection->GetConnectState();
     if (state != ConnectState::CONNECTED) {
         HILOG_WARN("state not connected, not handled");
@@ -163,7 +171,7 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
 
     if (!policy.IsSendRequestFailed()) {
         HILOG_WARN("Disconnect without prior SendRequest failure, not handled");
-        StartSignalTimeout(formId); // S2: fallback if no SendRequest follows (refresh overrides; acquire no-op)
+        StartSignalTimeout(formId); // Fallback if no SendRequest failure follows
         return false;
     }
 
@@ -175,11 +183,13 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
 
     HILOG_WARN("Retry limit reached on disconnect, formId %{public}" PRId64, formId);
     OnRetryLimitReached(formId);
+    CancelPendingTasks(formId);
+    retryPolicyMap_.erase(formId);
     return true;
 }
 
 void FormProviderConnectionErrorHandler::ScheduleRetryWithReset(int64_t formId, RetryPolicy &policy,
-    sptr<FormAbilityConnection> connection)
+    const sptr<FormAbilityConnection> &connection)
 {
     CancelSignalTimeout(formId); // dual-signal resolved, no need for the fallback timeout
     policy.IncrementRetryCount();
@@ -199,7 +209,7 @@ void FormProviderConnectionErrorHandler::ScheduleRetryWithReset(int64_t formId, 
 }
 
 void FormProviderConnectionErrorHandler::ExecuteRetry(
-    int64_t formId, sptr<FormAbilityConnection> originalConnection)
+    int64_t formId, const sptr<FormAbilityConnection> &originalConnection)
 {
     bool formExist = FormDataMgr::GetInstance().HasFormRecord(formId);
 
@@ -212,6 +222,12 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
         CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
         HILOG_WARN("FormRecord not found, abort retry for formId %{public}" PRId64, formId);
+        return;
+    }
+    if (originalConnection == nullptr) {
+        HILOG_ERROR("null originalConnection, abort retry for formId %{public}" PRId64, formId);
+        CancelPendingTasks(formId);
+        retryPolicyMap_.erase(formId);
         return;
     }
 
@@ -232,12 +248,6 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
         CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
     }
-}
-
-void FormProviderConnectionErrorHandler::OnRetryLimitReached(int64_t formId)
-{
-    CancelPendingTasks(formId);
-    retryPolicyMap_.erase(formId);
 }
 
 }  // namespace AppExecFwk

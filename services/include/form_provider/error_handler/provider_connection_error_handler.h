@@ -114,7 +114,7 @@ protected:
     void StartSignalTimeout(int64_t formId);
 
     /**
-     * @brief Timeout handler: erase the policy if still stuck in a half-signal state.
+     * @brief Timeout handler: erase the policy if only one of the two signals arrived.
      * @param formId Form ID.
      */
     void OnSignalTimeout(int64_t formId);
@@ -140,7 +140,7 @@ protected:
      * @param formId Form ID.
      * @param originalConnection Connection captured at dual-signal time (for CreateRetryConnection).
      */
-    void ExecuteRetry(int64_t formId, sptr<FormAbilityConnection> originalConnection);
+    void ExecuteRetry(int64_t formId, const sptr<FormAbilityConnection> &originalConnection);
 
     /**
      * @brief Commit a retry attempt: cancel signal timeout, increment count, reset signals,
@@ -149,7 +149,7 @@ protected:
      * @param policy Retry policy (caller holds retryPolicyMutex_).
      * @param connection Connection to clone at retry time.
      */
-    void ScheduleRetryWithReset(int64_t formId, RetryPolicy &policy, sptr<FormAbilityConnection> connection);
+    void ScheduleRetryWithReset(int64_t formId, RetryPolicy &policy, const sptr<FormAbilityConnection> &connection);
 
     // --- Virtual hooks: subclass variation points ---
 
@@ -162,11 +162,11 @@ protected:
 
     /**
      * @brief Called when retry limit is reached (terminal failure).
-     *        Default erases the policy; override to add scenario-specific failure reporting
-     *        (e.g. acquire reports SendFormFailedEvent). Called within retryPolicyMutex_.
+     *        Default is no-op; override to add scenario-specific failure reporting
+     *        (e.g. acquire reports SendFormFailedEvent).
      * @param formId Form ID.
      */
-    virtual void OnRetryLimitReached(int64_t formId);
+    virtual void OnRetryLimitReached(int64_t formId) {};
 
     /**
      * @brief Hook invoked after CreateRetryConnection, before ConnectServiceAbility.

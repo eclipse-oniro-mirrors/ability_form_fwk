@@ -50,11 +50,6 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(
     return false;
 }
 
-void FormProviderConnectionErrorHandler::OnRetryLimitReached(int64_t formId)
-{
-    GTEST_LOG_(INFO) << "OnRetryLimitReached stub called (virtual, required by vtable)";
-}
-
 bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)
 {
     GTEST_LOG_(INFO) << "IsRemoteDead stub called";

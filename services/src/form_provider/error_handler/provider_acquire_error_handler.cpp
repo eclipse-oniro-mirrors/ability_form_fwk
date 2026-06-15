@@ -31,8 +31,7 @@ TaskType FormProviderAcquireErrorHandler::GetRetryTaskType() const
 
 void FormProviderAcquireErrorHandler::OnPrepareRetryConnect(sptr<FormAbilityConnection> &connection)
 {
-    // Acquire-only (per design): mark CONNECTING before the AMS connect call to complete the
-    // connection state machine (DISCONNECTED -> CONNECTING -> CONNECTED -> DISCONNECTED).
+    // Acquire-only: mark CONNECTING to complete the state machine before AMS connect.
     if (connection != nullptr) {
         connection->SetConnectState(ConnectState::CONNECTING);
     }
@@ -40,12 +39,7 @@ void FormProviderAcquireErrorHandler::OnPrepareRetryConnect(sptr<FormAbilityConn
 
 void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t formId)
 {
-    // Called within retryPolicyMutex_ (caller holds the lock).
-    // Align with the existing ReAcquireProviderFormInfoAsync exhaustion handling: erase policy
-    // and report a HiSys failed event. No host push-notification exists; no FormRecord cleanup
-    // (current acquire-failure handling does not delete the record).
-    CancelPendingTasks(formId);
-    retryPolicyMap_.erase(formId);
+    // Align with ReAcquireProviderFormInfoAsync exhaustion: report HiSys failed event, no host push.
     HILOG_WARN("Acquire retry limit reached, formId %{public}" PRId64, formId);
     FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
         "", "", static_cast<int32_t>(ConnectFormAbilityErrorType::UPDATE_FORM_FAILED),

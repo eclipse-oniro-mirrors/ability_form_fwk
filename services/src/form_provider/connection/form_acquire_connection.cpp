@@ -51,12 +51,12 @@ void FormAcquireConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
     ConnectState state = connectState_.load();
     HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, state:%{public}d",
         GetFormId(), resultCode, static_cast<int32_t>(state));
-    // Path A: was connected -> dual-signal handler (BEFORE base: it re-reads GetConnectState).
+    // Was connected: dual-signal retry handler (before base resets state).
     if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED) {
         sptr<FormAbilityConnection> conn = this;
         FormProviderErrorHandlerFactory::GetAcquireHandler()->HandleDisconnectError(GetFormId(), conn);
     }
-    // Path B: was NOT connected -> existing ReAcquire (uses pre-base local state).
+    // Was not connected: retry via existing ReAcquire mechanism.
     if (resultCode == DISCONNECT_ERROR && state != ConnectState::CONNECTED) {
         FormMgrAdapterFacade::GetInstance().ReAcquireProviderFormInfoAsync(info_, wantParams_);
     }
