@@ -729,7 +729,7 @@ void FormInfoMgr::ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
     }
 }
 
-ErrCode FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
+void FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
 {
     HILOG_DEBUG("call, config size:%{public}zu", configs.size());
     // Group configs by bundleName
@@ -738,7 +738,6 @@ ErrCode FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &
         bundleConfigsMap[config.bundleName].push_back(config);
     }
 
-    ErrCode errCode = ERR_OK;
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     for (const auto &[bundleName, bundleConfigs] : bundleConfigsMap) {
         auto iter = bundleFormInfoMap_.find(bundleName);
@@ -746,14 +745,8 @@ ErrCode FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &
             HILOG_WARN("no BundleFormInfo for %{public}s", bundleName.c_str());
             continue;
         }
-        ErrCode ret = iter->second->UpdateFormShowConfigs(bundleConfigs);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("UpdateFormShowConfigs failed for %{public}s, err:%{public}d",
-                bundleName.c_str(), ret);
-            errCode = ret;
-        }
+        iter->second->UpdateFormShowConfigs(bundleConfigs);
     }
-    return errCode;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

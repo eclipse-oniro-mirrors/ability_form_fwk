@@ -46,7 +46,7 @@ public:
         const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId) = 0;
     virtual ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
         int32_t providerUserId, bool &appFormVisibleNotify) = 0;
-    virtual ErrCode UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs) = 0;
+    virtual void UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs) = 0;
     virtual ErrCode GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo) = 0;
 };
 
@@ -72,7 +72,7 @@ public:
         const std::string &moduleName, std::vector<FormInfo> &formInfos, int32_t userId));
     MOCK_METHOD3(GetAppFormVisibleNotifyByBundleName, ErrCode(const std::string &bundleName,
         int32_t providerUserId, bool &appFormVisibleNotify));
-    MOCK_METHOD1(UpdateFormShowConfigs, ErrCode(const std::vector<FormCustomConfig> &configs));
+    MOCK_METHOD1(UpdateFormShowConfigs, void(const std::vector<FormCustomConfig> &configs));
     MOCK_METHOD2(GetFormsInfoByRecord, ErrCode(const FormRecord &formRecord, FormInfo &formInfo));
 };
 }  // namespace AppExecFwk

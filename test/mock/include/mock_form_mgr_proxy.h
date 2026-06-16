@@ -19,6 +19,7 @@
 #include "gmock/gmock.h"
 #include "form_mgr_proxy.h"
 #include "form_provider_data.h"
+#include "form_record_filter.h"
 #include "mock_i_remote_object.h"
 
 namespace OHOS {
@@ -134,6 +135,12 @@ public:
     MOCK_METHOD3(RequestPublishFormCrossUser, ErrCode(Want &want, int32_t userId, int64_t &formId));
     MOCK_METHOD1(RegisterFormWantCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(UnregisterFormWantCallback, ErrCode());
+    MOCK_METHOD1(RegisterUpdateFormsConfigCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterUpdateFormsConfigCallback, ErrCode());
+    MOCK_METHOD1(UpdateFormsConfig, ErrCode(const std::vector<FormCustomConfig> &configs));
+    MOCK_METHOD1(RegisterDeleteFormsCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterDeleteFormsCallback, ErrCode());
+    MOCK_METHOD1(DeleteForms, ErrCode(const std::vector<FormRecordFilter> &filters));
 
     sptr<IRemoteObject> AsObject()
     {

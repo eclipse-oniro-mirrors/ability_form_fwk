@@ -2642,5 +2642,220 @@ HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeleteForms_003 end";
 }
 
+// ========== RegisterUpdateFormsConfigCallback Tests ==========
+
+/**
+ * @tc.name: RegisterUpdateFormsConfigCallback_001
+ * @tc.desc: Verify RegisterUpdateFormsConfigCallback returns ERR_OK with valid callerToken
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RegisterUpdateFormsConfigCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RegisterUpdateFormsConfigCallback_001 start";
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto mockDelegate = new MockFormHostDelegateStub();
+    sptr<IRemoteObject> callerToken(mockDelegate);
+    auto result = FormCallbackAdapter::GetInstance().RegisterUpdateFormsConfigCallback(callerToken);
+    ASSERT_EQ(result, ERR_OK);
+
+    // Verify proxy is stored
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Get(
+        TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(storedProxy, callerToken);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "RegisterUpdateFormsConfigCallback_001 end";
+}
+
+/**
+ * @tc.name: RegisterUpdateFormsConfigCallback_002
+ * @tc.desc: Verify register with cached configs triggers NotifyCachedFormConfigs
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, RegisterUpdateFormsConfigCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RegisterUpdateFormsConfigCallback_002 start";
+
+    // Setup cached configs
+    std::vector<FormCustomConfig> cachedConfigs;
+    FormCustomConfig config;
+    config.bundleName = TEST_BUNDLE_NAME;
+    config.formName = TEST_FORM_NAME;
+    cachedConfigs.push_back(config);
+    {
+        std::lock_guard<std::mutex> lock(FormCallbackAdapter::GetInstance().formCustomConfigCacheMutex_);
+        FormCallbackAdapter::GetInstance().formCustomConfigCache_ = cachedConfigs;
+    }
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->updateFormsConfigResult_ = ERR_OK;
+    sptr<IRemoteObject> callerToken(mockDelegate);
+
+    auto result = FormCallbackAdapter::GetInstance().RegisterUpdateFormsConfigCallback(callerToken);
+    ASSERT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+    {
+        std::lock_guard<std::mutex> lock(FormCallbackAdapter::GetInstance().formCustomConfigCacheMutex_);
+        FormCallbackAdapter::GetInstance().formCustomConfigCache_.clear();
+    }
+
+    GTEST_LOG_(INFO) << "RegisterUpdateFormsConfigCallback_002 end";
+}
+
+// ========== UnregisterUpdateFormsConfigCallback Tests ==========
+
+/**
+ * @tc.name: UnregisterUpdateFormsConfigCallback_001
+ * @tc.desc: Verify unregister after registration returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UnregisterUpdateFormsConfigCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UnregisterUpdateFormsConfigCallback_001 start";
+
+    // Register first
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    auto mockDelegate = new MockFormHostDelegateStub();
+    sptr<IRemoteObject> callerToken(mockDelegate);
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().RegisterUpdateFormsConfigCallback(callerToken), ERR_OK);
+
+    // Unregister
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    auto result = FormCallbackAdapter::GetInstance().UnregisterUpdateFormsConfigCallback();
+    EXPECT_EQ(result, ERR_OK);
+
+    // Verify proxy is removed
+    sptr<IRemoteObject> storedProxy;
+    EXPECT_NE(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Get(
+        TEST_CALLING_UID, storedProxy), ERR_OK);
+
+    GTEST_LOG_(INFO) << "UnregisterUpdateFormsConfigCallback_001 end";
+}
+
+/**
+ * @tc.name: UnregisterUpdateFormsConfigCallback_002
+ * @tc.desc: Verify unregister without prior registration returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UnregisterUpdateFormsConfigCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UnregisterUpdateFormsConfigCallback_002 start";
+
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    auto result = FormCallbackAdapter::GetInstance().UnregisterUpdateFormsConfigCallback();
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UnregisterUpdateFormsConfigCallback_002 end";
+}
+
+// ========== UpdateFormsConfig Tests ==========
+
+/**
+ * @tc.name: UpdateFormsConfig_001
+ * @tc.desc: Verify UpdateFormsConfig returns GET_HOST_FAILED when no hosts registered
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsConfig_001 start";
+
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+
+    std::vector<FormCustomConfig> configs;
+    FormCustomConfig config;
+    config.bundleName = TEST_BUNDLE_NAME;
+    configs.push_back(config);
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, UpdateFormShowConfigs(_))
+        .WillOnce(Return());
+
+    auto result = FormCallbackAdapter::GetInstance().UpdateFormsConfig(configs);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "UpdateFormsConfig_001 end";
+}
+
+/**
+ * @tc.name: UpdateFormsConfig_002
+ * @tc.desc: Verify UpdateFormsConfig succeeds with registered host
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsConfig_002 start";
+
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->updateFormsConfigResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    std::vector<FormCustomConfig> configs;
+    FormCustomConfig config;
+    config.bundleName = TEST_BUNDLE_NAME;
+    configs.push_back(config);
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, UpdateFormShowConfigs(_))
+        .WillOnce(Return());
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(nullptr));
+
+    auto result = FormCallbackAdapter::GetInstance().UpdateFormsConfig(configs);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "UpdateFormsConfig_002 end";
+}
+
+/**
+ * @tc.name: UpdateFormsConfig_003
+ * @tc.desc: Verify UpdateFormsConfig returns notify error when delegate fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsConfig_003 start";
+
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->updateFormsConfigResult_ = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    std::vector<FormCustomConfig> configs;
+    FormCustomConfig config;
+    config.bundleName = TEST_BUNDLE_NAME;
+    configs.push_back(config);
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, UpdateFormShowConfigs(_))
+        .WillOnce(Return());
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(nullptr));
+
+    auto result = FormCallbackAdapter::GetInstance().UpdateFormsConfig(configs);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+
+    GTEST_LOG_(INFO) << "UpdateFormsConfig_003 end";
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

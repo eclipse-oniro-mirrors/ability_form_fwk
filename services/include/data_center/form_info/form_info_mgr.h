@@ -91,7 +91,7 @@ public:
 
     bool IsDeleteCacheInUpgradeScene(const FormInfo &formInfo);
 
-    ErrCode UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs);
+    void UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs);
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);

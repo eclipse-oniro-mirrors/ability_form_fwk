@@ -384,4 +384,30 @@ export default namespace formInfo {
   }
 
   type PublishFormCrossBundleControlCallback = (info: PublishFormCrossBundleInfo) => boolean;
+
+  type GetWantParamsCallback = (formInfos: Array<FormInfo>) => Array<Record<string, Object>>;
+
+  interface FormCustomConfig {
+    bundleName: string;
+    moduleName: string;
+    abilityName: string;
+    formName: string;
+    relatedBundleName: string;
+    isShowInFormCenter: boolean;
+    isRepeatAdditionSupported: boolean;
+  }
+
+  class FormCustomConfigInner implements FormCustomConfig {
+    bundleName: string;
+    moduleName: string;
+    abilityName: string;
+    formName: string;
+    relatedBundleName: string;
+    isShowInFormCenter: boolean;
+    isRepeatAdditionSupported: boolean;
+  }
+
+  type UpdateFormsConfigCallback = (configInfo: Array<FormCustomConfig>) => void;
+
+  type DeleteFormsCallback = (formIds: Array<string>) => void;
 }

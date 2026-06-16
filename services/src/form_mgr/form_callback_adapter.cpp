@@ -483,15 +483,11 @@ ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfi
         std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
         formCustomConfigCache_ = configs;
     }
-    ErrCode persistResult = FormInfoMgr::GetInstance().UpdateFormShowConfigs(configs);
-    if (persistResult != ERR_OK) {
-        HILOG_ERROR("UpdateFormShowConfigs failed, err:%{public}d", persistResult);
-    }
-    ErrCode notifyResult = NotifyAllHosts(updateFormsConfigRegistry_, "UpdateFormsConfig",
+    FormInfoMgr::GetInstance().UpdateFormShowConfigs(configs);
+    return NotifyAllHosts(updateFormsConfigRegistry_, "UpdateFormsConfig",
         [&configs](const sptr<IFormHostDelegate> &proxy) {
             return proxy->UpdateFormsConfigCallback(configs);
         });
-    return notifyResult != ERR_OK ? notifyResult : persistResult;
 }
 
 ErrCode FormCallbackAdapter::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
