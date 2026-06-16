@@ -5664,7 +5664,7 @@ HWTEST_F(FormMgrTest, FormMgr_RegisterDeleteFormsCallback_002, TestSize.Level1)
     FormMgr::GetInstance().SetFormMgrService(nullptr);
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     auto result = FormMgr::GetInstance().RegisterDeleteFormsCallback(token);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_FMS_FAILED);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_RegisterDeleteFormsCallback_002 end";
 }
 
@@ -5711,7 +5711,7 @@ HWTEST_F(FormMgrTest, FormMgr_UnregisterDeleteFormsCallback_002, TestSize.Level1
     GTEST_LOG_(INFO) << "FormMgr_UnregisterDeleteFormsCallback_002 begin";
     FormMgr::GetInstance().SetFormMgrService(nullptr);
     auto result = FormMgr::GetInstance().UnregisterDeleteFormsCallback();
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_FMS_FAILED);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_UnregisterDeleteFormsCallback_002 end";
 }
 
@@ -5765,7 +5765,7 @@ HWTEST_F(FormMgrTest, FormMgr_DeleteForms_002, TestSize.Level1)
     filter.bundleName = "com.test";
     filters.push_back(filter);
     auto result = FormMgr::GetInstance().DeleteForms(filters);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_FMS_FAILED);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_DeleteForms_002 end";
 }
 
