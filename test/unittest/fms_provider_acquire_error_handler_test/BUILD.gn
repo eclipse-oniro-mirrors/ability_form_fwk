@@ -16,15 +16,19 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/form_fwk/form_mgr_service"
 
-ohos_unittest("FmsProviderConnectionErrorHandlerTest") {
+ohos_unittest("FmsProviderAcquireErrorHandlerTest") {
   module_out_path = module_output_path
 
   sources = [
     "${form_fwk_path}/services/src/common/retry_policy/retry_policy.cpp",
     "${form_fwk_path}/services/src/form_provider/error_handler/provider_connection_error_handler.cpp",
+    "${form_fwk_path}/services/src/form_provider/error_handler/provider_acquire_error_handler.cpp",
     "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
     "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
-    "${form_fwk_path}/test/unittest/fms_provider_connection_error_handler_test/fms_provider_connection_error_handler_test.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_ams_helper.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_event_report.cpp",
+    "fms_provider_acquire_error_handler_test.cpp",
   ]
 
   include_dirs = [
@@ -33,10 +37,11 @@ ohos_unittest("FmsProviderConnectionErrorHandlerTest") {
     "${form_fwk_path}/services/include/common/retry_policy",
     "${form_fwk_path}/services/include/form_provider/error_handler",
     "${form_fwk_path}/services/include/common/util",
-    "${form_fwk_path}/services/include/form_mgr",
-    "${form_fwk_path}/services/common/include/queue",
-    "${form_fwk_path}/services/include/queue",
-    "${form_fwk_path}/services/include/common/util",
+    "${form_fwk_path}/services/include/common/connection",
+    "${form_fwk_path}/services/include/ams_mgr",
+    "${form_fwk_path}/services/include/data_center",
+    "${form_fwk_path}/test/mock/include",
+    "${form_fwk_path}/test/mock/include/form_provider",
   ]
 
   configs = []
@@ -87,6 +92,6 @@ ohos_unittest("FmsProviderConnectionErrorHandlerTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsProviderConnectionErrorHandlerTest" ]
+  deps = [ ":FmsProviderAcquireErrorHandlerTest" ]
 }
 ###############################################################################

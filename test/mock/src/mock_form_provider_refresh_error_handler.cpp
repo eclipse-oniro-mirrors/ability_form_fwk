@@ -12,15 +12,25 @@
 #include "fms_log_wrapper.h"
 #include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_provider/error_handler/provider_refresh_error_handler.h"
+#include "form_provider/error_handler/provider_acquire_error_handler.h"
 #include "form_provider/error_handler/provider_connection_error_handler.h"
 #include "common/retry_policy/retry_policy.h"
+#include "common/util/form_task_common.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 std::shared_ptr<MockFormProviderRefreshErrorHandler> MockFormProviderRefreshErrorHandler::obj = nullptr;
 
-// --- FormProviderRefreshErrorHandler (derived class overrides) ---
-bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
+// vtable anchor for FormProviderRefreshErrorHandler (refresh handler thinned to GetRetryTaskType only)
+TaskType FormProviderRefreshErrorHandler::GetRetryTaskType() const
+{
+    return TaskType::REFRESH_RETRY_TASK;
+}
+
+// --- FormProviderConnectionErrorHandler (base class methods) ---
+// HandleSendRequestFailed/HandleDisconnectError moved from refresh subclass to base (refactor);
+// stubs delegate to the gmock object for test expectations. ExecuteRefreshRetry removed.
+bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
     int64_t formId, int errorCode, const Want &want)
 {
     GTEST_LOG_(INFO) << "HandleSendRequestFailed called";
@@ -30,7 +40,7 @@ bool FormProviderRefreshErrorHandler::HandleSendRequestFailed(
     return false;
 }
 
-bool FormProviderRefreshErrorHandler::HandleDisconnectError(
+bool FormProviderConnectionErrorHandler::HandleDisconnectError(
     int64_t formId, const sptr<FormAbilityConnection> &connection)
 {
     GTEST_LOG_(INFO) << "HandleDisconnectError called formId:" << formId;
@@ -40,13 +50,6 @@ bool FormProviderRefreshErrorHandler::HandleDisconnectError(
     return false;
 }
 
-void FormProviderRefreshErrorHandler::ExecuteRefreshRetry(int64_t formId,
-    sptr<FormAbilityConnection> originalConnection)
-{
-    GTEST_LOG_(INFO) << "ExecuteRefreshRetry called (private stub)";
-}
-
-// --- FormProviderConnectionErrorHandler (base class methods) ---
 bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)
 {
     GTEST_LOG_(INFO) << "IsRemoteDead stub called";
@@ -76,6 +79,16 @@ RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formI
     static RetryPolicy defaultPolicy;
     return defaultPolicy;
 }
+
+// FormProviderAcquireErrorHandler stubs (vtable + overrides; no heavy deps)
+TaskType FormProviderAcquireErrorHandler::GetRetryTaskType() const
+{
+    return TaskType::ACQUIRE_RETRY_TASK;
+}
+
+void FormProviderAcquireErrorHandler::OnPrepareRetryConnect(sptr<FormAbilityConnection> &) {}
+
+void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t) {}
 
 }  // namespace AppExecFwk
 }  // namespace OHOS

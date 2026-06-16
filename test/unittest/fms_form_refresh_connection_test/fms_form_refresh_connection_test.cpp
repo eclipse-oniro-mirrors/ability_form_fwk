@@ -198,7 +198,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DisconnectError_0
     sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
-    conn->OnPreConnectTask();
+    conn->SetConnectState(ConnectState::CONNECTED);
     EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(1, _)).Times(1);
     conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
     EXPECT_EQ(0, conn->GetConnectId());
@@ -222,7 +222,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_ErrOk_001, TestSi
     sptr<FormRefreshConnection> conn = CreateRefreshConnection(2, want);
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
-    conn->OnPreConnectTask();
+    conn->SetConnectState(ConnectState::CONNECTED);
     EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
     conn->OnAbilityDisconnectDone(element, ERR_OK);
     EXPECT_EQ(0, conn->GetConnectId());
@@ -269,7 +269,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_OtherResultCode_0
     sptr<FormRefreshConnection> conn = CreateRefreshConnection(4, want);
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
-    conn->OnPreConnectTask();
+    conn->SetConnectState(ConnectState::CONNECTED);
     EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
     conn->OnAbilityDisconnectDone(element, -2);
     EXPECT_EQ(0, conn->GetConnectId());
@@ -447,7 +447,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnPreConnectTask_001, TestSize.Level0)
     sptr<FormRefreshConnection> connection = CreateRefreshConnection(1, want);
     ASSERT_NE(nullptr, connection);
     EXPECT_EQ(ConnectState::DISCONNECTED, connection->connectState_);
-    connection->OnPreConnectTask();
+    connection->SetConnectState(ConnectState::CONNECTED);
     EXPECT_EQ(ConnectState::CONNECTED, connection->connectState_);
     GTEST_LOG_(INFO) << "OnPreConnectTask_001 end";
 }

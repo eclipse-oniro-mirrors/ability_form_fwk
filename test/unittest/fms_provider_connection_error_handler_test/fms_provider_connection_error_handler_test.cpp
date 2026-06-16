@@ -50,14 +50,9 @@ public:
     TestConnectionErrorHandler() = default;
     virtual ~TestConnectionErrorHandler() = default;
 
-    bool HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want) override
+    TaskType GetRetryTaskType() const override
     {
-        return true;
-    }
-
-    bool HandleDisconnectError(int64_t formId, int resultCode, const Want &want) override
-    {
-        return true;
+        return TaskType::REFRESH_RETRY_TASK;
     }
 };
 
@@ -69,7 +64,7 @@ public:
     void TearDown();
 
 protected:
-    std::shared_ptr<TestConnectionErrorHandler> handler_;
+    sptr<TestConnectionErrorHandler> handler_;
 
     // Helper methods to eliminate repetitive patterns
     RetryPolicy &EnsurePolicyWithLock(int64_t formId);
@@ -85,12 +80,12 @@ void FmsProviderConnectionErrorHandlerTest::TearDownTestCase() {}
 
 void FmsProviderConnectionErrorHandlerTest::SetUp()
 {
-    handler_ = std::make_shared<TestConnectionErrorHandler>();
+    handler_ = new TestConnectionErrorHandler();
 }
 
 void FmsProviderConnectionErrorHandlerTest::TearDown()
 {
-    handler_.reset();
+    handler_ = nullptr;
 }
 
 RetryPolicy &FmsProviderConnectionErrorHandlerTest::EnsurePolicyWithLock(int64_t formId)
@@ -234,21 +229,19 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, RemoveRetryPolicy_MultipleAndDou
 {
     GTEST_LOG_(INFO) << "RemoveRetryPolicy_MultipleAndDoubleRemove_002 start";
 
-    // Test: remove one formId while others remain
-    std::lock_guard<std::mutex> lock(handler_->retryPolicyMutex_);
-    handler_->EnsureRetryPolicy(FORM_ID);
-    handler_->EnsureRetryPolicy(FORM_ID_2);
-    handler_->EnsureRetryPolicy(FORM_ID_3);
+    // EnsureRetryPolicy requires caller holds retryPolicyMutex_; use helper then release.
+    EnsurePolicyWithLock(FORM_ID);
+    EnsurePolicyWithLock(FORM_ID_2);
+    EnsurePolicyWithLock(FORM_ID_3);
     VerifyMapSize(3);
 
+    // RemoveRetryPolicy takes its own lock — must NOT hold retryPolicyMutex_ here.
     handler_->RemoveRetryPolicy(FORM_ID);
-
     VerifyMapSize(2);
     VerifyPolicyNotExists(FORM_ID);
     VerifyPolicyExists(FORM_ID_2);
     VerifyPolicyExists(FORM_ID_3);
 
-    // Test: double remove no crash
     handler_->RemoveRetryPolicy(FORM_ID_2);
     VerifyMapSize(1);
 

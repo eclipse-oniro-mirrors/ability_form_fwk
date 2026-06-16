@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "form_provider/error_handler/provider_acquire_error_handler.h"
 #include "form_provider/error_handler/provider_refresh_error_handler.h"
 #include "nocopyable.h"
 
@@ -32,6 +33,14 @@ public:
         return instance;
     }
 
+    static sptr<FormProviderAcquireErrorHandler> GetAcquireHandler()
+    {
+        static sptr<FormProviderAcquireErrorHandler> instance = new FormProviderAcquireErrorHandler();
+        return instance;
+    }
+
+private:
+    FormProviderErrorHandlerFactory() = default;
     DISALLOW_COPY_AND_MOVE(FormProviderErrorHandlerFactory);
 };
 

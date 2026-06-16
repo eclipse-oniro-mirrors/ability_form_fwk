@@ -39,6 +39,7 @@ public:
     virtual bool GetFormRecord(const int64_t formId, FormRecord &formRecord) = 0;
     virtual bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos,
         int32_t userId) const = 0;
+    virtual bool HasFormRecord(const int64_t formId) const = 0;
     virtual void CheckForms(const std::vector<int64_t> &formIds) = 0;
     // MergeFormWant removed - FormWant::MergeFrom is used directly now
     virtual void SetNeedRefresh(const int64_t formId, const bool needRefresh) = 0;
@@ -108,6 +109,7 @@ public:
     MOCK_METHOD2(GetFormRecord, bool(const int64_t formId, FormRecord &formRecord));
     MOCK_CONST_METHOD3(GetFormRecord, bool(const std::string &bundleName,
         std::vector<FormRecord> &formInfos, int32_t userId));
+    MOCK_CONST_METHOD1(HasFormRecord, bool(const int64_t formId));
     MOCK_METHOD1(CheckForms, void(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(SetNeedRefresh, void(const int64_t formId, const bool needRefresh));
     MOCK_METHOD3(GetUpdatedForm, bool(const FormRecord &record, const std::vector<FormInfo> &targetForms,

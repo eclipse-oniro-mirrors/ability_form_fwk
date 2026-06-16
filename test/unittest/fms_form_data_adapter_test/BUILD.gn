@@ -47,6 +47,7 @@ ohos_unittest("FmsFormDataAdapterTest") {
     "${form_fwk_path}/test/mock/src/mock_form_report.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_ams_helper.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_acquire_connection.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_provider_refresh_error_handler.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_ability_connection_reporter.cpp",
     "${form_fwk_path}/test/mock/src/form_refresh/mock_form_refresh_mgr.cpp",
     "fms_form_data_adapter_test.cpp",

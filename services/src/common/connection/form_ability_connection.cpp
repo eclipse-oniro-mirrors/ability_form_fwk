@@ -61,6 +61,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
         RegisterToSupplyCallback();
     }
 
+    connectState_.store(ConnectState::CONNECTED);
     OnPreConnectTask();
 
     Want want = OnBuildTaskWant();
@@ -137,6 +138,7 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
         HILOG_ERROR("invalid connectId_:%{public}d", connectId_);
     }
     ReportFormAppUnbindEvent();
+    connectState_.store(ConnectState::DISCONNECTED);
 }
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()
@@ -248,6 +250,11 @@ int64_t FormAbilityConnection::GetFormId() const
 ConnectState FormAbilityConnection::GetConnectState() const
 {
     return connectState_.load();
+}
+
+void FormAbilityConnection::SetConnectState(ConnectState state)
+{
+    connectState_.store(state);
 }
 
 int32_t FormAbilityConnection::GetUserId() const
