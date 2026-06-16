@@ -91,7 +91,7 @@ void FmsProviderConnectionErrorHandlerTest::TearDown()
 RetryPolicy &FmsProviderConnectionErrorHandlerTest::EnsurePolicyWithLock(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(handler_->retryPolicyMutex_);
-    return handler_->EnsureRetryPolicy(formId);
+    return handler_->EnsureRetryPolicyLocked(formId);
 }
 
 void FmsProviderConnectionErrorHandlerTest::VerifyMapSize(size_t expectedSize)
@@ -141,15 +141,15 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, IsRemoteDead_AllErrorCodes_001, 
 }
 
 /**
- * @tc.name: EnsureRetryPolicy_NewFormId_001
- * @tc.desc: Verify EnsureRetryPolicy creates default policy for new formId with default configuration,
+ * @tc.name: EnsureRetryPolicyLocked_NewFormId_001
+ * @tc.desc: Verify EnsureRetryPolicyLocked creates default policy for new formId with default configuration,
  *           zero retry count, and both signals (sendRequestFailed/disconnectFailed) set to false.
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
-HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicy_NewFormId_001, TestSize.Level1)
+HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicyLocked_NewFormId_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "EnsureRetryPolicy_NewFormId_001 start";
+    GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked_NewFormId_001 start";
 
     VerifyMapSize(0);
 
@@ -164,28 +164,28 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicy_NewFormId_001,
     EXPECT_FALSE(policy.sendRequestFailed_);
     EXPECT_FALSE(policy.disconnectFailed_);
 
-    GTEST_LOG_(INFO) << "EnsureRetryPolicy_NewFormId_001 end";
+    GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked_NewFormId_001 end";
 }
 
 /**
- * @tc.name: EnsureRetryPolicy_ExistingFormId_002
- * @tc.desc: Verify EnsureRetryPolicy returns same reference when formId already exists in map,
+ * @tc.name: EnsureRetryPolicyLocked_ExistingFormId_002
+ * @tc.desc: Verify EnsureRetryPolicyLocked returns same reference when formId already exists in map,
  *           preserving modified state (sendRequestFailed=true, retryCount=1).
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
-HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicy_ExistingFormId_002, TestSize.Level1)
+HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicyLocked_ExistingFormId_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "EnsureRetryPolicy_ExistingFormId_002 start";
+    GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked_ExistingFormId_002 start";
 
     std::lock_guard<std::mutex> lock(handler_->retryPolicyMutex_);
-    RetryPolicy &policy1 = handler_->EnsureRetryPolicy(FORM_ID);
+    RetryPolicy &policy1 = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy1.sendRequestFailed_ = true;
     policy1.retryCount_ = 1;
 
     VerifyMapSize(1);
 
-    RetryPolicy &policy2 = handler_->EnsureRetryPolicy(FORM_ID);
+    RetryPolicy &policy2 = handler_->EnsureRetryPolicyLocked(FORM_ID);
 
     // Verify same reference returned
     VerifyMapSize(1);
@@ -193,7 +193,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicy_ExistingFormId
     EXPECT_TRUE(policy2.sendRequestFailed_);
     EXPECT_EQ(policy2.GetRetryCount(), 1);
 
-    GTEST_LOG_(INFO) << "EnsureRetryPolicy_ExistingFormId_002 end";
+    GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked_ExistingFormId_002 end";
 }
 
 /**
@@ -229,7 +229,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, RemoveRetryPolicy_MultipleAndDou
 {
     GTEST_LOG_(INFO) << "RemoveRetryPolicy_MultipleAndDoubleRemove_002 start";
 
-    // EnsureRetryPolicy requires caller holds retryPolicyMutex_; use helper then release.
+    // EnsureRetryPolicyLocked requires caller holds retryPolicyMutex_; use helper then release.
     EnsurePolicyWithLock(FORM_ID);
     EnsurePolicyWithLock(FORM_ID_2);
     EnsurePolicyWithLock(FORM_ID_3);

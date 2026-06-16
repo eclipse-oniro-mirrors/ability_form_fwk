@@ -98,11 +98,11 @@ protected:
 
     /**
      * @brief Ensure retry policy exists for specified form (create default if absent).
-     *        Must be called within lock_guard of retryPolicyMutex_.
+     *        Caller MUST hold retryPolicyMutex_ before calling.
      * @param formId Form ID.
      * @return Reference to retry policy in retryPolicyMap_.
      */
-    RetryPolicy &EnsureRetryPolicy(int64_t formId);
+    RetryPolicy &EnsureRetryPolicyLocked(int64_t formId);
 
     /**
      * @brief Start the dual-signal fallback timeout. If the second signal does not arrive

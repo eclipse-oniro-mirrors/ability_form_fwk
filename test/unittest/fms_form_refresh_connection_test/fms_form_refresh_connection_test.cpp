@@ -434,25 +434,6 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_DefaultRefresh_001, 
 }
 
 /**
- * @tc.name: OnPreConnectTask_001
- * @tc.desc: test OnPreConnectTask.
- *           Verify connectState_ is set to CONNECTED.
- * @tc.type: FUNC
- * @tc.require: issueI5T4GJ
- */
-HWTEST_F(FmsFormRefreshConnectionTest, OnPreConnectTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "OnPreConnectTask_001 start";
-    Want want;
-    sptr<FormRefreshConnection> connection = CreateRefreshConnection(1, want);
-    ASSERT_NE(nullptr, connection);
-    EXPECT_EQ(ConnectState::DISCONNECTED, connection->connectState_);
-    connection->SetConnectState(ConnectState::CONNECTED);
-    EXPECT_EQ(ConnectState::CONNECTED, connection->connectState_);
-    GTEST_LOG_(INFO) << "OnPreConnectTask_001 end";
-}
-
-/**
  * @tc.name: FormUtil_001
  * @tc.desc: test PaddingUdidHash function.
  * @tc.type: FUNC

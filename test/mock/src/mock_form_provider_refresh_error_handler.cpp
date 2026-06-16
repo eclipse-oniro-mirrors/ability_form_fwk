@@ -72,9 +72,9 @@ RetryPolicy FormProviderConnectionErrorHandler::GetDefaultRetryPolicy() const
     return RetryPolicy();
 }
 
-RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formId)
+RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicyLocked(int64_t formId)
 {
-    GTEST_LOG_(INFO) << "EnsureRetryPolicy stub called";
+    GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked stub called";
     static RetryPolicy defaultPolicy;
     return defaultPolicy;
 }
@@ -85,7 +85,7 @@ TaskType FormProviderAcquireErrorHandler::GetRetryTaskType() const
     return TaskType::ACQUIRE_RETRY_TASK;
 }
 
-void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t) {}
+void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t formId) {}
 
 }  // namespace AppExecFwk
 }  // namespace OHOS

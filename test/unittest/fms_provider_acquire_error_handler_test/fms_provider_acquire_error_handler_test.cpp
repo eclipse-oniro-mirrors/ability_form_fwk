@@ -107,7 +107,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, GetRetryTaskType_001, TestSize.Leve
 HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnRetryLimitReached_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "OnRetryLimitReached_001 start";
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
     handler_->OnRetryLimitReached(FORM_ID);
@@ -179,7 +179,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_SendFirst_001, TestSize.
 HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_RetryLimit_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DualSignal_RetryLimit_001 start";
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     policy.SetDisconnectFailed(true);
     for (int i = 0; i < 3; i++) { // maxRetryCount = 3 → IsRetryLimitReached
@@ -278,7 +278,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_StuckHalfSignal_001
 {
     GTEST_LOG_(INFO) << "OnSignalTimeout_StuckHalfSignal_001 start";
     // Simulate partial state: only sendRequestFailed set (waiting for disconnect that never comes)
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
 
@@ -296,7 +296,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_StuckHalfSignal_001
 HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_BothSignalsSet_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "OnSignalTimeout_BothSignalsSet_001 start";
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     policy.SetDisconnectFailed(true);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());

@@ -37,7 +37,7 @@ RetryPolicy FormProviderConnectionErrorHandler::GetDefaultRetryPolicy() const
     return RetryPolicy();
 }
 
-RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formId)
+RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicyLocked(int64_t formId)
 {
     auto it = retryPolicyMap_.find(formId);
     if (it == retryPolicyMap_.end()) {
@@ -121,7 +121,7 @@ bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
     }
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
-    auto &policy = EnsureRetryPolicy(formId);
+    auto &policy = EnsureRetryPolicyLocked(formId);
     policy.SetSendRequestFailed(true);
 
     if (!policy.IsDisconnectFailed()) {
@@ -165,7 +165,7 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
     }
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
-    auto &policy = EnsureRetryPolicy(formId);
+    auto &policy = EnsureRetryPolicyLocked(formId);
     policy.SetOriginalConnection(connection);
     policy.SetDisconnectFailed(true);
 
