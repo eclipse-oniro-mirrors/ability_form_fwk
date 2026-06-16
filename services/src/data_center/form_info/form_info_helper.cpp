@@ -82,7 +82,7 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    BundleInfo bundleInfo;
+    BundleInfo bundleInfos;
     int32_t flag = GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS | GET_BUNDLE_INFO_EXCLUDE_EXT;
     ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(bundleNames, flag,
         bundleInfos, userId));
