@@ -173,8 +173,9 @@ bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, Abil
         HILOG_ERROR("null iBundleMgr");
         return false;
     }
-    return IN_PROCESS_CALL(
-        iBundleMgr->QueryAbilityInfo(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT, userId, abilityInfo));
+
+    int32_t flags = AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT | AbilityInfoFlag::GET_ABILITY_INFO_EXCLUDE_EXT;
+    return IN_PROCESS_CALL(iBundleMgr->QueryAbilityInfo(want, flags, userId, abilityInfo));
 }
 
 bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,
@@ -217,6 +218,7 @@ bool FormBmsHelper::GetBundleInfoByFlags(const std::string& bundleName, int32_t 
     BundleInfo &bundleInfo)
 {
     HILOG_DEBUG("call");
+    flags += BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT;
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("null iBundleMgr");
@@ -240,6 +242,7 @@ ErrCode FormBmsHelper::GetBundleInfoV9(const std::string& bundleName, int32_t us
         static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_DISABLE) +
         static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO) +
         static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY) +
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT) +
         static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_METADATA)),
         bundleInfo, userId)) != ERR_OK) {
         HILOG_ERROR("get bundleInfo failed");
@@ -298,7 +301,7 @@ bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::str
         HILOG_ERROR("null iBundleMgr");
         return false;
     }
-    int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT;
+    int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT | BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT;
     BundleInfo bundleInfo;
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId))) {
         HILOG_ERROR("Get bundle info failed");
@@ -325,7 +328,7 @@ bool FormBmsHelper::GetCompatibleVersion(const std::string& bundleName, int32_t 
         HILOG_ERROR("null iBundleMgr");
         return false;
     }
-    int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT;
+    int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT | BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT;
     BundleInfo bundleInfo;
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId))) {
         HILOG_ERROR("Get bundle info failed");

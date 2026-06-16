@@ -57,7 +57,8 @@ int32_t FormFreeInstallOperator::StartFreeInstall(
     want.SetElementName(bundleName, abilityName);
     want.SetModuleName(moduleName);
     AbilityInfo abilityInfo = {};
-    constexpr auto flag = AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_WITH_APPLICATION;
+    constexpr auto flag = AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_WITH_APPLICATION |
+        AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_EXCLUDE_EXT;
     if (iBundleMgr->QueryAbilityInfo(
         want, flag, FormUtil::GetCurrentAccountId(), abilityInfo, freeInstallStatusCallBack_)) {
         HILOG_DEBUG("The app has installed");

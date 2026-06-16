@@ -77,7 +77,7 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
     }
 
     BundleInfo bundleInfo;
-    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES;
+    int32_t flag = GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS | GET_BUNDLE_INFO_EXCLUDE_EXT;
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flag, bundleInfo, userId))) {
         HILOG_ERROR("get bundleInfo failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;

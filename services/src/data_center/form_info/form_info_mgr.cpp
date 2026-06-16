@@ -223,18 +223,18 @@ ErrCode FormInfoMgr::GetTemplateFormsInfoByBundle(
         HILOG_ERROR("empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
- 
+
     if (!CheckBundlePermission() && !IsCaller(bundleName)) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
- 
+
     std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     auto bundleFormInfoIter = bundleFormInfoMap_.find(bundleName);
     if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
         HILOG_ERROR("no forms found");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
- 
+
     if (bundleFormInfoIter->second != nullptr) {
         bundleFormInfoIter->second->GetAllTemplateFormsInfo(formInfos, userId);
     }
@@ -264,12 +264,12 @@ ErrCode FormInfoMgr::GetTemplateFormsInfoByModule(const std::string &bundleName,
         HILOG_ERROR("empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
- 
+
     if (!CheckBundlePermission() && !IsCaller(bundleName)) {
         HILOG_ERROR("CheckBundlePermission and IsCaller failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
- 
+
     return GetTemplateFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
 }
 
@@ -301,14 +301,14 @@ ErrCode FormInfoMgr::GetTemplateFormsInfoByModuleWithoutCheck(const std::string 
         HILOG_ERROR("empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
- 
+
     std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     auto bundleFormInfoIter = bundleFormInfoMap_.find(bundleName);
     if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
         HILOG_ERROR("no forms found for %{public}s", bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
- 
+
     if (bundleFormInfoIter->second != nullptr) {
         bundleFormInfoIter->second->GetTemplateFormsInfoByModule(moduleName, formInfos, userId);
     }
@@ -379,7 +379,7 @@ ErrCode FormInfoMgr::AddDynamicFormInfo(FormInfo &formInfo, int32_t userId)
     }
 
     BundleInfo bundleInfo;
-    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES;
+    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(formInfo.bundleName, flag, bundleInfo, userId))) {
         HILOG_ERROR("get bundleInfo failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
@@ -550,7 +550,8 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
     }
 
     std::vector<BundleInfo> bundleInfos {};
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfos(GET_BUNDLE_WITH_ABILITIES, bundleInfos, userId))) {
+    int32_t flags = GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
+    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfos(flags, bundleInfos, userId))) {
         HILOG_ERROR("get bundle infos failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
