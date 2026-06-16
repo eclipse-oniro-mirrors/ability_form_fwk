@@ -17,7 +17,7 @@
 #include "fms_log_wrapper.h"
 #include "js_form_state_observer_interface.h"
 #include "form_mgr/form_mgr_queue.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
  
 namespace OHOS {
 namespace AppExecFwk {
@@ -91,7 +91,7 @@ void FormObserverTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
     HILOG_DEBUG("call");
  
     auto batchRefreshForms = [formRefreshType]() {
-        return FormMgrAdapter::GetInstance().BatchRefreshForms(formRefreshType);
+        return FormMgrAdapterFacade::GetInstance().BatchRefreshForms(formRefreshType);
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchRefreshForms);
 }
@@ -105,7 +105,7 @@ void FormObserverTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Co
     HILOG_INFO("Call.");
  
     auto batchConfigurationUpdate = [configuration]() {
-        return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
+        return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchConfigurationUpdate);
     HILOG_INFO("end");

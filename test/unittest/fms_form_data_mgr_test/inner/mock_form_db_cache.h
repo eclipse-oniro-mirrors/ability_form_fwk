@@ -1,0 +1,34 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef INNER_MOCK_FORM_DB_CACHE_H
+#define INNER_MOCK_FORM_DB_CACHE_H
+
+#include "data_center/database/form_db_info.h"
+#include "data_center/form_record/form_record.h"
+
+void MockGetAllFormInfo(int32_t mockRet);
+
+void MockGetAllFormInfoSize(int32_t mockRet, int callingUid);
+
+void MockGetFormCountsByUserId(int32_t mockRet);
+
+void MockGetFormCountsByHostBundleName(int32_t mockRet);
+
+void MockGetAllFormInfo(const std::vector<OHOS::AppExecFwk::FormDBInfo> &formDBInfos);
+
+void MockGetDBRecord(int64_t formId, const OHOS::AppExecFwk::FormRecord &formRecord, int32_t ret);
+
+#endif // INNER_MOCK_FORM_DB_CACHE_H

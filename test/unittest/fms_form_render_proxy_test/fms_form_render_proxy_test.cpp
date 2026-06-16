@@ -246,7 +246,8 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0013, TestSize.Level1) {
     formSurfaceInfo.borderWidth = 1.1;
     formSurfaceInfo.formViewScale = 1.1;
     std::string uid = "uid";
-    int result = formRenderProxy_->UpdateFormSize(formId, formSurfaceInfo, uid);
+    FormJsInfo formJsInfo;
+    int result = formRenderProxy_->UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0013 test ends";
 }

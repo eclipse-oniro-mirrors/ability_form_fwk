@@ -30,6 +30,9 @@ void MockIsFormInvisible(bool mockBool);
 void MockIsScreenOff(bool mockBool);
 void MockIsHealthyControl(bool mockBool);
 void MockIsNeedToFresh(bool mockBool);
+void MockIsAddFormFinish(bool mockBool);
 void MockFormProviderUpdateForm(ErrCode mockRet);
+void MockGetHapTokenID(uint32_t mockRet);
+void MockVerifyAccessToken(int32_t mockRet);
 }
 #endif // OHOS_MOCK_REFRESH_MGR_H

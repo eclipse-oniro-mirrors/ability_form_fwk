@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "napi/native_node_api.h"
 #include "napi_common_want.h"
 #include "form_instance.h"
+#include "form_custom_config.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -74,8 +75,20 @@ public:
     bool UnregisterGetLiveFormStatusListener();
 
     bool RegisterTemplateFormDetailInfoChange(napi_env env, napi_ref callback);
- 
+
     bool UnregisterTemplateFormDetailInfoChange();
+
+    void RegisterUpdateFormsConfigCallback(napi_env env, napi_ref callback);
+
+    void UnregisterUpdateFormsConfigCallback();
+
+    void RegisterDeleteFormsCallback(napi_env env, napi_ref callback);
+
+    void UnregisterDeleteFormsCallback();
+
+    void RegisterFormWantCallbackListener(napi_env env, napi_ref callback);
+
+    void UnregisterFormWantCallbackListener();
 
 private:
     static std::mutex mutex_;
@@ -115,11 +128,36 @@ private:
     void GetTemplateFormInfoArray(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
         napi_value &templateFormInfoArray);
 
+    napi_ref updateFormsConfigCallbackRef_ = nullptr;
+    napi_env updateFormsConfigEnv_ = nullptr;
+    ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool UpdateFormsConfigCallbackInner(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool GetFormCustomConfigArray(const std::vector<AppExecFwk::FormCustomConfig> &configs,
+        napi_value &configArray);
+
+    napi_ref deleteFormsCallbackRef_ = nullptr;
+    napi_env deleteFormsCallbackEnv_ = nullptr;
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds);
+    bool DeleteFormsCallbackInner(const std::vector<std::string> &formIds);
+    bool CreateStringArray(const std::vector<std::string> &strings, napi_value &array);
+    static bool GetValidCallback(napi_env env, napi_ref callbackRef, napi_value &callback);
+
+    napi_ref formWantCallbackRef_ = nullptr;
+    napi_env formWantCallbackEnv_ = nullptr;
+    ErrCode RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
+    bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
+    bool ParseWantParamsArray(napi_value funcResult, std::vector<AAFwk::WantParams> &wantParamsList);
+
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
     mutable std::mutex registerGetFormRectProxyMutex_;
     mutable std::mutex registerGetLiveFormStatusProxyMutex_;
     mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
+    mutable std::mutex registerUpdateFormsConfigMutex_;
+    mutable std::mutex registerDeleteFormsMutex_;
+    mutable std::mutex registerFormWantCallbackMutex_;
 };
 
 class PromiseCallbackInfo {

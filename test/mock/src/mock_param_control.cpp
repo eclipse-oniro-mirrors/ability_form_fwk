@@ -44,5 +44,21 @@ bool ParamControl::IsFormRemove(const FormRecord &formRecord)
     }
     return false;
 }
+
+bool ParamControl::IsDueDisableCtrlEmpty()
+{
+    if (MockParamControl::obj) {
+        return MockParamControl::obj->IsDueDisableCtrlEmpty();
+    }
+    return true;
+}
+
+int ParamControl::GetDueUpdateDuration(const FormRecord &formRecord)
+{
+    if (MockParamControl::obj) {
+        return MockParamControl::obj->GetDueUpdateDuration(formRecord);
+    }
+    return 0;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

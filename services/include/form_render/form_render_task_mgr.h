@@ -41,6 +41,8 @@ public:
     void PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
 
+    void PostSetRenderGroupParams(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
 private:
     void UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid,
         const sptr<IRemoteObject> &remoteObject);
@@ -54,6 +56,8 @@ private:
     void ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
     void RestoreFormsRecycledStatus(const std::vector<FormRecord> &&formRecords);
+
+    void SetRenderGroupParams(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

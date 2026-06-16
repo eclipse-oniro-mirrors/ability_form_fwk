@@ -23,15 +23,17 @@ ohos_unittest("FmsFormObserverTaskMgrTest") {
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
   ]
   sources += [
     "fms_form_observer_task_mgr_test.cpp",
-    "${form_fwk_path}/services/src/form_mgr/form_mgr_queue.cpp",
     "${form_fwk_path}/services/src/form_observer/form_observer_task_mgr.cpp",
   ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/common/include",
   ]
 
   configs = [
@@ -44,6 +46,10 @@ ohos_unittest("FmsFormObserverTaskMgrTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

@@ -16,25 +16,21 @@
 #ifndef OHOS_FORM_FWK_FORM_HOST_QUEUE_H
 #define OHOS_FORM_FWK_FORM_HOST_QUEUE_H
 
+#include <functional>
 #include <singleton.h>
-#include "common/util/form_serial_queue.h"
 #include "common/util/form_task_common.h"
+#include "queue/form_singleton_queue_base.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-class FormHostQueue final : public DelayedRefSingleton<FormHostQueue> {
-    DECLARE_DELAYED_REF_SINGLETON(FormHostQueue)
 
+class FormHostQueue final : public DelayedRefSingleton<FormHostQueue>, public Common::FormSingletonQueueBase {
 public:
     DISALLOW_COPY_AND_MOVE(FormHostQueue);
 
-    bool ScheduleTask(uint64_t ms, std::function<void()> func);
-    void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
-    void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
-
-private:
-    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
+    FormHostQueue(): Common::FormSingletonQueueBase("FormHostQueue") {}
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
+
+} // namespace AppExecFwk
+} // namespace OHOS
 #endif // OHOS_FORM_FWK_FORM_HOST_QUEUE_H

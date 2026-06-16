@@ -32,8 +32,11 @@ void FormRouterProxyMgr::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
     std::lock_guard<std::mutex> lock(deathRecipientsMutex_);
     auto iter = deathRecipients_.find(callerToken);
     if (iter == deathRecipients_.end()) {
-        deathRecipients_.emplace(callerToken, deathRecipient);
-        callerToken->AddDeathRecipient(deathRecipient);
+        if (callerToken->AddDeathRecipient(deathRecipient)) {
+            deathRecipients_.emplace(callerToken, deathRecipient);
+            return;
+        }
+        HILOG_ERROR("Failed to add death recipient");
     } else {
         HILOG_DEBUG("The deathRecipient has been added");
     }
@@ -54,12 +57,13 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
         }
         formRouterProxyMap_.emplace(formId, callerToken);
     }
-    auto dealthRecipient = new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
-    if (dealthRecipient == nullptr) {
-        HILOG_ERROR("create ClientDealthRecipient failed");
+    sptr<IRemoteObject::DeathRecipient> deathRecipient =
+        new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
+    if (deathRecipient == nullptr) {
+        HILOG_ERROR("create ClientDeathRecipient failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    SetDeathRecipient(callerToken, dealthRecipient);
+    SetDeathRecipient(callerToken, deathRecipient);
     return ERR_OK;
 #else
     return ERR_OK;

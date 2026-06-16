@@ -115,7 +115,7 @@ HWTEST_F(FmsFormMgrRequestFormTest, RequestForm_001, TestSize.Level0)
     FormItemInfo info;
     FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
     Want want;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormMgr::GetInstance().RequestForm(formId, token_, want));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().RequestForm(formId, token_, want));
 
     token_->Wait();
     FormDataMgr::GetInstance().DeleteFormRecord(formId);

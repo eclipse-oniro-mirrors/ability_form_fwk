@@ -46,13 +46,15 @@ public:
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
 
-    void OnScreenUnlock(int32_t userId);
+    void OnScreenUnlock(const int32_t userId);
 
     void OnUnlock(int32_t userId);
 
-    void NotifyScreenOn();
+    void NotifyScreenOn(const int32_t userId);
 
     void SetRenderGroupEnableFlag(int64_t formId, bool isEnable);
+
+    void SetRenderGroupParams(int64_t formId, const Want &want);
 
     void SetVisibleChange(int64_t formId, bool isVisible, int32_t userId = Constants::INVALID_USER_ID);
 
@@ -65,7 +67,7 @@ public:
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
-    void GetFormRenderState();
+    void GetFormRenderState(const int32_t userId);
 
     bool GetIsSecondMounted() const;
 
@@ -113,7 +115,7 @@ public:
 
     void DeletePostRenderFormTask(int64_t formId);
 
-    void PostOnUnlockTask();
+    void PostOnUnlockTask(const int32_t userId);
 
     ErrCode RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
         const sptr<IRemoteObject> &remoteObjectOfHost);
@@ -136,6 +138,7 @@ public:
     bool GetFormSandboxMgrInner(int32_t userId,
         std::shared_ptr<FormSandboxRenderMgrInner> &sandboxInner);
 
+    void DeleteRenderInner(int32_t userId);
 private:
     void InitRenderInner(bool isSandbox, int32_t userId);
 

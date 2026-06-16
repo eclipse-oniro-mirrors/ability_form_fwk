@@ -46,7 +46,7 @@ void FmsFormSystemloadListenerTest::OnSystemloadLevel(int32_t level)
  * @tc.name: OnSystemloadLevel.
  * @tc.desc: Verify that the OnSystemloadLevel interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormSystemloadListenerTest, SetOnSystemloadLevel_0001, Function | MediumTest | Level1)
+HWTEST_F(FmsFormSystemloadListenerTest, SetOnSystemloadLevel_0001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "SetOnSystemloadLevel_0001 start";
     FormSystemloadListener formSystemloadListener(nullptr);
@@ -59,7 +59,7 @@ HWTEST_F(FmsFormSystemloadListenerTest, SetOnSystemloadLevel_0001, Function | Me
  * @tc.name: OnSystemloadLevel.
  * @tc.desc: Verify that the OnSystemloadLevel interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormSystemloadListenerTest, SetOnSystemloadLevel_0002, Function | MediumTest | Level1)
+HWTEST_F(FmsFormSystemloadListenerTest, SetOnSystemloadLevel_0002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "SetOnSystemloadLevel_0002 start";
     OnSystemloadLevel(2);

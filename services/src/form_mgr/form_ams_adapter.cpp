@@ -17,6 +17,7 @@
 
 #include "form_mgr_errors.h"
 #include "ams_mgr/form_ams_helper.h"
+#include "ams_mgr/form_app_mgr_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "common/util/form_util.h"
 
@@ -56,6 +57,12 @@ ErrCode FormAmsAdapter::StartUIAbilityByFms(const int32_t uid, const Want &want)
     if (abilityInfo.type != AbilityType::PAGE) {
         HILOG_ERROR("target ability is not UIAbility");
         return ERR_APPEXECFWK_FORM_NOT_UI_ABILITY;
+    }
+    bool isForeground =
+        FormAppMgrHelper::GetInstance().IsAbilityForeground(bundleName, ExtensionAbilityType::FORM_EDIT);
+    if (!isForeground) {
+        HILOG_ERROR("form edit ability is not foreground");
+        return ERR_APPEXECFWK_FORM_ABILITY_NOT_FOREGROUND;
     }
     ErrCode retCode = FormAmsHelper::GetInstance().StartAbility(securedWant, userId);
     if (retCode != ERR_OK) {

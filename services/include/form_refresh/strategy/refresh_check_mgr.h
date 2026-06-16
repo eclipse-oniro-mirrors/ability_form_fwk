@@ -31,6 +31,7 @@ enum CheckValidType {
     TYPE_ACTIVE_USER,
     TYPE_ADD_FINISH,
     TYPE_UNTRUST_APP,
+    TYPE_MULTI_ACTIVE_USERS,
 };
 
 /**

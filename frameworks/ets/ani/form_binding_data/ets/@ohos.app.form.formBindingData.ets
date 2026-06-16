@@ -12,25 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { RecordData } from '@ohos.base';
 
 export namespace formBindingData {
 
   loadLibraryWithPermissionCheck("formBindingData_ani.z", "@ohos.app.form.formBindingData");
 
-  interface ProxyData {
+  export interface ProxyData {
     key: string;
     subscriberId?: string;
   }
 
-  interface FormBindingData {
-    data: Object;
+  export interface FormBindingData {
+    data: RecordData;
     proxies?: Array<ProxyData>;
   }
 
   class FormBindingDataInner implements FormBindingData {
-    data: Object;
+    data: RecordData;
     proxies?: Array<ProxyData>;
   }
 
-  native function createFormBindingData(obj?: Object | string): FormBindingData;
+  native function createFormBindingData(obj?: RecordData): FormBindingData;
 }

@@ -16,7 +16,7 @@
 #include "status_mgr_center/form_status_table.h"
 #include <unordered_map>
 #include "fms_log_wrapper.h"
-#include "form_status_print.h"
+#include "util/form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -28,28 +28,28 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_INIT = {
         FormFsmEvent::RENDER_FORM,
         FormFsmStatus::RENDERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::INIT,
         FormFsmEvent::RECYCLE_DATA,
         FormFsmStatus::RECYCLING_DATA,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::INIT,
         FormFsmEvent::RECYCLE_FORM,
         FormFsmStatus::RECYCLING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::INIT,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::DELETING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
 };
 
@@ -119,28 +119,28 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RENDERED = {
         FormFsmEvent::RENDER_FORM,
         FormFsmStatus::RENDERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::RENDERED,
         FormFsmEvent::RECYCLE_DATA,
         FormFsmStatus::RECYCLING_DATA,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::RENDERED,
         FormFsmEvent::RECYCLE_FORM,
         FormFsmStatus::RECYCLING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::RENDERED,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::DELETING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
 };
 
@@ -150,28 +150,28 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLED = {
         FormFsmEvent::RENDER_FORM,
         FormFsmStatus::RENDERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::RECYCLED,
         FormFsmEvent::RECYCLE_FORM,
         FormFsmStatus::RECYCLING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::RECYCLED,
         FormFsmEvent::RECOVER_FORM,
         FormFsmStatus::RECOVERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::RECYCLED,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::DELETING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
 };
 
@@ -202,7 +202,7 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA = {
         FormFsmEvent::RECYCLE_FORM,
         FormFsmStatus::RECYCLING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::RECYCLING_DATA,
@@ -223,6 +223,13 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_RECYCLING_DATA = {
         FormFsmEvent::EXECUTION_TIMEOUT,
         FormFsmStatus::UNPROCESSABLE,
         FormFsmProcessType::PROCESS_TASK_RETRY,
+        FormEventTimeout::TIMEOUT_NO_NEED,
+    },
+    {
+        FormFsmStatus::RECYCLING_DATA,
+        FormFsmEvent::RECYCLE_FORM_FAIL,
+        FormFsmStatus::UNPROCESSABLE,
+        FormFsmProcessType::PROCESS_TASK_DIRECT,
         FormEventTimeout::TIMEOUT_NO_NEED,
     },
 };
@@ -382,35 +389,35 @@ const std::vector<FormStatusMachineInfo> FORM_STATUS_TABLE_UNPROCESSABLE = {
         FormFsmEvent::RENDER_FORM,
         FormFsmStatus::RENDERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::UNPROCESSABLE,
         FormFsmEvent::RECYCLE_DATA,
         FormFsmStatus::RECYCLING_DATA,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::UNPROCESSABLE,
         FormFsmEvent::RECYCLE_FORM,
         FormFsmStatus::RECYCLING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::UNPROCESSABLE,
         FormFsmEvent::RECOVER_FORM,
         FormFsmStatus::RECOVERING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
     {
         FormFsmStatus::UNPROCESSABLE,
         FormFsmEvent::DELETE_FORM,
         FormFsmStatus::DELETING,
         FormFsmProcessType::PROCESS_TASK_DIRECT,
-        FormEventTimeout::TIMEOUT_3_S,
+        FormEventTimeout::TIMEOUT_30_S,
     },
 };
 

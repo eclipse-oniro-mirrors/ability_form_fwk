@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -276,6 +276,16 @@ public:
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies = {});
+
+    /**
+     * @brief Request to publish a form to the form host with specific userId.
+     *
+     * @param want The want of the form to publish.
+     * @param userId User ID.
+     * @param formId Return the form id to be published.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId);
 
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
@@ -773,6 +783,7 @@ public:
      */
     int32_t UpdateFormSize(const int64_t formId, float width, float height, float borderWidth,
         float formViewScale);
+
     /**
      * @brief Open the form edit ability.
      * @param abilityName The form edit ability name.
@@ -942,6 +953,67 @@ public:
      */
     ErrCode UpdateTemplateFormDetailInfo(
         const std::vector<TemplateFormDetailInfo> &templateFormInfo);
+
+    /**
+     * @brief Register form want callback for app upgrade.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister form want callback for app upgrade.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormWantCallback();
+
+    /**
+     * @brief Get formIds by form location.
+     * @param formLocation Indicate the location of the form.
+     * @param formIds [out] The formIds of the form location to be returned.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds);
+
+    /**
+     * @brief Register update form config callback.
+     * @param callerToken The caller token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister update form config callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterUpdateFormsConfigCallback();
+
+    /**
+     * @brief Update form config.
+     * @param configs The form custom configs to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs);
+
+    /**
+     * @brief Register delete forms callback.
+     * @param callerToken The caller token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister delete forms callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterDeleteFormsCallback();
+
+    /**
+     * @brief Delete forms by filters.
+     * @param filters The form record filters.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters);
 
 private:
     /**

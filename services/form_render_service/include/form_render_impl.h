@@ -25,7 +25,6 @@
 #include "context_impl.h"
 #include "event_handler.h"
 #include "form_render_record.h"
-#include "form_render_serial_queue.h"
 #include "form_supply_proxy.h"
 #include "js_runtime.h"
 #include "runtime.h"
@@ -89,8 +88,10 @@ public:
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) override;
 
-    int32_t UpdateFormSize(
-        const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid) override;
+    int32_t UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid,
+        const FormJsInfo &formJsInfo) override;
+
+    int32_t SetRenderGroupParams(int64_t formId, const Want &want) override;
 
 protected:
     int32_t CheckPermission() override;

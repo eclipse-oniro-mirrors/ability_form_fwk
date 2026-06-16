@@ -19,7 +19,9 @@
           "form_fwk_form_dimension_2_3",
           "form_fwk_form_dimension_3_3",
           "form_fwk_watch_api_disable",
-          "form_fwk_dynamic_support"
+          "form_fwk_dynamic_support",
+          "form_fwk_with_distributed_capability",
+          "form_fwk_support_api_metrics"
         ],
         "adapted_system_type": [
             "standard"
@@ -32,6 +34,7 @@
         "deps": {
           "components": [
               "ability_runtime",
+              "api_metrics",
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
@@ -75,7 +78,9 @@
               "selinux_adapter",
               "openssl",
               "window_manager",
-              "graphic_2d"
+              "graphic_2d",
+              "qos_manager",
+              "input"
 
           ],
           "third_party": [
@@ -111,7 +116,6 @@
                     "form_js_info.h",
                     "form_mgr_interface.h",
                     "form_mgr_stub.h",
-                    "form_provider_data.h",
                     "form_provider_interface.h",
                     "form_provider_stub.h",
                     "form_publish_interceptor_interface.h",
@@ -169,8 +173,35 @@
                   ]
                 },
                 "name": "//foundation/ability/form_fwk/frameworks/js/napi:formutil_napi"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include/",
+                  "header_files": [
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk:form_utils"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include/",
+                  "header_files": [
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk:form_common_info"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include/",
+                  "header_files": [
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk:form_render_info"
+              },
+              {
+                "name": "//foundation/ability/form_fwk/services/common:libform_common"
               }
-          ],
+            ],
           "test": [
               "//foundation/ability/form_fwk/test:benchmarktest",
               "//foundation/ability/form_fwk/test:unittest",

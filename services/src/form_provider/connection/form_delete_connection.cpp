@@ -18,42 +18,22 @@
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "form_constants.h"
-#include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
 FormDeleteConnection::FormDeleteConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName)
+    const std::string &abilityName, const int32_t userId)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- * @param element service ability's ElementName.
- * @param remoteObject the session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
-void FormDeleteConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
-{
-    HILOG_INFO("call");
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            element.GetAbilityName().c_str(), GetFormId(), resultCode);
-        return;
-    }
-    onFormAppConnect();
-    sptr<FormDeleteConnection> connection(this);
-    FormSupplyCallback::GetInstance()->AddConnection(connection);
 
-    Want want;
-    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    HILOG_DEBUG("connectId:%{public}d", this->GetConnectId());
+void FormDeleteConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
     FormProviderTaskMgr::GetInstance().PostDeleteTask(GetFormId(), want, remoteObject);
 }
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

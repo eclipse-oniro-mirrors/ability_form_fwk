@@ -25,6 +25,7 @@ ohos_unittest("FmsFormMgrUpdateFormTest") {
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/mock/src/remote_native_token.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_update_form_test/mock_ipc_skeleton.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_update_form_test/mock_form_refresh_mgr.cpp",
   ]
   sources += [ "fms_form_mgr_update_form_test.cpp" ]
 
@@ -48,6 +49,10 @@ ohos_unittest("FmsFormMgrUpdateFormTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -63,10 +68,14 @@ ohos_unittest("FmsFormMgrUpdateFormTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "libxml2:libxml2",
     "memmgr:memmgrclient",

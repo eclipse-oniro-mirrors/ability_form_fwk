@@ -17,11 +17,13 @@
 
 #include <cinttypes>
 
+#include "ipc_skeleton.h"
 #include "fms_log_wrapper.h"
 #include "ams_mgr/form_ams_helper.h"
 #include "form_constants.h"
 #include "data_center/form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"
+#include "common/util/form_task_common.h"
 #include "form_provider/form_provider_mgr.h"
 #include "form_provider/form_provider_task_mgr.h"
 #include "form_provider/form_provider_queue.h"
@@ -33,8 +35,10 @@
 #include "form_host_interface.h"
 #include "common/util/form_report.h"
 #include "data_center/form_record/form_record_report.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
+#include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "status_mgr_center/form_status_task_mgr.h"
+#include "int_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -91,8 +95,12 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         HILOG_ERROR("empty formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    int64_t formId = std::stoll(strFormId);
-    FormReport::GetInstance().SetAddFormFinish(formId);
+    int64_t formId = 0;
+    if (!FormUtil::ConvertStringToInt64(strFormId, formId)) {
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    int32_t callerUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId, callerUserId);
     FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormRecordReport::GetInstance().SetFormRecordRecordInfo(formId, want);
     FormReport::GetInstance().SetFormRecordInfo(formId, want);
@@ -102,16 +110,12 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     }
 
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
-        errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
-            want.GetParams(), false);
-        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
-        return errCode;
+        return HandleRenderForm(formId, formProviderInfo, want, callerUserId);
     }
 
     int32_t ret = ERR_APPEXECFWK_FORM_INVALID_PARAM;
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
-    HILOG_DEBUG("%{public}" PRId64 ",%{public}d,%{public}d",
-        formId, connectId, type);
+    HILOG_DEBUG("%{public}" PRId64 ",%{public}d,%{public}d", formId, connectId, type);
     switch (type) {
         case Constants::ACQUIRE_TYPE_CREATE_FORM:
             ret = FormProviderMgr::GetInstance().AcquireForm(formId, formProviderInfo);
@@ -123,7 +127,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
             HILOG_WARN("onAcquired type:%{public}d", type);
     }
 
-    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
+    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want, callerUserId);
     HILOG_INFO("end");
     return ret;
 }
@@ -140,7 +144,7 @@ int FormSupplyCallback::OnEventHandle(const Want &want)
     std::string supplyInfo = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
     HILOG_INFO("connectId:%{public}d, supplyInfo:%{public}s", connectId, supplyInfo.c_str());
     FormProviderQueue::GetInstance().CancelDelayTask(
-        { Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId) });
+        std::make_pair(static_cast<int64_t>(Constants::DETECT_FORM_EXIT_DELAY_TASK), static_cast<int64_t>(connectId)));
     RemoveConnection(connectId);
     HILOG_INFO("end");
     return ERR_OK;
@@ -354,14 +358,25 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want
 
 int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("recover forms by config update");
-    Want want;
-    return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
+    HILOG_INFO("update forms by config update");
+    for (int64_t formId : formIds) {
+        FormRecord formRecord;
+        if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+            HILOG_WARN("form record not exist, formId:%{public}" PRId64, formId);
+            continue;
+        }
+        FormProviderData formProviderData;
+        formProviderData.EnableDbCache(true);
+        WantParams wantParams;
+        wantParams.SetParam(Constants::FORM_UPDATE_TYPE_KEY, Integer::Box(Constants::ADD_FORM_UPDATE_FORM));
+        FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, false);
+    }
+    return ERR_OK;
 }
 
 int32_t FormSupplyCallback::OnNotifyRefreshForm(const int64_t formId)
 {
-    FormMgrAdapter::GetInstance().OnNotifyRefreshForm(formId);
+    FormMgrAdapterFacade::GetInstance().OnNotifyRefreshForm(formId);
     return ERR_OK;
 }
 
@@ -383,6 +398,23 @@ int32_t FormSupplyCallback::OnRecycleFormDone(const int64_t formId, const Want &
 int32_t FormSupplyCallback::OnDeleteFormDone(const int64_t formId, const Want &want)
 {
     return FormStatusTaskMgr::GetInstance().OnDeleteFormDone(formId, want);
+}
+
+int32_t FormSupplyCallback::HandleRenderForm(const int64_t formId, const FormProviderInfo &formProviderInfo,
+    const Want &want, int32_t callerUserId)
+{
+    FormRecord formRecord;
+    FormProviderData formProviderData = formProviderInfo.GetFormData();
+    bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    if (hasRecord && !FormMgrAdapterFacade::GetInstance().IsDeleteCacheInUpgradeScene(formRecord)) {
+        HILOG_INFO("To use the DB cahed data when formProviderData is empty, formId: %{public}" PRId64, formId);
+        formProviderData.EnableDbCache(true);
+    }
+    int32_t errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData,
+        want.GetParams(), false);
+    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want,
+        callerUserId);
+    return errCode;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

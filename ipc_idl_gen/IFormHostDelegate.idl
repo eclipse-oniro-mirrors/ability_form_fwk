@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,6 +10,9 @@ sequenceable OHOS.AAFwk.Want;
 sequenceable FormInstance..OHOS.AppExecFwk.OverflowInfo;
 sequenceable FormInstance..OHOS.AppExecFwk.Rect;
 sequenceable OHOS.AppExecFwk.TemplateFormDetailInfo;
+sequenceable OHOS.AppExecFwk.FormCustomConfig;
+sequenceable OHOS.AppExecFwk.FormInfo;
+sequenceable OHOS.AAFwk.WantParams;
 
 interface OHOS.AppExecFwk.IFormHostDelegate {
     [ipccode 4002] void RouterEvent([in] long formId, [in] Want want);
@@ -18,4 +21,7 @@ interface OHOS.AppExecFwk.IFormHostDelegate {
     [ipccode 4005] void GetFormRect([in] long formId, [inout] Rect rect);
     [ipccode 4006] void GetLiveFormStatus([inout] Map<String, String> liveFormStatusMap);
     [ipccode 4007] void TemplateFormDetailInfoChange([in] TemplateFormDetailInfo[] templateFormDetailInfo);
+    [ipccode 4008] void RequestFormWants([in] FormInfo[] formInfos, [out] WantParams[] wantParamsList);
+    [ipccode 4009] void UpdateFormsConfigCallback([in] FormCustomConfig[] formCustomConfigs);
+    [ipccode 4010] void DeleteFormsCallback([in] String[] formIds);
 }

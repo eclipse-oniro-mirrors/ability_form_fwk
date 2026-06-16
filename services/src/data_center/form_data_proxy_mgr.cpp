@@ -20,6 +20,7 @@
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_data_proxy_record.h"
 #include "common/util/form_util.h"
+#include "common/util/form_task_common.h"
 #include "form_event_report.h"
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_queue.h"
@@ -29,7 +30,6 @@ namespace AppExecFwk {
 namespace {
 constexpr int SUBSCRIBE_PROXY_RETRY_TIMES = 3;
 constexpr int SUBSCRIBE_PROXY_RETRY_DELAY_TIME_MS = 30000;
-constexpr int64_t SUBSCRIBE_PROXY_RETRY_TASK = 20000; // task type base
 }
 FormDataProxyMgr::FormDataProxyMgr()
 {}
@@ -38,7 +38,7 @@ FormDataProxyMgr::~FormDataProxyMgr()
 {}
 
 ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
-    const AAFwk::Want &want)
+    const AAFwk::Want &want, const int32_t userId)
 {
     HILOG_INFO("subscribe form data. formId:%{public} " PRId64 ", proxy data size:%{public}zu",
         formId, formDataProxies.size());
@@ -61,8 +61,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     UnsubscribeFormDataById(formId);
 
     ApplicationInfo appInfo;
-    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
-        appInfo) != ERR_OK) {
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, userId, appInfo) != ERR_OK) {
         HILOG_ERROR("get app info failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
@@ -93,7 +92,8 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
     UnsubscribeFormDataById(formId);
     // cancel delay subscribe task
-    FormMgrQueue::GetInstance().CancelDelayTask(std::make_pair(SUBSCRIBE_PROXY_RETRY_TASK, formId));
+    FormMgrQueue::GetInstance().CancelDelayTask(
+        std::make_pair(static_cast<int64_t>(TaskType::SUBSCRIBE_PROXY_RETRY_TASK), formId));
     return ERR_OK;
 }
 
@@ -204,8 +204,14 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
         auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
         if (ret == ERR_OK) {
             HILOG_INFO("subscribe data proxy success, formId:%{public}" PRId64, formId);
-            std::lock_guard<std::mutex> lock(FormDataProxyMgr::GetInstance().formDataProxyRecordMutex_);
-            FormDataProxyMgr::GetInstance().formDataProxyRecordMap_[formId] = formDataProxyRecord;
+            {
+                std::lock_guard<std::mutex> lock(FormDataProxyMgr::GetInstance().formDataProxyRecordMutex_);
+                FormDataProxyMgr::GetInstance().formDataProxyRecordMap_[formId] = formDataProxyRecord;
+            }
+            if (!FormDataMgr::GetInstance().GetFormVisible(formId)) {
+                HILOG_INFO("form is invisible, disable subscribe. formId:%{public}" PRId64, formId);
+                FormDataProxyMgr::GetInstance().DisableSubscribeFormData({ formId });
+            }
             return;
         }
 
@@ -216,7 +222,8 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
     };
 
     HILOG_INFO("post subs proxy task, formId:%{public}" PRId64, formId);
-    FormMgrQueue::GetInstance().ScheduleDelayTask(std::make_pair(SUBSCRIBE_PROXY_RETRY_TASK, formId),
+    FormMgrQueue::GetInstance().ScheduleDelayTask(
+        std::make_pair(static_cast<int64_t>(TaskType::SUBSCRIBE_PROXY_RETRY_TASK), formId),
         SUBSCRIBE_PROXY_RETRY_DELAY_TIME_MS, delaySubsProxyTask);
 }
 } // namespace AppExecFwk

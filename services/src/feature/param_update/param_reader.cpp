@@ -30,11 +30,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    const std::string CERT_ENC_FILE = "CERT.ENC";
-    const std::string CERT_SF_FILE = "CERT.SF";
-    const std::string MANIFEST_MF_FILE = "MANIFEST.MF";
-    const std::string FILE_SHA_KEY = "Name: ";
-    const std::string PUBKEY_PATH = "/system/etc/update/hwkey_param_upgrade_v1.pem";
+constexpr const char *CERT_ENC_FILE = "CERT.ENC";
+constexpr const char *CERT_SF_FILE = "CERT.SF";
+constexpr const char *MANIFEST_MF_FILE = "MANIFEST.MF";
+constexpr const char *FILE_SHA_KEY = "Name: ";
+constexpr const char *PUBKEY_PATH = "/system/etc/update/hwkey_param_upgrade_v1.pem";
 }
 
 ParamReader::ParamReader()
@@ -74,8 +74,8 @@ std::string ParamReader::GetPathVersion(const std::string &path)
 
 bool ParamReader::VerifyCertSfFile()
 {
-    std::string certFile = Constants::FORM_MGR_CONFIG_DIR + CERT_ENC_FILE;
-    std::string verifyFile = Constants::FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
+    std::string certFile = std::string(Constants::FORM_MGR_CONFIG_DIR) + CERT_ENC_FILE;
+    std::string verifyFile = std::string(Constants::FORM_MGR_CONFIG_DIR) + CERT_SF_FILE;
     if (!SignTools::VerifyFileSign(PUBKEY_PATH, certFile, verifyFile)) {
         HILOG_ERROR("verify file sign failed");
         return false;
@@ -136,7 +136,7 @@ std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
 
 std::string ParamReader::GetManifestSha256Digest()
 {
-    std::string verifyFile = Constants::FORM_MGR_CONFIG_DIR + CERT_SF_FILE;
+    std::string verifyFile = std::string(Constants::FORM_MGR_CONFIG_DIR) + CERT_SF_FILE;
     std::ifstream file(verifyFile);
     std::string sha256Digest;
     if (!file.good()) {
@@ -153,7 +153,7 @@ std::string ParamReader::GetManifestSha256Digest()
 
 std::string ParamReader::GetSha256Digest(const std::string &fileName)
 {
-    std::string manifestFile = Constants::FORM_MGR_CONFIG_DIR + MANIFEST_MF_FILE;
+    std::string manifestFile = std::string(Constants::FORM_MGR_CONFIG_DIR) + MANIFEST_MF_FILE;
     std::ifstream file(manifestFile);
     std::string sha256Digest;
     if (!file.good()) {
@@ -176,7 +176,7 @@ std::string ParamReader::GetSha256Digest(const std::string &fileName)
 
 std::string ParamReader::CalcFileSha256Digest(const std::string &fileName)
 {
-    std::string filePath = Constants::FORM_MGR_CONFIG_DIR + fileName;
+    std::string filePath = std::string(Constants::FORM_MGR_CONFIG_DIR) + fileName;
     std::string calSha256Digest;
     std::tuple<int, std::string> ret = SignTools::CalcFileSha256Digest(filePath);
     if (std::get<0>(ret) != 0) {

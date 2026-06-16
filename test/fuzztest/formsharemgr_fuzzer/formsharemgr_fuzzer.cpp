@@ -43,21 +43,22 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     int64_t requestCode = static_cast<int64_t>(GetU32Data(data));
     formShareMgr.ShareForm(formId, deviceId, callerToken, requestCode);
     FormShareInfo info;
-    formShareMgr.HandleRecvFormShareInfoFromRemoteTask(info);
+    int32_t userId = static_cast<int64_t>(GetU32Data(data));
+    formShareMgr.HandleRecvFormShareInfoFromRemoteTask(info, userId);
     formShareMgr.CheckFormShareInfo(info);
     formShareMgr.MakeFormShareInfoKey(info);
     Want want;
     formShareMgr.MakeFormShareInfoKey(want);
-    formShareMgr.StartFormUser(info);
+    formShareMgr.StartFormUser(info, userId);
     std::string bundleName(data, size);
     std::string moduleName(data, size);
-    formShareMgr.IsExistFormPackage(bundleName, moduleName);
+    formShareMgr.IsExistFormPackage(bundleName, moduleName, userId);
     std::string formShareInfoKey(data, size);
     formShareMgr.RemoveFormShareInfo(formShareInfoKey);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
     formShareMgr.FinishFreeInstallTask(freeInstallOperator);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey, userId);
     int64_t eventId = static_cast<int64_t>(GetU32Data(data));
     formShareMgr.HandleFormShareInfoTimeout(eventId);
     formShareMgr.HandleFreeInstallTimeout(eventId);
@@ -66,8 +67,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formShareMgr.IsShareForm(want);
     int64_t msg = static_cast<int64_t>(GetU32Data(data));
     formShareMgr.OnEventTimeoutResponse(msg, eventId);
-    formShareMgr.RecvFormShareInfoFromRemote(info);
-    formShareMgr.CheckFormPackage(info, formShareInfoKey);
+    formShareMgr.RecvFormShareInfoFromRemote(info, userId);
+    formShareMgr.CheckFormPackage(info, formShareInfoKey, userId);
     return true;
 }
 }

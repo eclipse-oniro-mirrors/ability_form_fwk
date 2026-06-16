@@ -21,10 +21,13 @@ ohos_unittest("FmsFormDataMgrTest") {
 
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_host_task_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/services/src/form_host/form_host_callback.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/fms_form_data_mgr_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/mock_form_db_cache.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/mock_form_cache_mgr.cpp",
   ]
 
   include_dirs = [
@@ -37,7 +40,13 @@ ohos_unittest("FmsFormDataMgrTest") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
-  deps = [ "${form_fwk_path}:fms_target" ]
+  deps = [
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
 
   external_deps = [
     "ability_base:base",
@@ -66,6 +75,7 @@ ohos_unittest("FmsFormDataMgrTest") {
     "faultloggerd:libdfx_dumpcatcher",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "googletest:gmock_main",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",

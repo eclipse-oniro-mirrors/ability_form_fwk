@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 import { BusinessError, AsyncCallback, Callback } from '@ohos.base';
 import formInfo from '@ohos.app.form.formInfo';
 
-class AsyncCallbackWrapper<T, E = void> {
+export class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => {}
 
   constructor(myFun: AsyncCallback<T, E>) {
@@ -28,7 +28,7 @@ class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
-class CallbackWrapper<T> {
+export class CallbackWrapper<T> {
   private myFun_: Callback<T> = (data: T) => {}
 
   constructor(myFun: Callback<T>) {

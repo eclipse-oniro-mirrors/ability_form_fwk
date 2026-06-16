@@ -17,32 +17,43 @@
 #define OHOS_FORM_FWK_FORM_CONFIGURATION_UPDATE_CONNECTION_H
 
 #include "common/connection/form_ability_connection.h"
-#include "want.h"
 #include "configuration.h"
- 
+
 namespace OHOS {
 namespace AppExecFwk {
-using Want = OHOS::AAFwk::Want;
+
 /**
- * @class FormRefreshConnection
- * Form Refresh Connection Stub.
+ * @class ConfigurationUpdateConnection
+ * Configuration update Connection Stub.
  */
 class ConfigurationUpdateConnection : public FormAbilityConnection {
 public:
     ConfigurationUpdateConnection(const int64_t formId, const Want &want,
         const std::string &bundleName, const std::string &abilityName,
-        AppExecFwk::Configuration configuration);
+        AppExecFwk::Configuration configuration, const int32_t userId);
     virtual ~ConfigurationUpdateConnection() = default;
- 
+
+protected:
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     *
-     * @param element service ability's ElementName.
-     * @param remoteObject the session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
+     * @brief Whether freeInstall processing is needed.
+     *        Configuration update connection needs freeInstall processing.
+     * @return true.
      */
-    void OnAbilityConnectDone(const AppExecFwk::ElementName &element,
-        const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+    bool NeedFreeInstallProcessing() const override { return true; }
+
+    /**
+     * @brief Build task Want parameter.
+     * @return Built Want object.
+     */
+    Want OnBuildTaskWant() override;
+
+    /**
+     * @brief Execute configuration update task after connection success.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
+
 private:
     Want want_;
     AppExecFwk::Configuration configuration_;
@@ -50,4 +61,5 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif // OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
+
+#endif // OHOS_FORM_FWK_FORM_CONFIGURATION_UPDATE_CONNECTION_H

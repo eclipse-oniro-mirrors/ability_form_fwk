@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,8 +35,8 @@ struct ExtraFormInfo {
 
 class FormInfoHelper {
 public:
-    static ErrCode LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
-        int32_t userId);
+    static ErrCode LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames, int32_t userId,
+        std::map<std::string, std::vector<FormInfo>> &formInfosMap);
 
 private:
     static ErrCode LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos);
@@ -65,14 +65,23 @@ private:
 
     static void SendLoadStageFormConfigEvent(const FormInfo& formInfo);
 
-    static bool GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId);
-
-    static void UpdateBundleTransparencyEnabled(const std::string &bundleName, int32_t userId,
-        std::vector<FormInfo> &formInfos);
-
     static void LoadProfileFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
         const ExtensionAbilityInfo &extensionInfo, const std::vector<std::string> &profileInfos,
         const ExtraFormInfo &extraFormInfo);
+
+    static void UpdateFormInfoByAppServicesCapability(const BundleInfo &bundleInfo, int32_t userId,
+        std::vector<FormInfo> &formInfos);
+
+    static void UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo, int32_t userId,
+        std::vector<FormInfo> &formInfos);
+
+    static void UpdateFormInfoFormStandby(const BundleInfo &bundleInfo, int32_t userId,
+        std::vector<FormInfo> &formInfos);
+
+    static bool CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
+        const std::string &capabilityKey);
+
+    static void LoadExtensionInfos(const BundleInfo &bundleInfo, std::vector<ExtensionAbilityInfo> &extensionInfos);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

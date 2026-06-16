@@ -17,7 +17,11 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 config("formrender_config") {
   visibility = [ ":*" ]
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${form_fwk_path}/common/include",
+    "${form_fwk_path}/services/common/include",
+  ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -65,6 +69,24 @@ ohos_shared_library("formrender") {
 
   configs = [ ":formrender_config" ]
 
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz"
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,-z,relro",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+    "-Wl,--as-needed",
+    "-Wl,--sort-common",
+    "-Wl,--relax",
+    "-Wl,-z,now",
+    "-Wl,--icf=all",
+  ]
+
   sources = [
     "src/form_memmgr_client.cpp",
     "src/form_memory_guard.cpp",
@@ -72,8 +94,8 @@ ohos_shared_library("formrender") {
     "src/form_render_event_report.cpp",
     "src/form_render_record.cpp",
     "src/js_form_runtime.cpp",
-    "src/form_render_serial_queue.cpp",
     "src/form_render_service_mgr.cpp",
+    "src/form_scoped_qos_promotion.cpp",
     "src/status_mgr_center/form_render_status.cpp",
     "src/status_mgr_center/form_render_status_mgr.cpp",
     "src/status_mgr_center/form_render_status_table.cpp",
@@ -91,7 +113,13 @@ ohos_shared_library("formrender") {
     }
   }
 
-  deps = [ "${form_fwk_path}:form_manager" ]
+  deps = [
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}/services/common:libform_common",
+  ]
 
   external_deps = [
     "ability_base:configuration",
@@ -126,6 +154,7 @@ ohos_shared_library("formrender") {
     "graphic_2d:librender_service_client",
     "graphic_2d:rosen_text",
     "ace_engine:ace_uicontent",
+    "qos_manager:qos",
   ]
 
   subsystem_name = "ability"
@@ -142,6 +171,24 @@ ohos_shared_library("formrender_service") {
 
   configs = [ ":formrender_config" ]
 
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz"
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,-z,relro",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+    "-Wl,--as-needed",
+    "-Wl,--sort-common",
+    "-Wl,--relax",
+    "-Wl,-z,now",
+    "-Wl,--icf=all",
+  ]
+
   sources = [
     "src/form_render_impl.cpp",
     "src/form_render_service_extension.cpp",
@@ -157,7 +204,11 @@ ohos_shared_library("formrender_service") {
 
   deps = [
     ":formrender",
+    "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}/services/common:libform_common",
   ]
 
   external_deps = [

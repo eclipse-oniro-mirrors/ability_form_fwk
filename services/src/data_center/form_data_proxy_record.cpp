@@ -22,7 +22,8 @@
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "data_center/form_record/form_record_report.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
 #include "form_mgr_errors.h"
 #include "form_provider/form_provider_mgr.h"
 #include "common/util/form_util.h"
@@ -34,7 +35,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string KEY_DELIMITER = "?"; // the delimiter between key and uid
+constexpr const char *KEY_DELIMITER = "?"; // the delimiter between key and uid
 } // namespace
 
 class PermissionCustomizeListener : public Security::AccessToken::PermStateChangeCallbackCustomize {
@@ -108,7 +109,7 @@ void FormDataProxyRecord::SetWant(const AAFwk::Want &want)
 void FormDataProxyRecord::GetSubscribeFormDataProxies(const FormDataProxy formDataProxy,
     std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unSubscribeFormDataProxies)
 {
-    std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
+    std::string userId = std::to_string(FormUtil::GetCallerUserId(uid_));
     std::string token = std::to_string(tokenId_);
     std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token +
         "&dstBundleName=" + bundleName_;
@@ -146,7 +147,8 @@ void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataP
 {
     std::vector<ProxyData> proxyData;
     std::vector<std::string> permList;
-    FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
+    int32_t userId = FormUtil::GetCallerUserId(uid_);
+    FormBmsHelper::GetInstance().GetAllProxyDataInfos(userId, proxyData);
     if (proxyData.empty() || !formDataPermissionProxyMap_.empty()) {
         return;
     }
@@ -386,7 +388,8 @@ void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> 
     SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap)
 {
     std::vector<ProxyData> proxyData;
-    FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
+    int32_t userId = FormUtil::GetCallerUserId(uid_);
+    FormBmsHelper::GetInstance().GetAllProxyDataInfos(userId, proxyData);
     HILOG_INFO("size:%{public}zu", proxyData.size());
     std::unordered_set<std::string> expectedKeys;
     for (auto &data : proxyData) {
@@ -426,7 +429,7 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(
     const SubscribeMap &subscribeMap, std::vector<FormDataProxyRequest> &formDataProxyRequests)
 {
     formDataProxyRequests.clear();
-    std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
+    std::string userId = std::to_string(FormUtil::GetCallerUserId(uid_));
     std::string token = std::to_string(tokenId_);
     std::unordered_map<int64_t, std::vector<std::string>> subscribeId2UrisMap;
 
@@ -497,7 +500,8 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
     FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
     FormRecord formRecord;
     (void)FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord);
-    auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
+    FormRecordReport::GetInstance().IncreaseUpdateTimes(formId_, HiSysEventPointType::TYPE_ACTUAL_PROXY_REFRESH);
+    auto ret = FormMgrAdapterFacade::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     NewFormEventInfo eventInfo;
     eventInfo.formId = formId_;
     eventInfo.bundleName = bundleName_;
@@ -530,7 +534,8 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     formProviderData.SetDataString(formDataStr);
 
     FormDataMgr::GetInstance().SetDataProxyUpdate(formId_);
-    auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
+    FormRecordReport::GetInstance().IncreaseUpdateTimes(formId_, HiSysEventPointType::TYPE_ACTUAL_PROXY_REFRESH);
+    auto ret = FormMgrAdapterFacade::GetInstance().UpdateForm(formId_, uid_, formProviderData);
     if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {
         receivedDataCount_ += 1;
     }

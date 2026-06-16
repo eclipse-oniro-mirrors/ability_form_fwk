@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,28 +34,66 @@ uint32_t GetU32Data(const char* ptr)
     // convert fuzz input data to an integer
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
+
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    FormInfoRdbStorageMgr formInfoRdbStorageMgr;
+    FormInfoRdbStorageMgr &formInfoRdbStorageMgr = FormInfoRdbStorageMgr::GetInstance();
+
+    // Test LoadFormInfos
     std::string aa(data, size);
     std::string bb(data, size);
     std::pair<std::string, std::string> loadForm = std::make_pair(aa, bb);
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
     formInfoStorages.emplace_back(loadForm);
-    formInfoStorageMgr.LoadFormInfos(formInfoStorages);
+    formInfoRdbStorageMgr.LoadFormInfos(formInfoStorages);
+
+    // Test RemoveBundleFormInfos
     std::string bundleName(data, size);
-    formInfoStorageMgr.RemoveBundleFormInfos(bundleName);
+    formInfoRdbStorageMgr.RemoveBundleFormInfos(bundleName);
+
+    // Test UpdateBundleFormInfos
     std::string formInfoStorags(data, size);
-    formInfoStorageMgr.UpdateBundleFormInfos(bundleName, formInfoStorags);
-    formInfoStorageMgr.CheckRdbStore();
+    formInfoRdbStorageMgr.UpdateBundleFormInfos(bundleName, formInfoStorags);
+
+    // Test LoadFormData
     std::vector<InnerFormInfo> innerFormInfos;
     InnerFormInfo innerFormInfo;
     innerFormInfos.emplace_back(innerFormInfo);
-    formInfoStorageMgr.LoadFormData(innerFormInfos);
+    formInfoRdbStorageMgr.LoadFormData(innerFormInfos);
+
+    // Test SaveStorageFormData
+    formInfoRdbStorageMgr.SaveStorageFormData(innerFormInfo);
+
+    // Test ModifyStorageFormData
+    formInfoRdbStorageMgr.ModifyStorageFormData(innerFormInfo);
+
+    // Test DeleteStorageFormData
     std::string formId(data, size);
-    formInfoStorageMgr.SaveStorageFormData(innerFormInfo);
-    formInfoStorageMgr.ModifyStorageFormData(innerFormInfo);
-    formInfoStorageMgr.DeleteStorageFormData(formId);
+    formInfoRdbStorageMgr.DeleteStorageFormData(formId);
+
+    // Test LoadStatusData
+    std::string statusData;
+    formInfoRdbStorageMgr.LoadStatusData(formId, statusData);
+
+    // Test UpdateStatusData
+    std::string newStatusData(data, size);
+    formInfoRdbStorageMgr.UpdateStatusData(formId, newStatusData);
+
+    // Test GetFormVersionCode
+    std::string versionCode;
+    formInfoRdbStorageMgr.GetFormVersionCode(versionCode);
+
+    // Test UpdateFormVersionCode
+    formInfoRdbStorageMgr.UpdateFormVersionCode();
+
+    // Test GetMultiAppFormVersionCode
+    std::string testBundleName(data, size);
+    formInfoRdbStorageMgr.GetMultiAppFormVersionCode(testBundleName, versionCode);
+
+    // Test UpdateMultiAppFormVersionCode
+    std::string testVersionCode(data, size);
+    formInfoRdbStorageMgr.UpdateMultiAppFormVersionCode(testBundleName, testVersionCode);
+
     return true;
 }
 }
@@ -89,4 +127,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     ch = nullptr;
     return 0;
 }
-

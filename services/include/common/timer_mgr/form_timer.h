@@ -140,6 +140,7 @@ public:
     int64_t formId = 0L;
     int64_t settedTime = INT64_MAX;
     int32_t userId = -1;
+    bool nextRefreshFlag = false;
 
     DynamicRefreshItem() {}
 

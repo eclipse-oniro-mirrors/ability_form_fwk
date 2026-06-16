@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,7 @@ void FmsFormTimerMgrTest::TearDown() {}
  * @tc.name: AddFormTimer.
  * @tc.desc: Add duration form timer.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0001, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0001 start";
     bool isOk = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_1,  1 * Constants::MIN_PERIOD);
@@ -73,7 +73,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0001, Function | MediumTest | Lev
  * @tc.name: AddFormTimer.
  * @tc.desc: Add scheduled form timer.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0002, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0002 start";
     bool isOk = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_2,  2, 50, 0);
@@ -86,7 +86,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0002, Function | MediumTest | Lev
  * @tc.name: RemoveFormTimer.
  * @tc.desc: Delete form timer.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0003, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0003 start";
     bool isAddOk1 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_3,  336 * Constants::MIN_PERIOD);
@@ -104,7 +104,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0003, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_INTERVAL_CHANGE).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0004, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0004 start";
     bool isAddOk1 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_1,  3 * Constants::MIN_PERIOD);
@@ -124,7 +124,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0004, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_ATTIME_CHANGE).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0005, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0005 start";
     bool isAddOk2 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_2,  3, 30, 0);
@@ -146,7 +146,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0005, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_INTERVAL_TO_ATTIME).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0006, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0006, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0006 start";
     bool isAddOk3 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_3,  6 * Constants::MIN_PERIOD);
@@ -167,7 +167,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0006, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_ATTIME_TO_INTERVAL).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0007, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0007, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0007 start";
     bool isAddOk4 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_4,  10, 30, 0);
@@ -187,7 +187,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0007, Function | MediumTest | Lev
  * @tc.name: HandleSystemTimeChanged.
  * @tc.desc: Handle system time changed.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0008, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0008, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0008 start";
     bool isAddOk5 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_1,  11, 30, 0);
@@ -203,7 +203,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0008, Function | MediumTest | Lev
  * @tc.name: TimerReceiver::OnReceiveEvent.
  * @tc.desc: Receive common event(COMMON_EVENT_TIMEZONE_CHANGED).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0009, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0009, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0009 start";
     bool isAddOk5 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_2,  11, 30, 0);
@@ -218,7 +218,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0009, Function | MediumTest | Lev
  * @tc.name: HandleResetLimiter.
  * @tc.desc: Handle reset limiter.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0010, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0010, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0010 start";
     bool isAddOk5 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_3,  16, 30, 0);
@@ -234,7 +234,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0010, Function | MediumTest | Lev
  * @tc.name: OnUpdateAtTrigger.
  * @tc.desc:handle attimer update.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0011, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0011, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0011 start";
     bool isAddOk5 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_4,  11, 30, 0);
@@ -250,7 +250,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0011, Function | MediumTest | Lev
  * @tc.name: OnDynamicTimeTrigger.
  * @tc.desc: handle dynamic update.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0012, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0012, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0012 start";
     bool isAddOk5 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_5,  11, 30, 0);
@@ -267,7 +267,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0012, Function | MediumTest | Lev
  * @tc.name: AddFormTimer.
  * @tc.desc: Add duration form timer.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0013, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0013, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0013 start";
     bool isOk = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_1,  0);
@@ -280,7 +280,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0013, Function | MediumTest | Lev
  * @tc.name: AddFormTimer.
  * @tc.desc: Add scheduled form timer.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0014, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0014, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0014 start";
     bool isOk = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_2,  0, 60, 0);
@@ -293,7 +293,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0014, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_INTERVAL_CHANGE).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0015, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0015, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0015 start";
     bool isAddOk1 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_1,  3 * Constants::MIN_PERIOD);
@@ -313,7 +313,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0015, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_ATTIME_CHANGE).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0016, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0016, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0016 start";
     bool isAddOk2 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_2,  3, 30, 0);
@@ -335,7 +335,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0016, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_INTERVAL_TO_ATTIME).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0017, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0017, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0017 start";
     bool isAddOk3 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_3,  6 * Constants::MIN_PERIOD);
@@ -356,7 +356,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0017, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_ATTIME_TO_INTERVAL).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0018, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0018, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0018 start";
     bool isAddOk4 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_4,  10, 30, 0);
@@ -377,7 +377,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0018, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::AddItem.
  * @tc.desc: AddItem success.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0019, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0019 start";
 
@@ -395,7 +395,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0019, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::DeleteItem.
  * @tc.desc: DeleteItem success.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0020, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0020, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0020 start";
 
@@ -410,7 +410,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0020, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::IsEnableRefresh.
  * @tc.desc: IsEnableRefresh.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0021, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0021, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0021 start";
 
@@ -428,7 +428,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0021, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::Increase.
  * @tc.desc: Increase refreshCount.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0022, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0022, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0022 start";
 
@@ -449,7 +449,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0022, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::ResetLimit.
  * @tc.desc: ResetLimit.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0023, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0023 start";
 
@@ -472,7 +472,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0023, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::Increase.
  * @tc.desc: report refresh to 50 count.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0024, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0024, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0024 start";
 
@@ -494,7 +494,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0024, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::IsEnableRefresh.
  * @tc.desc: report refresh to 50 count.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0025, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0025, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0025 start";
 
@@ -516,7 +516,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0025, Function | MediumTest | Lev
  * @tc.name: FormRefreshLimiter::MarkRemind.
  * @tc.desc: Mark remind when refresh count >= 50.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0026, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0026, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0026 start";
 
@@ -540,7 +540,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0026, Function | MediumTest | Lev
  * @tc.name: OnIntervalTimeOut.
  * @tc.desc: Interval timer timeout.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0027, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0027, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0027 start";
     bool isAddOk4 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_6,  10, 30, 0);
@@ -553,7 +553,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0027, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: test UpdateFormTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0028, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0028, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0028 start";
     FormTimerMgr formTimerMgr;
@@ -569,7 +569,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0028, Function | MediumTest | Lev
  * @tc.name: UpdateFormTimer.
  * @tc.desc: Update form timer(TYPE_INTERVAL_ONCE).
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0029, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0029, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0029 start";
     FormTimerMgr formTimerMgr;
@@ -586,7 +586,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0029, Function | MediumTest | Lev
  * @tc.name: UpdateIntervalValue.
  * @tc.desc: test UpdateIntervalValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0030, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0030, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0030 start";
     FormTimerMgr formTimerMgr;
@@ -602,7 +602,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0030, Function | MediumTest | Lev
  * @tc.name: UpdateIntervalValue.
  * @tc.desc: test UpdateIntervalValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0031, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0031, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0031 start";
     FormTimerMgr formTimerMgr;
@@ -618,7 +618,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0031, Function | MediumTest | Lev
  * @tc.name: UpdateIntervalValue.
  * @tc.desc: test UpdateIntervalValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0032, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0032, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0032 start";
     FormTimerMgr formTimerMgr;
@@ -634,7 +634,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0032, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0033, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0033, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0033 start";
     FormTimerMgr formTimerMgr;
@@ -650,7 +650,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0033, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0034, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0034, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0034 start";
     FormTimerMgr formTimerMgr;
@@ -666,7 +666,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0034, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0035, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0035, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0035 start";
     FormTimerMgr formTimerMgr;
@@ -682,7 +682,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0035, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0036, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0036, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0036 start";
     FormTimerMgr formTimerMgr;
@@ -698,7 +698,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0036, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0037, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0037, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0037 start";
     FormTimerMgr formTimerMgr;
@@ -715,7 +715,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0037, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0038, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0038, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0038 start";
     FormTimerMgr formTimerMgr;
@@ -735,7 +735,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0038, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0039, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0039, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0039 start";
     FormTimerMgr formTimerMgr;
@@ -755,7 +755,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0039, Function | MediumTest | Lev
  * @tc.name: IntervalToAtTimer.
  * @tc.desc: test IntervalToAtTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0040, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0040, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0040 start";
     FormTimerMgr formTimerMgr;
@@ -771,7 +771,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0040, Function | MediumTest | Lev
  * @tc.name: IntervalToAtTimer.
  * @tc.desc: test IntervalToAtTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0041, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0041, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0041 start";
     FormTimerMgr formTimerMgr;
@@ -787,7 +787,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0041, Function | MediumTest | Lev
  * @tc.name: IntervalToAtTimer.
  * @tc.desc: test IntervalToAtTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0042, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0042, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0042 start";
     FormTimerMgr formTimerMgr;
@@ -803,7 +803,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0042, Function | MediumTest | Lev
  * @tc.name: IntervalToAtTimer.
  * @tc.desc: test IntervalToAtTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0043, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0043, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0043 start";
     FormTimerMgr formTimerMgr;
@@ -820,7 +820,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0043, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerValue.
  * @tc.desc: test UpdateAtTimerValue function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0044, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0044, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0044 start";
     FormTimerMgr formTimerMgr;
@@ -837,7 +837,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0044, Function | MediumTest | Lev
  * @tc.name: AtTimerToIntervalTimer.
  * @tc.desc: test AtTimerToIntervalTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0045, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0045, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0045 start";
     FormTimerMgr formTimerMgr;
@@ -853,7 +853,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0045, Function | MediumTest | Lev
  * @tc.name: AtTimerToIntervalTimer.
  * @tc.desc: test AtTimerToIntervalTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0046, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0046, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0046 start";
     FormTimerMgr formTimerMgr;
@@ -869,7 +869,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0046, Function | MediumTest | Lev
  * @tc.name: AtTimerToIntervalTimer.
  * @tc.desc: test AtTimerToIntervalTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0047, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0047, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0047 start";
     FormTimerMgr formTimerMgr;
@@ -885,7 +885,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0047, Function | MediumTest | Lev
  * @tc.name: AtTimerToIntervalTimer.
  * @tc.desc: test AtTimerToIntervalTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0048, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0048, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0048 start";
     FormTimerMgr formTimerMgr;
@@ -904,7 +904,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0048, Function | MediumTest | Lev
  * @tc.name: SetNextRefreshTime.
  * @tc.desc: test SetNextRefreshTime function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0049, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0049, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0049 start";
     FormTimerMgr formTimerMgr;
@@ -920,7 +920,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0049, Function | MediumTest | Lev
  * @tc.name: SetNextRefreshTime.
  * @tc.desc: test SetNextRefreshTime function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0050, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0050, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0050 start";
     FormTimerMgr formTimerMgr;
@@ -936,7 +936,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0050, Function | MediumTest | Lev
  * @tc.name: SetNextRefreshTime.
  * @tc.desc: test SetNextRefreshTime function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0051, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0051, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0051 start";
     FormTimerMgr formTimerMgr;
@@ -956,7 +956,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0051, Function | MediumTest | Lev
  * @tc.name: SetNextRefreshTime.
  * @tc.desc: test SetNextRefreshTime function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0052, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0052, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0052 start";
     FormTimerMgr formTimerMgr;
@@ -976,7 +976,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0052, Function | MediumTest | Lev
  * @tc.name: SetNextRefreshTime.
  * @tc.desc: test SetNextRefreshTime function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0053, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0053, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0053 start";
     FormTimerMgr formTimerMgr;
@@ -996,7 +996,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0053, Function | MediumTest | Lev
  * @tc.name: SetNextRefreshTime.
  * @tc.desc: test SetNextRefreshTime function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0054, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0054, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0054 start";
     FormTimerMgr formTimerMgr;
@@ -1016,7 +1016,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0054, Function | MediumTest | Lev
  * @tc.name: SetEnableFlag.
  * @tc.desc: test SetEnableFlag function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0055, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0055, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0055 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1032,7 +1032,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0055, Function | MediumTest | Lev
  * @tc.name: SetEnableFlag.
  * @tc.desc: test SetEnableFlag function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0056, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0056, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0056 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1050,7 +1050,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0056, Function | MediumTest | Lev
  * @tc.name: OnUpdateAtTrigger.
  * @tc.desc: test OnUpdateAtTrigger function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0057, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0057, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0057 start";
     FormTimerMgr formTimerMgr;
@@ -1068,7 +1068,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0057, Function | MediumTest | Lev
  * @tc.name: OnUpdateAtTrigger.
  * @tc.desc: test OnUpdateAtTrigger function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0058, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0058, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0058 start";
     FormTimerMgr formTimerMgr;
@@ -1086,7 +1086,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0058, Function | MediumTest | Lev
  * @tc.name: OnUpdateAtTrigger.
  * @tc.desc: test OnUpdateAtTrigger function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0059, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0059, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0059 start";
     FormTimerMgr formTimerMgr;
@@ -1104,7 +1104,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0059, Function | MediumTest | Lev
  * @tc.name: OnUpdateAtTrigger.
  * @tc.desc: test OnUpdateAtTrigger function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0060, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0060, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0060 start";
     FormTimerMgr formTimerMgr;
@@ -1122,7 +1122,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0060, Function | MediumTest | Lev
  * @tc.name: OnDynamicTimeTrigger.
  * @tc.desc: test OnDynamicTimeTrigger function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0061, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0061, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0061 start";
     FormTimerMgr formTimerMgr;
@@ -1139,7 +1139,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0061, Function | MediumTest | Lev
  * @tc.name: OnDynamicTimeTrigger.
  * @tc.desc: test OnDynamicTimeTrigger function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0062, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0062, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0062 start";
     FormTimerMgr formTimerMgr;
@@ -1156,7 +1156,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0062, Function | MediumTest | Lev
  * @tc.name: SetIntervalEnableFlag.
  * @tc.desc: test SetIntervalEnableFlag function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0063, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0063, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0063 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1172,7 +1172,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0063, Function | MediumTest | Lev
  * @tc.name: SetIntervalEnableFlag.
  * @tc.desc: test SetIntervalEnableFlag function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0064, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0064, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0064 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1190,7 +1190,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0064, Function | MediumTest | Lev
  * @tc.name: GetIntervalTimer.
  * @tc.desc: test GetIntervalTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0065, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0065, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0065 start";
     FormTimerMgr formTimerMgr;
@@ -1205,7 +1205,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0065, Function | MediumTest | Lev
  * @tc.name: GetIntervalTimer.
  * @tc.desc: test GetIntervalTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0066, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0066, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0066 start";
     FormTimerMgr formTimerMgr;
@@ -1221,7 +1221,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0066, Function | MediumTest | Lev
  * @tc.name: GetUpdateAtTimer.
  * @tc.desc: test GetUpdateAtTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0067, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0067, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0067 start";
     FormTimerMgr formTimerMgr;
@@ -1236,7 +1236,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0067, Function | MediumTest | Lev
  * @tc.name: GetUpdateAtTimer.
  * @tc.desc: test GetUpdateAtTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0068, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0068, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0068 start";
     FormTimerMgr formTimerMgr;
@@ -1253,7 +1253,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0068, Function | MediumTest | Lev
  * @tc.name: GetUpdateAtTimer.
  * @tc.desc: test GetUpdateAtTimer function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0069, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0069, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0069 start";
     FormTimerMgr formTimerMgr;
@@ -1270,7 +1270,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0069, Function | MediumTest | Lev
  * @tc.name: DeleteDynamicItem.
  * @tc.desc: test DeleteDynamicItem function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0073, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0073, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0073 start";
     FormTimerMgr formTimerMgr;
@@ -1287,7 +1287,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0073, Function | MediumTest | Lev
  * @tc.name: DeleteDynamicItem.
  * @tc.desc: test DeleteDynamicItem function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0074, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0074, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0074 start";
     FormTimerMgr formTimerMgr;
@@ -1304,7 +1304,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0074, Function | MediumTest | Lev
  * @tc.name: DeleteDynamicItem.
  * @tc.desc: test DeleteDynamicItem function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0075, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0075, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0075 start";
     FormTimerMgr formTimerMgr;
@@ -1324,7 +1324,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0075, Function | MediumTest | Lev
  * @tc.name: OnIntervalTimeOut.
  * @tc.desc: test OnIntervalTimeOut function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0076, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0076, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0076 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1338,7 +1338,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0076, Function | MediumTest | Lev
  * @tc.name: OnIntervalTimeOut.
  * @tc.desc: test OnIntervalTimeOut function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0077, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0077, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0077 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1356,7 +1356,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0077, Function | MediumTest | Lev
  * @tc.name: OnIntervalTimeOut.
  * @tc.desc: test OnIntervalTimeOut function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0078, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0078, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0078 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1374,7 +1374,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0078, Function | MediumTest | Lev
  * @tc.name: ClearLimiterTimerResource.
  * @tc.desc: test ClearLimiterTimerResource function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0079 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1389,7 +1389,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079, Function | MediumTest | Lev
  * @tc.name: ClearLimiterTimerResource.
  * @tc.desc: test ClearLimiterTimerResource function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079_1, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079_1, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0079_1 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1406,7 +1406,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0079_1, Function | MediumTest | L
  * @tc.name: UpdateDynamicAlarm.
  * @tc.desc: test UpdateDynamicAlarm function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0080, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0080, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0080 start";
     FormTimerMgr formTimerMgr;
@@ -1419,7 +1419,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0080, Function | MediumTest | Lev
  * @tc.name: UpdateDynamicAlarm.
  * @tc.desc: test UpdateDynamicAlarm function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0081, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0081, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0081 start";
     FormTimerMgr formTimerMgr;
@@ -1436,7 +1436,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0081, Function | MediumTest | Lev
  * @tc.name: UpdateDynamicAlarm.
  * @tc.desc: test UpdateDynamicAlarm function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0082, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0082, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0082 start";
     FormTimerMgr formTimerMgr;
@@ -1453,7 +1453,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0082, Function | MediumTest | Lev
  * @tc.name: UpdateDynamicAlarm.
  * @tc.desc: test UpdateDynamicAlarm function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0083, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0083, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0083 start";
     FormTimerMgr formTimerMgr;
@@ -1471,7 +1471,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0083, Function | MediumTest | Lev
  * @tc.name: ClearDynamicResource.
  * @tc.desc: test ClearDynamicResource function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0084, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0084, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0084 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1487,7 +1487,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0084, Function | MediumTest | Lev
  * @tc.name: ExecTimerTask.
  * @tc.desc: test ExecTimerTask function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0088, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0088, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0088 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1502,7 +1502,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0088, Function | MediumTest | Lev
  * @tc.name: IsDynamicTimerExpired.
  * @tc.desc: test IsDynamicTimerExpired function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, Function | MediumTest | Level0)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
@@ -1516,7 +1516,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, Function | MediumTest | Lev
  * @tc.name: UpdateAtTimerAlarmDetail.
  * @tc.desc: test UpdateAtTimerAlarmDetail function.
  */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0090, Function | MediumTest | Level1)
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0090, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 start";
     std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();

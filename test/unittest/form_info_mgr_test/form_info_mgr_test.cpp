@@ -104,43 +104,6 @@ FormInfo GetTestCircleFormInfo()
 }
 
 /**
- * @tc.name: FormInfoHelper_LoadFormConfigInfoByBundleName_0100
- * @tc.number: LoadFormConfigInfoByBundleName
- * @tc.desc: call LoadFormConfigInfoByBundleName with wrong userId
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_LoadFormConfigInfoByBundleName_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0100 start";
-    std::vector<FormInfo> formInfos;
-    int32_t userId = 0;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED,
-        formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, userId));
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0100 end";
-}
-
-/**
- * @tc.name: FormInfoHelper_LoadFormConfigInfoByBundleName_0200
- * @tc.number: LoadFormConfigInfoByBundleName
- * @tc.desc: call LoadFormConfigInfoByBundleName success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_LoadFormConfigInfoByBundleName_0200, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_OK, formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 end";
-}
-
-/**
  * @tc.name: FormInfoHelper_LoadStageFormConfigInfo_0100
  * @tc.number: LoadStageFormConfigInfo
  * @tc.desc: call LoadStageFormConfigInfo with wrong extensionAbilityInfo type
@@ -223,58 +186,6 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0200, TestSize.L
 }
 
 /**
- * @tc.name: FormInfoHelper_GetFormInfoDescription_0300
- * @tc.number: GetFormInfoDescription
- * @tc.desc: call LoadFormConfigInfoByBundleName with GetStringById success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_OK, formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 end";
-}
-
-/**
- * @tc.name: FormInfoHelper_GetBundleTransparencyEnabled_0100
- * @tc.number: GetBundleTransparencyEnabled
- * @tc.desc: call GetBundleTransparencyEnabled success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetBundleTransparencyEnabled_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 start";
-    bool isAGCTransparencyEnabled = formInfoHelper_->GetBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID);
-    EXPECT_FALSE(isAGCTransparencyEnabled);
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetBundleTransparencyEnabled_0100 end";
-}
-
-/**
- * @tc.name: FormInfoHelper_UpdateBundleTransparencyEnabled_0100
- * @tc.number: UpdateBundleTransparencyEnabled
- * @tc.desc: call UpdateBundleTransparencyEnabled success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateBundleTransparencyEnabled_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 start";
-    std::vector<FormInfo> formInfos;
-    FormInfo formInfo = GetTestFormInfo();
-    formInfo.transparencyEnabled = true;
-    formInfos.emplace_back(formInfo);
-    formInfoHelper_->UpdateBundleTransparencyEnabled(FORM_BUNDLE_NAME_TEST, USER_ID, formInfos);
-    EXPECT_FALSE(formInfos[0].transparencyEnabled);
-    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateBundleTransparencyEnabled_0100 end";
-}
-
-/**
  * @tc.name: BundleFormInfo_InitFromJson_0100
  * @tc.number: InitFromJson
  * @tc.desc: call InitFromJson with bad profile
@@ -296,14 +207,6 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_InitFromJson_0100, TestSize.Level1)
 HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
     FormInfo formInfo = GetTestFormInfo();
     FormInfoStorage formInfoStorage;
@@ -312,8 +215,17 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Le
     formInfo.isStatic = false;
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(GetTestFormInfo());
+ 
+    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(formInfos, USER_ID));
+ 
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_.size(), 1);
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_[0].userId, USER_ID);
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_[0].formInfos.size(), 1);
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_[0].formInfos[0].name, PARAM_FORM_NAME);
+
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 end";
 }
 
@@ -325,21 +237,32 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Le
 HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0200, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 start";
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = 101;
     formInfoStorage.formInfos.push_back(GetTestFormInfo());
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(GetTestFormInfo());
+ 
+    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(formInfos, USER_ID));
+    
+    EXPECT_EQ(bundleFormInfo.formInfoStorages_.size(), 2);
+    
+    bool hasOriginalUser = false;
+    bool hasNewUser = false;
+    for (const auto& storage : bundleFormInfo.formInfoStorages_) {
+        if (storage.userId == 101) {
+            hasOriginalUser = true;
+        }
+        if (storage.userId == USER_ID) {
+            hasNewUser = true;
+        }
+    }
+    EXPECT_TRUE(hasOriginalUser);
+    EXPECT_TRUE(hasNewUser);
+
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 end";
 }
 
@@ -514,11 +437,29 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_UpdateStaticFormInfos_0100, TestSize.Level
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::vector<std::string> &bundleNames, int32_t flag,
+        std::vector<BundleInfo> &bundleInfos, int32_t userId) {
         GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 bmsTask called";
-        return true;
+        BundleInfo bundleInfo;
+        bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+        
+        HapModuleInfo moduleInfo;
+        moduleInfo.name = PARAM_MODULE_NAME_TEST;
+        moduleInfo.moduleType = ModuleType::ENTRY;
+        
+        AbilityInfo abilityInfo;
+        abilityInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+        abilityInfo.moduleName = PARAM_MODULE_NAME_TEST;
+        abilityInfo.type = AbilityType::FORM;
+        abilityInfo.visible = true;
+        
+        moduleInfo.abilityInfos.push_back(abilityInfo);
+        bundleInfo.hapModuleInfos.emplace_back(moduleInfo);
+        
+        bundleInfos.push_back(bundleInfo);
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bmsProxy, BatchGetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_EQ(ERR_OK, formInfoMgr_.UpdateStaticFormInfos(FORM_BUNDLE_NAME_TEST, USER_ID));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 end";
@@ -1481,4 +1422,929 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001, Test
     ret = formInfoMgr_.IsDeleteCacheInUpgradeScene(info);
     EXPECT_FALSE(ret);
     GTEST_LOG_(INFO) << "FormInfoMgrTest_IsDeleteCacheInUpgradeScene_0001 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100
+ * @tc.desc: test UpdateFormInfoByAppServicesCapability function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfo.standby.isSupported = true;
+    formInfo.standby.isAdapted = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = false;
+
+    // Call UpdateFormInfoByAppServicesCapability, should set transparencyEnabled and standby to false
+    // when no capability is configured
+    formInfoHelper_->UpdateFormInfoByAppServicesCapability(bundleInfo, USER_ID, formInfos);
+
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200
+ * @tc.desc: test UpdateFormInfoByAppServicesCapability with system app.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = true;
+
+    // System app should not have transparencyEnabled modified
+    formInfoHelper_->UpdateFormInfoByAppServicesCapability(bundleInfo, USER_ID, formInfos);
+
+    // For system apps, transparencyEnabled should remain unchanged
+    // standby should be set to false when no capability is configured
+    EXPECT_TRUE(formInfos[0].transparencyEnabled);
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100
+ * @tc.desc: test UpdateFormInfoTransparencyEnabled function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = false;
+
+    // Call UpdateFormInfoTransparencyEnabled with no capability configured
+    formInfoHelper_->UpdateFormInfoTransparencyEnabled(bundleInfo, USER_ID, formInfos);
+
+    // Should set transparencyEnabled to false when no capability is configured
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200
+ * @tc.desc: test UpdateFormInfoTransparencyEnabled with system app.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.transparencyEnabled = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = true;
+
+    // System app should return early, transparencyEnabled should remain unchanged
+    formInfoHelper_->UpdateFormInfoTransparencyEnabled(bundleInfo, USER_ID, formInfos);
+
+    EXPECT_TRUE(formInfos[0].transparencyEnabled);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoTransparencyEnabled_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoFormStandby_0100
+ * @tc.desc: test UpdateFormInfoFormStandby function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoFormStandby_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoFormStandby_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.standby.isSupported = true;
+    formInfo.standby.isAdapted = true;
+    formInfos.emplace_back(formInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+
+    // Call UpdateFormInfoFormStandby with no capability configured
+    formInfoHelper_->UpdateFormInfoFormStandby(bundleInfo, USER_ID, formInfos);
+
+    // Should set standby to false when no capability is configured
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoFormStandby_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_CheckAppServicesCapability_0100
+ * @tc.desc: test CheckAppServicesCapability with null bundle manager.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_CheckAppServicesCapability_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0100 start";
+
+    // Set bundle manager to null
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = nullptr;
+
+    std::string capabilityKey = "test.capability";
+    bool result = formInfoHelper_->CheckAppServicesCapability(USER_ID, FORM_BUNDLE_NAME_TEST, capabilityKey);
+
+    // Should return false when bundle manager is null
+    EXPECT_FALSE(result);
+
+    // Restore bundle manager
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_CheckAppServicesCapability_0200
+ * @tc.desc: test CheckAppServicesCapability with mock bundle manager.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_CheckAppServicesCapability_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0200 start";
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+
+    // Mock GetAppProvisionInfo to return error
+    auto bmsTask = [] (const std::string &bundleName, const int32_t userId, AppProvisionInfo &appProvisionInfo) {
+        GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0200 bmsTask called";
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    };
+    EXPECT_CALL(*bmsProxy, GetAppProvisionInfo(_, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+
+    std::string capabilityKey = "test.capability";
+    bool result = formInfoHelper_->CheckAppServicesCapability(USER_ID, FORM_BUNDLE_NAME_TEST, capabilityKey);
+
+    // Should return false when GetAppProvisionInfo fails
+    EXPECT_FALSE(result);
+
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormInfoHelper_CheckAppServicesCapability_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300
+ * @tc.desc: test UpdateFormInfoByAppServicesCapability with multiple forms.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300 start";
+    std::vector<FormInfo> formInfos;
+    FormInfo formInfo1 = GetTestFormInfo();
+    formInfo1.transparencyEnabled = true;
+    formInfo1.standby.isSupported = true;
+    formInfos.emplace_back(formInfo1);
+
+    FormInfo formInfo2 = GetTestFormInfo();
+    formInfo2.name = "form2";
+    formInfo2.transparencyEnabled = true;
+    formInfo2.standby.isAdapted = true;
+    formInfos.emplace_back(formInfo2);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = FORM_BUNDLE_NAME_TEST;
+    bundleInfo.applicationInfo.isSystemApp = false;
+
+    // Call UpdateFormInfoByAppServicesCapability with multiple forms
+    formInfoHelper_->UpdateFormInfoByAppServicesCapability(bundleInfo, USER_ID, formInfos);
+
+    // Both forms should be updated
+    EXPECT_FALSE(formInfos[0].transparencyEnabled);
+    EXPECT_FALSE(formInfos[0].standby.isSupported);
+    EXPECT_FALSE(formInfos[0].standby.isAdapted);
+
+    EXPECT_FALSE(formInfos[1].transparencyEnabled);
+    EXPECT_FALSE(formInfos[1].standby.isSupported);
+    EXPECT_FALSE(formInfos[1].standby.isAdapted);
+    GTEST_LOG_(INFO) << "FormInfoHelper_UpdateFormInfoByAppServicesCapability_0300 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetAllTemplateFormsInfo_001
+ * @tc.desc: test GetAllTemplateFormsInfo with SA permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_001 start";
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_001 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetAllTemplateFormsInfo_002
+ * @tc.desc: test GetAllTemplateFormsInfo with permission verified.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_002 start";
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_002 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetAllTemplateFormsInfo_003
+ * @tc.desc: test GetAllTemplateFormsInfo with permission denied.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_003 start";
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_003 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetAllTemplateFormsInfo_004
+ * @tc.desc: test GetAllTemplateFormsInfo with empty map.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_004, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_004 start";
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
+    EXPECT_TRUE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_004 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetAllTemplateFormsInfo_005
+ * @tc.desc: test GetAllTemplateFormsInfo with nullptr in map.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_005, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_005 start";
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = nullptr;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
+    EXPECT_TRUE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_005 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetAllTemplateFormsInfo_006
+ * @tc.desc: test GetAllTemplateFormsInfo with valid data.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_006 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.isTemplateForm = true;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
+    EXPECT_FALSE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_006 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_001
+ * @tc.desc: test GetTemplateFormsInfoByBundle with SA permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_001 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetTemplateFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_001 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_002
+ * @tc.desc: test GetTemplateFormsInfoByBundle with permission verified.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_002 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetTemplateFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_002 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_003
+ * @tc.desc: test GetTemplateFormsInfoByBundle with IsCaller true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_003 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
+        formInfoMgr_.GetTemplateFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_003 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_004
+ * @tc.desc: test GetTemplateFormsInfoByBundle with empty bundleName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_004 start";
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formInfoMgr_.GetTemplateFormsInfoByBundle("", formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_004 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_005
+ * @tc.desc: test GetTemplateFormsInfoByBundle with bundle not found.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_005 start";
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
+        formInfoMgr_.GetTemplateFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_005 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_006
+ * @tc.desc: test GetTemplateFormsInfoByBundle with nullptr BundleFormInfo.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_006, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_006 start";
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = nullptr;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetTemplateFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    EXPECT_TRUE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_006 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_007
+ * @tc.desc: test GetTemplateFormsInfoByBundle with valid data.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_007 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.isTemplateForm = true;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetTemplateFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    EXPECT_FALSE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_007 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_001
+ * @tc.desc: test GetTemplateFormsInfoByModule with SA permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_001 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_001 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_002
+ * @tc.desc: test GetTemplateFormsInfoByModule with permission verified.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_002 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(true);
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_002 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_003
+ * @tc.desc: test GetTemplateFormsInfoByModule with IsCaller true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_003 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
+        formInfoMgr_.GetTemplateFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_003 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_004
+ * @tc.desc: test GetTemplateFormsInfoByModule with permission denied.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_004 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
+        formInfoMgr_.GetTemplateFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_004 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_005
+ * @tc.desc: test GetTemplateFormsInfoByModule with empty bundleName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_005 start";
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formInfoMgr_.GetTemplateFormsInfoByModule("", PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_005 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_006
+ * @tc.desc: test GetTemplateFormsInfoByModule with bundle not found.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_006 start";
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
+        formInfoMgr_.GetTemplateFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_006 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_007
+ * @tc.desc: test GetTemplateFormsInfoByModule with nullptr BundleFormInfo.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_007, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_007 start";
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = nullptr;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    EXPECT_TRUE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_007 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_008
+ * @tc.desc: test GetTemplateFormsInfoByModule with valid data.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_008 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.isTemplateForm = true;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    EXPECT_FALSE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_008 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_001
+ * @tc.desc: test GetTemplateFormsInfoByModuleWithoutCheck with empty bundleName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_001 start";
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formInfoMgr_.GetTemplateFormsInfoByModuleWithoutCheck("", PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_001 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_002
+ * @tc.desc: test GetTemplateFormsInfoByModuleWithoutCheck with bundle not found.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_002 start";
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
+        formInfoMgr_.GetTemplateFormsInfoByModuleWithoutCheck(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST,
+        formInfos, USER_ID));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_002 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_003
+ * @tc.desc: test GetTemplateFormsInfoByModuleWithoutCheck with nullptr BundleFormInfo.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_003, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_003 start";
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = nullptr;
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModuleWithoutCheck(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST,
+        formInfos, USER_ID));
+    EXPECT_TRUE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_003 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_004
+ * @tc.desc: test GetTemplateFormsInfoByModuleWithoutCheck with valid data.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_004 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.isTemplateForm = true;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModuleWithoutCheck(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST,
+        formInfos, USER_ID));
+    EXPECT_FALSE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_004 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_005
+ * @tc.desc: test GetTemplateFormsInfoByModuleWithoutCheck with empty moduleName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_005, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_005 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModuleWithoutCheck(FORM_BUNDLE_NAME_TEST, "", formInfos, USER_ID));
+    EXPECT_TRUE(formInfos.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_005 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_006
+ * @tc.desc: test GetTemplateFormsInfoByModuleWithoutCheck with multiple modules.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_006, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_006 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    
+    FormInfo formInfo1 = GetTestFormInfo();
+    formInfo1.isStatic = true;
+    formInfo1.moduleName = "entry";
+    formInfoStorage.formInfos.push_back(formInfo1);
+    
+    FormInfo formInfo2 = GetTestFormInfo();
+    formInfo2.isStatic = true;
+    formInfo2.moduleName = "module2";
+    formInfo2.name = "form2";
+    formInfoStorage.formInfos.push_back(formInfo2);
+    
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_OK,
+        formInfoMgr_.GetTemplateFormsInfoByModuleWithoutCheck(FORM_BUNDLE_NAME_TEST, "entry", formInfos, USER_ID));
+    for (const auto &info : formInfos) {
+        EXPECT_EQ(info.moduleName, "entry");
+    }
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModuleWithoutCheck_006 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0100
+ * @tc.desc: test ProcessBundleVersionMap with empty bundleFormInfoMap_
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0100 start";
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.bundle1"] = 1001;
+    bundleVersionMap["com.test.bundle2"] = 1002;
+    std::vector<std::string> needUpdateBundleNames;
+    
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+    
+    EXPECT_TRUE(needUpdateBundleNames.empty());
+    EXPECT_EQ(bundleVersionMap.size(), 2);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0100 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0200
+ * @tc.desc: test ProcessBundleVersionMap with bundle not in bundleVersionMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0200 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+ 
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.newbundle"] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+ 
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+ 
+    EXPECT_TRUE(needUpdateBundleNames.empty());
+    EXPECT_FALSE(formInfoMgr_.bundleFormInfoMap_.empty());
+    EXPECT_TRUE(formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST]->Empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0200 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0300
+ * @tc.desc: test ProcessBundleVersionMap with isNeedUpdateAll=true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0300 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+ 
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap[FORM_BUNDLE_NAME_TEST] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+ 
+    formInfoMgr_.ProcessBundleVersionMap(true, USER_ID, bundleVersionMap, needUpdateBundleNames);
+ 
+    EXPECT_EQ(needUpdateBundleNames.size(), 1);
+    EXPECT_EQ(needUpdateBundleNames[0], FORM_BUNDLE_NAME_TEST);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0300 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0400
+ * @tc.desc: test ProcessBundleVersionMap with same version code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0400 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.versionCode = 1001;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap[FORM_BUNDLE_NAME_TEST] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+    
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+    
+    EXPECT_TRUE(needUpdateBundleNames.empty());
+    EXPECT_TRUE(bundleVersionMap.empty());
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0400 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_ProcessBundleVersionMap_0500
+ * @tc.desc: test ProcessBundleVersionMap with different version code
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ProcessBundleVersionMap_0500, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0500 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    FormInfo formInfo = GetTestFormInfo();
+    formInfo.versionCode = 1000;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+ 
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap[FORM_BUNDLE_NAME_TEST] = 1001;
+    std::vector<std::string> needUpdateBundleNames;
+ 
+    formInfoMgr_.ProcessBundleVersionMap(false, USER_ID, bundleVersionMap, needUpdateBundleNames);
+ 
+    EXPECT_EQ(needUpdateBundleNames.size(), 1);
+    EXPECT_EQ(needUpdateBundleNames[0], FORM_BUNDLE_NAME_TEST);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ProcessBundleVersionMap_0500 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0100
+ * @tc.desc: test AddBundleFormInfos with empty bundleVersionMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0100 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0100 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0200
+ * @tc.desc: test AddBundleFormInfos when LoadFormConfigInfoByBundleNames fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0200 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.bundle1"] = 1001;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0200 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0300
+ * @tc.desc: test AddBundleFormInfos when UpdateStaticFormInfos fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0300 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.invalid"] = 1001;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0300 end";
+}
+ 
+/**
+ * @tc.name: FormInfoMgr_AddBundleFormInfos_0400
+ * @tc.desc: test AddBundleFormInfos when BundleFormInfo is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddBundleFormInfos_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0400 start";
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    bundleVersionMap["com.test.empty"] = 1001;
+    size_t mapSizeBefore = formInfoMgr_.bundleFormInfoMap_.size();
+    
+    formInfoMgr_.AddBundleFormInfos(bundleVersionMap, USER_ID);
+    
+    EXPECT_EQ(formInfoMgr_.bundleFormInfoMap_.size(), mapSizeBefore);
+    GTEST_LOG_(INFO) << "FormInfoMgr_AddBundleFormInfos_0400 end";
 }

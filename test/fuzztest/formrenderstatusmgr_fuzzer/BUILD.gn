@@ -1,0 +1,85 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("FormRenderStatusMgrFuzzTest") {
+  module_out_path = form_fuzz_test_path
+
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formrenderstatusmgr_fuzzer"
+
+  include_dirs = [
+    "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/form_render_service/include",
+    "${form_fwk_path}/services/common/include",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [
+    "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status.cpp",
+    "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_mgr.cpp",
+    "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_table.cpp",
+    "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_task_mgr.cpp",
+    "${form_fwk_path}/services/common/src/util/form_status_print.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
+    "formrenderstatusmgr_fuzzer.cpp"
+  ]
+
+  deps = [
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}/services/form_render_service:formrender",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "ffrt:libffrt",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  # Temporarily disabled due to missing form_render_service_target dependency
+  # deps += [
+  #   ":FormRenderStatusMgrFuzzTest",
+  # ]
+}
+###############################################################################

@@ -38,10 +38,6 @@ void FormProviderQueueTest(FuzzedDataProvider *fdp)
     std::function<void()> func = []() { return 1; };
     uint32_t ms32 = fdp->ConsumeIntegral<uint32_t>();
     const std::pair<int64_t, int64_t> eventMsg;
-    bool isTrue = fdp->ConsumeBool();
-    if (isTrue) {
-        FormProviderQueue::GetInstance().serialQueue_ = nullptr;
-    }
     FormProviderQueue::GetInstance().ScheduleTask(ms64, func);
     FormProviderQueue::GetInstance().ScheduleDelayTask(eventMsg, ms32, func);
     FormProviderQueue::GetInstance().CancelDelayTask(eventMsg);
@@ -91,6 +87,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formTaskMgr.NotifyFormLocationUpdate(formId, want, remoteObject);
     formTaskMgr.NotifySizeChanged(formId, newDimension, newRect, want, remoteObject);
     formTaskMgr.RemoveConnection(formId);
+    int32_t connectId = fdp->ConsumeIntegral<int32_t>();
+    formTaskMgr.DelayedFormExitDetect(connectId);
     OHOS::FormProviderQueueTest(fdp);
     return true;
 }
@@ -108,21 +106,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
     FuzzedDataProvider fdp(data, size);
     OHOS::DoSomethingInterestingWithMyAPI(&fdp);
-    free(ch);
-    ch = nullptr;
     return 0;
 }

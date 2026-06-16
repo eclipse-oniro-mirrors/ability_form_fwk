@@ -61,6 +61,12 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(sharedThis->env_, &scope);
+        if (scope == nullptr) {
+            HILOG_ERROR("null scope");
+            return;
+        }
         napi_value callbackValues = nullptr;
         napi_create_object(sharedThis->env_, &callbackValues);
         ParseRunningFormInfoIntoNapi(sharedThis->env_, runningFormInfo, callbackValues);
@@ -70,6 +76,7 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
+        napi_close_handle_scope(sharedThis->env_, scope);
     });
 }
 
@@ -108,6 +115,12 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(sharedThis->env_, &scope);
+        if (scope == nullptr) {
+            HILOG_ERROR("null scope");
+            return;
+        }
         napi_value callbackValues = nullptr;
         napi_create_object(sharedThis->env_, &callbackValues);
         ParseRunningFormInfoIntoNapi(sharedThis->env_, runningFormInfo, callbackValues);
@@ -117,6 +130,7 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
+        napi_close_handle_scope(sharedThis->env_, scope);
     });
 }
 
@@ -251,7 +265,7 @@ void JsFormStateObserver::DelFormAddCallbackByBundle(const napi_value callback, 
         HILOG_INFO("no formAddCallback registered with this bundleName");
     } else {
         auto &callbacks = formAddCallbacks->second;
-        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&](const auto &cb) {
+        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&callback](const auto &cb) {
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
@@ -302,7 +316,7 @@ void JsFormStateObserver::DelFormRemoveCallbackByBundle(const napi_value callbac
         HILOG_INFO("no formRemoveCallback registered with this bundleName");
     } else {
         auto &callbacks = formRemoveCallbacks->second;
-        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&](const auto &cb) {
+        auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&callback](const auto &cb) {
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
@@ -441,15 +455,24 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
     }
 }
 
+std::shared_ptr<AppExecFwk::EventHandler> JsFormStateObserver::GetMainEventRunner()
+{
+    std::lock_guard<std::mutex> handlerLock(handlerMutex_);
+    if (handler_ == nullptr) {
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    }
+    return handler_;
+}
+
 int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
     const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &formInstances)
 {
-    handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     HILOG_DEBUG("call");
+    std::shared_ptr<AppExecFwk::EventHandler> handler = GetMainEventRunner();
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    if (handler_) {
+    if (handler) {
         wptr<JsFormStateObserver> weakObserver = this;
-        handler_->PostSyncTask([weakObserver, visibleType, formInstances, bundleName]() {
+        handler->PostSyncTask([weakObserver, visibleType, formInstances, bundleName]() {
             std::string specialFlag = "#";
             bool isVisibleTypeFlag = false;
             auto sharedThis = weakObserver.promote();
@@ -502,12 +525,11 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
         HILOG_ERROR("empty Calltype");
         return ERR_INVALID_VALUE;
     }
-    if (handler_ == nullptr) {
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
-        if (handler_ == nullptr) {
-            HILOG_ERROR("null Handler");
-            return ERR_INVALID_VALUE;
-        }
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = GetMainEventRunner();
+    if (handler == nullptr) {
+        HILOG_ERROR("null Handler");
+        return ERR_INVALID_VALUE;
     }
 
     wptr<JsFormStateObserver> weakObserver = this;
@@ -533,7 +555,7 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
         }
     };
 
-    handler_->PostSyncTask(notify);
+    handler->PostSyncTask(notify);
     return ERR_OK;
 }
 
@@ -707,6 +729,12 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
         HILOG_ERROR("null env");
         return;
     }
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env_, &scope);
+    if (scope == nullptr) {
+        HILOG_ERROR("null scope");
+        return;
+    }
     napi_value formInfo = nullptr;
     napi_create_object(env_, &formInfo);
     ParseRunningFormInfoIntoNapi(env_, runningFormInfo, formInfo);
@@ -718,6 +746,7 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
             napi_call_function(env_, nullptr, callbackfun, ARGS_ONE, &formInfo, &callResult);
         }
     }
+    napi_close_handle_scope(env_, scope);
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

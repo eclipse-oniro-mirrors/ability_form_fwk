@@ -18,14 +18,14 @@
 #define private public
 #include "status_mgr_center/form_status_mgr.h"
 #include "status_mgr_center/form_status.h"
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "status_mgr_center/form_event_queue.h"
 #include "status_mgr_center/form_event_retry_mgr.h"
 #include "status_mgr_center/form_status.h"
 #undef private
 #include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
-#include "form_status_print.h"
+#include "util/form_status_print.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -107,7 +107,7 @@ HWTEST_F(FormStatusMgrTest, FormStatusMgrTest_0003, TestSize.Level0)
     std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formId);
     EXPECT_EQ(eventId, "");
 
-    timeoutMs = FormEventTimeout::TIMEOUT_3_S;
+    timeoutMs = FormEventTimeout::TIMEOUT_30_S;
     FormStatusMgr::GetInstance().ExecFormTaskTimeout(formId, timeoutMs, event, status);
 
     FormStatusMgr::GetInstance().SetFormEventId(formId);

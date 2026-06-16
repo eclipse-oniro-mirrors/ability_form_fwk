@@ -35,6 +35,11 @@ export class LiveFormExtensionContext extends ExtensionContext {
     return this.__context_impl__.setUIExtCustomDensity(layoutScale);
   }
 
+  setFontScale(fontScale) {
+    hilog.sLogI(domainID, TAG, `setFontScale: ${fontScale}`);
+    return this.__context_impl__.setFontScale(fontScale);
+  }
+
   startAbilityByLiveForm(want) {
     let jsonWant = JSON.stringify(want);
     hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${jsonWant}`);

@@ -469,7 +469,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0018, TestSize.Level1) {
     int errCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
 
-    EXPECT_EQ(result, "check permission deny, need to request ohos.permission.REQUIRE_FORM "
+    EXPECT_EQ(result, "check permission denied, need to request ohos.permission.REQUIRE_FORM "
         "or ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS.");
     GTEST_LOG_(INFO) << "FormMgrTest_0018 test ends";
 }
@@ -544,7 +544,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0021, TestSize.Level1) {
 
 /**
  * @tc.name: FormMgrTest_0022
- * @tc.desc: Verify  GetAllFormsInfo
+ * @tc.desc: Verify GetAllFormsInfo
  * @tc.type: FUNC
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0022, TestSize.Level1) {
@@ -3719,7 +3719,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0200, TestSize.Level1)
 
 /**
  * @tc.name: FormMgrTest_0201
- * @tc.desc: Verify  GetAllFormsInfo
+ * @tc.desc: Verify GetAllFormsInfo
  * @tc.type: FUNC
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0201, TestSize.Level1)
@@ -3786,7 +3786,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0203, TestSize.Level1)
 
 /**
  * @tc.name: FormMgrTest_0204
- * @tc.desc: Verify  GetAllFormsInfo
+ * @tc.desc: Verify GetAllFormsInfo
  * @tc.type: FUNC
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0204, TestSize.Level1)
@@ -5034,6 +5034,261 @@ HWTEST_F(FormMgrTest, FormMgrTest_0285, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FormMgrTest_0286
+ * @tc.desc: invalid want
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0286, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0286 starts";
+    Want want;
+    int64_t formId;
+    int32_t userId = 100;
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0286 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0287
+ * @tc.desc: invalid userid
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0287, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0287 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::DEFAULT);
+    int64_t formId;
+    int32_t userId = Constants::INVALID_USER_ID;
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0287 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0288
+ * @tc.desc: empty bundleName
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0288, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0288 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::NO_BUNDLE_NAME);
+    int64_t formId;
+    int32_t userId = 100;
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0288 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0289
+ * @tc.desc: empty abilityName
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0289, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0289 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::NO_ABILITY_NAME);
+    int64_t formId;
+    int32_t userId = 100;
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0289 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0290
+ * @tc.desc: empty moduleName
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0290, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0290 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::NO_MODEL_NAME);
+    int64_t formId;
+    int32_t userId = 100;
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0290 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0291
+ * @tc.desc: dimensionId is 0
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0291, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0291 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::NO_FORM_DIMENSION);
+    int64_t formId;
+    int32_t userId = 100;
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0291 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0292
+ * @tc.desc: valid parameters but remoteProxy is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0292, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0292 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::DEFAULT);
+    int64_t formId;
+    int32_t userId = 100;
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    FormMgr::GetInstance().SetFormMgrService(mockProxy);
+    GTEST_LOG_(INFO) << "FormMgrTest_0292 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0293
+ * @tc.desc: invalid userid
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0293, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0293 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::NO_FORM_NAME);
+    int64_t formId;
+    int32_t userId = Constants::INVALID_USER_ID;
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0293 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0294
+ * @tc.desc: Connect failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0294, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0294 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::DEFAULT);
+    int64_t formId;
+    int32_t userId = 100;
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    FormMgr::GetInstance().SetFormMgrService(mockProxy);
+    GTEST_LOG_(INFO) << "FormMgrTest_0294 test ends";
+}
+ 
+/**
+ * @tc.name: FormMgrTest_0295
+ * @tc.desc: Connect failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0295, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0295 starts";
+    Want want;
+    makeWant(want, MakeWantFlag::DEFAULT);
+    int64_t formId;
+    int32_t userId = 100;
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
+    int32_t result = FormMgr::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    FormMgr::GetInstance().SetFormMgrService(mockProxy);
+    GTEST_LOG_(INFO) << "FormMgrTest_0295 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetAllTemplateFormsInfo_001
+ * @tc.desc: Verify GetAllTemplateFormsInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetAllTemplateFormsInfo_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 begin";
+    std::vector<FormInfo> formInfos;
+    auto result = FormMgr::GetInstance().GetAllTemplateFormsInfo(formInfos);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetAllTemplateFormsInfo_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetTemplateFormsInfoByApp_001
+ * @tc.desc: Verify GetTemplateFormsInfoByApp
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetTemplateFormsInfoByApp_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByApp_001 begin";
+    std::vector<FormInfo> formInfos;
+    const std::string bundleName = "ohos.samples.FormApplication";
+    auto result = FormMgr::GetInstance().GetTemplateFormsInfoByApp(bundleName, formInfos);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByApp_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetTemplateFormsInfoByModule_001
+ * @tc.desc: Verify GetTemplateFormsInfoByModule
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetTemplateFormsInfoByModule_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByModule_001 begin";
+    std::vector<FormInfo> formInfos;
+    const std::string bundleName = "ohos.samples.FormApplication";
+    const std::string moduleName = "entry";
+    auto result = FormMgr::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetTemplateFormsInfoByModule_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_RegisterTemplateFormDetailInfoChange_001
+ * @tc.desc: Verify RegisterTemplateFormDetailInfoChange
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterTemplateFormDetailInfoChange_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterTemplateFormDetailInfoChange_001 begin";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    auto result = FormMgr::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterTemplateFormDetailInfoChange_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterTemplateFormDetailInfoChange_001
+ * @tc.desc: Verify UnregisterTemplateFormDetailInfoChange
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterTemplateFormDetailInfoChange_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterTemplateFormDetailInfoChange_001 begin";
+    auto result = FormMgr::GetInstance().UnregisterTemplateFormDetailInfoChange();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterTemplateFormDetailInfoChange_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UpdateTemplateFormDetailInfo_001
+ * @tc.desc: Verify UpdateTemplateFormDetailInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UpdateTemplateFormDetailInfo_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UpdateTemplateFormDetailInfo_001 begin";
+    const std::vector<TemplateFormDetailInfo> templateFormInfo;
+    auto result = FormMgr::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_UpdateTemplateFormDetailInfo_001 end";
+}
+
+/**
  * @tc.name: FormMgrTest_ReloadForms_001
  * @tc.desc: Verify ReloadForms
  * @tc.type: FUNC
@@ -5172,5 +5427,211 @@ HWTEST_F(FormMgrTest, FormMgrTest_SendNonTransparencyRatio_001, TestSize.Level1)
     auto result = FormMgr::GetInstance().SendNonTransparencyRatio(formId, ratio);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_SendNonTransparencyRatio_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_StartUIAbilityByFms_001
+ * @tc.desc: Verify StartUIAbilityByFms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_StartUIAbilityByFms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_StartUIAbilityByFms_001 begin";
+    EXPECT_CALL(*mockProxy, StartUIAbilityByFms(_))
+        .WillOnce(Return(ERR_OK));
+    Want want;
+    auto result = FormMgr::GetInstance().StartUIAbilityByFms(want);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_StartUIAbilityByFms_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_CloseFormEditAbility_001
+ * @tc.desc: Verify CloseFormEditAbility
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_CloseFormEditAbility_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_CloseFormEditAbility_001 begin";
+    EXPECT_CALL(*mockProxy, CloseFormEditAbility(_))
+        .WillOnce(Return(ERR_OK));
+    bool isMainPage = false;
+    auto result = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_CloseFormEditAbility_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_RegisterPublishFormCrossBundleControl_001
+ * @tc.desc: Verify RegisterPublishFormCrossBundleControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterPublishFormCrossBundleControl_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 start";
+    EXPECT_CALL(*mockProxy, RegisterPublishFormCrossBundleControl(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    auto result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterPublishFormCrossBundleControl_001 test end";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterPublishFormCrossBundleControl_001
+ * @tc.desc: Verify UnregisterPublishFormCrossBundleControl
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterPublishFormCrossBundleControl_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 start";
+    EXPECT_CALL(*mockProxy, UnregisterPublishFormCrossBundleControl())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterPublishFormCrossBundleControl_001 test end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_001
+ * @tc.desc: Verify GetFormIdsByFormLocation with DESKTOP location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_001 begin";
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_001 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_002
+ * @tc.desc: Verify GetFormIdsByFormLocation with service error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_002 begin";
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_002 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_003
+ * @tc.desc: Verify GetFormIdsByFormLocation returns empty vector
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_003 begin";
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<std::string>{}), Return(ERR_OK)));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_TRUE(formIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_003 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetFormIdsByFormLocation_004
+ * @tc.desc: Verify GetFormIdsByFormLocation returns form IDs
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetFormIdsByFormLocation_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_004 begin";
+    std::vector<std::string> expectedFormIds = {"formId1", "formId2", "formId3"};
+    EXPECT_CALL(*mockProxy, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(expectedFormIds), Return(ERR_OK)));
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    std::vector<std::string> formIds;
+    auto result = FormMgr::GetInstance().GetFormIdsByFormLocation(formLocation, formIds);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(formIds.size(), expectedFormIds.size());
+    EXPECT_THAT(formIds, ContainerEq(expectedFormIds));
+    GTEST_LOG_(INFO) << "FormMgrTest_GetFormIdsByFormLocation_004 end";
+}
+
+/**
+ * @tc.name: FormMgr_RegisterFormWantCallback_001
+ * @tc.desc: Verify RegisterFormWantCallback returns ERR_OK on success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_RegisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_001 begin";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
+    EXPECT_CALL(*mockProxy, RegisterFormWantCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = FormMgr::GetInstance().RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgr_RegisterFormWantCallback_002
+ * @tc.desc: Verify RegisterFormWantCallback returns error when proxy returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_RegisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_002 begin";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
+    EXPECT_CALL(*mockProxy, RegisterFormWantCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+    auto result = FormMgr::GetInstance().RegisterFormWantCallback(callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgr_RegisterFormWantCallback_002 end";
+}
+
+/**
+ * @tc.name: FormMgr_UnregisterFormWantCallback_001
+ * @tc.desc: Verify UnregisterFormWantCallback returns ERR_OK on success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_UnregisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_001 begin";
+    EXPECT_CALL(*mockProxy, UnregisterFormWantCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = FormMgr::GetInstance().UnregisterFormWantCallback();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgr_UnregisterFormWantCallback_002
+ * @tc.desc: Verify UnregisterFormWantCallback returns error when proxy returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_UnregisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_002 begin";
+    EXPECT_CALL(*mockProxy, UnregisterFormWantCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+    auto result = FormMgr::GetInstance().UnregisterFormWantCallback();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgr_UnregisterFormWantCallback_002 end";
 }
 } // namespace

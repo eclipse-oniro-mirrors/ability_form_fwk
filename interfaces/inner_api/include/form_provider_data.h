@@ -138,7 +138,7 @@ public:
      * @brief Merge new data to FormProviderData.
      * @param addJsonData data to merge to FormProviderData
      */
-    void MergeData(nlohmann::json &addJsonData);
+    void MergeData(const nlohmann::json &addJsonData);
 
     /**
      * Read this {@code FormProviderData} object from a Parcel.
@@ -187,16 +187,46 @@ public:
     void ClearData();
 
     /**
+     * @brief Checks if the form provider contains any data.
+     * @return Returns {@code true} if either JSON data or image data is present; returns {@code false} otherwise.
+     */
+    inline bool HasData() const
+    {
+        return !jsonFormProviderData_.empty() || !imageDataMap_.empty();
+    }
+
+    /**
      * @brief Whether the form provider data needs to be cached
      * @return Returns {@code true} if the data needs to be cached; returns {@code false} otherwise.
      */
-    bool NeedCache() const;
+    inline bool NeedCache() const
+    {
+        return HasData();
+    }
 
     /**
      * @brief Convert raw image data to shmem image data
      * @return Returns {@code true} if the image data converted successfully; returns {@code false} otherwise.
      */
     bool ConvertRawImageData();
+
+    /**
+     * @brief Checks whether the DB cache is enabled
+     * @return Returns {@code true} if the DB cache is enabled, returns {@code false} otherwise.
+     */
+    bool IsDbCacheEnabled() const
+    {
+        return enableDbCache_;
+    }
+
+    /**
+     * @brief Enable or disable the DB cahe,
+     * @param enable {@code true} To use the DB cahed data (FormProviderData is empty)
+     */
+    void EnableDbCache(bool enable)
+    {
+        enableDbCache_ = enable;
+    }
 public:
     static constexpr int IMAGE_DATA_STATE_REMOVED = -1;
     static constexpr int IMAGE_DATA_STATE_NO_OPERATION = 0;
@@ -225,6 +255,7 @@ private:
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap_;
     std::map<std::string, std::pair<std::shared_ptr<char>, int32_t>> rawImageBytesMap_;
     int32_t imageDataState_ = 0;
+    bool enableDbCache_ = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

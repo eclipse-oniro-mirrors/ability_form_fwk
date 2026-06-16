@@ -23,17 +23,17 @@ ohos_unittest("FrsFormStatusMgrCenterTest") {
     "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_table_test.cpp",
     "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_mgr_test.cpp",
     "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_test.cpp",
-    "${form_fwk_path}/test/unittest/frs_form_status_mgr_center_test/frs_form_render_status_task_mgr_test.cpp",
     "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_table.cpp",
     "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_mgr.cpp",
     "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status.cpp",
-    "${form_fwk_path}/services/form_render_service/src/status_mgr_center/form_render_status_task_mgr.cpp",
+    "${form_fwk_path}/services/common/src/util/form_status_print.cpp",
   ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/form_render_service/include",
     "${form_fwk_path}/test/mock/include",
+    "${form_fwk_path}/services/common/include",
   ]
 
   configs = []
@@ -46,6 +46,10 @@ ohos_unittest("FrsFormStatusMgrCenterTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

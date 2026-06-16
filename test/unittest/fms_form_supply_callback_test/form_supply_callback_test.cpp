@@ -34,7 +34,11 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
 #include "mock_form_token.h"
+#include "mock_form_mgr_adapter_facade.h"
+#include "mock_form_render_mgr.h"
+#include "mock_form_data_mgr.h"
 
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
@@ -73,21 +77,6 @@ void FmsFormSupplyCallbackTest::TearDown()
  * @tc.desc: test RemoveFormHostCaller function and GetHostToken is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0001, TestSize.Level0)
-{
-    HILOG_INFO("FormAcquireConnectionTest_0001 start");
-    int64_t formId = 1;
-    FormItemInfo info;
-    WantParams wantParams;
-    FormAcquireConnection formAcquireConnection(formId, info, wantParams, nullptr);
-    AppExecFwk::ElementName element;
-    int resultCode = ERR_OK;
-    FormAbilityConnection formAbilityConnection;
-    // set hostToken is nullptr
-    formAbilityConnection.SetHostToken(nullptr);
-    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0001 end";
-}
-
 /**
  * @tc.name: FormAcquireConnectionTest_0002
  * @tc.desc: test IsRemoveConnection function and hostToken is nullptr
@@ -117,45 +106,6 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0003, TestSize.Lev
 }
 
 /**
- * @tc.name: FormAcquireConnectionTest_0004
- * @tc.desc: test RemoveConnection function and GetFormId is 2
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0004, TestSize.Level0)
-{
-    HILOG_INFO("FormAcquireConnectionTest_0004 start");
-    int64_t formId = 1;
-    sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
-    sptr<FormAbilityConnection> providerToken = new (std::nothrow) FormAbilityConnection();
-    FormSupplyCallback formSupplyCallback;
-    // add connection
-    formSupplyCallback.AddConnection(providerToken);
-    // test RemoveConnection function
-    formSupplyCallback.RemoveConnection(formId, hostToken);
-    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0004 end";
-}
-
-/**
- * @tc.name: FormAcquireConnectionTest_0005
- * @tc.desc: test IsRemoveConnection function and GetFormId is 2
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0005, TestSize.Level0)
-{
-    HILOG_INFO("FormAcquireConnectionTest_0005 start");
-    int64_t formId = 1;
-    sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
-    sptr<FormAbilityConnection> providerToken = new (std::nothrow) FormAbilityConnection();
-    std::shared_ptr<FormSupplyCallback> formSupplyCallback = std::make_shared<FormSupplyCallback>();
-    ASSERT_NE(nullptr, formSupplyCallback);
-    // add connection
-    formSupplyCallback->AddConnection(providerToken);
-    // test IsRemoveConnection function
-    formSupplyCallback->IsRemoveConnection(formId, hostToken);
-    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0005 end";
-}
-
-/**
  * @tc.name: FormAcquireConnectionTest_0006
  * @tc.desc: test HandleHostDied function and hostToken is not nullptr
  * @tc.type: FUNC
@@ -182,48 +132,6 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0007, TestSize.Lev
     // test HandleHostDied function
     formSupplyCallback.HandleHostDied(nullptr);
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0007 end";
-}
-
-/**
- * @tc.name: FormAcquireConnectionTest_0008
- * @tc.desc: test HandleHostDied function and hostToken is not nullptr GetHostToken is not nullptr
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0008, TestSize.Level0)
-{
-    HILOG_INFO("FormAcquireConnectionTest_0008 start");
-    FormAbilityConnection formAbilityConnection;
-    sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
-    sptr<FormAbilityConnection> providerToken = new (std::nothrow) FormAbilityConnection();
-    FormSupplyCallback formSupplyCallback;
-    // add connection
-    formSupplyCallback.AddConnection(providerToken);
-    // GetHostToken is not nullptr
-    formAbilityConnection.SetHostToken(hostToken);
-    // test HandleHostDied function
-    formSupplyCallback.HandleHostDied(hostToken);
-    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0008 end";
-}
-
-/**
- * @tc.name: FormAcquireConnectionTest_0009
- * @tc.desc: test HandleHostDied function and hostToken is not nullptr GetHostToken is nullptr
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0009, TestSize.Level0)
-{
-    HILOG_INFO("FormAcquireConnectionTest_0009 start");
-    sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
-    sptr<FormAbilityConnection> providerToken = new (std::nothrow) FormAbilityConnection();
-    FormSupplyCallback formSupplyCallback;
-    // add connection
-    formSupplyCallback.AddConnection(providerToken);
-    // GetHostToken is nullptr
-    FormAbilityConnection formAbilityConnection;
-    formAbilityConnection.SetHostToken(nullptr);
-    // test HandleHostDied function
-    formSupplyCallback.HandleHostDied(hostToken);
-    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0009 end";
 }
 
 /**
@@ -698,10 +606,88 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormOnDeleteFormDoneTest_0001, TestSize.Leve
 HWTEST_F(FmsFormSupplyCallbackTest, FormOnNotifyRefreshFormTest_0001, TestSize.Level0)
 {
     HILOG_INFO("FormOnNotifyRefreshFormTest_0001 start");
-    
+
     FormSupplyCallback formSupplyCallback;
     EXPECT_EQ(formSupplyCallback.OnNotifyRefreshForm(123), ERR_OK);
 
     GTEST_LOG_(INFO) << "FormOnNotifyRefreshFormTest_0001 end";
+}
+
+/**
+ * @tc.name: HandleRenderFormTest_001
+ * @tc.desc: Test HandleRenderForm with hasRecord=false, DB cache not enabled
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, HandleRenderFormTest_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_001 start";
+    
+    int64_t formId = 1001;
+    int32_t callerUserId = 100;
+    Want want;
+    WantParams wantParams;
+    FormProviderInfo formProviderInfo;
+    FormProviderData formProviderData;
+    formProviderInfo.SetFormData(formProviderData);
+    
+    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+    MockFormMgrAdapterFacade::obj = std::make_shared<MockFormMgrAdapterFacade>();
+    MockFormRenderMgr::obj = std::make_shared<MockFormRenderMgr>();
+    
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).WillOnce(Return(false));
+    EXPECT_CALL(*MockFormRenderMgr::obj, UpdateRenderingForm(_, _, _, _)).WillOnce(Return(ERR_OK));
+    
+    FormSupplyCallback formSupplyCallback;
+    int32_t ret = formSupplyCallback.HandleRenderForm(formId, formProviderInfo, want, callerUserId);
+    
+    EXPECT_EQ(ret, ERR_OK);
+    
+    MockFormDataMgr::obj = nullptr;
+    MockFormMgrAdapterFacade::obj = nullptr;
+    MockFormRenderMgr::obj = nullptr;
+    
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_001 end";
+}
+
+/**
+ * @tc.name: HandleRenderFormTest_002
+ * @tc.desc: Test HandleRenderForm with hasRecord=true and not in upgrade scene, DB cache enabled
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, HandleRenderFormTest_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_002 start";
+    
+    int64_t formId = 1002;
+    int32_t callerUserId = 100;
+    Want want;
+    WantParams wantParams;
+    FormProviderInfo formProviderInfo;
+    FormProviderData formProviderData;
+    formProviderInfo.SetFormData(formProviderData);
+    
+    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+    MockFormMgrAdapterFacade::obj = std::make_shared<MockFormMgrAdapterFacade>();
+    MockFormRenderMgr::obj = std::make_shared<MockFormRenderMgr>();
+    
+    FormRecord formRecord;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll([&](int64_t, FormRecord &record) {
+            record = formRecord;
+            return true;
+        }));
+    EXPECT_CALL(*MockFormMgrAdapterFacade::obj, IsDeleteCacheInUpgradeScene(_)).WillOnce(Return(false));
+    EXPECT_CALL(*MockFormRenderMgr::obj, UpdateRenderingForm(_, _, _, _)).WillOnce(Return(ERR_OK));
+    
+    FormSupplyCallback formSupplyCallback;
+    int32_t ret = formSupplyCallback.HandleRenderForm(formId, formProviderInfo, want, callerUserId);
+    
+    EXPECT_EQ(ret, ERR_OK);
+    
+    MockFormDataMgr::obj = nullptr;
+    MockFormMgrAdapterFacade::obj = nullptr;
+    MockFormRenderMgr::obj = nullptr;
+    
+    GTEST_LOG_(INFO) << "HandleRenderFormTest_002 end";
 }
 }

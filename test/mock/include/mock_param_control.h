@@ -28,6 +28,8 @@ public:
     virtual ~AbstractMockParamControl() = default;
     virtual bool IsFormDisable(const FormRecord &formRecord) = 0;
     virtual bool IsFormRemove(const FormRecord &formRecord) = 0;
+    virtual bool IsDueDisableCtrlEmpty() = 0;
+    virtual int GetDueUpdateDuration(const FormRecord &formRecord) = 0;
 };
 
 class MockParamControl : public AbstractMockParamControl {
@@ -37,6 +39,8 @@ public:
     ~MockParamControl() override = default;
     MOCK_METHOD1(IsFormDisable, bool(const FormRecord &formRecord));
     MOCK_METHOD1(IsFormRemove, bool(const FormRecord &formRecord));
+    MOCK_METHOD0(IsDueDisableCtrlEmpty, bool());
+    MOCK_METHOD1(GetDueUpdateDuration, int(const FormRecord &formRecord));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

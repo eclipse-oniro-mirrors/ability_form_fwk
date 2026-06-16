@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string FORM_CONNECTION_PROCESS_NAME_SUFFIX = ":form";
+constexpr const char *FORM_CONNECTION_PROCESS_NAME_SUFFIX = ":form";
 }
 
 FormAbilityConnectionReporter::FormAbilityConnectionReporter()

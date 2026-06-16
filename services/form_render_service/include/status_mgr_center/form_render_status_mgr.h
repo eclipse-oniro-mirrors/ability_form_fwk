@@ -18,10 +18,9 @@
 
 #include <singleton.h>
 #include <string>
-#include <unordered_map>
-#include <shared_mutex>
+#include <functional>
 
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "status_mgr_center/form_render_status_table.h"
 #include "status_mgr_center/form_render_status.h"
 
@@ -41,26 +40,6 @@ public:
      * @return The event handling result (default is nullptr)
      */
     int32_t PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<int32_t()> func = nullptr);
-
-    /**
-     * @brief Gets the eventId form map
-     * @param formId The ID of the form
-     * @return The TID of the event
-     */
-    std::string GetFormEventId(const int64_t formId);
-
-    /**
-     * @brief Sets the <formId, eventId> pair to map
-     * @param formId The ID of the form
-     * @param eventId The ID of the event
-     */
-    void SetFormEventId(const int64_t formId, std::string &eventId);
-
-    /**
-     * @brief Delete <formId, eventId> pair form map
-     * @param formId The ID of the form
-     */
-    void DeleteFormEventId(const int64_t formId);
 
 private:
     /**
@@ -97,10 +76,6 @@ private:
      * @return Returns the execution result, success returns 0, failure returns -1
      */
     int32_t PrintTaskInfo(const int64_t formId, const FormFsmEvent event, const FormFsmStatus status);
-
-    // <formId, eventId>
-    std::shared_mutex formEventIdMapMutex_;
-    std::unordered_map<int64_t, std::string> formEventIdMap_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

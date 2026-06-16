@@ -117,10 +117,7 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 {
     HILOG_INFO("form: %{public}" PRId64, formId);
     DeleteFormDBInfoCache(formId);
-    if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId)) == ERR_OK) {
-        return ERR_OK;
-    }
-    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    return FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId));
 }
 /**
  * @brief Delete form data in DbCache and DB with formId.
@@ -156,22 +153,6 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
     HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     formDBInfos = formDBInfos_;
-}
-
-/**
- * @brief Get all location data from DbCache.
- * @param locationMap all location data map
- */
-void FormDbCache::GetLocationMap(std::map<Constants::FormLocation, int> &locationMap)
-{
-    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    for (const auto& dbInfo : formDBInfos_) {
-        if (locationMap.count(dbInfo.formLocation) == 0) {
-            locationMap[dbInfo.formLocation] = 1;
-        } else {
-            ++locationMap[dbInfo.formLocation];
-        }
-    }
 }
 
 /**
@@ -244,6 +225,11 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormDBInfo &record) const
  */
 ErrCode FormDbCache::UpdateDBRecord(const int64_t formId, const FormRecord &record) const
 {
+    if (record.formTempFlag) {
+        HILOG_ERROR("refusing to save temp form to db: %{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
     FormDBInfo formDBInfo(formId, record);
     return FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
 }
@@ -262,7 +248,7 @@ ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
         if (dbInfo.Contains(uid)) {
             dbInfo.Remove(uid);
             if (dbInfo.formUserUids.empty()) {
-                FormIdKey formIdKey(dbInfo.bundleName, dbInfo.abilityName);
+                FormIdKey formIdKey(dbInfo.bundleName, dbInfo.abilityName, dbInfo.moduleName);
                 auto itIdsSet = noHostFormDBList.find(formIdKey);
                 if (itIdsSet == noHostFormDBList.end()) {
                     std::set<int64_t> formIdsSet;
@@ -349,7 +335,7 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
         HILOG_WARN("found invalid form:%{public}" PRId64, formId);
         formRecord.formUserUids.erase(iter);
         if (formRecord.formUserUids.empty()) {
-            FormIdKey formIdKey(formRecord.bundleName, formRecord.abilityName);
+            FormIdKey formIdKey(formRecord.bundleName, formRecord.abilityName, formRecord.moduleName);
             auto itIdsSet = noHostDBFormsMap.find(formIdKey);
             if (itIdsSet == noHostDBFormsMap.end()) {
                 std::set<int64_t> formIdsSet;
@@ -381,7 +367,10 @@ void FormDbCache::BatchDeleteNoHostDBForms(int32_t callingUid, std::map<FormIdKe
         FormIdKey formIdKey = element.first;
         std::string bundleName = formIdKey.bundleName;
         std::string abilityName = formIdKey.abilityName;
-        FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds);
+        std::string moduleName = formIdKey.moduleName;
+        int32_t userId = FormUtil::GetCallerUserId(callingUid);
+        FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, moduleName,
+            formIds, userId);
         for (const int64_t formId : formIds) {
             foundFormsMap.emplace(formId, true);
             FormDBInfo dbInfo;
@@ -488,27 +477,46 @@ ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t form
 }
 
 /**
- * @brief Get form counts from DbCache by calling user id.
- * @param currentAccountId current account ID.
- * @param callingUid calling user ID.
+ * @brief Get form counts from DbCache by caller user Id.
+ * @param userId caller user Id.
  * @return Returns form counts.
  */
-int FormDbCache::GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid)
+int FormDbCache::GetFormCountsByUserId(const int32_t userId)
 {
-    int callingUidFormCounts = 0;
+    int userIdFormCounts = 0;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (const auto &record : formDBInfos_) {
-        if (record.providerUserId != currentAccountId) {
+        if (record.userId != userId) {
             continue;
         }
-        for (const auto &userUid : record.formUserUids) {
-            if (userUid != callingUid) {
+        userIdFormCounts++;
+    }
+    return userIdFormCounts;
+}
+
+/**
+ * @brief Get form counts from DbCache by host bundle name.
+ * @param hostBundleName host bundle name.
+ * @return Returns form counts.
+ */
+int32_t FormDbCache::GetFormCountsByHostBundleName(const std::string &hostBundleName)
+{
+    int32_t formCounts = 0;
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (const auto& record : formDBInfos_) {
+        for (const auto &hostUid : record.formUserUids) {
+            std::string recordHostBundleName;
+            int32_t ret = FormBmsHelper::GetInstance().GetBundleNameByUid(hostUid, recordHostBundleName);
+            if (ret != ERR_OK) {
                 continue;
             }
-            callingUidFormCounts++;
+            if (recordHostBundleName != hostBundleName) {
+                continue;
+            }
+            formCounts++;
         }
     }
-    return callingUidFormCounts;
+    return formCounts;
 }
 
 /**

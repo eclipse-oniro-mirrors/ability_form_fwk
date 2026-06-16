@@ -16,14 +16,10 @@
 #ifndef OHOS_FORM_FWK_FORM_ACQUIRE_DATA_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_ACQUIRE_DATA_CONNECTION_H
 
-#include "event_handler.h"
 #include "common/connection/form_ability_connection.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-using WantParams = OHOS::AAFwk::WantParams;
-using Want = OHOS::AAFwk::Want;
 
 /**
  * @class FormAcquireDataConnection
@@ -31,24 +27,29 @@ using Want = OHOS::AAFwk::Want;
  */
 class FormAcquireDataConnection : public FormAbilityConnection {
 public:
-    FormAcquireDataConnection(int64_t formId, const std::string &bundleName, const std::string &abilityName,
-       int64_t formRequestCode);
-
+    FormAcquireDataConnection(const int64_t formId, const std::string &bundleName,
+        const std::string &abilityName, int64_t formRequestCode, const int32_t userId);
     virtual ~FormAcquireDataConnection() = default;
 
+protected:
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     * @param element service ability's ElementName.
-     * @param remoteObject The session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
+     * @brief Build task Want parameter with requestCode.
+     * @return Built Want object.
      */
-    void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+    Want OnBuildTaskWant() override;
+
+    /**
+     * @brief Execute acquire data task after connection success.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
 
 private:
-    int64_t formRequestCode_ {0};
+    int64_t formRequestCode_;
     DISALLOW_COPY_AND_MOVE(FormAcquireDataConnection);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
+
 #endif // OHOS_FORM_FWK_FORM_FORM_ACQUIRE_DATA_CONNECTION_H

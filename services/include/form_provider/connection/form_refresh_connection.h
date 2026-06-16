@@ -16,34 +16,70 @@
 #ifndef OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_REFRESH_CONNECTION_H
 
+#include <atomic>
+
 #include "common/connection/form_ability_connection.h"
-#include "want.h"
+#include "data_center/form_record/form_record.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-using Want = OHOS::AAFwk::Want;
+
 /**
  * @class FormRefreshConnection
  * Form Refresh Connection Stub.
  */
 class FormRefreshConnection : public FormAbilityConnection {
 public:
-    FormRefreshConnection(const int64_t formId, const Want &want,
-        const std::string &bundleName, const std::string &abilityName, bool isFreeInstall);
+    FormRefreshConnection(const int64_t formId, const Want &want, const FormRecord &record);
     virtual ~FormRefreshConnection() = default;
 
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     *
-     * @param element service ability's ElementName.
-     * @param remoteObject the session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
+     * @brief Create retry connection for delayed retry policy.
+     *        Creates a new FormRefreshConnection with same formId, want, and record.
+     * @return Retry FormRefreshConnection object (sptr<FormAbilityConnection>).
      */
-    void OnAbilityConnectDone(const AppExecFwk::ElementName &element,
-        const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+    sptr<FormAbilityConnection> CreateRetryConnection() const override;
+
+protected:
+    /**
+     * @brief Whether freeInstall processing is needed.
+     *        Refresh connection needs freeInstall processing.
+     * @return true.
+     */
+    bool NeedFreeInstallProcessing() const override { return true; }
+
+    /**
+     * @brief Pre-processing after connection success.
+     *        Marks connected state for dual-signal precondition check.
+     */
+    void OnPreConnectTask() override;
+
+    /**
+     * @brief Build task Want parameter based on refresh type.
+     * @return Built Want object.
+     */
+    Want OnBuildTaskWant() override;
+
+    /**
+     * @brief Execute refresh task after connection success.
+     *        Handles message event, recreate form, and refresh form scenarios.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
+
+    /**
+     * @brief Override: DISCONNECT_ERROR+CONNECTED triggers HandleDisconnectError.
+     *        Calls base OnAbilityDisconnectDone first, then checks dual-signal condition.
+     * @param element Element name of the ability.
+     * @param resultCode Result code of disconnect operation.
+     */
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
 private:
     Want want_;
+    FormRecord record_;
     DISALLOW_COPY_AND_MOVE(FormRefreshConnection);
 };
 }  // namespace AppExecFwk

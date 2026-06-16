@@ -16,9 +16,11 @@
 #include "form_errors.h"
 #include "appexecfwk_errors.h"
 #include "form_mgr_errors.h"
+#include "ability_business_error/ability_business_error.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+using AbilityErrorCode = AbilityRuntime::AbilityErrorCode;
 namespace {
 struct FormErrInfo {
     int32_t externalErr;
@@ -38,7 +40,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         {
             ERR_FORM_EXTERNAL_PERMISSION_DENIED,
-            "check permission deny, need to request ohos.permission.REQUIRE_FORM or "
+            "check permission denied, need to request ohos.permission.REQUIRE_FORM or "
             "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS."
         }
     },
@@ -46,7 +48,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
         {
             ERR_FORM_EXTERNAL_NOT_SYSTEM_APP,
-            "The application is not a system application, check permission deny, need system permission."
+            "The application is not a system application, check permission denied, need system permission."
         }
     },
     {
@@ -195,7 +197,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT, { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT, "" }
     },
     {
-        ERR_APPEXECFWK_FORM_STATUS_TIMIE_OUT, { ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT, "" }
+        ERR_APPEXECFWK_FORM_STATUS_TIME_OUT, { ERR_FORM_EXTERNAL_FORM_STATUS_TIME_OUT, "" }
     },
     {
         ERR_APPEXECFWK_FORM_SET_OPERATION_FAILED, { ERR_FORM_EXTERNAL_SET_OPERATION_FAILED, "" }
@@ -215,7 +217,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_DIMENSION_ERROR, { ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR, "" }
     },
     {
-        ERR_APPEXECFWK_FORM_LIVE_OP_PAGE_INFO_MISTMATCH,
+        ERR_APPEXECFWK_FORM_LIVE_OP_PAGE_INFO_MISMATCH,
         {
             ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,
             "The form can not support this operation, please check if page information specified in want belongs to "
@@ -226,7 +228,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
         {
             ERR_FORM_EXTERNAL_PERMISSION_DENIED,
-            "check permission deny, need to request ohos.permission.GET_BUNDLE_INFO_PRIVILEGED."
+            "check permission denied, need to request ohos.permission.GET_BUNDLE_INFO_PRIVILEGED."
         }
     },
     {
@@ -236,7 +238,71 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED, { ERR_FORM_EXTERNAL_IPC_ERROR, "" }
     },
     {
-        ERR_APPEXECFWK_FORM_NOT_UI_ABILITY, { ERR_FORM_EXTERNAL_PARAM_INVALID, "Target ability is not UI ability." }
+        ERR_APPEXECFWK_FORM_NOT_UI_ABILITY,
+        {
+            static_cast<int32_t>(AbilityErrorCode::ERROR_CODE_TARGET_TYPE_NOT_UI_ABILITY),
+            "Target ability is not UI ability."
+        }
+    },
+    {
+        ERR_APPEXECFWK_FORM_ABILITY_NOT_FOREGROUND,
+        {
+            ERR_FORM_EXTERNAL_FORM_ABILITY_NOT_FOREGROUND,
+            "The form edit page is not in the foreground. The current operation is not supported."
+        }
+    },
+    {
+        ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION, { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION, "" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_EDIT_UNSUPPORT_OPERATION,
+        {
+            ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,
+            "Cannot close the widget editing page. The page is not in the foreground or not owned by the caller."
+        }
+    },
+    {
+        ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "The context is not ability context." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_IS_ACTIVING,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form is activing." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_POWER_MODE_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Device status check failed, possibly due to power saving mode." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_HOT_CONTROL,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Device status check failed, possibly due to hot control." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_HOST_STATUS_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Form Host status check failed." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_COMPETITION_FAILED,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form overflow competition failure." }
+    },
+    {
+        ERR_APPEXECFWK_LIVE_FORM_OVERFLOW_PARAMS_ERROR,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "The live form overflow request parameter is invalid." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER,
+        { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "exceed max forms per user" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_LOCATION_INVALID,
+        { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID, "The location of the widget is invalid." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG,
+        {
+            ERR_FORM_EXTERNAL_PERMISSION_DENIED,
+            "check permission denied, need to request ohos.permission.FORM_CUSTOM_CONFIG."
+        }
     }
 };
 
@@ -262,11 +328,15 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_RENDER_DIED,                  "FormRenderService is dead, please reconnect." },
     { ERR_FORM_EXTERNAL_FORM_NOT_TRUST,               "Form is not trust." },
     { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT,            "Waiting for the form addition to the desktop timed out." },
-    { ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT,        "form status timeout, try reAddForm." },
+    { ERR_FORM_EXTERNAL_FORM_STATUS_TIME_OUT,        "form status timeout, try reAddForm." },
     { ERR_FORM_EXTERNAL_SET_OPERATION_FAILED,         "Failed to set the live form background image." },
     { ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED,          "The form can not support this operation, Please check whether "
         "the configuration information of sceneAnimationParams in your form_config is correct."},
     { ERR_FORM_EXTERNAL_FORM_DIMENSION_ERROR,         "The dimension parameter is incorrect." },
+    { ERR_FORM_EXTERNAL_SYSTEM_UNSUPPORT_OPERATION,   "The system does not support the current operation."},
+    { ERR_FORM_EXTERNAL_FORM_ABILITY_NOT_FOREGROUND,  "The app is not in the foreground." },
+    { ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,     "Cannot close the widget editing page opened by other apps." },
+    { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID,        "The location of the widget is invalid." },
 };
 }
 

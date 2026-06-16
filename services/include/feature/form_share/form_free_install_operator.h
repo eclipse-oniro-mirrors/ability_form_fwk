@@ -33,9 +33,9 @@ public:
         const std::shared_ptr<FormSerialQueue> &serialQueue);
     ~FormFreeInstallOperator();
 
-    int32_t StartFreeInstall(
-        const std::string &bundleName, const std::string &moduleName, const std::string &abilityName);
-    void OnInstallFinished(int32_t resultCode);
+    int32_t StartFreeInstall(const std::string &bundleName, const std::string &moduleName,
+        const std::string &abilityName, const int32_t userId);
+    void OnInstallFinished(int32_t resultCode, const int32_t userId);
 
 private:
     std::string formShareInfoKey_;

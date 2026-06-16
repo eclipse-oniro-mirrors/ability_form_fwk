@@ -39,7 +39,6 @@ enum class SceneType {
 
 class FormRenderEventReport {
 public:
-    static int64_t GetNowMillisecond();
     static void SendPerformanceEvent(SceneType sceneType, PerformanceEventInfo &eventInfo);
     static void SendBlockFaultEvent(const std::string &bundleName, const std::string &errorName,
         const std::string &errorMsg);

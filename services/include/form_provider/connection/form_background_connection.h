@@ -20,28 +20,36 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+
 /**
  * @class FormBackgroundConnection
  * Form Background Connection Stub.
  */
 class FormBackgroundConnection : public FormAbilityConnection {
 public:
-    FormBackgroundConnection(const int64_t formId, const std::string &bundleName, const std::string &abilityName,
-                             const std::string &funcName, const std::string &params);
+    FormBackgroundConnection(const int64_t formId, const std::string &bundleName,
+        const std::string &abilityName, const std::string &funcName, const std::string &params,
+        const int32_t userId);
     virtual ~FormBackgroundConnection() = default;
 
+protected:
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     * @param element service ability's ElementName.
-     * @param remoteObject the session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
+     * @brief Whether register to FormSupplyCallback.
+     *        Background connection does not need register.
+     * @return false.
      */
-    void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+    bool NeedRegisterToSupplyCallback() const override { return false; }
+
+    /**
+     * @brief Execute background function task after connection success.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
 
 private:
-    std::string funcName_ = "";
-    std::string params_ = "";
+    std::string funcName_;
+    std::string params_;
     DISALLOW_COPY_AND_MOVE(FormBackgroundConnection);
 };
 }  // namespace AppExecFwk

@@ -15,7 +15,7 @@
 
 #include "bms_mgr/form_bms_helper.h"
 #include "form_mgr_errors.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
 
 namespace {
     bool g_mockGetAbilityInfoRet = true;
@@ -57,7 +57,7 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
     return g_mockGetAbilityInfoByActionRet;
 }
 
-ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
+ErrCode FormMgrAdapterFacade::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
     const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
 {
@@ -66,7 +66,6 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     } else if (formId == 2) {
         return ERR_OK;
     }
-
     return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
 }
 } // namespace AppExecFwk

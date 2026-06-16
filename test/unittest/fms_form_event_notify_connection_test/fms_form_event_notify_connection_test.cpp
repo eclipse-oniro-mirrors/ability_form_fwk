@@ -66,8 +66,9 @@ HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0001, TestSize
     int32_t formVisibleType = 2;
     std::string bundleName = "aaa";
     std::string abilityName = "bbb";
+    int32_t userId = 100;
     sptr<FormEventNotifyConnection> formEventNotifyConnection =
-        new FormEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName);
+        new FormEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName, userId);
     formEventNotifyConnection_ = formEventNotifyConnection;
 
     AppExecFwk::ElementName element;
@@ -91,8 +92,9 @@ HWTEST_F(FormEventNotifyConnectionTest, FormEventNotifyConnection_0002, TestSize
     int32_t formVisibleType = 2;
     std::string bundleName = "aaa";
     std::string abilityName = "bbb";
+    int32_t userId = 100;
     sptr<FormEventNotifyConnection> formEventNotifyConnection =
-        new FormEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName);
+        new FormEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName, userId);
     formEventNotifyConnection_ = formEventNotifyConnection;
 
     AppExecFwk::ElementName element;

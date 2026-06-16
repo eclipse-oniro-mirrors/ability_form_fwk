@@ -42,7 +42,7 @@ bool FormUtil::IsSACall()
     return g_isSACall;
 }
 
-bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
+bool FormUtil::VerifyCallingPermission(std::string_view permissionName)
 {
     GTEST_LOG_(INFO) << "VerifyCallingPermission called " << g_verifyCallingPermission;
     return g_verifyCallingPermission;

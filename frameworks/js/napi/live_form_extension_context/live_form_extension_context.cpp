@@ -29,7 +29,6 @@ using namespace OHOS::AppExecFwk;
 const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
 const std::string REQUEST_METHOD = "startAbilityByLiveForm";
 const std::string TRANSPARENT_COLOR = "#00FFFFFF";
-constexpr float DEFAULT_VIEW_SCALE = 1.0f;
 
 bool LiveFormExtensionContext::SetWindowBackgroundColor()
 {
@@ -61,7 +60,7 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    if (std::isgreaterequal(layoutScale, DEFAULT_VIEW_SCALE) || std::islessequal(layoutScale, 0.0f)) {
+    if (std::islessequal(layoutScale, 0.0f)) {
         HILOG_ERROR("not satisfied within (0, 1), layoutScale: %{public}f", layoutScale);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }

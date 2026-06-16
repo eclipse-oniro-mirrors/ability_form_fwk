@@ -38,7 +38,12 @@ ohos_shared_library("cj_formBindingData_ffi") {
 
   configs = [ ":fmskit_config" ]
 
-  deps = [ "${form_fwk_path}:form_manager" ]
+  deps = [
+    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -82,6 +87,9 @@ ohos_shared_library("cj_formProvider_ffi") {
     "${form_fwk_napi_path}:formutil_napi",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

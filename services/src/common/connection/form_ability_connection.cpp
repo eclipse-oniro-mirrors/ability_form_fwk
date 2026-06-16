@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +22,7 @@
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
+#include "form_constants.h"
 #include "form_event_report.h"
 #include "form_info.h"
 #include "data_center/form_info/form_info_mgr.h"
@@ -34,23 +34,61 @@
 #include "system_ability_definition.h"
 #include "want.h"
 #include "common/util/form_report.h"
+#include "util/form_time_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- * @param element service ability's ElementName.
- * @param remoteObject the session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
+
 void FormAbilityConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
+    HILOG_INFO("formId:%{public}" PRId64, formId_);
+
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("formId:%{public}" PRId64 ", resultCode:%{public}d", formId_, resultCode);
+        OnConnectError(resultCode, element);
+        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
+            element.GetAbilityName().c_str(), resultCode);
         return;
     }
 
+    if (NeedFreeInstallProcessing()) {
+        ProcessFreeInstall(element, remoteObject, resultCode);
+    }
+
+    onFormAppConnect();
+
+    if (NeedRegisterToSupplyCallback()) {
+        RegisterToSupplyCallback();
+    }
+
+    OnPreConnectTask();
+
+    Want want = OnBuildTaskWant();
+
+    OnExecuteConnectTask(want, remoteObject);
+}
+
+Want FormAbilityConnection::OnBuildTaskWant()
+{
+    Want want;
+    want.SetParam(Constants::FORM_CONNECT_ID, GetConnectId());
+    return want;
+}
+
+bool FormAbilityConnection::ValidateResult(int resultCode, const AppExecFwk::ElementName &element)
+{
+    return resultCode == ERR_OK;
+}
+
+void FormAbilityConnection::RegisterToSupplyCallback()
+{
+    sptr<FormAbilityConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
+}
+
+void FormAbilityConnection::ProcessFreeInstall(const AppExecFwk::ElementName &element,
+    const sptr<IRemoteObject> &remoteObject, int resultCode)
+{
     HILOG_INFO("free install is %{public}d", isFreeInstall_);
     if (!isFreeInstall_) {
         return;
@@ -77,7 +115,6 @@ void FormAbilityConnection::OnAbilityConnectDone(
         return;
     }
 
-    // delete form
     HILOG_WARN("delete form record, form:%{public}" PRId64, formId_);
     if (formRecord.formTempFlag) {
         FormDataMgr::GetInstance().DeleteTempForm(formId_);
@@ -90,11 +127,6 @@ void FormAbilityConnection::OnAbilityConnectDone(
     FormTimerMgr::GetInstance().RemoveFormTimer(formId_);
 }
 
-/**
- * @brief OnAbilityDisconnectDone, AbilityMs notify caller ability the result of disconnect.
- * @param element service ability's ElementName.
- * @param resultCode ERR_OK on success, others on failure.
- */
 void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     HILOG_INFO("element:%{public}s, resultCode:%{public}d", element.GetURI().c_str(), resultCode);
@@ -105,20 +137,6 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
         HILOG_ERROR("invalid connectId_:%{public}d", connectId_);
     }
     ReportFormAppUnbindEvent();
-}
-
-/**
- * @brief Remote object died event.
- * @param remoteObject the remote object of service ability.
- */
-void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObject)
-{
-    if (connectId_ != 0) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
-        connectId_ = 0;
-    } else {
-        HILOG_ERROR("connectId_ invalidate. connectId_:%{public}d", connectId_);
-    }
 }
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()
@@ -170,7 +188,7 @@ bool FormAbilityConnection::onFormAppConnect()
 void FormAbilityConnection::ReportFormAppUnbindEvent()
 {
     FormEventInfo eventInfo;
-    eventInfo.timeStamp = FormUtil::GetNowMillisecond();
+    eventInfo.timeStamp = Common::FormTimeUtil::GetNowMillisecond();
     eventInfo.formId = GetFormId();
     eventInfo.bundleName = GetBundleName() + ":form";
     eventInfo.formAppPid = GetAppFormPid();
@@ -180,48 +198,36 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
     FormEventReport::SendThirdFormEvent(FormEventName::UNBIND_FORM_APP, HiSysEventType::BEHAVIOR, eventInfo);
 }
 
-/**
- * @brief Set connectId.
- * @param connectId The ability connection id.
- */
 void FormAbilityConnection::SetConnectId(int32_t connectId)
 {
     HILOG_INFO("connectId_:%{public}d", connectId);
     connectId_ = connectId;
 }
 
-/**
- * @brief Get connectId.
- * @return The ability connection id.
- */
 int32_t FormAbilityConnection::GetConnectId() const
 {
     return connectId_;
 }
 
-/**
- * @brief Get the provider Key
- *
- * @return The provider Key
- */
 std::string FormAbilityConnection::GetProviderKey() const
 {
-    if (bundleName_.empty() || abilityName_.empty()) {
+    if (bundleName_.empty() || abilityName_.empty() || userId_ < 0) {
         return "";
     }
-    return bundleName_ + "::" + abilityName_;
+    return bundleName_ + "::" + abilityName_ + "::" + std::to_string(userId_);
 }
 
-/**
- * @brief Set the Provider Key
- *
- * @param bundleName bundleName
- * @param abilityName abilityName
- */
-void FormAbilityConnection::SetProviderKey(const std::string &bundleName, const std::string &abilityName)
+void FormAbilityConnection::SetProviderKey(const std::string &bundleName, const std::string &abilityName,
+    const int32_t userId)
 {
     bundleName_ = bundleName;
     abilityName_ = abilityName;
+    userId_ = userId;
+}
+
+void FormAbilityConnection::SetModuleName(const std::string &moduleName)
+{
+    moduleName_ = moduleName;
 }
 
 void FormAbilityConnection::SetFreeInstall(bool isFreeInstall)
@@ -237,6 +243,27 @@ void FormAbilityConnection::SetFormId(int64_t formId)
 int64_t FormAbilityConnection::GetFormId() const
 {
     return formId_;
+}
+
+ConnectState FormAbilityConnection::GetConnectState() const
+{
+    return connectState_.load();
+}
+
+int32_t FormAbilityConnection::GetUserId() const
+{
+    return userId_;
+}
+
+Want FormAbilityConnection::CreateConnectWant() const
+{
+    Want connectWant;
+    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connectWant.SetElementName(bundleName_, abilityName_);
+    if (!moduleName_.empty()) {
+        connectWant.SetModuleName(moduleName_);
+    }
+    return connectWant;
 }
 
 void FormAbilityConnection::SetHostToken(const sptr<IRemoteObject> hostToken)

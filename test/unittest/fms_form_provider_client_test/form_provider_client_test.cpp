@@ -78,7 +78,7 @@ void FormProviderClientTest::TearDown(void)
  * @tc.name: AcquireProviderFormInfo
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireProviderFormInfo_0100 start";
 
@@ -105,7 +105,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInf
  * @tc.name: AcquireProviderFormInfo
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireProviderFormInfo_0200 start";
 
@@ -132,7 +132,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInf
  * @tc.name: AcquireProviderFormInfo
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0300, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireProviderFormInfo_0300 start";
 
@@ -159,7 +159,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInf
  * @tc.name: AcquireProviderFormInfo
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0400, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0400, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireProviderFormInfo_0400 start";
 
@@ -188,7 +188,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInf
  * @tc.name: AcquireProviderFormInfo
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0500, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInfo_0500, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireProviderFormInfo_0500 start";
 
@@ -215,7 +215,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireProviderFormInf
  * @tc.name: EventNotify
  * @tc.desc: Verify that the return value of EventNotify is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_EventNotify_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_EventNotify_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_EventNotify_0100 start";
 
@@ -251,7 +251,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_EventNotify_0100, Func
  * @tc.name: EventNotify
  * @tc.desc: Verify that the return value of EventNotify is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_EventNotify_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_EventNotify_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_EventNotify_0200 start";
 
@@ -288,7 +288,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_EventNotify_0200, Func
  * @tc.name: NotifyFormCastTempForm
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormCastTempForm_0100 start";
 
@@ -315,7 +315,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm
  * @tc.name: NotifyFormCastTempForm
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormCastTempForm_0200 start";
 
@@ -343,7 +343,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm
  * @tc.name: NotifyFormCastTempForm
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm_0300, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormCastTempForm_0300 start";
 
@@ -370,7 +370,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormCastTempForm
  * @tc.name: FireFormEvent
  * @tc.desc: Verify that the return value of FireFormEvent is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_FireFormEvent_0100 start";
 
@@ -395,7 +395,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0100, Fu
  * @tc.name: FireFormEvent
  * @tc.desc: Verify that the return value of FireFormEvent is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_FireFormEvent_0200 start";
 
@@ -418,7 +418,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0200, Fu
  * @tc.name: NotifyFormCastTempForm
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0300, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_FireFormEvent_0300 start";
 
@@ -443,7 +443,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_FireFormEvent_0300, Fu
  * @tc.name: FireFormEvent
  * @tc.desc: Verify that the return value of FireFormEvent is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormsDelete_0100 start";
 
@@ -466,7 +466,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0100
  * @tc.name: FireFormEvent
  * @tc.desc: Verify that the return value of FireFormEvent is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormsDelete_0200 start";
 
@@ -488,7 +488,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0200
  * @tc.name: NotifyFormCastTempForm
  * @tc.desc: Verify that the return value of AddForm is correct.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0300, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormsDelete_0300 start";
 
@@ -512,7 +512,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormsDelete_0300
  * @tc.type: AcquireShareFormData
  * @tc.require: issueI581YL
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireShareFormData_0100 start";
 
@@ -534,7 +534,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0
  * @tc.type: AcquireShareFormData
  * @tc.require: issueI581YL
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireShareFormData_0200 start";
 
@@ -556,7 +556,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0
  * @tc.type: AcquireShareFormData
  * @tc.require: issueI581YL
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0300, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireShareFormData_0300 start";
 
@@ -578,7 +578,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0
  * @tc.type: AcquireShareFormData
  * @tc.require: issueI581YL
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0400, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0400, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireShareFormData_0400 start";
 
@@ -600,7 +600,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0
  * @tc.type: AcquireShareFormData
  * @tc.require: issueI581YL
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0500, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0500, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireShareFormData_0500 start";
 
@@ -622,7 +622,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0
  * @tc.desc: Verify that the return value of AcquireFormData is correct.
  * @tc.type: AcquireFormData
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireFormData_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireFormData_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireFormData_0100 start";
 
@@ -643,7 +643,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireFormData_0100, 
  * @tc.name: NotifyFormDelete
  * @tc.desc: Verify that function NotifyFormDelete.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormDelete_0100 start";
     int64_t formId = 10;
@@ -662,7 +662,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0100,
  * @tc.name: NotifyFormDelete
  * @tc.desc: Verify that function NotifyFormDelete.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormDelete_0200 start";
     int64_t formId = 10;
@@ -678,7 +678,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0200,
  * @tc.name: NotifyFormDelete
  * @tc.desc: Verify that function NotifyFormDelete.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0300, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormDelete_0300 start";
     int64_t formId = 10;
@@ -696,7 +696,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormDelete_0300,
  * @tc.name: NotifyFormUpdate
  * @tc.desc: Verify that function NotifyFormUpdate.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormUpdate_0100 start";
     int64_t formId = 10;
@@ -716,7 +716,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0100,
  * @tc.name: NotifyFormUpdate
  * @tc.desc: Verify that function NotifyFormUpdate.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormUpdate_0200 start";
     int64_t formId = 10;
@@ -732,7 +732,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0200,
  * @tc.name: NotifyFormUpdate
  * @tc.desc: Verify that function NotifyFormUpdate.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0300, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyFormUpdate_0300 start";
     int64_t formId = 10;
@@ -750,7 +750,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyFormUpdate_0300,
  * @tc.name: CheckIsSystemApp
  * @tc.desc: Verify that function CheckIsSystemApp.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_CheckIsSystemApp_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_CheckIsSystemApp_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_CheckIsSystemApp_0100 start";
     auto result = instance_->CheckIsSystemApp();
@@ -763,7 +763,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_CheckIsSystemApp_0100,
  * @tc.name: AcquireState
  * @tc.desc: Verify that function AcquireState.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireState_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireState_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireState_0100 start";
     Want wantArg;
@@ -780,7 +780,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireState_0100, Fun
  * @tc.name: AcquireState
  * @tc.desc: Verify that function AcquireState.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireState_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireState_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireState_0200 start";
     Want wantArg;
@@ -799,7 +799,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireState_0200, Fun
  * @tc.name: ClearOwner
  * @tc.desc: Verify that function ClearOwner.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_ClearOwner_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_ClearOwner_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_ClearOwner_0200 start";
     instance_->ClearOwner(nullptr);
@@ -812,7 +812,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_ClearOwner_0200, Funct
  * @tc.name: GetOwner
  * @tc.desc: Verify that function GetOwner.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_GetOwner_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_GetOwner_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_GetOwner_0100 start";
     auto result = instance_->GetOwner();
@@ -825,7 +825,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_GetOwner_0100, Functio
  * @tc.name: GetOwner
  * @tc.desc: Verify that function GetOwner.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_GetOwner_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_GetOwner_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_GetOwner_0200 start";
     std::shared_ptr<Ability> ability = std::make_shared<Ability>();
@@ -840,7 +840,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_GetOwner_0200, Functio
  * @tc.name: HandleAcquire
  * @tc.desc: Verify that function HandleAcquire.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquire_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquire_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_HandleAcquire_0100 start";
     FormProviderInfo formProviderInfo;
@@ -856,7 +856,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquire_0100, Fu
  * @tc.name: HandleAcquire
  * @tc.desc: Verify that function HandleAcquire.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquire_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquire_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_HandleAcquire_0200 start";
     FormProviderInfo formProviderInfo;
@@ -872,7 +872,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquire_0200, Fu
  * @tc.name: DCRtnHelper
  * @tc.desc: Verify that function DCRtnHelper.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_DCRtnHelper_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_DCRtnHelper_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_DCRtnHelper_0100 start";
     int32_t errCode = ERR_NO_MEMORY;
@@ -888,7 +888,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_DCRtnHelper_0100, Func
  * @tc.name: DCRtnHelper
  * @tc.desc: Verify that function DCRtnHelper.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_DCRtnHelper_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_DCRtnHelper_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_DCRtnHelper_0200 start";
     int32_t errCode = ERR_OK;
@@ -904,7 +904,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_DCRtnHelper_0200, Func
  * @tc.name: HandleDisconnect
  * @tc.desc: Verify that function HandleDisconnect.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleDisconnect_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleDisconnect_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_HandleDisconnect_0100 start";
     Want Want;
@@ -919,7 +919,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleDisconnect_0100,
  * @tc.name: HandleAcquireStateResult
  * @tc.desc: Verify that function HandleAcquireStateResult.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquireStateResult_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquireStateResult_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_HandleAcquireStateResult_0100 start";
     FormState state = FormState::UNKNOWN;
@@ -937,7 +937,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquireStateResu
  * @tc.name: HandleAcquireStateResult
  * @tc.desc: Verify that function HandleAcquireStateResult.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquireStateResult_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquireStateResult_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_HandleAcquireStateResult_0200 start";
     FormState state = FormState::UNKNOWN;
@@ -955,7 +955,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleAcquireStateResu
  * @tc.name: HandleRemoteAcquire
  * @tc.desc: Verify that function HandleRemoteAcquire.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleRemoteAcquire_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleRemoteAcquire_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_HandleRemoteAcquire_0100 start";
     FormJsInfo formJsInfo;
@@ -973,7 +973,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleRemoteAcquire_01
  * @tc.name: HandleRemoteAcquire
  * @tc.desc: Verify that function HandleRemoteAcquire.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleRemoteAcquire_0200, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleRemoteAcquire_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_HandleRemoteAcquire_0200 start";
     FormJsInfo formJsInfo;
@@ -997,7 +997,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_HandleRemoteAcquire_02
  * @tc.name: IsCallBySelfBundle
  * @tc.desc: Verify that function IsCallBySelfBundle.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_IsCallBySelfBundle_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_IsCallBySelfBundle_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_IsCallBySelfBundle_0100 start";
     auto result = instance_->IsCallBySelfBundle();
@@ -1010,7 +1010,7 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_IsCallBySelfBundle_010
  * @tc.name: NotifyConfigurationUpdate
  * @tc.desc: notify provider configuration update.
  */
-HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyConfigurationUpdate_0100, Function | MediumTest | Level1)
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_NotifyConfigurationUpdate_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_NotifyConfigurationUpdate_0100 start";
 

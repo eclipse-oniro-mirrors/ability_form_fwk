@@ -346,7 +346,7 @@ public:
         return 0;
     }
 
-    int32_t SetApplicationAutoStartupByEDM(const AutoStartupInfo &info, bool flag) override
+    int32_t SetApplicationAutoStartupByEDM(const AutoStartupInfo &info, bool flag, bool isHiddenStart = false) override
     {
         return 0;
     }
@@ -747,7 +747,7 @@ public:
 
     int StartAbilityByCall(const Want &want, const sptr<IAbilityConnection> &connect,
         const sptr<IRemoteObject> &callerToken, int32_t accountId = DEFAULT_INVAL_VALUE, bool isSilent = false,
-        bool promotePriority = false) override
+        bool promotePriority = false, bool isVisible = false, uint64_t specifiedFullTokenId = 0) override
     {
         return startAbilityByCall_;
     }
@@ -845,6 +845,18 @@ public:
         return startAbilityOnlyUIAbility_;
     }
 
+    int32_t OpenLink(const Want &want, sptr<IRemoteObject> callerToken, int32_t userId = DEFAULT_INVAL_VALUE,
+        int requestCode = DEFAULT_INVAL_VALUE, bool hideFailureTipDialog = false)
+    {
+        return openLink_;
+    }
+
+    int32_t OpenAtomicService(Want& want, const StartOptions &options, sptr<IRemoteObject> callerToken,
+        int32_t requestCode = DEFAULT_INVAL_VALUE, int32_t userId = DEFAULT_INVAL_VALUE)
+    {
+        return openAtomicService_;
+    }
+
     int32_t startAbility_ = 0;
 
     int32_t startAbilityByCall_ = 0;
@@ -852,6 +864,10 @@ public:
     int32_t startAbilityWithSpecifyTokenId_ = 0;
 
     int32_t startAbilityOnlyUIAbility_ = 0;
+    
+    int32_t openLink_ = 0;
+
+    int32_t openAtomicService_ = 0;
 private:
     Semaphore sem_;
 };

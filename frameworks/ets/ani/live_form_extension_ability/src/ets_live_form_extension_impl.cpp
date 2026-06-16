@@ -18,6 +18,7 @@
 #include "ani_common_util.h"
 #include "ani_common_want.h"
 #include "ani_form_error_util.h"
+#include "ani_form_common_util.h"
 #include "ets_ui_extension_content_session.h"
 #include "ani_common_want.h"
 #include "fms_log_wrapper.h"
@@ -28,10 +29,12 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-constexpr const char* LIVE_FORM_EXTENSION_CLASS_NAME =
+constexpr double MAX_FONT_SCALE = 1.3;
+constexpr const char *LIVE_FORM_EXTENSION_CLASS_NAME =
     "@ohos.app.form.LiveFormExtensionAbility.LiveFormExtensionAbility";
-constexpr const char* LIVE_FORM_CLASSNAME_ASYNC_CALLBACK_WRAPPER =
+constexpr const char *LIVE_FORM_CLASSNAME_ASYNC_CALLBACK_WRAPPER =
     "@ohos.app.form.LiveFormExtensionAbility.AsyncCallbackWrapper";
+constexpr const char *SIGNATURE_SET_FONT_SCALE = "d:";
 }
 
 EtsLiveFormExtensionImpl::EtsLiveFormExtensionImpl(const std::unique_ptr<Runtime> &runtime)
@@ -60,9 +63,9 @@ void EtsLiveFormExtensionImpl::BindContext()
         return;
     }
     ani_field contextField;
-    auto status = env->Class_FindField(etsObj_->aniCls, "context", &contextField);
+    auto status = env->Class_FindField(etsObj_->aniCls, "liveFormContext", &contextField);
     if (status != ANI_OK) {
-        HILOG_ERROR("Class_GetField context failed");
+        HILOG_ERROR("Class_GetField liveFormContext failed");
         return;
     }
     ani_ref contextRef = nullptr;
@@ -105,6 +108,8 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
     std::array functions = {
         ani_native_function { "nativeSetWindowBackgroundColor", nullptr,
             reinterpret_cast<ani_int*>(EtsLiveFormExtensionImpl::SetWindowBackgroundColor) },
+        ani_native_function { "nativeSetFontScale", SIGNATURE_SET_FONT_SCALE,
+            reinterpret_cast<void *>(EtsLiveFormExtensionImpl::SetFontScale) },
         };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
@@ -172,38 +177,45 @@ void EtsLiveFormExtensionImpl::OnSetWindowBackgroundColor(ani_env *env, ani_obje
     AsyncCallback(env, callback, EtsFormErrorUtil::CreateError(env, ERR_OK), nullptr);
 }
 
+void EtsLiveFormExtensionImpl::SetFontScale(ani_env *env, ani_object aniObj, ani_double fontScale)
+{
+    HILOG_DEBUG("called");
+    auto etsLiveForm = GetEtsEtsLiveForm(env, aniObj);
+    if (etsLiveForm == nullptr) {
+        HILOG_ERROR("null EtsLiveFormExtensionImpl");
+        return;
+    }
+    etsLiveForm->OnSetFontScale(env, fontScale);
+}
+
+void EtsLiveFormExtensionImpl::OnSetFontScale(ani_env *env, ani_double fontScale)
+{
+    HILOG_DEBUG("called");
+
+    if (std::isnan(fontScale) || std::islessequal(fontScale, 0.0f)) {
+        HILOG_ERROR("fontScale %{public}f is nan or less than default scale", fontScale);
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        return;
+    }
+
+    if (std::isgreaterequal(fontScale, MAX_FONT_SCALE)) {
+        HILOG_WARN("fontScale %{public}f greater than max scale", fontScale);
+        fontScale = MAX_FONT_SCALE;
+    }
+
+    if (!context_) {
+        HILOG_ERROR("null context");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
+        return;
+    }
+
+    context_->SetAbilityFontSize(fontScale);
+}
+
 bool EtsLiveFormExtensionImpl::AsyncCallback(ani_env *env, ani_object call, ani_object error, ani_object result)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("null env");
-        return false;
-    }
-    ani_class clsCall = nullptr;
-    ani_status status = env->FindClass(LIVE_FORM_CLASSNAME_ASYNC_CALLBACK_WRAPPER, &clsCall);
-    if (status!= ANI_OK || clsCall == nullptr) {
-        HILOG_ERROR("FindClass status: %{public}d, or null clsCall", status);
-        return false;
-    }
-    ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method)) != ANI_OK || method == nullptr) {
-        HILOG_ERROR("Class_FindMethod status: %{public}d, or null method", status);
-        return false;
-    }
-    if (error == nullptr) {
-        ani_ref nullRef = nullptr;
-        env->GetNull(&nullRef);
-        error = reinterpret_cast<ani_object>(nullRef);
-    }
-    if (result == nullptr) {
-        ani_ref undefinedRef = nullptr;
-        env->GetUndefined(&undefinedRef);
-        result = reinterpret_cast<ani_object>(undefinedRef);
-    }
-    if ((status = env->Object_CallMethod_Void(call, method, error, result)) != ANI_OK) {
-        HILOG_ERROR("Object_CallMethod_Void status: %{public}d", status);
-        return false;
-    }
-    return true;
+    // Use the unified implementation from EtsFormErrorUtil
+    return FormAniUtil::AsyncCallback(env, LIVE_FORM_CLASSNAME_ASYNC_CALLBACK_WRAPPER, call, error, result);
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

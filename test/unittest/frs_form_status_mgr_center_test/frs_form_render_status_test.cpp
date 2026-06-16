@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include "status_mgr_center/form_render_status.h"
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "fms_log_wrapper.h"
 #include "gmock/gmock.h"
 
@@ -62,7 +62,7 @@ HWTEST_F(FormRenderStatusTest, FormRenderStatusTest_0001, TestSize.Level0)
     EXPECT_EQ(ret, false);
 
     FormFsmStatus status = FormRenderStatus::GetInstance().GetFormStatus(formId);
-    EXPECT_EQ(status, FormFsmStatus::INIT);
+    EXPECT_EQ(status, FormFsmStatus::UNPROCESSABLE);
 
     FormRenderStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::RENDERED);
     ret = FormRenderStatus::GetInstance().HasFormStatus(formId);

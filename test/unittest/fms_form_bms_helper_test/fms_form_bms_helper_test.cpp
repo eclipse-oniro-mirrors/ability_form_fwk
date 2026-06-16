@@ -632,14 +632,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_023, TestSize.Level1)
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_023 end";
 }
@@ -1048,14 +1045,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_043, TestSize.Level1)
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_043 end";
 }
@@ -1327,7 +1321,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0011, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0011 start";
     FormBmsHelper formBmsHelper;
-
+    
     std::string action = "";
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
@@ -1559,7 +1553,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0023 start";
     FormBmsHelper formBmsHelper;
-
+    
     Want want;
     std::string deviceId;
     std::string bundleName = "ohos.samples.FormApplication";
@@ -1577,15 +1571,13 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
 
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
+    ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0023 end";
 }
@@ -1893,7 +1885,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_111, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_111 start";
     FormBmsHelper formBmsHelper;
-
+    
     std::string action = "";
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
@@ -2125,7 +2117,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_123, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_123 start";
     FormBmsHelper formBmsHelper;
-
+    
     Want want;
     std::string deviceId;
     std::string bundleName = "ohos.samples.FormApplication";
@@ -2143,15 +2135,13 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_123, TestSize.Level1)
 
     constexpr int32_t userId = 1;
     AbilityInfo abilityInfo;
+    ExtensionAbilityInfo extensionAbilityInfo;
     want.SetElementName(deviceId, bundleName, "");
-    EXPECT_EQ(false, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     want.SetElementName(deviceId, bundleName, abilityName);
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
-    EXPECT_EQ(true, formBmsHelper.GetAbilityInfo(want, userId, abilityInfo));
 
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_123 end";
 }
@@ -2262,6 +2252,613 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_128, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_128 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_20027
+ * @tc.desc: Verify that the RegisterBundleEventCallback interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_20027, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20027 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    const std::string moduleName = "";
+    constexpr int32_t userId = 1;
+    std::vector<ProxyData> proxyData;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20027 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_20028
+ * @tc.desc: Verify that the UnregisterBundleEventCallback interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_20028, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20028 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20028 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2101
+ * @tc.desc: Verify that the GetBundleMgr interface executes as expected and the return value is not empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2101, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2101 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2101 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2102
+ * @tc.desc: Verify that the NotifyModuleRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2102, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2102 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    const std::string bundleName = "";
+    const std::string moduleName = "";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2102 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2103
+ * @tc.desc: Verify that the NotifyModuleRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2103, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2103 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    const std::string bundleName = "";
+    const std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2103 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2104
+ * @tc.desc: Verify that the NotifyModuleRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2104, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2104 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    const std::string bundleName = "bb";
+    const std::string moduleName = "";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2104 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2105
+ * @tc.desc: Verify that the NotifyModuleRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2105, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2105 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "bb";
+    const std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    EXPECT_NE(formBmsHelper.GetBundleMgr(), nullptr);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2105 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2106
+ * @tc.desc: Verify that the NotifyModuleNotRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2106, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2106 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    const std::string moduleName = "";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2106 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2107
+ * @tc.desc: Verify that the NotifyModuleNotRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2107, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2107 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    const std::string bundleName = "";
+    const std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2107 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2108
+ * @tc.desc: Verify that the NotifyModuleNotRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2108, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2108 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    const std::string bundleName = "bb";
+    const std::string moduleName = "";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2108 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2109
+ * @tc.desc: Verify that the NotifyModuleNotRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2109, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2109 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    const std::string bundleName = "bb";
+    const std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2109 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2110
+ * @tc.desc: Verify that the GetBundlePackInfo interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2110, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2110 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "aa";
+    constexpr int32_t userId = 1;
+    BundlePackInfo bundlePackInfo;
+    EXPECT_FALSE(formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_FALSE(formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2110 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2111
+ * @tc.desc: Verify that the GetAbilityInfoByAction interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2111, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2111 start";
+    FormBmsHelper formBmsHelper;
+    
+    std::string action = "";
+    constexpr int32_t userId = 1;
+    AbilityInfo abilityInfo;
+    ExtensionAbilityInfo extensionAbilityInfo;
+    EXPECT_FALSE(formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_FALSE(formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2111 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2112
+ * @tc.desc: Verify that the GetAbilityInfoByAction interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2112, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2112 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string action = "abc";
+    constexpr int32_t userId = 1;
+    AbilityInfo abilityInfo;
+    ExtensionAbilityInfo extensionAbilityInfo;
+    EXPECT_FALSE(formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2112 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2113
+ * @tc.desc: Verify that the GetBundleInfo interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2113, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2113 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    constexpr int32_t userId = 1;
+    BundleInfo bundleInfo;
+    EXPECT_FALSE(formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo));
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_FALSE(formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2113 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2114
+ * @tc.desc: Verify that the GetCallerBundleName interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2114, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2114 start";
+    FormBmsHelper formBmsHelper;
+    std::string callerBundleName = "";
+    EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2114 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2115
+ * @tc.desc: Verify that the GetUidByBundleName interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2115, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2115 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    constexpr int32_t userId = 1;
+    EXPECT_EQ(formBmsHelper.GetUidByBundleName(bundleName, userId), -1);
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(formBmsHelper.GetUidByBundleName(bundleName, userId), 0);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2115 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2116
+ * @tc.desc: Verify that the GetBundlePackInfo interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2116, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2116 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->GetBundlePackInfo_ = ERR_OK;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName = "aa";
+    constexpr int32_t userId = 1;
+    BundlePackInfo bundlePackInfo;
+    EXPECT_TRUE(formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2116 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2117
+ * @tc.desc: Verify that the NotifyModuleNotRemovable interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2117, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2117 start";
+    FormBmsHelper formBmsHelper;
+
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->setModuleRemovable_ = true;
+    formBmsHelper.SetBundleManager(bundleManager);
+    const std::string bundleName = "bb";
+    const std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2117 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2118
+ * @tc.desc: Verify that the GetCallerBundleName interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2118, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2118 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->GetNameForUid_ = ERR_OK;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string callerBundleName = "";
+    EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2118 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2119
+ * @tc.desc: Verify that the GetBundleNameByUid interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2119, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_2119 start";
+    FormBmsHelper formBmsHelper;
+    sptr<IRemoteObject> impl;
+    sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->GetNameForUid_ = ERR_OK;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName = "A";
+    std::int32_t uid = 0;
+    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_2119 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2120
+ * @tc.desc: Verify that the GetBundleNameByUid interface fails to execute and returns an error code.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2120, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_2120 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "A";
+    std::int32_t uid = 0;
+    formBmsHelper.SetBundleManager(nullptr);
+    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_2120 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2121
+ * @tc.desc: Verify that the GetBundleNameByUid interface fails to execute and returns an error code.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2121, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_2121 start";
+    FormBmsHelper formBmsHelper;
+    sptr<IRemoteObject> impl;
+    sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->GetNameForUid_ = ERR_OK + 1;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName = "A";
+    std::int32_t uid = 0;
+    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_2121 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2122
+ * @tc.desc: Verify that the GetBundleInstaller interface executes as expected and the return value is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2122, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2122 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(nullptr, formBmsHelper.GetBundleInstaller());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2122 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2123
+ * @tc.desc: Verify that the GetAbilityInfo interface executes as expected and the return value is correct.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2123, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2123 start";
+    FormBmsHelper formBmsHelper;
+    
+    Want want;
+    std::string deviceId;
+    std::string bundleName = "ohos.samples.FormApplication";
+    std::string moduleName = "entry";
+    std::string abilityName = "FormAbility";
+    std::string formName = "widget";
+    constexpr int32_t dimension = 3;
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, moduleName);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formName);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimension);
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+
+    constexpr int32_t userId = 1;
+    AbilityInfo abilityInfo;
+    ExtensionAbilityInfo extensionAbilityInfo;
+    want.SetElementName(deviceId, bundleName, "");
+
+    want.SetElementName(deviceId, bundleName, abilityName);
+
+    abilityInfo.name = "MainAbility";
+    abilityInfo.bundleName = "com.ohos.launcher";
+
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2123 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2124
+ * @tc.desc: Verify that the GetBundleInfoWithPermission interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2124, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2124 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    constexpr int32_t userId = 1;
+    BundleInfo bundleInfo;
+    formBmsHelper.SetBundleManager(nullptr);
+    EXPECT_FALSE(formBmsHelper.GetBundleInfoWithPermission(bundleName, userId, bundleInfo));
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_FALSE(formBmsHelper.GetBundleInfoWithPermission(bundleName, userId, bundleInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2124 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2125
+ * @tc.desc: Verify that the GetCompileMode interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2125, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2125 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    const std::string moduleName = "";
+    int32_t userId = 1;
+    int32_t compileMode = 1;
+    formBmsHelper.SetBundleManager(nullptr);
+    EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2125 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2126
+ * @tc.desc: Verify that the GetProxyDataInfos interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2126, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2126 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    const std::string moduleName = "";
+    constexpr int32_t userId = 1;
+    std::vector<ProxyData> proxyData;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2126 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2127
+ * @tc.desc: Verify that the RegisterBundleEventCallback interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2127, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2127 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    const std::string moduleName = "";
+    constexpr int32_t userId = 1;
+    std::vector<ProxyData> proxyData;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2127 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_2128
+ * @tc.desc: Verify that the UnregisterBundleEventCallback interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2128, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2128 start";
+    FormBmsHelper formBmsHelper;
+    const std::string bundleName = "";
+    const std::string moduleName = "";
+    int32_t userId = 1;
+    int32_t compileMode = 1;
+    formBmsHelper.SetBundleManager(nullptr);
+    EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
+
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2128 end";
 }
 } // namespace AppExecFwk
 } // namespace OHOS

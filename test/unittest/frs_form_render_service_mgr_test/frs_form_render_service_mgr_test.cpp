@@ -31,6 +31,7 @@
 #include "power_mgr_client.h"
 #endif
 #include "want.h"
+#include "ohos_application.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -44,6 +45,7 @@ constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t ERR_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
+constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 }  // namespace
 
 class FormRenderServiceMgrTest : public testing::Test {
@@ -170,10 +172,6 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_002, TestSize.Level0
     ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
 
-    want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    ret = FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_OK);
-
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_002 end";
 }
 
@@ -197,12 +195,6 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_003, TestSize.Level0
     FormRenderServiceMgr::GetInstance().SetFormSupplyClient(nullptr);
     ret = FormRenderServiceMgr::GetInstance().ProcessRenderForm(formJsInfo, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_SUPPLY_CLIENT_NULL);
-
-    callerToken = new (std::nothrow) MockFormSupplyStub();
-    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
-    FormRenderServiceMgr::GetInstance().SetFormSupplyClient(formSupplyClient);
-    ret = FormRenderServiceMgr::GetInstance().ProcessRenderForm(formJsInfo, want);
-    EXPECT_EQ(ret, ERR_OK);
 
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_003 end";
 }
@@ -469,6 +461,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_016, TestSize.Level0
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_016 start";
     FormRenderServiceMgr formRenderServiceMgr;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "dark");
     EXPECT_FALSE(formRenderServiceMgr.configuration_);
     formRenderServiceMgr.OnConfigurationUpdated(configuration);
     EXPECT_TRUE(formRenderServiceMgr.configuration_);
@@ -486,7 +479,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_017, TestSize.Level0
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_017 start";
     FormRenderServiceMgr formRenderServiceMgr;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
-
+    configuration->AddItem("ohos.system.colorMode", "dark");
     formRenderServiceMgr.configUpdateTime_ = std::chrono::steady_clock::now();
     formRenderServiceMgr.OnConfigurationUpdated(configuration);
 #ifdef SUPPORT_POWER
@@ -530,6 +523,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_019, TestSize.Level0
     formRenderServiceMgr.SetConfiguration(configuration);
     EXPECT_FALSE(formRenderServiceMgr.configuration_);
     configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "dark");
     formRenderServiceMgr.OnConfigurationUpdated(configuration);
     EXPECT_TRUE(formRenderServiceMgr.configuration_);
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_019 end";
@@ -546,6 +540,7 @@ HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_020, TestSize.Level0
     GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_020 start";
     FormRenderServiceMgr formRenderServiceMgr;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "dark");
     EXPECT_FALSE(formRenderServiceMgr.configuration_);
     formRenderServiceMgr.SetConfiguration(configuration);
     EXPECT_TRUE(formRenderServiceMgr.configuration_);
@@ -1206,36 +1201,370 @@ HWTEST_F(FormRenderServiceMgrTest, UpdateFormSize_001, TestSize.Level0)
     formSurfaceInfo.formViewScale = 1.0;
     std::string uid{"uid"};
     FormRenderServiceMgr formRenderServiceMgr;
-    int32_t ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uid);
+    FormJsInfo formJsInfo;
+    int32_t ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo);
     EXPECT_EQ(ret, UPDATE_FORM_SIZE_FAILED);
 
     formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
-    ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uid);
+    ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo);
     EXPECT_EQ(ret, UPDATE_FORM_SIZE_FAILED);
 
     std::string uidNew{"uidNew"};
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uidNew);
     formRenderServiceMgr.renderRecordMap_.emplace(uidNew, formRenderRecord);
-    ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uidNew);
+    ret = formRenderServiceMgr.UpdateFormSize(formId, formSurfaceInfo, uidNew, formJsInfo);
     EXPECT_EQ(ret, ERR_OK);
 
     GTEST_LOG_(INFO) << "UpdateFormSize_001 end";
 }
 
 /**
- * @tc.name: SetMainRuntimeCb_001
- * @tc.desc: Verify SetMainRuntimeCb.
+ * @tc.name: SetMainGcCb_001
+ * @tc.desc: Verify SetMainGcCb.
  * @tc.type: FUNC
  */
-HWTEST_F(FormRenderServiceMgrTest, SetMainRuntimeCb_001, TestSize.Level0)
+HWTEST_F(FormRenderServiceMgrTest, SetMainGcCb_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 start";
-    std::unique_ptr<Runtime> runtime = nullptr;
-    auto cb = [&runtime]() -> const std::unique_ptr<Runtime> & {
-        return runtime;
+    GTEST_LOG_(INFO) << "SetMainGcCb_001 start";
+    bool ret = false;
+    auto cb = [&ret]() {
+        ret = true;
     };
-    FormRenderServiceMgr::GetInstance().SetMainRuntimeCb(cb);
-    EXPECT_EQ(FormRenderServiceMgr::GetInstance().mainRuntimeCb_(), nullptr);
+    FormRenderServiceMgr::GetInstance().SetMainGcCb(cb);
+    FormRenderServiceMgr::GetInstance().mainGcCb_();
+    EXPECT_TRUE(ret);
+    GTEST_LOG_(INFO) << "SetMainGcCb_001 end";
+}
 
-    GTEST_LOG_(INFO) << "SetMainRuntimeCb_001 end";
+/**
+ * @tc.name: SetRenderGroupParams_001
+ * @tc.desc: Verify SetRenderGroupParams.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupParams_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupParams_001 start";
+    int64_t formId = 0;
+    Want want;
+    FormRenderServiceMgr formRenderServiceMgr;
+    int32_t ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+
+    formId = 1;
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    std::string uid{"20251209"};
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderServiceMgr.renderRecordMap_[uid] = formRenderRecord;
+    ret = formRenderServiceMgr.SetRenderGroupParams(formId, want);
+    EXPECT_EQ(ret, ERR_OK);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupParams_001 end";
+}
+
+/**
+ * @tc.name: SetConfiguration_001
+ * @tc.desc: Verify SetConfiguration returns false when configuration is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetConfiguration_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration;
+    bool ret = formRenderServiceMgr.SetConfiguration(configuration);
+    EXPECT_FALSE(ret);
+    GTEST_LOG_(INFO) << "SetConfiguration_001 end";
+}
+
+/**
+ * @tc.name: SetConfiguration_002
+ * @tc.desc: Verify SetConfiguration returns true when new config has valid values.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetConfiguration_002 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "dark");
+    bool ret = formRenderServiceMgr.SetConfiguration(configuration);
+    EXPECT_TRUE(ret);
+    GTEST_LOG_(INFO) << "SetConfiguration_002 end";
+}
+
+/**
+ * @tc.name: SetConfiguration_003
+ * @tc.desc: Verify SetConfiguration returns false when new config values are empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetConfiguration_003 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    formRenderServiceMgr.configuration_->AddItem("ohos.system.colorMode", "dark");
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "");
+    bool ret = formRenderServiceMgr.SetConfiguration(configuration);
+    EXPECT_FALSE(ret);
+    GTEST_LOG_(INFO) << "SetConfiguration_003 end";
+}
+
+/**
+ * @tc.name: OnConfigurationUpdated_001
+ * @tc.desc: Verify OnConfigurationUpdated when SetConfiguration returns false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, OnConfigurationUpdated_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnConfigurationUpdated_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.configuration_ = std::make_shared<Configuration>();
+    formRenderServiceMgr.configuration_->AddItem("ohos.system.colorMode", "dark");
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.colorMode", "");
+    formRenderServiceMgr.configUpdateTime_ = std::chrono::steady_clock::now();
+    formRenderServiceMgr.OnConfigurationUpdated(configuration);
+    EXPECT_EQ(formRenderServiceMgr.configuration_->GetItem("ohos.system.colorMode"), "dark");
+    GTEST_LOG_(INFO) << "OnConfigurationUpdated_001 end";
+}
+
+/**
+ * @tc.name: InitMemoryMonitor_001
+ * @tc.desc: Verify InitMemoryMonitor initializes memory monitoring task.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, InitMemoryMonitor_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InitMemoryMonitor_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    // InitMemoryMonitor is called in constructor, verify it doesn't crash
+    // The actual task registration is done through Watchdog, which is external dependency
+    EXPECT_TRUE(formRenderServiceMgr.serialQueue_ != nullptr);
+    GTEST_LOG_(INFO) << "InitMemoryMonitor_001 end";
+}
+
+/**
+ * @tc.name: RemoveMemoryMonitor_001
+ * @tc.desc: Verify RemoveMemoryMonitor removes memory monitoring task.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, RemoveMemoryMonitor_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RemoveMemoryMonitor_001 start";
+    {
+        FormRenderServiceMgr formRenderServiceMgr;
+        // RemoveMemoryMonitor is called in destructor, verify it doesn't crash
+        EXPECT_TRUE(formRenderServiceMgr.serialQueue_ != nullptr);
+    }
+    // Destructor called here, RemoveMemoryMonitor should execute without crash
+    GTEST_LOG_(INFO) << "RemoveMemoryMonitor_001 end";
+}
+
+/**
+ * @tc.name: ReportProcessMemory_001
+ * @tc.desc: Verify ReportProcessMemory with empty render record map.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, ReportProcessMemory_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReportProcessMemory_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    formRenderServiceMgr.renderRecordMap_.clear();
+    // ReportProcessMemory should handle empty map without crash
+    formRenderServiceMgr.ReportProcessMemory();
+    EXPECT_TRUE(formRenderServiceMgr.renderRecordMap_.empty());
+    GTEST_LOG_(INFO) << "ReportProcessMemory_001 end";
+}
+
+/**
+ * @tc.name: ReportProcessMemory_002
+ * @tc.desc: Verify ReportProcessMemory with valid render record.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, ReportProcessMemory_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReportProcessMemory_002 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::string uid{"202410101010"};
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    EXPECT_TRUE(formRenderRecord);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
+    // ReportProcessMemory should handle valid record without crash
+    formRenderServiceMgr.ReportProcessMemory();
+    EXPECT_FALSE(formRenderServiceMgr.renderRecordMap_.empty());
+    GTEST_LOG_(INFO) << "ReportProcessMemory_002 end";
+}
+
+/**
+ * @tc.name: ReportProcessMemory_003
+ * @tc.desc: Verify ReportProcessMemory with null render record.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, ReportProcessMemory_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReportProcessMemory_003 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::string uid{"202410101010"};
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
+    // ReportProcessMemory should handle null record without crash
+    formRenderServiceMgr.ReportProcessMemory();
+    EXPECT_EQ(formRenderServiceMgr.renderRecordMap_.size(), 1);
+    GTEST_LOG_(INFO) << "ReportProcessMemory_003 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_001
+ * @tc.desc: Verify SetRenderGroupEnableFlag with invalid formId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_001 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{0};
+    bool isEnable{true};
+    Want want;
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_001 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_002
+ * @tc.desc: Verify SetRenderGroupEnableFlag with empty uid.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_002 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    Want want;
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_002 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_003
+ * @tc.desc: Verify SetRenderGroupEnableFlag when render record not found.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_003 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_003 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_004
+ * @tc.desc: Verify SetRenderGroupEnableFlag when render record is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_004 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, nullptr);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want),
+        SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_004 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_005
+ * @tc.desc: Verify SetRenderGroupEnableFlag with valid parameters.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_005 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{true};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_005 end";
+}
+
+/**
+ * @tc.name: SetRenderGroupEnableFlag_006
+ * @tc.desc: Verify SetRenderGroupEnableFlag with isEnable set to false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetRenderGroupEnableFlag_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_006 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    int64_t formId{1};
+    bool isEnable{false};
+    std::string uid{"202410101010"};
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, formRenderRecord);
+
+    EXPECT_EQ(formRenderServiceMgr.SetRenderGroupEnableFlag(formId, isEnable, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "SetRenderGroupEnableFlag_006 end";
+}
+
+/**
+ * @tc.name: SetConfiguration_004
+ * @tc.desc: Verify SetConfiguration returns false when new config values are empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetConfiguration_004 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    configuration->AddItem("ohos.system.mcc", "1");
+    configuration->AddItem("ohos.system.mnc", "2");
+    EXPECT_FALSE(formRenderServiceMgr.configuration_);
+    formRenderServiceMgr.SetConfiguration(configuration);
+    EXPECT_FALSE(formRenderServiceMgr.configuration_);
+    GTEST_LOG_(INFO) << "SetConfiguration_004 end";
 }

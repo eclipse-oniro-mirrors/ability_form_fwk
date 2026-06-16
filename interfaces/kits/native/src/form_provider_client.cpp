@@ -497,7 +497,9 @@ void FormProviderClient::HandleRemoteAcquire(const FormJsInfo &formJsInfo, const
     std::vector<std::shared_ptr<FormProviderCaller>> formProviderCallers;
     FormCallerMgr::GetInstance().GetFormProviderCaller(formJsInfo.formId, formProviderCallers);
     for (const auto &formProviderCaller : formProviderCallers) {
-        formProviderCaller->OnAcquire(formProviderInfo, want, token);
+        if (formProviderCaller != nullptr) {
+            formProviderCaller->OnAcquire(formProviderInfo, want, token);
+        }
     }
 }
 

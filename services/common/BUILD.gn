@@ -1,0 +1,96 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+config("form_common_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "include/queue",
+    "include/timer",
+    "include/util",
+    "//foundation/ability/form_fwk/interfaces/inner_api/include",
+  ]
+
+  cflags = [
+    "-fdata-sections",
+    "-ffunction-sections",
+  ]
+}
+
+################################### libform_common ########################################
+ohos_shared_library("libform_common") {
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,-z,relro",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+    "-Wl,--as-needed",
+    "-Wl,--sort-common",
+    "-Wl,--relax",
+    "-Wl,-z,now",
+    "-Wl,--icf=all",
+  ]
+
+  include_dirs = [
+    "include",
+    "include/queue",
+    "include/util",
+  ]
+
+  sources = [
+    "src/queue/form_base_serial_queue.cpp",
+    "src/queue/form_singleton_queue_base.cpp",
+    "src/util/form_status_print.cpp",
+    "src/util/form_time_util.cpp",
+  ]
+
+  public_configs = [ ":form_common_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ffrt:libffrt",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hicollie:libhicollie",
+    "ipc:ipc_core",
+    "time_service:time_client",
+    "ability_runtime:wantagent_innerkits",
+  ]
+
+  subsystem_name = "ability"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "form_fwk"
+}
+
+group("form_common_target") {
+  deps = [ ":libform_common" ]
+}

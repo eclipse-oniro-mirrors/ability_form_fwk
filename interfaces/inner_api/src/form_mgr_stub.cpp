@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -152,6 +152,12 @@ int FormMgrStub::OnRemoteRequestSecond(uint32_t code, MessageParcel &data, Messa
             return HandleBackgroundEvent(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM):
             return HandleRequestPublishForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER):
+            return HandleRequestPublishFormCrossUser(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK):
+            return HandleRegisterFormWantCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK):
+            return HandleUnregisterFormWantCallback(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM):
             return HandleShareForm(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE):
@@ -368,6 +374,36 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
             return HandleUnregisterTemplateFormDetailInfoChange(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO):
             return HandleUpdateTemplateFormDetailInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION):
+            return HandleGetFormIdsByFormLocation(data, reply);
+        default:
+            return OnRemoteRequestSeventh(code, data, reply, option);
+    }
+}
+
+/**
+ * @brief the seventh part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK):
+            return HandleRegisterUpdateFormsConfigCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_UPDATE_FORMS_CONFIG_CALLBACK):
+            return HandleUnregisterUpdateFormsConfigCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORMS_CONFIG):
+            return HandleUpdateFormsConfig(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK):
+            return HandleRegisterDeleteFormsCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK):
+            return HandleUnregisterDeleteFormsCallback(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORMS):
+            return HandleDeleteForms(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -522,6 +558,35 @@ int32_t FormMgrStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel &r
 }
 
 /**
+ * @brief handle RequestPublishFormCrossUser message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormMgrStub::HandleRequestPublishFormCrossUser(MessageParcel &data, MessageParcel &reply)
+{
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t userId;
+    if (!data.ReadInt32(userId)) {
+        HILOG_ERROR("get userId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int64_t formId = 0;
+    ErrCode result = RequestPublishFormCrossUser(*want, userId, formId);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        reply.WriteInt64(formId);
+    }
+    return result;
+}
+
+/**
  * @brief handle RequestPublishForm message.
  * @param data input param.
  * @param reply output param.
@@ -623,6 +688,7 @@ int32_t FormMgrStub::HandleRequestForm(MessageParcel &data, MessageParcel &reply
     reply.WriteInt32(result);
     return result;
 }
+
 /**
  * @brief handle NotifyVisibleForms message.
  * @param data input param.
@@ -1836,7 +1902,11 @@ ErrCode FormMgrStub::HandleRequestPublishFormWithSnapshot(MessageParcel &data, M
 
 ErrCode FormMgrStub::HandleBatchRefreshForms(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t formRefreshType = data.ReadInt32();
+    int32_t formRefreshType;
+    if (!data.ReadInt32(formRefreshType)) {
+        HILOG_ERROR("read formRefreshType failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = BatchRefreshForms(formRefreshType);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2283,7 +2353,7 @@ ErrCode FormMgrStub::HandleRegisterTemplateFormDetailInfoChange(MessageParcel &d
     }
     return ERR_OK;
 }
- 
+
 ErrCode FormMgrStub::HandleUnregisterTemplateFormDetailInfoChange(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
@@ -2305,7 +2375,7 @@ ErrCode FormMgrStub::HandleUpdateTemplateFormDetailInfo(MessageParcel &data, Mes
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     for (int32_t i = 0; i < size; i++) {
-        auto templateFormDetailInfo = data.ReadParcelable<TemplateFormDetailInfo>();
+        std::unique_ptr<TemplateFormDetailInfo> templateFormDetailInfo(data.ReadParcelable<TemplateFormDetailInfo>());
         if (templateFormDetailInfo == nullptr) {
             HILOG_ERROR("read templateFormDetailInfo failed at index %d.", i);
             return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2315,6 +2385,176 @@ ErrCode FormMgrStub::HandleUpdateTemplateFormDetailInfo(MessageParcel &data, Mes
     ErrCode result = UpdateTemplateFormDetailInfo(templateFormInfo);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write request result failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleGetFormIdsByFormLocation(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    std::vector<std::string> formIds;
+    int32_t formLocation = data.ReadInt32();
+    ErrCode result = GetFormIdsByFormLocation(formLocation, formIds);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result == ERR_OK) {
+        HILOG_INFO("result is ok");
+        if (!reply.WriteStringVector(formIds)) {
+            HILOG_ERROR("WriteStringVector<formIds> failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterUpdateFormsConfigCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("read callerToken failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterUpdateFormsConfigCallback(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write request result failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterUpdateFormsConfigCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    ErrCode result = UnregisterUpdateFormsConfigCallback();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write request result failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUpdateFormsConfig(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int32_t size = data.ReadInt32();
+    if (size <= 0 || size > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
+        HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
+        if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_COMMON_CODE)) {
+            HILOG_ERROR("write error code failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
+    std::vector<FormCustomConfig> configs;
+    configs.reserve(size);
+    for (int32_t i = 0; i < size; i++) {
+        std::unique_ptr<FormCustomConfig> config(data.ReadParcelable<FormCustomConfig>());
+        if (config == nullptr) {
+            HILOG_ERROR("read config failed at index %{public}d.", i);
+            if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
+                HILOG_ERROR("write error code failed");
+                return ERR_APPEXECFWK_PARCEL_ERROR;
+            }
+            return ERR_OK;
+        }
+        configs.push_back(*config);
+    }
+    ErrCode result = UpdateFormsConfig(configs);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed, result=%{public}d", result);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterDeleteFormsCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("read callerToken failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterDeleteFormsCallback(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write request result failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterDeleteFormsCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    ErrCode result = UnregisterDeleteFormsCallback();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write request result failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleDeleteForms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int32_t size = data.ReadInt32();
+    if (size <= 0 || size > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
+        HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::DELETE_FORMS_FILTER_MAX_NUM);
+        if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {
+            HILOG_ERROR("write error code failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
+    std::vector<FormRecordFilter> filters;
+    filters.reserve(size);
+    for (int32_t i = 0; i < size; i++) {
+        std::unique_ptr<FormRecordFilter> filter(data.ReadParcelable<FormRecordFilter>());
+        if (filter == nullptr) {
+            HILOG_ERROR("read filter failed at index %{public}d.", i);
+            if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
+                HILOG_ERROR("write error code failed");
+                return ERR_APPEXECFWK_PARCEL_ERROR;
+            }
+            return ERR_OK;
+        }
+        filters.push_back(*filter);
+    }
+    ErrCode result = DeleteForms(filters);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed, result=%{public}d", result);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterFormWantCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    auto callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("ReadRemoteObject failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterFormWantCallback(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterFormWantCallback(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    ErrCode result = UnregisterFormWantCallback();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

@@ -17,11 +17,9 @@
 #define OHOS_FORM_FWK_ETS_FORM_HOST_H
 
 #include "ani.h"
-#include "ani_common_want.h"
 #include "ani_form_common_util.h"
 #include "ani_form_error_util.h"
 #include "ani_form_util.h"
-#include "ani_helpers.h"
 #include "event_handler.h"
 #include "form_host_delegate_stub.h"
 #include "form_instance.h"
@@ -31,7 +29,6 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-using namespace OHOS::AbilityRuntime::FormAniHelpers;
 
 class FormRouterProxyCallbackClient : public std::enable_shared_from_this<FormRouterProxyCallbackClient> {
 public:
@@ -42,12 +39,12 @@ public:
 
     ~FormRouterProxyCallbackClient()
     {
-        ani_env *env = GetEnvFromVm(m_vm);
+        ani_env *env = FormAniUtil::GetEnvFromVm(m_vm);
         if (env == nullptr) {
             HILOG_ERROR("Env is null");
             return;
         }
-        env->Reference_Delete(m_callback);
+        env->GlobalReference_Delete(m_callback);
     }
 
     void ProcessFormRouterProxy(const Want &want)
@@ -65,14 +62,14 @@ public:
                 return;
             }
 
-            ani_env *env = GetEnvFromVm(sharedThis->m_vm);
+            ani_env *env = FormAniUtil::GetEnvFromVm(sharedThis->m_vm);
             if (env == nullptr) {
                 HILOG_ERROR("Env is null");
                 return;
             }
 
             ani_object aniWant = AppExecFwk::WrapWant(env, want);
-            auto res = InvokeCallback(env, static_cast<ani_object>(sharedThis->m_callback), aniWant);
+            auto res = FormAniUtil::InvokeCallback(env, static_cast<ani_object>(sharedThis->m_callback), aniWant);
             if (!res) {
                 HILOG_ERROR("Cannot call callback");
                 return;
@@ -109,10 +106,18 @@ public:
     void RegisterGetLiveFormStatusListener(ani_vm *ani_vm, ani_object callback);
 
     void UnregisterGetLiveFormStatusListener();
+
+    void RegisterTemplateFormDetailInfoChange(ani_vm* ani_vm, ani_object callback);
+
+    void UnregisterTemplateFormDetailInfoChange();
+
+    void RegisterFormWantCallbackListener(ani_vm *vm, ani_object callback);
+    void UnregisterFormWantCallbackListener();
+
     void RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds);
 
     void AddFormRouterProxyCallback(ani_env* env, ani_object callback,
-    const std::vector<int64_t> &formIds);
+        const std::vector<int64_t> &formIds);
 
     ErrCode RouterEvent(const int64_t formId, const OHOS::AAFwk::Want &want);
 private:
@@ -121,6 +126,7 @@ private:
     mutable std::mutex FormRouterProxyCallbackMutex_;
     std::map<int64_t, std::shared_ptr<FormRouterProxyCallbackClient>> formRouterProxyCallbackMap_;
     ani_ref overflowRegisterCallback_ = nullptr;
+    mutable std::mutex aniVmMutex_;
     ani_vm* ani_vm_ = nullptr;
     ani_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
     ani_ref getFormRectCallbackRef_ = nullptr;
@@ -137,16 +143,40 @@ private:
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     ani_env* GetAniEnv();
+    void SetAniVM(ani_vm* ani_vm);
     bool bindNativeMethod(ani_env* env, ani_class cls, LiveFormInterfaceParam *dataParam);
     void CallPromise(ani_env* env, ani_class cls, ani_object callbackObj, ani_object retObj,
         LiveFormInterfaceParam *params);
     static void GetFormRectPromiseCallback(ani_env *env, ani_object aniObj, ani_object obj);
     static bool ConvertFunctionResult(ani_env* env, ani_object retObj, Rect &item);
-    ErrCode TemplateFormDetailInfoChange(
-        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
     mutable std::mutex registerGetFormRectProxyMutex_;
+
+    mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
+    ani_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
+    ani_vm* templateFormDetailInfoChangeVM;
+    ani_env* GetTemplateFormDetailInfoChangeEnv();
+    void SetTemplateFormDetailInfoChangeVM(ani_vm* ani_vm);
+
+    ErrCode TemplateFormDetailInfoChange(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
+    void TemplateFormDetailInfoChangeInner(
+        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
+    void GetTemplateFormInfoArray(ani_env* env,
+        const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
+        ani_array &templateFormInfoArray);
+
+    ani_ref formWantCallbackRef_ = nullptr;
+    ani_vm *formWantCallbackVM_ = nullptr;
+    mutable std::mutex registerFormWantCallbackMutex_;
+    ErrCode RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
+    bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList);
+
+    ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

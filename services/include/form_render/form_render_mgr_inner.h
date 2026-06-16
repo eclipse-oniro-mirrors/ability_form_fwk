@@ -21,10 +21,12 @@
 #include <shared_mutex>
 #include <unordered_map>
 
+#include "want.h"
+
 #include "data_center/form_record/form_record.h"
 #include "form_render/form_render_connection.h"
+#include "form_render/form_res_sched.h"
 #include "form_render_interface.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -34,7 +36,7 @@ using WantParams = OHOS::AAFwk::WantParams;
  * @class FormRenderMgrInner
  * FormRenderMgrInner provides a facility for managing form render life cycle.
  */
-class FormRenderMgrInner {
+class FormRenderMgrInner : public std::enable_shared_from_this<FormRenderMgrInner> {
 public:
     FormRenderMgrInner();
     virtual ~FormRenderMgrInner();
@@ -101,8 +103,12 @@ public:
     void DisconnectAllRenderConnections();
 
     bool GetIsFRSDiedInLowMemory();
-    
+
+    void PostSetRenderGroupParamsTask(const int64_t formId, const Want &want);
+
 private:
+    bool RegisterRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject);
+
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection, int32_t level) const;
 
     void DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const;
@@ -111,7 +117,7 @@ private:
 
     void NotifyHostRenderServiceIsDead() const;
 
-    void FillBundleInfo(Want &want, const std::string &bundleName) const;
+    void FillBundleInfo(Want &want, const std::string &bundleName, const int32_t userId) const;
 
     void CheckIfFormRecycled(FormRecord &formRecord, Want& want) const;
 
@@ -140,6 +146,12 @@ private:
      */
     void RecoverFRSOnFormActivity();
 
+    void ExecOnUnlockTask(const sptr<IRemoteObject> &remoteObject);
+
+    void CollectConnectionsToDisconnect(
+        const std::unordered_set<int64_t> &formIdSet,
+        std::unordered_map<int64_t, sptr<FormRenderConnection>> &connections);
+
 private:
     class RemoteObjHash {
     public:
@@ -150,12 +162,18 @@ private:
     };
 
     mutable std::mutex resourceMutex_;
-    mutable std::shared_mutex renderRemoteObjMutex_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     // <hostToken, formIds>
     std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> etsHosts_;
+
+    mutable std::shared_mutex renderRemoteObjMutex_;
     sptr<IFormRender> renderRemoteObj_ = nullptr;
+    mutable std::mutex onUnlockTaskMutex_;
+    std::function<void(const sptr<IRemoteObject> &remoteObject)> onUnlockTask_ = nullptr;
+    mutable std::mutex formResSchedMutex_;
+    std::unique_ptr<FormResSched> formResSched_ = nullptr;
+    mutable std::mutex renderDeathRecipientMutex_;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
     // userId_ is Active User

@@ -137,7 +137,7 @@ void FormCallerMgr::GetFormProviderCaller(int64_t formId,
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
-        if (formProviderCaller->HasForm(formId)) {
+        if (formProviderCaller != nullptr && formProviderCaller->HasForm(formId)) {
             formProviderCallers.emplace_back(formProviderCaller);
         }
     }

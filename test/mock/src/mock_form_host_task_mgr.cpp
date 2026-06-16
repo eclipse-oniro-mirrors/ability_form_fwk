@@ -69,6 +69,9 @@ void FormHostTaskMgr::PostLockFormsTaskToHost(
     const std::vector<int64_t> &formIds, const bool lock, const sptr<IRemoteObject> &remoteObject)
 {
     GTEST_LOG_(INFO) << "PostLockFormsTaskToHost called";
+    if (AppExecFwk::MockFormHostTaskMgr::obj) {
+        return AppExecFwk::MockFormHostTaskMgr::obj->PostLockFormsTaskToHost(formIds, lock, remoteObject);
+    }
 }
 
 void FormHostTaskMgr::PostDueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,

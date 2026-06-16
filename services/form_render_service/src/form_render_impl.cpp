@@ -121,10 +121,10 @@ int32_t FormRenderImpl::RecoverForm(const FormJsInfo &formJsInfo, const Want &wa
     return FormRenderStatusMgr::GetInstance().PostFormEvent(formJsInfo.formId, FormFsmEvent::RECOVER_FORM, recoverForm);
 }
 
-int32_t FormRenderImpl::UpdateFormSize(
-    const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid)
+int32_t FormRenderImpl::UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+    const std::string &uid, const FormJsInfo &formJsInfo)
 {
-    return FormRenderServiceMgr::GetInstance().UpdateFormSize(formId, formSurfaceInfo, uid);
+    return FormRenderServiceMgr::GetInstance().UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo);
 }
 
 bool FormRenderImpl::CheckIsFoundationCall()
@@ -139,6 +139,11 @@ int32_t FormRenderImpl::CheckPermission()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return ERR_OK;
+}
+
+int32_t FormRenderImpl::SetRenderGroupParams(int64_t formId, const Want &want)
+{
+    return FormRenderServiceMgr::GetInstance().SetRenderGroupParams(formId, want);
 }
 }  // namespace FormRender
 }  // namespace AppExecFwk

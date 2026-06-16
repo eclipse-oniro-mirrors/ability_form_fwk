@@ -19,6 +19,7 @@
 #include "form_constants.h"
 #include "form_js_info.h"
 #include "form_mgr_errors.h"
+#include "form_surface_info.h"
 #define private public
 #include "form_render_impl.h"
 #undef private
@@ -1081,4 +1082,114 @@ HWTEST_F(FormRenderImplTest, RunCachedConfigurationUpdatedTest_001, TestSize.Lev
     formRenderImpl.RunCachedConfigurationUpdated();
     EXPECT_FALSE(formRenderImpl.hasCachedConfig_);
     GTEST_LOG_(INFO) << "RunCachedConfigurationUpdatedTest_001 end";
+}
+
+/**
+* @tc.name: FormRenderImplTest_049
+* @tc.desc: 1.Verify SetRenderGroupEnableFlag interface executes as expected.
+*           2.call SetRenderGroupEnableFlag
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_049, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_049 start";
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    bool isEnable = true;
+    Want want;
+    EXPECT_EQ(formRenderImpl.SetRenderGroupEnableFlag(formId, isEnable, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_049 end";
+}
+
+/**
+* @tc.name: FormRenderImplTest_050
+* @tc.desc: 1.Verify SetRenderGroupEnableFlag interface executes as expected.
+*           2.call SetRenderGroupEnableFlag with false
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_050, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_050 start";
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 0 };
+    bool isEnable = false;
+    Want want;
+    EXPECT_EQ(formRenderImpl.SetRenderGroupEnableFlag(formId, isEnable, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_050 end";
+}
+
+/**
+* @tc.name: FormRenderImplTest_051
+* @tc.desc: 1.Verify UpdateFormSize interface executes as expected.
+*           2.call UpdateFormSize
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_051, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_051 start";
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 100.0f;
+    formSurfaceInfo.height = 200.0f;
+    std::string uid{ "202410101010" };
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    EXPECT_EQ(formRenderImpl.UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_051 end";
+}
+
+/**
+* @tc.name: FormRenderImplTest_052
+* @tc.desc: 1.Verify UpdateFormSize interface executes as expected.
+*           2.call UpdateFormSize with zero values
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_052, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_052 start";
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 0 };
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 0.0f;
+    formSurfaceInfo.height = 0.0f;
+    std::string uid{ "" };
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    EXPECT_EQ(formRenderImpl.UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_052 end";
+}
+
+/**
+* @tc.name: FormRenderImplTest_053
+* @tc.desc: 1.Verify SetRenderGroupParams interface executes as expected.
+*           2.call SetRenderGroupParams
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_053, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_053 start";
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    Want want;
+    const std::string val = "testValue";
+    want.SetParam("testKey", val);
+    EXPECT_EQ(formRenderImpl.SetRenderGroupParams(formId, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_053 end";
+}
+
+/**
+* @tc.name: FormRenderImplTest_054
+* @tc.desc: 1.Verify SetRenderGroupParams interface executes as expected.
+*           2.call SetRenderGroupParams with empty want
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_054, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_054 start";
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 0 };
+    Want want;
+    EXPECT_EQ(formRenderImpl.SetRenderGroupParams(formId, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_054 end";
 }

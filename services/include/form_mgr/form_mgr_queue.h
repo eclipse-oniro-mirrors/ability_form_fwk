@@ -15,26 +15,27 @@
 
 #ifndef OHOS_FORM_FWK_FORM_MGR_QUEUE_H
 #define OHOS_FORM_FWK_FORM_MGR_QUEUE_H
- 
+
+#include <functional>
 #include <singleton.h>
-#include "common/util/form_serial_queue.h"
 #include "common/util/form_task_common.h"
+#include "queue/form_singleton_queue_base.h"
+#include "queue/task_wrapper_strategy.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-class FormMgrQueue final : public DelayedRefSingleton<FormMgrQueue> {
-    DECLARE_DELAYED_REF_SINGLETON(FormMgrQueue)
- 
+namespace {
+constexpr int32_t QUEUE_TASK_TIME_OUT = 5;
+}
+
+class FormMgrQueue final : public DelayedRefSingleton<FormMgrQueue>, public Common::FormSingletonQueueBase {
 public:
     DISALLOW_COPY_AND_MOVE(FormMgrQueue);
 
-    bool ScheduleTask(uint64_t ms, std::function<void()> func);
-    void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
-    void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
- 
-private:
-    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
+    FormMgrQueue(): Common::FormSingletonQueueBase("FormMgrQueue",
+        std::make_shared<Common::XCollieTimeoutStrategy>(QUEUE_TASK_TIME_OUT, "FMS_QueueTask")) {}
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
+
+} // namespace AppExecFwk
+} // namespace OHOS
 #endif // OHOS_FORM_FWK_FORM_MGR_QUEUE_H

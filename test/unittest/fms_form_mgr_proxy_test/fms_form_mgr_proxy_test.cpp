@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -95,7 +95,7 @@ int SendRequestReplaceFormInfo(uint32_t code, MessageParcel &data, MessageParcel
  * @tc.desc: test AddForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AddFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AddFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AddFormTest_0100, TestSize.Level1";
@@ -115,7 +115,7 @@ HWTEST_F(FmsFormMgrProxyTest, AddFormTest_0100, Function | MediumTest | Level1)
  * @tc.desc: test AddForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AddFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AddFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AddFormTest_0100, TestSize.Level1";
@@ -136,7 +136,7 @@ HWTEST_F(FmsFormMgrProxyTest, AddFormTest_0200, Function | MediumTest | Level1)
  * @tc.desc: test DeleteForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DeleteFormTest_0100, TestSize.Level1";
@@ -154,7 +154,7 @@ HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0100, Function | MediumTest | Level
  * @tc.desc: test DeleteForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DeleteFormTest_0200, TestSize.Level1";
@@ -174,7 +174,7 @@ HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0200, Function | MediumTest | Level
  * @tc.desc: test DeleteForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DeleteFormTest_0300, TestSize.Level1";
@@ -193,7 +193,7 @@ HWTEST_F(FmsFormMgrProxyTest, DeleteFormTest_0300, Function | MediumTest | Level
  * @tc.desc: test ReleaseForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ReleaseFormTest_0100, TestSize.Level1";
@@ -211,7 +211,7 @@ HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0100, Function | MediumTest | Leve
  * @tc.desc: test ReleaseForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ReleaseFormTest_0200, TestSize.Level1";
@@ -231,7 +231,7 @@ HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0200, Function | MediumTest | Leve
  * @tc.desc: test ReleaseForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ReleaseFormTest_0300, TestSize.Level1";
@@ -250,7 +250,7 @@ HWTEST_F(FmsFormMgrProxyTest, ReleaseFormTest_0300, Function | MediumTest | Leve
  * @tc.desc: test UpdateForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, UpdateFormTest_0100, TestSize.Level1";
@@ -269,7 +269,7 @@ HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0100, Function | MediumTest | Level
  * @tc.desc: test UpdateForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, UpdateFormTest_0200, TestSize.Level1";
@@ -290,7 +290,7 @@ HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0200, Function | MediumTest | Level
  * @tc.desc: test UpdateForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, UpdateFormTest_0300, TestSize.Level1";
@@ -310,7 +310,7 @@ HWTEST_F(FmsFormMgrProxyTest, UpdateFormTest_0300, Function | MediumTest | Level
  * @tc.desc: test SetNextRefreshTime function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, SetNextRefreshTimeTest_0100, TestSize.Level1";
@@ -328,7 +328,7 @@ HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0100, Function | MediumTest
  * @tc.desc: test SetNextRefreshTime function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, SetNextRefreshTimeTest_0200, TestSize.Level1";
@@ -348,7 +348,7 @@ HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0200, Function | MediumTest
  * @tc.desc: test SetNextRefreshTime function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, SetNextRefreshTimeTest_0300, TestSize.Level1";
@@ -367,7 +367,7 @@ HWTEST_F(FmsFormMgrProxyTest, SetNextRefreshTimeTest_0300, Function | MediumTest
  * @tc.desc: test LifecycleUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, LifecycleUpdateTest_0100, TestSize.Level1";
@@ -386,7 +386,7 @@ HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0100, Function | MediumTest | 
  * @tc.desc: test LifecycleUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, LifecycleUpdateTest_0200, TestSize.Level1";
@@ -407,7 +407,7 @@ HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0200, Function | MediumTest | 
  * @tc.desc: test LifecycleUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, LifecycleUpdateTest_0300, TestSize.Level1";
@@ -427,7 +427,7 @@ HWTEST_F(FmsFormMgrProxyTest, LifecycleUpdateTest_0300, Function | MediumTest | 
  * @tc.desc: test RequestForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestFormTest_0100, TestSize.Level1";
@@ -446,7 +446,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0100, Function | MediumTest | Leve
  * @tc.desc: test RequestForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestFormTest_0200, TestSize.Level1";
@@ -467,7 +467,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0200, Function | MediumTest | Leve
  * @tc.desc: test RequestForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestFormTest_0300, TestSize.Level1";
@@ -487,7 +487,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestFormTest_0300, Function | MediumTest | Leve
  * @tc.desc: test NotifyWhetherVisibleForms function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0100, TestSize.Level1";
@@ -506,7 +506,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0100, Function | Med
  * @tc.desc: test NotifyWhetherVisibleForms function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0200, TestSize.Level1";
@@ -527,7 +527,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0200, Function | Med
  * @tc.desc: test NotifyWhetherVisibleForms function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0300, TestSize.Level1";
@@ -547,7 +547,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyWhetherVisibleFormsTest_0300, Function | Med
  * @tc.desc: test CastTempForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, CastTempFormTest_0100, TestSize.Level1";
@@ -565,7 +565,7 @@ HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0100, Function | MediumTest | Lev
  * @tc.desc: test CastTempForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, CastTempFormTest_0200, TestSize.Level1";
@@ -585,7 +585,7 @@ HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0200, Function | MediumTest | Lev
  * @tc.desc: test CastTempForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, CastTempFormTest_0300, TestSize.Level1";
@@ -604,7 +604,7 @@ HWTEST_F(FmsFormMgrProxyTest, CastTempFormTest_0300, Function | MediumTest | Lev
  * @tc.desc: test MessageEvent function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, MessageEventTest_0100, TestSize.Level1";
@@ -623,7 +623,7 @@ HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0100, Function | MediumTest | Lev
  * @tc.desc: test MessageEvent function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, MessageEventTest_0200, TestSize.Level1";
@@ -644,7 +644,7 @@ HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0200, Function | MediumTest | Lev
  * @tc.desc: test MessageEvent function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, MessageEventTest_0300, TestSize.Level1";
@@ -664,7 +664,7 @@ HWTEST_F(FmsFormMgrProxyTest, MessageEventTest_0300, Function | MediumTest | Lev
  * @tc.desc: test RouterEvent function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RouterEventTest_0100, TestSize.Level1";
@@ -683,7 +683,7 @@ HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0100, Function | MediumTest | Leve
  * @tc.desc: test RouterEvent function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RouterEventTest_0200, TestSize.Level1";
@@ -704,7 +704,7 @@ HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0200, Function | MediumTest | Leve
  * @tc.desc: test RouterEvent function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RouterEventTest_0300, TestSize.Level1";
@@ -724,7 +724,7 @@ HWTEST_F(FmsFormMgrProxyTest, RouterEventTest_0300, Function | MediumTest | Leve
  * @tc.desc: test DeleteInvalidForms function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DeleteInvalidFormsTest_0100, TestSize.Level1";
@@ -744,7 +744,7 @@ HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0100, Function | MediumTest
  * @tc.desc: test DeleteInvalidForms function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DeleteInvalidFormsTest_0200, TestSize.Level1";
@@ -766,7 +766,7 @@ HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0200, Function | MediumTest
  * @tc.desc: test DeleteInvalidForms function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DeleteInvalidFormsTest_0300, TestSize.Level1";
@@ -787,7 +787,7 @@ HWTEST_F(FmsFormMgrProxyTest, DeleteInvalidFormsTest_0300, Function | MediumTest
  * @tc.desc: test AcquireFormState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AcquireFormStateTest_0100, TestSize.Level1";
@@ -807,7 +807,7 @@ HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0100, Function | MediumTest |
  * @tc.desc: test AcquireFormState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AcquireFormStateTest_0200, TestSize.Level1";
@@ -829,7 +829,7 @@ HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0200, Function | MediumTest |
  * @tc.desc: test AcquireFormState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AcquireFormStateTest_0300, TestSize.Level1";
@@ -850,7 +850,7 @@ HWTEST_F(FmsFormMgrProxyTest, AcquireFormStateTest_0300, Function | MediumTest |
  * @tc.desc: test NotifyFormsVisible function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsVisibleTest_0100, TestSize.Level1";
@@ -869,7 +869,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0100, Function | MediumTest
  * @tc.desc: test NotifyFormsVisible function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsVisibleTest_0200, TestSize.Level1";
@@ -890,7 +890,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0200, Function | MediumTest
  * @tc.desc: test NotifyFormsVisible function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsVisibleTest_0300, TestSize.Level1";
@@ -910,7 +910,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsVisibleTest_0300, Function | MediumTest
  * @tc.desc: test NotifyFormsPrivacyProtected function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0100, TestSize.Level1";
@@ -929,7 +929,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0100, Function | M
  * @tc.desc: test NotifyFormsPrivacyProtected function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0200, TestSize.Level1";
@@ -950,7 +950,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0200, Function | M
  * @tc.desc: test NotifyFormsPrivacyProtected function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0300, TestSize.Level1";
@@ -970,7 +970,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsPrivacyProtectedTest_0300, Function | M
  * @tc.desc: test NotifyFormsEnableUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0100, TestSize.Level1";
@@ -989,7 +989,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0100, Function | Mediu
  * @tc.desc: test NotifyFormsEnableUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0200, TestSize.Level1";
@@ -1010,7 +1010,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0200, Function | Mediu
  * @tc.desc: test NotifyFormsEnableUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0300, TestSize.Level1";
@@ -1030,7 +1030,7 @@ HWTEST_F(FmsFormMgrProxyTest, NotifyFormsEnableUpdateTest_0300, Function | Mediu
  * @tc.desc: test GetAllFormsInfo function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetAllFormsInfoTest_0100, TestSize.Level1";
@@ -1049,7 +1049,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0100, Function | MediumTest | 
  * @tc.desc: test GetAllFormsInfo function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetAllFormsInfoTest_0200, TestSize.Level1";
@@ -1071,7 +1071,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0200, Function | MediumTest | 
  * @tc.desc: test GetAllFormsInfo function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetAllFormsInfoTest_0300, TestSize.Level1";
@@ -1091,7 +1091,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetAllFormsInfoTest_0300, Function | MediumTest | 
  * @tc.desc: test GetFormsInfoByApp function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoByAppTest_0100, TestSize.Level1";
@@ -1111,7 +1111,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0100, Function | MediumTest 
  * @tc.desc: test GetFormsInfoByApp function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoByAppTest_0200, TestSize.Level1";
@@ -1134,7 +1134,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0200, Function | MediumTest 
  * @tc.desc: test GetFormsInfoByApp function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoByAppTest_0300, TestSize.Level1";
@@ -1155,7 +1155,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByAppTest_0300, Function | MediumTest 
  * @tc.desc: test GetFormsInfoByModule function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0100, TestSize.Level1";
@@ -1176,7 +1176,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0100, Function | MediumTe
  * @tc.desc: test GetFormsInfoByModule function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0200, TestSize.Level1";
@@ -1200,7 +1200,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0200, Function | MediumTe
  * @tc.desc: test GetFormsInfoByModule function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0300, TestSize.Level1";
@@ -1222,7 +1222,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByModuleTest_0300, Function | MediumTe
  * @tc.desc: test GetFormsInfo function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoTest_0100, TestSize.Level1";
@@ -1242,7 +1242,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0100, Function | MediumTest | Lev
  * @tc.desc: test GetFormsInfo function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoTest_0200, TestSize.Level1";
@@ -1265,7 +1265,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0200, Function | MediumTest | Lev
  * @tc.desc: test GetFormsInfo function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoTest_0300, TestSize.Level1";
@@ -1286,7 +1286,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoTest_0300, Function | MediumTest | Lev
  * @tc.desc: test IsRequestPublishFormSupported function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0100, TestSize.Level1";
@@ -1304,7 +1304,7 @@ HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0100, Function |
  * @tc.desc: test IsRequestPublishFormSupported function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0200, TestSize.Level1";
@@ -1324,7 +1324,7 @@ HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0200, Function |
  * @tc.desc: test IsRequestPublishFormSupported function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0300, TestSize.Level1";
@@ -1343,7 +1343,7 @@ HWTEST_F(FmsFormMgrProxyTest, IsRequestPublishFormSupportedTest_0300, Function |
  * @tc.desc: test StartAbility function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, StartAbilityTest_0100, TestSize.Level1";
@@ -1362,7 +1362,7 @@ HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0100, Function | MediumTest | Lev
  * @tc.desc: test StartAbility function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, StartAbilityTest_0200, TestSize.Level1";
@@ -1383,7 +1383,7 @@ HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0200, Function | MediumTest | Lev
  * @tc.desc: test StartAbility function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, StartAbilityTest_0300, TestSize.Level1";
@@ -1403,7 +1403,7 @@ HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0300, Function | MediumTest | Lev
  * @tc.desc: test ShareForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ShareFormTest_0100, TestSize.Level1";
@@ -1422,7 +1422,7 @@ HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0100, Function | MediumTest | Level1
  * @tc.desc: test ShareForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ShareFormTest_0200, TestSize.Level1";
@@ -1443,7 +1443,7 @@ HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0200, Function | MediumTest | Level1
  * @tc.desc: test ShareForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ShareFormTest_0300, TestSize.Level1";
@@ -1463,7 +1463,7 @@ HWTEST_F(FmsFormMgrProxyTest, ShareFormTest_0300, Function | MediumTest | Level1
  * @tc.desc: test RecvFormShareInfoFromRemote function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0100, TestSize.Level1";
@@ -1482,7 +1482,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0100, Function | M
  * @tc.desc: test RecvFormShareInfoFromRemote function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0200, TestSize.Level1";
@@ -1503,7 +1503,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0200, Function | M
  * @tc.desc: test RecvFormShareInfoFromRemote function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0300, TestSize.Level1";
@@ -1523,7 +1523,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecvFormShareInfoFromRemoteTest_0300, Function | M
  * @tc.desc: test RequestPublishForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormTest_0100, TestSize.Level1";
@@ -1545,7 +1545,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0100, Function | MediumTest
  * @tc.desc: test RequestPublishForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormTest_0200, TestSize.Level1";
@@ -1569,7 +1569,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0200, Function | MediumTest
  * @tc.desc: test RequestPublishForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormTest_0300, TestSize.Level1";
@@ -1592,7 +1592,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0300, Function | MediumTest
  * @tc.desc: test SendTransactCmd function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, SendTransactCmdTest_0100, TestSize.Level1";
@@ -1615,7 +1615,7 @@ HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0100, Function | MediumTest | 
  * @tc.desc: test SendTransactCmd function and return ERR_OK
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, SendTransactCmdTest_0200, TestSize.Level1";
@@ -1639,7 +1639,7 @@ HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0200, Function | MediumTest | 
  * @tc.desc: test GetStringInfo function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetStringInfoTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetStringInfoTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetStringInfoTest_0100, TestSize.Level1";
@@ -1661,7 +1661,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetStringInfoTest_0100, Function | MediumTest | Le
  * @tc.desc: test GetStringInfo function and return ERR_APPEXECFWK_FORM_COMMON_CODE
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetStringInfoTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetStringInfoTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetStringInfoTest_0200, TestSize.Level1";
@@ -1684,7 +1684,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetStringInfoTest_0200, Function | MediumTest | Le
  * @tc.desc: test DumpStorageFormInfos function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpStorageFormInfosTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpStorageFormInfosTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpStorageFormInfosTest_0100, TestSize.Level1";
@@ -1703,7 +1703,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpStorageFormInfosTest_0100, Function | MediumTe
  * @tc.desc: test DumpStorageFormInfos function and return ERR_APPEXECFWK_FORM_COMMON_CODE
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpStorageFormInfosTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpStorageFormInfosTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpStorageFormInfosTest_0200, TestSize.Level1";
@@ -1724,7 +1724,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpStorageFormInfosTest_0200, Function | MediumTe
  * @tc.desc: test DumpFormInfoByBundleName function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0100, TestSize.Level1";
@@ -1744,7 +1744,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0100, Function | Medi
  * @tc.desc: test DumpFormInfoByBundleName function and return ERR_APPEXECFWK_FORM_COMMON_CODE
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0200, TestSize.Level1";
@@ -1766,7 +1766,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByBundleNameTest_0200, Function | Medi
  * @tc.desc: test DumpFormInfoByFormId function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0100, TestSize.Level1";
@@ -1786,7 +1786,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0100, Function | MediumTe
  * @tc.desc: test DumpFormInfoByFormId function and return ERR_APPEXECFWK_FORM_COMMON_CODE
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0200, TestSize.Level1";
@@ -1808,7 +1808,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpFormInfoByFormIdTest_0200, Function | MediumTe
  * @tc.desc: test DumpFormTimerByFormId function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0100, TestSize.Level1";
@@ -1828,7 +1828,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0100, Function | MediumT
  * @tc.desc: test DumpFormTimerByFormId function and return ERR_APPEXECFWK_FORM_COMMON_CODE
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0200, TestSize.Level1";
@@ -1850,7 +1850,7 @@ HWTEST_F(FmsFormMgrProxyTest, DumpFormTimerByFormIdTest_0200, Function | MediumT
  * @tc.desc: test BackgroundEvent function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, BackgroundEventTest_0100, TestSize.Level1";
@@ -1870,7 +1870,7 @@ HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0100, Function | MediumTest | 
  * @tc.desc: test BackgroundEvent function and return ERR_OK
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, BackgroundEventTest_0200, TestSize.Level1";
@@ -1892,7 +1892,7 @@ HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0200, Function | MediumTest | 
  * @tc.desc: test BackgroundEvent function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, BackgroundEventTest_0300, TestSize.Level1";
@@ -1913,7 +1913,7 @@ HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0300, Function | MediumTest | 
  * @tc.desc: test GetFormsCount function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsCountTest_0100, TestSize.Level1";
@@ -1932,7 +1932,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0100, Function | MediumTest | Le
  * @tc.desc: test GetFormsCount function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsCountTest_0200, TestSize.Level1";
@@ -1953,7 +1953,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0200, Function | MediumTest | Le
  * @tc.desc: test GetFormsCount function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsCountTest_0300, TestSize.Level1";
@@ -1973,7 +1973,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0300, Function | MediumTest | Le
  * @tc.desc: test GetHostFormsCount function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetHostFormsCount_0100, TestSize.Level1";
@@ -1993,7 +1993,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0100, Function | MediumTest | Le
  * @tc.desc: test GetHostFormsCount function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetHostFormsCount_0200, TestSize.Level1";
@@ -2015,7 +2015,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0200, Function | MediumTest | Le
  * @tc.desc: test GetHostFormsCount function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetHostFormsCount_0300, TestSize.Level1";
@@ -2037,7 +2037,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0300, Function | MediumTest | Le
  * @tc.desc: test AcquireFormData function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AcquireFormDataTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AcquireFormDataTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AcquireFormDataTest_0100, TestSize.Level1";
@@ -2057,7 +2057,7 @@ HWTEST_F(FmsFormMgrProxyTest, AcquireFormDataTest_0100, Function | MediumTest | 
  * @tc.desc: test AcquireFormData function and return ERR_OK
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AcquireFormData_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AcquireFormData_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AcquireFormData_0200, TestSize.Level1";
@@ -2079,7 +2079,7 @@ HWTEST_F(FmsFormMgrProxyTest, AcquireFormData_0200, Function | MediumTest | Leve
  * @tc.desc: test AcquireFormData function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, AcquireFormData_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, AcquireFormData_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, AcquireFormData_0300, TestSize.Level1";
@@ -2100,7 +2100,7 @@ HWTEST_F(FmsFormMgrProxyTest, AcquireFormData_0300, Function | MediumTest | Leve
  * @tc.desc: test GetFormInstancesByFilter function and return ERR_OK
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstancesByFilter_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2119,7 +2119,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0100, Function | MediumTe
  * @tc.desc: test GetFormInstancesByFilter function and return ERR_APPEXECFWK_PARCEL_ERROR
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstancesByFilter_0200, TestSize.Level1";
     MockWriteInterfaceToken(false);
@@ -2138,7 +2138,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0200, Function | MediumTe
  * @tc.desc: test GetFormInstancesByFilter function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstancesByFilter_0300, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2157,7 +2157,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0300, Function | MediumTe
  * @tc.desc: test GetFormInstancesById function and return ERR_APPEXECFWK_PARCEL_ERROR
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesById_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesById_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstancesById_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2175,7 +2175,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesById_0100, Function | MediumTest |
  * @tc.desc: test GetFormInstancesById function and return ERR_APPEXECFWK_PARCEL_ERROR
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesById_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesById_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstancesById_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2192,7 +2192,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesById_0200, Function | MediumTest |
  * @tc.desc: test GetFormInstance function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstance_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2212,7 +2212,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0100, Function | MediumTest | Leve
  * @tc.desc: test GetFormInstance function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstance_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2232,7 +2232,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0200, Function | MediumTest | Leve
  * @tc.desc: test GetFormsInfoByFilter function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByFilterTest_0201, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByFilterTest_0201, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormsInfoByFilterTest_0201, TestSize.Level1";
@@ -2255,7 +2255,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByFilterTest_0201, Function | MediumTe
  * @tc.desc: test StopRenderingForm function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, StopRenderingForm_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, StopRenderingForm_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, StopRenderingForm_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2276,7 +2276,7 @@ HWTEST_F(FmsFormMgrProxyTest, StopRenderingForm_0100, Function | MediumTest | Le
  * @tc.desc: test ReleaseRenderer function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ReleaseRenderer_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ReleaseRenderer_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, ReleaseRenderer_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2297,7 +2297,7 @@ HWTEST_F(FmsFormMgrProxyTest, ReleaseRenderer_0100, Function | MediumTest | Leve
  * @tc.desc: test CheckFMSReady function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, CheckFMSReady_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, CheckFMSReady_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, CheckFMSReady_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2317,7 +2317,7 @@ HWTEST_F(FmsFormMgrProxyTest, CheckFMSReady_0100, Function | MediumTest | Level1
  * @tc.desc: test SetBackgroundFunction function and return ERR_APPEXECFWK_FORM_SEND_FMS_MSG
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SetBackgroundFunction_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SetBackgroundFunction_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, SetBackgroundFunction_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2339,7 +2339,7 @@ HWTEST_F(FmsFormMgrProxyTest, SetBackgroundFunction_0100, Function | MediumTest 
  * @tc.desc: test UpdateProxyForm function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UpdateProxyForm_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UpdateProxyForm_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UpdateProxyForm_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2363,7 +2363,7 @@ HWTEST_F(FmsFormMgrProxyTest, UpdateProxyForm_0100, Function | MediumTest | Leve
  * @tc.desc: test UpdateProxyForm function and return ERR_OK.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UpdateProxyForm_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UpdateProxyForm_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UpdateProxyForm_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2388,7 +2388,7 @@ HWTEST_F(FmsFormMgrProxyTest, UpdateProxyForm_0200, Function | MediumTest | Leve
  * @tc.desc: test RequestPublishProxyForm function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishProxyForm_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishProxyForm_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RequestPublishProxyForm_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2415,7 +2415,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishProxyForm_0100, Function | MediumTes
  * @tc.desc: test RequestPublishProxyForm function and return ERR_OK.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishProxyForm_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishProxyForm_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RequestPublishProxyForm_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2443,7 +2443,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishProxyForm_0200, Function | MediumTes
  * @tc.desc: test RegisterPublishFormInterceptor function and return ERR_OK.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2463,7 +2463,7 @@ HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0100, Function | Me
  * @tc.desc: test RegisterPublishFormInterceptor function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2484,7 +2484,7 @@ HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0200, Function | Me
  * @tc.desc: test UnregisterPublishFormInterceptor function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2504,7 +2504,7 @@ HWTEST_F(FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0100, Function | 
  * @tc.desc: test UnregisterPublishFormInterceptor function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2525,7 +2525,7 @@ HWTEST_F(FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0200, Function | 
  * @tc.desc: test RegisterClickEventObserver function and return ERR_OK.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RegisterClickEventObserver_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RegisterClickEventObserver_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RegisterClickEventObserver_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2548,7 +2548,7 @@ HWTEST_F(FmsFormMgrProxyTest, RegisterClickEventObserver_0100, Function | Medium
  * @tc.desc: test RegisterClickEventObserver function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RegisterClickEventObserver_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RegisterClickEventObserver_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RegisterClickEventObserver_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2572,7 +2572,7 @@ HWTEST_F(FmsFormMgrProxyTest, RegisterClickEventObserver_0200, Function | Medium
  * @tc.desc: test UnregisterClickEventObserver function and return ERR_OK.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UnregisterClickEventObserver_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UnregisterClickEventObserver_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UnregisterClickEventObserver_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2595,7 +2595,7 @@ HWTEST_F(FmsFormMgrProxyTest, UnregisterClickEventObserver_0100, Function | Medi
  * @tc.desc: test UnregisterClickEventObserver function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, UnregisterClickEventObserver_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, UnregisterClickEventObserver_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UnregisterClickEventObserver_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2619,7 +2619,7 @@ HWTEST_F(FmsFormMgrProxyTest, UnregisterClickEventObserver_0200, Function | Medi
  * @tc.desc: test SetFormsRecyclable function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, SetFormsRecyclable_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2641,7 +2641,7 @@ HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0100, Function | MediumTest | L
  * @tc.desc: test SetFormsRecyclable function and return ERR_OK.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, SetFormsRecyclable_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2662,7 +2662,7 @@ HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0200, Function | MediumTest | L
  * @tc.desc: test RecycleForms function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecycleForms_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecycleForms_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RecycleForms_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2685,7 +2685,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecycleForms_0100, Function | MediumTest | Level1)
  * @tc.desc: test RecycleForms function and return ERR_OK.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecycleForms_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecycleForms_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RecycleForms_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2707,7 +2707,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecycleForms_0200, Function | MediumTest | Level1)
  * @tc.desc: test RecoverForms function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RecoverForms_0100, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2730,7 +2730,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0100, Function | MediumTest | Level1)
  * @tc.desc: test RecoverForms function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RecoverForms_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
@@ -2752,7 +2752,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0200, Function | MediumTest | Level1)
  * @tc.desc: test RecoverForms function and return ERR.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0201, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0201, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormWithSnapshot_0201, TestSize.Level1";
@@ -2774,7 +2774,7 @@ HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0201, Function | MediumTest | Level1)
  * @tc.desc: test RequestPublishFormWithSnapshot function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0100, TestSize.Level1";
@@ -2796,7 +2796,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0100, Function 
  * @tc.desc: test RequestPublishFormWithSnapshot function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0200, TestSize.Level1";
@@ -2820,7 +2820,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0200, Function 
  * @tc.desc: test RequestPublishFormWithSnapshot function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0300, TestSize.Level1";
@@ -2843,7 +2843,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormWithSnapshotTest_0300, Function 
  * @tc.desc: test RequestOverflow function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestOverflowTest_0100, TestSize.Level1";
@@ -2864,7 +2864,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0100, Function | MediumTest | 
  * @tc.desc: test RequestOverflow function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestOverflowTest_0200, TestSize.Level1";
@@ -2887,7 +2887,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0200, Function | MediumTest | 
  * @tc.desc: test RequestOverflow function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestOverflowTest_0300, TestSize.Level1";
@@ -2909,7 +2909,7 @@ HWTEST_F(FmsFormMgrProxyTest, RequestOverflowTest_0300, Function | MediumTest | 
  * @tc.desc: test ChangeSceneAnimationState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0100, TestSize.Level1";
@@ -2929,7 +2929,7 @@ HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0100, Function | Med
  * @tc.desc: test ChangeSceneAnimationState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0200, TestSize.Level1";
@@ -2951,7 +2951,7 @@ HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0200, Function | Med
  * @tc.desc: test ChangeSceneAnimationState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0300, TestSize.Level1";
@@ -2972,7 +2972,7 @@ HWTEST_F(FmsFormMgrProxyTest, ChangeSceneAnimationStateTest_0300, Function | Med
  * @tc.desc: test GetFormRect function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormRectTest_0100, TestSize.Level1";
@@ -2992,7 +2992,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0100, Function | MediumTest | Leve
  * @tc.desc: test GetFormRect function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormRectTest_0200, TestSize.Level1";
@@ -3014,7 +3014,7 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0200, Function | MediumTest | Leve
  * @tc.desc: test GetFormRect function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, GetFormRectTest_0300, TestSize.Level1";
@@ -3028,5 +3028,89 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormRectTest_0300, Function | MediumTest | Leve
     Rect rect;
     int32_t result = proxy->GetFormRect(formId, rect);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_RegisterFormWantCallback_001
+ * @tc.desc: test RegisterFormWantCallback function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_RegisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_001 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) -> int {
+            reply.WriteInt32(ERR_OK);
+            return NO_ERROR;
+        }), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->RegisterFormWantCallback(iremoteObject);
+    EXPECT_EQ(ERR_OK, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_RegisterFormWantCallback_002
+ * @tc.desc: test RegisterFormWantCallback with send request failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_RegisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_002 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(Return(-1));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->RegisterFormWantCallback(iremoteObject);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterFormWantCallback_002 end";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_UnregisterFormWantCallback_001
+ * @tc.desc: test UnregisterFormWantCallback function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_UnregisterFormWantCallback_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_001 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) -> int {
+            reply.WriteInt32(ERR_OK);
+            return NO_ERROR;
+        }), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->UnregisterFormWantCallback();
+    EXPECT_EQ(ERR_OK, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_001 end";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_UnregisterFormWantCallback_002
+ * @tc.desc: test UnregisterFormWantCallback with send request failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_UnregisterFormWantCallback_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_002 start";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(Return(-1));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t result = proxy->UnregisterFormWantCallback();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterFormWantCallback_002 end";
 }
 }

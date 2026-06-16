@@ -98,8 +98,9 @@ public:
      * @brief Post connect FRS failed task to form host when FormRenderService is died.
      * @param formId The Id of the form.
      * @param errorCode Indicates error-code of the form.
+     * @param delayTime Milliseconds to delay posting an event.
      */
-    void PostConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode);
+    void PostConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode, uint32_t delayTime);
 
     /**
      * @brief Handle form host died(task).

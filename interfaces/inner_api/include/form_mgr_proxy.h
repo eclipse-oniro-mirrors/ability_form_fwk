@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -115,6 +115,16 @@ public:
      */
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
                                std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override;
+
+    /**
+     * @brief Request to publish a form to the form host with specific userId.
+     *
+     * @param want The want of the form to publish.
+     * @param userId User ID.
+     * @param formId Return the form id to be published.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId) override;
 
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo) override;
 
@@ -874,7 +884,7 @@ public:
      * @return Return ERR_OK on success, others on failure
      */
     ErrCode RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken) override;
- 
+
     /**
      * @brief UnRegister template from detail info change proxy in fms.
      * @return Return ERR_OK on success, others on failure
@@ -888,6 +898,54 @@ public:
      */
     ErrCode UpdateTemplateFormDetailInfo(
         const std::vector<TemplateFormDetailInfo> &templateFormInfo) override;
+
+    /**
+     * @brief Get formIds by form location.
+     * @param formLocation Indicate the location of the form.
+     * @param formIds [out] The formIds of the form location to be returned.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds) override;
+
+    /**
+     * @brief Register update forms config callback in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister update forms config callback in fms.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterUpdateFormsConfigCallback() override;
+
+    /**
+     * @brief Update form config.
+     * @param configs The form custom configs to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs) override;
+
+    /**
+     * @brief Register delete forms callback in fms.
+     * @param callerToken The form host proxy.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister delete forms callback in fms.
+     * @return Return ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterDeleteFormsCallback() override;
+
+    /**
+     * @brief Delete forms by filters.
+     * @param filters The form record filters to match forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters) override;
 
 private:
     template<typename T>
@@ -904,6 +962,9 @@ private:
         std::vector<RunningFormInfo> &runningFormInfos);
     int32_t GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances);
     bool WriteFormDataProxies(MessageParcel &data, const std::vector<FormDataProxy> &formDataProxies);
+
+    ErrCode RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken) override;
+    ErrCode UnregisterFormWantCallback() override;
 private:
     static inline BrokerDelegator<FormMgrProxy> delegator_;
 };

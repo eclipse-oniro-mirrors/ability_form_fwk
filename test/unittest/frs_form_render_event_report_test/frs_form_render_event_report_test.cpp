@@ -80,19 +80,6 @@ HWTEST_F(FormRenderEventReportTest, SendBlockFaultEvent_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetNowMillisecond_001
- * @tc.desc: Check GetNowMillisecond Test
- * @tc.type: FUNC
- * @tc.require: issuesI9MVRJ
- */
-HWTEST_F(FormRenderEventReportTest, GetNowMillisecond_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GetNowMillisecond_001 begin";
-    FormRenderEventReport::GetNowMillisecond();
-    GTEST_LOG_(INFO) << "GetNowMillisecond_001 test ends";
-}
-
-/**
  * @tc.name: FormMemoryGuardTest_001
  * @tc.desc: Check FormMemoryGuard Test
  * @tc.type: FUNC

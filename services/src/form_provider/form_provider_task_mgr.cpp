@@ -15,13 +15,14 @@
 
 #include "form_provider/form_provider_task_mgr.h"
 #include "form_provider_interface.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "fms_log_wrapper.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_queue.h"
 #include "data_center/form_data_mgr.h"
 #include "common/util/form_report.h"
 #include "common/util/form_util.h"
-#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -278,13 +279,17 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
         return;
     }
     int error = formProviderProxy->NotifyFormUpdate(formId, want, FormSupplyCallback::GetInstance());
-    if (error != ERR_OK) {
-        RemoveConnection(connectId);
-        HILOG_ERROR("fail notify form update");
+    if (error == ERR_OK) {
+        FormProviderErrorHandlerFactory::GetRefreshHandler()->RemoveRetryPolicy(formId);
+        DelayedFormExitDetect(connectId);
         return;
     }
-
-    DelayedFormExitDetect(connectId);
+    HILOG_ERROR("fail notify form update, error:%{public}d", error);
+    bool handled = FormProviderErrorHandlerFactory::GetRefreshHandler()
+        ->HandleSendRequestFailed(formId, error, want);
+    if (!handled) {
+        RemoveConnection(connectId);
+    }
 }
 
 /**
@@ -534,7 +539,7 @@ void FormProviderTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Co
 {
     HILOG_INFO("Call.");
     auto batchConfigurationUpdate = [configuration]() {
-        return FormMgrAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
+        return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
     };
     HILOG_INFO("end");
 }
@@ -589,7 +594,7 @@ void FormProviderTaskMgr::DelayedFormExitDetect(int32_t connectId)
         FormProviderTaskMgr::GetInstance().RemoveConnection(connectId);
     };
     FormProviderQueue::GetInstance().ScheduleDelayTask(
-        { Constants::DETECT_FORM_EXIT_DELAY_TASK, static_cast<int64_t>(connectId) },
+        std::make_pair(static_cast<int64_t>(Constants::DETECT_FORM_EXIT_DELAY_TASK), static_cast<int64_t>(connectId)),
         Constants::DETECT_FORM_EXIT_TIMEOUT_DELAY, detectFunc);
 }
 } // namespace AppExecFwk

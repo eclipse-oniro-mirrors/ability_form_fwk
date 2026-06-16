@@ -18,46 +18,24 @@
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "form_constants.h"
-#include "want.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "form_provider/form_supply_callback.h"
-
 
 namespace OHOS {
 namespace AppExecFwk {
-FormUpdateSizeConnection::FormUpdateSizeConnection(const int64_t formId,
-    const std::string &bundleName, const std::string &abilityName,
-    const int32_t newDimension, const Rect &newRect)
-    :newDimension_(newDimension), newRect_(newRect)
+
+FormUpdateSizeConnection::FormUpdateSizeConnection(const int64_t formId, const std::string &bundleName,
+    const std::string &abilityName, const int32_t newDimension, const Rect &newRect, const int32_t userId)
+    : newDimension_(newDimension), newRect_(newRect)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
- 
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- *
- * @param element Service ability's ElementName.
- * @param remoteObject The session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
-void FormUpdateSizeConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
+
+void FormUpdateSizeConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
-    FormAbilityConnection::OnAbilityConnectDone(element, remoteObject, resultCode);
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            element.GetAbilityName().c_str(), GetFormId(), resultCode);
-        return;
-    }
-    onFormAppConnect();
-    sptr<FormUpdateSizeConnection> connection(this);
-    FormSupplyCallback::GetInstance()->AddConnection(connection);
-    Want want;
-    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormProviderTaskMgr::GetInstance().PostSizeChangedTask(GetFormId(), newDimension_, newRect_, want, remoteObject);
+    FormProviderTaskMgr::GetInstance().PostSizeChangedTask(
+        GetFormId(), newDimension_, newRect_, want, remoteObject);
 }
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -28,12 +28,12 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    constexpr int32_t SEGMENT_LENGTH = 3;
-    const std::string PARAM_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
-    constexpr const char* FORM_MGR_CONFIG_VERSION = "FormMgrConfig_version";
-    constexpr const char* FORM_MGR_CONFIG_DATA = "FormMgrConfig_data";
-    const std::string CONFIG_FILE_NAME = "form_mgr_config.json";
-    const std::string PARAM_PRESET_PATH = "/system/etc/FormMgrConfig/";
+constexpr int32_t SEGMENT_LENGTH = 3;
+constexpr const char *PARAM_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
+constexpr const char *FORM_MGR_CONFIG_VERSION = "FormMgrConfig_version";
+constexpr const char *FORM_MGR_CONFIG_DATA = "FormMgrConfig_data";
+constexpr const char *CONFIG_FILE_NAME = "form_mgr_config.json";
+constexpr const char *PARAM_PRESET_PATH = "/system/etc/FormMgrConfig/";
 }
 
 ParamManager::ParamManager()

@@ -73,10 +73,13 @@ public:
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) override;
 
-    int32_t UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
-        const std::string &uid) override;
+    int32_t UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+        const std::string &uid, const FormJsInfo &formJsInfo) override;
 
     void RunCachedConfigurationUpdated() override;
+
+    int32_t SetRenderGroupParams(const int64_t formId, const Want &want) override;
+
 private:
     bool WriteInterfaceToken(MessageParcel &data);
     template<typename T>

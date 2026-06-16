@@ -37,6 +37,7 @@ public:
     }
 
     static void SetWindowBackgroundColor(ani_env *env, ani_object obj, ani_object callback);
+    static void SetFontScale(ani_env *env, ani_object aniObj, ani_double fontScale);
 
 protected:
     void BindContext() override;
@@ -49,6 +50,7 @@ private:
     bool AsyncCallback(ani_env *env, ani_object call, ani_object error, ani_object result);
     static EtsLiveFormExtensionImpl* GetEtsEtsLiveForm(ani_env *env, ani_object obj);
     void OnSetWindowBackgroundColor(ani_env *env, ani_object callback);
+    void OnSetFontScale(ani_env *env, ani_double fontScale);
 
     using EtsUIExtensionBase::SetContext;
 };

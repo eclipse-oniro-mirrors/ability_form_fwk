@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-int64_t FormEventHandler::eventId_ = 0;
+std::atomic<int64_t> FormEventHandler::eventId_(0);
 FormEventHandler::FormEventHandler(const std::shared_ptr<FormSerialQueue> &serialQueue)
     : serialQueue_(serialQueue)
 {
@@ -36,6 +36,10 @@ void FormEventHandler::ProcessEvent(int64_t msg, int64_t eventId, int64_t delayT
 
     auto task = [thisWeakPtr = weak_from_this(), msg, eventId]() {
         auto sharedThis = thisWeakPtr.lock();
+        if (sharedThis == nullptr) {
+            HILOG_ERROR("sharedThis is null");
+            return;
+        }
         std::lock_guard<std::mutex> lock(sharedThis->observerMutex_);
         for (auto &observer : sharedThis->observers_) {
             if (observer == nullptr) {
@@ -50,8 +54,7 @@ void FormEventHandler::ProcessEvent(int64_t msg, int64_t eventId, int64_t delayT
 
 int64_t FormEventHandler::GetEventId()
 {
-    eventId_++;
-    return eventId_;
+    return ++eventId_;
 }
 
 void FormEventHandler::RegisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer)

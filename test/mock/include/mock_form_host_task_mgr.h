@@ -28,6 +28,8 @@ public:
     virtual ~AbstractMockFormHostTaskMgr() = default;
     virtual void PostCheckFormsTaskToHost(
         const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject) = 0;
+    virtual void PostLockFormsTaskToHost(
+        const std::vector<int64_t> &formIds, const bool lock, const sptr<IRemoteObject> &remoteObject) = 0;
 };
 
 class MockFormHostTaskMgr : public AbstractMockFormHostTaskMgr {
@@ -35,8 +37,10 @@ public:
     static std::shared_ptr<MockFormHostTaskMgr> obj;
     MockFormHostTaskMgr() = default;
     ~MockFormHostTaskMgr() override = default;
-    MOCK_METHOD2(
-        PostCheckFormsTaskToHost, void(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject));
+    MOCK_METHOD2(PostCheckFormsTaskToHost, void(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &remoteObject));
+    MOCK_METHOD3(PostLockFormsTaskToHost, void(const std::vector<int64_t> &formIds, const bool lock,
+        const sptr<IRemoteObject> &remoteObject));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

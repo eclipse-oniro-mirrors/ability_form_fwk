@@ -82,8 +82,8 @@ public:
     {
         return ERR_OK;
     };
-    int32_t UpdateFormSize(const int64_t &formId, const FormSurfaceInfo &formSurfaceInfo,
-        const std::string &uid) override
+    int32_t UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+        const std::string &uid, const FormJsInfo &formJsInfo) override
     {
         return ERR_OK;
     };
@@ -219,6 +219,10 @@ public:
     int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) override
     {
         return number_;
+    }
+    ErrCode RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId) override
+    {
+        return 0;
     }
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override
@@ -449,7 +453,7 @@ public:
     {
         return true;
     }
-	
+
     int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override
     {
         return ERR_OK;
@@ -1037,13 +1041,15 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_027, TestSize.Level0)
     data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
     int64_t formId = 1;
     data.WriteInt64(formId);
-    float width = 1.1;
-    float height = 1.1;
-    float borderWidth = 1.1;
-    data.WriteFloat(width);
-    data.WriteFloat(height);
-    data.WriteFloat(borderWidth);
+    FormSurfaceInfo formSurfaceInfo;
+    formSurfaceInfo.width = 1.1;
+    formSurfaceInfo.height = 1.1;
+    formSurfaceInfo.borderWidth = 1.1;
+    formSurfaceInfo.formViewScale = 1.1;
+    data.WriteParcelable(&formSurfaceInfo);
     data.WriteString("<uid>");
+    FormJsInfo formJsInfo = {};
+    data.WriteParcelable(&formJsInfo);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,9 @@
 #ifndef OHOS_FORM_FWK_FORM_CONSTANTS_H
 #define OHOS_FORM_FWK_FORM_CONSTANTS_H
 
-#include <map>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -33,8 +34,10 @@ namespace Constants {
     constexpr const char* PERMISSION_START_ABILITIES_FROM_BACKGROUND =
         "ohos.permission.START_ABILITIES_FROM_BACKGROUND";
     constexpr const char* PERMISSION_PUBLISH_FORM_CROSS_BUNDLE = "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE";
+    constexpr const char* PERMISSION_FORM_CUSTOM_CONFIG = "ohos.permission.FORM_CUSTOM_CONFIG";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
+    constexpr const char* PARAM_FORM_MANUAL_CLICK_KEY = "ohos.extra.param.key.manually_click";
     constexpr const char* PARAM_MODULE_NAME_KEY = "ohos.extra.param.key.module_name";
     constexpr const char* PARAM_BUNDLE_NAME_KEY = "ohos.extra.param.key.bundle_name";
     constexpr const char* PARAM_ABILITY_NAME_KEY = "ohos.extra.param.key.ability_name";
@@ -56,6 +59,7 @@ namespace Constants {
     constexpr const char* PARAM_LAYOUT_WIDTH_KEY = "ohos.extra.param.key.layout_width";
     constexpr const char* PARAM_LAYOUT_HEIGHT_KEY = "ohos.extra.param.key.layout_height";
     constexpr const char* PARAM_FORM_VIEW_SCALE = "ohos.extra.param.key.form_view_scale";
+    constexpr const char* CONNECT_TO_RENDER = "ohos.connect.to.render";
     constexpr const char* PARAM_JSON_WANT_KEY = "ohos.extra.param.key.json_want";
     constexpr const char* PARAM_LIVE_FORM_ID_KEY = "ohos.extra.param.key.live_form_id";
     constexpr int32_t ONE_HOST_MAX_FORM_SIZE = 256;
@@ -109,10 +113,12 @@ namespace Constants {
     constexpr const char* FORM_HEIGHT_VP_KEY = "ohos.extra.param.key.form_height_vp";
     constexpr const char* FORM_DISABLE_GESTURE_KEY = "ohos.extra.param.key.form_disable_gesture";
     constexpr const char* FORM_DISABLE_BLUR_BACKGROUND = "ohos.extra.param.key.form_disable_blur_background";
+    constexpr const char* FORM_FONT_SIZE_SCALE_KEY = "ohos.extra.param.key.form_font_size_scale";
+    constexpr const char* FORM_FONT_WEIGHT_SCALE_KEY = "ohos.extra.param.key.form_font_weight_scale";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
-    const long ABS_REFRESH_MS = 2500;
+    constexpr long ABS_REFRESH_MS = 2500;
     constexpr const char* PARAM_HOST_BG_INVERSE_COLOR_KEY = "ohos.extra.param.key.host_bg_inverse_color";
     constexpr const char* PARAM_FONT_FOLLOW_SYSTEM_KEY = "ohos.inner.key.font_follow_system";
     constexpr const char* PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY = "ohos.inner.key.enable_blur_background";
@@ -133,6 +139,7 @@ namespace Constants {
     constexpr const char* PARAM_LIVE_FORM_SUPPORT_KEY = "persist.sys.fms.support.liveForm";
     constexpr const char* PARAM_GAME_CARD_KEY = "gameType";
     constexpr const char* PARAM_GAME_CARD_TYPE = "quick";
+    constexpr const char* UPDATE_FORM_REASON_KEY = "ohos.extra.param.key.update_form_reason";
     // live form support type
     constexpr const char* LIVE_FORM_NONE = "0";
     constexpr const char* FUN_INTERACTION = "1";
@@ -188,14 +195,14 @@ namespace Constants {
     constexpr int32_t MIN_PER_HOUR = 60;
     constexpr int32_t SEC_PER_MIN = 60;
     constexpr int32_t MS_PER_DAY = 24 * 60 * 60 * 1000;
-    const long TIME_1000 = 1000;
-    const long TIME_1000000 = 1000000;
-    const long TIME_CONVERSION = 30 * 60 * TIME_1000;
+    constexpr long TIME_1000 = 1000;
+    constexpr long TIME_1000000 = 1000000;
+    constexpr long TIME_CONVERSION = 30 * 60 * TIME_1000;
     constexpr int32_t MIN_CONFIG_DURATION = 1; // 1 means 30 min
     constexpr int32_t MAX_CONFIG_DURATION = 2 * 24 * 7; // one week
-    const long MIN_PERIOD = MIN_CONFIG_DURATION * TIME_CONVERSION; // 30 min in ms unit
-    const long MAX_PERIOD = MAX_CONFIG_DURATION * TIME_CONVERSION; // 1 week in ms unit
-    const long ABS_TIME = 30 * TIME_1000; // 30s abs time
+    constexpr long MIN_PERIOD = MIN_CONFIG_DURATION * TIME_CONVERSION;
+    constexpr long MAX_PERIOD = MAX_CONFIG_DURATION * TIME_CONVERSION;
+    constexpr long ABS_TIME = 30 * TIME_1000;
     constexpr const char* TIME_DELIMETER = ":";
     constexpr const char* TIMES_DELIMETER = ",";
     constexpr int32_t UPDATE_AT_CONFIG_COUNT = 2;
@@ -239,9 +246,10 @@ namespace Constants {
     constexpr const char* FORM_STATUS_EVENT = "form_status_event";
     constexpr const char* FORM_STATUS_EVENT_ID = "form_status_event_id";
 
-    const size_t MAX_LAYOUT = 8;
+    constexpr size_t MAX_LAYOUT = 8;
     constexpr int32_t MAX_FORMS = 512;
-    constexpr int32_t MAX_RECORD_PER_APP = 256;
+    constexpr int32_t MAX_RECORD_PER_HOST = 256;
+    constexpr int32_t MAX_RECORD_PER_USER = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
     constexpr int32_t DEFAULT_VISIBLE_NOTIFY_DELAY = 1000;
@@ -250,6 +258,7 @@ namespace Constants {
     constexpr char MAX_TEMP_FORM_SIZE [] = "maxTempFormSize";
     constexpr char HOST_MAX_FORM_SIZE [] = "hostMaxFormSize";
     constexpr char VISIBLE_NOTIFY_DELAY [] = "visibleNotifyDelayTime";
+    constexpr const char* MAX_FORM_SIZE_PER_USER = "maxFormSizePerUser";
 
     constexpr int32_t NOT_IN_RECOVERY = 0;
     constexpr int32_t RECOVER_FAIL = 1;
@@ -295,7 +304,7 @@ namespace Constants {
         CIRCLE
     };
 
-    const std::map<Dimension, std::string> DIMENSION_MAP = {
+    inline const std::unordered_map<Dimension, std::string> DIMENSION_MAP = {
         {Dimension::DIMENSION_1_2, "1*2"},
         {Dimension::DIMENSION_2_2, "2*2"},
         {Dimension::DIMENSION_2_4, "2*4"},
@@ -312,7 +321,7 @@ namespace Constants {
         bool isSupportLauncher;
     };
 
-    const std::map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
+    inline const std::unordered_map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
         {"00", {"INACTIVE", false}},
         {"01", {"INACTIVE", true}},
         {"10", {"PAUSE", false}},
@@ -347,6 +356,11 @@ namespace Constants {
         INTERNAL_ERROR,
     };
  
+    enum FormUpdateReason : int8_t {
+        REASON_UNKNOWN = -1,
+        FORM_NODE_REUSE = 0
+    };
+
     // templateFormImperativeFwk range
     constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_NONE = "none";
     constexpr const char* TEMPLATE_FORM_IMPERATIVE_FWK_LITE = "lite";
@@ -377,8 +391,8 @@ namespace Constants {
     constexpr int32_t ADD_UPDATE = 1;
 
     // rdb
-    const std::string FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
-    const std::string FORM_RDB_NAME = "/formdb.db";
+    constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
+    constexpr const char* FORM_RDB_NAME = "/formdb.db";
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
     constexpr const char* FORM_SYNC_MODE = "FULL";
@@ -415,6 +429,8 @@ namespace Constants {
     constexpr int32_t FORM_DEFAULT = 1;
     // The form launch reason which means that the form is share.
     constexpr int32_t FORM_SHARE = 2;
+    // The form launch reason which means that the form size change.
+    constexpr int32_t FORM_SIZE_CHANGE = 3;
     // Specify the form Id
     constexpr const char* PARAM_FORM_MIGRATE_FORM_KEY = "ohos.extra.param.key.migrate_form";
     // For click message event
@@ -431,25 +447,34 @@ namespace Constants {
     // Allow form update and refresh
     constexpr const char* FORM_ENABLE_UPDATE_REFRESH_KEY = "enableFormUpdateRefresh";
     // Is form contains multiple app
-    const std::string IS_MULTI_APP_FORM = "isMultiAppForm";
+    constexpr const char* IS_MULTI_APP_FORM = "isMultiAppForm";
     // form contains multi app is true
-    const std::string IS_MULTI_APP_FORM_TRUE = "true";
+    constexpr const char* IS_MULTI_APP_FORM_TRUE = "true";
     // Form data update type
     constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
     // Form info max num
     constexpr const int32_t FORM_INFO_MAX_NUM = 16;
+    // Update form config max num
+    constexpr const int32_t UPDATE_FORM_CONFIG_MAX_NUM = 64;
+    // Delete forms filter max num
+    constexpr const int32_t DELETE_FORMS_FILTER_MAX_NUM = 64;
     // Form version code
-    constexpr const int32_t FORM_VERSION_CODE = 100002;
+    constexpr const int32_t FORM_VERSION_CODE = 100003;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
     // Is delete cache in upgrade scene
     constexpr const char* IS_DELETE_CACHE_IN_UPGRADE_SCENE = "isDeleteCacheInUpgradeScene";
+    // Is show in form center
+    constexpr const char* IS_SHOW_IN_FORM_CENTER = "isShowInFormCenter";
     // Is form need the addition process on request form
     constexpr const char* IS_NEED_ADDFORM_ON_REQUEST = "isNeedAddForm";
+    // Default transparency color
+    constexpr const char* DEFAULT_TRANSPARENCY_COLOR = "#FFFFFFFF";
 
-    const std::string FORM_MGR_CONFIG_DIR = "/data/service/el1/public/update/param_service/install/system/etc/FormMgrConfig/";
+    constexpr const char* FORM_MGR_CONFIG_DIR =
+        "/data/service/el1/public/update/param_service/install/system/etc/FormMgrConfig/";
 
-    const std::string VERSION_FILE_NAME = "version.txt";
+    constexpr const char* VERSION_FILE_NAME = "version.txt";
 
     constexpr const char* FMC_DEFAULT_VERSION = "10.10.25.100";
     constexpr const char* FORM_IS_VISIBLE = "ohos.extra.param.key.form_is_visible";
@@ -458,6 +483,13 @@ namespace Constants {
     constexpr int64_t DETECT_FORM_EXIT_TIMEOUT_DELAY = 10 * 1000;
 
     constexpr int32_t DUE_INVALID_UPDATE_DURATION = -1;
+
+    enum class CardActionParamOpenType : int8_t {
+        START_ABILITY = 0,
+        OPEN_APP_LINKING = 1,
+        OPEN_ATOMIC_SERVICE = 2,
+    };
+    constexpr const char* PARAM_OPEN_TYPE = "ohos.form.action.key.open_type";
 
     constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
 
@@ -469,9 +501,28 @@ namespace Constants {
         "ohos.permission.PUBLISH_FORM_CROSS_BUNDLE_CONTROL";
 
     // When adding Form, distinguish whether the want parameter comes from the host.
+    // Used to distinguish FormComponent from other AddForm scenarios
+    // true: Host actively adds card via FormComponent (update hostWant cache)
+    // false: Other AddForm scenarios (extract hostWant parameters)
     constexpr const char* IS_ADD_FORM_BY_HOST = "isAddFormByHost";
 
     constexpr const int32_t TEMPLATE_FORM_MAX_SIZE = 20;
+
+    constexpr const char* PARAM_VISUAL_EFFECT_TYPE_KEY = "visualEffectType";
+
+    constexpr const char* ORIGINAL_FORM_KEY = "ohos.extra.param.key.original_form_id";
+
+    constexpr const char* FORM_ENABLE_MATERIAL_BACKGROUND_KEY = "ohos.extra.param.key.form_enable_material_background";
+
+    constexpr const char* FORM_STYLE_PARAMETERS_KEY = "STYLE_PARAMETERS";
+
+    constexpr const char* FORM_ONE_MIRROR_CHANGE_KEY = "ONE_MIRROR_CHANGE";
+
+    constexpr const int32_t DELAY_REFRESH_PER_BATCH = 6;
+
+    inline const std::unordered_set<int32_t> CONDITION_REFRESHTYPE_SET = {
+        REFRESHTYPE_NETWORKCHANGED,
+    };
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

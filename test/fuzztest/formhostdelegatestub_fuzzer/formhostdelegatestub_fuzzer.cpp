@@ -55,6 +55,19 @@ public:
     {
         return ERR_OK;
     }
+    ErrCode RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
+        std::vector<AAFwk::WantParams> &wantParamsList) override
+    {
+        return ERR_OK;
+    }
+    ErrCode UpdateFormsConfigCallback(const std::vector<FormCustomConfig> &configs) override
+    {
+        return ERR_OK;
+    }
+    ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds) override
+    {
+        return ERR_OK;
+    }
 };
 uint32_t GetU32Data(const char* ptr)
 {

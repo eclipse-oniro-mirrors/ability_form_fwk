@@ -48,7 +48,7 @@ void FmsFormObserverRecordTest::TearDown() {}
  * @tc.name: SetDeathRecipient.
  * @tc.desc: Verify that the SetDeathRecipient interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_001, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_001 start";
     FormObserverRecord formObserverRecord;
@@ -62,7 +62,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_001, Function | Me
  * @tc.name: SetFormAddObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_002, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_002 start";
     FormObserverRecord formObserverRecord;
@@ -77,7 +77,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_002, Function | Me
  * @tc.name: SetFormRemoveObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_003, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_003 start";
     FormObserverRecord formObserverRecord;
@@ -92,7 +92,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_003, Function | Me
  * @tc.name: onFormAdd.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_004, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_004 start";
     FormObserverRecord formObserverRecord;
@@ -107,7 +107,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_004, Function | Me
  * @tc.name: onFormRemove.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_005, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_005 start";
     FormObserverRecord formObserverRecord;
@@ -122,7 +122,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_005, Function | Me
  * @tc.name: CleanResource.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_006, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_006, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_006 start";
     FormObserverRecord formObserverRecord;
@@ -137,7 +137,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_006, Function | Me
  * @tc.name: SetFormEventObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_007, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_007, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_007 start";
     FormObserverRecord formObserverRecord;
@@ -160,7 +160,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_007, Function | Me
  * @tc.name: RemoveFormEventObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_008, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_008, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_008 start";
     FormObserverRecord formObserverRecord;
@@ -186,7 +186,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_008, Function | Me
  * @tc.name: RemoveFormEventObserverLocked.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_009, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_009, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_009 start";
     FormObserverRecord formObserverRecord;
@@ -219,7 +219,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_009, Function | Me
  * @tc.name: ClearDeathRemoteObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_010, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_010, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_010 start";
     FormObserverRecord formObserverRecord;
@@ -240,7 +240,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_010, Function | Me
  * @tc.name: RemoveFormEventObserverLocked.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_011, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_011, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_011 start";
     sptr<IRemoteObject> callerToken = nullptr;
@@ -262,7 +262,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_011, Function | Me
  * @tc.name: OnRemoteDied.
  * @tc.desc: OnRemoteDied
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_012, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_012, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_012 start";
     FormObserverRecord::ClientDeathRecipient clientDeathRecipient;
@@ -276,7 +276,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_012, Function | Me
  * @tc.name: NotifyFormEvent.
  * @tc.desc: NotifyFormEvent
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_013, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_013, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_013 start";
     FormObserverRecord formObserverRecord;
@@ -299,7 +299,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_013, Function | Me
  * @tc.name: SetFormEventObserverLocked.
  * @tc.desc: SetFormEventObserverLocked
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_014, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_014, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_014 start";
     FormObserverRecord formObserverRecord;
@@ -319,7 +319,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_014, Function | Me
  * @tc.name: SetDeathRecipient.
  * @tc.desc: Verify that the SetDeathRecipient interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_015, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_015, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_015 start";
     FormObserverRecord formObserverRecord;
@@ -333,7 +333,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_015, Function | Me
  * @tc.name: SetFormAddObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_016, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_016, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_016 start";
     FormObserverRecord formObserverRecord;
@@ -348,7 +348,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_016, Function | Me
  * @tc.name: SetFormRemoveObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_017, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_017, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_017 start";
     FormObserverRecord formObserverRecord;
@@ -363,7 +363,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_017, Function | Me
  * @tc.name: onFormAdd.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_018, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_018, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_018 start";
     FormObserverRecord formObserverRecord;
@@ -378,7 +378,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_018, Function | Me
  * @tc.name: onFormRemove.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_019, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_019 start";
     FormObserverRecord formObserverRecord;
@@ -393,7 +393,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_019, Function | Me
  * @tc.name: CleanResource.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_020, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_020, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_020 start";
     FormObserverRecord formObserverRecord;
@@ -408,7 +408,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_020, Function | Me
  * @tc.name: SetFormEventObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_021, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_021, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_021 start";
     FormObserverRecord formObserverRecord;
@@ -431,7 +431,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_021, Function | Me
  * @tc.name: RemoveFormEventObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_022, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_022, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_022 start";
     FormObserverRecord formObserverRecord;
@@ -457,7 +457,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_022, Function | Me
  * @tc.name: RemoveFormEventObserverLocked.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_023, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_023 start";
     FormObserverRecord formObserverRecord;
@@ -490,7 +490,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_023, Function | Me
  * @tc.name: ClearDeathRemoteObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_024, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_024, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_024 start";
     FormObserverRecord formObserverRecord;
@@ -511,7 +511,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_024, Function | Me
  * @tc.name: RemoveFormEventObserverLocked.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_025, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_025, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_025 start";
     sptr<IRemoteObject> callerToken = nullptr;
@@ -534,7 +534,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_025, Function | Me
  * @tc.name: OnRemoteDied.
  * @tc.desc: OnRemoteDied
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_026, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_026, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_026 start";
     FormObserverRecord::ClientDeathRecipient clientDeathRecipient;
@@ -548,7 +548,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_026, Function | Me
  * @tc.name: NotifyFormEvent.
  * @tc.desc: NotifyFormEvent
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_027, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_027, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_027 start";
     FormObserverRecord formObserverRecord;
@@ -571,7 +571,7 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_027, Function | Me
  * @tc.name: SetFormEventObserverLocked.
  * @tc.desc: SetFormEventObserverLocked
  */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_028, Function | MediumTest | Level1)
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_028, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_028 start";
     FormObserverRecord formObserverRecord;

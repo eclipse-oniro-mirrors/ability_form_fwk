@@ -15,9 +15,13 @@
 
 #include "form_refresh/form_refresh_mgr.h"
 
+#include <unordered_map>
+#include <unordered_set>
+
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_event_report.h"
+#include "form_refresh/batch_refresh/batch_refresh_mgr.h"
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_next_time_refresh_impl.h"
@@ -31,18 +35,15 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const static std::set<int> ERROR_CODE_WHITE_LIST = {
+const std::unordered_set<int> ERROR_CODE_WHITE_LIST = {
     ERR_OK,
     ERR_APPEXECFWK_FORM_INVALID_PARAM,
     ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
-    ERR_APPEXECFWK_FORM_DISABLE_REFRESH
+    ERR_APPEXECFWK_FORM_DISABLE_REFRESH,
+    ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED,
+    ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED
 };
-}
-
-FormRefreshMgr::FormRefreshMgr() {}
-FormRefreshMgr::~FormRefreshMgr() {}
-
-const static std::map<int32_t, IFormRefresh *> refreshMap = {
+const std::unordered_map<int32_t, IFormRefresh *> REFRESH_MAP = {
     { TYPE_HOST, &FormHostRefreshImpl::GetInstance() },
     { TYPE_NETWORK, &FormNetConnRefreshImpl::GetInstance() },
     { TYPE_NEXT_TIME, &FormNextTimeRefreshImpl::GetInstance() },
@@ -53,13 +54,18 @@ const static std::map<int32_t, IFormRefresh *> refreshMap = {
     { TYPE_APP_UPGRADE, &FormAppUpgradeRefreshImpl::GetInstance() },
     { TYPE_PROVIDER, &FormProviderRefreshImpl::GetInstance() },
 };
+}
+
+FormRefreshMgr::FormRefreshMgr() {}
+FormRefreshMgr::~FormRefreshMgr() {}
 
 int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
 {
     HILOG_INFO("refreshInputType:%{public}d, formId:%{public}" PRId64, refreshType, data.formId);
-    auto it = refreshMap.find(refreshType);
-    if (it != refreshMap.end()) {
+    auto it = REFRESH_MAP.find(refreshType);
+    if (it != REFRESH_MAP.end()) {
         int ret = it->second->RefreshFormRequest(data);
+        data.errorCode = ret;
         if (ERROR_CODE_WHITE_LIST.find(ret) == ERROR_CODE_WHITE_LIST.end()) {
             FormEventReport::SendFormFailedEvent(FormEventName::UPDATE_FORM_FAILED,
                 data.formId,
@@ -72,8 +78,22 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
     }
 
     HILOG_ERROR("invalid refreshType");
+    data.errorCode = ERR_APPEXECFWK_FORM_INVALID_PARAM;
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
+int32_t FormRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
+    const StaggerStrategyType strategyType, std::vector<RefreshData> &batch)
+{
+    HILOG_INFO("BatchRequestRefresh: batch size = %{public}zu, refreshType = %{public}d, strategyType = %{public}d",
+        batch.size(), refreshType, static_cast<int>(strategyType));
+
+    if (batch.empty()) {
+        return ERR_OK;
+    }
+
+    static BatchRefreshMgr batchRefreshMgr;
+    return batchRefreshMgr.BatchRequestRefresh(refreshType, strategyType, batch);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

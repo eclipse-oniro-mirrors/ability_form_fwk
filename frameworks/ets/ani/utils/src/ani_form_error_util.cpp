@@ -33,9 +33,10 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-const std::map<int32_t, std::string> CODE_MSG_MAP = {
+constexpr const char *ERR_COMMON_MSG = "internal error";
+constexpr std::pair<int32_t, const char *> CODE_MSG_MAP[] = {
     { ERR_OK, "success" },
-    { ERR_COMMON, "internal error" },
+    { ERR_COMMON, ERR_COMMON_MSG },
     { ERR_PERMISSION_DENY, "does not have permission to use forms" },
     { ERR_GET_INFO_FAILED, "failed to obtain the configuration information" },
     { ERR_GET_BUNDLE_FAILED, "failed to obtain the bundle information" },
@@ -60,17 +61,43 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
     { ERR_IN_RECOVERY, "the form is being restored" }
 };
 constexpr const char *BUSINESS_ERROR_CLASS = "@ohos.base.BusinessError";
-constexpr const char *ERROR_CLASS_NAME = "escompat.Error";
+constexpr const char *ERROR_CLASS_NAME = "std.core.Error";
+
+std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type)
+{
+    std::string errorMessage = "Parameter error.";
+    if (paramName.empty()) {
+        // Parameter error.
+        return errorMessage;
+    }
+    errorMessage += " The type of \"" + paramName + "\"";
+    if (type.empty()) {
+        errorMessage += " is invalid.";
+        // Parameter error. The type of "paramName" is invalid.
+        return errorMessage;
+    }
+    errorMessage += " must be " + type + ".";
+    // Parameter error. The type of "${paramName}" must be ${type}.
+    return errorMessage;
 }
+} // anonymous namespace
 
 bool EtsFormErrorUtil::ThrowParamError(ani_env *env, const std::string &extraMessage)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     std::string errorMessage = "Parameter error. " + extraMessage;
     return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
 }
 
 bool EtsFormErrorUtil::ThrowByInternalErrorCode(ani_env *env, int32_t internalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
@@ -79,12 +106,20 @@ bool EtsFormErrorUtil::ThrowByInternalErrorCode(ani_env *env, int32_t internalEr
 
 bool EtsFormErrorUtil::ThrowByExternalErrorCode(ani_env *env, int32_t externalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
     return Throw(env, externalErrorCode, externalErrorMessage);
 }
 
 bool EtsFormErrorUtil::ThrowParamTypeError(ani_env *env, const std::string &paramName, const std::string &type)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, CreateParamTypeErrorMessage(paramName, type));
 }
 
@@ -105,6 +140,10 @@ bool EtsFormErrorUtil::Throw(ani_env *env, int32_t errCode, const std::string &e
 
 ani_object EtsFormErrorUtil::CreateErrorByInternalErrorCode(ani_env *env, int32_t internalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
@@ -124,7 +163,7 @@ ani_object EtsFormErrorUtil::CreateError(ani_env *env, ani_int code, const std::
         return nullptr;
     }
     ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{std.core.Error}:", &method)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
@@ -152,12 +191,12 @@ ani_object EtsFormErrorUtil::CreateError(ani_env *env, const ErrCode &err)
 
 std::string EtsFormErrorUtil::QueryRetMsg(int32_t errorCode)
 {
-    auto iter = CODE_MSG_MAP.find(errorCode);
-    if (iter != CODE_MSG_MAP.end()) {
-        return iter->second;
-    } else {
-        return CODE_MSG_MAP.at(ERR_COMMON);
+    for (const auto &iter : CODE_MSG_MAP) {
+        if (iter.first == errorCode) {
+            return iter.second;
+        }
     }
+    return ERR_COMMON_MSG;
 }
 
 ani_object EtsFormErrorUtil::WrapError(ani_env *env, const std::string &msg)
@@ -183,7 +222,7 @@ ani_object EtsFormErrorUtil::WrapError(ani_env *env, const std::string &msg)
         return nullptr;
     }
     ani_method method = nullptr;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{std.core.ErrorOptions}:", &method)) !=
         ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed %{public}d", status);
         return nullptr;
@@ -194,24 +233,6 @@ ani_object EtsFormErrorUtil::WrapError(ani_env *env, const std::string &msg)
         return nullptr;
     }
     return obj;
-}
-
-std::string EtsFormErrorUtil::CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type)
-{
-    std::string errorMessage = "Parameter error.";
-    if (paramName.empty()) {
-        // Parameter error.
-        return errorMessage;
-    }
-    errorMessage += " The type of \"" + paramName + "\"";
-    if (type.empty()) {
-        errorMessage += " is invalid.";
-        // Parameter error. The type of "paramName" is invalid.
-        return errorMessage;
-    }
-    errorMessage += " must be " + type + ".";
-    // Parameter error. The type of "${paramName}" must be ${type}.
-    return errorMessage;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

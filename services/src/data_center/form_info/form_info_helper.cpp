@@ -30,8 +30,14 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
-const std::string FORM_METADATA_NAME = "ohos.extension.form";
-const std::string TEMPLATE_FORM_METADATA_NAME = "ohos.extension.templateForm";
+constexpr const char *FORM_METADATA_NAME = "ohos.extension.form";
+constexpr const char *TEMPLATE_FORM_METADATA_NAME = "ohos.extension.templateForm";
+constexpr int32_t GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS =
+    static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_ABILITY) |
+    static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY) |
+    static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) |
+    static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_METADATA) |
+    static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION);
 }
 
 bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)
@@ -61,12 +67,12 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
     return true;
 }
 
-ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
-    int32_t userId)
+ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames,
+    int32_t userId, std::map<std::string, std::vector<FormInfo>> &formInfosMap)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    if (bundleName.empty()) {
-        HILOG_ERROR("invalid bundleName");
+    if (bundleNames.empty()) {
+        HILOG_ERROR("invalid bundleNames");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -78,22 +84,39 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
 
     BundleInfo bundleInfo;
     int32_t flag = GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS | GET_BUNDLE_INFO_EXCLUDE_EXT;
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flag, bundleInfo, userId))) {
-        HILOG_ERROR("get bundleInfo failed");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(bundleNames, flag,
+        bundleInfos, userId));
+    HILOG_INFO("bundleInfos size:%{public}zu, bundleNames size:%{public}zu", bundleInfos.size(), bundleNames.size());
+    if (ret != ERR_OK) {
+        HILOG_ERROR("batch get bundleInfo failed, erroCode:%{public}d", ret);
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
-    if (bundleInfo.abilityInfos.empty()) {
-        HILOG_WARN("empty abilityInfos");
-        // Check if current bundle contains FA forms.
-        LoadAbilityFormConfigInfo(bundleInfo, formInfos);
-        // Check if current bundle contains Stage forms.
-        LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
-        return ERR_OK;
-    }
-    if (bundleInfo.abilityInfos[0].isStageBasedModel) {
-        LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
-    } else {
-        LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+    for (const auto &bundleInfo : bundleInfos) {
+        if (bundleInfo.hapModuleInfos.empty()) {
+            continue;
+        }
+        bool hasAbilityInfos = false;
+        bool isStageBasedModel = false;
+        for (const auto &moduleInfo : bundleInfo.hapModuleInfos) {
+            if (!moduleInfo.abilityInfos.empty()) {
+                hasAbilityInfos = true;
+                isStageBasedModel = moduleInfo.abilityInfos[0].isStageBasedModel;
+                break;
+            }
+        }
+        std::vector<FormInfo> formInfos;
+        if (!hasAbilityInfos) {
+            HILOG_WARN("empty abilityInfos, %{public}s", bundleInfo.name.c_str());
+            // Check if current bundle contains FA forms.
+            LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+            // Check if current bundle contains Stage forms.
+            LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+        } else if (isStageBasedModel) {
+            LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
+        } else {
+            LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+        }
+        formInfosMap[bundleInfo.name] = formInfos;
     }
     return ERR_OK;
 }
@@ -107,7 +130,10 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
         HILOG_ERROR("fail get BundleMgrClient");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    for (auto const &extensionInfo: bundleInfo.extensionInfos) {
+    std::vector<ExtensionAbilityInfo> extensionInfos;
+    // In the new interface, extensionInfos needs to be obtained from bundleInfo.hapModuleInfos
+    LoadExtensionInfos(bundleInfo, extensionInfos);
+    for (const auto &extensionInfo: extensionInfos) {
         if (extensionInfo.type != ExtensionAbilityType::FORM) {
             continue;
         }
@@ -141,9 +167,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
         }
     }
 
-    if (!bundleInfo.applicationInfo.isSystemApp) {
-        UpdateBundleTransparencyEnabled(bundleInfo.name, userId, formInfos);
-    }
+    UpdateFormInfoByAppServicesCapability(bundleInfo, userId, formInfos);
 
     return ERR_OK;
 }
@@ -283,39 +307,72 @@ ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource:
     return ERR_OK;
 }
 
-void FormInfoHelper::UpdateBundleTransparencyEnabled(const std::string &bundleName, int32_t userId,
+void FormInfoHelper::UpdateFormInfoByAppServicesCapability(const BundleInfo &bundleInfo, int32_t userId,
     std::vector<FormInfo> &formInfos)
 {
-    bool isAGCTransparencyEnabled = GetBundleTransparencyEnabled(bundleName, userId);
+    UpdateFormInfoTransparencyEnabled(bundleInfo, userId, formInfos);
+    UpdateFormInfoFormStandby(bundleInfo, userId, formInfos);
+}
+
+void FormInfoHelper::UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo, int32_t userId,
+    std::vector<FormInfo> &formInfos)
+{
+    if (bundleInfo.applicationInfo.isSystemApp) {
+        return;
+    }
+
+    bool isTransparencyEnabled = false;
+    const std::string &transparencyFormCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
+    if (!transparencyFormCapabilityKey.empty()) {
+        isTransparencyEnabled = CheckAppServicesCapability(userId, bundleInfo.applicationInfo.bundleName,
+            transparencyFormCapabilityKey);
+    }
+    HILOG_DEBUG("isTransparencyEnabled: %{public}d", isTransparencyEnabled);
+    if (isTransparencyEnabled) {
+        return;
+    }
+
     for (auto &formInfo: formInfos) {
-        // Only when configured as true will the AGC audit results be set.
-        if (formInfo.transparencyEnabled) {
-            formInfo.transparencyEnabled = isAGCTransparencyEnabled;
-        }
+        formInfo.transparencyEnabled = false;
     }
 }
 
-bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName, int32_t userId)
+void FormInfoHelper::UpdateFormInfoFormStandby(const BundleInfo &bundleInfo, int32_t userId,
+    std::vector<FormInfo> &formInfos)
+{
+    bool isStandbyEnabled = false;
+    const std::string &standbyCapabilityKey = FormDataMgr::GetInstance().GetFormStandbyCapabilityKey();
+    if (!standbyCapabilityKey.empty()) {
+        isStandbyEnabled = CheckAppServicesCapability(userId, bundleInfo.applicationInfo.bundleName,
+            standbyCapabilityKey);
+    }
+    HILOG_DEBUG("isStandbyEnabled: %{public}d", isStandbyEnabled);
+    if (isStandbyEnabled) {
+        return;
+    }
+
+    for (auto &formInfo: formInfos) {
+        formInfo.standby.isSupported = false;
+        formInfo.standby.isAdapted = false;
+    }
+}
+
+bool FormInfoHelper::CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
+    const std::string &capabilityKey)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("get IBundleMgr failed");
         return false;
     }
-    const std::string &transparencyFormCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
-    if (transparencyFormCapabilityKey.empty()) {
-        HILOG_ERROR("get transparencyFormCapabilityKey is empty");
-        return false;
-    }
+
     AppProvisionInfo appProvisionInfo;
-    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId,
-        appProvisionInfo));
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId, appProvisionInfo));
     if (ret != ERR_OK) {
         HILOG_ERROR("get AppProvisionInfo failed");
         return false;
     } else {
-        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities,
-            nullptr, false);
+        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities, nullptr, false);
         if (jsonObject.is_discarded()) {
             HILOG_ERROR("fail parse appServiceCapabilities");
             return false;
@@ -324,7 +381,7 @@ bool FormInfoHelper::GetBundleTransparencyEnabled(const std::string &bundleName,
             HILOG_ERROR("appServiceCapabilities is not object");
             return false;
         }
-        return jsonObject.contains(transparencyFormCapabilityKey);
+        return jsonObject.contains(capabilityKey);
     }
 }
 
@@ -334,6 +391,15 @@ void FormInfoHelper::LoadProfileFormInfos(std::vector<FormInfo> &formInfos, cons
 {
     for (const auto &profileInfo: profileInfos) {
         LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, extraFormInfo);
+    }
+}
+
+void FormInfoHelper::LoadExtensionInfos(const BundleInfo &bundleInfo, std::vector<ExtensionAbilityInfo> &extensionInfos)
+{
+    for (const auto &moduleInfo : bundleInfo.hapModuleInfos) {
+        for (const auto &extensionInfo : moduleInfo.extensionInfos) {
+            extensionInfos.push_back(extensionInfo);
+        }
     }
 }
 }  // namespace AppExecFwk

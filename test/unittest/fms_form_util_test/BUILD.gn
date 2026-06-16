@@ -30,7 +30,13 @@ ohos_unittest("FmsFormUtilTest") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
-  deps = [ "${form_fwk_path}:fms_target" ]
+  deps = [
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
 
   external_deps = [
     "ability_base:want",

@@ -79,7 +79,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderMgrInner.DisconnectRenderService(connection, size);
     formRenderMgrInner.RemoveHostToken(host);
     formRenderMgrInner.NotifyHostRenderServiceIsDead();
-    formRenderMgrInner.FillBundleInfo(want, bundleName);
+    formRenderMgrInner.FillBundleInfo(want, bundleName, userId);
     formRenderMgrInner.CheckIfFormRecycled(formRecord, want);
     formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want);
     sptr<IRemoteObject> renderObj = nullptr;

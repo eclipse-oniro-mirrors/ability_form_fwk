@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License"),
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,21 +21,40 @@ import formInfo from '@ohos.app.form.formInfo';
 import Want from '@ohos.app.ability.Want';
 import { RecordData } from '@ohos.base';
 
-interface LiveFormInfo {
+const FORM_FONT_SCALE_KEY = 'ohos.extra.param.key.form_font_size_scale';
+const FORM_FONT_WEIGHT_SCALE_KEY = 'ohos.extra.param.key.form_font_weight_scale';
+
+export interface LiveFormInfo {
   formId: string;
   rect: formInfo.Rect;
   borderRadius: double;
 }
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
-  public context: LiveFormExtensionContext = {};
+  public liveFormContext: LiveFormExtensionContext = {};
 
   private native nativeSetWindowBackgroundColor(): void;
+  private native nativeSetFontScale(fontScale: double): void;
 
   setWindowBackgroundColor(): void {
     taskpool.execute((): void => {
       this.nativeSetWindowBackgroundColor();
     });
+  }
+
+  setFontScale(fontScale: double): Promise<void> {
+    let p : Promise<void> = new Promise<void>((
+      resolve: (data: undefined) => void,
+      reject: (err: BusinessError) => void): void => {
+        taskpool.execute((): void => {
+          try {
+            this.nativeSetFontScale(fontScale);
+          } catch (err) {
+            reject(err as BusinessError);
+          }
+        });
+      });
+    return p;
   }
 
   onSessionCreate(want: Want, session: UIExtensionContentSession): void {
@@ -77,6 +96,22 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
       console.error('null formInfo data');
       this.onDestroy();
       return;
+    }
+
+    let fontScale = want.parameters?.get(FORM_FONT_SCALE_KEY) as double;
+    // fontWeight is unused until UEA providers api for setting font weight
+    let fontWeight = want.parameters?.get(FORM_FONT_WEIGHT_SCALE_KEY) as double;
+    if (fontScale != null && fontWeight != null) {
+      console.debug(`setFontScale ${FORM_FONT_SCALE_KEY}: ${fontScale}, ${FORM_FONT_WEIGHT_SCALE_KEY}: ${fontWeight}`);
+      this.setFontScale(fontScale)
+        .then(() => {
+          console.info(`setFontScale succeed, scale is ${fontScale}`);
+        })
+        .catch((err) => {
+          console.error(`setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
+        });
+    } else {
+      console.error(`setFontScale fontScale or fontWeight is null`);
     }
 
     let liveFormInfo : LiveFormInfo =

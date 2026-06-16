@@ -24,6 +24,7 @@
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
 #include "form_provider_info.h"
+#include "form_histogram_utils.h"
 #include "ipc_skeleton.h"
 #include "nlohmann/json.hpp"
 #include "runtime.h"
@@ -37,18 +38,19 @@ using namespace OHOS::AppExecFwk;
 using FormMgr = AppExecFwk::FormMgr;
 namespace {
 const std::string IS_FORM_AGENT = "isFormAgent";
-constexpr const char* ETS_FORM_AGENT_NAME = "@ohos.app.form.formAgent.formAgent";
-constexpr const char* AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "@ohos.app.form.formAgent.AsyncCallbackWrapper";
+constexpr const char *ETS_FORM_AGENT_NAME = "@ohos.app.form.formAgent.formAgent";
+constexpr const char *AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER = "@ohos.app.form.formAgent.AsyncCallbackWrapper";
+constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 struct RequestPublishFormCallbackInfo {
     Want want {};
     bool withFormBindingData = false;
     std::unique_ptr<OHOS::AppExecFwk::FormProviderData> formProviderData = nullptr;
     std::vector<AppExecFwk::FormDataProxy> formDataProxies;
 };
-}
 
-static void RequestPublishForm(ani_env *env, ani_object aniWant, ani_object callback)
+void RequestPublishForm(ani_env *env, ani_object aniWant, ani_object callback)
 {
+    FormHistogramUtils::ReportHistogramBoolean("Form.Agent.requestPublishForm", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
@@ -67,7 +69,7 @@ static void RequestPublishForm(ani_env *env, ani_object aniWant, ani_object call
         formId, asyncCallbackInfo->formDataProxies);
     if (ret != ERR_OK) {
         HILOG_ERROR("fail RequestPublishForm startAbility");
-        AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
+        FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
             callback, EtsFormErrorUtil::CreateErrorByInternalErrorCode(env, ret),
             nullptr);
         return;
@@ -75,18 +77,18 @@ static void RequestPublishForm(ani_env *env, ani_object aniWant, ani_object call
     ret = FormMgr::GetInstance().AcquireAddFormResult(formId);
     if (ret == ERR_OK) {
         HILOG_INFO("Sucess");
-        ani_string aniStrformId = GetAniString(env, std::to_string(formId));
-        AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback, EtsFormErrorUtil::CreateError(env, ret),
-            reinterpret_cast<ani_object>(aniStrformId));
+        ani_string aniStrformId = FormAniUtil::GetAniString(env, std::to_string(formId));
+        FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
+            EtsFormErrorUtil::CreateError(env, ret), reinterpret_cast<ani_object>(aniStrformId));
     } else {
         HILOG_ERROR("fail");
-        AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
+        FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
             EtsFormErrorUtil::CreateErrorByInternalErrorCode(env, ret), nullptr);
     }
     return;
 }
 
-static void CheckWantParam(ani_env *env, ani_object aniWant, ani_object callback)
+void CheckWantParam(ani_env *env, ani_object aniWant, ani_object callback)
 {
     HILOG_INFO("call");
     if (env == nullptr) {
@@ -101,6 +103,7 @@ static void CheckWantParam(ani_env *env, ani_object aniWant, ani_object callback
     }
 }
 
+} // anonymous namespace
 
 void EtsFormAgentInit(ani_env* env)
 {

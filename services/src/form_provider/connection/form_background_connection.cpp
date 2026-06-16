@@ -19,42 +19,28 @@
 #include "form_constants.h"
 #include "form_mgr_proxy.h"
 #include "form_provider/form_supply_callback.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
 FormBackgroundConnection::FormBackgroundConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName, const std::string &funcName, const std::string &params)
-    : funcName_(funcName), params_(params)
+    const std::string &abilityName, const std::string &funcName, const std::string &params,
+    const int32_t userId) : funcName_(funcName), params_(params)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- * @param element service ability's ElementName.
- * @param remoteObject the session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
-void FormBackgroundConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
-{
-    HILOG_DEBUG("call");
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
-            element.GetAbilityName().c_str(), resultCode);
-        return;
-    }
-    onFormAppConnect();
 
+void FormBackgroundConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
     sptr<IFormMgr> formMgrProxy = iface_cast<IFormMgr>(remoteObject);
     if (formMgrProxy == nullptr) {
         HILOG_ERROR("fail get formMgrProxy");
         return;
     }
     formMgrProxy->SetBackgroundFunction(funcName_, params_);
-    FormSupplyCallback::GetInstance()->RemoveConnection(this->GetConnectId());
-    HILOG_DEBUG("end");
+    FormSupplyCallback::GetInstance()->RemoveConnection(GetConnectId());
 }
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

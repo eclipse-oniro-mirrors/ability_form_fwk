@@ -60,8 +60,19 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderRecord->CreateContext(formJsInfo, want);
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
-    formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
-    formRenderRecord->CreateFormRendererGroupLock(formJsInfo, context, runtime);
+    formRenderRecord->SetEventHandlerNeedResetFlag(false);
+    auto formRendererGroup = formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
+    if (formRendererGroup != nullptr) {
+        formRendererGroup->AddForm(want, formJsInfo);
+        formRendererGroup->OnUnlock();
+        formRendererGroup->SetVisibleChange(isRenderGroupEmpty);
+        formRendererGroup->ReloadForm(formJsInfo);
+        formRendererGroup->UpdateForm(formJsInfo);
+        formRendererGroup->RecycleForm(compId);
+        formRendererGroup->IsManagerDelegateValid(want);
+        formRendererGroup->SetUiContentParams(want);
+    }
+    formRenderRecord->CreateFormRendererGroupLock(context, runtime);
     formRenderRecord->HandleDeleteInJsThread(formId, compId);
     formRenderRecord->HandleDestroyInJsThread();
     formRenderRecord->ReleaseHapFileHandle();
@@ -102,4 +113,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     ch = nullptr;
     return 0;
 }
-

@@ -41,6 +41,8 @@
 #include "gmock/gmock.h"
 #include "mock_ability_manager.h"
 #include "mock_form_params.h"
+#include "inner/mock_form_bms_helper.h"
+#include "inner/mock_form_util.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -49,12 +51,9 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::AAFwk;
 
 extern void MockCheckAcrossLocalAccountsPermission(bool mockRet);
-extern void MockIsSACall(bool mockRet);
 extern void MockCheckInvalidForm(int32_t mockRet);
 extern void MockVerifyCallingPermission(bool mockRet);
 extern void MockIsSystemAppByFullTokenID(bool mockRet);
-extern void MockGetCurrentAccountIdRet(int32_t userId);
-extern void MockGetCallerBundleName(int32_t mockRet);
 extern void MockRrequestPublishForm(int32_t mockRet);
 
 namespace {

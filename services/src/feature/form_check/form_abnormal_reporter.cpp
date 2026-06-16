@@ -18,7 +18,7 @@
 #include "fms_log_wrapper.h"
 #include "form_event_report_define.h"
 #include "form_event_report.h"
-#include "common/util/form_timer_util.h"
+#include "util/form_time_util.h"
 #include "data_center/form_data_mgr.h"
 #include "feature/param_update/param_control.h"
 
@@ -94,7 +94,7 @@ void FormAbnormalReporter::CheckForms()
         formIds.emplace_back(formId);
     }
 
-    HILOG_INFO("total:%{public}" PRIu32 " checkSize:%{public}d" PRIu32, formIdSet.size(), formIds.size());
+    HILOG_INFO("total:%{public}zu checkSize:%{public}zu", formIdSet.size(), formIds.size());
     if (formIds.empty()) {
         return;
     }
@@ -127,7 +127,7 @@ void FormAbnormalReporter::ReportAbnormalForms()
         }
     }
     total += count;
-    HILOG_INFO("map size:%{public}" PRIu32 " total:%{public}d remained:%{public}d", map.size(), total, count);
+    HILOG_INFO("map size:%{public}zu total:%{public}d remained:%{public}d", map.size(), total, count);
     if (count > 0) {
         FormEventReport::SendFormAbnormalEvent(params);
     }

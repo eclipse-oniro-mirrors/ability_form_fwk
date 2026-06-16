@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <memory>
+#include <fstream>
+#include <sstream>
 
 #include "event_handler.h"
 #include "fms_log_wrapper.h"
@@ -32,6 +34,8 @@
 #endif
 #include "status_mgr_center/form_render_status_task_mgr.h"
 #include "status_mgr_center/form_render_status_mgr.h"
+#include "xcollie/watchdog.h"
+#include "util/form_time_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,8 +49,41 @@ constexpr int32_t ENABLE_FORM_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
 constexpr int64_t MIN_DURATION_MS = 1500;
 constexpr int64_t TASK_ONCONFIGURATIONUPDATED_DELAY_MS = 1000;
-const std::string FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
-const std::string TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
+constexpr int32_t MEMORY_MONITOR_INTERVAL = Constants::MS_PER_DAY * 2;
+constexpr uint64_t MEMORY_LEAK_THRESHOLD = 300 * 1024 * 1024;
+constexpr size_t BYTE_PER_KB = 1024;
+constexpr const char *FORM_RENDER_SERIAL_QUEUE = "FormRenderSerialQueue";
+constexpr const char *TASK_ONCONFIGURATIONUPDATED = "FormRenderServiceMgr::OnConfigurationUpdated";
+constexpr const char *FRS_MEMORY_MONITOR = "FormRenderMemoryMonitor";
+
+uint64_t GetPss()
+{
+    pid_t pid = getprocpid();
+    std::string filePath = "/proc/" + std::to_string(pid) + "/smaps_rollup";
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        HILOG_ERROR("pid:%{public}d get pss failed", pid);
+        return 0;
+    }
+    std::string line;
+    int64_t pss = 0;
+    int64_t swapPss = 0;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string key;
+        int64_t value;
+        std::string unit;
+        if (iss >> key >> value >> unit) {
+            if (key == "Pss:") {
+                pss = value;
+            } else if (key == "SwapPss:") {
+                swapPss = value;
+            }
+        }
+    }
+    file.close();
+    return (pss + swapPss) * BYTE_PER_KB;
+}
 }  // namespace
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -55,15 +92,21 @@ const static std::unordered_set<std::string> configItemList_ = {
     SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE
 };
 
+const static std::unordered_set<std::string> CONFIG_ITEM_BLACK_LIST = { SYSTEM_MCC, SYSTEM_MNC };
+
 FormRenderServiceMgr::FormRenderServiceMgr()
 {
-    serialQueue_ = std::make_unique<FormRenderSerialQueue>(FORM_RENDER_SERIAL_QUEUE);
+    serialQueue_ = std::make_shared<Common::FormBaseSerialQueue>(FORM_RENDER_SERIAL_QUEUE);
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
     appliedConfig_ = std::make_shared<AppExecFwk::Configuration>();
     mainHandler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    InitMemoryMonitor();
 }
 
-FormRenderServiceMgr::~FormRenderServiceMgr() = default;
+FormRenderServiceMgr::~FormRenderServiceMgr()
+{
+    RemoveMemoryMonitor();
+}
 
 int32_t FormRenderServiceMgr::RenderForm(
     const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken)
@@ -95,7 +138,7 @@ int32_t FormRenderServiceMgr::RenderForm(
 int32_t FormRenderServiceMgr::ProcessRenderForm(const FormJsInfo &formJsInfo, const Want &want)
 {
     HILOG_INFO("Render form,bundleName=%{public}s,abilityName=%{public}s,formName=%{public}s,"
-               "moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{public}s,formId=%{public}" PRId64,
+               "moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{private}s,formId=%{public}" PRId64,
         formJsInfo.bundleName.c_str(),
         formJsInfo.abilityName.c_str(),
         formJsInfo.formName.c_str(),
@@ -252,7 +295,7 @@ int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
     }
 
     search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
-    HILOG_INFO("end,isRenderGroupEmpty:%{public}d", isRenderGroupEmpty);
+    HILOG_INFO("end,formId:%{public}" PRId64 ", isRenderGroupEmpty:%{public}d", formId, isRenderGroupEmpty);
     FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     if (isRenderGroupEmpty) {
         search->second->Release();
@@ -275,6 +318,7 @@ int32_t FormRenderServiceMgr::CleanFormHost(const sptr<IRemoteObject> &hostToken
         auto renderRecord = iter->second;
         if (renderRecord && renderRecord->HandleHostDied(hostToken)) {
             HILOG_DEBUG("empty renderRecord,remove");
+            renderRecord->Release();
             iter = renderRecordMap_.erase(iter);
         } else {
             ++iter;
@@ -420,7 +464,10 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
         return;
     }
     SetCriticalTrueOnFormActivity();
-    SetConfiguration(configuration);
+    if (!SetConfiguration(configuration)) {
+        HILOG_INFO("no need to update the configuration");
+        return;
+    }
 
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
@@ -436,9 +483,9 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
     auto duration = std::chrono::steady_clock::now() - configUpdateTime_;
     if (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() < MIN_DURATION_MS) {
         HILOG_INFO("OnConfigurationUpdated ignored");
-        auto configUpdateFunc = [this]() {
+        auto configUpdateFunc = []() {
             HILOG_INFO("OnConfigurationUpdated task run");
-            this->OnConfigurationUpdatedInner();
+            FormRenderServiceMgr::GetInstance().OnConfigurationUpdatedInner();
         };
         serialQueue_->ScheduleDelayTask(TASK_ONCONFIGURATIONUPDATED,
             TASK_ONCONFIGURATIONUPDATED_DELAY_MS, configUpdateFunc);
@@ -473,16 +520,29 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
     HILOG_INFO("OnConfigurationUpdated %{public}zu forms updated.", allFormCount);
     hasCachedConfig_ = false;
     PerformanceEventInfo eventInfo;
-    eventInfo.timeStamp = FormRenderEventReport::GetNowMillisecond();
+    eventInfo.timeStamp = Common::FormTimeUtil::GetNowMillisecond();
     eventInfo.bundleName = Constants::FRS_BUNDLE_NAME;
     eventInfo.sceneId = Constants::CPU_SCENE_ID_CONFIG_UPDATE;
     FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
 }
 
-void FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config)
+bool FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config)
 {
+    if (config == nullptr) {
+        HILOG_WARN("config item is nullptr.");
+        return false;
+    }
+    for (const auto &item : CONFIG_ITEM_BLACK_LIST) {
+        if (!config->GetItem(item).empty()) {
+            config->RemoveItem(item);
+        }
+    }
+    if (config->GetItemSize() == 0) {
+        HILOG_WARN("config item is empty.");
+        return false;
+    }
     std::lock_guard<std::mutex> lock(configMutex_);
-    if (config != nullptr && configuration_ != nullptr) {
+    if (configuration_ != nullptr) {
         for (const auto &item : configItemList_) {
             std::string newValue = config->GetItem(item);
             std::string oldValue = configuration_->GetItem(item);
@@ -490,13 +550,10 @@ void FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecF
                 config->AddItem(item, oldValue);
             }
         }
-
-        configuration_ = config;
-        HILOG_INFO("current configuration_:%{public}s", configuration_->GetName().c_str());
-        return;
     }
-
     configuration_ = config;
+    HILOG_INFO("current configuration_:%{public}s", configuration_->GetName().c_str());
+    return true;
 }
 
 void FormRenderServiceMgr::RunCachedConfigurationUpdated()
@@ -651,8 +708,8 @@ void FormRenderServiceMgr::ConfirmUnlockState(Want &renderWant)
     }
 }
 
-int32_t FormRenderServiceMgr::UpdateFormSize(
-    const int64_t formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid)
+int32_t FormRenderServiceMgr::UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo,
+    const std::string &uid, const FormJsInfo &formJsInfo)
 {
     SetCriticalTrueOnFormActivity();
 
@@ -662,7 +719,7 @@ int32_t FormRenderServiceMgr::UpdateFormSize(
             HILOG_ERROR("UpdateFormSize null renderRecord of %{public}" PRId64, formId);
             return UPDATE_FORM_SIZE_FAILED;
         }
-        search->second->UpdateFormSizeOfGroups(formId, formSurfaceInfo);
+        search->second->UpdateFormSizeOfGroups(formId, formSurfaceInfo, formJsInfo);
         return ERR_OK;
     }
     HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
@@ -787,6 +844,7 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
             HILOG_ERROR("fail.");
             return RENDER_FORM_FAILED;
         }
+        search->Release();
         renderRecordMap_.erase(iterator);
         HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
     }
@@ -860,9 +918,9 @@ void FormRenderServiceMgr::CacheAppliedConfig()
     HILOG_INFO("already applied config:%{public}s", appliedConfig_->GetName().c_str());
 }
 
-void FormRenderServiceMgr::SetMainRuntimeCb(std::function<const std::unique_ptr<Runtime> &()> &&cb)
+void FormRenderServiceMgr::SetMainGcCb(std::function<void()> &&cb)
 {
-    mainRuntimeCb_ = std::move(cb);
+    mainGcCb_ = std::move(cb);
 }
 
 void FormRenderServiceMgr::MainThreadForceFullGC()
@@ -874,14 +932,87 @@ void FormRenderServiceMgr::MainThreadForceFullGC()
     }
 
     auto task = []() {
-        if (FormRenderServiceMgr::GetInstance().mainRuntimeCb_ == nullptr ||
-            FormRenderServiceMgr::GetInstance().mainRuntimeCb_() == nullptr) {
-            HILOG_ERROR("null runtime");
-            return;
+        if (FormRenderServiceMgr::GetInstance().mainGcCb_  != nullptr) {
+            FormRenderServiceMgr::GetInstance().mainGcCb_();
         }
-        FormRenderServiceMgr::GetInstance().mainRuntimeCb_()->ForceFullGC(0);
     };
     mainHandler_->PostTask(task, "MainThreadForceFullGC");
+}
+
+int32_t FormRenderServiceMgr::SetRenderGroupParams(const int64_t formId, const Want &want)
+{
+    if (formId <= 0) {
+        HILOG_ERROR("formId is negative");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("empty uid,formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    auto search = renderRecordMap_.find(uid);
+    if (search != renderRecordMap_.end()) {
+        if (search->second == nullptr) {
+            HILOG_ERROR("null renderRecord of %{public}" PRId64, formId);
+            return RENDER_FORM_FAILED;
+        }
+        auto ret = search->second->SetRenderGroupParams(formId, want);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("SetRenderGroupParams %{public}" PRId64 " failed.", formId);
+            return ret;
+        }
+    } else {
+        HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
+        return RENDER_FORM_FAILED;
+    }
+    return ERR_OK;
+}
+
+void FormRenderServiceMgr::InitMemoryMonitor()
+{
+    auto memoryMonitorTask = []() {
+        FormRenderServiceMgr::GetInstance().ReportProcessMemory();
+    };
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(FRS_MEMORY_MONITOR, memoryMonitorTask,
+        MEMORY_MONITOR_INTERVAL);
+}
+
+void FormRenderServiceMgr::RemoveMemoryMonitor()
+{
+    OHOS::HiviewDFX::Watchdog::GetInstance().RemovePeriodicalTask(FRS_MEMORY_MONITOR);
+}
+
+void FormRenderServiceMgr::ReportProcessMemory()
+{
+    uint64_t processMemory = GetPss();
+    if (processMemory < MEMORY_LEAK_THRESHOLD) {
+        return;
+    }
+    HILOG_WARN("FRS memory exceeds threshold: %{public}" PRIu64 " bytes", processMemory);
+
+    std::stringstream memoryInfos;
+    uint64_t totalSizes = 0;
+    std::vector<std::string> formNames;
+    std::vector<uint32_t> formLocations;
+    {
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        for (const auto &iter : renderRecordMap_) {
+            if (iter.second) {
+                std::string bundleName;
+                uint64_t runtimeMemory;
+                iter.second->GetRuntimeMemory(bundleName, runtimeMemory, formNames, formLocations);
+                memoryInfos << bundleName << ":" << runtimeMemory << ";";
+                totalSizes += runtimeMemory;
+            }
+        }
+    }
+
+    if (totalSizes > 0) {
+        FormRenderEventReport::SendRuntimeMemoryLeakEvent(memoryInfos.str(), processMemory, totalSizes, formNames,
+            formLocations);
+    }
 }
 }  // namespace FormRender
 }  // namespace AppExecFwk

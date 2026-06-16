@@ -22,7 +22,8 @@ ohos_unittest("FmsObserverRecordTest") {
   sources = [
     "${form_fwk_path}/services/src/form_observer/form_observer_record.cpp",
     "${form_fwk_path}/services/src/form_observer/form_observer_task_mgr.cpp",
-    "${form_fwk_path}/services/src/form_mgr/form_mgr_queue.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "fms_observer_record_test.cpp",
   ]
@@ -30,6 +31,7 @@ ohos_unittest("FmsObserverRecordTest") {
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/common/include",
   ]
   cflags = []
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
@@ -38,6 +40,10 @@ ohos_unittest("FmsObserverRecordTest") {
   }
   deps = [
     "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

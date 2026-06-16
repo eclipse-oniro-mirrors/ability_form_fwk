@@ -13,45 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_FORM_RENDER_QUEUE_H
-#define OHOS_FORM_FWK_FORM_RENDER_QUEUE_H
+#ifndef OHOS_FORM_FWK_FORM_EVENT_TIMEOUT_QUEUE_H
+#define OHOS_FORM_FWK_FORM_EVENT_TIMEOUT_QUEUE_H
 
+#include <functional>
 #include <singleton.h>
-#include "common/util/form_serial_queue.h"
+#include "queue/form_singleton_queue_base.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-class FormEventTimeoutQueue final : public DelayedRefSingleton<FormEventTimeoutQueue> {
-    DECLARE_DELAYED_REF_SINGLETON(FormEventTimeoutQueue)
 
+class FormEventTimeoutQueue final : public DelayedRefSingleton<FormEventTimeoutQueue>,
+                                    public Common::FormSingletonQueueBase {
 public:
     DISALLOW_COPY_AND_MOVE(FormEventTimeoutQueue);
 
-    /**
-     * @brief Schedule a task
-     * @param ms Delay time
-     * @param func Execute function
-     * @return Returns true if successful, false otherwise
-     */
-    bool ScheduleTask(uint64_t ms, std::function<void()> func);
-
-    /**
-     * @brief Schedule a delayed task
-     * @param eventMsg Event message
-     * @param ms Delay time
-     * @param func Execute function
-     */
-    void ScheduleDelayTask(const std::pair<int64_t, std::string> &eventMsg, uint32_t ms, std::function<void()> func);
-
-    /**
-     * @brief Cancel a delayed task
-     * @param eventMsg Event message
-     */
-    void CancelDelayTask(const std::pair<int64_t, std::string> &eventMsg);
-
-private:
-    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
+    FormEventTimeoutQueue(): Common::FormSingletonQueueBase("FormEventTimeoutQueue") {}
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
-#endif  // OHOS_FORM_FWK_FORM_RENDER_QUEUE_H
+
+} // namespace AppExecFwk
+} // namespace OHOS
+#endif // OHOS_FORM_FWK_FORM_EVENT_TIMEOUT_QUEUE_H

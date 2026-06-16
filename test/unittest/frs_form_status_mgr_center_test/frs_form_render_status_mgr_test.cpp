@@ -18,7 +18,7 @@
 #define private public
 #include "status_mgr_center/form_render_status_mgr.h"
 #include "status_mgr_center/form_render_status.h"
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "status_mgr_center/form_render_status_table.h"
 #undef private
 #include "fms_log_wrapper.h"
@@ -123,34 +123,5 @@ HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0003, TestSize.Level0)
     EXPECT_EQ(ret, -1);
 
     GTEST_LOG_(INFO) << "FormRenderStatusMgrTest_0003 end";
-}
-
-/**
- * @tc.name: FormRenderStatusMgrTest_0004
- * @tc.desc: Verify GetFormEventId SetFormEventId and DeleteFormEventId
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderStatusMgrTest, FormRenderStatusMgrTest_0004, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderStatusMgrTest_0004 start";
-
-    int64_t formId = 123;
-    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    std::string eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    EXPECT_EQ(eventId, "");
-
-    eventId = "eventId";
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
-    eventId = "eventIdNew";
-    FormRenderStatusMgr::GetInstance().SetFormEventId(formId, eventId);
-    eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    EXPECT_EQ(eventId, "eventIdNew");
-
-    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    FormRenderStatusMgr::GetInstance().DeleteFormEventId(formId);
-    eventId = FormRenderStatusMgr::GetInstance().GetFormEventId(formId);
-    EXPECT_EQ(eventId, "");
-
-    GTEST_LOG_(INFO) << "FormRenderStatusMgrTest_0004 end";
 }
 }  // namespace

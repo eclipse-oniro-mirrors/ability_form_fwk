@@ -34,6 +34,10 @@ ohos_unittest("FmsFormInfoMgrTest") {
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}/test/resource/benchmark/form_test_bundle:formTestWidget1",
     "${form_fwk_path}/test/unittest/ohos_test:copy_ohos_test",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

@@ -31,6 +31,7 @@ public:
     MOCK_METHOD3(ReleaseForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache));
     MOCK_METHOD2(UpdateForm, int(const int64_t formId, const FormProviderData &formProviderData));
     MOCK_METHOD2(SetNextRefreshTime, int(const int64_t formId, const int64_t nextTime));
+    MOCK_METHOD3(RequestPublishFormCrossUser, ErrCode(Want &want, int32_t userId, int64_t &formId));
     MOCK_METHOD4(RequestPublishForm, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
     MOCK_METHOD3(LifecycleUpdate, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
@@ -142,6 +143,12 @@ public:
     MOCK_METHOD1(ReloadAllForms, ErrCode(int32_t &reloadNum));
     MOCK_METHOD2(IsFormDueControl, bool(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy));
     MOCK_METHOD2(SendNonTransparencyRatio, ErrCode(int64_t formId, int32_t ratio));
+    MOCK_METHOD2(GetFormIdsByFormLocation, ErrCode(int32_t formLocation, std::vector<std::string> &formIds));
+    MOCK_METHOD1(RegisterFormWantCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterFormWantCallback, ErrCode());
+    MOCK_METHOD1(RegisterDeleteFormsCallback, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterDeleteFormsCallback, ErrCode());
+    MOCK_METHOD1(DeleteForms, ErrCode(const std::vector<FormRecordFilter> &filters));
 };
 }
 }

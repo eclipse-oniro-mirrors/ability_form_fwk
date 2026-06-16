@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License")_;
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -59,16 +59,9 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
     return ERR_OK;
 }
 
-ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
+ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    HILOG_DEBUG("Update static form infos, userId is %{public}d", userId);
-    std::vector<FormInfo> formInfos;
-    ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleName(bundleName_, formInfos, userId);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("LoadFormConfigInfoByBundleName failed, errCode:%{public}d", errCode);
-        return errCode;
-    }
-
+    HILOG_INFO("userId is %{public}d", userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     if (!formInfos.empty()) {
         std::vector<FormDBInfo> formDBInfos;
@@ -369,6 +362,60 @@ void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
     }
     HILOG_INFO("clear distributed app formInfos, bundleName: %{public}s", bundleName_.c_str());
     formInfoStorages_.clear();
+}
+
+bool BundleFormInfo::IsFormInfoMatched(const FormInfo &formInfo, const FormCustomConfig &config) const
+{
+    if (!config.moduleName.empty() && formInfo.moduleName != config.moduleName) {
+        return false;
+    }
+    if (!config.abilityName.empty() && formInfo.abilityName != config.abilityName) {
+        return false;
+    }
+    if (!config.formName.empty() && formInfo.name != config.formName) {
+        return false;
+    }
+    return true;
+}
+
+void BundleFormInfo::UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow)
+{
+    std::string value = isShow ? "true" : "false";
+    for (auto &data : formInfo.customizeDatas) {
+        if (data.name == Constants::IS_SHOW_IN_FORM_CENTER) {
+            data.value = value;
+            return;
+        }
+    }
+    formInfo.customizeDatas.push_back({Constants::IS_SHOW_IN_FORM_CENTER, value});
+}
+
+bool BundleFormInfo::ApplyConfigToStorages(const FormCustomConfig &config)
+{
+    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
+    bool updated = false;
+    for (auto &storage : formInfoStorages_) {
+        for (auto &formInfo : storage.formInfos) {
+            if (IsFormInfoMatched(formInfo, config)) {
+                UpdateFormShowConfigInCustomizeDatas(formInfo, config.isShowInFormCenter);
+                updated = true;
+            }
+        }
+    }
+    return updated;
+}
+
+ErrCode BundleFormInfo::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
+{
+    HILOG_DEBUG("call, bundleName:%{public}s", bundleName_.c_str());
+    bool needUpdate = false;
+    for (const auto &config : configs) {
+        needUpdate = ApplyConfigToStorages(config) || needUpdate;
+    }
+    if (needUpdate) {
+        return UpdateFormInfoStorageLocked();
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

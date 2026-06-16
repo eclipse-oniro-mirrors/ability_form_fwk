@@ -16,6 +16,7 @@
 #include "provider_connect_stub.h"
 #include <gtest/gtest.h>
 #include "common/connection/form_ability_connection.h"
+#include "form_provider/form_supply_callback.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"
 #include "message_parcel.h"
@@ -27,6 +28,19 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace AppExecFwk {
+// Mock implementation of FormAbilityConnection for testing
+class MockFormAbilityConnection : public FormAbilityConnection {
+public:
+    MockFormAbilityConnection() : FormAbilityConnection() {}
+    virtual ~MockFormAbilityConnection() = default;
+
+protected:
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override
+    {
+        // Mock implementation for testing - do nothing
+    }
+};
+
 class ProviderConnectStubTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -36,6 +50,9 @@ public:
     void SetUp();
 
     void TearDown();
+
+protected:
+    std::vector<sptr<FormAbilityConnection>> connections_;
 };
 
 void ProviderConnectStubTest::SetUpTestCase() {}
@@ -44,7 +61,15 @@ void ProviderConnectStubTest::TearDownTestCase() {}
 
 void ProviderConnectStubTest::SetUp() {}
 
-void ProviderConnectStubTest::TearDown() {}
+void ProviderConnectStubTest::TearDown()
+{
+    for (auto &connection : connections_) {
+        if (connection != nullptr && connection->GetConnectId() != 0) {
+            FormSupplyCallback::GetInstance()->RemoveConnection(connection->GetConnectId());
+        }
+    }
+    connections_.clear();
+}
 
 /**
  * @tc.name: ProviderConnectStubTest_001
@@ -54,14 +79,14 @@ void ProviderConnectStubTest::TearDown() {}
 HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_001 start";
-    FormAbilityConnection formAbility;
+    sptr<MockFormAbilityConnection> formAbility = new MockFormAbilityConnection();
     uint32_t code = 1;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     std::u16string value = u"ohos.abilityshell.DistributedConnection";
     data.WriteString16(value);
-    auto result = formAbility.OnRemoteRequest(code, data, reply, option);
+    auto result = formAbility->OnRemoteRequest(code, data, reply, option);
 
     EXPECT_EQ(result, ERR_INVALID_STATE);
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_001 end";
@@ -75,14 +100,14 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_001, TestSize.Level0)
 HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_002 start";
-    FormAbilityConnection formAbility;
+    sptr<MockFormAbilityConnection> formAbility = new MockFormAbilityConnection();
     uint32_t code = 1;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     std::u16string metaDescriptor_ = u"ohos.abilityshell.DistributedConnection";
     data.WriteInterfaceToken(metaDescriptor_);
-    auto result = formAbility.OnRemoteRequest(code, data, reply, option);
+    auto result = formAbility->OnRemoteRequest(code, data, reply, option);
 
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_002 end";
@@ -96,14 +121,14 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_002, TestSize.Level0)
 HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_003 start";
-    FormAbilityConnection formAbility;
+    sptr<MockFormAbilityConnection> formAbility = new MockFormAbilityConnection();
     uint32_t code = 2;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     std::u16string metaDescriptor_ = u"ohos.abilityshell.DistributedConnection";
     data.WriteInterfaceToken(metaDescriptor_);
-    auto result = formAbility.OnRemoteRequest(code, data, reply, option);
+    auto result = formAbility->OnRemoteRequest(code, data, reply, option);
 
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_003 end";
@@ -117,14 +142,14 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_003, TestSize.Level0)
 HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_004 start";
-    FormAbilityConnection formAbility;
+    sptr<MockFormAbilityConnection> formAbility = new MockFormAbilityConnection();
     uint32_t code = 3;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     std::u16string metaDescriptor_ = u"ohos.abilityshell.DistributedConnection";
     data.WriteInterfaceToken(metaDescriptor_);
-    auto result = formAbility.OnRemoteRequest(code, data, reply, option);
+    auto result = formAbility->OnRemoteRequest(code, data, reply, option);
 
     EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_004 end";
@@ -138,7 +163,8 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_004, TestSize.Level0)
 HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_005 start";
-    FormAbilityConnection formAbility;
+    sptr<MockFormAbilityConnection> formAbility = new MockFormAbilityConnection();
+    connections_.push_back(formAbility);
     FormInfoFilter filter;
     uint32_t code = IAbilityConnection::ON_ABILITY_CONNECT_DONE;
     MessageParcel data;
@@ -147,7 +173,7 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_005, TestSize.Level1)
     std::u16string metaDescriptor_ = u"ohos.abilityshell.DistributedConnection";
     data.WriteInterfaceToken(metaDescriptor_);
     data.WriteParcelable(&filter);
-    auto result = formAbility.OnRemoteRequest(code, data, reply, option);
+    auto result = formAbility->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_005 end";
 }
@@ -160,7 +186,8 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_005, TestSize.Level1)
 HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_006, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_006 start";
-    FormAbilityConnection formAbility;
+    sptr<MockFormAbilityConnection> formAbility = new MockFormAbilityConnection();
+    connections_.push_back(formAbility);
     FormInfoFilter filter;
     uint32_t code = IAbilityConnection::ON_ABILITY_DISCONNECT_DONE;
     MessageParcel data;
@@ -169,7 +196,7 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_006, TestSize.Level1)
     std::u16string metaDescriptor_ = u"ohos.abilityshell.DistributedConnection";
     data.WriteInterfaceToken(metaDescriptor_);
     data.WriteParcelable(&filter);
-    auto result = formAbility.OnRemoteRequest(code, data, reply, option);
+    auto result = formAbility->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_006 end";
 }
@@ -182,7 +209,8 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_006, TestSize.Level1)
 HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_007, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_007 start";
-    FormAbilityConnection formAbility;
+    sptr<MockFormAbilityConnection> formAbility = new MockFormAbilityConnection();
+    connections_.push_back(formAbility);
     FormInfoFilter filter;
     uint32_t code = 3;
     MessageParcel data;
@@ -191,7 +219,7 @@ HWTEST_F(ProviderConnectStubTest, ProviderConnectStubTest_007, TestSize.Level1)
     std::u16string metaDescriptor_ = u"ohos.abilityshell.DistributedConnection";
     data.WriteInterfaceToken(metaDescriptor_);
     data.WriteParcelable(&filter);
-    auto result = formAbility.OnRemoteRequest(code, data, reply, option);
+    auto result = formAbility->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
     GTEST_LOG_(INFO) << "ProviderConnectStubTest_007 end";
 }

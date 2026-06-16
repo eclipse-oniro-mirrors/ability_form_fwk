@@ -19,36 +19,30 @@
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "common/util/form_util.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
 FormAcquireDataConnection::FormAcquireDataConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName, int64_t formRequestCode) : formRequestCode_(formRequestCode)
+    const std::string &abilityName, int64_t formRequestCode, const int32_t userId)
+    : formRequestCode_(formRequestCode)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 
-void FormAcquireDataConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
-    const sptr<IRemoteObject> &remoteObject, int resultCode)
+Want FormAcquireDataConnection::OnBuildTaskWant()
 {
-    HILOG_DEBUG("call");
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
-            element.GetAbilityName().c_str(), resultCode);
-        return;
-    }
-    onFormAppConnect();
-    sptr<FormAcquireDataConnection> connection(this);
-    FormSupplyCallback::GetInstance()->AddConnection(connection);
-    Want want;
-    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
+    Want want = FormAbilityConnection::OnBuildTaskWant();
     want.SetParam(Constants::FORM_ACQUIRE_DATA_REQUEST_CODE, formRequestCode_);
+    return want;
+}
+
+void FormAcquireDataConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
     FormProviderTaskMgr::GetInstance().PostAcquireDataTask(GetFormId(), want, remoteObject);
 }
+
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -189,4 +189,941 @@ HWTEST(ExtensionFormProfileTest, TransformTo_0103, TestSize.Level0)
         ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
     EXPECT_EQ(0, level);
 }
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0104, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0105, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0106, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0107, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0108, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0109, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0110, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0111, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0112, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0113, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0114, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0115, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0116, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0117, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0118, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0119, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0120, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0121, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0122, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0123, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0124, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0125, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0126, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0127, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0128, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0129, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0130, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0131, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0132, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0133, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0134, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0135, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0136, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0137, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0138, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
+HWTEST(ExtensionFormProfileTest, TransformTo_0139, TestSize.Level0)
+{
+    std::vector<ExtensionFormInfo> extensionFormInfos {};
+    int32_t level = -1;
+    int32_t numForms = 0;
+
+    // dimension
+    nlohmann::json errorJson = JSON_FORMS;
+    const std::string invalidDimension = "1*4";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = invalidDimension;
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::SUPPORT_DIMENSIONS].push_back(
+        invalidDimension);
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(numForms, extensionFormInfos.size());
+    EXPECT_EQ(0, level);
+
+    // not in support
+    errorJson = JSON_FORMS;
+    const std::string validDimension = "1*2";
+    errorJson[ExtensionFormProfileReader::FORMS][0][ExtensionFormProfileReader::DEFAULT_DIMENSION] = validDimension;
+    EXPECT_EQ(ERR_APPEXECFWK_PARSE_PROFILE_PROP_CHECK_ERROR,
+        ExtensionFormProfile::TransformTo(JsonToString(errorJson), extensionFormInfos, level));
+    EXPECT_EQ(0, level);
+}
+
 }  // namespace

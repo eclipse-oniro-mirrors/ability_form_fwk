@@ -27,8 +27,8 @@ namespace {
 constexpr int32_t FORM_RENDER_SERVICE_TYPE = 3;
 constexpr int32_t FORM_RENDER_SERVICE_STATUS = 1;
 constexpr int32_t FORM_RENDER_SERVICE_SAID = -1;
-constexpr char LIB_MEMMGR_CLIENT_NAME[] = "libmemmgrclient.z.so";
-constexpr char CRITICAL_NOTIFY_PARAM_NAME[] = "const.form.mem_reduce.critical_notify_enable";
+constexpr const char *LIB_MEMMGR_CLIENT_NAME = "libmemmgrclient.z.so";
+constexpr const char *CRITICAL_NOTIFY_PARAM_NAME = "const.form.mem_reduce.critical_notify_enable";
 }
 
 FormMemmgrClient::FormMemmgrClient()

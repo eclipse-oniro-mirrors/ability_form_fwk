@@ -26,6 +26,7 @@ ohos_fuzztest("FormShareTaskMgrFuzzTest") {
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/common/include",
   ]
   cflags = [
     "-g",
@@ -35,13 +36,18 @@ ohos_fuzztest("FormShareTaskMgrFuzzTest") {
   ]
   sources = [
     "formsharetaskmgr_fuzzer.cpp",
-    "${form_fwk_path}/services/src/form_mgr/form_mgr_queue.cpp",
     "${form_fwk_path}/services/src/feature/form_share/form_share_task_mgr.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
+    "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
   ]
 
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

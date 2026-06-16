@@ -25,7 +25,7 @@
 #include "data_center/database/form_db_cache.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr_errors.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
 #include "form_render/form_render_mgr.h"
 #include "common/util/form_serial_queue.h"
 #include "common/timer_mgr/form_timer_mgr.h"
@@ -40,6 +40,17 @@ namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
 constexpr int32_t TASK_DELAY_TIME = 30; // ms
+constexpr const char *KEY_USER_ID = "userId";
+const std::unordered_set<std::string> actionSet {
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
+    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED,
+    EventFwk::CommonEventSupport::COMMON_EVENT_USER_STARTED
+};
 } // namespace
 /**
  * @brief Receiver Constructor.
@@ -69,6 +80,12 @@ void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int
 
 void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 {
+    if (userId < 0) {
+        HILOG_ERROR("invalid screen unlocked userId:%{public}d", userId);
+        return;
+    }
+
+    HILOG_INFO("handle screen unlocked, userId: %{public}d", userId);
     auto task = [userId]() {
         FormRenderMgr::GetInstance().OnScreenUnlock(userId);
     };
@@ -101,12 +118,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         HILOG_ERROR("empty action");
         return;
     }
-    if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+    if (bundleName.empty() && actionSet.find(action) == actionSet.end()) {
         HILOG_ERROR("invalid param, action:%{public}s, bundleName:%{public}s",
             action.c_str(), bundleName.c_str());
         return;
@@ -126,8 +138,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         HandlePackageDataCleared(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
-        int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         // el2 path maybe not unlocked
+        int32_t userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         HandleScreenUnlocked(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED) {
         // el2 path is unlocked when receive SECOND_MOUNTED
@@ -135,6 +147,12 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         HandleUserUnlocked(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         HandleScreenOn();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
+        int32_t userId = eventData.GetCode();
+        HandleUserStopped(userId);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STARTED) {
+        int32_t userId = eventData.GetCode();
+        HandleUserStarted(userId);
     } else {
         HILOG_WARN("invalid action");
     }
@@ -157,6 +175,9 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
         for (itRemoved = removedFormIds.begin(); itRemoved != removedFormIds.end(); ++itRemoved) {
             FormTimerMgr::GetInstance().RemoveFormTimer(*itRemoved);
         }
+
+        // delete formRenderInner
+        FormRenderMgr::GetInstance().DeleteRenderInner(userId);
     });
 }
 
@@ -189,25 +210,28 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         return;
     }
 
-    if (lastUserId_ == 0) {
-        HILOG_INFO("reboot init lastUserId");
+    {
+        std::lock_guard<std::mutex> lock(lastUserIdMutex_);
+        if (lastUserId_ == 0) {
+            HILOG_INFO("reboot init lastUserId");
+            lastUserId_ = userId;
+            return;
+        }
+ 
+        if (lastUserId_ == userId) {
+            HILOG_WARN("same userId");
+            return;
+        }
+ 
         lastUserId_ = userId;
-        return;
+        HILOG_INFO("switch to userId: (%{public}d)", userId);
     }
 
-    if (lastUserId_ == userId) {
-        HILOG_WARN("same userId");
-        return;
-    }
-
-    int32_t lastUserId = lastUserId_;
-    lastUserId_ = userId;
-    HILOG_INFO("switch to userId: (%{public}d)", userId);
     if (FormRenderMgr::GetInstance().GetFRSDiedInLowMemoryByUid(userId)) {
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     }
 
-    FormMgrQueue::GetInstance().ScheduleTask(0, [userId, lastUserId, this]() {
+    FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
         if (userId != MAIN_USER_ID) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         }
@@ -221,7 +245,8 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
 void FormSysEventReceiver::HandleScreenOn()
 {
     FormMgrQueue::GetInstance().ScheduleTask(0, []() {
-        FormRenderMgr::GetInstance().NotifyScreenOn();
+        int32_t userId = FormUtil::GetCurrentAccountId();
+        FormRenderMgr::GetInstance().NotifyScreenOn(userId);
         RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
     });
 }
@@ -232,7 +257,35 @@ void FormSysEventReceiver::RecycleForms(int32_t userId)
     FormDataMgr::GetInstance().GetFormIdsByUserId(userId, formIds);
     Want want;
     want.SetParam(Constants::RECYCLE_FORMS_USER_ID, userId);
-    FormMgrAdapter::GetInstance().RecycleForms(formIds, want, false);
+    FormMgrAdapterFacade::GetInstance().RecycleForms(formIds, want, false);
+}
+
+void FormSysEventReceiver::HandleUserStopped(const int32_t userId)
+{
+    if (userId < 0) {
+        HILOG_ERROR("invalid stopped userId:%{public}d", userId);
+        return;
+    }
+
+    HILOG_INFO("user stopped userId: %{public}d", userId);
+    auto task = [userId]() {
+        FormRenderMgr::GetInstance().DisconnectAllRenderConnections(userId);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
+}
+
+void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
+{
+    if (userId < 0) {
+        HILOG_ERROR("invalid started userId:%{public}d", userId);
+        return;
+    }
+
+    HILOG_INFO("user started userId: %{public}d", userId);
+    auto task = [userId]() {
+        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

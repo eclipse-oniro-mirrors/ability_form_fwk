@@ -47,7 +47,7 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     status = env->Reference_IsUndefined(paramObject, &isUndefined);
     if (isUndefined || status != ANI_OK) {
         HILOG_ERROR("createFormBindingData failed %{public}d ", static_cast<int>(status));
-        return formBindingDataObj;
+        return nullptr;
     }
     ani_class stringClass;
     if ((status = env->FindClass("std.core.String", &stringClass)) != ANI_OK) {

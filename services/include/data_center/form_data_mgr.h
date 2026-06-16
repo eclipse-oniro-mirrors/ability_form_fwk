@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,6 +67,16 @@ public:
      * @param formInfo Js info.
      */
     void CreateFormJsInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo);
+
+    /**
+     * @brief Create form js info by form record.
+     * @param formId The Id of the form.
+     * @param record Form record.
+     * @param formProviderData The form data.
+     * @param formInfo Js info.
+     */
+    void CreateFormJsInfo(const int64_t formId, const FormRecord &record, const FormProviderData &formProviderData,
+        FormJsInfo &formInfo);
     /**
      * @brief Delete form js info by form record.
      * @param formId The Id of the form.
@@ -90,16 +100,27 @@ public:
         const int64_t formId, const int callingUid);
     /**
      * @brief Check temp form count is max.
+     * @param currentUserId The current userId.
      * @return Returns ERR_OK if the temp form not reached; returns ERR_MAX_SYSTEM_TEMP_FORMS is reached.
      */
-    int CheckTempEnoughForm() const;
+    int CheckTempEnoughForm(const int32_t currentUserId) const;
     /**
      * @brief Check form count is max.
      * @param currentUserId The current userId.
      * @param callingUid The UID of the proxy.
-     * @return Returns true if this function is successfully called; returns false otherwise.
+     * @param isCastTempForm Is cast temp form to normal form.
+     * @return Returns ERR_OK if enough form; returns other error code otherwise.
      */
-    int CheckEnoughForm(const int callingUid, const int32_t currentUserId = Constants::DEFAULT_USER_ID) const;
+    int CheckEnoughForm(const int callingUid, const int32_t currentUserId = Constants::DEFAULT_USER_ID,
+        const bool isCastTempForm = false) const;
+
+    /**
+     * @brief Check user form count is max.
+     * @param currentUserId The current userId.
+     * @param isCastTempForm Is cast temp form to normal form.
+     * @return Returns ERR_OK if enough form; returns other error code otherwise.
+     */
+    int CheckEnoughFormForUser(const int32_t currentUserId, const bool isCastTempForm) const;
     /**
      * @brief Delete temp form.
      * @param formId The Id of the form.
@@ -140,6 +161,13 @@ public:
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     bool UpdateFormRecord(const int64_t formId, const FormRecord &formRecord);
+    /**
+     * @brief Update form record.
+     * @param formId The Id of the form.
+     * @param updateFunc A function that performs the update operation on the found record.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool UpdateFormRecord(const int64_t formId, std::function<void(FormRecord &)> updateFunc);
     /**
      * @brief Get form record.
      * @param formId The Id of the form.
@@ -197,6 +225,17 @@ public:
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     bool GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const;
+    /**
+     * @brief Check if a form record has network condition in its conditionUpdate.
+     * @param record The form record to check.
+     * @return Returns true if the form needs network monitoring.
+     */
+    static bool IsNetworkConditionForm(const FormRecord &record);
+    /**
+     * @brief Check if any form record has network condition.
+     * @return Returns true if at least one form needs network monitoring.
+     */
+    bool HasNetworkConditionForm() const;
     /**
      * @brief Get temporary form record.
      * @param formTempRecords The temp form record.
@@ -355,7 +394,7 @@ public:
     */
     void ClearHostRefreshFlag(const int64_t formId);
 
-    /**
+/**
      * @brief Get updated form info.
      * @param record FormRecord.
      * @param targetForms Target forms.
@@ -562,7 +601,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
-                               const sptr<IRemoteObject> &callerToken);
+                               const sptr<IRemoteObject> &callerToken, const int32_t callerUserId);
 
     /**
      * @brief set form record visible.
@@ -640,7 +679,7 @@ public:
      * @param formId Indicates the form ID.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode CheckInvalidForm(const int64_t formId);
+    ErrCode CheckInvalidForm(const int64_t formId, const int32_t callerUserId);
 
     /**
     * @brief get cast forms count.
@@ -650,10 +689,17 @@ public:
     int32_t GetCastFormsCount(int32_t &formCount);
 
     /**
-    * @brief get temp forms count.
-    * @return Return the temp forms number.
-    */
+     * @brief get temp forms count.
+     * @return Return the temp forms number.
+     */
     int32_t GetTempFormCount() const;
+
+    /**
+     * @brief get temp forms count by userId.
+     * @param userId User ID.
+     * @return Return the temp forms number for the specified user.
+     */
+    int32_t GetTempFormCountByUserId(const int32_t userId) const;
 
     /**
     * @brief get temp forms count.
@@ -676,7 +722,7 @@ public:
     * @param formId Indicates the form ID.
     * @return Returns ERR_OK on success, others on failure.
     */
-    ErrCode HandleFormAddObserver(const std::string hostBundleName, const int64_t formId);
+    ErrCode HandleFormAddObserver(const std::string &hostBundleName, const int64_t formId, const int32_t userId);
 
     /**
     * @brief handle form add observer.
@@ -692,7 +738,7 @@ public:
      * @param runningFormInfos Return the running forms' infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo);
+    ErrCode GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo, const int32_t userId);
 
     /**
      * @brief Get all running form infos.
@@ -700,7 +746,8 @@ public:
      * @param runningFormInfos Return the running forms' infos currently.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
+    ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos,
+        const int32_t userId);
 
     /**
      * @brief Get the running form infos by bundle name.
@@ -709,8 +756,8 @@ public:
      * @param runningFormInfos Return the running forms' infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfosByBundleName(
-        const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName, bool isUnusedIncluded,
+        std::vector<RunningFormInfo> &runningFormInfos, const int32_t userId);
 
     /**
      * @brief Get form instances by filter info.
@@ -910,19 +957,12 @@ public:
     bool GetFormCanUpdate(int64_t formId);
 
     /**
-     * @brief merge form new want to old want.
-     * @param newWant new want info.
-     * @param oldWant old want info.
-     */
-    void MergeFormWant(const Want &newWant, Want &oldWant);
-
-    /**
      * @brief Update form want.
      * @param formId form id.
      * @param want new want.
      * @param record form record info.
      */
-    void UpdateFormWant(const int64_t formId, const Want &want, FormRecord &record);
+    void UpdateRefreshWant(const int64_t formId, const Want &want, FormRecord &record);
 
     /**
      * @brief Get all formRecord by userId.
@@ -1023,6 +1063,98 @@ public:
      * @return Returns transparencyFormCapabilityKey value.
      */
     const std::string& GetTransparencyFormCapabilityKey();
+
+    /**
+     * @brief Get formStandbyCapabilityKey value.
+     * @return Returns formStandbyCapabilityKey value.
+     */
+    const std::string& GetFormStandbyCapabilityKey();
+
+    /**
+     * @brief Get form upgrade info from formRecord.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetFormUpgradeInfo(const int64_t formId, FormUpgradeInfo& formUpgradeInfo) const;
+
+    /**
+     * @brief Update form upgrade info.
+     * @param formId The Id of the form.
+     * @param FormUpgradeInfo The form upgrade info.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool UpdateFormUpgradeInfo(const int64_t formId, const FormUpgradeInfo& formUpgradeInfo);
+
+    /**
+     * @brief Set transparent form color form for host clients.
+     * @param formId The Id of the form.
+     * @param transparencyColor The transparency color.
+     */
+    void SetHostTransparentFormColor(const int64_t formId, const std::string &transparencyColor);
+
+    /**
+     * @brief Delete transparent form color form for host clients.
+     * @param formId The Id of the form.
+     */
+    void DelHostTransparentFormColor(const int64_t formId);
+
+    /**
+     * @brief Get addFormFinish and set isNeedUpdateFormOnAddFormFinish flag atomic method.
+     * @param formId The Id of the form.
+     * @return Returns value of addFormFinish.
+     */
+    bool GetAddfinishAndSetUpdateFlag(const int64_t formId);
+
+    /**
+     * @brief Is needUpdate On addFinish atomic method.
+     * @param formId The Id of the form.
+     * @param formRecord form record.
+     * @return Returns value of IsNeedUpdate.
+     */
+    bool GetIsNeedUpdateOnAddFinish(const int64_t formId, FormRecord &formRecord);
+
+    /**
+    * @brief Merges form data into the provider data.
+    * @param formId The Id of the form.
+    * @param formProviderData The target FormProviderData to receive the merged data.
+    * @return Returns true if this function is successfully called; returns false otherwise.
+    */
+    bool MergeFormData(const int64_t formId, FormProviderData &formProviderData);
+
+    /**
+     * @brief Update hostWant cache with parameter control.
+     * @param formId form id.
+     * @param want Want parameters.
+     * @param shouldMerge true-merge parameters (RequestForm), false-assign update (AddForm).
+     */
+    void UpdateHostWant(const int64_t formId, const Want &want, bool shouldMerge = false);
+
+    /**
+     * @brief Update hostWant size parameters only (partial update).
+     * @param formId form id.
+     * @param width form width.
+     * @param height form height.
+     * @param borderWidth border width.
+     * @param formViewScale view scale.
+     */
+    void UpdateHostWantSize(const int64_t formId, float width, float height, float borderWidth, float formViewScale);
+
+    /**
+     * @brief Cancel rerender all forms delayed task.
+     */
+    void CancelRerenderAllFormsDelayTask();
+
+    /**
+     * @brief Schedule rerender all forms delayed task.
+     * @return Returns true if scheduled successfully, false otherwise.
+     */
+    bool ScheduleRerenderAllFormsDelayTask();
+
+    /**
+     * @brief Check if form record exists.
+     * @param formId The Id of the form.
+     * @return Returns true if form record exists; returns false otherwise.
+     */
+    bool HasFormRecord(const int64_t formId) const;
 
 private:
     /**
@@ -1149,9 +1281,9 @@ private:
     void InitLowMemoryStatus();
 
     /**
-     * @brief Init transparencyFormCapbilityKey.
+     * @brief Init formCapabilityKey.
      */
-    void InitTransparencyFormCapabilityKey();
+    void InitFormCapabilityKey();
 
 private:
     void GetUnusedFormInstancesByFilter(
@@ -1160,6 +1292,14 @@ private:
     void GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
     void GetUnusedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos);
     void DeleteRecordTempForms(const std::vector<int64_t> &recordTempForms);
+    /**
+     * @brief Check form count is max on the device.
+     * @param currentUserId The current userId.
+     * @param callingUid The UID of the proxy.
+     * @return Returns ERR_OK if enough form; returns other error code otherwise.
+     */
+    ErrCode CheckEnoughFormOnDevice(const int callingUid,
+        const int32_t currentUserId = Constants::DEFAULT_USER_ID) const;
 
     mutable std::mutex formRecordMutex_;
     mutable std::mutex formHostRecordMutex_;
@@ -1185,6 +1325,7 @@ private:
     std::unordered_map<int64_t, bool> formVisibleMap_;
     std::atomic_bool isLowMemory_ = false;
     std::string transparencyFormCapabilityKey_ = "";
+    std::string formStandbyCapabilityKey_ = "";
 };
 } // namespace AppExecFwk
 } // namespace OHOS

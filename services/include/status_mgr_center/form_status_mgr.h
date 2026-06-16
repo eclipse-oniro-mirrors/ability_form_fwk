@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <shared_mutex>
 
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "status_mgr_center/form_status_table.h"
 #include "status_mgr_center/form_status_queue.h"
 #include "status_mgr_center/form_event_queue.h"
@@ -39,8 +39,10 @@ public:
      * @param formId The ID of the form
      * @param event The event to trigger
      * @param func The function to handle the event (default is nullptr)
+     * @param delayMs Delay time (default is 0 ms)
      */
-    void PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func = nullptr);
+    void PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func = nullptr,
+        uint64_t delayMs = 0);
 
     /**
      * @brief Cancel a form event timeout task

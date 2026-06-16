@@ -26,8 +26,8 @@
 namespace OHOS {
 namespace AAFwk {
 namespace {
-const std::string JSON_KEY_USER_ID = "userId";
-const std::string JSON_KEY_FORM_INFO = "formInfos";
+constexpr const char *JSON_KEY_USER_ID = "userId";
+constexpr const char *JSON_KEY_FORM_INFO = "formInfos";
 const int32_t DEFAULT_RECT_SHAPE = 1;
 } // namespace
 

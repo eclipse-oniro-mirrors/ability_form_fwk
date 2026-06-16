@@ -40,6 +40,8 @@ public:
 
     static napi_value SetUIExtCustomDensity(napi_env env, napi_callback_info info);
 
+    static napi_value SetFontScale(napi_env env, napi_callback_info info);
+
     static napi_value StartAbilityByLiveForm(napi_env env, napi_callback_info info);
 
     static napi_value ConnectAbility(napi_env env, napi_callback_info info);
@@ -52,6 +54,8 @@ private:
     napi_value OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info);
 
     napi_value OnSetUIExtCustomDensity(napi_env env, NapiCallbackInfo &info);
+
+    napi_value OnSetFontScale(napi_env env, NapiCallbackInfo &info);
 
     napi_value OnStartAbilityByLiveForm(napi_env env, NapiCallbackInfo &info);
 

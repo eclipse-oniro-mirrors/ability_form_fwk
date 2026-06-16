@@ -16,6 +16,7 @@
 #include "form_host/form_host_record.h"
 
 #include <cinttypes>
+#include "form_constants.h"
 #include "form_host/form_host_task_mgr.h"
 
 namespace OHOS {
@@ -38,6 +39,7 @@ void FormHostRecord::AddForm(int64_t formId)
 void FormHostRecord::DelForm(int64_t formId)
 {
     forms_.erase(formId);
+    transparentForms_.erase(formId);
 }
 /**
  * @brief forms_ is empty or not.
@@ -403,6 +405,31 @@ void FormHostRecord::OnDueControlForms(
         return;
     }
     formHostCallback_->OnDueControlForms(formIds, isDisablePolicy, isControl, formHostClient_);
+}
+
+bool FormHostRecord::ContainsTransparentForm(const int64_t formId)
+{
+    return transparentForms_.find(formId) != transparentForms_.end();
+}
+
+void FormHostRecord::SetTransparentFormColor(const int64_t formId, const std::string &transparencyColor)
+{
+    transparentForms_[formId] = transparencyColor;
+    HILOG_DEBUG("transparentForms_ count: %{public}d", (int)transparentForms_.size());
+}
+
+std::string FormHostRecord::GetTransparentFormColor(const int64_t formId) const
+{
+    auto result = transparentForms_.find(formId);
+    if (result == transparentForms_.end()) {
+        return Constants::DEFAULT_TRANSPARENCY_COLOR;
+    }
+    return result->second;
+}
+
+void FormHostRecord::DeleteTransparentFormColor(const int64_t formId)
+{
+    transparentForms_.erase(formId);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

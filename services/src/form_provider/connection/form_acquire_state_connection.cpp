@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,41 +16,22 @@
 #include "form_provider/connection/form_acquire_state_connection.h"
 
 #include "fms_log_wrapper.h"
-#include "form_constants.h"
-#include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
 FormAcquireStateConnection::FormAcquireStateConnection(const std::string &bundleName,
-    const std::string &abilityName, const Want &want, std::string &provider)
+    const std::string &abilityName, const Want &want, std::string &provider, const int32_t userId)
     : want_(want), provider_(provider)
 {
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- * @param element service ability's ElementName.
- * @param remoteObject the session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
-void FormAcquireStateConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
+void FormAcquireStateConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
-            element.GetAbilityName().c_str(), resultCode);
-        return;
-    }
-    onFormAppConnect();
-    sptr<FormAcquireStateConnection> connection(this);
-    FormSupplyCallback::GetInstance()->AddConnection(connection);
-    Want want;
-    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     FormProviderTaskMgr::GetInstance().PostAcquireStateTask(want_, provider_, want, remoteObject);
 }
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

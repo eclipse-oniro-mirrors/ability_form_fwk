@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License"),
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,9 @@
 import ExtensionContext from 'application.ExtensionContext';
 import { BusinessError, AsyncCallback } from '@ohos.base';
 import type Want from '@ohos.app.ability.Want';
+import { ConnectOptions } from 'ability.connectOptions';
 
-class AsyncCallbackWrapper<T, E = void> {
+export class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => {}
 
   constructor(myFun: AsyncCallback<T, E>) {
@@ -29,7 +30,7 @@ class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
-class Cleaner {
+export class Cleaner {
   public ptr: long = 0;
   constructor(ptr: long) {
     this.ptr = ptr;
@@ -63,6 +64,8 @@ export default class LiveFormExtensionContext extends ExtensionContext {
   private cleaner: Cleaner | null = null;
 
   native nativeStartAbilityByLiveForm(want: Want, formId: string, callback: AsyncCallbackWrapper<void>): void;
+  native nativeConnectServiceExtensionAbility(want: Want, options: ConnectOptions): long;
+  native nativeDisconnectServiceExtensionAbility(connectionId: long, callback: AsyncCallbackWrapper<void>): void;
 
   startAbilityByLiveForm(want: Want): Promise<void> {
     let p: Promise<void> = new Promise<void>((
@@ -78,8 +81,34 @@ export default class LiveFormExtensionContext extends ExtensionContext {
         taskpool.execute((): void => {
           try {
             this.nativeStartAbilityByLiveForm(want, "", myCall);
-          } catch (err: BusinessError) {
+          } catch (err) {
+            reject(err as BusinessError);
+          }
+        });
+      });
+    return p;
+  }
+
+  connectServiceExtensionAbility(want: Want, options: ConnectOptions): long {
+    return this.nativeConnectServiceExtensionAbility(want, options);
+  }
+
+  disconnectServiceExtensionAbility(connectionId: long): Promise<void> {
+    let p : Promise<void> = new Promise<void>((
+      resolve: (data: undefined) => void,
+      reject: (err: BusinessError) => void): void => {
+        let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
+          if (err == null || err.code == 0) {
+            resolve(undefined);
+          } else {
             reject(err);
+          }
+        });
+        taskpool.execute((): void => {
+          try {
+            this.nativeDisconnectServiceExtensionAbility(connectionId, myCall);
+          } catch (err) {
+            reject(err as BusinessError);
           }
         });
       });

@@ -1,0 +1,71 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+module_output_path = "form_fwk/form_fwk/form_mgr_service"
+
+ohos_unittest("FmsRefreshCacheMgrTest") {
+  module_out_path = module_output_path
+  
+  sources = [
+    "${form_fwk_path}/services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_refresh_cache_mgr_test/fms_refresh_cache_mgr_test.cpp",
+    "${form_fwk_path}/test/mock/src/common/mock_form_util.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/form_refresh/mock_form_refresh_mgr.cpp",
+  ]
+  
+  include_dirs = [
+    "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/include",
+    "${form_fwk_path}/test/mock/include",
+  ]
+  
+  configs = []
+  cflags = []
+  
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+  
+  deps = [
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
+  
+  external_deps = [
+    "ability_runtime:app_manager",
+    "c_utils:utils",
+    "ffrt:libffrt",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "libxml2:libxml2",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "googletest:gmock_main",
+  ]
+}
+
+###############################################################################
+group("unittest") {
+  testonly = true
+  
+  deps = [ ":FmsRefreshCacheMgrTest" ]
+}
+###############################################################################

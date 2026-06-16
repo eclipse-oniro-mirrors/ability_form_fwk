@@ -17,30 +17,33 @@
 #define OHOS_FORM_FWK_FORM_MSG_EVENT_CONNECTION_H
 
 #include "common/connection/form_ability_connection.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-using Want = OHOS::AAFwk::Want;
+
 /**
  * @class FormMsgEventConnection
- * Form Refresh Connection Stub.
+ * Form message event Connection Stub.
  */
 class FormMsgEventConnection : public FormAbilityConnection {
 public:
-    FormMsgEventConnection(const int64_t formId, const Want &want,
-        const std::string &bundleName, const std::string &abilityName);
+    FormMsgEventConnection(const int64_t formId, const Want &want, const std::string &bundleName,
+        const std::string &abilityName, const int32_t userId);
     virtual ~FormMsgEventConnection() = default;
 
+protected:
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     *
-     * @param element service ability's ElementName.
-     * @param remoteObject the session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
+     * @brief Build task Want parameter with message key.
+     * @return Built Want object.
      */
-    void OnAbilityConnectDone(const AppExecFwk::ElementName &element,
-        const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+    Want OnBuildTaskWant() override;
+
+    /**
+     * @brief Execute message event task after connection success.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
 
 private:
     Want want_;

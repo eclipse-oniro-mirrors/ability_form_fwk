@@ -15,6 +15,8 @@
 
 #include "form_refresh/check_mgr/active_user_checker.h"
 
+#include "common/util/form_util.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 
@@ -23,8 +25,13 @@ ActiveUserChecker::~ActiveUserChecker() {}
 
 int ActiveUserChecker::CheckValid(const CheckValidFactor &factor)
 {
-    const int32_t currentActiveUserId =
-        factor.want.GetIntParam(Constants::PARAM_FORM_USER_ID, Constants::DEFAULT_PROVIDER_USER_ID);
+    int32_t currentActiveUserId = Constants::DEFAULT_PROVIDER_USER_ID;
+    if (factor.want.HasParameter(Constants::PARAM_FORM_USER_ID)) {
+        currentActiveUserId = factor.want.GetIntParam(Constants::PARAM_FORM_USER_ID,
+            Constants::DEFAULT_PROVIDER_USER_ID);
+    } else {
+        currentActiveUserId = FormUtil::GetCallerUserId(factor.callingUid);
+    }
     if (currentActiveUserId != factor.record.providerUserId) {
         HILOG_ERROR("not current user:%{public}d, providerUserId:%{public}d, formId:%{public}" PRId64,
             currentActiveUserId, factor.record.providerUserId, factor.formId);

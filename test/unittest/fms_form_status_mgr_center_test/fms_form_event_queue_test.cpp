@@ -19,7 +19,7 @@
 #define private public
 #include "status_mgr_center/form_event_queue.h"
 #undef private
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "fms_log_wrapper.h"
 
 using namespace testing::ext;

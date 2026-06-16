@@ -15,6 +15,8 @@
 
 #include "form_refresh/strategy/refresh_check_mgr.h"
 
+#include <unordered_map>
+
 #include "fms_log_wrapper.h"
 #include "form_refresh/check_mgr/system_app_checker.h"
 #include "form_refresh/check_mgr/self_form_checker.h"
@@ -23,14 +25,12 @@
 #include "form_refresh/check_mgr/active_user_checker.h"
 #include "form_refresh/check_mgr/add_finish_checker.h"
 #include "form_refresh/check_mgr/untrust_app_checker.h"
+#include "form_refresh/check_mgr/multi_active_users_checker.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-
-RefreshCheckMgr::RefreshCheckMgr() {}
-RefreshCheckMgr::~RefreshCheckMgr() {}
-
-const static std::map<int32_t, IBaseChecker *> checkerMap = {
+namespace {
+const std::unordered_map<int32_t, IBaseChecker *> CHECKER_MAP = {
     { TYPE_SYSTEM_APP, &SystemAppChecker::GetInstance() },
     { TYPE_SELF_FORM, &SelfFormChecker::GetInstance() },
     { TYPE_CALLING_USER, &CallingUserChecker::GetInstance() },
@@ -38,7 +38,12 @@ const static std::map<int32_t, IBaseChecker *> checkerMap = {
     { TYPE_ACTIVE_USER, &ActiveUserChecker::GetInstance() },
     { TYPE_ADD_FINISH, &AddFinishChecker::GetInstance() },
     { TYPE_UNTRUST_APP, &UntrustAppChecker::GetInstance() },
+    { TYPE_MULTI_ACTIVE_USERS, &MultiActiveUsersChecker::GetInstance() },
 };
+}
+
+RefreshCheckMgr::RefreshCheckMgr() {}
+RefreshCheckMgr::~RefreshCheckMgr() {}
 
 int RefreshCheckMgr::IsBaseValidPass(const std::vector<int32_t> &types, const CheckValidFactor &factor)
 {
@@ -61,8 +66,8 @@ int RefreshCheckMgr::IsBaseValidPass(const std::vector<int32_t> &types, const Ch
 int RefreshCheckMgr::HandleCheckValid(const CheckValidFactor &factor, const int32_t checkType)
 {
     HILOG_DEBUG("checkType:%{public}d, formId:%{public}" PRId64, checkType, factor.formId);
-    auto it = checkerMap.find(checkType);
-    if (it != checkerMap.end()) {
+    auto it = CHECKER_MAP.find(checkType);
+    if (it != CHECKER_MAP.end()) {
         return it->second->CheckValid(factor);
     } else {
         HILOG_ERROR("invalid checkType");

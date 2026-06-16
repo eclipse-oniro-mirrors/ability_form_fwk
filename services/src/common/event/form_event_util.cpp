@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,12 +26,13 @@
 #include "data_center/form_data_proxy_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #include "data_center/form_info/form_info_mgr.h"
-#include "form_mgr/form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
 #include "form_render/form_render_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "form_provider/form_provider_mgr.h"
+#include "iform_host_delegate.h"
 #include "want.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "feature/param_update/param_control.h"
@@ -85,7 +86,7 @@ void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, i
 
 void FormEventUtil::HandleUpdateFormCloud(const std::string &bundleName)
 {
-    FormMgrAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
+    FormMgrAdapterFacade::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
 }
 
 void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId,
@@ -158,7 +159,9 @@ void FormEventUtil::HandleFormReload(
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    FormMgrAdapter::GetInstance().DelayRefreshForms(updatedForms, want);
+    // For forms with registered want callback, trigger onAddForm directly
+    HandleFormWantCallbackAddForm(updatedForms);
+    FormMgrAdapterFacade::GetInstance().DelayRefreshFormsOnAppUpgrade(updatedForms, want);
     if (needReload) {
         FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
     } else {
@@ -293,7 +296,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
 
     // update resource
-    if (FormMgrAdapter::GetInstance().IsDeleteCacheInUpgradeScene(formRecord)) {
+    if (FormMgrAdapterFacade::GetInstance().IsDeleteCacheInUpgradeScene(formRecord)) {
         HILOG_INFO("Delete cache data in upgrade scene");
         FormCacheMgr::GetInstance().DeleteData(formId);
     }
@@ -374,7 +377,10 @@ void FormEventUtil::BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey
         FormIdKey formIdKey = element.first;
         std::string bundleName = formIdKey.bundleName;
         std::string abilityName = formIdKey.abilityName;
-        int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds);
+        std::string moduleName = formIdKey.moduleName;
+        int32_t userId = FormUtil::GetCallerUserId(uid);
+        int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, moduleName,
+            formIds, userId);
         if (result != ERR_OK) {
             HILOG_ERROR("NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s",
                 bundleName.c_str(), abilityName.c_str());
@@ -508,10 +514,10 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     if (!record.isEnableUpdate && timerCfg.enableUpdate) {
         FormDataMgr::GetInstance().SetUpdateInfo(formId, true,
             timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin, timerCfg.updateAtTimes);
-        if (timerCfg.updateDuration > 0) {
+        if (timerCfg.updateDuration > 0 && (!record.isDataProxy || !record.isSystemApp)) {
             HILOG_INFO("add interval timer:%{public}" PRId64, timerCfg.updateDuration);
             int64_t updateDuration = timerCfg.updateDuration;
-            if (!FormMgrAdapter::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
+            if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
                 HILOG_WARN("Get updateDuration failed, uses local configuration");
             }
             FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, record.providerUserId);
@@ -532,7 +538,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     auto newTimerCfg = timerCfg;
     if (type == TYPE_INTERVAL_CHANGE || type == TYPE_ATTIME_TO_INTERVAL) {
         int64_t updateDuration = timerCfg.updateDuration;
-        if (!FormMgrAdapter::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
+        if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
             HILOG_WARN("Get updateDuration failed, uses local configuration");
         }
         newTimerCfg.updateDuration = updateDuration;
@@ -597,7 +603,7 @@ void FormEventUtil::ReCreateForm(const int64_t formId)
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, reCreateRecord.formTempFlag);
     want.SetParam(Constants::RECREATE_FORM_KEY, true);
     want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, (int)record.renderingMode);
-
+    record.hostWant.ExtractHostParamsToWant(want);
     FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, reCreateRecord, want);
 }
 
@@ -610,7 +616,10 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
         FormIdKey formIdKey = element.first;
         std::string bundleName = formIdKey.bundleName;
         std::string abilityName = formIdKey.abilityName;
-        int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds);
+        std::string moduleName = formIdKey.moduleName;
+        int32_t userId = FormUtil::GetCallerUserId(uid);
+        int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, moduleName,
+            formIds, userId);
         if (result != ERR_OK) {
             HILOG_ERROR("NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s",
                 bundleName.c_str(), abilityName.c_str());
@@ -648,7 +657,7 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
 bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
 {
     HILOG_DEBUG("Call, bundleName:%{public}s", bundleName.c_str());
-    FormMgrAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
+    FormMgrAdapterFacade::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         HILOG_DEBUG("No form info");
@@ -660,7 +669,7 @@ bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
             continue;
         }
         int64_t updateDuration = formRecord.updateDuration;
-        if (!FormMgrAdapter::GetInstance().GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
+        if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
             HILOG_WARN("Get updateDuration failed, uses local configuration");
         }
 
@@ -714,6 +723,7 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     formRecord.privacyLevel = formInfo.privacyLevel;
     formRecord.isEnableUpdate = formInfo.updateEnabled;
     formRecord.updateDuration = formInfo.updateDuration * Constants::TIME_CONVERSION;
+    formRecord.isDataProxy = formInfo.dataProxyEnabled;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
     if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
         formRecord.updateAtHour = FormUtil::ConvertStringToInt(time[0]);
@@ -723,6 +733,10 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
+    FormUpgradeInfo oldFormUpgradeInfo;
+    FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, oldFormUpgradeInfo);
+    oldFormUpgradeInfo.enableBlurBackground = formInfo.enableBlurBackground;
+    formRecord.formUpgradeInfo = oldFormUpgradeInfo;
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
@@ -758,6 +772,77 @@ void FormEventUtil::HandleProviderUpdatedDetail(const std::vector<int64_t> &remo
     }
     ParamControl::GetInstance().ReloadDueControlByAppUpgrade(updatedForms);
     HandleFormReload(bundleName, userId, needReload, updatedForms);
+}
+
+void FormEventUtil::HandleFormWantCallbackAddForm(const std::vector<FormRecord> &updatedForms)
+{
+    std::unordered_map<int32_t, std::vector<FormRecord>> hostGroups;
+    for (const auto &record : updatedForms) {
+        for (int32_t hostUid : record.formUserUids) {
+            hostGroups[hostUid].push_back(record);
+        }
+    }
+    for (const auto &[hostUid, records] : hostGroups) {
+        HandleWantCallbackForHost(hostUid, records);
+    }
+}
+
+void FormEventUtil::HandleWantCallbackForHost(int32_t hostUid, const std::vector<FormRecord> &records)
+{
+    sptr<IRemoteObject> proxy;
+    ErrCode ret = FormMgrAdapterFacade::GetInstance().GetWantCallbackProxy(hostUid, proxy);
+    if (ret != ERR_OK || proxy == nullptr) {
+        return;
+    }
+    auto formHostProxy = iface_cast<IFormHostDelegate>(proxy);
+    if (formHostProxy == nullptr) {
+        HILOG_WARN("iface_cast IFormHostDelegate failed for hostUid=%{public}d", hostUid);
+        return;
+    }
+    auto formInfos = BuildFormInfos(records);
+    std::vector<AAFwk::WantParams> wantParamsList;
+    ret = formHostProxy->RequestFormWants(formInfos, wantParamsList);
+    if (ret != ERR_OK) {
+        HILOG_WARN("RequestFormWants failed:%{public}d for hostUid=%{public}d", ret, hostUid);
+        return;
+    }
+    if (wantParamsList.size() != records.size()) {
+        HILOG_WARN("wantParamsList size %{public}zu != records size %{public}zu for hostUid=%{public}d",
+            wantParamsList.size(), records.size(), hostUid);
+    }
+    ApplyWantParams(records, wantParamsList);
+}
+
+std::vector<FormInfo> FormEventUtil::BuildFormInfos(const std::vector<FormRecord> &records)
+{
+    std::vector<FormInfo> formInfos;
+    for (const auto &record : records) {
+        FormInfo formInfo;
+        if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo) == ERR_OK) {
+            formInfos.push_back(std::move(formInfo));
+        } else {
+            HILOG_WARN("GetFormsInfoByRecord failed, formId:%{public}" PRId64, record.formId);
+            formInfos.emplace_back();
+        }
+    }
+    return formInfos;
+}
+
+void FormEventUtil::ApplyWantParams(const std::vector<FormRecord> &records,
+    const std::vector<AAFwk::WantParams> &wantParamsList)
+{
+    for (size_t i = 0; i < records.size(); i++) {
+        const auto &record = records[i];
+        AAFwk::WantParams params;
+        if (i < wantParamsList.size()) {
+            params = wantParamsList[i];
+        }
+        AAFwk::Want hostWant;
+        hostWant.SetParams(params);
+        FormDataMgr::GetInstance().UpdateHostWant(record.formId, hostWant, true);
+        ErrCode ret = FormMgrAdapterFacade::GetInstance().AcquireProviderFormInfoByFormRecord(record, params);
+        HILOG_INFO("onAddForm via want callback, formId:%{public}" PRId64 ", ret:%{public}d", record.formId, ret);
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

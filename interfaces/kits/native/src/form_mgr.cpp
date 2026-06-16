@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -628,6 +628,42 @@ int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
     return remoteProxy_->SetNextRefreshTime(formId, nextTime);
 }
 
+ErrCode FormMgr::RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId)
+{
+    HILOG_INFO("call,userId:%{public}d", userId);
+    std::string bundleName = want.GetElement().GetBundleName();
+    std::string abilityName = want.GetElement().GetAbilityName();
+    if (bundleName.empty() || abilityName.empty()) {
+        HILOG_ERROR("bundleName:%{public}s,abilityName:%{public}s",
+            bundleName.c_str(), abilityName.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
+    std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
+    int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
+    if (formName.empty() || moduleName.empty() || dimensionId == 0) {
+        HILOG_ERROR("formName:%{public}s,moduleName:%{public}s,dimensionId:%{public}d",
+            formName.c_str(), moduleName.c_str(), dimensionId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (userId == Constants::INVALID_USER_ID) {
+        HILOG_ERROR("invalid userId:%{public}d", userId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("errCode:%{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RequestPublishFormCrossUser(want, userId, formId);
+}
+
 ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
     const std::vector<FormDataProxy> &formDataProxies)
@@ -664,7 +700,6 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
 #endif
     return ret;
 }
-
 
 ErrCode FormMgr::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
@@ -2650,6 +2685,156 @@ ErrCode FormMgr::UpdateTemplateFormDetailInfo(
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->UpdateTemplateFormDetailInfo(templateFormInfo);
+}
+
+ErrCode FormMgr::GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
+{
+    HILOG_DEBUG("call");
+ 
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+ 
+    int resultCode = remoteProxy_->GetFormIdsByFormLocation(formLocation, formIds);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail GetFormIdsByFormLocation,errCode %{public}d", resultCode);
+    }
+ 
+    return resultCode;
+}
+
+ErrCode FormMgr::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RegisterUpdateFormsConfigCallback(callerToken);
+}
+
+ErrCode FormMgr::UnregisterUpdateFormsConfigCallback()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UnregisterUpdateFormsConfigCallback();
+}
+
+ErrCode FormMgr::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UpdateFormsConfig(configs);
+}
+
+ErrCode FormMgr::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RegisterDeleteFormsCallback(callerToken);
+}
+
+ErrCode FormMgr::UnregisterDeleteFormsCallback()
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UnregisterDeleteFormsCallback();
+}
+
+ErrCode FormMgr::DeleteForms(const std::vector<FormRecordFilter> &filters)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->DeleteForms(filters);
+}
+
+ErrCode FormMgr::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed, errCode %{public}d", errCode);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RegisterFormWantCallback(callerToken);
+}
+
+ErrCode FormMgr::UnregisterFormWantCallback()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed, errCode %{public}d", errCode);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UnregisterFormWantCallback();
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

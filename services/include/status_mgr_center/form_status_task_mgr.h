@@ -20,7 +20,7 @@
 #include "iremote_object.h"
 #include "want.h"
 #include "data_center/form_record/form_record.h"
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 
 namespace OHOS {
 namespace AppExecFwk {

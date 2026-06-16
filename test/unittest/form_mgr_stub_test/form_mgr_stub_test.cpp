@@ -21,6 +21,8 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_service.h"
 #include "mock_form_token.h"
+#include "form_mgr_errors.h"
+#include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -3427,5 +3429,716 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReloadAllForms_001, TestSize.Lev
     auto result = mockFormMgrService->HandleReloadAllForms(data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadAllForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_001
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with DESKTOP location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with DESKTOP location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1", "formId2"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::DESKTOP));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), formIds.size());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_002
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with FORM_CENTER location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with FORM_CENTER location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds;
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::FORM_CENTER));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_TRUE(resultFormIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_003
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with FORM_MANAGER location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with FORM_MANAGER location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), 1);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_004
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with NEGATIVE_SCREEN location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with NEGATIVE_SCREEN location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_004 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds;
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::NEGATIVE_SCREEN));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_TRUE(resultFormIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_005
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with SCREEN_LOCK location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with SCREEN_LOCK location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_005 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1", "formId2", "formId3"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::SCREEN_LOCK));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), 3);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_005 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_006
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with AI_SUGGESTION location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with AI_SUGGESTION location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_006 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds;
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_TRUE(resultFormIds.empty());
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_006 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_007
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with STANDBY location
+ * @tc.desc: test HandleGetFormIdsByFormLocation with STANDBY location
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_007 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1"};
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::STANDBY));
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), 1);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_007 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_008
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with service error
+ * @tc.desc: test HandleGetFormIdsByFormLocation when service returns error
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_008 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(formLocation, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    MessageParcel data;
+    data.WriteInt32(formLocation);
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_008 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_GetFormIdsByFormLocation_009
+ * @tc.name: Verify HandleGetFormIdsByFormLocation with multiple form IDs
+ * @tc.desc: test HandleGetFormIdsByFormLocation returns multiple form IDs
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_009, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_009 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    std::vector<std::string> formIds = {"formId1", "formId2", "formId3", "formId4", "formId5"};
+    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
+    EXPECT_CALL(*mockFormMgrService, GetFormIdsByFormLocation(formLocation, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(formIds), Return(ERR_OK)));
+    MessageParcel data;
+    data.WriteInt32(formLocation);
+    MessageParcel reply;
+    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    std::vector<std::string> resultFormIds;
+    reply.ReadStringVector(&resultFormIds);
+    EXPECT_EQ(resultFormIds.size(), formIds.size());
+    EXPECT_THAT(resultFormIds, ContainerEq(formIds));
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_009 ends";
+}
+ 
+/**
+ * @tc.number: FormMgrStubTest_RequestPublishFormCrossUser_001
+ * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormCrossUser
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER, the interface return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RequestPublishFormCrossUser_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RequestPublishFormCrossUser_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    Want want;
+    makeWant(want, MakeWantFlag::DEFAULT);
+    int32_t userId = 100;
+    int64_t formId = 123456;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteParcelable(&want);
+    data.WriteInt32(userId);
+    EXPECT_CALL(*mockFormMgrService, RequestPublishFormCrossUser(_, userId, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<2>(formId), Return(ERR_OK)));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t errCode = reply.ReadInt32();
+    EXPECT_EQ(errCode, ERR_OK);
+    int64_t resultFormId = reply.ReadInt64();
+    EXPECT_EQ(resultFormId, formId);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RequestPublishFormCrossUser_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RequestPublishFormCrossUser_002
+ * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormCrossUser
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER, the interface return value is
+             ERR_OK + 1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RequestPublishFormCrossUser_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RequestPublishFormCrossUser_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    Want want;
+    makeWant(want, MakeWantFlag::DEFAULT);
+    int32_t userId = 100;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER);
+    constexpr int32_t errorCode = ERR_OK + 1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteParcelable(&want);
+    data.WriteInt32(userId);
+    EXPECT_CALL(*mockFormMgrService, RequestPublishFormCrossUser(_, userId, _))
+        .Times(1)
+        .WillOnce(Return(errorCode));
+    mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    int32_t result = reply.ReadInt32();
+    EXPECT_EQ(result, errorCode);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RequestPublishFormCrossUser_002 ends";
+}
+ 
+/**
+ * @tc.number: FormMgrStubTest_RequestPublishFormCrossUser_003
+ * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormCrossUser
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER, the interface return value is
+ *           ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RequestPublishFormCrossUser_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RequestPublishFormCrossUser_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RequestPublishFormCrossUser_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterFormWantCallback_001
+ * @tc.name: Verify OnRemoteRequest HandleRegisterFormWantCallback
+ * @tc.desc: When the parameter code is FORM_MGR_REGISTER_FORM_WANT_CALLBACK, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterFormWantCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterFormWantCallback_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterFormWantCallback(_)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterFormWantCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterFormWantCallback_002
+ * @tc.name: Verify HandleRegisterFormWantCallback with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterFormWantCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterFormWantCallback_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterFormWantCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterFormWantCallback_001
+ * @tc.name: Verify OnRemoteRequest HandleUnregisterFormWantCallback
+ * @tc.desc: When the parameter code is FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterFormWantCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    EXPECT_CALL(*mockFormMgrService, UnregisterFormWantCallback()).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterFormWantCallback_002
+ * @tc.name: Verify HandleUnregisterFormWantCallback with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterFormWantCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterFormWantCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_001
+ * @tc.name: Verify OnRemoteRequest HandleRegisterDeleteFormsCallback
+ * @tc.desc: When the parameter code is FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterDeleteFormsCallback(_)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_002
+ * @tc.name: Verify HandleRegisterDeleteFormsCallback with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_003
+ * @tc.name: Verify HandleRegisterDeleteFormsCallback with nullptr callerToken
+ * @tc.desc: When callerToken is nullptr, return ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteRemoteObject(nullptr);
+    auto errCode = mockFormMgrService->HandleRegisterDeleteFormsCallback(data, reply);
+    EXPECT_EQ(errCode, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_RegisterDeleteFormsCallback_004
+ * @tc.name: Verify HandleRegisterDeleteFormsCallback service error
+ * @tc.desc: When service returns error, verify result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_004 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterDeleteFormsCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
+    auto errCode = mockFormMgrService->HandleRegisterDeleteFormsCallback(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterDeleteFormsCallback_001
+ * @tc.name: Verify OnRemoteRequest HandleUnregisterDeleteFormsCallback
+ * @tc.desc: When the parameter code is FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterDeleteFormsCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    EXPECT_CALL(*mockFormMgrService, UnregisterDeleteFormsCallback()).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterDeleteFormsCallback_002
+ * @tc.name: Verify HandleUnregisterDeleteFormsCallback with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterDeleteFormsCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_UnregisterDeleteFormsCallback_003
+ * @tc.name: Verify HandleUnregisterDeleteFormsCallback service error
+ * @tc.desc: When service returns error, verify result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterDeleteFormsCallback_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, UnregisterDeleteFormsCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
+    auto errCode = mockFormMgrService->HandleUnregisterDeleteFormsCallback(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_UnregisterDeleteFormsCallback_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_001
+ * @tc.name: Verify OnRemoteRequest HandleDeleteForms
+ * @tc.desc: When the parameter code is FORM_MGR_DELETE_FORMS, return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filter.moduleName = "module";
+    filter.abilityName = "ability";
+    filter.formName = "form";
+    filters.push_back(filter);
+    
+    data.WriteInt32(filters.size());
+    for (const auto &f : filters) {
+        data.WriteParcelable(&f);
+    }
+    
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_)).Times(1).WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_002
+ * @tc.name: Verify HandleDeleteForms with invalid token
+ * @tc.desc: When interface token mismatch, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_003
+ * @tc.name: Verify HandleDeleteForms with invalid size (zero)
+ * @tc.desc: When size is 0, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_003 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(0);
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_004
+ * @tc.name: Verify HandleDeleteForms with invalid size (exceeds max)
+ * @tc.desc: When size exceeds max, return ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_004 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(Constants::DELETE_FORMS_FILTER_MAX_NUM + 1);
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_005
+ * @tc.name: Verify HandleDeleteForms with nullptr filter
+ * @tc.desc: When filter is nullptr, return ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_005 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(1);
+    // Write nullptr for filter
+    data.WriteParcelable(nullptr);
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_005 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_006
+ * @tc.name: Verify HandleDeleteForms service error
+ * @tc.desc: When service returns error, verify result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_006 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test.bundle";
+    filters.push_back(filter);
+    
+    data.WriteInt32(filters.size());
+    for (const auto &f : filters) {
+        data.WriteParcelable(&f);
+    }
+    
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG));
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_006 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_DeleteForms_007
+ * @tc.name: Verify HandleDeleteForms with multiple filters
+ * @tc.desc: Test HandleDeleteForms with multiple valid filters.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_007 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    
+    std::vector<FormRecordFilter> filters;
+    for (int i = 0; i < Constants::DELETE_FORMS_FILTER_MAX_NUM; ++i) {
+        FormRecordFilter filter;
+        filter.bundleName = "bundle" + std::to_string(i);
+        filter.moduleName = "module" + std::to_string(i);
+        filter.abilityName = "ability" + std::to_string(i);
+        filter.formName = "form" + std::to_string(i);
+        filters.push_back(filter);
+    }
+    
+    data.WriteInt32(filters.size());
+    for (const auto &f : filters) {
+        data.WriteParcelable(&f);
+    }
+    
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_)).Times(1).WillOnce(Return(ERR_OK));
+    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    auto result = reply.ReadInt32();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_007 ends";
 }
 }

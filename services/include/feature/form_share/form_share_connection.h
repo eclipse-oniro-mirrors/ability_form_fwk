@@ -16,14 +16,10 @@
 #ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_SHARE_CONNECTION_H
 #define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_SHARE_CONNECTION_H
 
-#include "event_handler.h"
 #include "common/connection/form_ability_connection.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-using WantParams = OHOS::AAFwk::WantParams;
-using Want = OHOS::AAFwk::Want;
 
 /**
  * @class FormShareConnection
@@ -32,25 +28,38 @@ using Want = OHOS::AAFwk::Want;
 class FormShareConnection : public FormAbilityConnection {
 public:
     FormShareConnection(int64_t formId, const std::string &bundleName, const std::string &abilityName,
-        const std::string &deviceId, int64_t formShareRequestCode);
-
+        const std::string &deviceId, int64_t formShareRequestCode, const int32_t userId);
     virtual ~FormShareConnection() = default;
 
+protected:
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     * @param element service ability's ElementName.
-     * @param remoteObject The session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
+     * @brief Error handling when connection fails.
+     *        Share connection sends error response on failure.
+     * @param resultCode Error code.
+     * @param element Connection element.
      */
-    void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int32_t resultCode) override;
+    void OnConnectError(int resultCode, const AppExecFwk::ElementName &element) override;
+
+    /**
+     * @brief Build task Want parameter with share request code.
+     * @return Built Want object.
+     */
+    Want OnBuildTaskWant() override;
+
+    /**
+     * @brief Execute share acquire task after connection success.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
 
 private:
-    int64_t formId_ {-1};
-    std::string remoteDeviceId_ {""};
-    int64_t formShareRequestCode_ {0};
+    int64_t formId_;
+    std::string remoteDeviceId_;
+    int64_t formShareRequestCode_;
     DISALLOW_COPY_AND_MOVE(FormShareConnection);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
+
 #endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_SHARE_CONNECTION_H

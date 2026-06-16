@@ -49,6 +49,7 @@ export default namespace formInfo {
     readonly isStandbySupported?: boolean;
     readonly isStandbyAdapted?: boolean;
     readonly isPrivacySensitive?: boolean;
+    readonly isTemplateForm?: boolean;
   }
 
   enum RenderingMode {
@@ -62,13 +63,7 @@ export default namespace formInfo {
     eTS = 2
   }
 
-  enum ColorMode {
-    MODE_AUTO = -1,
-    MODE_DARK = 0,
-    MODE_LIGHT = 1
-  }
-
-  interface FormStateInfo {
+  export interface FormStateInfo {
     formState: FormState;
     want: Want;
   }
@@ -98,9 +93,16 @@ export default namespace formInfo {
     HOST_BG_INVERSE_COLOR_KEY = 'ohos.extra.param.key.host_bg_inverse_color',
     FORM_PERMISSION_NAME_KEY = 'ohos.extra.param.key.permission_name',
     FORM_PERMISSION_GRANTED_KEY = 'ohos.extra.param.key.permission_granted',
+    ORIGINAL_FORM_KEY = 'ohos.extra.param.key.original_form_id',
+    EDIT_FORM_KEY = 'ohos.extra.param.key.edit_form_id',
+    FORM_MANAGER_SHOW_SINGLE_FORM = 'ohos.extra.param.key.form_manager_show_single_form',
+    TEMPLATE_FORM_DETAIL_ID = 'ohos.extra.param.key.template_form_detail_id',
+    TEMPLATE_FORM_DATA = 'ohos.extra.param.key.template_form_data',
+    TEMPLATE_FORM_DISPLAY_NAME = 'ohos.extra.param.key.template_form_display_name',
+    TEMPLATE_FORM_DESCRIPTION = 'ohos.extra.param.key.template_form_description'
   }
 
-  interface FormInfoFilter {
+  export interface FormInfoFilter {
     bundleName?: string;
     moduleName?: string;
     supportedDimensions?: Array<int>;
@@ -124,6 +126,11 @@ export default namespace formInfo {
     CIRCLE = 2
   }
 
+  enum FormUpdateReason {
+    UNKNOWN = -1,
+    FORM_NODE_REUSE = 0
+  }
+
   enum VisibilityType {
     UNKNOWN = 0,
     FORM_VISIBLE = 1,
@@ -132,10 +139,11 @@ export default namespace formInfo {
 
   enum LaunchReason {
     FORM_DEFAULT = 1,
-    FORM_SHARE = 2
+    FORM_SHARE = 2,
+    FORM_SIZE_CHANGE = 3
   }
 
-  interface PublishFormResult {
+  export interface PublishFormResult {
     code: PublishFormErrorCode;
     message: string;
   }
@@ -147,7 +155,7 @@ export default namespace formInfo {
     INTERNAL_ERROR = 3
   }
 
-  interface FormProviderFilter {
+  export interface FormProviderFilter {
     bundleName: string;
     formName?: string;
     moduleName?: string;
@@ -203,6 +211,10 @@ export default namespace formInfo {
     STANDBY = 8,
   }
 
+  enum SceneAnimationTriggerType {
+    SHAKE = 1,
+  }
+
   export class formInfoInner implements FormInfo {
     public bundleName: string = '';
     public moduleName: string = '';
@@ -236,6 +248,7 @@ export default namespace formInfo {
     public isStandbySupported?: boolean = true;
     public isStandbyAdapted?: boolean = false;
     public isPrivacySensitive?: boolean = false;
+    public isTemplateForm?: boolean = false;
   }
 
   export class runningFormInfoInner implements RunningFormInfo {
@@ -252,7 +265,7 @@ export default namespace formInfo {
     public formDescription: string = '';
     public extraData?: Record<string, Object> = {};
   }
-  
+
   export class FormStateInfoInner implements FormStateInfo {
     formState: FormState;
     want: Want;
@@ -284,7 +297,31 @@ export default namespace formInfo {
     overflowInfo?: OverflowInfo;
   }
 
-  interface Rect {
+  interface TemplateFormDetailInfo {
+    bundleName: string;
+    moduleName: string;
+    abilityName: string;
+    formName: string;
+    dimension: FormDimension;
+    detailId: string;
+    displayName: string;
+    description: string;
+  }
+
+  class TemplateFormDetailInfoInner implements TemplateFormDetailInfo {
+    bundleName: string;
+    moduleName: string;
+    abilityName: string;
+    formName: string;
+    dimension: FormDimension;
+    detailId: string;
+    displayName: string;
+    description: string;
+  }
+
+  type TemplateFormDetailInfoCallback = (info: Array<TemplateFormDetailInfo>) => void;
+
+  export interface Rect {
     left: double;
     top: double;
     width: double;
@@ -298,12 +335,12 @@ export default namespace formInfo {
     height: double;
   }
 
-  interface OverflowInfo {
+  export interface OverflowInfo {
     area: Rect;
     duration: int;
     useDefaultAnimation?: boolean;
   }
-  
+
   class OverflowInfoInner implements OverflowInfo {
     area: Rect;
     duration: int;
@@ -323,12 +360,28 @@ export default namespace formInfo {
   interface SceneAnimationParams {
     abilityName: string;
     disabledDesktopBehaviors?: string;
+    triggerTypes?: Array<SceneAnimationTriggerType>;
   }
 
   class SceneAnimationParamsInner implements SceneAnimationParams {
     abilityName: string;
     disabledDesktopBehaviors?: string;
+    triggerTypes?: Array<SceneAnimationTriggerType>;
   }
 
   type GetFormRectInfoCallback = (formId: string) => Promise<Rect>;
+
+  interface PublishFormCrossBundleInfo {
+    callerBundleName: string;
+    targetBundleName: string;
+    targetTemplateFormDetailId: string;
+  }
+
+  class PublishFormCrossBundleInfoInner implements PublishFormCrossBundleInfo {
+    callerBundleName: string;
+    targetBundleName: string;
+    targetTemplateFormDetailId: string;
+  }
+
+  type PublishFormCrossBundleControlCallback = (info: PublishFormCrossBundleInfo) => boolean;
 }

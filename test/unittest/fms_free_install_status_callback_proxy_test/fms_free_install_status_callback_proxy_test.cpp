@@ -68,7 +68,7 @@ public:
  * @tc.desc: Verify that the OnInstallFinished interface executes normally and exits without exception.
  */
 HWTEST_F(FmsFreeInstallStatusCallbackProxyTest,
-    Fms_FreeInstallStatusCallbackProxy_0001, Function | MediumTest | Level1)
+    Fms_FreeInstallStatusCallbackProxy_0001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FreeInstallStatusCallbackProxy_0001 start";
     sptr<MolFreeInstallStatusCallBackStub> impl = new (std::nothrow) MolFreeInstallStatusCallBackStub();
@@ -88,7 +88,7 @@ HWTEST_F(FmsFreeInstallStatusCallbackProxyTest,
  * @tc.desc: Verify that the OnInstallFinished interface executes normally and exits without exception.
  */
 HWTEST_F(FmsFreeInstallStatusCallbackProxyTest,
-    Fms_FreeInstallStatusCallbackProxy_0002, Function | MediumTest | Level1)
+    Fms_FreeInstallStatusCallbackProxy_0002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FreeInstallStatusCallbackProxy_0002 start";
     sptr<MolFreeInstallStatusCallBackStub> impl = new (std::nothrow) MolFreeInstallStatusCallBackStub();

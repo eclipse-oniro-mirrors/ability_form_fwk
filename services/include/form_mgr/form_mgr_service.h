@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 
 #ifndef OHOS_FORM_FWK_FORM_MGR_SERVICE_H
 #define OHOS_FORM_FWK_FORM_MGR_SERVICE_H
+
+#include <string_view>
 
 #include <singleton.h>
 #include <system_ability.h>
@@ -143,7 +145,17 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
-                               std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override;
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override;
+
+    /**
+    * @brief Request to publish a form to the form host with specific userId.
+    *
+    * @param want The want of the form to publish.
+     * @param userId User ID.
+    * @param formId Return the form id to be published.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId) override;
 
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo) override;
 
@@ -774,8 +786,6 @@ public:
     ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
         float formViewScale) override;
 
-    void SubscribeNetConn();
-
     /**
      * @brief Handle open form edit ability.
      * @param abilityName The form edit ability name.
@@ -791,8 +801,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode CloseFormEditAbility(bool isMainPage) override;
-
-    friend class NetConnCallbackObserver;
 
     /**
      * @brief Register overflow proxy
@@ -948,6 +956,57 @@ public:
     ErrCode UpdateTemplateFormDetailInfo(
         const std::vector<TemplateFormDetailInfo> &templateFormInfo) override;
 
+    /**
+     * @brief Get formIds by form location.
+     * @param formLocation Indicate the location of the form.
+     * @param formIds [out] The formIds of the form location to be returned.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds) override;
+
+    ErrCode RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken) override;
+    ErrCode UnregisterFormWantCallback() override;
+
+    /**
+     * @brief Register update form config callback.
+     * @param callerToken The caller token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister update form config callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterUpdateFormsConfigCallback() override;
+
+    /**
+     * @brief Update form config.
+     * @param configs The form custom configs to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormsConfig(const std::vector<FormCustomConfig> &configs) override;
+
+    /**
+     * @brief Register delete forms callback.
+     * @param callerToken The caller token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister delete forms callback.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterDeleteFormsCallback() override;
+
+    /**
+     * @brief Delete forms by filters.
+     * @param filters The form record filters.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters) override;
+
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
@@ -975,13 +1034,11 @@ private:
     ErrCode Init();
 
     ErrCode CheckFormPermission(
-        const std::string &permission = AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+        std::string_view permission = AppExecFwk::Constants::PERMISSION_REQUIRE_FORM, bool checkSA = false);
 
     bool CheckAcrossLocalAccountsPermission() const;
 
     void InitFormShareMgrSerialQueue();
-
-    void PostConnectNetWork();
 
     void Dump(const std::vector<std::u16string> &args, std::string &result);
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
@@ -996,8 +1053,6 @@ private:
     void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
-    void SetNetConnect();
-    void SetDisConnectTypeTime();
     bool PublishFormCrossBundleControl(const Want &want);
 
 private:
@@ -1013,8 +1068,6 @@ private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
     uint32_t NetSceneCallbackId_ = 0;
-    int32_t netConTime = 0;
-    int64_t lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
     std::set<int64_t> requestPublishFormWithSnapshotSet_;
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);

@@ -83,6 +83,8 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return HandleUpdateFormSize(data, reply);
         case static_cast<uint32_t>(IFormRender::Message::FORM_SET_RENDER_GROUP_ENABLE_FLAG):
             return HandleSetRenderGroupEnableFlag(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_SET_RENDER_GROUP_PARAMS):
+            return HandleSetRenderGroupParams(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -305,10 +307,30 @@ int32_t FormRenderStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string uid = data.ReadString();
+
+    std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
+    if (!formJsInfo) {
+        HILOG_ERROR("ReadParcelable<formJsInfo> fail");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_UpdateFormSize",
         FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    int32_t result = UpdateFormSize(formId, *formSurfaceInfo, uid);
+
+    int32_t result = UpdateFormSize(formId, *formSurfaceInfo, uid, *formJsInfo);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormRenderStub::HandleSetRenderGroupParams(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("error to ReadParcelable<Want>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = SetRenderGroupParams(formId, *want);
     reply.WriteInt32(result);
     return result;
 }

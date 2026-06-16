@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,10 @@
 #include "form_render_event_report.h"
 
 #include <chrono>
-#include <map>
+#include <unordered_map>
 #include "backtrace_local.h"
 #include "fms_log_wrapper.h"
+#include "form_hisysevent_wrapper.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 
@@ -40,8 +41,9 @@ constexpr const char *INVALIDEVENTNAME = "INVALIDEVENTNAME";
 constexpr int64_t RECYCLE_FORM_FAILED = 1;
 constexpr int64_t WAIT_RELEASE_RENDERER_ERROR_CODE = 400;
 constexpr int64_t WAIT_RELEASE_RENDERER_TIMEOUT = 2000;
-const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
-    std::map<FormEventName, std::string>::value_type(FormEventName::RELOAD_FORM_FAILED, "RELOAD_FORM_FAILED"),
+static const std::unordered_map<FormEventName, const char *> EVENT_NAME_MAP = {
+    {FormEventName::RELOAD_FORM_FAILED, "RELOAD_FORM_FAILED"},
+    {FormEventName::RECYCLE_RECOVER_FORM_FAILED, "RECYCLE_RECOVER_FORM_FAILED"},
 };
 }
 
@@ -50,24 +52,15 @@ using namespace std::chrono;
 
 std::unordered_map<int64_t, int32_t> FormRenderEventReport::waitReleaseTimerMap_ = {};
 
-int64_t FormRenderEventReport::GetNowMillisecond()
-{
-    system_clock::time_point pointTime = system_clock::now();
-    auto timeMilliseconds = chrono::duration_cast<chrono::milliseconds>(pointTime.time_since_epoch());
-    return timeMilliseconds.count();
-}
-
 void FormRenderEventReport::SendPerformanceEvent(SceneType sceneType, PerformanceEventInfo &eventInfo)
 {
+    FormHiSysEventBuilder builder;
     switch (sceneType) {
         case SceneType::CPU_SCENE_ENTRY:
-            HiSysEventWrite(
-                DOMAIN_PERFORMANCE,
-                "CPU_SCENE_ENTRY",
-                HiSysEventType::BEHAVIOR,
-                "PACKAGE_NAME", eventInfo.bundleName,
-                "SCENE_ID", eventInfo.sceneId,
-                "HAPPEN_TIME", eventInfo.timeStamp);
+            builder.InsertParam("PACKAGE_NAME", eventInfo.bundleName);
+            builder.InsertParam("SCENE_ID", eventInfo.sceneId);
+            builder.InsertParam("HAPPEN_TIME", eventInfo.timeStamp);
+            builder.Write(DOMAIN_PERFORMANCE, "CPU_SCENE_ENTRY", HISYSEVENT_BEHAVIOR);
             break;
         default:
             break;
@@ -77,13 +70,11 @@ void FormRenderEventReport::SendPerformanceEvent(SceneType sceneType, Performanc
 void FormRenderEventReport::SendBlockFaultEvent(const std::string &bundleName, const std::string &errorName,
     const std::string &errorMsg)
 {
-    HiSysEventWrite(
-        HiSysEvent::Domain::FORM_MANAGER,
-        "FORM_BLOCK_CALLSTACK",
-        HiSysEvent::EventType::FAULT,
-        EVENT_KEY_BUNDLE_NAME, bundleName,
-        EVENT_KEY_ERROR_NAME, errorName,
-        EVENT_KEY_ERROR_MSG, errorMsg);
+    FormHiSysEventBuilder builder;
+    builder.InsertParam(EVENT_KEY_BUNDLE_NAME, bundleName);
+    builder.InsertParam(EVENT_KEY_ERROR_NAME, errorName);
+    builder.InsertParam(EVENT_KEY_ERROR_MSG, errorMsg);
+    builder.Write("FORM_MANAGER", "FORM_BLOCK_CALLSTACK", HISYSEVENT_FAULT);
 }
 
 std::string FormRenderEventReport::ConvertEventName(const FormEventName &eventName)
@@ -104,34 +95,30 @@ void FormRenderEventReport::SendFormFailedEvent(const FormEventName &eventName, 
         return;
     }
 
-    HiSysEventWrite(
-        HiSysEvent::Domain::FORM_MANAGER,
-        "FORM_ERROR",
-        HiSysEvent::EventType::FAULT,
-        EVENT_KEY_FORM_ID, formId,
-        EVENT_KEY_BUNDLE_NAME, bundleName,
-        EVENT_KEY_FORM_NAME, formName,
-        EVENT_KEY_ERROR_NAME, name,
-        EVENT_KEY_ERROR_TYPE, errorType,
-        EVENT_KEY_ERROR_CODE, errorCode);
+    FormHiSysEventBuilder builder;
+    builder.InsertParam(EVENT_KEY_FORM_ID, formId);
+    builder.InsertParam(EVENT_KEY_BUNDLE_NAME, bundleName);
+    builder.InsertParam(EVENT_KEY_FORM_NAME, formName);
+    builder.InsertParam(EVENT_KEY_ERROR_NAME, name);
+    builder.InsertParam(EVENT_KEY_ERROR_TYPE, errorType);
+    builder.InsertParam(EVENT_KEY_ERROR_CODE, errorCode);
+    builder.Write("FORM_MANAGER", "FORM_ERROR", HISYSEVENT_FAULT);
 }
 
-// After RecycleForm is executed, it will proceed to ReleaseRenderer.
-// If ReleaseRenderer is not called within the timeout period, a card recycling failure will be reported.
 void FormRenderEventReport::StartReleaseTimeoutReportTimer(int64_t formId, const std::string &uid)
 {
     FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
     auto timeoutCallback = [formId, uid](void *) {
         HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
-        HiSysEventWrite(
-            HiSysEvent::Domain::FORM_MANAGER, "FORM_ERROR",
-            HiSysEvent::EventType::FAULT,
-            EVENT_KEY_FORM_ID, formId,
-            EVENT_KEY_BUNDLE_NAME, uid,
-            EVENT_KEY_FORM_NAME, "",
-            EVENT_KEY_ERROR_NAME, "RECYCLE_RECOVER_FORM_FAILED",
-            EVENT_KEY_ERROR_TYPE, RECYCLE_FORM_FAILED,
-            EVENT_KEY_ERROR_CODE, WAIT_RELEASE_RENDERER_ERROR_CODE);
+        std::string eventName = ConvertEventName(FormEventName::RECYCLE_RECOVER_FORM_FAILED);
+        FormHiSysEventBuilder builder;
+        builder.InsertParam(EVENT_KEY_FORM_ID, formId);
+        builder.InsertParam(EVENT_KEY_BUNDLE_NAME, uid);
+        builder.InsertParam(EVENT_KEY_FORM_NAME, std::string(""));
+        builder.InsertParam(EVENT_KEY_ERROR_NAME, eventName);
+        builder.InsertParam(EVENT_KEY_ERROR_TYPE, static_cast<int32_t>(RECYCLE_FORM_FAILED));
+        builder.InsertParam(EVENT_KEY_ERROR_CODE, static_cast<int32_t>(WAIT_RELEASE_RENDERER_ERROR_CODE));
+        builder.Write("FORM_MANAGER", "FORM_ERROR", HISYSEVENT_FAULT);
     };
     const std::string taskName = "FRS_WaitReleaseRenderer_" + std::to_string(formId);
     int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer(taskName, WAIT_RELEASE_RENDERER_TIMEOUT,
@@ -157,14 +144,13 @@ void FormRenderEventReport::SendRuntimeMemoryLeakEvent(const std::string &bundle
     HILOG_INFO("runtime memory leak, bundleName: %{public}s processMemory: %{public}" PRIu64
         ", runtimeMemory: %{public}" PRIu64, bundleName.c_str(), processMemory, runtimeMemory);
 
-    HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER,
-        "FORM_MEMORY_LEAK",
-        HiSysEvent::EventType::STATISTIC,
-        EVENT_KEY_BUNDLE_NAME, bundleName,
-        EVENT_KEY_PROCESS_MEMORY, processMemory,
-        EVENT_KEY_BUNDLE_MEMORY, runtimeMemory,
-        EVENT_KEY_FORM_NAME, formName,
-        EVENT_KEY_FORM_LOCATION, formLocation);
+    FormHiSysEventBuilder builder;
+    builder.InsertParam(EVENT_KEY_BUNDLE_NAME, bundleName);
+    builder.InsertParam(EVENT_KEY_PROCESS_MEMORY, processMemory);
+    builder.InsertParam(EVENT_KEY_BUNDLE_MEMORY, runtimeMemory);
+    builder.InsertParam(EVENT_KEY_FORM_NAME, formName);
+    builder.InsertParam(EVENT_KEY_FORM_LOCATION, formLocation);
+    builder.Write("FORM_MANAGER", "FORM_MEMORY_LEAK", HISYSEVENT_STATISTIC);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

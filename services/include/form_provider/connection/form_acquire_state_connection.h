@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-using WantParams = OHOS::AAFwk::WantParams;
 using Want = OHOS::AAFwk::Want;
 
 /**
@@ -30,19 +29,17 @@ using Want = OHOS::AAFwk::Want;
  */
 class FormAcquireStateConnection : public FormAbilityConnection {
 public:
-    FormAcquireStateConnection(const std::string &bundleName, const std::string &abilityName, const Want &want,
-                               std::string &provider);
-
+    FormAcquireStateConnection(const std::string &bundleName, const std::string &abilityName,
+        const Want &want, std::string &provider, const int32_t userId);
     virtual ~FormAcquireStateConnection() = default;
 
+protected:
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     * @param element service ability's ElementName.
-     * @param remoteObject the session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
+     * @brief Execute acquire state task after connection success.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
      */
-    void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
 
 private:
     Want want_;

@@ -14,6 +14,8 @@
  */
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 
+#include <unordered_map>
+
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "common/util/scope_guard.h"
@@ -21,17 +23,23 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    const std::string DISTRIBUTED_FORM_BUNDLE_TABLE = "distributed_form_bundle_table";
-    constexpr int32_t KEY_INDEX = 0;
-    constexpr int32_t USERID_INDEX = 1;
-    constexpr int32_t ENTRYMODULE_INDEX = 2;
-    constexpr int32_t UIMODULE_INDEX = 3;
-    constexpr int32_t VALUE_INDEX = 4;
-    constexpr const char* KEY = "KEY"; // KEY = BUNDLENAME + USERID
-    constexpr const char* USERID = "USERID";
-    constexpr const char* ENTRYMODULE = "ENTRYMODULE";
-    constexpr const char* UIMODULE = "UIMODULE";
-    constexpr const char* VALUE = "VALUE";
+const std::string DISTRIBUTED_FORM_BUNDLE_TABLE = "distributed_form_bundle_table";
+constexpr int32_t KEY_INDEX = 0;
+constexpr int32_t USERID_INDEX = 1;
+constexpr int32_t ENTRYMODULE_INDEX = 2;
+constexpr int32_t UIMODULE_INDEX = 3;
+constexpr int32_t VALUE_INDEX = 4;
+constexpr const char* KEY = "KEY";
+constexpr const char* USERID = "USERID";
+constexpr const char* ENTRYMODULE = "ENTRYMODULE";
+constexpr const char* UIMODULE = "UIMODULE";
+constexpr const char* VALUE = "VALUE";
+const std::unordered_map<std::string, std::string> TABLE_EXTRA_COLUMNS = {
+    { USERID, "INTEGER" },
+    { ENTRYMODULE, "TEXT" },
+    { UIMODULE, "TEXT" },
+    { VALUE, "TEXT" },
+};
 }
 
 FormDistributedMgr::FormDistributedMgr()
@@ -43,13 +51,6 @@ FormDistributedMgr::~FormDistributedMgr()
 {
     HILOG_INFO("Destroy");
 }
-
-const static std::map<std::string, std::string> tableExtraColumns_ = {
-    { USERID, "INTEGER" },
-    { ENTRYMODULE, "TEXT" },
-    { UIMODULE, "TEXT" },
-    { VALUE, "TEXT" },
-};
 
 void FormDistributedMgr::Start()
 {
@@ -136,8 +137,8 @@ void FormDistributedMgr::AlterTableAddColumn()
     static const std::vector<std::string> columns = { USERID, ENTRYMODULE, UIMODULE, VALUE };
     std::string sql;
     for (const auto &iter : columns) {
-        auto it = tableExtraColumns_.find(iter);
-        if (it == tableExtraColumns_.end()) {
+        auto it = TABLE_EXTRA_COLUMNS.find(iter);
+        if (it == TABLE_EXTRA_COLUMNS.end()) {
             return;
         }
         sql = "ALTER TABLE " + DISTRIBUTED_FORM_BUNDLE_TABLE + " ADD COLUMN " + it->first + " " + it->second;

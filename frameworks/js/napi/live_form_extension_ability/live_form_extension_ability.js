@@ -19,29 +19,31 @@ let UIExtensionAbility = requireNapi('app.ability.UIExtensionAbility');
 const domainID = 0xD001301;
 const TAG = 'FormManagerService';
 const FORM_LAYOUT_SCALE = 'layout_scale';
-const DEFAULT_LAYOUT_SCALE = 1;
+const NUMBER_TYPE = 'number';
+const FORM_FONT_SCALE_KEY = 'ohos.extra.param.key.form_font_size_scale';
+const FORM_FONT_WEIGHT_SCALE_KEY = 'ohos.extra.param.key.form_font_weight_scale';
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
   liveFormInfo = undefined;
 
   onSessionCreate(want, session) {
-    hilog.slogI(domainID, TAG, 'onSessionCreate');
+    hilog.sLogI(domainID, TAG, 'onSessionCreate');
     if (!want.parameters) {
-      hilog.slogE(domainID, TAG, 'null parameters');
+      hilog.sLogE(domainID, TAG, 'null parameters');
       this.onDestroy();
       return;
     }
 
     let extraInfo = want.parameters.extraInfo;
     if (!extraInfo) {
-      hilog.slogE(domainID, TAG, 'null extraInfo');
+      hilog.sLogE(domainID, TAG, 'null extraInfo');
       this.onDestroy();
       return;
     }
 
     this.liveFormInfo = extraInfo.formInfo;
     if (!this.liveFormInfo) {
-      hilog.slogE(domainID, TAG, 'null liveFormInfo');
+      hilog.sLogE(domainID, TAG, 'null liveFormInfo');
       this.onDestroy();
       return;
     }
@@ -49,14 +51,14 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
     this.context.formId = this.liveFormInfo.formId;
     this.context.setWindowBackgroundColor()
       .then(() => {
-          hilog.slogI(domainID, TAG, 'setWindowBackgroundColor succeed');
+          hilog.sLogI(domainID, TAG, 'setWindowBackgroundColor succeed');
       })
       .catch((err) => {
-        hilog.slogE(domainID, TAG, `setWindowBackgroundColor failed, code is ${err?.code}, message is ${err?.message}`);
+        hilog.sLogE(domainID, TAG, `setWindowBackgroundColor failed, code is ${err?.code}, message is ${err?.message}`);
       });
 
     let layoutScale = want.parameters[FORM_LAYOUT_SCALE];
-    if (layoutScale > 0  && layoutScale < DEFAULT_LAYOUT_SCALE) {
+    if (layoutScale > 0) {
       try {
         this.context.setUIExtCustomDensity(layoutScale)
           .then(() => {
@@ -67,22 +69,43 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
           });
       } catch(err) {
         hilog.sLogE(domainID, TAG, `setUIExtCustomDensity failed, code is ${err?.code}, message is ${err?.message}`);
-     }
+      }
+    }
+
+    let fontScale = want.parameters[FORM_FONT_SCALE_KEY];
+    // fontWeight is unused until UEA providers api for setting font weight
+    let fontWeight = want.parameters[FORM_FONT_WEIGHT_SCALE_KEY];
+    if (typeof fontScale === NUMBER_TYPE && typeof fontWeight === NUMBER_TYPE) {
+      hilog.sLogD(domainID, TAG,
+        `setFontScale ${FORM_FONT_SCALE_KEY}: ${fontScale}, ${FORM_FONT_WEIGHT_SCALE_KEY}: ${fontWeight}`);
+      try {
+        this.context.setFontScale(fontScale)
+          .then(() => {
+            hilog.sLogI(domainID, TAG, `setFontScale succeed, scale is ${fontScale}`);
+          })
+          .catch((err) => {
+            hilog.sLogE(domainID, TAG, `setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
+          });
+      } catch(err) {
+        hilog.sLogE(domainID, TAG, `setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
+      }
+    } else {
+      hilog.sLogE(domainID, TAG, `setFontScale fontScale or fontWeight isn't number type`);
     }
 
     this.onLiveFormCreate(this.liveFormInfo, session);
   }
 
   onLiveFormCreate(liveFormInfo, session) {
-    hilog.slogI(domainID, TAG, 'onLiveFormCreate');
+    hilog.sLogI(domainID, TAG, 'onLiveFormCreate');
   }
 
   onDestroy() {
-    hilog.slogI(domainID, TAG, 'onDestroy');
+    hilog.sLogI(domainID, TAG, 'onDestroy');
     this.onLiveFormDestroy(this.liveFormInfo);
   }
 
   onLiveFormDestroy(liveFormInfo) {
-    hilog.slogI(domainID, TAG, 'onLiveFormDestroy');
+    hilog.sLogI(domainID, TAG, 'onLiveFormDestroy');
   }
 }

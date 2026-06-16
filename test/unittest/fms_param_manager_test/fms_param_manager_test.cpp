@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
+#define private public
 #include "feature/param_update/param_manager.h"
-#include "feature/param_update/param_common_event.h"
 #include "feature/param_update/param_reader.h"
+#undef private
+#include "feature/param_update/param_common_event.h"
 #include "feature/param_update/sign_tools.h"
 #include "form_constants.h"
 
@@ -181,6 +183,32 @@ HWTEST_F(FmsParamManagerTest, fmsParamManager_009, TestSize.Level1)
     std::tuple<int, std::string> ret = SignTools::CalcFileSha256Digest(path);
     EXPECT_NE(std::get<0>(ret), 0);
     GTEST_LOG_(INFO) << "FmsParamManagerTest fmsParamManager_009 end";
+}
+
+/**
+ * @tc.name: GetSha256Digest_001
+ * @tc.desc: test GetSha256Digest with empty fileName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamManagerTest, GetSha256Digest_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamManagerTest GetSha256Digest_001 start";
+    std::string result = paramReader.GetSha256Digest("");
+    EXPECT_TRUE(result.empty());
+    GTEST_LOG_(INFO) << "FmsParamManagerTest GetSha256Digest_001 end";
+}
+
+/**
+ * @tc.name: CalcFileSha256Digest_001
+ * @tc.desc: test CalcFileSha256Digest with empty fileName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsParamManagerTest, CalcFileSha256Digest_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsParamManagerTest CalcFileSha256Digest_001 start";
+    std::string result = paramReader.CalcFileSha256Digest("");
+    EXPECT_TRUE(result.empty());
+    GTEST_LOG_(INFO) << "FmsParamManagerTest CalcFileSha256Digest_001 end";
 }
 }
 }

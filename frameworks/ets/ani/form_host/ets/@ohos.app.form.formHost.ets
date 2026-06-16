@@ -61,9 +61,12 @@ export default namespace formHost {
   native function isSystemReadyInner(callback: AsyncCallbackWrapper<void>): void;
   native function getAllFormsInfoInner(callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
   native function getFormsInfoByFilterInner(filter: formInfo.FormInfoFilter,
-      callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+    callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
   native function getFormsInfoInner(bundleName: string, moduleName: string,
-        callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+    callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+  native function getAllTemplateFormsInfoInner(callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
+  native function getTemplateFormsInfoInner(bundleName: string, moduleName: string,
+    callback: AsyncCallbackWrapper<Array<formInfo.FormInfo>>): void;
   native function notifyFormsEnableUpdateInner(formIds: Array<string>, isEnableUpdate: boolean, callback: AsyncCallbackWrapper<void>): void;
   native function notifyFormsVisibleInner(formIds: Array<string>, isVisible: boolean, callback: AsyncCallbackWrapper<void>): void;
   native function releaseFormInner(formId: string, isReleaseCache: boolean, callback: AsyncCallbackWrapper<void>): void;
@@ -84,6 +87,8 @@ export default namespace formHost {
   native function unRegisterFormObserverInner(callback?: CallbackWrapper<string>): void;
   native function setRouterProxyInner(formIds: Array<string>, proxy: CallbackWrapper<Want>, callback: AsyncCallbackWrapper<void>): void;
   native function clearRouterProxyInner(formIds: Array<string>, callback: AsyncCallbackWrapper<void>): void;
+  native function getFormIdsByFormLocationInner(location: formInfo.FormLocation,
+    callback: AsyncCallbackWrapper<Array<string>>): void;
   export native function nativeOnFormOverflow(callback: CallbackWrapper<formInfo.OverflowRequest>): void;
   export native function nativeOffFormOverflow(callback?: CallbackWrapper<formInfo.OverflowRequest>): void;
   export native function nativeOnChangeSceneAnimationState(callback: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
@@ -92,13 +97,18 @@ export default namespace formHost {
   export native function nativeOffGetFormRect(callback?: GetFormRectInfoCallbackWrapper): void;
   export native function nativeOnGetLiveFormStatus(callback: GetLiveFormStatusCallbackWrapper): void;
   export native function nativeOffGetLiveFormStatus(callback?: GetLiveFormStatusCallbackWrapper): void;
+  export native function nativeOnTemplateFormDetailInfoChange(callback: TemplateFormDetailInfoChangeCallbackWrapper): void;
+  export native function nativeOffTemplateFormDetailInfoChange(callback?: TemplateFormDetailInfoChangeCallbackWrapper): void;
+  export native function nativeOnGetWantParamsCallback(callback: GetWantParamsCallbackWrapper): void;
+  export native function nativeOffGetWantParamsCallback(callback?: GetWantParamsCallbackWrapper): void;
+  export native function nativeUpdateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void;
 
-  const ERR_OK = 0;
-  const INVALID_PARAM_ERROR_CODE = 401;
-  const INVALID_PARAM_MESSAGE_ETS = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
+  const ERR_OK: int = 0;
+  const INVALID_PARAM_ERROR_CODE: int = 401;
+  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
     + " 2.Incorrect parameter types;"
     + " 3.Parameter verification failed.";
-  const INVALID_CALLBACK_INDEX = -1;
+  const INVALID_CALLBACK_INDEX: int = -1;
 
   export function acquireFormState(want: Want, callback: AsyncCallback<formInfo.FormStateInfo>): void {
     if (want === undefined || want === null) {
@@ -439,6 +449,48 @@ export default namespace formHost {
     taskpool.execute((): void => {
       getFormsInfoInner(bundleName, emptyString, call);
     })
+  }
+
+  export function getAllTemplateFormsInfo(): Promise<Array<formInfo.FormInfo>> {
+    return new Promise<Array<formInfo.FormInfo>>(
+      (resolve: (data: Array<formInfo.FormInfo>) => void,
+        reject: (err: BusinessError) => void): void => {
+        let call = new AsyncCallbackWrapper<Array<formInfo.FormInfo>>(
+          (err: BusinessError | null, data: Array<formInfo.FormInfo> | undefined) => {
+            if (err == null || err.code == ERR_OK) {
+              resolve(data as Array<formInfo.FormInfo>);
+            } else {
+              reject(err);
+            }
+          });
+        taskpool.execute((): void => {
+          getAllTemplateFormsInfoInner(call);
+        });
+      });
+  }
+
+  export function getTemplateFormsInfo(bundleName: string, moduleName?: string): Promise<Array<formInfo.FormInfo>> {
+    let targetModule: string = moduleName ?? "";
+
+    return new Promise<Array<formInfo.FormInfo>>(
+      (resolve: (data: Array<formInfo.FormInfo>) => void,
+        reject: (err: BusinessError) => void): void => {
+        if (bundleName === "") {
+          reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+          return;
+        }
+        let call = new AsyncCallbackWrapper<Array<formInfo.FormInfo>>(
+          (err: BusinessError | null, data: Array<formInfo.FormInfo> | undefined) => {
+            if (err == null || err.code == ERR_OK) {
+              resolve(data as Array<formInfo.FormInfo>);
+            } else {
+              reject(err);
+            }
+          });
+        taskpool.execute((): void => {
+          getTemplateFormsInfoInner(bundleName, targetModule, call);
+        });
+      });
   }
 
   export function isSystemReady(): Promise<void> {
@@ -960,6 +1012,25 @@ export default namespace formHost {
     return findIndex;
   }
 
+  export function getFormIdsByFormLocation(location: formInfo.FormLocation): Promise<Array<string>> {
+    return new Promise<Array<string>>(
+      (resolve: (data: Array<string>) => void,
+        reject: (err: BusinessError) => void): void => {
+ 
+        let call = new AsyncCallbackWrapper<Array<string>>(
+          (err: BusinessError | null, data: Array<string> | undefined) => {
+            if (err == null || err.code == ERR_OK) {
+              resolve(data as Array<string>);
+            } else {
+              reject(err);
+            }
+          });
+        taskpool.execute((): void => {
+          getFormIdsByFormLocationInner(location, call);
+        });
+      });
+  }
+
   function createCallbackWrapper(callback: Callback<string>): CallbackWrapper<string> {
     let findIndex = findCallbackIndex(callback);
     if (findIndex != INVALID_CALLBACK_INDEX) {
@@ -1022,6 +1093,38 @@ export default namespace formHost {
     formHost.nativeOffGetLiveFormStatus(myCall);
   }
 
+  function onTemplateFormDetailInfoChange(callback: formInfo.TemplateFormDetailInfoCallback): void {
+    let myCall = new TemplateFormDetailInfoChangeCallbackWrapper(callback);
+    formHost.nativeOnTemplateFormDetailInfoChange(myCall);
+  }
+
+  function offTemplateFormDetailInfoChange(callback?: formInfo.TemplateFormDetailInfoCallback): void {
+    let myCall: TemplateFormDetailInfoChangeCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new TemplateFormDetailInfoChangeCallbackWrapper(callback);
+    }
+    formHost.nativeOffTemplateFormDetailInfoChange(myCall);
+  }
+
+  type GetWantParamsCallback = (formInfos: Array<formInfo.FormInfo>) => Array<Record<string, Object>>;
+
+  function onGetWantParamsCallback(callback: GetWantParamsCallback): void {
+    let myCall = new GetWantParamsCallbackWrapper(callback);
+    formHost.nativeOnGetWantParamsCallback(myCall);
+  }
+
+  function offGetWantParamsCallback(callback?: GetWantParamsCallback): void {
+    let myCall: GetWantParamsCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new GetWantParamsCallbackWrapper(callback);
+    }
+    formHost.nativeOffGetWantParamsCallback(myCall);
+  }
+
+  function updateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void {
+    formHost.nativeUpdateFormSize(formId, newDimension, newRect);
+  }
+
   class GetFormRectInfoCallbackWrapper {
     private liveFormInterfaceParam: long;
 
@@ -1035,13 +1138,13 @@ export default namespace formHost {
     }
 
     private callPromise(p: Promise<formInfo.Rect>): void {
-      let rectObj: formInfo.Rect = await p;
+      let rectObj: formInfo.Rect = p.awaitSync();
       this.nativePromiseCallback(rectObj);
     }
 
     private formRectCallback: formInfo.GetFormRectInfoCallback = (formId: string): Promise<formInfo.Rect> => {
       return new Promise<formInfo.Rect>((resolve: (rect: formInfo.Rect) => void,
-        reject: (rect: formInfo.Rect) => void): void => {
+        reject: (error: Error) => void): void => {
       });
     }
 
@@ -1055,7 +1158,7 @@ export default namespace formHost {
   }
 
   class GetLiveFormStatusCallbackWrapper {
-    private liveFormStatusCallback: formInfo.GetLiveFormStatusCallback = (): Record<string, string> => { }
+    private liveFormStatusCallback: formInfo.GetLiveFormStatusCallback = (): Record<string, string> => { return {} }
 
     constructor(callback: formInfo.GetLiveFormStatusCallback) {
       this.liveFormStatusCallback = callback;
@@ -1063,6 +1166,30 @@ export default namespace formHost {
 
     invoke(): Record<string, string> {
       return this.liveFormStatusCallback();
+    }
+  }
+
+  class TemplateFormDetailInfoChangeCallbackWrapper {
+    private templateFormDetailInfoCallback: formInfo.TemplateFormDetailInfoCallback = (info: Array<formInfo.TemplateFormDetailInfo>) => { }
+
+    constructor(callback: formInfo.TemplateFormDetailInfoCallback) {
+      this.templateFormDetailInfoCallback = callback;
+    }
+
+    invoke(info: Array<formInfo.TemplateFormDetailInfo>): void {
+      this.templateFormDetailInfoCallback(info);
+    }
+  }
+
+  class GetWantParamsCallbackWrapper {
+    private callback_: GetWantParamsCallback;
+
+    constructor(callback: GetWantParamsCallback) {
+      this.callback_ = callback;
+    }
+
+    invoke(formInfos: Array<formInfo.FormInfo>): Array<Record<string, Object>> {
+      return this.callback_(formInfos);
     }
   }
 }

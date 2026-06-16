@@ -65,13 +65,14 @@ public:
 
     void UpdateFormRecord(const FormRecord &formRecord);
 
-private:
-    enum class ConnectState {
-        DISCONNECTED,
-        CONNECTING,
-        CONNECTED,
-    };
+protected:
+    /**
+     * @brief Empty implementation - FormRenderConnection uses its own OnAbilityConnectDone logic.
+     *        This class does NOT participate in the template method pattern refactoring.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override {}
 
+private:
     FormRecord formRecord_;
     WantParams wantParams_;
     ConnectState connectState_ = ConnectState::DISCONNECTED;

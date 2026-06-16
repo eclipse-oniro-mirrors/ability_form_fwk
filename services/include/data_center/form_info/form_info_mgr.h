@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 
 #include "appexecfwk_errors.h"
 #include "bundle_form_info.h"
+#include "form_custom_config.h"
 #include "bundle_info.h"
 #include "form_info.h"
 #include "form_info_filter.h"
@@ -90,6 +91,8 @@ public:
 
     bool IsDeleteCacheInUpgradeScene(const FormInfo &formInfo);
 
+    ErrCode UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs);
+
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
     static bool IsCaller(const std::string& bundleName);
@@ -97,6 +100,10 @@ private:
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
     static ErrCode GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId);
     void UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId);
+    void AddBundleFormInfos(const std::map<std::string, std::uint32_t>& bundleVersionMap, int32_t userId);
+    void ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
+        std::map<std::string, std::uint32_t> &bundleVersionMap,
+        std::vector<std::string> &needUpdateBundleNames);
 
     mutable std::shared_timed_mutex bundleFormInfoMapMutex_ {};
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap_ {};

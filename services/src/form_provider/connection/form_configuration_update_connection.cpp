@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,44 +19,31 @@
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-ConfigurationUpdateConnection::ConfigurationUpdateConnection(const int64_t formId, const Want& want,
+
+ConfigurationUpdateConnection::ConfigurationUpdateConnection(const int64_t formId, const Want &want,
     const std::string &bundleName, const std::string &abilityName,
-    AppExecFwk::Configuration configuration): want_(want), configuration_(configuration)
+    AppExecFwk::Configuration configuration, const int32_t userId)
+    : want_(want), configuration_(configuration)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
- 
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- *
- * @param element Service ability's ElementName.
- * @param remoteObject The session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
-void ConfigurationUpdateConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
-{
-    HILOG_INFO("call");
-    FormAbilityConnection::OnAbilityConnectDone(element, remoteObject, resultCode);
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            element.GetAbilityName().c_str(), GetFormId(), resultCode);
-        return;
-    }
-    onFormAppConnect();
-    sptr<ConfigurationUpdateConnection> connection(this);
-    FormSupplyCallback::GetInstance()->AddConnection(connection);
 
+Want ConfigurationUpdateConnection::OnBuildTaskWant()
+{
     Want want = Want(want_);
-    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
+    want.SetParam(Constants::FORM_CONNECT_ID, GetConnectId());
+    return want;
+}
+
+void ConfigurationUpdateConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
     FormProviderTaskMgr::GetInstance().NotifyConfigurationUpdate(configuration_, want, remoteObject);
 }
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

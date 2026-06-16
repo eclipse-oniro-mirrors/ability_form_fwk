@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "data_center/database/form_db_info.h"
 #include "data_center/form_info/form_info_storage.h"
 #include "form_constants.h"
+#include "form_custom_config.h"
 #include "form_info.h"
 
 namespace OHOS {
@@ -34,7 +35,7 @@ public:
 
     ErrCode InitFromJson(const std::string &formInfoStoragesJson);
 
-    ErrCode UpdateStaticFormInfos(int32_t userId);
+    ErrCode UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode Remove(int32_t userId);
 
@@ -61,6 +62,8 @@ public:
     ErrCode GetFormsInfoByFilter(
         const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
+    ErrCode UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs);
+
 private:
     ErrCode UpdateFormInfoStorageLocked();
 
@@ -71,6 +74,10 @@ private:
         const std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames);
 
     void ClearDistributedFormInfos(int32_t userId);
+
+    bool IsFormInfoMatched(const FormInfo &formInfo, const FormCustomConfig &config) const;
+    void UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow);
+    bool ApplyConfigToStorages(const FormCustomConfig &config);
 
     std::string bundleName_ {};
     mutable std::shared_timed_mutex formInfosMutex_ {};

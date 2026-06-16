@@ -82,7 +82,9 @@ private:
     int32_t HandleRecoverForm(MessageParcel &data, MessageParcel &reply);
 
     int32_t HandleUpdateFormSize(MessageParcel &data, MessageParcel &reply);
-	
+
+    int32_t HandleSetRenderGroupParams(MessageParcel &data, MessageParcel &reply);
+
 protected:
     virtual int32_t CheckPermission() = 0;
 

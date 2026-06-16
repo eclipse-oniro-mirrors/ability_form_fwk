@@ -100,6 +100,16 @@ public:
      * @brief unregister Configuration Observer.
      */
     void UnRegisterConfigurationObserver();
+    /**
+     * @brief StartAbilityOnlyUIAbility with want, send want to ability manager service.
+     * @param want The want of the ability to start.
+     * @param callerToken The caller token of the ability to start.
+     * @param specifyTokenId The token ID used to specify the caller identity for permission verification.
+     * @param userId Designation User ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject> &callerToken,
+        uint32_t specifyTokenId, const int32_t userId);
 private:
     /**
      * @brief Disconnect ability task, disconnect session with service ability.
@@ -109,7 +119,8 @@ private:
     void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
-    sptr<IConfigurationObserver> configurationObserver = nullptr;
+    sptr<IConfigurationObserver> configurationObserver_ = nullptr;
+    std::mutex configObserverMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

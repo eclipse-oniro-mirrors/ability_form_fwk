@@ -19,6 +19,7 @@
 #include <mutex>
 #include <singleton.h>
 #include <string>
+#include <unordered_set>
 
 #include "form_provider_data.h"
 #include "data_center/database/form_rdb_data_mgr.h"
@@ -54,6 +55,22 @@ public:
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const;
 
     bool NeedAcquireProviderData(int64_t formId) const;
+
+    /**
+     * @brief Check whether the database has already cleaned dirty data.
+     * @return Returns true dirty data has been cleaned, false otherwise.
+     */
+    bool IsDirtyDataCleaned() const;
+    /**
+     * @brief Sets the database dirty data cleaned flag.
+     */
+    void SetIsDirtyDataCleaned();
+    /**
+     * @brief Get all form IDs from form_cache.
+     * @param[out] formIds Output parameter to store form IDs.
+     * @return Returns true on success, false otherwise.
+     */
+    bool GetFormCacheIds(std::unordered_set<int64_t> &formIds);
 private:
     void CreateFormCacheTable();
     bool GetDataCacheFromDb(int64_t formId, FormCache &formCache) const;

@@ -20,9 +20,9 @@
 #include "iremote_object.h"
 #include "want.h"
 
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "form_supply_proxy.h"
-#include "form_render_serial_queue.h"
+#include "queue/form_base_serial_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -33,7 +33,7 @@ class FormRenderStatusTaskMgr final : public DelayedRefSingleton<FormRenderStatu
 public:
     DISALLOW_COPY_AND_MOVE(FormRenderStatusTaskMgr);
 
-    void SetSerialQueue(const std::shared_ptr<FormRenderSerialQueue> &serialQueue)
+    void SetSerialQueue(const std::shared_ptr<Common::FormBaseSerialQueue> &serialQueue)
     {
         if (serialQueue == nullptr) {
             return;
@@ -108,7 +108,7 @@ public:
 
 private:
     std::mutex serialQueueMutex_;
-    std::shared_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
+    std::shared_ptr<Common::FormBaseSerialQueue> serialQueue_ = nullptr;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

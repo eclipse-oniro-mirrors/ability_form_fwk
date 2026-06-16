@@ -42,15 +42,10 @@ void FormSerialQueueTest(FuzzedDataProvider *fdp)
     auto testTask = []() {};
     int64_t num1 = fdp->ConsumeIntegral<int64_t>();
     int64_t num2 = fdp->ConsumeIntegral<int64_t>();
-    int64_t num3 = fdp->ConsumeIntegral<int64_t>();
-    std::string str1 = fdp->ConsumeRandomLengthString();
     std::pair<int64_t, int64_t> eventMsg = std::make_pair(num1, num2);
-    std::pair<int64_t, std::string> eventMsgStr = std::make_pair(num3, str1);
     formSerialQueue.ScheduleTask(ms, testTask);
     formSerialQueue.ScheduleDelayTask(eventMsg, msg, testTask);
     formSerialQueue.CancelDelayTask(eventMsg);
-    formSerialQueue.ScheduleDelayTask(eventMsgStr, msg, testTask);
-    formSerialQueue.CancelDelayTask(eventMsgStr);
 }
 
 void FormDumpMgrTestPartOne(FuzzedDataProvider *fdp)

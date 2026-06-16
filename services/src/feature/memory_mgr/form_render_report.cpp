@@ -19,6 +19,7 @@
 #include "data_center/form_data_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_render/form_render_mgr_inner.h"
+#include "util/form_time_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -66,7 +67,7 @@ void FormRenderReport::RecordFRSStatus(uint8_t status)
             .isLowMemory = isLowMemory,
             .status = status,
             .formCount = formCount,
-            .occurrenceTime = FormUtil::GetNowMillisecond()
+            .occurrenceTime = Common::FormTimeUtil::GetNowMillisecond()
         };
         frsStatusRecords_.push_back(record);
     }

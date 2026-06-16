@@ -25,10 +25,17 @@ ohos_unittest("FmsFormMgrStubTest") {
 
   configs = [ ":form_mgr_stub_test_config" ]
 
-  sources = [ "form_mgr_stub_test.cpp" ]
+  sources = [
+    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "form_mgr_stub_test.cpp",
+  ]
 
   deps = [
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

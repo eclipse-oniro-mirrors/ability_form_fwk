@@ -25,9 +25,9 @@
 namespace OHOS {
 namespace AppExecFwk {
 /**
-* @class RefreshCacheMgr
-* RefreshCacheMgr is used to cache form refresh task.
-*/
+ * @class RefreshCacheMgr
+ * RefreshCacheMgr is used to cache form refresh task.
+ */
 class RefreshCacheMgr : public DelayedRefSingleton<RefreshCacheMgr> {
     DECLARE_DELAYED_REF_SINGLETON(RefreshCacheMgr);
 public:
@@ -66,11 +66,11 @@ public:
     void AddFlagByInvisible(const int64_t formId, const int32_t refreshType);
 
     /**
-     * @brief The form resume visible, consume cache flag.
-     * @param formId The formId.
+     * @brief The form resume visible, consume cache flag in batch.
+     * @param visibleFormRecords The vector of visible form records.
      * @param userId Current active userId.
      */
-    void ConsumeInvisibleFlag(const int64_t formId, const int32_t userId);
+    void ConsumeInvisibleFlag(const std::vector<FormRecord> &visibleFormRecords, int32_t userId);
 
     /**
      * @brief Refresh task be screen off controlled, add cache flag.
@@ -109,7 +109,17 @@ public:
      * @param disableFormRecords The due disable form list.
      */
     void CosumeRefreshByDueControl(const std::vector<FormRecord> &disableFormRecords);
+
+    /**
+     * @brief The form add finish, consume cache flag.
+     * @param formId The formId.
+     * @param userId Current active userId.
+     */
+    void ConsumeAddUnfinishFlag(const int64_t formId, const int32_t userId);
+
 private:
+    Want CreateWant(const std::vector<FormRecord>::iterator &record, const int32_t userId);
+
     std::mutex overloadTaskMutex_;
     std::vector<FormTimer> overloadTask_;
     std::mutex renderTaskMapMutex_;

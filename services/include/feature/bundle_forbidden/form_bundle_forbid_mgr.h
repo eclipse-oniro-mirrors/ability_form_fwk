@@ -35,12 +35,6 @@ public:
     DISALLOW_COPY_AND_MOVE(FormBundleForbidMgr);
 
     /**
-     * @brief Init form bundle forbid mgr.
-     * @return True for sucessful init, false for failed init.
-     */
-    bool Init();
-
-    /**
      * @brief Get whether bundle is forbidden.
      * @param bundleName Bundle name to be check.
      * @return True for forbidden, false for not forbidden.
@@ -56,10 +50,10 @@ public:
 
 private:
     /**
-     * @brief check whether bundle forbid mgr is init.
-     * @return True for inited, false for not init.
+     * @brief Init form bundle forbid mgr.
+     * @return True for sucessful init, false for failed init.
      */
-    bool IsBundleForbidMgrInit();
+    bool Init();
 
 private:
     bool isInitialized_ = false;

@@ -28,8 +28,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-const std::string KEY_UID = "uid";
-const std::string KEY_USER_ID = "userId";
 class FormEventUtil {
 public:
     static void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId, bool &needReload);
@@ -59,8 +57,13 @@ public:
         std::map<int64_t, bool> &removedFormsMap);
     static void HandleOnUnlock(int32_t userId);
     static bool HandleAdditionalInfoChanged(const std::string &bundleName);
+    static void HandleFormWantCallbackAddForm(const std::vector<FormRecord> &updatedForms);
 
 private:
+    static void HandleWantCallbackForHost(int32_t hostUid, const std::vector<FormRecord> &records);
+    static std::vector<FormInfo> BuildFormInfos(const std::vector<FormRecord> &records);
+    static void ApplyWantParams(const std::vector<FormRecord> &records,
+        const std::vector<AAFwk::WantParams> &wantParamsList);
     static void UpdateMultiUpdateTime(std::string multiScheduledUpdateTime, FormRecord &formRecord);
     static void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
     static void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);

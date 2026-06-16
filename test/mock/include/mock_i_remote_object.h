@@ -46,10 +46,7 @@ public:
         return true;
     }
 
-    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient) override
-    {
-        return true;
-    }
+    MOCK_METHOD(bool, AddDeathRecipient, (const sptr<DeathRecipient>& recipient), (override));
 
     bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) override
     {

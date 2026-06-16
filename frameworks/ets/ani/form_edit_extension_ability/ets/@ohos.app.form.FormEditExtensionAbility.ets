@@ -17,5 +17,5 @@ import UIExtensionAbility from '@ohos.app.ability.UIExtensionAbility';
 import FormEditExtensionContext from 'application.FormEditExtensionContext';
 
 export default class FormEditExtensionAbility extends UIExtensionAbility {
-	public context: FormEditExtensionContext = {};
+	public formEditorContext: FormEditExtensionContext = {};
 }

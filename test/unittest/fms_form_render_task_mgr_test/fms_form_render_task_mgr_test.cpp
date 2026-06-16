@@ -224,4 +224,20 @@ HWTEST_F(FormRenderTaskMgrTest, FormRenderTaskMgr_0010, TestSize.Level0)
     formTaskMgr->ReloadForm(std::move(formRecords), want, remoteObject);
     GTEST_LOG_(INFO) << "FormRenderTaskMgr_0010 end";
 }
+
+/**
+ * @tc.name: FormRenderTaskMgr_PostSetRenderGroupParams_0001
+ * @tc.desc: test PostSetRenderGroupParams function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderTaskMgrTest, FormRenderTaskMgr_PostSetRenderGroupParams_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderTaskMgr_PostSetRenderGroupParams_0001 start";
+    std::shared_ptr<FormRenderTaskMgr> formTaskMgr = std::make_shared<FormRenderTaskMgr>();
+    ASSERT_NE(formTaskMgr, nullptr);
+    Want want;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr->PostSetRenderGroupParams(1, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormRenderTaskMgr_PostSetRenderGroupParams_0001 end";
+}
 }

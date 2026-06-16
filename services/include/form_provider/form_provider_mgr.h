@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -113,12 +113,13 @@ public:
     /**
      * @brief Notify provider forms batch delete.
      * @param bundleName BundleName.
-     * @param bundleName AbilityName.
+     * @param abilityName AbilityName.
+     * @param moduleName ModuleName.
      * @param formIds form id list.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode NotifyProviderFormsBatchDelete(const std::string &bundleName, const std::string &abilityName,
-        const std::set<int64_t> &formIds);
+        const std::string &moduleName, const std::set<int64_t> &formIds, const int32_t userId);
     /**
      * @brief Acquire form state.
      * @param state form state.
@@ -143,7 +144,6 @@ public:
      * @return Returns true if execute success, false otherwise.
      */
     int MessageEvent(const int64_t formId, const FormRecord &record, const Want &want);
-    void MergeWant(const Want &newWant, Want &oldWant);
 
     /**
      * @brief Connect ams for refresh form location
@@ -181,7 +181,7 @@ private:
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
-    void UpdateWant(const int64_t formId, const Want &want, FormRecord &record);
+    
     void DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate);
     void PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh);
 };

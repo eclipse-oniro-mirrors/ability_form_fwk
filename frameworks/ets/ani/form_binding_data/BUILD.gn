@@ -26,7 +26,12 @@ ohos_shared_library("formBindingData_ani") {
 
   sources = [ "src/ets_form_binding_data.cpp" ]
 
-  deps = [ "${form_fwk_path}:form_manager" ]
+  deps = [
+    "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",

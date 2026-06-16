@@ -12,27 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_FORM_FWK_FORM_TASK_COMMON_H
 #define OHOS_FORM_FWK_FORM_TASK_COMMON_H
- 
+
 namespace OHOS {
 namespace AppExecFwk {
 enum class TaskType : int64_t {
     RECYCLE_FORM = 0, // add form type base 0
     RENDER_FORM,
     DELETE_FORM_HOST_RECORD = 10000, // add form_host type base 10000
-    UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT
+    UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+    SUBSCRIBE_PROXY_RETRY_TASK = 20000,
+    REFRESH_RETRY_TASK = 20001,
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t FORM_FRS_DIED_TASK_DELAY_TIME = 100; // ms
+constexpr int32_t FORM_RECONNECT_DELAY_TIME = 1000; // ms
 constexpr int32_t FORM_BUILD_DELAY_TIME = 2000; // ms
 constexpr int32_t ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME = 5000; // ms
 constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_CON_NETWORK_DELAY_TIME = 500; // ms
 constexpr int32_t PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME = 500; // ms
 constexpr int32_t IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME = 2000; // ms
+constexpr int32_t WAIT_ON_ADD_FORM_DELAY_TIME = 50; // ms
+constexpr int32_t RECONNECT_RETRY_DELAY_TIME = 500; // ms
+constexpr int32_t LAST_RECONNECT_RETRY_DELAY_TIME = 1000 * 60 * 30; // ms
+constexpr int32_t BATCH_DELAY_REFRESH_TIME = 1000; // ms
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

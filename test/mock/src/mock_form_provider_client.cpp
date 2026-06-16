@@ -184,5 +184,22 @@ int32_t MockFormProviderClient::AcquireFormData(int64_t formId, const sptr<IRemo
     HILOG_DEBUG("MockFormProviderClient::AcquireFormData");
     return ERR_OK;
 }
+
+void makeWant(Want &want, MakeWantFlag flag)
+{
+    const std::string widget = "widget";
+    const std::string model = "entry";
+    const int32_t dimension = 3;
+    if (flag != MakeWantFlag::NO_FORM_NAME) want.SetParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY, widget);
+    if (flag != MakeWantFlag::NO_MODEL_NAME) want.SetParam(Constants::PARAM_MODULE_NAME_KEY, model);
+    if (flag != MakeWantFlag::NO_FORM_DIMENSION) want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimension);
+    if (flag == MakeWantFlag::NO_BUNDLE_NAME) {
+        want.SetElementName("", "abilityName");
+    } else if (flag == MakeWantFlag::NO_ABILITY_NAME) {
+        want.SetElementName("bundleName", "");
+    } else {
+        want.SetElementName("bundleName", "abilityName");
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

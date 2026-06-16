@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <shared_mutex>
 
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 #include "status_mgr_center/form_event_queue.h"
 
 namespace OHOS {

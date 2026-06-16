@@ -25,19 +25,10 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-ani_object CreateFunInteractionParamsDatas(ani_env* env,
-    const OHOS::AppExecFwk::FormFunInteractionParams &funInteractionParamsDatas);
-ani_object CreateSceneAnimationParamsDatas(ani_env* env,
-    const AppExecFwk::FormSceneAnimationParams &sceneAnimationParamsDatas);
-ani_object CreateFormInfo(ani_env* env, const OHOS::AppExecFwk::FormInfo &formInfo);
-ani_object CreateFormInfos(ani_env* env, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos);
+namespace FormAniUtil {
 bool UnwrapFormRect(ani_env *env, ani_object rectobject, AppExecFwk::Rect &rect);
-bool GetRefProperty(ani_env *env, ani_object param, const char *name, ani_ref &value);
-bool GetDoublePropertyObject(ani_env *env, ani_object param, const char *name, double &value);
 bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<std::string, std::string> &mockList);
-bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, ani_ref &aniKey, ani_ref &aniValue);
-void SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
-    std::unordered_map<std::string, std::string> &uMap);
+} // namespace FormAniUtil
 } // namespace AbilityRuntime
 } // namespace OHOS
 #endif /* OHOS_FORM_FWK_ANI_FORM_UTIL_H */

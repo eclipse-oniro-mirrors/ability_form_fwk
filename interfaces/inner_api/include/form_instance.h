@@ -17,8 +17,10 @@
 #define FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H
 
 #include <string>
+#include <mutex>
+#include <condition_variable>
 #include "parcel.h"
-#include "event_handler.h"
+#include "errors.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -115,6 +117,7 @@ typedef struct LiveFormInterfaceParam {
     bool result = false;
     AppExecFwk::Rect formRect;
     std::unordered_map<std::string, std::string> liveFormStatusMap;
+    ErrCode errCode = ERR_OK;
 } LiveFormInterfaceParam;
 } // namespace OHOS
 #endif // FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H

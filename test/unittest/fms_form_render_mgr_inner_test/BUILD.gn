@@ -21,7 +21,7 @@ ohos_unittest("FrsFormRenderMgrInnerTest") {
 
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_render_mgr_inner_test/mock_form_ams_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_inner_test/fms_form_render_mgr_inner_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_inner_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/mock_form_data_mgr.cpp",
@@ -40,6 +40,10 @@ ohos_unittest("FrsFormRenderMgrInnerTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [

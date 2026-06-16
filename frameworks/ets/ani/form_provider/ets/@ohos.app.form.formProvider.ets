@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ import formInfo from '@ohos.app.form.formInfo';
 import Want from '@ohos.app.ability.Want';
 import UIAbilityContext from 'application.UIAbilityContext';
 
-class AsyncCallbackWrapper<T, E = void> {
+export class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => { }
 
   constructor(myFun: AsyncCallback<T, E>) {
@@ -55,10 +55,12 @@ export namespace formProvider {
   native function checkOverflowInfoParam(overflowInfo: formInfo.OverflowInfo): void;
   native function nativeReloadForms(context: UIAbilityContext, moduleName: string, abilityName: string, formName: string, callback: AsyncCallbackWrapper<int>): void;
   native function nativeReloadAllForms(context: UIAbilityContext, callback: AsyncCallbackWrapper<int>): void;
+  native function nativeOnPublishFormCrossBundleControl(callback: PublishFormCrossBundleControlCallbackWrapper): void;
+  native function nativeOffPublishFormCrossBundleControl(callback?: PublishFormCrossBundleControlCallbackWrapper): void;
 
-  const ERR_OK = 0;
-  const INVALID_PARAM_ERROR_CODE = 401;
-  const INVALID_PARAM_MESSAGE_ETS = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
+  const ERR_OK: int = 0;
+  const INVALID_PARAM_ERROR_CODE: int = 401;
+  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
     + " 2.Incorrect parameter types;"
     + " 3.Parameter verification failed.";
 
@@ -440,5 +442,30 @@ export namespace formProvider {
         });
       });
     return reloadAllFormsPromise;
+  }
+
+  function onPublishFormCrossBundleControl(callback: formInfo.PublishFormCrossBundleControlCallback): void {
+    let myCall = new PublishFormCrossBundleControlCallbackWrapper(callback);
+    nativeOnPublishFormCrossBundleControl(myCall);
+  }
+
+  function offPublishFormCrossBundleControl(callback?: formInfo.PublishFormCrossBundleControlCallback): void {
+    let myCall: PublishFormCrossBundleControlCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new PublishFormCrossBundleControlCallbackWrapper(callback);
+    }
+    nativeOffPublishFormCrossBundleControl(myCall);
+  }
+
+  class PublishFormCrossBundleControlCallbackWrapper {
+    private publishFormCrossBundleControlCallback: formInfo.PublishFormCrossBundleControlCallback = (info: formInfo.PublishFormCrossBundleInfo): boolean => { return true }
+
+    constructor(callback: formInfo.PublishFormCrossBundleControlCallback) {
+      this.publishFormCrossBundleControlCallback = callback;
+    }
+
+    invoke(info: formInfo.PublishFormCrossBundleInfo): boolean {
+      return this.publishFormCrossBundleControlCallback(info);
+    }
   }
 }

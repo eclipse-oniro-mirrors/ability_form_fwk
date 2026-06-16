@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_EVENT_REPORT_DEFINE_H
  
 #include <string>
+#include "form_constants.h"
 #include "hisysevent.h"
  
 namespace OHOS {
@@ -28,6 +29,7 @@ struct FormEventInfo {
     std::string abilityName;
     std::string hostBundleName = "";
     int32_t formAppPid = -1;
+    int32_t formLocation = -1;
     int64_t timeStamp = 0;
     int64_t formDimension = 0;
     bool isDistributedForm = false;
@@ -126,6 +128,8 @@ struct NewFormEventInfo {
     int32_t renderingMode;
     std::string bundleAndFormName;
     bool isDistributedForm = false;
+    Constants::FormLocation formLocation = Constants::FormLocation::FORM_LOCATION_END;
+    int32_t actualProxyRefreshTimes = 0;
 };
 
 struct FormAbnormalReportParams {
@@ -177,6 +181,7 @@ enum class FormEventName {
     FORM_STATUS_ERROR,
     FORM_EVENT_QUEUE_OVER_LIMIT,
     FORM_DUE_CONTROL,
+    FORM_EXCEEDS_DISTRIBUTION,
 };
  
 enum class RequestFormType : int8_t {

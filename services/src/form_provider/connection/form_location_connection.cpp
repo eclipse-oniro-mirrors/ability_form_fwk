@@ -19,44 +19,29 @@
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_provider/form_supply_callback.h"
 #include "form_provider/form_provider_task_mgr.h"
-#include "data_center/form_data_mgr.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-FormLocationConnection::FormLocationConnection(const int64_t formId, const Want& want,
-    const std::string &bundleName, const std::string &abilityName) : want_(want)
+
+FormLocationConnection::FormLocationConnection(const int64_t formId, const Want &want,
+    const std::string &bundleName, const std::string &abilityName, const int32_t userId) : want_(want)
 {
     SetFormId(formId);
-    SetProviderKey(bundleName, abilityName);
+    SetProviderKey(bundleName, abilityName, userId);
 }
 
-/**
-* @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-*
-* @param element Service ability's ElementName.
-* @param remoteObject The session proxy of service ability.
-* @param resultCode ERR_OK on success, others on failure.
-*/
-void FormLocationConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
+Want FormLocationConnection::OnBuildTaskWant()
 {
-    HILOG_INFO("call");
-    FormAbilityConnection::OnAbilityConnectDone(element, remoteObject, resultCode);
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            element.GetAbilityName().c_str(), GetFormId(), resultCode);
-        return;
-    }
-    onFormAppConnect();
-    sptr<FormLocationConnection> connection(this);
-    FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want = Want(want_);
-    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    
-FormProviderTaskMgr::GetInstance().PostRefreshLocationTask(GetFormId(), want, remoteObject);
+    want.SetParam(Constants::FORM_CONNECT_ID, GetConnectId());
+    return want;
 }
+
+void FormLocationConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    FormProviderTaskMgr::GetInstance().PostRefreshLocationTask(GetFormId(), want, remoteObject);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

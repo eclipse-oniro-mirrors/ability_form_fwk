@@ -49,6 +49,10 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -65,10 +69,15 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "data_share:datashare_provider",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",

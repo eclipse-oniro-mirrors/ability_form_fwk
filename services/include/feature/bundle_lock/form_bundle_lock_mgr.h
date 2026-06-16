@@ -35,17 +35,11 @@ public:
     DISALLOW_COPY_AND_MOVE(FormBundleLockMgr);
 
     /**
-     * @brief Init form bundle lock mgr.
-     * @return True for sucessful init, false for failed init.
-     */
-    bool Init();
-
-    /**
      * @brief Get whether bundle is lock.
      * @param bundleName Bundle name to be check.
      * @return True for lock, false for not lock.
      */
-    bool IsBundleLock(const std::string &bundleName, int64_t formId = 0);
+    bool IsBundleLock(const std::string &bundleName, const int32_t userId, int64_t formId = 0);
 
     /**
      * @brief Set whether bundle is lock.
@@ -59,7 +53,7 @@ public:
      * @param bundleName Bundle name to be check.
      * @return True for protect, false for not protect.
      */
-    bool IsBundleProtect(const std::string &bundleName, int64_t formId = 0);
+    bool IsBundleProtect(const std::string &bundleName, const int32_t userId, int64_t formId = 0);
 
     /**
      * @brief Set whether bundle is protect.
@@ -68,15 +62,30 @@ public:
      */
     void SetBundleProtectStatus(const std::string &bundleName, bool isProtect);
 
+    /**
+     * @brief Check whether the lock service has been initialized.
+     * @return True if initialized, false otherwise.
+     */
+    bool IsLockServiceInitialized() const
+    {
+        return isLockServiceInitialized_.load();
+    }
+
+    /**
+     * @brief Initializing the app lock service.
+     */
+    void InitLockService();
+
 private:
     /**
-     * @brief check whether bundle lock mgr is init.
-     * @return True for inited, false for not init.
+     * @brief Init form bundle lock mgr.
+     * @return True for sucessful init, false for failed init.
      */
-    bool IsBundleLockMgrInit();
+    bool Init();
 
 private:
     bool isInitialized_ = false;
+    std::atomic<bool> isLockServiceInitialized_{false};
     std::set<std::string> formBundleLockSet_;
     mutable std::shared_mutex bundleLockSetMutex_;
     std::set<std::string> formBundleProtectSet_;

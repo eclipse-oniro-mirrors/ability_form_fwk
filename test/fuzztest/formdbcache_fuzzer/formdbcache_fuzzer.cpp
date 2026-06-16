@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,8 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr int32_t INDEX_MAX = 5;
 const nlohmann::json JSON_FORMS = R"({})"_json;
+constexpr int32_t RANGE_MIN = -1;
+constexpr int32_t RANGE_MAX = 8;
 
 void GenerateMapData(FuzzedDataProvider *fdp, std::set<int64_t> &matchedFormIds,
     std::map<FormIdKey, std::set<int64_t>> &noHostDBFormsMap, std::map<int64_t, bool> &foundFormsMap)
@@ -134,8 +136,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     removedDBForms.emplace_back(formDBInfo);
     formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
     formDbCache.GetAllFormInfo(formDBInfos);
-    std::map<Constants::FormLocation, int> locationMap;
-    formDbCache.GetLocationMap(locationMap);
     FormRecord record;
     formDbCache.GetDBRecord(formId, record);
     formDbCache.GetMatchCount(bundleName, moduleName);
@@ -146,6 +146,66 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostDBFormsMap, foundFormsMap);
     formDbCache.GetMultiAppFormVersionCode(bundleName);
     formDbCache.UpdateMultiAppFormVersionCode(bundleName, versionCode);
+
+    // Cover GetAllFormInfoSize (not in original fuzzer)
+    formDbCache.GetAllFormInfoSize();
+
+    // Cover GetFormCountsByUserId (not in original fuzzer)
+    formDbCache.GetFormCountsByUserId(userId);
+
+    // Cover GetFormCountsByHostBundleName (not in original fuzzer)
+    formDbCache.GetFormCountsByHostBundleName(bundleName);
+
+    // Cover GetDBRecord with FormDBInfo (not in original fuzzer)
+    FormDBInfo formDBInfoRecord;
+    formDbCache.GetDBRecord(formId, formDBInfoRecord);
+
+    // Cover UpdateDBRecord (not in original fuzzer)
+    formDbCache.UpdateDBRecord(formId, record);
+
+    // Cover GetNoHostDBForms (not in original fuzzer)
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    std::map<int64_t, bool> foundFormsMap2;
+    formDbCache.GetNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap2);
+
+    // Cover DeleteDBFormsByUserId (not in original fuzzer)
+    formDbCache.DeleteDBFormsByUserId(userId);
+
+    // Cover GetNoHostInvalidDBForms (not in original fuzzer)
+    std::set<int64_t> matchedFormIds2;
+    std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap2;
+    std::map<int64_t, bool> foundFormsMap3;
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds2, noHostDBFormsMap2, foundFormsMap3);
+
+    // Cover DeleteInvalidDBForms (not in original fuzzer)
+    std::set<int64_t> matchedFormIds3;
+    std::map<int64_t, bool> removedFormsMap;
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds3, removedFormsMap);
+
+    // Cover UpdateFormLocation (not in original fuzzer)
+    int32_t formLocation = fdp->ConsumeIntegralInRange<int32_t>(RANGE_MIN, RANGE_MAX);
+    formDbCache.UpdateFormLocation(formId, formLocation);
+
+    // Cover private method SaveFormInfoNolock (not in original fuzzer)
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+
+    // Cover private method DeleteFormDBInfoCache (not in original fuzzer)
+    formDbCache.DeleteFormDBInfoCache(formId);
+
+    // Cover private method FindAndSaveFormDBInfoCache (not in original fuzzer)
+    FormDBInfo findInfo;
+    formDbCache.FindAndSaveFormDBInfoCache(formDBInfo, findInfo);
+
+    // Cover private method FindAndUpdateFormLocation (not in original fuzzer)
+    formDbCache.FindAndUpdateFormLocation(formId, formLocation, findInfo);
+
+    // Cover private method GetFormDBInfoCacheByBundleName (not in original fuzzer)
+    std::vector<FormDBInfo> dbFormInfos;
+    formDbCache.GetFormDBInfoCacheByBundleName(bundleName, userId, dbFormInfos);
+
+    // Cover private method GetFormDBInfoCacheByUserId (not in original fuzzer)
+    formDbCache.GetFormDBInfoCacheByUserId(userId, dbFormInfos);
+
     return true;
 }
 }

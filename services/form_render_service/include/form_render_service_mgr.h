@@ -26,11 +26,11 @@
 #include "event_handler.h"
 #include "form_supply_proxy.h"
 #include "form_render_record.h"
-#include "form_render_serial_queue.h"
+#include "queue/form_base_serial_queue.h"
 #include "js_runtime.h"
 #include "runtime.h"
 #include "want.h"
-#include "status_mgr_center/form_status_common.h"
+#include "util/form_status_common.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -85,8 +85,9 @@ public:
     /**
      * @brief Called when the system start.
      * @param config Indicates the updated configuration information.
+     * @return bool Returns true on success, false on failure.
      */
-    void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config);
+    bool SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration> &config);
 
     void RunCachedConfigurationUpdated();
 
@@ -102,7 +103,8 @@ public:
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want);
 
-    int32_t UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid);
+    int32_t UpdateFormSize(const int64_t formId, const FormSurfaceInfo &formSurfaceInfo, const std::string &uid,
+        const FormJsInfo &formJsInfo);
 
     void SetFormSupplyClient(const sptr<IFormSupply> &formSupplyClient);
 
@@ -110,9 +112,11 @@ public:
 
     void SetCriticalTrueOnFormActivity();
 
-    void SetMainRuntimeCb(std::function<const std::unique_ptr<Runtime> &()> &&cb);
+    void SetMainGcCb(std::function<void()> &&cb);
 
     void MainThreadForceFullGC();
+
+    int32_t SetRenderGroupParams(const int64_t formId, const Want &want);
 
 private:
     void SetCriticalFalseOnAllFormInvisible();
@@ -136,6 +140,9 @@ private:
     int32_t ProcessReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid, const Want &want);
     int32_t ProcessRecoverForm(const FormJsInfo &formJsInfo, const Want &want);
     int32_t ProcessStopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, bool &isRenderGroupEmptyOut);
+    void InitMemoryMonitor();
+    void RemoveMemoryMonitor();
+    void ReportProcessMemory();
 
 private:
     std::mutex renderRecordMutex_;
@@ -146,13 +153,13 @@ private:
     // The configuration items have already been applied to ArkUI.
     std::shared_ptr<OHOS::AppExecFwk::Configuration> appliedConfig_;
     std::chrono::steady_clock::time_point configUpdateTime_ = std::chrono::steady_clock::now();
-    std::shared_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
+    std::shared_ptr<Common::FormBaseSerialQueue> serialQueue_ = nullptr;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
     bool isVerified_ = false;
     bool hasCachedConfig_ = false;
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> mainHandler_ = nullptr;
-    std::function<const std::unique_ptr<Runtime> &()> mainRuntimeCb_ = nullptr;
+    std::function<void()> mainGcCb_ = nullptr;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

@@ -26,12 +26,20 @@ ohos_unittest("FmsFormProviderClientTest") {
     "form_provider_client_test.cpp",
   ]
 
+  deps = [
+    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
+  ]
+
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
     "ability_runtime:app_manager",
+    "ability_runtime:napi_common",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",

@@ -27,6 +27,7 @@
 #include "form_constants.h"
 #include "ipc_skeleton.h"
 #include "os_account_manager_wrapper.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -162,13 +163,6 @@ int64_t FormUtil::GetCurrentSteadyClockMillseconds()
         std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
-int64_t FormUtil::GetNowMillisecond()
-{
-    system_clock::time_point pointTime = system_clock::now();
-    auto timeMilliseconds = chrono::duration_cast<chrono::milliseconds>(pointTime.time_since_epoch());
-    return timeMilliseconds.count();
-}
-
 /**
  * @brief Get millisecond from tm.
  * @param tmAtTime tm time.
@@ -241,20 +235,40 @@ bool FormUtil::IsSACall()
     return false;
 }
 
-bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
+bool FormUtil::VerifyCallingPermission(std::string_view permissionName)
 {
-    HILOG_DEBUG("call.permission name is:%{public}s", permissionName.c_str());
+    HILOG_DEBUG("call.permission name is:%{public}s", std::string(permissionName).c_str());
     auto callerToken = IPCSkeleton::GetCallingTokenID();
-    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(
+        callerToken, std::string(permissionName));
     if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
-        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED", permissionName.c_str());
+        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED", std::string(permissionName).c_str());
         return false;
     }
     HILOG_DEBUG("Verify calling permission success");
     return true;
 }
 
-bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
+bool FormUtil::VerifyPermissionByBundleName(int32_t userId, const std::string &bundleName,
+    std::string_view permissionName)
+{
+    auto accessTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
+    if (accessTokenId == 0) {
+        HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
+            userId, bundleName.c_str());
+        return false;
+    }
+    std::string permStr(permissionName);
+    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(accessTokenId, permStr);
+    if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
+        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED for bundleName:%{public}s",
+            permStr.c_str(), bundleName.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool FormUtil::ConvertStringToInt64(std::string_view strInfo, int64_t &int64Value)
 {
     size_t strLength = strInfo.size();
     if (strLength == ZERO_VALUE) {
@@ -262,8 +276,9 @@ bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Va
         return true;
     }
     std::regex pattern("^0|-?[1-9][0-9]{0,18}$"); // "^-?[0-9]{1,19}$"
+    std::string strInfoStd(strInfo);
     std::smatch match;
-    if (regex_match(strInfo, match, pattern)) {
+    if (regex_match(strInfoStd, match, pattern)) {
         HILOG_DEBUG("regex_match successed");
         if (strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1) != "-") { // maximum: 9223372036854775807
             if (strLength < INT_64_LENGTH) {
@@ -308,14 +323,14 @@ bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Va
     return false;
 }
 
-int FormUtil::ConvertStringToInt(const std::string &strInfo, int radix)
+int FormUtil::ConvertStringToInt(std::string_view strInfo, int radix)
 {
-    return static_cast<int>(strtol(strInfo.c_str(), nullptr, radix));
+    return static_cast<int>(strtol(std::string(strInfo).c_str(), nullptr, radix));
 }
 
-long long FormUtil::ConvertStringToLongLong(const std::string &strInfo, int radix)
+long long FormUtil::ConvertStringToLongLong(std::string_view strInfo, int radix)
 {
-    return static_cast<long long>(strtoll(strInfo.c_str(), nullptr, radix));
+    return static_cast<long long>(strtoll(std::string(strInfo).c_str(), nullptr, radix));
 }
 
 bool FormUtil::IsActiveUser(const int32_t userId)
@@ -341,6 +356,44 @@ int32_t FormUtil::GetCallerUserId(const int callingUid)
     int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     (void)DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->GetOsAccountLocalIdFromUid(callingUid, userId);
     return userId;
+}
+
+void FormUtil::GetForegroundUsers(std::vector<int32_t> &foregroundList)
+{
+    std::vector<AccountSA::ForegroundOsAccount> accounts;
+    ErrCode errCode = AccountSA::OsAccountManager::GetForegroundOsAccounts(accounts);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Query foreground accounts failed");
+        return;
+    }
+    for (AccountSA::ForegroundOsAccount &account : accounts) {
+        foregroundList.push_back(account.localId);
+    }
+}
+
+std::vector<int> FormUtil::ParseFormUpdateLevels(const std::string &additionalInfo)
+{
+    constexpr int DATA_FIELD = 1;
+    constexpr int FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH = 3;
+    std::vector<int> durationArray;
+    if (additionalInfo.empty()) {
+        return durationArray;
+    }
+    std::regex regex(R"(formUpdateLevel:(\d+))");
+    std::smatch searchResult;
+    std::string::const_iterator iterStart = additionalInfo.begin();
+    std::string::const_iterator iterEnd = additionalInfo.end();
+    while (std::regex_search(iterStart, iterEnd, searchResult, regex)) {
+        iterStart = searchResult[0].second;
+        if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
+            continue;
+        }
+        int val = FormUtil::ConvertStringToInt(searchResult[DATA_FIELD].str());
+        if (val >= Constants::MIN_CONFIG_DURATION && val <= Constants::MAX_CONFIG_DURATION) {
+            durationArray.emplace_back(val);
+        }
+    }
+    return durationArray;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

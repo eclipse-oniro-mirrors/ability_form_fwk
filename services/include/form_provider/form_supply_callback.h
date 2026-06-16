@@ -173,6 +173,17 @@ private:
     bool CanDisconnect(sptr<FormAbilityConnection> &connection);
 
     bool IsRemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken);
+
+    /**
+     * @brief Handle render form.
+     * @param formId The Id of the form.
+     * @param formProviderInfo Form provider info.
+     * @param want Input data.
+     * @param callerUserId Caller user ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleRenderForm(const int64_t formId, const FormProviderInfo &formProviderInfo,
+        const Want &want, int32_t callerUserId);
 private:
     static std::mutex mutex_;
     static sptr<FormSupplyCallback> instance_;

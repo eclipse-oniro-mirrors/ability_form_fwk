@@ -27,12 +27,17 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "${form_fwk_path}/test/unittest/fms_form_supply_callback_test/mock_ability_connection.cpp",
     "${form_fwk_path}/test/unittest/fms_form_supply_callback_test/mock_event_handler.cpp",
     "${form_fwk_path}/services/src/status_mgr_center/form_status_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_mgr_adapter_facade.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_render_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
   ]
   sources += [ "form_supply_callback_test.cpp" ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/unittest/fms_form_supply_callback_test/",
+    "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/common/include",
   ]
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
@@ -45,6 +50,9 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_render_info",
+    "${form_fwk_path}:form_utils",
+    "${form_fwk_path}:form_common_info",
   ]
 
   external_deps = [
@@ -62,9 +70,13 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "cJSON:cjson_static",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "data_share:datashare_provider",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_core",

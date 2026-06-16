@@ -36,22 +36,23 @@ RefreshControlMgr::~RefreshControlMgr() {}
 #ifdef RES_SCHEDULE_ENABLE
 void RefreshControlMgr::SetSystemOverloadFlag(bool flag)
 {
-    if (isSystemOverload_ && !flag) {
+    bool isSystemOverload = isSystemOverload_.load();
+    HILOG_INFO("isSystemOverload_ old: %{public}d, new: %{public}d", isSystemOverload, flag);
+    isSystemOverload_.store(flag);
+    if (isSystemOverload && !flag) {
         RefreshCacheMgr::GetInstance().ConsumeOverloadTaskQueue();
     }
-
-    HILOG_INFO("isSystemOverload_:%{public}d, new flag:%{public}d", isSystemOverload_, flag);
-    isSystemOverload_ = flag;
 }
 #endif
 
 bool RefreshControlMgr::IsSystemOverload()
 {
 #ifdef RES_SCHEDULE_ENABLE
-    if (isSystemOverload_) {
+    bool isSystemOverload = isSystemOverload_.load();
+    if (isSystemOverload) {
         HILOG_WARN("system overload");
     }
-    return isSystemOverload_;
+    return isSystemOverload;
 #endif
     return false;
 }
@@ -109,5 +110,11 @@ bool RefreshControlMgr::IsNeedToFresh(FormRecord &record, bool isVisibleToFresh)
     return isEnableUpdate;
 }
 
+bool RefreshControlMgr::IsAddFormFinish(const int64_t formId)
+{
+    bool ret = FormDataMgr::GetInstance().GetAddfinishAndSetUpdateFlag(formId);
+    HILOG_INFO("check formId:%{public}" PRId64 " IsAddFormFinish result:%{public}d", formId, ret);
+    return ret;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

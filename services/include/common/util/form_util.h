@@ -16,6 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_UTIL_H
 #define OHOS_FORM_FWK_FORM_UTIL_H
 
+#include <string_view>
+
 #include "want.h"
 
 namespace OHOS {
@@ -72,12 +74,6 @@ public:
     static int64_t GetCurrentSteadyClockMillseconds();
 
     /**
-     * @brief Get current system millisecond.
-     * @return Current system millisecond.
-     */
-    static int64_t GetNowMillisecond();
-
-    /**
      * @brief Get millisecond from tm.
      * @param tmAtTime tm time.
      * @return Millisecond.
@@ -108,7 +104,17 @@ public:
      * @param permissionName The name of the permission.
      * @return Returns true if the caller has certain permissions; returns false otherwise.
      */
-    static bool VerifyCallingPermission(const std::string &permissionName);
+    static bool VerifyCallingPermission(std::string_view permissionName);
+
+    /**
+     * @brief Checks whether the specified bundle has a certain permission.
+     * @param userId The user ID.
+     * @param bundleName The bundle name.
+     * @param permissionName The name of the permission.
+     * @return Returns true if the bundle has certain permissions; returns false otherwise.
+     */
+    static bool VerifyPermissionByBundleName(int32_t userId, const std::string &bundleName,
+        std::string_view permissionName);
 
     /**
      * @brief Convert string to int64_t
@@ -118,15 +124,24 @@ public:
      *
      * @return Return the convert result
      */
-    static bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value);
+    static bool ConvertStringToInt64(std::string_view strInfo, int64_t &int64Value);
 
-    static int ConvertStringToInt(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
+    static int ConvertStringToInt(std::string_view strInfo, int radix = BASE_REQUEST_CODE_NUM);
 
-    static long long ConvertStringToLongLong(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
+    static long long ConvertStringToLongLong(std::string_view strInfo, int radix = BASE_REQUEST_CODE_NUM);
 
     static bool IsActiveUser(const int32_t userId);
 
     static void GetActiveUsers(std::vector<int32_t> &activeList);
+
+    static void GetForegroundUsers(std::vector<int32_t> &foregroundList);
+
+    /**
+     * @brief Parse formUpdateLevel values from additionalInfo string.
+     * @param additionalInfo The additional info string containing formUpdateLevel entries.
+     * @return Vector of valid duration values parsed from formUpdateLevel patterns.
+     */
+    static std::vector<int> ParseFormUpdateLevels(const std::string &additionalInfo);
 
     /**
      * @brief Get caller user ID.

@@ -387,25 +387,35 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         resourceName,
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
-            AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
+            AsyncErrMsgCallbackInfo *callbackInfo = static_cast<AsyncErrMsgCallbackInfo*>(data);
             HILOG_INFO("complete");
-            if (asyncCallbackInfo->callback != nullptr) {
+            if (callbackInfo->callback != nullptr) {
                 napi_value callback;
                 napi_value undefined;
                 napi_value result[ARGS_SIZE_TWO] = {0};
-                InnerCreateCallbackRetMsg(env, asyncCallbackInfo->code, result);
+                InnerCreateCallbackRetMsg(env, callbackInfo->code, result);
                 napi_get_undefined(env, &undefined);
-                napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+                napi_get_reference_value(env, callbackInfo->callback, &callback);
                 napi_value callResult;
                 napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
-                napi_delete_reference(env, asyncCallbackInfo->callback);
+                napi_delete_reference(env, callbackInfo->callback);
             }
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
+            if (callbackInfo->asyncWork != nullptr) {
+                napi_delete_async_work(env, callbackInfo->asyncWork);
+            }
+            delete callbackInfo;
         },
-        (void *)asyncCallbackInfo,
+        static_cast<void *>(asyncCallbackInfo),
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return NapiGetResult(env, 1);
 }
 
@@ -428,16 +438,26 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("promise complete");
-            AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
+            AsyncErrMsgCallbackInfo *callbackInfo = static_cast<AsyncErrMsgCallbackInfo*>(data);
             napi_value result;
-            InnerCreatePromiseRetMsg(env, asyncCallbackInfo->code, &result);
-            napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
+            InnerCreatePromiseRetMsg(env, callbackInfo->code, &result);
+            napi_reject_deferred(env, callbackInfo->deferred, result);
+            if (callbackInfo->asyncWork != nullptr) {
+                napi_delete_async_work(env, callbackInfo->asyncWork);
+            }
+            delete callbackInfo;
         },
-        (void *)asyncCallbackInfo,
+        static_cast<void *>(asyncCallbackInfo),
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return promise;
 }
 
@@ -484,7 +504,8 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     napi_set_named_property(env, result, "formId", CreateJsValue(env, std::to_string(runningFormInfo.formId)));
     napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
     napi_set_named_property(env, result, "hostBundleName", CreateJsValue(env, runningFormInfo.hostBundleName));
-    napi_set_named_property(env, result, "visibilityType", CreateJsValue(env, (int32_t)runningFormInfo.formVisiblity));
+    napi_set_named_property(env, result, "visibilityType", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formVisiblity)));
     napi_set_named_property(env, result, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
     napi_set_named_property(env, result, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
     napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
@@ -492,7 +513,8 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     napi_set_named_property(env, result, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, result, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
     napi_set_named_property(env, result, "formDescription", CreateJsValue(env, runningFormInfo.description));
-    napi_set_named_property(env, result, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
+    napi_set_named_property(env, result, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)
@@ -544,7 +566,7 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "customizeData", CreateFormCustomizeDatas(env, formInfo.customizeDatas));
     napi_set_named_property(env, objContext, "isDynamic", CreateJsValue(env, formInfo.isDynamic));
     napi_set_named_property(env, objContext, "transparencyEnabled", CreateJsValue(env, formInfo.transparencyEnabled));
-    napi_set_named_property(env, objContext, "fontScaleFollowSystem",
+    napi_set_named_property(env, objContext, "isFontScaleFollowSystem",
         CreateJsValue(env, formInfo.fontScaleFollowSystem));
     napi_set_named_property(env, objContext, "supportedShapes", CreateNativeArray(env, formInfo.supportShapes));
     napi_set_named_property(env, objContext, "previewImages", CreateNativeArray(env, formInfo.formPreviewImages));
@@ -560,6 +582,8 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "isStandbyAdapted", CreateJsValue(env, formInfo.standby.isAdapted));
     napi_set_named_property(
         env, objContext, "isPrivacySensitive", CreateJsValue(env, formInfo.standby.isPrivacySensitive));
+    napi_set_named_property(
+        env, objContext, "isTemplateForm", CreateJsValue(env, formInfo.isTemplateForm));
 
     return objContext;
 }
@@ -593,7 +617,8 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
     napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
-    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
 
     return objContext;
 }
@@ -623,7 +648,8 @@ napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &running
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
     napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
-    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
+        static_cast<int32_t>(runningFormInfo.formLocation)));
  
     return objContext;
 }
@@ -661,6 +687,8 @@ napi_value CreateSceneAnimationParamsDatas(napi_env env, const FormSceneAnimatio
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, sceneAnimationParamsDatas.abilityName));
     napi_set_named_property(env, objContext, "disabledDesktopBehaviors",
         CreateJsValue(env, sceneAnimationParamsDatas.disabledDesktopBehaviors));
+    napi_set_named_property(env, objContext, "triggerTypes",
+        CreateNativeArray(env, sceneAnimationParamsDatas.triggerTypes));
     return objContext;
 }
 
@@ -712,6 +740,14 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
 
     if (napi_get_value_string_utf8(env, value, nullptr, 0, &size) != napi_ok) {
         HILOG_ERROR("can't get stringSize");
+        return "";
+    }
+    if (size == 0) {
+        HILOG_WARN("args size is zero");
+        return "";
+    }
+    if (size >= SIZE_MAX - 1) {
+        HILOG_ERROR("string size too large");
         return "";
     }
     result.resize(size + 1);
@@ -836,6 +872,23 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
     rect.width = rectWidth;
     rect.height = rectHeight;
     return true;
+}
+
+int NapiFormUtil::CatchErrorCode(napi_env env)
+{
+    napi_value errResult;
+    if (napi_get_and_clear_last_exception(env, &errResult) == napi_ok) {
+        napi_value errCode;
+        napi_get_named_property(env, errResult, "code", &errCode);
+        napi_valuetype errCodeType;
+        napi_typeof(env, errCode, &errCodeType);
+        if (errCodeType == napi_number) {
+            int32_t errCodeInt;
+            napi_get_value_int32(env, errCode, &errCodeInt);
+            return errCodeInt;
+        }
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

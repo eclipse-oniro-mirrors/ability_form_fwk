@@ -170,34 +170,34 @@ static void FormCallbackCreateAsyncWork(napi_env env, AsyncRequestPublishFormCal
         resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("running");
-            auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
-            InnerRequestPublishForm(env, asyncCallbackInfo);
+            auto *callbackInfo = static_cast<AsyncRequestPublishFormCallbackInfo*>(data);
+            InnerRequestPublishForm(env, callbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("complete");
-            auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
+            auto *callbackInfo = static_cast<AsyncRequestPublishFormCallbackInfo*>(data);
 
-            if (asyncCallbackInfo->callback != nullptr) {
+            if (callbackInfo->callback != nullptr) {
                 napi_value callback;
                 napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
-                InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
-                if (asyncCallbackInfo->result == ERR_OK) {
-                    std::string strFormId = std::to_string(asyncCallbackInfo->formId);
+                InnerCreateCallbackRetMsg(env, callbackInfo->result, callbackValues);
+                if (callbackInfo->result == ERR_OK) {
+                    std::string strFormId = std::to_string(callbackInfo->formId);
                     napi_value formId;
                     napi_create_string_utf8(env, strFormId.c_str(), strFormId.length(), &formId);
                     callbackValues[1] = formId;
                 }
 
-                napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+                napi_get_reference_value(env, callbackInfo->callback, &callback);
                 napi_value callResult;
                 napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
-                napi_delete_reference(env, asyncCallbackInfo->callback);
+                napi_delete_reference(env, callbackInfo->callback);
             }
 
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
+            napi_delete_async_work(env, callbackInfo->asyncWork);
+            delete callbackInfo;
         },
-        (void *) asyncCallbackInfo,
+        static_cast<void *>(asyncCallbackInfo),
         &asyncCallbackInfo->asyncWork);
 }
 
@@ -233,7 +233,18 @@ static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, boo
     napi_create_reference(env, argv[callbackIdx], REF_COUNT, &asyncCallbackInfo->callback);
 
     FormCallbackCreateAsyncWork(env, asyncCallbackInfo);
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
+        if (asyncCallbackInfo->callback) {
+            napi_delete_reference(env, asyncCallbackInfo->callback);
+        }
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return NapiGetResult(env, 1);
 }
 
@@ -247,29 +258,29 @@ static void FormPromiseCreateAsyncWork(napi_env env, AsyncRequestPublishFormCall
         resourceName,
         [](napi_env env, void *data) {
             HILOG_INFO("running");
-            auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
-            if (asyncCallbackInfo) {
-                InnerRequestPublishForm(env, asyncCallbackInfo);
+            auto *callbackInfo = static_cast<AsyncRequestPublishFormCallbackInfo*>(data);
+            if (callbackInfo) {
+                InnerRequestPublishForm(env, callbackInfo);
             }
         },
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("complete");
-            auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
+            auto *callbackInfo = static_cast<AsyncRequestPublishFormCallbackInfo*>(data);
             napi_value result;
-            if (asyncCallbackInfo) {
-                if (asyncCallbackInfo->result == ERR_OK) {
-                    std::string strFormId = std::to_string(asyncCallbackInfo->formId);
+            if (callbackInfo) {
+                if (callbackInfo->result == ERR_OK) {
+                    std::string strFormId = std::to_string(callbackInfo->formId);
                     napi_create_string_utf8(env, strFormId.c_str(), strFormId.length(), &result);
-                    napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
+                    napi_resolve_deferred(callbackInfo->env, callbackInfo->deferred, result);
                 } else {
-                    InnerCreatePromiseRetMsg(env, asyncCallbackInfo->result, &result);
-                    napi_reject_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
+                    InnerCreatePromiseRetMsg(env, callbackInfo->result, &result);
+                    napi_reject_deferred(callbackInfo->env, callbackInfo->deferred, result);
                 }
-                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-                delete asyncCallbackInfo;
+                napi_delete_async_work(env, callbackInfo->asyncWork);
+                delete callbackInfo;
             }
         },
-        (void *) asyncCallbackInfo,
+        static_cast<void *>(asyncCallbackInfo),
         &asyncCallbackInfo->asyncWork);
 }
 
@@ -297,7 +308,15 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
     }
     
     FormPromiseCreateAsyncWork(env, asyncCallbackInfo);
-    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        HILOG_ERROR("async work failed!");
+        if (asyncCallbackInfo->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
+        delete asyncCallbackInfo;
+        return nullptr;
+    }
     return promise;
 }
 

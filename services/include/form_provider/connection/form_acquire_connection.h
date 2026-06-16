@@ -16,10 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_ACQUIRE_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_ACQUIRE_CONNECTION_H
 
-#include "event_handler.h"
 #include "common/connection/form_ability_connection.h"
 #include "data_center/form_info/form_item_info.h"
-#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -27,26 +25,18 @@ using WantParams = OHOS::AAFwk::WantParams;
 
 /**
  * @class FormAcquireConnection
- * Form Acquire Connection Stub.
+ * Form Acquire Connection Stub. Uses multiple hooks for complex logic.
  */
 class FormAcquireConnection : public FormAbilityConnection {
 public:
-    FormAcquireConnection(const int64_t formId, const FormItemInfo &info, const WantParams &wantParams,
-        const sptr<IRemoteObject> hostToken);
-    FormAcquireConnection() = delete; // disable default constructor.
+    FormAcquireConnection(const int64_t formId, const FormItemInfo &info,
+        const WantParams &wantParams, const sptr<IRemoteObject> hostToken);
+    FormAcquireConnection() = delete;
     virtual ~FormAcquireConnection() = default;
 
     /**
-     * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
-     * @param element service ability's ElementName.
-     * @param remoteObject the session proxy of service ability.
-     * @param resultCode ERR_OK on success, others on failure.
-     */
-    void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
-
-    /**
      * @brief OnAbilityDisconnectDone, AbilityMs notify caller ability the result of disconnect.
+     *        Has special reconnect logic when not connected yet.
      * @param element service ability's ElementName.
      * @param resultCode ERR_OK on success, others on failure.
      */
@@ -72,12 +62,33 @@ public:
      */
     void OnFormAbilityDisconnectDoneCallback();
 
+protected:
+    /**
+     * @brief Pre-processing after connection success.
+     *        Clears reconnect num, sets bind time, marks connected.
+     */
+    void OnPreConnectTask() override;
+
+    /**
+     * @brief Build complex Want parameter for acquire.
+     * @return Built Want object with form info.
+     */
+    Want OnBuildTaskWant() override;
+
+    /**
+     * @brief Execute acquire task after connection success.
+     * @param want Task Want parameter.
+     * @param remoteObject Remote object.
+     */
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override;
+
 private:
     FormItemInfo info_;
     WantParams wantParams_;
     bool isConnected_ = false;
     std::function<void(const std::string &bundleName)> onFormAblityConnectCb_;
     std::function<void(const std::string &bundleName)> onFormAblityDisconnectCb_;
+    static constexpr int32_t DISCONNECT_ERROR = -1;
 
     DISALLOW_COPY_AND_MOVE(FormAcquireConnection);
 };

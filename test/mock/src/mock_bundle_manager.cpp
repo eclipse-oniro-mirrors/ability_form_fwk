@@ -160,5 +160,7 @@ bool BundleMgrService::GetFormsInfoByModule(const std::string &bundleName, const
     formInfo.emplace_back(form);
     return true;
 }
+
+void BundleMgrService::SetBundleInfo(std::string bundleName, int32_t userId, BundleInfo bundleInfo) {}
 } // namespace AppExecFwk
 } // namespace OHOS

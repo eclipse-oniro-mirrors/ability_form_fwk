@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,12 +43,13 @@
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "feature/memory_mgr/form_render_report.h"
 #include "form_surface_info.h"
+#include "ability_manager_errors.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr size_t LAST_CONNECTION = 1;
-const std::string DLP_INDEX = "ohos.dlp.params.index";
+constexpr const char *DLP_INDEX = "ohos.dlp.params.index";
 const int FORM_DISCONNECT_FRS_DELAY_TIME = 5000; // ms
 }
 using Want = OHOS::AAFwk::Want;
@@ -57,7 +58,9 @@ FormRenderMgrInner::FormRenderMgrInner()
 }
 FormRenderMgrInner::~FormRenderMgrInner()
 {
+    DisconnectAllRenderConnections();
 }
+
 
 ErrCode FormRenderMgrInner::RenderForm(
     const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &hostToken)
@@ -77,7 +80,7 @@ ErrCode FormRenderMgrInner::RenderForm(
         HILOG_WARN("isActiveUser is false, return");
         return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
     }
-    FillBundleInfo(want, formRecord.bundleName);
+    FillBundleInfo(want, formRecord.bundleName, formRecord.userId);
 
     sptr<FormRenderConnection> connection = nullptr;
     bool connectionExisted = GetRenderFormConnection(connection, formRecord.formId);
@@ -89,14 +92,15 @@ ErrCode FormRenderMgrInner::RenderForm(
         return RenderConnectedForm(formRecord, want, connection);
     }
 
-    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
+    sptr<FormRenderConnection> formRenderConnection = new (std::nothrow) FormRenderConnection(
+        formRecord, want.GetParams());
     if (formRenderConnection == nullptr) {
         HILOG_ERROR("null formRenderConnection");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     ErrCode errorCode = ConnectRenderService(formRenderConnection, formRecord.privacyLevel);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
         FormRenderMgr::GetInstance().HandleConnectFailed(formRecord.formId, errorCode);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
             formRecord.formId,
@@ -153,7 +157,18 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
         return ERR_OK;
     }
 
-    auto task = [formRecord, newWant = want, remoteObject]() {
+    auto task = [formRecord, want, weak = weak_from_this()]() {
+        sptr<IRemoteObject> remoteObject;
+        auto formRenderMgrInner = weak.lock();
+        if (!formRenderMgrInner) {
+            HILOG_ERROR("formRenderMgrInner is null.");
+            return;
+        }
+        auto ret = formRenderMgrInner->GetRenderObject(remoteObject);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("get remote object fail.");
+            return;
+        }
         FormRecord newRecord(formRecord);
         std::string cacheData;
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
@@ -162,7 +177,7 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
             newRecord.formProviderInfo.SetFormDataString(cacheData);
             newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
         }
-        FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, newWant, remoteObject);
+        FormStatusTaskMgr::GetInstance().PostRenderForm(newRecord, want, remoteObject);
     };
     RefreshCacheMgr::GetInstance().AddRenderTask(formRecord.formId, task);
     return ERR_OK;
@@ -185,14 +200,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
 
     if (formRecord.formProviderInfo.NeedCache()) {
         FormCacheMgr::GetInstance().AddData(formRecord.formId, formRecord.formProviderInfo.GetFormData());
-        if (FormStatus::GetInstance().GetFormStatus(formRecord.formId) == FormFsmStatus::RECYCLED) {
-            std::string cacheData;
-            std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-            if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
-                formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-            }
-        }
-    } else {
+    } else if (!formProviderData.IsDbCacheEnabled()) {
         HILOG_DEBUG("need to delete data");
         FormCacheMgr::GetInstance().DeleteData(formRecord.formId);
     }
@@ -212,7 +220,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     }
     Want want;
     want.SetParams(wantParams);
-    FillBundleInfo(want, formRecord.bundleName);
+    FillBundleInfo(want, formRecord.bundleName, formRecord.userId);
     if (wantParams.IsEmpty()) {
         want.SetParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADAPTER_UPDATE_FORM);
     }
@@ -234,7 +242,7 @@ ErrCode FormRenderMgrInner::ReloadForm(
         return ret;
     }
     Want want;
-    FillBundleInfo(want, bundleName);
+    FillBundleInfo(want, bundleName, userId);
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
     want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
     FormRenderTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords),
@@ -242,11 +250,11 @@ ErrCode FormRenderMgrInner::ReloadForm(
     return ERR_OK;
 }
 
-void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleName) const
+void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleName, const int32_t userId) const
 {
     BundleInfo bundleInfo;
     if (!FormBmsHelper::GetInstance().GetBundleInfoDefault(
-        bundleName, FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        bundleName, userId, bundleInfo)) {
         HILOG_ERROR("get bundle info failed. %{public}s", bundleName.c_str());
         return;
     }
@@ -259,12 +267,17 @@ void FormRenderMgrInner::PostOnUnlockTask()
 {
     HILOG_DEBUG("call");
     RecoverFRSOnFormActivity();
+    std::unique_lock<std::mutex> guard(onUnlockTaskMutex_);
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
-        HILOG_ERROR("null remoteObjectGotten");
+        HILOG_WARN("null remoteObjectGotten");
+        onUnlockTask_ = [](const sptr<IRemoteObject> &remoteObject) {
+            FormRenderTaskMgr::GetInstance().PostOnUnlock(remoteObject);
+        };
         return;
     }
+    guard.unlock();
     FormRenderTaskMgr::GetInstance().PostOnUnlock(remoteObject);
 }
 
@@ -500,6 +513,15 @@ void FormRenderMgrInner::CleanFormHost(const sptr<IRemoteObject> &host)
     renderRemoteObj_->CleanFormHost(host);
 }
 
+void FormRenderMgrInner::ExecOnUnlockTask(const sptr<IRemoteObject> &remoteObject)
+{
+    std::unique_lock<std::mutex> unlockTaskLock(onUnlockTaskMutex_);
+    if (onUnlockTask_) {
+        onUnlockTask_(remoteObject);
+        onUnlockTask_ = nullptr;
+    }
+}
+
 void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject)
 {
     std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
@@ -515,24 +537,49 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
         HILOG_ERROR("null renderRemoteObj");
         return;
     }
+    FormDataMgr::GetInstance().CancelRerenderAllFormsDelayTask();
 
+    if (!RegisterRenderDeathRecipient(remoteObject)) {
+        return;
+    }
+    SetRenderRemoteObj(renderRemoteObj);
+    ExecOnUnlockTask(remoteObject);
+
+    std::lock_guard<std::mutex> lock(formResSchedMutex_);
+    formResSched_ = std::make_unique<FormResSched>(GetUserId());
+    formResSched_->ReportFormLayoutStart();
+}
+
+bool FormRenderMgrInner::RegisterRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject)
+{
+    std::lock_guard<std::mutex> lock(renderDeathRecipientMutex_);
     if (renderDeathRecipient_ == nullptr) {
-        renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([this]() {
-            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d", userId_, isActiveUser_);
-            if (isActiveUser_) {
-                RerenderAllForms();
+        renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([weak = weak_from_this()]() {
+            auto renderMgrInner = weak.lock();
+            if (renderMgrInner == nullptr) {
+                HILOG_ERROR("null renderMgrInner");
+                return;
+            }
+            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
+                renderMgrInner->userId_, renderMgrInner->isActiveUser_);
+            if (renderMgrInner->isActiveUser_) {
+                renderMgrInner->RerenderAllForms();
             } else {
-                std::unique_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
-                renderRemoteObj_ = nullptr;
-                guard.unlock();
+                std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
+                renderMgrInner->renderRemoteObj_ = nullptr;
+            }
+            std::lock_guard<std::mutex> lock(renderMgrInner->formResSchedMutex_);
+            if (renderMgrInner->formResSched_) {
+                renderMgrInner->formResSched_->ReportFormLayoutEnd();
+                renderMgrInner->formResSched_ = nullptr;
             }
         });
     }
     if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
         HILOG_ERROR("AddDeathRecipient failed");
-        return;
+        return false;
     }
-    SetRenderRemoteObj(renderRemoteObj);
+    return true;
 }
 
 inline ErrCode FormRenderMgrInner::ConnectRenderService(
@@ -550,7 +597,15 @@ inline ErrCode FormRenderMgrInner::ConnectRenderService(
         want.SetParam(Constants::FRS_APP_INDEX, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX);
     }
     connection->SetStateConnecting();
-    return FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(want, connection, GetUserId());
+    auto ret = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(want, connection, GetUserId());
+    if (ret != ERR_OK) {
+        connection->SetStateDisconnected();
+        if (ret == OHOS::AAFwk::ERR_ALL_APP_START_BLOCKED) {
+            FormDataMgr::GetInstance().ScheduleRerenderAllFormsDelayTask();
+        }
+    }
+    
+    return ret;
 }
 
 void FormRenderMgrInner::SetUserId(int32_t userId)
@@ -566,10 +621,13 @@ int32_t FormRenderMgrInner::GetUserId() const
 void FormRenderMgrInner::RerenderAllFormsImmediate()
 {
     HILOG_INFO("Called");
-    isActiveUser_ = true;
-    if (etsHosts_.empty()) {
-        HILOG_WARN("All hosts died, no need to rerender.");
-        return;
+    {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        isActiveUser_ = true;
+        if (etsHosts_.empty()) {
+            HILOG_WARN("All hosts died, no need to rerender.");
+            return;
+        }
     }
     NotifyHostRenderServiceIsDead();
 }
@@ -629,10 +687,27 @@ inline void FormRenderMgrInner::AddHostToken(const sptr<IRemoteObject> &host, in
     }
 }
 
+void FormRenderMgrInner::CollectConnectionsToDisconnect(
+    const std::unordered_set<int64_t> &formIdSet,
+    std::unordered_map<int64_t, sptr<FormRenderConnection>> &connections)
+{
+    for (const int64_t formId : formIdSet) {
+        if (!FormDataMgr::GetInstance().HasFormRecord(formId)) {
+            std::lock_guard<std::mutex> lock(resourceMutex_);
+            auto conIter = renderFormConnections_.find(formId);
+            if (conIter != renderFormConnections_.end()) {
+                connections.emplace(formId, conIter->second);
+                renderFormConnections_.erase(conIter);
+            }
+        }
+    }
+}
+
 void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
 {
-    size_t left = 0;
-    std::unordered_map<int64_t, sptr<FormRenderConnection>> connections;
+    size_t renderConnectionSize = 0;
+    std::unordered_set<int64_t> formIdSet;
+    bool disconnectAll = false;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
         auto iter = etsHosts_.find(host);
@@ -640,25 +715,26 @@ void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
             HILOG_ERROR("Can't find host in etsHosts");
             return;
         }
-        auto formIdSet = iter->second;
+        formIdSet = std::move(iter->second);
         etsHosts_.erase(host);
-        if (etsHosts_.empty()) {
-            HILOG_DEBUG("etsHosts is empty, disconnect all connections size:%{public}zu",
-                renderFormConnections_.size());
-            connections.swap(renderFormConnections_);
-        } else {
-            for (const int64_t formId : formIdSet) {
-                FormRecord formRecord;
-                if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-                    connections.emplace(formId, renderFormConnections_[formId]);
-                    renderFormConnections_.erase(formId);
-                }
-            }
-        }
-        left = renderFormConnections_.size();
+        disconnectAll = etsHosts_.empty();
+        renderConnectionSize = renderFormConnections_.size();
     }
+
+    std::unordered_map<int64_t, sptr<FormRenderConnection>> connections;
+
+    if (disconnectAll) {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        HILOG_DEBUG("etsHosts is empty, disconnect all connections size:%{public}zu",
+            renderConnectionSize);
+        connections.swap(renderFormConnections_);
+    } else {
+        CollectConnectionsToDisconnect(formIdSet, connections);
+    }
+
     for (auto iter = connections.begin(); iter != connections.end();) {
-        DisconnectRenderService(iter->second, connections.size() > left ? connections.size() : left);
+        DisconnectRenderService(iter->second, connections.size() > renderConnectionSize ? connections.size() :
+            renderConnectionSize);
         iter = connections.erase(iter);
     }
 }
@@ -692,6 +768,7 @@ void FormRenderMgrInner::NotifyHostRenderServiceIsDead() const
 
 sptr<IFormRender> FormRenderMgrInner::GetRenderRemoteObj() const
 {
+    std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
     return renderRemoteObj_;
 }
 
@@ -745,12 +822,6 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
             continue;
         }
 
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
-            formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-        }
-
         std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
         want.SetParam(Constants::FORM_SUPPLY_UID, uid);
 
@@ -776,6 +847,14 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
 {
     HILOG_DEBUG("call");
     RecoverFRSOnFormActivity();
+    
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    FormDataMgr::GetInstance().UpdateHostWantSize(formId, width, height, borderWidth, formViewScale);
+
     sptr<IRemoteObject> remoteObject;
     auto ret = GetRenderObject(remoteObject);
     if (ret != ERR_OK) {
@@ -783,17 +862,13 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
         return ret;
     }
 
-    FormRecord formRecord;
-    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
     FormSurfaceInfo formSurfaceInfo;
     formSurfaceInfo.width = width;
     formSurfaceInfo.height = height;
     formSurfaceInfo.borderWidth = borderWidth;
     formSurfaceInfo.formViewScale = formViewScale;
     std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
+
     FormRenderTaskMgr::GetInstance().PostUpdateFormSize(formId, formSurfaceInfo, uid, remoteObject);
     return ERR_OK;
 }
@@ -940,6 +1015,18 @@ bool FormRenderMgrInner::GetIsFRSDiedInLowMemory()
 {
     HILOG_INFO("call isFrsDiedInLowMemory_ %{public}d", isFrsDiedInLowMemory_.load());
     return isFrsDiedInLowMemory_;
+}
+
+void FormRenderMgrInner::PostSetRenderGroupParamsTask(const int64_t formId, const Want &want)
+{
+    HILOG_INFO("call");
+    sptr<IRemoteObject> remoteObject;
+    auto ret = GetRenderObject(remoteObject);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("null remoteObjectGotten");
+        return;
+    }
+    FormRenderTaskMgr::GetInstance().PostSetRenderGroupParams(formId, want, remoteObject);
 }
 
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)

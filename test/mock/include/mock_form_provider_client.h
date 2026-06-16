@@ -159,6 +159,17 @@ private:
 private:
     DISALLOW_COPY_AND_MOVE(MockFormProviderClient);
 };
+
+enum class MakeWantFlag : int {
+    NO_FORM_NAME = 1,
+    NO_MODEL_NAME = 2,
+    NO_FORM_DIMENSION = 3,
+    NO_BUNDLE_NAME = 4,
+    NO_ABILITY_NAME = 5,
+    DEFAULT = 6
+};
+
+void makeWant(Want &want, MakeWantFlag flag);
 } // namespace AppExecFwk
 } // namespace OHOS
 #endif // OHOS_FORM_FWK_MOCK_FORM_PROVIDER_CLIENT_H

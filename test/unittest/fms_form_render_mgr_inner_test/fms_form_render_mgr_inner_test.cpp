@@ -347,7 +347,8 @@ HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_014, TestSize.Level0)
     FormRenderMgrInner formRenderMgrInner;
     std::string bundleName = "<bundleName>";
     Want want;
-    formRenderMgrInner.FillBundleInfo(want, bundleName);
+    int32_t userId = 100;
+    formRenderMgrInner.FillBundleInfo(want, bundleName, userId);
     EXPECT_EQ(true, want.HasParameter(Constants::FORM_COMPATIBLE_VERSION_KEY));
     EXPECT_EQ(true, want.HasParameter(Constants::FORM_TARGET_VERSION_KEY));
     GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_014 end";
@@ -1177,5 +1178,1464 @@ HWTEST_F(FormRenderMgrInnerTest, DisconnectAllRenderConnections_002, TestSize.Le
     formRenderMgrInner.DisconnectAllRenderConnections();
     EXPECT_EQ(0, formRenderMgrInner.renderFormConnections_.size());
     GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_002 end";
+}
+
+/**
+ * @tc.name: PostSetRenderGroupParamsTask_001
+ * @tc.desc: test PostSetRenderGroupParamsTask function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    Want want;
+    formRenderMgrInner.PostSetRenderGroupParamsTask(1, want);
+    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 end";
+}
+
+/**
+ * @tc.name: ReleaseRenderer_001
+ * @tc.desc: test ReleaseRenderer function when uiSyntax is JS.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReleaseRenderer_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.uiSyntax = FormType::JS;
+    std::string compId = "compId";
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
+    GTEST_LOG_(INFO) << "ReleaseRenderer_001 end";
+}
+
+/**
+ * @tc.name: ReleaseRenderer_002
+ * @tc.desc: test ReleaseRenderer function when abilityName is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReleaseRenderer_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.uiSyntax = FormType::ETS;
+    formRecord.abilityName = "";
+    std::string compId = "compId";
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
+    GTEST_LOG_(INFO) << "ReleaseRenderer_002 end";
+}
+
+/**
+ * @tc.name: ReleaseRenderer_003
+ * @tc.desc: test ReleaseRenderer function when bundleName is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReleaseRenderer_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.uiSyntax = FormType::ETS;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "";
+    std::string compId = "compId";
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
+    GTEST_LOG_(INFO) << "ReleaseRenderer_003 end";
+}
+
+/**
+ * @tc.name: ReleaseRenderer_004
+ * @tc.desc: test ReleaseRenderer function when connection does not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReleaseRenderer_004 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.uiSyntax = FormType::ETS;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    std::string compId = "compId";
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
+    GTEST_LOG_(INFO) << "ReleaseRenderer_004 end";
+}
+
+/**
+ * @tc.name: ReleaseRenderer_005
+ * @tc.desc: test ReleaseRenderer function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReleaseRenderer_005 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.uiSyntax = FormType::ETS;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    std::string compId = "compId";
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
+    GTEST_LOG_(INFO) << "ReleaseRenderer_005 end";
+}
+
+/**
+ * @tc.name: ReleaseRenderer_006
+ * @tc.desc: test ReleaseRenderer function when renderRemoteObj_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ReleaseRenderer_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ReleaseRenderer_006 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.uiSyntax = FormType::ETS;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    formRecord.providerUserId = 100;
+    formRecord.isDynamic = true;
+    std::string compId = "compId";
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->ReleaseRenderer(formId, formRecord, compId));
+    GTEST_LOG_(INFO) << "ReleaseRenderer_006 end";
+}
+
+/**
+ * @tc.name: RecycleForms_001
+ * @tc.desc: test RecycleForms function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecycleForms_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecycleForms_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    std::vector<int64_t> formIds = {1, 2, 3};
+    Want want;
+    sptr<IRemoteObject> remoteObjectOfHost = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecycleForms(formIds, want, remoteObjectOfHost));
+    GTEST_LOG_(INFO) << "RecycleForms_001 end";
+}
+
+/**
+ * @tc.name: RecycleForms_002
+ * @tc.desc: test RecycleForms function when renderRemoteObj_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecycleForms_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecycleForms_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::vector<int64_t> formIds = {1};
+    Want want;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(FormRecord(), wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(1, conn);
+    sptr<IRemoteObject> remoteObjectOfHost = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecycleForms(formIds, want, remoteObjectOfHost));
+    GTEST_LOG_(INFO) << "RecycleForms_002 end";
+}
+
+/**
+ * @tc.name: RecoverForms_001
+ * @tc.desc: test RecoverForms function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecoverForms_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecoverForms_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    std::vector<int64_t> formIds = {1, 2, 3};
+    WantParams wantParams;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
+    GTEST_LOG_(INFO) << "RecoverForms_001 end";
+}
+
+/**
+ * @tc.name: RecoverForms_002
+ * @tc.desc: test RecoverForms function when renderRemoteObj_ is not nullptr and form record not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecoverForms_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecoverForms_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::vector<int64_t> formIds = {1};
+    WantParams wantParams;
+    MockGetFormRecord(false, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
+    GTEST_LOG_(INFO) << "RecoverForms_002 end";
+}
+
+/**
+ * @tc.name: RecoverForms_003
+ * @tc.desc: test RecoverForms function when connection does not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecoverForms_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecoverForms_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::vector<int64_t> formIds = {1};
+    WantParams wantParams;
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
+    GTEST_LOG_(INFO) << "RecoverForms_003 end";
+}
+
+/**
+ * @tc.name: RecoverForms_004
+ * @tc.desc: test RecoverForms function when connection exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecoverForms_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecoverForms_004 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::vector<int64_t> formIds = {100};
+    WantParams wantParams;
+    FormRecord formRecord;
+    formRecord.formId = 100;
+    formRecord.providerUserId = 100;
+    formRecord.bundleName = "bundleName";
+    WantParams connWantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, connWantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(100, conn);
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
+    GTEST_LOG_(INFO) << "RecoverForms_004 end";
+}
+
+/**
+ * @tc.name: UpdateFormSize_001
+ * @tc.desc: test UpdateFormSize function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateFormSize_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    int64_t formId = 1;
+    float width = 100.0f;
+    float height = 100.0f;
+    float borderWidth = 1.0f;
+    float formViewScale = 1.0f;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner->UpdateFormSize(formId, width, height, borderWidth, formViewScale));
+    GTEST_LOG_(INFO) << "UpdateFormSize_001 end";
+}
+
+/**
+ * @tc.name: UpdateFormSize_002
+ * @tc.desc: test UpdateFormSize function when form record not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateFormSize_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    int64_t formId = 1;
+    float width = 100.0f;
+    float height = 100.0f;
+    float borderWidth = 1.0f;
+    float formViewScale = 1.0f;
+    MockGetFormRecord(false, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner->UpdateFormSize(formId, width, height, borderWidth, formViewScale));
+    GTEST_LOG_(INFO) << "UpdateFormSize_002 end";
+}
+
+/**
+ * @tc.name: UpdateFormSize_003
+ * @tc.desc: test UpdateFormSize function when form record exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, UpdateFormSize_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateFormSize_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    int64_t formId = 100;
+    float width = 100.0f;
+    float height = 100.0f;
+    float borderWidth = 1.0f;
+    float formViewScale = 1.0f;
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner->UpdateFormSize(formId, width, height, borderWidth, formViewScale));
+    GTEST_LOG_(INFO) << "UpdateFormSize_003 end";
+}
+
+/**
+ * @tc.name: GetRenderObject_001
+ * @tc.desc: test GetRenderObject function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderObject_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderObject_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    sptr<IRemoteObject> renderObj;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->GetRenderObject(renderObj));
+    GTEST_LOG_(INFO) << "GetRenderObject_001 end";
+}
+
+/**
+ * @tc.name: GetRenderObject_002
+ * @tc.desc: test GetRenderObject function when renderRemoteObj_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderObject_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderObject_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    sptr<IRemoteObject> renderObj;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->GetRenderObject(renderObj));
+    GTEST_LOG_(INFO) << "GetRenderObject_002 end";
+}
+
+/**
+ * @tc.name: GetRenderFormConnectId_001
+ * @tc.desc: test GetRenderFormConnectId function when connection not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderFormConnectId_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    int32_t connectId = 0;
+    EXPECT_FALSE(formRenderMgrInner->GetRenderFormConnectId(formId, connectId));
+    GTEST_LOG_(INFO) << "GetRenderFormConnectId_001 end";
+}
+
+/**
+ * @tc.name: GetRenderFormConnectId_002
+ * @tc.desc: test GetRenderFormConnectId function when connection is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderFormConnectId_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    int32_t connectId = 0;
+    formRenderMgrInner->renderFormConnections_.emplace(formId, nullptr);
+    EXPECT_FALSE(formRenderMgrInner->GetRenderFormConnectId(formId, connectId));
+    GTEST_LOG_(INFO) << "GetRenderFormConnectId_002 end";
+}
+
+/**
+ * @tc.name: GetRenderFormConnectId_003
+ * @tc.desc: test GetRenderFormConnectId function when connection exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnectId_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderFormConnectId_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    int32_t connectId = 0;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    EXPECT_TRUE(formRenderMgrInner->GetRenderFormConnectId(formId, connectId));
+    GTEST_LOG_(INFO) << "GetRenderFormConnectId_003 end";
+}
+
+/**
+ * @tc.name: GetRenderFormConnection_001
+ * @tc.desc: test GetRenderFormConnection function when connection not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnection_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderFormConnection_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    sptr<FormRenderConnection> connection;
+    EXPECT_FALSE(formRenderMgrInner->GetRenderFormConnection(connection, formId));
+    GTEST_LOG_(INFO) << "GetRenderFormConnection_001 end";
+}
+
+/**
+ * @tc.name: GetRenderFormConnection_002
+ * @tc.desc: test GetRenderFormConnection function when connection exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderFormConnection_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderFormConnection_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    sptr<FormRenderConnection> connection;
+    EXPECT_TRUE(formRenderMgrInner->GetRenderFormConnection(connection, formId));
+    EXPECT_NE(connection, nullptr);
+    GTEST_LOG_(INFO) << "GetRenderFormConnection_002 end";
+}
+
+/**
+ * @tc.name: GetConnectedForms_001
+ * @tc.desc: test GetConnectedForms function when no connection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetConnectedForms_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    std::vector<int64_t> formIds = {1, 2, 3};
+    std::vector<int64_t> connectedForms;
+    formRenderMgrInner->GetConnectedForms(formIds, connectedForms);
+    EXPECT_EQ(0, connectedForms.size());
+    GTEST_LOG_(INFO) << "GetConnectedForms_001 end";
+}
+
+/**
+ * @tc.name: GetConnectedForms_002
+ * @tc.desc: test GetConnectedForms function with connection nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetConnectedForms_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    formRenderMgrInner->renderFormConnections_.emplace(formId, nullptr);
+    std::vector<int64_t> formIds = {formId};
+    std::vector<int64_t> connectedForms;
+    formRenderMgrInner->GetConnectedForms(formIds, connectedForms);
+    EXPECT_EQ(0, connectedForms.size());
+    GTEST_LOG_(INFO) << "GetConnectedForms_002 end";
+}
+
+/**
+ * @tc.name: GetConnectedForms_003
+ * @tc.desc: test GetConnectedForms function with valid connection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetConnectedForms_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetConnectedForms_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    std::vector<int64_t> formIds = {formId};
+    std::vector<int64_t> connectedForms;
+    formRenderMgrInner->GetConnectedForms(formIds, connectedForms);
+    EXPECT_EQ(1, connectedForms.size());
+    GTEST_LOG_(INFO) << "GetConnectedForms_003 end";
+}
+
+/**
+ * @tc.name: RenderConnectedForm_001
+ * @tc.desc: test RenderConnectedForm function when connection is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RenderConnectedForm_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    FormRecord formRecord;
+    Want want;
+    sptr<FormRenderConnection> connection = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RenderConnectedForm(formRecord, want, connection));
+    GTEST_LOG_(INFO) << "RenderConnectedForm_001 end";
+}
+
+/**
+ * @tc.name: RenderConnectedForm_002
+ * @tc.desc: test RenderConnectedForm function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RenderConnectedForm_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    WantParams wantParams;
+    sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    MockConnectServiceAbility(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+        formRenderMgrInner->RenderConnectedForm(formRecord, want, connection));
+    GTEST_LOG_(INFO) << "RenderConnectedForm_002 end";
+}
+
+/**
+ * @tc.name: RenderConnectedForm_003
+ * @tc.desc: test RenderConnectedForm function when renderRemoteObj_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RenderConnectedForm_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    WantParams wantParams;
+    sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner->RenderConnectedForm(formRecord, want, connection));
+    GTEST_LOG_(INFO) << "RenderConnectedForm_003 end";
+}
+
+/**
+ * @tc.name: PostStopRenderingFormTask_001
+ * @tc.desc: test PostStopRenderingFormTask function when connection not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_001 end";
+}
+
+/**
+ * @tc.name: PostStopRenderingFormTask_002
+ * @tc.desc: test PostStopRenderingFormTask function when connection is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    formRenderMgrInner->renderFormConnections_.emplace(formRecord.formId, nullptr);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_002 end";
+}
+
+/**
+ * @tc.name: PostStopRenderingFormTask_003
+ * @tc.desc: test PostStopRenderingFormTask function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formRecord.formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_003 end";
+}
+
+/**
+ * @tc.name: PostStopRenderingFormTask_004
+ * @tc.desc: test PostStopRenderingFormTask function when renderRemoteObj_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostStopRenderingFormTask_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_004 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formRecord.formId, conn);
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->PostStopRenderingFormTask(formRecord, want));
+    GTEST_LOG_(INFO) << "PostStopRenderingFormTask_004 end";
+}
+
+/**
+ * @tc.name: CheckRenderConnectionExistById_001
+ * @tc.desc: test CheckRenderConnectionExistById function when connection not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->CheckRenderConnectionExistById(formId));
+    GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_001 end";
+}
+
+/**
+ * @tc.name: CheckRenderConnectionExistById_002
+ * @tc.desc: test CheckRenderConnectionExistById function when connection is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    formRenderMgrInner->renderFormConnections_.emplace(formId, nullptr);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->CheckRenderConnectionExistById(formId));
+    GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_002 end";
+}
+
+/**
+ * @tc.name: CheckRenderConnectionExistById_003
+ * @tc.desc: test CheckRenderConnectionExistById function when connection exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, CheckRenderConnectionExistById_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId = 1;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->CheckRenderConnectionExistById(formId));
+    GTEST_LOG_(INFO) << "CheckRenderConnectionExistById_003 end";
+}
+
+/**
+ * @tc.name: RecoverFRSOnFormActivity_002
+ * @tc.desc: test RecoverFRSOnFormActivity function when isFrsDiedInLowMemory_ is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecoverFRSOnFormActivity_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecoverFRSOnFormActivity_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->isFrsDiedInLowMemory_ = true;
+    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
+    std::unordered_set<int64_t> form;
+    form.insert(1);
+    formRenderMgrInner->etsHosts_.emplace(remote, form);
+    formRenderMgrInner->RecoverFRSOnFormActivity();
+    EXPECT_FALSE(formRenderMgrInner->isFrsDiedInLowMemory_);
+    GTEST_LOG_(INFO) << "RecoverFRSOnFormActivity_002 end";
+}
+
+/**
+ * @tc.name: GetIsFRSDiedInLowMemory_001
+ * @tc.desc: test GetIsFRSDiedInLowMemory function when isFrsDiedInLowMemory_ is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->isFrsDiedInLowMemory_ = false;
+    EXPECT_FALSE(formRenderMgrInner->GetIsFRSDiedInLowMemory());
+    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_001 end";
+}
+
+/**
+ * @tc.name: GetIsFRSDiedInLowMemory_002
+ * @tc.desc: test GetIsFRSDiedInLowMemory function when isFrsDiedInLowMemory_ is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->isFrsDiedInLowMemory_ = true;
+    EXPECT_TRUE(formRenderMgrInner->GetIsFRSDiedInLowMemory());
+    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_002 end";
+}
+
+/**
+ * @tc.name: ExecOnUnlockTask_002
+ * @tc.desc: test ExecOnUnlockTask function when onUnlockTask_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ExecOnUnlockTask_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ExecOnUnlockTask_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->onUnlockTask_ = [](const sptr<IRemoteObject> &remoteObject) {};
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formRenderMgrInner->ExecOnUnlockTask(remoteObject);
+    EXPECT_EQ(formRenderMgrInner->onUnlockTask_, nullptr);
+    GTEST_LOG_(INFO) << "ExecOnUnlockTask_002 end";
+}
+
+/**
+ * @tc.name: checkConnectionsFormIds_001
+ * @tc.desc: test checkConnectionsFormIds function when all connections exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, checkConnectionsFormIds_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "checkConnectionsFormIds_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId1 = 1;
+    int64_t formId2 = 2;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn1 = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    sptr<FormRenderConnection> conn2 = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId1, conn1);
+    formRenderMgrInner->renderFormConnections_.emplace(formId2, conn2);
+    std::vector<int64_t> formIds = {formId1, formId2};
+    std::vector<int64_t> needConFormIds;
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->checkConnectionsFormIds(formIds, needConFormIds));
+    EXPECT_EQ(0, needConFormIds.size());
+    GTEST_LOG_(INFO) << "checkConnectionsFormIds_001 end";
+}
+
+/**
+ * @tc.name: checkConnectionsFormIds_002
+ * @tc.desc: test checkConnectionsFormIds function when some connections not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, checkConnectionsFormIds_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "checkConnectionsFormIds_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    int64_t formId1 = 1;
+    int64_t formId2 = 2;
+    int64_t formId3 = 3;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn1 = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId1, conn1);
+    std::vector<int64_t> formIds = {formId1, formId2, formId3};
+    std::vector<int64_t> needConFormIds;
+    EXPECT_EQ(ERR_OK, formRenderMgrInner->checkConnectionsFormIds(formIds, needConFormIds));
+    EXPECT_EQ(2, needConFormIds.size());
+    GTEST_LOG_(INFO) << "checkConnectionsFormIds_002 end";
+}
+
+/**
+ * @tc.name: GetReRenderCount_001
+ * @tc.desc: test GetReRenderCount function when atomicRerenderCount_ is 0.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetReRenderCount_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->atomicRerenderCount_ = 0;
+    EXPECT_EQ(0, formRenderMgrInner->GetReRenderCount());
+    GTEST_LOG_(INFO) << "GetReRenderCount_001 end";
+}
+
+/**
+ * @tc.name: GetReRenderCount_002
+ * @tc.desc: test GetReRenderCount function when atomicRerenderCount_ is not 0.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetReRenderCount_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->atomicRerenderCount_ = 5;
+    EXPECT_EQ(5, formRenderMgrInner->GetReRenderCount());
+    GTEST_LOG_(INFO) << "GetReRenderCount_002 end";
+}
+
+/**
+ * @tc.name: GetRenderRemoteObj_001
+ * @tc.desc: test GetRenderRemoteObj function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderRemoteObj_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = nullptr;
+    EXPECT_EQ(nullptr, formRenderMgrInner->GetRenderRemoteObj());
+    GTEST_LOG_(INFO) << "GetRenderRemoteObj_001 end";
+}
+
+/**
+ * @tc.name: GetRenderRemoteObj_002
+ * @tc.desc: test GetRenderRemoteObj function when renderRemoteObj_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderRemoteObj_002 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_NE(nullptr, formRenderMgrInner->GetRenderRemoteObj());
+    GTEST_LOG_(INFO) << "GetRenderRemoteObj_002 end";
+}
+
+/**
+ * @tc.name: SetRenderRemoteObj_001
+ * @tc.desc: test SetRenderRemoteObj function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, SetRenderRemoteObj_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    sptr<IFormRender> remoteObject = new (std::nothrow) MockIFormRender();
+    formRenderMgrInner->SetRenderRemoteObj(remoteObject);
+    EXPECT_NE(nullptr, formRenderMgrInner->renderRemoteObj_);
+    GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 end";
+}
+
+/**
+ * @tc.name: PostOnUnlockTask_001
+ * @tc.desc: test PostOnUnlockTask function when renderRemoteObj_ is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostOnUnlockTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostOnUnlockTask_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    formRenderMgrInner.PostOnUnlockTask();
+    EXPECT_NE(nullptr, formRenderMgrInner.onUnlockTask_);
+    GTEST_LOG_(INFO) << "PostOnUnlockTask_001 end";
+}
+
+/**
+ * @tc.name: PostOnUnlockTask_002
+ * @tc.desc: test PostOnUnlockTask function when renderRemoteObj_ is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostOnUnlockTask_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostOnUnlockTask_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    formRenderMgrInner.PostOnUnlockTask();
+    EXPECT_NE(nullptr, formRenderMgrInner.onUnlockTask_);
+    GTEST_LOG_(INFO) << "PostOnUnlockTask_002 end";
+}
+
+/**
+ * @tc.name: StopRenderingForm_001
+ * @tc.desc: test StopRenderingForm function with hostToken.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, StopRenderingForm_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "StopRenderingForm_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.uiSyntax = FormType::ETS;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    formRecord.providerUserId = 100;
+    std::string compId = "compId";
+    sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.StopRenderingForm(formId, formRecord, compId, hostToken));
+    GTEST_LOG_(INFO) << "StopRenderingForm_001 end";
+}
+
+/**
+ * @tc.name: RenderForm_001
+ * @tc.desc: test RenderForm function when isActiveUser_ is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RenderForm_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RenderForm_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.isActiveUser_ = false;
+    FormRecord formRecord;
+    Want want;
+    sptr<IRemoteObject> hostToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, formRenderMgrInner.RenderForm(formRecord, want, hostToken));
+    GTEST_LOG_(INFO) << "RenderForm_001 end";
+}
+
+/**
+ * @tc.name: AddConnection_001
+ * @tc.desc: test AddConnection function when connection already exists with different connectId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, AddConnection_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "AddConnection_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    int64_t formId = 1;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> oldConn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    oldConn->SetConnectId(100);
+    formRenderMgrInner.renderFormConnections_.emplace(formId, oldConn);
+    sptr<FormRenderConnection> newConn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    newConn->SetConnectId(200);
+    EXPECT_EQ(ERR_OK, formRenderMgrInner.AddConnection(formId, newConn));
+    EXPECT_NE(nullptr, formRenderMgrInner.renderFormConnections_[formId]);
+    GTEST_LOG_(INFO) << "AddConnection_001 end";
+}
+
+/**
+ * @tc.name: RenderForm_002
+ * @tc.desc: test RenderForm function when new connection allocation fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RenderForm_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RenderForm_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.isActiveUser_ = true;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.bundleName = "bundleName";
+    formRecord.userId = 100;
+    Want want;
+    sptr<IRemoteObject> hostToken = nullptr;
+    MockConnectServiceAbility(false);
+    EXPECT_EQ(ERR_OK, formRenderMgrInner.RenderForm(formRecord, want, hostToken));
+    GTEST_LOG_(INFO) << "RenderForm_002 end";
+}
+
+/**
+ * @tc.name: UpdateRenderingForm_001
+ * @tc.desc: test UpdateRenderingForm when formProviderInfo.NeedCache is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, UpdateRenderingForm_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.enableForm = true;
+    formRecord.isTimerRefresh = false;
+    nlohmann::json jsonData;
+    jsonData["key"] = "value";
+    FormProviderData formProviderDataWithData(jsonData);
+    formRecord.formProviderInfo.SetFormData(formProviderDataWithData);
+    WantParams wantParams;
+    FormProviderData formProviderData;
+    bool mergeData = false;
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.UpdateRenderingForm(formRecord, formProviderData, wantParams, mergeData));
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_001 end";
+}
+
+/**
+ * @tc.name: UpdateRenderingForm_002
+ * @tc.desc: test UpdateRenderingForm when enableForm is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, UpdateRenderingForm_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.enableForm = false;
+    formRecord.bundleName = "bundleName";
+    formRecord.userId = 100;
+    formRecord.providerUserId = 100;
+    WantParams wantParams;
+    FormProviderData formProviderData;
+    bool mergeData = false;
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_DISABLE_REFRESH,
+        formRenderMgrInner.UpdateRenderingForm(formRecord, formProviderData, wantParams, mergeData));
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_002 end";
+}
+
+/**
+ * @tc.name: UpdateRenderingForm_003
+ * @tc.desc: test UpdateRenderingForm when wantParams is empty and enableForm is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, UpdateRenderingForm_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_003 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.enableForm = true;
+    formRecord.bundleName = "bundleName";
+    formRecord.userId = 100;
+    WantParams emptyWantParams;
+    FormProviderData formProviderData;
+    bool mergeData = false;
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.UpdateRenderingForm(formRecord, formProviderData, emptyWantParams, mergeData));
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_003 end";
+}
+
+/**
+ * @tc.name: UpdateRenderingForm_004
+ * @tc.desc: test UpdateRenderingForm when mergeData is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, UpdateRenderingForm_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_004 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.enableForm = true;
+    formRecord.bundleName = "bundleName";
+    formRecord.userId = 100;
+    WantParams wantParams;
+nlohmann::json jsonData;
+    jsonData["key"] = "value";
+    FormProviderData formProviderData(jsonData);
+    bool mergeData = true;
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.UpdateRenderingForm(formRecord, formProviderData, wantParams, mergeData));
+    GTEST_LOG_(INFO) << "UpdateRenderingForm_004 end";
+}
+
+/**
+ * @tc.name: CheckIfFormRecycled_001
+ * @tc.desc: test CheckIfFormRecycled when form status is RECYCLED and isDynamic is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, CheckIfFormRecycled_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "CheckIfFormRecycled_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.isDynamic = false;
+    Want want;
+    MockGetFormRecord(true, 0);
+    formRenderMgrInner.CheckIfFormRecycled(formRecord, want);
+    EXPECT_FALSE(want.HasParameter(Constants::FORM_STATUS_DATA));
+    GTEST_LOG_(INFO) << "CheckIfFormRecycled_001 end";
+}
+
+/**
+ * @tc.name: CheckIfFormRecycled_002
+ * @tc.desc: test CheckIfFormRecycled when form status is RECYCLED and isDynamic is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, CheckIfFormRecycled_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "CheckIfFormRecycled_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.isDynamic = true;
+    Want want;
+    MockGetFormRecord(true, 0);
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.CheckIfFormRecycled(formRecord, want));
+    GTEST_LOG_(INFO) << "CheckIfFormRecycled_002 end";
+}
+
+/**
+ * @tc.name: GetConnectionAndRenderForm_001
+ * @tc.desc: test GetConnectionAndRenderForm when GetRenderFormConnectId fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetConnectionAndRenderForm_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetConnectionAndRenderForm_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    MockGetFormRecord(false, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want));
+    GTEST_LOG_(INFO) << "GetConnectionAndRenderForm_001 end";
+}
+
+/**
+ * @tc.name: GetConnectionAndRenderForm_002
+ * @tc.desc: test GetConnectionAndRenderForm with renderType not ADAPTER_UPDATE_FORM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetConnectionAndRenderForm_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetConnectionAndRenderForm_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    want.SetParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADD_FORM_UPDATE_FORM);
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, conn);
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want));
+    GTEST_LOG_(INFO) << "GetConnectionAndRenderForm_002 end";
+}
+
+/**
+ * @tc.name: GetConnectionAndRenderForm_003
+ * @tc.desc: test GetConnectionAndRenderForm with renderType ADAPTER_UPDATE_FORM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetConnectionAndRenderForm_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetConnectionAndRenderForm_003 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    want.SetParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADAPTER_UPDATE_FORM);
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, conn);
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want));
+    GTEST_LOG_(INFO) << "GetConnectionAndRenderForm_003 end";
+}
+
+/**
+ * @tc.name: RerenderAllForms_001
+ * @tc.desc: test RerenderAllForms when not low memory.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RerenderAllForms_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RerenderAllForms_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    ASSERT_NE(nullptr, formRenderMgrInner);
+    int64_t formId = 1;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
+    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
+    std::unordered_set<int64_t> form;
+    form.insert(formId);
+    formRenderMgrInner->etsHosts_.emplace(remote, form);
+    formRenderMgrInner->RerenderAllForms();
+    EXPECT_TRUE(formRenderMgrInner->isFrsDiedInLowMemory_);
+    GTEST_LOG_(INFO) << "RerenderAllForms_001 end";
+}
+
+/**
+ * @tc.name: StopRenderingFormCallback_001
+ * @tc.desc: test StopRenderingFormCallback when etsHosts becomes empty after removal.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, StopRenderingFormCallback_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "StopRenderingFormCallback_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    int64_t formId = 1;
+    Want want;
+    FormRecord formRecord;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
+    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
+    std::unordered_set<int64_t> form;
+    form.insert(formId);
+    formRenderMgrInner.etsHosts_.emplace(remote, form);
+    MockDisconnectServiceAbility(false);
+    EXPECT_EQ(ERR_OK, formRenderMgrInner.StopRenderingFormCallback(formId, want));
+    EXPECT_EQ(0, formRenderMgrInner.etsHosts_.size());
+    GTEST_LOG_(INFO) << "StopRenderingFormCallback_001 end";
+}
+
+/**
+ * @tc.name: RemoveHostToken_001
+ * @tc.desc: test RemoveHostToken when etsHosts becomes empty after removal.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RemoveHostToken_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RemoveHostToken_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
+    std::unordered_set<int64_t> form;
+    int64_t formId = 1;
+    form.insert(formId);
+    formRenderMgrInner.etsHosts_.emplace(remote, form);
+    WantParams wantParams;
+    FormRecord formRecord;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
+    MockGetFormRecord(false, 0);
+    MockDisconnectServiceAbility(false);
+    formRenderMgrInner.RemoveHostToken(remote);
+    EXPECT_EQ(0, formRenderMgrInner.etsHosts_.size());
+    GTEST_LOG_(INFO) << "RemoveHostToken_001 end";
+}
+
+/**
+ * @tc.name: NotifyHostRenderServiceIsDead_001
+ * @tc.desc: test NotifyHostRenderServiceIsDead when renderRemoteObj is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, NotifyHostRenderServiceIsDead_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
+    std::unordered_set<int64_t> form;
+    int64_t formId = 1;
+    form.insert(formId);
+    formRenderMgrInner.etsHosts_.emplace(remote, form);
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.NotifyHostRenderServiceIsDead());
+    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_001 end";
+}
+
+/**
+ * @tc.name: AddRenderDeathRecipient_001
+ * @tc.desc: test AddRenderDeathRecipient when AddDeathRecipient fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, AddRenderDeathRecipient_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "AddRenderDeathRecipient_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    ASSERT_NE(nullptr, formRenderMgrInner);
+    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner->AddRenderDeathRecipient(remoteObject));
+    GTEST_LOG_(INFO) << "AddRenderDeathRecipient_001 end";
+}
+
+/**
+ * @tc.name: NotifyScreenOn_002
+ * @tc.desc: test NotifyScreenOn when GetRenderObject fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, NotifyScreenOn_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "NotifyScreenOn_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.NotifyScreenOn());
+    GTEST_LOG_(INFO) << "NotifyScreenOn_002 end";
+}
+
+/**
+ * @tc.name: PostSetRenderGroupEnableFlagTask_001
+ * @tc.desc: test PostSetRenderGroupEnableFlagTask when GetRenderObject fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupEnableFlagTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    int64_t formId = 1;
+    bool isEnable = true;
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetRenderGroupEnableFlagTask(formId, isEnable));
+    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_001 end";
+}
+
+/**
+ * @tc.name: PostSetVisibleChangeTask_001
+ * @tc.desc: test PostSetVisibleChangeTask when isVisible is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostSetVisibleChangeTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    int64_t formId = 1;
+    bool isVisible = true;
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetVisibleChangeTask(formId, isVisible));
+    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_001 end";
+}
+
+/**
+ * @tc.name: PostSetVisibleChangeTask_002
+ * @tc.desc: test PostSetVisibleChangeTask when isVisible is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostSetVisibleChangeTask_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    int64_t formId = 1;
+    bool isVisible = false;
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetVisibleChangeTask(formId, isVisible));
+    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_002 end";
+}
+
+/**
+ * @tc.name: RecoverForms_005
+ * @tc.desc: test RecoverForms when LoadStatusData fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RecoverForms_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RecoverForms_005 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::vector<int64_t> formIds = {100};
+    WantParams wantParams;
+    FormRecord formRecord;
+    formRecord.formId = 100;
+    formRecord.providerUserId = 100;
+    formRecord.bundleName = "bundleName";
+    WantParams connWantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, connWantParams);
+    formRenderMgrInner->renderFormConnections_.emplace(100, conn);
+    MockGetFormRecord(true, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->RecoverForms(formIds, wantParams));
+    GTEST_LOG_(INFO) << "RecoverForms_005 end";
+}
+
+/**
+ * @tc.name: GetRenderObject_003
+ * @tc.desc: test GetRenderObject when renderRemoteObj and AsObject are valid.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetRenderObject_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetRenderObject_003 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    MockIFormRender* mockRender = new (std::nothrow) MockIFormRender();
+    formRenderMgrInner->renderRemoteObj_ = mockRender;
+    sptr<IRemoteObject> renderObj;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgrInner->GetRenderObject(renderObj));
+    GTEST_LOG_(INFO) << "GetRenderObject_003 end";
+}
+
+/**
+ * @tc.name: RenderConnectedForm_004
+ * @tc.desc: test RenderConnectedForm when all parameters are valid.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RenderConnectedForm_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RenderConnectedForm_004 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    MockIFormRender* mockRender = new (std::nothrow) MockIFormRender();
+    formRenderMgrInner->renderRemoteObj_ = mockRender;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    Want want;
+    WantParams wantParams;
+    sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner->RenderConnectedForm(formRecord, want, connection));
+    GTEST_LOG_(INFO) << "RenderConnectedForm_004 end";
+}
+
+/**
+ * @tc.name: ExecOnUnlockTask_001
+ * @tc.desc: test ExecOnUnlockTask when onUnlockTask is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, ExecOnUnlockTask_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "ExecOnUnlockTask_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    formRenderMgrInner->onUnlockTask_ = nullptr;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formRenderMgrInner->ExecOnUnlockTask(remoteObject);
+    EXPECT_EQ(nullptr, formRenderMgrInner->onUnlockTask_);
+    GTEST_LOG_(INFO) << "ExecOnUnlockTask_001 end";
+}
+
+/**
+ * @tc.name: OnRenderingBlock_001
+ * @tc.desc: test OnRenderingBlock function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, OnRenderingBlock_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnRenderingBlock_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    std::string bundleName = "testBundle";
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.OnRenderingBlock(bundleName));
+    GTEST_LOG_(INFO) << "OnRenderingBlock_001 end";
+}
+
+/**
+ * @tc.name: PostSetRenderGroupParamsTask_002
+ * @tc.desc: test PostSetRenderGroupParamsTask when GetRenderObject fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    int64_t formId = 1;
+    Want want;
+    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetRenderGroupParamsTask(formId, want));
+    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_002 end";
+}
+
+/**
+ * @tc.name: StopRenderingForm_002
+ * @tc.desc: test StopRenderingForm successfully with valid parameters.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, StopRenderingForm_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "StopRenderingForm_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.uiSyntax = FormType::ETS;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    formRecord.providerUserId = 100;
+    std::string compId = "compId";
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formId, conn);
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formRenderMgrInner.StopRenderingForm(formId, formRecord, compId, nullptr));
+    GTEST_LOG_(INFO) << "StopRenderingForm_002 end";
 }
 }

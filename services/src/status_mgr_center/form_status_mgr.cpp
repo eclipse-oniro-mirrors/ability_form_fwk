@@ -22,7 +22,7 @@
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "form_event_report.h"
 #include "fms_log_wrapper.h"
-#include "form_status_print.h"
+#include "util/form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -36,13 +36,14 @@ FormStatusMgr::~FormStatusMgr()
     HILOG_DEBUG("destroy FormStatusMgr");
 }
 
-void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func)
+void FormStatusMgr::PostFormEvent(const int64_t formId, const FormFsmEvent event, std::function<void()> func,
+    uint64_t delayMs)
 {
     auto task = [formId, event, func]() {
         FormStatusMgr::GetInstance().ExecStatusMachineTask(formId, event, func);
     };
 
-    FormStatusQueue::GetInstance().ScheduleTask(0, task);
+    FormStatusQueue::GetInstance().ScheduleTask(delayMs, task);
 }
 
 void FormStatusMgr::CancelFormEventTimeout(const int64_t formId, std::string eventId)
@@ -183,7 +184,7 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
         temptaskInfoQueue.pop();
         formEventQueue->PushFormEvent(eventTaskInfo);
     }
-    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueue().size()));
+    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 
     FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
 }
@@ -218,7 +219,7 @@ void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEven
         }
     }
     formEventQueue->PushFormEvent(taskInfo);
-    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueue().size()));
+    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 }
 
 void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)

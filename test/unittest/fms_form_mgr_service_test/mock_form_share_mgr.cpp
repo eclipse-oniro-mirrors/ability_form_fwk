@@ -37,7 +37,7 @@ int32_t FormShareMgr::ShareForm(
     return shareForm;
 }
 
-int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info)
+int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info, const int32_t userId)
 {
     return g_recvFormShareInfoFromRemote;
 }

@@ -18,7 +18,7 @@
 #include "status_mgr_center/form_render_status_table.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "form_status_print.h"
+#include "util/form_status_print.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -76,36 +76,6 @@ int32_t FormRenderStatusMgr::ExecFormTask(FormFsmProcessType processType, const 
     }
 }
 
-std::string FormRenderStatusMgr::GetFormEventId(const int64_t formId)
-{
-    std::shared_lock<std::shared_mutex> lock(formEventIdMapMutex_);
-    if (formEventIdMap_.find(formId) == formEventIdMap_.end()) {
-        return "";
-    }
-
-    return formEventIdMap_[formId];
-}
-
-void FormRenderStatusMgr::SetFormEventId(const int64_t formId, std::string &eventId)
-{
-    std::unique_lock<std::shared_mutex> lock(formEventIdMapMutex_);
-    if (formEventIdMap_.find(formId) == formEventIdMap_.end()) {
-        formEventIdMap_.emplace(formId, eventId);
-        return;
-    }
-    formEventIdMap_[formId] = eventId;
-}
-
-void FormRenderStatusMgr::DeleteFormEventId(const int64_t formId)
-{
-    std::unique_lock<std::shared_mutex> lock(formEventIdMapMutex_);
-    auto iter = formEventIdMap_.find(formId);
-    if (iter != formEventIdMap_.end()) {
-        HILOG_INFO("formId:%{public}" PRId64 ". ", formId);
-        formEventIdMap_.erase(iter);
-    }
-}
-
 int32_t FormRenderStatusMgr::ProcessTaskDirect(std::function<int32_t()> func)
 {
     if (func == nullptr) {
@@ -117,7 +87,6 @@ int32_t FormRenderStatusMgr::ProcessTaskDirect(std::function<int32_t()> func)
 
 int32_t FormRenderStatusMgr::ProcessTaskDelete(const int64_t formId)
 {
-    DeleteFormEventId(formId);
     FormRenderStatus::GetInstance().DeleteFormStatus(formId);
     return ERR_OK;
 }

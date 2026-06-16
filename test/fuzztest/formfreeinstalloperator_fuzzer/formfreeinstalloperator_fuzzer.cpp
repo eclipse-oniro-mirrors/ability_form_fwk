@@ -36,12 +36,12 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string formShareInfoKey(data, size);
     FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formFreeInstallOperator.OnInstallFinished(resultCode, userId);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
     std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
     FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
     Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
     FormHostCallback formHostCallback;
     int64_t formId = static_cast<int32_t>(GetU32Data(data));
@@ -58,217 +58,28 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string bundleName(data, size);
     std::string abilityName(data, size);
     std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
-}
 
-bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
-{
-    std::string formShareInfoKey(data, size);
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
-    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
-    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
-    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
-    Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
-    FormHostCallback formHostCallback;
-    int64_t formId = static_cast<int32_t>(GetU32Data(data));
-    FormRecord record;
-    sptr<IRemoteObject> callerToken = nullptr;
-    formHostCallback.OnAcquired(formId, record, callerToken);
-    formHostCallback.OnUpdate(formId, record, callerToken);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formHostCallback.OnUninstall(formIds, callerToken);
-    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
-    AAFwk::Want wants;
-    formHostCallback.OnAcquireState(state, wants, callerToken);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
-}
+    // Add missing fuzz test cases for FormHostCallback
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = static_cast<int64_t>(GetU32Data(data));
+    formHostCallback.OnAcquireFormData(wantParams, requestCode, callerToken);
 
-bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
-{
-    std::string formShareInfoKey(data, size);
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
-    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
-    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
-    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
-    Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
-    FormHostCallback formHostCallback;
-    int64_t formId = static_cast<int32_t>(GetU32Data(data));
-    FormRecord record;
-    sptr<IRemoteObject> callerToken = nullptr;
-    formHostCallback.OnAcquired(formId, record, callerToken);
-    formHostCallback.OnUpdate(formId, record, callerToken);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formHostCallback.OnUninstall(formIds, callerToken);
-    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
-    AAFwk::Want wants;
-    formHostCallback.OnAcquireState(state, wants, callerToken);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
-}
+    AAFwk::Want recycleWant;
+    formHostCallback.OnRecycleForms(formIds, recycleWant, callerToken);
 
-bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
-{
-    std::string formShareInfoKey(data, size);
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
-    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
-    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
-    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
-    Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
-    FormHostCallback formHostCallback;
-    int64_t formId = static_cast<int32_t>(GetU32Data(data));
-    FormRecord record;
-    sptr<IRemoteObject> callerToken = nullptr;
-    formHostCallback.OnAcquired(formId, record, callerToken);
-    formHostCallback.OnUpdate(formId, record, callerToken);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formHostCallback.OnUninstall(formIds, callerToken);
-    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
-    AAFwk::Want wants;
-    formHostCallback.OnAcquireState(state, wants, callerToken);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
-}
+    bool enable = (formId % 2 == 0);
+    formHostCallback.OnEnableForms(formIds, enable, callerToken);
 
-bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
-{
-    std::string formShareInfoKey(data, size);
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
-    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
-    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
-    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
-    Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
-    FormHostCallback formHostCallback;
-    int64_t formId = static_cast<int32_t>(GetU32Data(data));
-    FormRecord record;
-    sptr<IRemoteObject> callerToken = nullptr;
-    formHostCallback.OnAcquired(formId, record, callerToken);
-    formHostCallback.OnUpdate(formId, record, callerToken);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formHostCallback.OnUninstall(formIds, callerToken);
-    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
-    AAFwk::Want wants;
-    formHostCallback.OnAcquireState(state, wants, callerToken);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
-}
+    bool lock = (formId % 3 == 0);
+    formHostCallback.OnLockForms(formIds, lock, callerToken);
 
-bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
-{
-    std::string formShareInfoKey(data, size);
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
-    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
-    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
-    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
-    Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
-    FormHostCallback formHostCallback;
-    int64_t formId = static_cast<int32_t>(GetU32Data(data));
-    FormRecord record;
-    sptr<IRemoteObject> callerToken = nullptr;
-    formHostCallback.OnAcquired(formId, record, callerToken);
-    formHostCallback.OnUpdate(formId, record, callerToken);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formHostCallback.OnUninstall(formIds, callerToken);
-    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
-    AAFwk::Want wants;
-    formHostCallback.OnAcquireState(state, wants, callerToken);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
-}
+    bool isDisablePolicy = (formId % 2 == 0);
+    bool isControl = (formId % 3 == 0);
+    formHostCallback.OnDueControlForms(formIds, isDisablePolicy, isControl, callerToken);
 
-bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
-{
-    std::string formShareInfoKey(data, size);
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
-    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
-    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
-    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
-    Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
-    FormHostCallback formHostCallback;
-    int64_t formId = static_cast<int32_t>(GetU32Data(data));
-    FormRecord record;
-    sptr<IRemoteObject> callerToken = nullptr;
-    formHostCallback.OnAcquired(formId, record, callerToken);
-    formHostCallback.OnUpdate(formId, record, callerToken);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formHostCallback.OnUninstall(formIds, callerToken);
-    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
-    AAFwk::Want wants;
-    formHostCallback.OnAcquireState(state, wants, callerToken);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
-}
+    formHostCallback.OnCheckForms(formIds, callerToken);
 
-bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
-{
-    std::string formShareInfoKey(data, size);
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formFreeInstallOperator.OnInstallFinished(resultCode);
-    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
-    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
-    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
-    Want want;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
-    FormHostCallback formHostCallback;
-    int64_t formId = static_cast<int32_t>(GetU32Data(data));
-    FormRecord record;
-    sptr<IRemoteObject> callerToken = nullptr;
-    formHostCallback.OnAcquired(formId, record, callerToken);
-    formHostCallback.OnUpdate(formId, record, callerToken);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formHostCallback.OnUninstall(formIds, callerToken);
-    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
-    AAFwk::Want wants;
-    formHostCallback.OnAcquireState(state, wants, callerToken);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string moduleName(data, size);
-    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName);
+    return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
 }
 

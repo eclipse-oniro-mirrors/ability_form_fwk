@@ -92,6 +92,9 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
             case TYPE_DISABLE_FORM_INTERCEPT:
                 info.disableFormRefreshTimes++;
                 break;
+            case TYPE_ACTUAL_PROXY_REFRESH:
+                info.actualProxyRefreshTimes++;
+                break;
             default:
                 break;
         }
@@ -107,13 +110,14 @@ void FormRecordReport::HandleFormRefreshCount()
         int64_t formId = entry.first;
         auto &queue = entry.second;
         if (formId <= 0 || queue.empty()) {
-            return;
+            continue;
         }
         FormRecord formRecord;
         (void)FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
         FormRecordReportInfo record = queue.front();
         NewFormEventInfo eventInfo;
         eventInfo.formId = formId;
+        eventInfo.abilityName = FormBasicInfoMgr::GetInstance().GetFormAbilityName(formId);
         eventInfo.bundleName = FormBasicInfoMgr::GetInstance().GetFormBundleName(formId);
         eventInfo.moduleName = FormBasicInfoMgr::GetInstance().GetFormModuleName(formId);
         eventInfo.formName = FormBasicInfoMgr::GetInstance().GetFormName(formId);
@@ -129,6 +133,8 @@ void FormRecordReport::HandleFormRefreshCount()
         eventInfo.disableFormRefreshTimes = record.disableFormRefreshTimes;
         eventInfo.formDimension = formRecord.specification;
         eventInfo.isDistributedForm = formRecord.isDistributedForm;
+        eventInfo.formLocation = formRecord.formLocation;
+        eventInfo.actualProxyRefreshTimes = record.actualProxyRefreshTimes;
         FormEventReport::SendFormRefreshCountEvent(FormEventName::UPDATE_FORM_REFRESH_TIMES,
             HiSysEventType::STATISTIC, eventInfo);
         while (queue.size() > REPORT_INFO_QUEUE_MIN_LEN) {

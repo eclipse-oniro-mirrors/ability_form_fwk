@@ -27,9 +27,9 @@
 #include "config_policy_utils.h"
 
 namespace {
-const std::string FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
-const std::string KEY_MODULE_ALLOW = "moduleAllowList";
-const std::vector<std::string> MODULE_ALLOW_LIST = {
+constexpr const char *FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
+constexpr const char *KEY_MODULE_ALLOW = "moduleAllowList";
+constexpr const char *MODULE_ALLOW_LIST[] = {
     "mediaquery",
     "display",
     "effectKit",
@@ -50,9 +50,81 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "graphics.uiEffect",
     "arkui.node",
     "arkui.uicontext",
-    "arkui.modifier"
+    "arkui.modifier",
+    "arkui.components.arkgauge",
+    "arkui.components.arkcheckbox",
+    "arkui.components.arkcheckboxgroup",
+    "arkui.components.arkrating",
+    "arkui.components.arkwaterflow",
+    "arkui.components.arkflowitem",
+    "arkui.components.arkcalendarpicker",
+    "arkui.components.arktimepicker",
+    "arkui.components.arkhyperlink",
+    "arkui.components.arksearch",
+    "arkui.components.arksymbolglyph",
+    "arkui.components.arkmarquee",
+    "arkui.components.arkrowsplit",
+    "arkui.components.arkcolumnsplit",
+    "arkui.components.arkfolderstack",
+    "arkui.components.arkstepper",
+    "arkui.components.arkstepperitem",
+    "arkui.components.arksidebarcontainer",
+    "arkui.components.arkslider",
+    "arkui.components.arkradio",
+    "arkui.components.arkmenu",
+    "arkui.components.arkmenuitem",
+    "arkui.components.arkmenuitemgroup",
+    "arkui.components.arkdatapanel",
+    "arkui.components.arktextclock",
+    "arkui.components.arkpatternlock",
+    "arkui.components.arkcounter",
+    "arkui.components.arkqrcode",
+    "arkui.components.arkalphabetindexer",
+    "arkui.components.arkricheditor",
+    "arkui.components.arktoggle",
+    "arkui.components.arktextinput",
+    "arkui.components.arktextarea",
+    "arkui.components.arkgrid",
+    "arkui.components.arkgriditem",
+    "arkui.components.arkbutton",
+    "arkui.components.arktoolbaritem",
+    "arkui.components.arklazygridlayout",
+    "arkui.components.arkloadingprogress",
+    "arkui.components.arkbadge",
+    "arkui.components.arkrefresh",
+    "arkui.components.arkblank",
+    "arkui.components.arkdivider",
+    "arkui.components.arkrelativecontainer",
+    "arkui.components.arkimagespan",
+    "arkui.components.arksymbolspan",
+    "arkui.components.arknavigator",
+    "arkui.components.arktabs",
+    "arkui.components.arktabcontent",
+    "arkui.components.arkswiper",
+    "arkui.components.arkswiperindicator",
+    "arkui.components.arkimageanimator",
+    "arkui.components.arkprogress",
+    "arkui.components.arktexttimer",
+    "arkui.components.arkcircle",
+    "arkui.components.arkellipse",
+    "arkui.components.arkline",
+    "arkui.components.arkpolyline",
+    "arkui.components.arkrect",
+    "arkui.components.arkshape",
+    "arkui.components.arkpolygon",
+    "arkui.components.arkpath",
+    "arkui.components.arkxcomponent",
+    "arkui.components.arkselect",
+    "arkui.components.arktextpicker",
+    "arkui.components.arkgridrow",
+    "arkui.components.arkgridcol",
+    "arkui.components.arkvideo",
+    "arkui.components.arkdatepicker",
+    "arkui.components.arkcanvas",
+    "arkui.components.arkpanel",
+    "arkui.components.arkgridcontainer",
 };
-const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
+constexpr const char *MODULE_ALLOW_WITH_API_LIST[] = {
     "i18n",
     "font",
     "multimedia.image",
@@ -61,14 +133,14 @@ const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "process",
     "graphics.text"
 };
-const std::vector<std::string> API_ALLOW_LIST = {
+constexpr const char *API_ALLOW_LIST[] = {
     "i18n.System.getSystemLanguage",
     "i18n.System.is24HourClock",
     "i18n.System.getSystemLocale",
     "i18n.System.getSystemRegion",
     "i18n.isRTL",
     "i18n.getTimeZone",
-    "i18n.getCalendar"
+    "i18n.getCalendar",
     "i18n.Calendar.*",
     "i18n.TimeZone.*",
     "i18n.Unicode.*",
@@ -115,6 +187,8 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "graphics.text.FontCollection.loadFont",
     "graphics.text.FontCollection.unloadFont",
     "graphics.text.FontCollection.clearCaches",
+    "graphics.text.FontCollection.loadFontSyncWithCheck",
+    "graphics.text.FontCollection.loadFontWithCheck",
 };
 } // namespace
 
@@ -165,7 +239,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         }
     }
     for (const auto& item : MODULE_ALLOW_LIST) {
-        if (item == moduleName) {
+        if (std::strcmp(item, moduleName) == 0) {
             HILOG_DEBUG("load moduleName= %{public}s", moduleName);
             return true;
         }
@@ -201,7 +275,7 @@ std::vector<std::string> FormModuleChecker::GetModuleAllowList()
     HILOG_INFO("read moduleAllowList from config file");
     std::vector<std::string> result;
     char buf[MAX_PATH_LEN];
-    char* path = GetOneCfgFile(FORM_MODULE_WHITE_LIST_PATH.c_str(), buf, MAX_PATH_LEN);
+    char* path = GetOneCfgFile(FORM_MODULE_WHITE_LIST_PATH, buf, MAX_PATH_LEN);
     if (path == nullptr || *path == '\0') {
         HILOG_ERROR("config file not found");
         return result;

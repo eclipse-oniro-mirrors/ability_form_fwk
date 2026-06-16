@@ -15,6 +15,7 @@
 
 #include "form_provider_caller.h"
 
+#include <charconv>
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
@@ -80,7 +81,12 @@ int32_t FormProviderCaller::OnAcquire(const FormProviderInfo &formProviderInfo, 
         HILOG_ERROR("empty formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    int64_t formId = std::stoll(strFormId);
+    int64_t formId = 0;
+    auto result = std::from_chars(strFormId.data(), strFormId.data() + strFormId.size(), formId);
+    if (!(result.ec == std::errc() && (result.ptr == strFormId.data() + strFormId.size()))) {
+        HILOG_ERROR("convert formId failed");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
     HILOG_DEBUG("formId is %{public}" PRId64 ", type is %{public}d", formId, type);
 

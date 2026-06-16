@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,7 +56,7 @@ void FmsFormHostProxyTest::TearDown() {}
  * @tc.desc: test OnAcquired function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquiredTest_0100, TestSize.Level1";
@@ -78,7 +78,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0100, Function | MediumTest | Leve
  * @tc.desc: test OnAcquired function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquiredTest_0100, TestSize.Level1";
@@ -99,7 +99,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0200, Function | MediumTest | Leve
  * @tc.desc: test OnAcquired function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquiredTest_0100, TestSize.Level1";
@@ -120,7 +120,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquiredTest_0300, Function | MediumTest | Leve
  * @tc.desc: test OnUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnUpdateTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnUpdateTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnUpdateTest_0100, TestSize.Level1";
@@ -141,7 +141,7 @@ HWTEST_F(FmsFormHostProxyTest, OnUpdateTest_0100, Function | MediumTest | Level1
  * @tc.desc: test OnUpdate function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnUpdateTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnUpdateTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnUpdateTest_0100, TestSize.Level1";
@@ -161,7 +161,7 @@ HWTEST_F(FmsFormHostProxyTest, OnUpdateTest_0200, Function | MediumTest | Level1
  * @tc.desc: test OnUninstall function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnUninstallTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnUninstallTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnUninstallTest_0100, TestSize.Level1";
@@ -182,7 +182,7 @@ HWTEST_F(FmsFormHostProxyTest, OnUninstallTest_0100, Function | MediumTest | Lev
  * @tc.desc: test OnUninstall function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnUninstallTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnUninstallTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnUninstallTest_0100, TestSize.Level1";
@@ -202,7 +202,7 @@ HWTEST_F(FmsFormHostProxyTest, OnUninstallTest_0200, Function | MediumTest | Lev
  * @tc.desc: test OnAcquireState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquireStateTest_0100, TestSize.Level1";
@@ -222,7 +222,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0100, Function | MediumTest | 
  * @tc.desc: test OnAcquireState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquireStateTest_0100, TestSize.Level1";
@@ -243,7 +243,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0200, Function | MediumTest | 
  * @tc.desc: test OnAcquireState function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquireStateTest_0300, TestSize.Level1";
@@ -264,7 +264,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquireStateTest_0300, Function | MediumTest | 
  * @tc.desc: test OnShareFormResponse function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnShareFormResponseTest_0100, TestSize.Level1";
@@ -282,7 +282,7 @@ HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0100, Function | MediumTe
  * @tc.desc: test OnShareFormResponse function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnShareFormResponseTest_0100, TestSize.Level1";
@@ -301,7 +301,7 @@ HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0200, Function | MediumTe
  * @tc.desc: test OnShareFormResponse function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnShareFormResponseTest_0300, TestSize.Level1";
@@ -320,7 +320,7 @@ HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0300, Function | MediumTe
  * @tc.desc: test OnAcquireDataResponse function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0100, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquireDataResponseTest_0100, TestSize.Level1";
@@ -339,7 +339,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0100, Function | Medium
  * @tc.desc: test OnAcquireDataResponse function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0200, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquireDataResponseTest_0200, TestSize.Level1";
@@ -359,7 +359,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0200, Function | Medium
  * @tc.desc: test OnAcquireDataResponse function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0300, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnAcquireDataResponseTest_0300, TestSize.Level1";
@@ -379,7 +379,7 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0300, Function | Medium
  * @tc.desc: test OnEnableForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, OnEnableFormTest_0301, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, OnEnableFormTest_0301, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, OnEnableFormTest_0301, TestSize.Level1";
@@ -399,7 +399,7 @@ HWTEST_F(FmsFormHostProxyTest, OnEnableFormTest_0301, Function | MediumTest | Le
  * @tc.desc: test OnError function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_001, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, FormHostProxyTest_001, TestSize.Level1";
@@ -423,7 +423,7 @@ HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_001, Function | MediumTest | Le
  * @tc.desc: test OnRecycleForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_002, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, FormHostProxyTest_002, TestSize.Level1";
@@ -443,7 +443,7 @@ HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_002, Function | MediumTest | Le
  * @tc.desc: test OnLockForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_003, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, FormHostProxyTest_003, TestSize.Level1";
@@ -465,7 +465,7 @@ HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_003, Function | MediumTest | Le
  * @tc.desc: test OnDueControlForm function
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_004, Function | MediumTest | Level1)
+HWTEST_F(FmsFormHostProxyTest, FormHostProxyTest_004, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormHostProxyTest, FormHostProxyTest_004, TestSize.Level1";
