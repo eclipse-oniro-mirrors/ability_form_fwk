@@ -5814,7 +5814,7 @@ HWTEST_F(FormMgrTest, FormMgr_RegisterUpdateFormsConfigCallback_001, TestSize.Le
 HWTEST_F(FormMgrTest, FormMgr_RegisterUpdateFormsConfigCallback_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgr_RegisterUpdateFormsConfigCallback_002 begin";
-    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
     auto result = FormMgr::GetInstance().RegisterUpdateFormsConfigCallback(callerToken);
     EXPECT_NE(result, ERR_OK);

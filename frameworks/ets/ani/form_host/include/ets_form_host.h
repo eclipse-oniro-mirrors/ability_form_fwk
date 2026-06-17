@@ -23,7 +23,6 @@
 #include "event_handler.h"
 #include "form_custom_config.h"
 #include "form_host_delegate_stub.h"
-#include "form_custom_config.h"
 #include "form_instance.h"
 #include "form_mgr.h"
 #include "fms_log_wrapper.h"
@@ -117,11 +116,11 @@ public:
 
     void UnregisterFormWantCallbackListener();
 
-    void RegisterUpdateFormsConfigCallbackListener(ani_vm *vm, ani_ref callbackRef);
+    bool RegisterUpdateFormsConfigCallbackListener(ani_vm *vm, ani_object callback);
 
     void UnregisterUpdateFormsConfigCallbackListener();
 
-    void RegisterDeleteFormsCallbackListener(ani_vm *vm, ani_ref callbackRef);
+    bool RegisterDeleteFormsCallbackListener(ani_vm *vm, ani_object callback);
 
     void UnregisterDeleteFormsCallbackListener();
 
@@ -200,19 +199,9 @@ private:
     bool GetFormCustomConfigAniArray(ani_env *env,
         const std::vector<AppExecFwk::FormCustomConfig> &configs, ani_array &configArray);
 
-    ani_ref updateFormsConfigCallbackRef_ = nullptr;
-    ani_vm *updateFormsConfigVM_ = nullptr;
-    mutable std::mutex registerUpdateFormsConfigMutex_;
-    ani_env *GetUpdateFormsConfigEnv();
-
     ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds);
     bool DeleteFormsCallbackInner(const std::vector<std::string> &formIds);
     bool CreateAniStringArray(ani_env *env, const std::vector<std::string> &strings, ani_array &strArray);
-
-    ani_ref deleteFormsCallbackRef_ = nullptr;
-    ani_vm *deleteFormsCallbackVM_ = nullptr;
-    mutable std::mutex registerDeleteFormsMutex_;
-    ani_env *GetDeleteFormsCallbackEnv();
 };
 } // namespace AbilityRuntime
 } // namespace OHOS
