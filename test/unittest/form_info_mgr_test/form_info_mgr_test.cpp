@@ -777,7 +777,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetBundleVersionMap_0100, TestSize.Level1)
         return true;
     };
     EXPECT_CALL(*bmsProxy, QueryExtensionAbilityInfos(_, _, _)).Times(1).WillOnce(Invoke(bmsQueryExtensionTask));
-    auto bmsGetBundleTask = [] (int32_t mock, std::vector<BundleInfo> &bundleInfos, int32_t userId) {
+    auto bmsGetBundleTask = [] (int32_t flag, std::vector<BundleInfo> &bundleInfos, int32_t userId) {
         GTEST_LOG_(INFO) << "FormInfoMgr_GetBundleVersionMap_0100 bmsGetBundleTask called";
         return true;
     };

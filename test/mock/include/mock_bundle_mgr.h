@@ -56,7 +56,7 @@ public:
     MOCK_METHOD2(GetAdditionalInfo, ErrCode(const std::string &, std::string &));
     MOCK_METHOD3(QueryExtensionAbilityInfos, bool(const ExtensionAbilityType &, const int32_t &,
         std::vector<ExtensionAbilityInfo> &));
-    MOCK_METHOD3(GetBundleInfos, bool(int32_t BundleFlag, std::vector<BundleInfo> &, int32_t));
+    MOCK_METHOD3(GetBundleInfos, bool(int32_t, std::vector<BundleInfo> &, int32_t));
     MOCK_METHOD4(BatchGetBundleInfo, ErrCode(const std::vector<std::string> &, int32_t,
         std::vector<BundleInfo> &, int32_t));
     MOCK_METHOD3(GetAppProvisionInfo, ErrCode(const std::string &, int32_t, AppProvisionInfo &));
