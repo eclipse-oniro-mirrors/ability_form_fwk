@@ -2836,7 +2836,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0152, TestSize.Level1) {
     appInfo.isSystemApp = false;
     FormMgr::GetInstance().resetFlag_ = true;
     result = FormMgr::GetInstance().RequestPublishFormWithSnapshot(want, true, formProviderData, formId);
-    EXPECT_NE(result, ERR_OK);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED);
     GTEST_LOG_(INFO) << "FormMgrTest_0152 test ends";
 }
 
@@ -5817,7 +5817,7 @@ HWTEST_F(FormMgrTest, FormMgr_RegisterUpdateFormsConfigCallback_002, TestSize.Le
     FormMgr::GetInstance().SetFormMgrService(nullptr);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockIRemoteObject();
     auto result = FormMgr::GetInstance().RegisterUpdateFormsConfigCallback(callerToken);
-    EXPECT_NE(result, ERR_OK);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_RegisterUpdateFormsConfigCallback_002 end";
 }
 
@@ -5847,7 +5847,7 @@ HWTEST_F(FormMgrTest, FormMgr_UnregisterUpdateFormsConfigCallback_002, TestSize.
     GTEST_LOG_(INFO) << "FormMgr_UnregisterUpdateFormsConfigCallback_002 begin";
     FormMgr::GetInstance().remoteProxy_ = nullptr;
     auto result = FormMgr::GetInstance().UnregisterUpdateFormsConfigCallback();
-    EXPECT_NE(result, ERR_OK);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_UnregisterUpdateFormsConfigCallback_002 end";
 }
 
@@ -5885,7 +5885,7 @@ HWTEST_F(FormMgrTest, FormMgr_UpdateFormsConfig_002, TestSize.Level1)
     FormMgr::GetInstance().remoteProxy_ = nullptr;
     std::vector<FormCustomConfig> configs;
     auto result = FormMgr::GetInstance().UpdateFormsConfig(configs);
-    EXPECT_NE(result, ERR_OK);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_UpdateFormsConfig_002 end";
 }
 } // namespace

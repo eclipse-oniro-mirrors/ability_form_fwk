@@ -366,9 +366,9 @@ void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
 
 bool BundleFormInfo::IsFormInfoMatched(const FormInfo &formInfo, const FormCustomConfig &config) const
 {
-    return formInfo.moduleName == config.moduleName
-        && formInfo.abilityName == config.abilityName
-        && formInfo.name == config.formName;
+    return formInfo.moduleName == config.moduleName &&
+        formInfo.abilityName == config.abilityName &&
+        formInfo.name == config.formName;
 }
 
 void BundleFormInfo::UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow)

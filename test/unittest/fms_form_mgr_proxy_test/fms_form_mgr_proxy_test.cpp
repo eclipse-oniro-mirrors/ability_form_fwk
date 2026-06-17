@@ -2656,8 +2656,8 @@ HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_DeleteForms_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_003 start";
     std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
     for (int32_t i = 0; i <= Constants::DELETE_FORMS_FILTER_MAX_NUM; i++) {
-        FormRecordFilter filter;
         filter.bundleName = "bundle" + std::to_string(i);
         filters.push_back(filter);
     }
@@ -2801,8 +2801,8 @@ HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_UpdateFormsConfig_004, TestSize.L
 {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_004 start";
     std::vector<FormCustomConfig> configs;
+    FormCustomConfig config;
     for (int32_t i = 0; i <= Constants::UPDATE_FORM_CONFIG_MAX_NUM; i++) {
-        FormCustomConfig config;
         config.bundleName = "com.test" + std::to_string(i);
         configs.push_back(config);
     }
