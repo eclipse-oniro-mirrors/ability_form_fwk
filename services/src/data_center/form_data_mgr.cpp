@@ -2277,7 +2277,7 @@ void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormId
  * @brief StopRenderingForm.
  * @param formId The form id.
  */
-void FormDataMgr::StopRenderingForm(int32_t formId)
+void FormDataMgr::StopRenderingForm(int64_t formId)
 {
     FormRecord formrecord;
     GetFormRecord(formId, formrecord);
