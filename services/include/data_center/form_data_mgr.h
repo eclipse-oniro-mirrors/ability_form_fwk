@@ -666,7 +666,7 @@ public:
      * @brief StopRenderingForm.
      * @param formId The form id.
      */
-    void StopRenderingForm(int32_t formId);
+    void StopRenderingForm(int64_t formId);
 
     /**
      * @brief update host forms
