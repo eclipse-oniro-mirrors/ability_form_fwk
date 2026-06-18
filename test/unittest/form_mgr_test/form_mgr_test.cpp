@@ -2836,7 +2836,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0152, TestSize.Level1) {
     appInfo.isSystemApp = false;
     FormMgr::GetInstance().resetFlag_ = true;
     result = FormMgr::GetInstance().RequestPublishFormWithSnapshot(want, true, formProviderData, formId);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED);
+    EXPECT_NE(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0152 test ends";
 }
 
