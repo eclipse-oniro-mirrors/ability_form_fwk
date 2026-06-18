@@ -29,14 +29,6 @@ TaskType FormProviderAcquireErrorHandler::GetRetryTaskType() const
     return TaskType::ACQUIRE_RETRY_TASK;
 }
 
-void FormProviderAcquireErrorHandler::OnPrepareRetryConnect(sptr<FormAbilityConnection> &connection)
-{
-    // Acquire-only: mark CONNECTING to complete the state machine before AMS connect.
-    if (connection != nullptr) {
-        connection->SetConnectState(ConnectState::CONNECTING);
-    }
-}
-
 void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t formId)
 {
     // Align with ReAcquireProviderFormInfoAsync exhaustion: report HiSys failed event, no host push.

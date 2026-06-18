@@ -37,7 +37,7 @@ RetryPolicy FormProviderConnectionErrorHandler::GetDefaultRetryPolicy() const
     return RetryPolicy();
 }
 
-RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formId)
+RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicyLocked(int64_t formId)
 {
     auto it = retryPolicyMap_.find(formId);
     if (it == retryPolicyMap_.end()) {
@@ -59,7 +59,7 @@ void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
     CancelPendingTasks(formId);
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
     retryPolicyMap_.erase(formId);
-    HILOG_INFO("Removed retry policy for formId %{public}" PRId64, formId);
+    HILOG_DEBUG("Removed retry policy for formId %{public}" PRId64, formId);
 }
 
 void FormProviderConnectionErrorHandler::CancelSignalTimeout(int64_t formId)
@@ -121,7 +121,7 @@ bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
     }
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
-    auto &policy = EnsureRetryPolicy(formId);
+    auto &policy = EnsureRetryPolicyLocked(formId);
     policy.SetSendRequestFailed(true);
 
     if (!policy.IsDisconnectFailed()) {
@@ -165,7 +165,7 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
     }
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
-    auto &policy = EnsureRetryPolicy(formId);
+    auto &policy = EnsureRetryPolicyLocked(formId);
     policy.SetOriginalConnection(connection);
     policy.SetDisconnectFailed(true);
 
@@ -211,6 +211,7 @@ void FormProviderConnectionErrorHandler::ScheduleRetryWithReset(int64_t formId, 
 void FormProviderConnectionErrorHandler::ExecuteRetry(
     int64_t formId, const sptr<FormAbilityConnection> &originalConnection)
 {
+    HILOG_INFO("Execute retry, formId %{public}" PRId64, formId);
     bool formExist = FormDataMgr::GetInstance().HasFormRecord(formId);
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
@@ -238,7 +239,7 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
         retryPolicyMap_.erase(formId);
         return;
     }
-    OnPrepareRetryConnect(retryConnection);
+    retryConnection->SetConnectState(ConnectState::CONNECTING);
 
     Want connectWant = retryConnection->CreateConnectWant();
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(

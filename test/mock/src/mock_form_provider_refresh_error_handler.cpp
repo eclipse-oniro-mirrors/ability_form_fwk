@@ -30,8 +30,7 @@ TaskType FormProviderRefreshErrorHandler::GetRetryTaskType() const
 // --- FormProviderConnectionErrorHandler (base class methods) ---
 // HandleSendRequestFailed/HandleDisconnectError moved from refresh subclass to base (refactor);
 // stubs delegate to the gmock object for test expectations. ExecuteRefreshRetry removed.
-bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
-    int64_t formId, int errorCode, const Want &want)
+bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(int64_t formId, int errorCode, const Want &want)
 {
     GTEST_LOG_(INFO) << "HandleSendRequestFailed called";
     if (MockFormProviderRefreshErrorHandler::obj) {
@@ -56,8 +55,8 @@ bool FormProviderConnectionErrorHandler::IsRemoteDead(int errorCode)
     return false;
 }
 
-void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId,
-    const RetryPolicy &policy, std::function<void()> retryFunc)
+void FormProviderConnectionErrorHandler::ScheduleRetry(
+    int64_t formId, const RetryPolicy &policy, std::function<void()> retryFunc)
 {
     GTEST_LOG_(INFO) << "ScheduleRetry stub called";
 }
@@ -73,9 +72,9 @@ RetryPolicy FormProviderConnectionErrorHandler::GetDefaultRetryPolicy() const
     return RetryPolicy();
 }
 
-RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicy(int64_t formId)
+RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicyLocked(int64_t formId)
 {
-    GTEST_LOG_(INFO) << "EnsureRetryPolicy stub called";
+    GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked stub called";
     static RetryPolicy defaultPolicy;
     return defaultPolicy;
 }
@@ -86,9 +85,7 @@ TaskType FormProviderAcquireErrorHandler::GetRetryTaskType() const
     return TaskType::ACQUIRE_RETRY_TASK;
 }
 
-void FormProviderAcquireErrorHandler::OnPrepareRetryConnect(sptr<FormAbilityConnection> &) {}
-
-void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t) {}
+void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t formId) {}
 
 }  // namespace AppExecFwk
 }  // namespace OHOS

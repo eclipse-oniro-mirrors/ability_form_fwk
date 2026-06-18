@@ -42,6 +42,7 @@ const int32_t IPC_ERR_DEAD_OBJECT = 32;
 class TestConnection : public FormAbilityConnection {
 public:
     TestConnection() = default;
+
 protected:
     void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override {}
     Want OnBuildTaskWant() override
@@ -49,6 +50,7 @@ protected:
         Want want;
         return want;
     }
+
 public:
     sptr<FormAbilityConnection> CreateRetryConnection() const override
     {
@@ -97,36 +99,20 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, GetRetryTaskType_001, TestSize.Leve
 }
 
 /**
- * @tc.name: OnPrepareRetryConnect_001
- * @tc.desc: Verify OnPrepareRetryConnect sets state to CONNECTING (acquire-only).
- * @tc.type: FUNC
- * @tc.require: issueI5NQJG
- */
-HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnPrepareRetryConnect_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnPrepareRetryConnect_001 start";
-    sptr<FormAbilityConnection> conn = new TestConnection();
-    conn->SetConnectState(ConnectState::DISCONNECTED);
-    handler_->OnPrepareRetryConnect(conn);
-    ASSERT_NE(conn, nullptr);
-    EXPECT_EQ(conn->GetConnectState(), ConnectState::CONNECTING);
-    GTEST_LOG_(INFO) << "OnPrepareRetryConnect_001 end";
-}
-
-/**
  * @tc.name: OnRetryLimitReached_001
- * @tc.desc: Verify OnRetryLimitReached erases the policy (acquire exhaustion terminal handling).
+ * @tc.desc: Verify OnRetryLimitReached is a pure hook: reports HiSys event but does not modify map.
  * @tc.type: FUNC
  * @tc.require: issueI5NQJG
  */
 HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnRetryLimitReached_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "OnRetryLimitReached_001 start";
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
     handler_->OnRetryLimitReached(FORM_ID);
-    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    handler_->RemoveRetryPolicy(FORM_ID);
     GTEST_LOG_(INFO) << "OnRetryLimitReached_001 end";
 }
 
@@ -193,7 +179,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_SendFirst_001, TestSize.
 HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_RetryLimit_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DualSignal_RetryLimit_001 start";
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     policy.SetDisconnectFailed(true);
     for (int i = 0; i < 3; i++) { // maxRetryCount = 3 → IsRetryLimitReached
@@ -292,7 +278,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_StuckHalfSignal_001
 {
     GTEST_LOG_(INFO) << "OnSignalTimeout_StuckHalfSignal_001 start";
     // Simulate partial state: only sendRequestFailed set (waiting for disconnect that never comes)
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
 
@@ -310,7 +296,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_StuckHalfSignal_001
 HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_BothSignalsSet_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "OnSignalTimeout_BothSignalsSet_001 start";
-    auto &policy = handler_->EnsureRetryPolicy(FORM_ID);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
     policy.SetSendRequestFailed(true);
     policy.SetDisconnectFailed(true);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());

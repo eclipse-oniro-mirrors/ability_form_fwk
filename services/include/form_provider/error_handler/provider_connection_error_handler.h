@@ -88,8 +88,7 @@ protected:
      * @param policy Retry policy configuration.
      * @param retryFunc Retry function to execute.
      */
-    virtual void ScheduleRetry(int64_t formId, const RetryPolicy &policy,
-        std::function<void()> retryFunc);
+    virtual void ScheduleRetry(int64_t formId, const RetryPolicy &policy, std::function<void()> retryFunc);
 
     /**
      * @brief Get default retry policy configuration.
@@ -99,11 +98,11 @@ protected:
 
     /**
      * @brief Ensure retry policy exists for specified form (create default if absent).
-     *        Must be called within lock_guard of retryPolicyMutex_.
+     *        Caller MUST hold retryPolicyMutex_ before calling.
      * @param formId Form ID.
      * @return Reference to retry policy in retryPolicyMap_.
      */
-    RetryPolicy &EnsureRetryPolicy(int64_t formId);
+    RetryPolicy &EnsureRetryPolicyLocked(int64_t formId);
 
     /**
      * @brief Start the dual-signal fallback timeout. If the second signal does not arrive
@@ -167,13 +166,6 @@ protected:
      * @param formId Form ID.
      */
     virtual void OnRetryLimitReached(int64_t formId) {};
-
-    /**
-     * @brief Hook invoked after CreateRetryConnection, before ConnectServiceAbility.
-     *        Override to set pre-connect state (e.g. acquire sets CONNECTING). Default no-op.
-     * @param connection Retry connection about to connect.
-     */
-    virtual void OnPrepareRetryConnect(sptr<FormAbilityConnection> &connection) {}
 };
 
 }  // namespace AppExecFwk
