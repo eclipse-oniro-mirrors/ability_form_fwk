@@ -388,18 +388,20 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
     HILOG_DEBUG("JsFormProvider OnOpenFormManager want:%{public}s", want.ToString().c_str());
 
 #ifdef NO_RUNTIME_EMULATOR
-    int64_t processorId = FormEventHiAppEvent::AddProcessor();
-    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
     time_t beginTime = time(nullptr);
-#endif
-    auto ret = FormMgr::GetInstance().StartAbilityByFms(want);
-#ifdef NO_RUNTIME_EMULATOR
     PublishFormData publishFormData = {want.GetBundle(), want.GetElement().GetAbilityName(),
         want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
         want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
         want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
-    FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManager", publishFormData,
-        processorId);
+#endif
+    auto ret = FormMgr::GetInstance().StartAbilityByFms(want);
+#ifdef NO_RUNTIME_EMULATOR
+    std::thread([ret, beginTime, publishFormData]() {
+        int64_t processorId = FormEventHiAppEvent::AddProcessor();
+        HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
+        FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManager", publishFormData,
+            processorId);
+    }).detach();
 #endif
     if (ret != ERR_OK) {
         HILOG_ERROR("fail to StartAbilityByFms, error code: %{public}d", static_cast<int>(ret));
@@ -423,11 +425,6 @@ napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t arg
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormManagerCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_DEBUG("call");
-#ifdef NO_RUNTIME_EMULATOR
-    int64_t processorId = FormEventHiAppEvent::AddProcessor();
-    HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
-    time_t beginTime = time(nullptr);
-#endif
     Want want;
     if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], want)) {
         HILOG_ERROR("fail convert want");
@@ -446,18 +443,25 @@ napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t arg
     want.SetParam(key, value);
     HILOG_DEBUG("JsFormProvider OnOpenFormManagerCrossBundle want:%{public}s", want.ToString().c_str());
 
-    auto ret = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
-    if (ret != ERR_OK) {
-        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
-    }
 #ifdef NO_RUNTIME_EMULATOR
+    time_t beginTime = time(nullptr);
     PublishFormData publishFormData = {want.GetBundle(), want.GetElement().GetAbilityName(),
         want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1),
         want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
         want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
-    FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManagerCrossBundle", publishFormData,
-        processorId);
 #endif
+    auto ret = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
+#ifdef NO_RUNTIME_EMULATOR
+    std::thread([ret, beginTime, publishFormData]() {
+        int64_t processorId = FormEventHiAppEvent::AddProcessor();
+        HILOG_INFO("Add processor begin.Processor id is %{public}" PRId64, processorId);
+        FormEventHiAppEvent::WriteAppFormEndEvent(ret, beginTime, "OpenFormManagerCrossBundle", publishFormData,
+            processorId);
+    }).detach();
+#endif
+    if (ret != ERR_OK) {
+        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+    }
     return CreateJsUndefined(env);
 }
 
