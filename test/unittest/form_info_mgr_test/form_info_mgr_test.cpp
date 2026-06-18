@@ -677,6 +677,64 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_ReloadFormInfos_0100, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FormInfoMgr_ReloadFormInfos_0200
+ * @tc.number: ReloadFormInfos
+ * @tc.desc: ReloadFormInfos for the same user is deduplicated; second call is skipped
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ReloadFormInfos_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ReloadFormInfos_0200 start";
+    formInfoMgr_.Start();
+    formInfoMgr_.reloadUserIds_.clear();
+    EXPECT_EQ(ERR_OK, formInfoMgr_.ReloadFormInfos(USER_ID));
+    EXPECT_EQ(1, static_cast<int>(formInfoMgr_.reloadUserIds_.count(USER_ID)));
+    // second call for the same user should be skipped (dedup)
+    EXPECT_EQ(ERR_OK, formInfoMgr_.ReloadFormInfos(USER_ID));
+    EXPECT_EQ(1, static_cast<int>(formInfoMgr_.reloadUserIds_.count(USER_ID)));
+    formInfoMgr_.ClearReloadUserId(USER_ID);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ReloadFormInfos_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_HasReloadedFormInfos_0100
+ * @tc.number: HasReloadedFormInfos
+ * @tc.desc: HasReloadedFormInfos reflects reload state of reloadUserIds_
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_HasReloadedFormInfos_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_HasReloadedFormInfos_0100 start";
+    formInfoMgr_.Start();
+    formInfoMgr_.reloadUserIds_.clear();
+    EXPECT_FALSE(formInfoMgr_.HasReloadedFormInfos(USER_ID));
+    EXPECT_EQ(ERR_OK, formInfoMgr_.ReloadFormInfos(USER_ID));
+    EXPECT_TRUE(formInfoMgr_.HasReloadedFormInfos(USER_ID));
+    formInfoMgr_.ClearReloadUserId(USER_ID);
+    GTEST_LOG_(INFO) << "FormInfoMgr_HasReloadedFormInfos_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_ClearReloadUserId_0100
+ * @tc.number: ClearReloadUserId
+ * @tc.desc: After ClearReloadUserId, the user can be reloaded again
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ClearReloadUserId_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ClearReloadUserId_0100 start";
+    formInfoMgr_.Start();
+    formInfoMgr_.reloadUserIds_.clear();
+    EXPECT_EQ(ERR_OK, formInfoMgr_.ReloadFormInfos(USER_ID));
+    EXPECT_TRUE(formInfoMgr_.HasReloadedFormInfos(USER_ID));
+    formInfoMgr_.ClearReloadUserId(USER_ID);
+    EXPECT_EQ(0, static_cast<int>(formInfoMgr_.reloadUserIds_.count(USER_ID)));
+    EXPECT_FALSE(formInfoMgr_.HasReloadedFormInfos(USER_ID));
+    // after clear, reload should run again
+    EXPECT_EQ(ERR_OK, formInfoMgr_.ReloadFormInfos(USER_ID));
+    EXPECT_TRUE(formInfoMgr_.HasReloadedFormInfos(USER_ID));
+    formInfoMgr_.ClearReloadUserId(USER_ID);
+    GTEST_LOG_(INFO) << "FormInfoMgr_ClearReloadUserId_0100 end";
+}
+
+/**
  * @tc.name: FormInfoMgr_GetFormsInfoByFilter_0100
  * @tc.number: GetFormsInfoByFilter
  * @tc.desc: call GetFormsInfoByFilter success

@@ -189,7 +189,7 @@ int32_t FormMgrService::CheckFMSReady()
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_CheckFMSReady",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    bool result = FormInfoMgr::GetInstance().HasReloadedFormInfos();
+    bool result = FormInfoMgr::GetInstance().HasReloadedFormInfos(userId);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
 
     if (!result) {

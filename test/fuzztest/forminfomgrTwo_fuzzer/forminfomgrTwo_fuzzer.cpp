@@ -80,7 +80,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formInfoMgr.PublishFmsReadyEvent();
 
     // Test HasReloadedFormInfos
-    formInfoMgr.HasReloadedFormInfos();
+    formInfoMgr.HasReloadedFormInfos(userId);
+    formInfoMgr.ClearReloadUserId(userId);
 
     // Test GetAppFormVisibleNotifyByBundleName
     bool appFormVisibleNotify = false;

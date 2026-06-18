@@ -49,7 +49,7 @@ FormInfoMgr::FormInfoMgr()
 
 FormInfoMgr::~FormInfoMgr() = default;
 
-ErrCode FormInfoMgr::Start()
+ErrCode FormInfoMgr::LoadFormInfosFromDb()
 {
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
     ErrCode errCode = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
@@ -72,6 +72,13 @@ ErrCode FormInfoMgr::Start()
     }
     HILOG_INFO("load bundle form infos from db done");
     return ERR_OK;
+}
+
+ErrCode FormInfoMgr::Start()
+{
+    // std::call_once guarantees Start() loads DB exactly once.
+    std::call_once(startOnceFlag_, [this]() { startResult_ = LoadFormInfosFromDb(); });
+    return startResult_;
 }
 
 ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_t userId)
@@ -503,21 +510,34 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("userId:%{public}d", userId);
+    {
+        std::shared_lock<std::shared_mutex> lock(reloadUserIdsMutex_);
+        if (reloadUserIds_.count(userId) != 0) {
+            HILOG_INFO("userId %{public}d already reloaded, skip", userId);
+            return ERR_OK;
+        }
+    }
+    // ensure DB data is loaded before touching bundleFormInfoMap_.
+    Start();
     std::map<std::string, std::uint32_t> bundleVersionMap {};
     ErrCode result = GetBundleVersionMap(bundleVersionMap, userId);
     if (result != ERR_OK) {
         return result;
     }
-    std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
-    hasReloadedFormInfosState_ = false;
-    UpdateBundleFormInfos(bundleVersionMap, userId);
-    AddBundleFormInfos(bundleVersionMap, userId);
-    hasReloadedFormInfosState_ = true;
+    {
+        std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+        UpdateBundleFormInfos(bundleVersionMap, userId);
+        AddBundleFormInfos(bundleVersionMap, userId);
+        HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
+    }
+    {
+        std::unique_lock<std::shared_mutex> lock(reloadUserIdsMutex_);
+        reloadUserIds_.insert(userId);
+    }
     bool publishRet = PublishFmsReadyEvent();
     if (!publishRet) {
         HILOG_ERROR("failed to publish fmsIsReady event with permission");
     }
-    HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
     return ERR_OK;
 }
 
@@ -534,10 +554,19 @@ bool FormInfoMgr::PublishFmsReadyEvent()
     return ret;
 }
 
-bool FormInfoMgr::HasReloadedFormInfos()
+void FormInfoMgr::ClearReloadUserId(int32_t userId)
 {
-    HILOG_DEBUG("Reloaded Form Infos state %{public}d", hasReloadedFormInfosState_);
-    return hasReloadedFormInfosState_;
+    HILOG_INFO("clear reload userId:%{public}d", userId);
+    std::unique_lock<std::shared_mutex> lock(reloadUserIdsMutex_);
+    reloadUserIds_.erase(userId);
+}
+
+bool FormInfoMgr::HasReloadedFormInfos(int32_t userId)
+{
+    std::shared_lock<std::shared_mutex> lock(reloadUserIdsMutex_);
+    bool reloaded = reloadUserIds_.count(userId) != 0;
+    HILOG_DEBUG("userId %{public}d reloaded state %{public}d", userId, reloaded);
+    return reloaded;
 }
 
 ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId)
@@ -702,7 +731,7 @@ void FormInfoMgr::AddBundleFormInfos(
         HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
     }
 }
- 
+
 void FormInfoMgr::ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
     std::map<std::string, std::uint32_t> &bundleVersionMap,
     std::vector<std::string> &needUpdateBundleNames)
@@ -714,7 +743,7 @@ void FormInfoMgr::ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
             bundleFormInfoPair.second->Remove(userId);
             continue;
         }
- 
+
         if (!isNeedUpdateAll) {
             uint32_t newVersionCode = bundleVersionPair->second;
             uint32_t oldVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
@@ -722,8 +751,10 @@ void FormInfoMgr::ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
                 bundleVersionMap.erase(bundleVersionPair);
                 continue;
             }
+            HILOG_INFO("bundle %{public}s version changed, old:%{public}u, new:%{public}u, userId:%{public}d",
+                bundleName.c_str(), oldVersionCode, newVersionCode, userId);
         }
- 
+
         bundleVersionMap.erase(bundleVersionPair);
         needUpdateBundleNames.push_back(bundleName);
     }

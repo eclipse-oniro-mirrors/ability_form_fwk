@@ -188,16 +188,17 @@ void FormSysEventReceiver::HandleBundleScanFinished()
 
 void FormSysEventReceiver::InitFormInfosAndRegister()
 {
+    HILOG_INFO("schedule init form infos and register bundle event callback");
     FormMgrQueue::GetInstance().ScheduleTask(TASK_DELAY_TIME, []() {
-        int32_t currUserId = FormUtil::GetCurrentAccountId();
-        if (currUserId == Constants::ANY_USERID) {
-            HILOG_INFO("use MAIN_USER_ID(%{public}d) instead of current userId: ANY_USERID(%{public}d)",
-                MAIN_USER_ID, currUserId);
-            currUserId = MAIN_USER_ID;
-        }
         FormBmsHelper::GetInstance().RegisterBundleEventCallback();
-        if (!FormInfoMgr::GetInstance().HasReloadedFormInfos()) {
-            FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
+        std::vector<int32_t> activeUsers;
+        FormUtil::GetActiveUsers(activeUsers);
+        if (activeUsers.empty()) {
+            HILOG_INFO("no active user, fallback to MAIN_USER_ID(%{public}d)", MAIN_USER_ID);
+            activeUsers.emplace_back(MAIN_USER_ID);
+        }
+        for (int32_t userId : activeUsers) {
+            FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         }
     });
 }
@@ -231,12 +232,6 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     }
 
-    FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
-        if (userId != MAIN_USER_ID) {
-            FormInfoMgr::GetInstance().ReloadFormInfos(userId);
-        }
-    });
-
     FormTimerMgr::GetInstance().UpdateLimiterAlarm();
     FormTimerMgr::GetInstance().UpdateAtTimerAlarm();
     FormTimerMgr::GetInstance().UpdateDynamicAlarm();
@@ -269,6 +264,7 @@ void FormSysEventReceiver::HandleUserStopped(const int32_t userId)
 
     HILOG_INFO("user stopped userId: %{public}d", userId);
     auto task = [userId]() {
+        FormInfoMgr::GetInstance().ClearReloadUserId(userId);
         FormRenderMgr::GetInstance().DisconnectAllRenderConnections(userId);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
@@ -283,6 +279,7 @@ void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
 
     HILOG_INFO("user started userId: %{public}d", userId);
     auto task = [userId]() {
+        FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
