@@ -18,6 +18,13 @@
         *OHOS::AbilityRuntime::WantAgent*;
         *OHOS::AbilityRuntime::JsFormStateObserverProxy*;
         *OHOS::AppExecFwk::BundleFormInfo*;
+        *OHOS::AppExecFwk::Common::FormBaseSerialQueue*;
+        *OHOS::AppExecFwk::Common::FormSingletonQueueBase*;
+        *OHOS::AppExecFwk::Common::FormStatusPrint*;
+        *OHOS::AppExecFwk::Common::FormTimeUtil*;
+        *OHOS::AppExecFwk::Common::ITaskWrapperStrategy*;
+        *OHOS::AppExecFwk::Common::NoWrapStrategy*;
+        *OHOS::AppExecFwk::Common::XCollieTimeoutStrategy*;
         *OHOS::AppExecFwk::FormAbilityConnection*;
         *OHOS::AppExecFwk::FormAbilityConnectionReporter*;
         *OHOS::AppExecFwk::FormAbnormalReporter*;
