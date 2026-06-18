@@ -102,6 +102,10 @@ export default namespace formHost {
   export native function nativeOnGetWantParamsCallback(callback: GetWantParamsCallbackWrapper): void;
   export native function nativeOffGetWantParamsCallback(callback?: GetWantParamsCallbackWrapper): void;
   export native function nativeUpdateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void;
+  export native function nativeOnUpdateFormsConfigCallback(callback: UpdateFormsConfigCallbackWrapper): void;
+  export native function nativeOffUpdateFormsConfigCallback(callback?: UpdateFormsConfigCallbackWrapper): void;
+  export native function nativeOnDeleteFormsCallback(callback: DeleteFormsCallbackWrapper): void;
+  export native function nativeOffDeleteFormsCallback(callback?: DeleteFormsCallbackWrapper): void;
 
   const ERR_OK: int = 0;
   const INVALID_PARAM_ERROR_CODE: int = 401;
@@ -1106,14 +1110,12 @@ export default namespace formHost {
     formHost.nativeOffTemplateFormDetailInfoChange(myCall);
   }
 
-  type GetWantParamsCallback = (formInfos: Array<formInfo.FormInfo>) => Array<Record<string, Object>>;
-
-  function onGetWantParamsCallback(callback: GetWantParamsCallback): void {
+  function onGetWantParamsCallback(callback: formInfo.GetWantParamsCallback): void {
     let myCall = new GetWantParamsCallbackWrapper(callback);
     formHost.nativeOnGetWantParamsCallback(myCall);
   }
 
-  function offGetWantParamsCallback(callback?: GetWantParamsCallback): void {
+  function offGetWantParamsCallback(callback?: formInfo.GetWantParamsCallback): void {
     let myCall: GetWantParamsCallbackWrapper | undefined = undefined;
     if (callback) {
       myCall = new GetWantParamsCallbackWrapper(callback);
@@ -1123,6 +1125,32 @@ export default namespace formHost {
 
   function updateFormSize(formId: string, newDimension: formInfo.FormDimension, newRect: formInfo.Rect): void {
     formHost.nativeUpdateFormSize(formId, newDimension, newRect);
+  }
+
+  function onUpdateFormsConfigCallback(callback: formInfo.UpdateFormsConfigCallback): void {
+    let myCall = new UpdateFormsConfigCallbackWrapper(callback);
+    formHost.nativeOnUpdateFormsConfigCallback(myCall);
+  }
+
+  function offUpdateFormsConfigCallback(callback?: formInfo.UpdateFormsConfigCallback): void {
+    let myCall: UpdateFormsConfigCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new UpdateFormsConfigCallbackWrapper(callback);
+    }
+    formHost.nativeOffUpdateFormsConfigCallback(myCall);
+  }
+
+  function onDeleteFormsCallback(callback: formInfo.DeleteFormsCallback): void {
+    let myCall = new DeleteFormsCallbackWrapper(callback);
+    formHost.nativeOnDeleteFormsCallback(myCall);
+  }
+
+  function offDeleteFormsCallback(callback?: formInfo.DeleteFormsCallback): void {
+    let myCall: DeleteFormsCallbackWrapper | undefined = undefined;
+    if (callback) {
+      myCall = new DeleteFormsCallbackWrapper(callback);
+    }
+    formHost.nativeOffDeleteFormsCallback(myCall);
   }
 
   class GetFormRectInfoCallbackWrapper {
@@ -1182,14 +1210,38 @@ export default namespace formHost {
   }
 
   class GetWantParamsCallbackWrapper {
-    private callback_: GetWantParamsCallback;
+    private callback_: formInfo.GetWantParamsCallback;
 
-    constructor(callback: GetWantParamsCallback) {
+    constructor(callback: formInfo.GetWantParamsCallback) {
       this.callback_ = callback;
     }
 
     invoke(formInfos: Array<formInfo.FormInfo>): Array<Record<string, Object>> {
       return this.callback_(formInfos);
+    }
+  }
+
+  class UpdateFormsConfigCallbackWrapper {
+    private callback_: formInfo.UpdateFormsConfigCallback;
+
+    constructor(callback: formInfo.UpdateFormsConfigCallback) {
+      this.callback_ = callback;
+    }
+
+    invoke(configs: Array<formInfo.FormCustomConfig>): void {
+      this.callback_(configs);
+    }
+  }
+
+  class DeleteFormsCallbackWrapper {
+    private callback_: formInfo.DeleteFormsCallback;
+
+    constructor(callback: formInfo.DeleteFormsCallback) {
+      this.callback_ = callback;
+    }
+
+    invoke(formIds: Array<string>): void {
+      this.callback_(formIds);
     }
   }
 }

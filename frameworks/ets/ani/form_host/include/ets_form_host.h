@@ -21,6 +21,7 @@
 #include "ani_form_error_util.h"
 #include "ani_form_util.h"
 #include "event_handler.h"
+#include "form_custom_config.h"
 #include "form_host_delegate_stub.h"
 #include "form_instance.h"
 #include "form_mgr.h"
@@ -112,7 +113,16 @@ public:
     void UnregisterTemplateFormDetailInfoChange();
 
     void RegisterFormWantCallbackListener(ani_vm *vm, ani_object callback);
+
     void UnregisterFormWantCallbackListener();
+
+    bool RegisterUpdateFormsConfigCallbackListener(ani_vm *vm, ani_object callback);
+
+    void UnregisterUpdateFormsConfigCallbackListener();
+
+    bool RegisterDeleteFormsCallbackListener(ani_vm *vm, ani_object callback);
+
+    void UnregisterDeleteFormsCallbackListener();
 
     void RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds);
 
@@ -174,9 +184,24 @@ private:
     bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
         std::vector<AAFwk::WantParams> &wantParamsList);
 
+    ani_ref updateFormsConfigCallbackRef_ = nullptr;
+    ani_vm *updateFormsConfigVM_ = nullptr;
+    mutable std::mutex registerUpdateFormsConfigMutex_;
+    ani_env *GetUpdateFormsConfigEnv();
+
+    ani_ref deleteFormsCallbackRef_ = nullptr;
+    ani_vm *deleteFormsCallbackVM_ = nullptr;
+    mutable std::mutex registerDeleteFormsMutex_;
+    ani_env *GetDeleteFormsCallbackEnv();
+
     ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool UpdateFormsConfigCallbackInner(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool GetFormCustomConfigAniArray(ani_env *env,
+        const std::vector<AppExecFwk::FormCustomConfig> &configs, ani_array &configArray);
 
     ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds);
+    bool DeleteFormsCallbackInner(const std::vector<std::string> &formIds);
+    bool CreateAniStringArray(ani_env *env, const std::vector<std::string> &strings, ani_array &strArray);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

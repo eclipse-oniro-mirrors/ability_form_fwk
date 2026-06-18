@@ -1075,6 +1075,10 @@ bool CheckCallerIsSystemApp()
 
 ani_env *GetEnvFromVm(ani_vm *vm)
 {
+    if (vm == nullptr) {
+        HILOG_ERROR("null vm");
+        return nullptr;
+    }
     ani_env *env = nullptr;
     ani_status status = vm->GetEnv(ANI_VERSION_1, &env);
     if (status != ANI_OK) {

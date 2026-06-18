@@ -22,7 +22,9 @@
 #include "mock_form_token.h"
 #include "form_provider_proxy.h"
 #include "form_mgr_errors.h"
-#include "form_mgr_proxy.h"
+#include "form_record_filter.h"
+#include "form_constants.h"
+#include "form_custom_config.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -3543,5 +3545,339 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_GetFormIdsByFormLocation_004, TestSi
     EXPECT_EQ(formIds.size(), expectedFormIds.size());
     EXPECT_THAT(formIds, ContainerEq(expectedFormIds));
     GTEST_LOG_(INFO) << "FormMgrProxyTest_GetFormIdsByFormLocation_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_RegisterDeleteFormsCallback_001
+ * @tc.name: Verify RegisterDeleteFormsCallback
+ * @tc.desc: test RegisterDeleteFormsCallback function with success.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterDeleteFormsCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterDeleteFormsCallback_001 starts";
+    EXPECT_CALL(*mockFormMgrService, RegisterDeleteFormsCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    auto result = formMgrProxy->RegisterDeleteFormsCallback(token);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterDeleteFormsCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_RegisterDeleteFormsCallback_002
+ * @tc.name: Verify RegisterDeleteFormsCallback with nullptr token
+ * @tc.desc: test RegisterDeleteFormsCallback when callerToken is nullptr.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterDeleteFormsCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterDeleteFormsCallback_002 starts";
+    auto result = formMgrProxy->RegisterDeleteFormsCallback(nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterDeleteFormsCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_RegisterDeleteFormsCallback_003
+ * @tc.name: Verify RegisterDeleteFormsCallback with service error
+ * @tc.desc: test RegisterDeleteFormsCallback when service returns error.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterDeleteFormsCallback_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterDeleteFormsCallback_003 starts";
+    EXPECT_CALL(*mockFormMgrService, RegisterDeleteFormsCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    auto result = formMgrProxy->RegisterDeleteFormsCallback(token);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterDeleteFormsCallback_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UnregisterDeleteFormsCallback_001
+ * @tc.name: Verify UnregisterDeleteFormsCallback
+ * @tc.desc: test UnregisterDeleteFormsCallback function with success.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterDeleteFormsCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterDeleteFormsCallback_001 starts";
+    EXPECT_CALL(*mockFormMgrService, UnregisterDeleteFormsCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = formMgrProxy->UnregisterDeleteFormsCallback();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterDeleteFormsCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UnregisterDeleteFormsCallback_002
+ * @tc.name: Verify UnregisterDeleteFormsCallback with service error
+ * @tc.desc: test UnregisterDeleteFormsCallback when service returns error.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterDeleteFormsCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterDeleteFormsCallback_002 starts";
+    EXPECT_CALL(*mockFormMgrService, UnregisterDeleteFormsCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY));
+    auto result = formMgrProxy->UnregisterDeleteFormsCallback();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterDeleteFormsCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_DeleteForms_001
+ * @tc.name: Verify DeleteForms
+ * @tc.desc: test DeleteForms function with single filter success.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_DeleteForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_001 starts";
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test";
+    filters.push_back(filter);
+    auto result = formMgrProxy->DeleteForms(filters);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_DeleteForms_002
+ * @tc.name: Verify DeleteForms with empty filters
+ * @tc.desc: test DeleteForms function with empty filters.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_DeleteForms_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_002 starts";
+    std::vector<FormRecordFilter> filters;
+    auto result = formMgrProxy->DeleteForms(filters);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_DeleteForms_003
+ * @tc.name: Verify DeleteForms with filters exceeding max
+ * @tc.desc: test DeleteForms function when filters size exceeds max.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_DeleteForms_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_003 starts";
+    std::vector<FormRecordFilter> filters;
+    for (int32_t i = 0; i <= Constants::DELETE_FORMS_FILTER_MAX_NUM; i++) {
+        FormRecordFilter filter;
+        filter.bundleName = "bundle" + std::to_string(i);
+        filters.push_back(filter);
+    }
+    auto result = formMgrProxy->DeleteForms(filters);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_DeleteForms_004
+ * @tc.name: Verify DeleteForms with service error
+ * @tc.desc: test DeleteForms when service returns error.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_DeleteForms_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_004 starts";
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY));
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter;
+    filter.bundleName = "com.test";
+    filters.push_back(filter);
+    auto result = formMgrProxy->DeleteForms(filters);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_DeleteForms_005
+ * @tc.name: Verify DeleteForms with multiple filters
+ * @tc.desc: test DeleteForms function with multiple filters success.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_DeleteForms_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_005 starts";
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    std::vector<FormRecordFilter> filters;
+    FormRecordFilter filter1;
+    filter1.bundleName = "com.test1";
+    filter1.moduleName = "module1";
+    filters.push_back(filter1);
+    FormRecordFilter filter2;
+    filter2.bundleName = "com.test2";
+    filter2.abilityName = "ability2";
+    filters.push_back(filter2);
+    auto result = formMgrProxy->DeleteForms(filters);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_005 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_DeleteForms_006
+ * @tc.name: Verify DeleteForms with boundary value
+ * @tc.desc: test DeleteForms function with exactly max number of filters.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_DeleteForms_006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_006 starts";
+    EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    std::vector<FormRecordFilter> filters;
+    for (int32_t i = 0; i < Constants::DELETE_FORMS_FILTER_MAX_NUM; i++) {
+        FormRecordFilter filter;
+        filter.bundleName = "bundle" + std::to_string(i);
+        filters.push_back(filter);
+    }
+    auto result = formMgrProxy->DeleteForms(filters);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_DeleteForms_006 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_RegisterUpdateFormsConfigCallback_001
+ * @tc.name: Verify RegisterUpdateFormsConfigCallback
+ * @tc.desc: test RegisterUpdateFormsConfigCallback function with success.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterUpdateFormsConfigCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterUpdateFormsConfigCallback_001 starts";
+    EXPECT_CALL(*mockFormMgrService, RegisterUpdateFormsConfigCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    auto result = formMgrProxy->RegisterUpdateFormsConfigCallback(token);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterUpdateFormsConfigCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_RegisterUpdateFormsConfigCallback_002
+ * @tc.name: Verify RegisterUpdateFormsConfigCallback with nullptr token
+ * @tc.desc: test RegisterUpdateFormsConfigCallback when callerToken is nullptr.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterUpdateFormsConfigCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterUpdateFormsConfigCallback_002 starts";
+    auto result = formMgrProxy->RegisterUpdateFormsConfigCallback(nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterUpdateFormsConfigCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_RegisterUpdateFormsConfigCallback_003
+ * @tc.name: Verify RegisterUpdateFormsConfigCallback with service error
+ * @tc.desc: test RegisterUpdateFormsConfigCallback when service returns error.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterUpdateFormsConfigCallback_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterUpdateFormsConfigCallback_003 starts";
+    EXPECT_CALL(*mockFormMgrService, RegisterUpdateFormsConfigCallback(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    auto result = formMgrProxy->RegisterUpdateFormsConfigCallback(token);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterUpdateFormsConfigCallback_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_001
+ * @tc.name: Verify UnregisterUpdateFormsConfigCallback
+ * @tc.desc: test UnregisterUpdateFormsConfigCallback function with success.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_001 starts";
+    EXPECT_CALL(*mockFormMgrService, UnregisterUpdateFormsConfigCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = formMgrProxy->UnregisterUpdateFormsConfigCallback();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_002
+ * @tc.name: Verify UnregisterUpdateFormsConfigCallback with service error
+ * @tc.desc: test UnregisterUpdateFormsConfigCallback when service returns error.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_002 starts";
+    EXPECT_CALL(*mockFormMgrService, UnregisterUpdateFormsConfigCallback())
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY));
+    auto result = formMgrProxy->UnregisterUpdateFormsConfigCallback();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterUpdateFormsConfigCallback_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormsConfig_001
+ * @tc.name: Verify UpdateFormsConfig
+ * @tc.desc: test UpdateFormsConfig function with success.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsConfig_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_001 starts";
+    std::vector<FormCustomConfig> configs;
+    FormCustomConfig config;
+    config.bundleName = "com.test";
+    config.moduleName = "entry";
+    config.formName = "widget";
+    config.isShowInFormCenter = true;
+    configs.push_back(config);
+    EXPECT_CALL(*mockFormMgrService, UpdateFormsConfig(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = formMgrProxy->UpdateFormsConfig(configs);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormsConfig_002
+ * @tc.name: Verify UpdateFormsConfig with empty configs
+ * @tc.desc: test UpdateFormsConfig when configs is empty.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsConfig_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_002 starts";
+    std::vector<FormCustomConfig> configs;
+    auto result = formMgrProxy->UpdateFormsConfig(configs);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormsConfig_003
+ * @tc.name: Verify UpdateFormsConfig with configs exceeding max
+ * @tc.desc: test UpdateFormsConfig when configs size exceeds max limit.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsConfig_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_003 starts";
+    std::vector<FormCustomConfig> configs;
+    for (int32_t i = 0; i <= Constants::UPDATE_FORM_CONFIG_MAX_NUM; i++) {
+        FormCustomConfig config;
+        config.bundleName = "com.test" + std::to_string(i);
+        configs.push_back(config);
+    }
+    auto result = formMgrProxy->UpdateFormsConfig(configs);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormsConfig_004
+ * @tc.name: Verify UpdateFormsConfig with service error
+ * @tc.desc: test UpdateFormsConfig when service returns error.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsConfig_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_004 starts";
+    std::vector<FormCustomConfig> configs;
+    FormCustomConfig config;
+    config.bundleName = "com.test";
+    configs.push_back(config);
+    EXPECT_CALL(*mockFormMgrService, UpdateFormsConfig(_))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY));
+    auto result = formMgrProxy->UpdateFormsConfig(configs);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_004 ends";
 }
 }

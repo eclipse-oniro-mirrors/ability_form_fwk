@@ -366,16 +366,9 @@ void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
 
 bool BundleFormInfo::IsFormInfoMatched(const FormInfo &formInfo, const FormCustomConfig &config) const
 {
-    if (!config.moduleName.empty() && formInfo.moduleName != config.moduleName) {
-        return false;
-    }
-    if (!config.abilityName.empty() && formInfo.abilityName != config.abilityName) {
-        return false;
-    }
-    if (!config.formName.empty() && formInfo.name != config.formName) {
-        return false;
-    }
-    return true;
+    return formInfo.moduleName == config.moduleName &&
+        formInfo.abilityName == config.abilityName &&
+        formInfo.name == config.formName;
 }
 
 void BundleFormInfo::UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bool isShow)
@@ -393,29 +386,30 @@ void BundleFormInfo::UpdateFormShowConfigInCustomizeDatas(FormInfo &formInfo, bo
 bool BundleFormInfo::ApplyConfigToStorages(const FormCustomConfig &config)
 {
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    bool updated = false;
+    bool matched = false;
     for (auto &storage : formInfoStorages_) {
         for (auto &formInfo : storage.formInfos) {
             if (IsFormInfoMatched(formInfo, config)) {
                 UpdateFormShowConfigInCustomizeDatas(formInfo, config.isShowInFormCenter);
-                updated = true;
+                matched = true;
+                break;
             }
         }
     }
-    return updated;
+    return matched;
 }
 
-ErrCode BundleFormInfo::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
+void BundleFormInfo::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
 {
     HILOG_DEBUG("call, bundleName:%{public}s", bundleName_.c_str());
-    bool needUpdate = false;
+    int32_t matchedCount = 0;
     for (const auto &config : configs) {
-        needUpdate = ApplyConfigToStorages(config) || needUpdate;
+        if (ApplyConfigToStorages(config)) {
+            ++matchedCount;
+        }
     }
-    if (needUpdate) {
-        return UpdateFormInfoStorageLocked();
-    }
-    return ERR_OK;
+    HILOG_INFO("bundleName:%{public}s, config size:%{public}zu, matched config num:%{public}d",
+        bundleName_.c_str(), configs.size(), matchedCount);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

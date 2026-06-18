@@ -145,13 +145,12 @@ bool FormInfoMgr::IsDeleteCacheInUpgradeScene(const FormInfo &formInfo)
     return false;
 }
 
-ErrCode FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
+void FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
 {
     GTEST_LOG_(INFO) << "UpdateFormShowConfigs called";
     if (AppExecFwk::MockFormInfoMgr::obj) {
-        return AppExecFwk::MockFormInfoMgr::obj->UpdateFormShowConfigs(configs);
+        AppExecFwk::MockFormInfoMgr::obj->UpdateFormShowConfigs(configs);
     }
-    return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
