@@ -732,6 +732,7 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
+    eventInfo.uri = want.GetUriString();
     std::vector<FormHostRecord> formHostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecords);
     if (formHostRecords.size() != 0) {

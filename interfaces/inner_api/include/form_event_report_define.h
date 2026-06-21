@@ -28,6 +28,7 @@ struct FormEventInfo {
     std::string moduleName;
     std::string abilityName;
     std::string hostBundleName = "";
+    std::string uri = "";
     int32_t formAppPid = -1;
     int32_t formLocation = -1;
     int64_t timeStamp = 0;
