@@ -29,8 +29,6 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "${form_fwk_path}/services/src/status_mgr_center/form_status_mgr.cpp",
     "${form_fwk_path}/services/src/status_mgr_center/form_status.cpp",
     "${form_fwk_path}/services/src/status_mgr_center/form_status_table.cpp",
-    "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
-    "${form_fwk_path}/services/common/src/util/form_status_print.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_mgr_adapter_facade.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_render_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
@@ -42,6 +40,9 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "${form_fwk_path}/test/unittest/fms_form_supply_callback_test/",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/services/common/include",
+    "${form_fwk_path}/services/common/include/queue",
+    "${form_fwk_path}/services/common/include/util",
+    "${form_fwk_path}/services/common/include/timer",
   ]
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
@@ -57,6 +58,7 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}/services/common:libform_common",
   ]
 
   external_deps = [

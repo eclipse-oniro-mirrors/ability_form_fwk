@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,64 +11,71 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/features.gni")
+import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/form_fwk/form_mgr_service"
+##############################fuzztest##########################################
+ohos_fuzztest("FormQueryAdapterFuzzTest") {
+  module_out_path = form_fuzz_test_path
 
-ohos_unittest("FmsFormMgrDumpTest") {
-  module_out_path = module_output_path
-
-  sources = [
-    "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
-    "${form_fwk_path}/services/src/status_mgr_center/form_status.cpp",
-    "fms_form_mgr_dump_test.cpp",
-  ]
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formqueryadapter_fuzzer"
 
   include_dirs = [
+    "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/include",
   ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "formqueryadapter_fuzzer.cpp" ]
 
-  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
-  cflags = []
-  if (target_cpu == "arm") {
-    cflags += [ "-DBINDER_IPC_32BIT" ]
-  }
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
     "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}/services/common:libform_common",
   ]
 
   external_deps = [
     "ability_base:base",
-    "ability_base:configuration",
     "ability_base:want",
     "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "eventhandler:libeventhandler",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "ffrt:libffrt",
-    "form_fwk:form_manager",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
-    "kv_store:distributeddata_inner",
-    "memmgr:memmgrclient",
+    "libxml2:libxml2",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "googletest:gmock_main",
   ]
 }
 
-group("unittest") {
+###############################################################################
+group("fuzztest") {
   testonly = true
-  deps = [ ":FmsFormMgrDumpTest" ]
+  deps = []
+  deps += [
+    ":FormQueryAdapterFuzzTest",
+  ]
 }
+###############################################################################

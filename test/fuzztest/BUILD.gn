@@ -123,6 +123,8 @@ group("fuzztest") {
     "formdataadapter_fuzzer:fuzztest",
     "formdebugadapter_fuzzer:fuzztest",
     "formobserveradapter_fuzzer:fuzztest",
+    "formpublishadapter_fuzzer:fuzztest",
+    "formqueryadapter_fuzzer:fuzztest",
   ]
 
   if (ability_runtime_graphics) {

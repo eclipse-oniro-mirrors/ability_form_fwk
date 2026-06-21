@@ -20,7 +20,6 @@
         *OHOS::AppExecFwk::BundleFormInfo*;
         *OHOS::AppExecFwk::Common::FormBaseSerialQueue*;
         *OHOS::AppExecFwk::Common::FormSingletonQueueBase*;
-        *OHOS::AppExecFwk::Common::FormStatusPrint*;
         *OHOS::AppExecFwk::Common::FormTimeUtil*;
         *OHOS::AppExecFwk::Common::ITaskWrapperStrategy*;
         *OHOS::AppExecFwk::Common::NoWrapStrategy*;
@@ -44,9 +43,11 @@
         *OHOS::AppExecFwk::FormBundleLockMgr*;
         *OHOS::AppExecFwk::FormCacheMgr*;
         *OHOS::AppExecFwk::FormCallerMgr*;
+        *OHOS::AppExecFwk::FormCallbackAdapter*;
         *OHOS::AppExecFwk::FormCastTempConnection*;
         *OHOS::AppExecFwk::FormConfigurationUpdateConnection*;
         *OHOS::AppExecFwk::FormCustConfigMgr*;
+        *OHOS::AppExecFwk::FormCommonAdapter*;
         *OHOS::AppExecFwk::FormDataMgr*;
         *OHOS::AppExecFwk::FormDataProxyMgr*;
         *OHOS::AppExecFwk::FormDataAdapter*;
@@ -122,9 +123,7 @@
         *OHOS::AppExecFwk::FormShareConnection*;
         *OHOS::AppExecFwk::FormShareMgr*;
         *OHOS::AppExecFwk::FormShareTaskMgr*;
-        *OHOS::AppExecFwk::FormStatusMgr*;
-        *OHOS::AppExecFwk::FormStatusQueue*;
-        *OHOS::AppExecFwk::FormStatusTaskMgr*;
+        *OHOS::AppExecFwk::FormStatus*;
         *OHOS::AppExecFwk::FormSupplyCallback*;
         *OHOS::AppExecFwk::FormSupplyStub*;
         *OHOS::AppExecFwk::FormSysEventReceiver*;
