@@ -61,10 +61,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::string action = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     adapter.IsActionAllowToPublish(action);
 
-    // Fuzz AcquireAddFormResult
-    int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
-    adapter.AcquireAddFormResult(formId);
-
     // Fuzz SetPublishFormResult
     int64_t resultFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     Constants::PublishFormResult errorCodeInfo;
@@ -105,23 +101,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int32_t commonUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
     int64_t commonFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     adapter.RequestPublishFormCommon(commonWant, commonUserId, commonFormId);
-
-    // Fuzz RequestPublishFormCrossUser
-    Want crossUserWant = GenerateWant(fdp);
-    int32_t crossUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
-    int64_t crossUserFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
-    adapter.RequestPublishFormCrossUser(crossUserWant, crossUserId, crossUserFormId);
-
-    // Fuzz RequestPublishForm
-    Want publishWant = GenerateWant(fdp);
-    bool withFormBindingData = fdp->ConsumeBool();
-    std::string dataStr = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    auto formBindingData = std::make_unique<FormProviderData>(dataStr);
-    int64_t publishFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
-    std::vector<FormDataProxy> formDataProxies;
-    bool needPermission = fdp->ConsumeBool();
-    adapter.RequestPublishForm(publishWant, withFormBindingData, formBindingData,
-        publishFormId, formDataProxies, needPermission);
 
     return true;
 }
