@@ -31,6 +31,7 @@ constexpr const char *EVENT_KEY_BUNDLE_NAME = "BUNDLE_NAME";
 constexpr const char *EVENT_KEY_MODULE_NAME = "MODULE_NAME";
 constexpr const char *EVENT_KEY_ABILITY_NAME = "ABILITY_NAME";
 constexpr const char *EVENT_KEY_HOST_BUNDLE_NAME = "HOST_BUNDLE_NAME";
+constexpr const char *EVENT_KEY_URI = "URI";
 constexpr const char *EVENT_KEY_ERROR_NAME = "ERROR_NAME";
 constexpr const char *EVENT_KEY_ERROR_TYPE = "ERROR_TYPE";
 constexpr const char *EVENT_KEY_ERROR_CODE = "ERROR_CODE";
@@ -163,6 +164,7 @@ void FormEventReport::SendRouteEventFormEvent(const std::string &name, HiSysEven
     builder.InsertParam(EVENT_KEY_MODULE_NAME, eventInfo.moduleName);
     builder.InsertParam(EVENT_KEY_ABILITY_NAME, eventInfo.abilityName);
     builder.InsertParam(EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName);
+    builder.InsertParam(EVENT_KEY_URI, eventInfo.uri);
     builder.InsertParam(EVENT_KEY_FORM_LOCATION, eventInfo.formLocation);
     builder.Write("FORM_MANAGER", name, static_cast<HiSysEventEventType>(type));
 }
