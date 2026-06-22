@@ -46,6 +46,7 @@ ohos_shared_library("libform_common") {
   cflags_cc = [
     "-fdata-sections",
     "-ffunction-sections",
+    "-Oz",
   ]
 
   ldflags = [

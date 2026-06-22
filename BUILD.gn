@@ -155,12 +155,24 @@ ohos_shared_library("libfms") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
 
   shlib_type = "sa"
   version_script = "libfms.map"
-  cflags_cc = []
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz",
+  ]
+
+  ldflags = [
+    "-flto=full",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+  ]
   include_dirs =
       [ "${form_fwk_napi_path}/form_host/form_state_observer/include" ]
 
@@ -440,6 +452,8 @@ ohos_shared_library("fmskit_native") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
   configs = [
@@ -464,7 +478,7 @@ ohos_shared_library("fmskit_native") {
   ]
 
   ldflags = [
-    "-flto",
+    "-flto=full",
     "-Wl,-z,relro",
     "-Wl,--exclude-libs=ALL",
     "-Wl,--gc-sections",
@@ -536,6 +550,8 @@ ohos_shared_library("fmskit_provider_client") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
   configs = [ ":fmskit_provider_config" ]
@@ -549,7 +565,7 @@ ohos_shared_library("fmskit_provider_client") {
   ]
 
   ldflags = [
-    "-flto",
+    "-flto=full",
     "-Wl,-z,relro",
     "-Wl,--exclude-libs=ALL",
     "-Wl,--gc-sections",
@@ -622,6 +638,8 @@ ohos_shared_library("form_manager") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
   cflags_cc = [
@@ -631,7 +649,7 @@ ohos_shared_library("form_manager") {
   ]
 
   ldflags = [
-    "-flto",
+    "-flto=full",
     "-Wl,-z,relro",
     "-Wl,--exclude-libs=ALL",
     "-Wl,--gc-sections",
@@ -707,6 +725,8 @@ ohos_shared_library("form_utils") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
   cflags = []
@@ -716,7 +736,7 @@ ohos_shared_library("form_utils") {
     "-Oz"
   ]
   ldflags = [
-    "-flto",
+    "-flto=full",
     "-Wl,-z,relro",
     "-Wl,--exclude-libs=ALL",
     "-Wl,--gc-sections",
@@ -766,6 +786,8 @@ ohos_shared_library("form_common_info") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
   cflags = []
@@ -775,7 +797,7 @@ ohos_shared_library("form_common_info") {
     "-Oz"
   ]
   ldflags = [
-    "-flto",
+    "-flto=full",
     "-Wl,-z,relro",
     "-Wl,--exclude-libs=ALL",
     "-Wl,--gc-sections",
@@ -829,8 +851,21 @@ ohos_shared_library("form_render_info") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz",
+  ]
+
+  ldflags = [
+    "-flto=full",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+  ]
   cflags = []
   include_dirs = []
   sources = [
