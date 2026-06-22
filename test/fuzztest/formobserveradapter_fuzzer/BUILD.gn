@@ -26,6 +26,7 @@ ohos_fuzztest("FormObserverAdapterFuzzTest") {
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/common/include",
   ]
   cflags = [
     "-g",
@@ -33,7 +34,11 @@ ohos_fuzztest("FormObserverAdapterFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "formobserveradapter_fuzzer.cpp" ]
+  sources = [
+    "formobserveradapter_fuzzer.cpp",
+    "${form_fwk_path}/services/src/form_mgr/form_observer_adapter.cpp",
+    "${form_fwk_path}/services/src/form_observer/form_observer_record.cpp",
+  ]
 
   deps = [
     "${form_fwk_path}:fms_target",
@@ -43,6 +48,7 @@ ohos_fuzztest("FormObserverAdapterFuzzTest") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}/services/common:libform_common",
   ]
 
   external_deps = [
@@ -60,6 +66,8 @@ ohos_fuzztest("FormObserverAdapterFuzzTest") {
     "common_event_service:cesfwk_innerkits",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "hicollie:libhicollie",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "libxml2:libxml2",
     "safwk:system_ability_fwk",

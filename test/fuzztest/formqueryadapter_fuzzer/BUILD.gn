@@ -26,6 +26,7 @@ ohos_fuzztest("FormQueryAdapterFuzzTest") {
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/common/include",
   ]
   cflags = [
     "-g",
@@ -33,7 +34,12 @@ ohos_fuzztest("FormQueryAdapterFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "formqueryadapter_fuzzer.cpp" ]
+  sources = [
+    "formqueryadapter_fuzzer.cpp",
+    "${form_fwk_path}/services/src/form_mgr/form_query_adapter.cpp",
+    "${form_fwk_path}/services/src/form_provider/connection/form_acquire_data_connection.cpp",
+    "${form_fwk_path}/services/src/form_provider/form_provider_task_mgr.cpp",
+  ]
 
   deps = [
     "${form_fwk_path}:fms_target",
@@ -43,6 +49,7 @@ ohos_fuzztest("FormQueryAdapterFuzzTest") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}/services/common:libform_common",
   ]
 
   external_deps = [
@@ -62,6 +69,7 @@ ohos_fuzztest("FormQueryAdapterFuzzTest") {
     "data_share:datashare_consumer",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "hicollie:libhicollie",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "libxml2:libxml2",

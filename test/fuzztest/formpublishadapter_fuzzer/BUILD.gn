@@ -26,6 +26,7 @@ ohos_fuzztest("FormPublishAdapterFuzzTest") {
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
+    "${form_fwk_path}/services/common/include",
   ]
   cflags = [
     "-g",
@@ -33,7 +34,13 @@ ohos_fuzztest("FormPublishAdapterFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "formpublishadapter_fuzzer.cpp" ]
+  sources = [
+    "formpublishadapter_fuzzer.cpp",
+    "${form_fwk_path}/services/src/form_mgr/form_publish_adapter.cpp",
+    "${form_fwk_path}/services/src/data_center/form_data_proxy_mgr.cpp",
+    "${form_fwk_path}/services/src/data_center/form_data_proxy_record.cpp",
+    "${form_fwk_path}/services/src/feature/ecological_rule/form_ecological_rule_service.cpp",
+  ]
 
   deps = [
     "${form_fwk_path}:fms_target",
@@ -43,6 +50,7 @@ ohos_fuzztest("FormPublishAdapterFuzzTest") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}/services/common:libform_common",
   ]
 
   external_deps = [
@@ -62,6 +70,7 @@ ohos_fuzztest("FormPublishAdapterFuzzTest") {
     "data_share:datashare_consumer",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "hicollie:libhicollie",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "libxml2:libxml2",
