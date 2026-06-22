@@ -25,8 +25,21 @@ ohos_shared_library("cj_formBindingData_ffi") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz",
+  ]
+
+  ldflags = [
+    "-flto=full",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+  ]
 
   include_dirs = [ "form_binding_data/include" ]
 
@@ -67,8 +80,21 @@ ohos_shared_library("cj_formProvider_ffi") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
     debug = false
   }
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz",
+  ]
+
+  ldflags = [
+    "-flto=full",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+  ]
 
   include_dirs = [
     "form_binding_data/include",
