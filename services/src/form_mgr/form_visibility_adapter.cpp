@@ -54,6 +54,14 @@ FormVisibilityAdapter::~FormVisibilityAdapter()
 {
 }
 
+void FormVisibilityAdapter::Init()
+{
+    int32_t delay = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
+    FormDataMgr::GetInstance().GetConfigParamFormMap(Constants::VISIBLE_NOTIFY_DELAY, delay);
+    visibleNotifyDelay_.store(delay);
+    HILOG_INFO("load visibleNotifyDelayTime:%{public}d", visibleNotifyDelay_.load());
+}
+
 ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
@@ -123,7 +131,7 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
     RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(needRefreshRecords, userId);
     PostVisibleNotify(
         (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
-        formInstanceMaps, eventMaps, formVisibleType, visibleNotifyDelay_, callerToken);
+        formInstanceMaps, eventMaps, formVisibleType, visibleNotifyDelay_.load(), callerToken);
     return ERR_OK;
 }
 

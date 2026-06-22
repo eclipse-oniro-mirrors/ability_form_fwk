@@ -1426,5 +1426,25 @@ HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherFormsVisible_003, TestSize.L
  
     GTEST_LOG_(INFO) << "NotifyWhetherFormsVisible_003 end";
 }
+
+// ========== Init Tests ==========
+
+/**
+ * @tc.name: Init_001
+ * @tc.desc: Verify Init loads visibleNotifyDelayTime from the config map when the key exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormVisibilityAdapterTest, Init_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Init_001 start";
+    constexpr int32_t EXPECTED_DELAY = 2500;
+    std::map<std::string, int32_t> configMap = {{Constants::VISIBLE_NOTIFY_DELAY, EXPECTED_DELAY}};
+    FormDataMgr::GetInstance().SetConfigMap(configMap);
+    FormVisibilityAdapter::GetInstance().visibleNotifyDelay_.store(0);
+
+    FormVisibilityAdapter::GetInstance().Init();
+    EXPECT_EQ(FormVisibilityAdapter::GetInstance().visibleNotifyDelay_.load(), EXPECTED_DELAY);
+    GTEST_LOG_(INFO) << "Init_001 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
