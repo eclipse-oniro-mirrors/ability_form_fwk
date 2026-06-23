@@ -449,6 +449,8 @@ config("fmskit_public_config") {
 }
 
 ohos_shared_library("fmskit_native") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -547,6 +549,8 @@ config("fmskit_provider_public_config") {
 }
 
 ohos_shared_library("fmskit_provider_client") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true

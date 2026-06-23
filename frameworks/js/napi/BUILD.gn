@@ -22,6 +22,8 @@ config("fmskit_config") {
 
 ################################### formbindingdata_napi ########################################
 ohos_shared_library("formbindingdata_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -69,6 +71,8 @@ ohos_shared_library("formbindingdata_napi") {
 }
 
 ohos_shared_library("formbindingdata") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -145,6 +149,8 @@ gen_js_obj("form_extension_abc") {
 }
 
 ohos_shared_library("formextension_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -202,6 +208,8 @@ gen_js_obj("form_extension_ability_abc") {
 }
 
 ohos_shared_library("formextensionability") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -259,6 +267,8 @@ gen_js_obj("form_extension_context_abc") {
 }
 
 ohos_shared_library("formextensioncontext_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -296,6 +306,8 @@ ohos_shared_library("formextensioncontext_napi") {
 
 ################################### forminfo_napi ########################################
 ohos_shared_library("forminfo_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -351,6 +363,8 @@ ohos_shared_library("forminfo_napi") {
 }
 
 ohos_shared_library("forminfo") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -408,6 +422,8 @@ ohos_shared_library("forminfo") {
 
 ################################### formhost_napi ########################################
 ohos_shared_library("formhost_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -464,6 +480,8 @@ ohos_shared_library("formhost_napi") {
 
 ################################### formhost ########################################
 ohos_shared_library("formhost") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -540,6 +558,8 @@ ohos_shared_library("formhost") {
 
 ################################### formobserver ########################################
 ohos_shared_library("formobserver") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -608,6 +628,8 @@ ohos_shared_library("formobserver") {
 
 ################################### formprovider_napi ########################################
 ohos_shared_library("formprovider_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -667,6 +689,8 @@ ohos_shared_library("formprovider_napi") {
 }
 
 ohos_shared_library("formprovider") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -743,6 +767,8 @@ ohos_shared_library("formprovider") {
 
 ################################### formagent_napi ########################################
 ohos_shared_library("formagent") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -816,6 +842,8 @@ config("formutil_napi_public_config") {
 }
 
 ohos_shared_library("formutil_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -877,6 +905,8 @@ ohos_shared_library("formutil_napi") {
 
 ################################### formerror_napi ########################################
 ohos_shared_library("formerror_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -949,6 +979,8 @@ gen_js_obj("form_edit_extension_ability_abc") {
 }
 
 ohos_shared_library("formeditextensionability_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1008,6 +1040,8 @@ gen_js_obj("form_edit_extension_context_abc") {
 }
 
 ohos_shared_library("formeditextensioncontext_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1046,6 +1080,8 @@ ohos_shared_library("formeditextensioncontext_napi") {
 
 ################################### gen_form_edit_extension_ability ########################################
 ohos_shared_library("form_edit_extension") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1124,6 +1160,8 @@ ohos_shared_library("form_edit_extension") {
 }
 
 ohos_shared_library("form_edit_extension_module") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1182,6 +1220,8 @@ ohos_shared_library("form_edit_extension_module") {
 }
 
 ohos_shared_library("form_edit_extension_ani") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1281,6 +1321,8 @@ gen_js_obj("live_form_extension_ability_abc") {
 }
 
 ohos_shared_library("liveformextensionability_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1340,6 +1382,8 @@ gen_js_obj("live_form_extension_context_abc") {
 }
 
 ohos_shared_library("liveformextensioncontext_napi") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1378,6 +1422,8 @@ ohos_shared_library("liveformextensioncontext_napi") {
 
 ################################### gen_live_form_extension_ability ########################################
 ohos_shared_library("live_form_extension") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1449,6 +1495,8 @@ ohos_shared_library("live_form_extension") {
 }
 
 ohos_shared_library("live_form_extension_module") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -1508,6 +1556,8 @@ ohos_shared_library("live_form_extension_module") {
 }
 
 ohos_shared_library("live_form_extension_ani") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true

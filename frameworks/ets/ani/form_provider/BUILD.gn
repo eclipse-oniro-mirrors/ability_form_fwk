@@ -16,6 +16,8 @@ import("//build/ohos.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ohos_shared_library("formProvider_ani") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true

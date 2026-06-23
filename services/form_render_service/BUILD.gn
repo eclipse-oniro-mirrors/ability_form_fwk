@@ -60,6 +60,8 @@ ohos_resources("FormRender_resources") {
 }
 
 ohos_shared_library("formrender") {
+  branch_protector_ret = "pac_ret"
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
