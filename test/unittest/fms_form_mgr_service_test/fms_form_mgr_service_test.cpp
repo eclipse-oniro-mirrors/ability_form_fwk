@@ -98,10 +98,10 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
     EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_APPEXECFWK_FORM_COMMON_CODE);
  
     MockGetCurrentAccountIdRet(0);
-    FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = false;
+    FormInfoMgr::GetInstance().reloadUserIds_.erase(0);
     EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_APPEXECFWK_FORM_COMMON_CODE);
- 
-    FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = true;
+
+    FormInfoMgr::GetInstance().reloadUserIds_.insert(0);
     EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0001 end";
 }

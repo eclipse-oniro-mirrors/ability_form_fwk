@@ -70,6 +70,7 @@ int FormProviderClient::AcquireProviderFormInfo(
     createWant.RemoveParam(Constants::FORM_DENSITY);
     createWant.RemoveParam(Constants::FORM_PROCESS_ON_ADD_SURFACE);
     createWant.RemoveParam(Constants::FORM_ALLOW_UPDATE);
+    createWant.RemoveParam(Constants::CONNECT_TO_RENDER);
     if (!createWant.HasParameter(Constants::LAUNCH_REASON_KEY)) {
         createWant.SetParam(Constants::LAUNCH_REASON_KEY, Constants::FORM_DEFAULT);
     }

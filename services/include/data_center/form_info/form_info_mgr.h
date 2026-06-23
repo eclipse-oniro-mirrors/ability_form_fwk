@@ -19,6 +19,7 @@
 #include <shared_mutex>
 #include <singleton.h>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "appexecfwk_errors.h"
 #include "bundle_form_info.h"
@@ -81,7 +82,9 @@ public:
 
     bool PublishFmsReadyEvent();
 
-    bool HasReloadedFormInfos();
+    bool HasReloadedFormInfos(int32_t userId);
+
+    void ClearReloadUserId(int32_t userId);
 
     ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
         int32_t providerUserId, bool &appFormVisibleNotify);
@@ -98,6 +101,7 @@ private:
     static bool IsCaller(const std::string& bundleName);
     static bool CheckBundlePermission();
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
+    ErrCode LoadFormInfosFromDb();
     static ErrCode GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId);
     void UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId);
     void AddBundleFormInfos(const std::map<std::string, std::uint32_t>& bundleVersionMap, int32_t userId);
@@ -107,7 +111,10 @@ private:
 
     mutable std::shared_timed_mutex bundleFormInfoMapMutex_ {};
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap_ {};
-    bool hasReloadedFormInfosState_ = false;
+    mutable std::shared_mutex reloadUserIdsMutex_;
+    std::unordered_set<int32_t> reloadUserIds_;
+    std::once_flag startOnceFlag_;
+    ErrCode startResult_ = ERR_OK;
     std::map<std::string, bool> appFormVisibleNotifyMap_;
     std::mutex appFormVisibleNotifyMapMutex_;
 };
