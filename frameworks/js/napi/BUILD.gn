@@ -490,9 +490,7 @@ ohos_shared_library("formhost") {
 
   sources = [
     "form_host/js_form_host.cpp",
-    "form_host/js_form_state_observer.cpp",
     "form_host/native_module.cpp",
-    "${form_fwk_path}/services/src/common/util/form_histogram_utils.cpp",
   ]
 
   configs = [ ":fmskit_config" ]
@@ -504,6 +502,7 @@ ohos_shared_library("formhost") {
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_common_info",
     "${form_fwk_path}:libfms",
+    "${form_fwk_path}:form_utils",
   ]
 
   external_deps = [
@@ -530,11 +529,6 @@ ohos_shared_library("formhost") {
   defines = []
   if (form_fwk_watch_api_disable) {
     defines += [ "WATCH_API_DISABLE" ]
-  }
-
-  if (form_fwk_support_api_metrics) {
-    external_deps += [ "api_metrics:histogrammanager" ]
-    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
   }
 }
 
@@ -691,7 +685,6 @@ ohos_shared_library("formprovider") {
   sources = [
     "form_provider/js_form_provider.cpp",
     "form_provider/native_module.cpp",
-    "${form_fwk_path}/services/src/common/util/form_histogram_utils.cpp",
   ]
 
   configs = [ ":fmskit_config" ]
@@ -734,11 +727,6 @@ ohos_shared_library("formprovider") {
   if (hiappevent_global_part_enabled) {
     defines += [ "NO_RUNTIME_EMULATOR" ]
   }
-
-  if (form_fwk_support_api_metrics) {
-    external_deps += [ "api_metrics:histogrammanager" ]
-    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
-  }
 }
 
 ################################### formagent_napi ########################################
@@ -768,7 +756,6 @@ ohos_shared_library("formagent") {
   sources = [
     "form_agent/js_form_agent.cpp",
     "form_agent/native_module.cpp",
-    "${form_fwk_path}/services/src/common/util/form_histogram_utils.cpp",
   ]
 
   configs = [ ":fmskit_config" ]
@@ -797,12 +784,6 @@ ohos_shared_library("formagent") {
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
-
-  defines = []
-  if (form_fwk_support_api_metrics) {
-    external_deps += [ "api_metrics:histogrammanager" ]
-    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
-  }
 
   relative_install_dir = "module/app/form"
 
@@ -1079,7 +1060,6 @@ ohos_shared_library("form_edit_extension") {
     "form_edit_extension_context/form_edit_extension_context.cpp",
     "form_edit_extension_context/js_form_edit_extension_context.cpp",
     "form_edit_extension_context/js_form_edit_extension_impl.cpp",
-    "${form_fwk_path}/services/src/common/util/form_histogram_utils.cpp",
   ]
 
   configs = [ ":fmskit_config" ]
@@ -1112,12 +1092,6 @@ ohos_shared_library("form_edit_extension") {
     "ipc:ipc_napi",
     "napi:ace_napi",
   ]
-
-  defines = []
-  if (form_fwk_support_api_metrics) {
-    external_deps += [ "api_metrics:histogrammanager" ]
-    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
-  }
 
   subsystem_name = "ability"
   part_name = "form_fwk"
@@ -1212,7 +1186,6 @@ ohos_shared_library("form_edit_extension_ani") {
     "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension.cpp",
     "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_context.cpp",
     "${form_fwk_path}/frameworks/ets/ani/form_edit_extension_ability/src/ets_form_edit_extension_impl.cpp",
-    "${form_fwk_path}/services/src/common/util/form_histogram_utils.cpp",
   ]
 
   configs = [ ":fmskit_config" ]
@@ -1247,12 +1220,6 @@ ohos_shared_library("form_edit_extension_ani") {
     "ipc:ipc_napi",
     "runtime_core:ani",
   ]
-
-  defines = []
-  if (form_fwk_support_api_metrics) {
-    external_deps += [ "api_metrics:histogrammanager" ]
-    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
-  }
 
   subsystem_name = "ability"
   part_name = "form_fwk"
