@@ -83,8 +83,8 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
     }
 
     std::vector<BundleInfo> bundleInfos;
-    uint32_t flag = (uint32_t)GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS | (uint32_t)GET_BUNDLE_INFO_EXCLUDE_EXT;
-    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(bundleNames, flag,
+    uint32_t flag = static_cast<uint32_t>(flags) | static_cast<uint32_t>(BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(bundleNames, static_cast<int32_t>(flag),
         bundleInfos, userId));
     HILOG_INFO("bundleInfos size:%{public}zu, bundleNames size:%{public}zu", bundleInfos.size(), bundleNames.size());
     if (ret != ERR_OK) {
