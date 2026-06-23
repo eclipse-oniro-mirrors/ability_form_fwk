@@ -584,7 +584,7 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
     }
 
     std::vector<BundleInfo> bundleInfos {};
-    int32_t flags = GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
+    uint32_t flags = (uint32_t)GET_BUNDLE_WITH_ABILITIES | (uint32_t)GET_BUNDLE_INFO_EXCLUDE_EXT;
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfos(flags, bundleInfos, userId))) {
         HILOG_ERROR("get bundle infos failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
