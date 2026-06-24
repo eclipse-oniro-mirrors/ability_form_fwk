@@ -202,7 +202,6 @@ ohos_shared_library("libfms") {
     "services/src/common/util/form_dump_mgr.cpp",
     "services/src/common/util/form_proxy_registry.cpp",
     "services/src/common/util/form_report.cpp",
-    "services/src/common/util/form_histogram_utils.cpp",
     "services/src/common/util/form_serial_queue.cpp",
     "services/src/common/util/form_trust_mgr.cpp",
     "services/src/common/util/form_util.cpp",
@@ -760,6 +759,7 @@ ohos_shared_library("form_utils") {
     "common/src/form_hisysevent_wrapper.cpp",
     "interfaces/inner_api/src/form_file_util.cpp",
     "interfaces/inner_api/src/form_event_report.cpp",
+    "services/src/common/util/form_histogram_utils.cpp",
   ]
  
   public_configs = [
@@ -778,11 +778,17 @@ ohos_shared_library("form_utils") {
     "hisysevent:libhisysevent",
   ]
 
+  defines = []
+  if (form_fwk_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
+  }
+
   subsystem_name = "ability"
   innerapi_tags = [ "platformsdk" ]
   part_name = "form_fwk"
 }
- 
+
 ################################### form_common_info ########################################
 ohos_shared_library("form_common_info") {
   branch_protector_ret = "pac_ret"
