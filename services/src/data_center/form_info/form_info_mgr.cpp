@@ -42,8 +42,8 @@ constexpr const char *FMS_IS_READY_EVENT = "fmsIsReady";
 constexpr const char *PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 constexpr const char *IS_DELETE_CACHE_FALSE = "false";
 constexpr uint32_t GET_BUNDLE_INFO_WITH_ABILITY_EXTENSIONS =
-    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_ABILITY) |
-    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
+    static_cast<uint32_t>(BundleFlag::GET_BUNDLE_WITH_ABILITIES) |
+    static_cast<uint32_t>(BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
 }  // namespace
 FormInfoMgr::FormInfoMgr()
 {
