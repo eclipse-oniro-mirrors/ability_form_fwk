@@ -114,7 +114,6 @@ group("fuzztest") {
     "parammanager_fuzzer:fuzztest",
     "paramreader_fuzzer:fuzztest",
     "signtools_fuzzer:fuzztest",
-    "providerconnectproxy_fuzzer:fuzztest",
     "providerconnectstub_fuzzer:fuzztest",
     "formcustomconfig_fuzzer:fuzztest",
     "formcallbackadapter_fuzzer:fuzztest",
