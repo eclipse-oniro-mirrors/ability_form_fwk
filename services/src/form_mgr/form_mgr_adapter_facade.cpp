@@ -24,6 +24,7 @@
 #include "form_mgr/form_callback_adapter.h"
 #include "form_mgr/form_debug_adapter.h"
 #include "form_mgr/form_publish_adapter.h"
+#include "form_mgr/form_visibility_adapter.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
@@ -46,6 +47,8 @@ void FormMgrAdapterFacade::Init()
 
     // Clean up invalid form cache (only executes once)
     FormDataAdapter::GetInstance().DeleteInvalidFormCacheIfNeed();
+    // Load visibleNotifyDelayTime
+    FormVisibilityAdapter::GetInstance().Init();
 }
 
 ErrCode FormMgrAdapterFacade::QueryPublishFormToHost(Want &want)

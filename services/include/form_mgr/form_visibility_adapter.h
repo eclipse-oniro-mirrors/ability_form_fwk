@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_VISIBILITY_ADAPTER_H
 #define OHOS_FORM_FWK_FORM_VISIBILITY_ADAPTER_H
 
+#include <atomic>
 #include <unordered_map>
 #include <mutex>
 
@@ -48,6 +49,8 @@ namespace AppExecFwk {
 class FormVisibilityAdapter final : public DelayedRefSingleton<FormVisibilityAdapter> {
     DECLARE_DELAYED_REF_SINGLETON(FormVisibilityAdapter)
 public:
+
+    void Init();
 
     ErrCode NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType);
@@ -110,7 +113,7 @@ private:
     ErrCode HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate);
 
-    int32_t visibleNotifyDelay_;
+    std::atomic<int32_t> visibleNotifyDelay_;
 };
 
 } // namespace AppExecFwk
