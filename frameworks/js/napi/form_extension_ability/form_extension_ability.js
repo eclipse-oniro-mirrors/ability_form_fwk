@@ -15,7 +15,7 @@
 
 class FormExtensionAbility {
   onAddForm(want) {
-    console.log('FormExtension onAddForm, want:' + want.abilityName);
+    console.log('FormExtension onAddForm, want:' + want?.abilityName);
     return {
       data: ''
     };
