@@ -218,13 +218,13 @@ bool FormBmsHelper::GetBundleInfoByFlags(const std::string& bundleName, int32_t 
     BundleInfo &bundleInfo)
 {
     HILOG_DEBUG("call");
-    flags += BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT;
+    uint32_t flag = static_cast<uint32_t>(flags) | static_cast<uint32_t>(BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("null iBundleMgr");
         return false;
     }
-    return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
+    return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, static_cast<int32_t>(flag), bundleInfo, userId)));
 }
 
 ErrCode FormBmsHelper::GetBundleInfoV9(const std::string& bundleName, int32_t userId, BundleInfo &bundleInfo)

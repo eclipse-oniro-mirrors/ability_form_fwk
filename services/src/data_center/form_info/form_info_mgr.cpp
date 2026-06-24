@@ -41,7 +41,10 @@ namespace {
 constexpr const char *FMS_IS_READY_EVENT = "fmsIsReady";
 constexpr const char *PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 constexpr const char *IS_DELETE_CACHE_FALSE = "false";
-} // namespace
+constexpr uint32_t GET_BUNDLE_INFO_WITH_ABILITY_EXTENSIONS =
+    static_cast<uint32_t>(BundleFlag::GET_BUNDLE_WITH_ABILITIES) |
+    static_cast<uint32_t>(BundleFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
+}  // namespace
 FormInfoMgr::FormInfoMgr()
 {
     HILOG_INFO("create");
@@ -584,8 +587,8 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
     }
 
     std::vector<BundleInfo> bundleInfos {};
-    int32_t flags = GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfos(flags, bundleInfos, userId))) {
+    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfos(
+        static_cast<int32_t>(GET_BUNDLE_INFO_WITH_ABILITY_EXTENSIONS), bundleInfos, userId))) {
         HILOG_ERROR("get bundle infos failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
