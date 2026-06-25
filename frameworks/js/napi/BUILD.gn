@@ -113,10 +113,12 @@ ohos_shared_library("formbindingdata") {
     "ability_runtime:extensionkit_native",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_core",
     "napi:ace_napi",
   ]
@@ -464,10 +466,12 @@ ohos_shared_library("formhost_napi") {
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
@@ -531,10 +535,12 @@ ohos_shared_library("formhost") {
     "ability_runtime:runtime",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
@@ -606,10 +612,12 @@ ohos_shared_library("formobserver") {
     "ability_runtime:runtime",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
@@ -668,10 +676,12 @@ ohos_shared_library("formprovider_napi") {
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
@@ -734,10 +744,12 @@ ohos_shared_library("formprovider") {
     "ability_runtime:runtime",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
@@ -865,6 +877,7 @@ ohos_shared_library("formutil_napi") {
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",
@@ -924,9 +937,11 @@ ohos_shared_library("formerror_napi") {
     "ability_runtime:extensionkit_native",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
+    "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
   ]
@@ -1121,12 +1136,15 @@ ohos_shared_library("form_edit_extension") {
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "ability_runtime:ui_extension",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "image_framework:image_native",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "window_manager:libwm",
   ]
 
   subsystem_name = "ability"
@@ -1177,6 +1195,7 @@ ohos_shared_library("form_edit_extension_module") {
     "hilog:libhilog",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "window_manager:libwm",
   ]
 
   if (ability_runtime_graphics) {
@@ -1252,13 +1271,17 @@ ohos_shared_library("form_edit_extension_ani") {
     "ability_runtime:runtime",
     "ability_runtime:ui_extension",
     "ability_runtime:ui_extension_ani",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "image_framework:image_native",
     "ipc:ipc_core",
     "ipc:ipc_napi",
+    "napi:ace_napi",
     "runtime_core:ani",
+    "window_manager:libwm",
   ]
 
   subsystem_name = "ability"
@@ -1448,6 +1471,7 @@ ohos_shared_library("live_form_extension") {
     "ability_runtime:runtime",
     "ability_runtime:ui_extension",
     "access_token:libtokenid_sdk",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -1506,6 +1530,7 @@ ohos_shared_library("live_form_extension_module") {
     "hilog:libhilog",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "window_manager:libwm",
   ]
 
   if (ability_runtime_graphics) {
@@ -1580,13 +1605,17 @@ ohos_shared_library("live_form_extension_ani") {
     "ability_runtime:ui_extension",
     "ability_runtime:ui_extension_ani",
     "access_token:libtokenid_sdk",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "image_framework:image_native",
     "ipc:ipc_core",
     "ipc:ipc_napi",
+    "napi:ace_napi",
     "runtime_core:ani",
+    "window_manager:libwm",
   ]
 
   subsystem_name = "ability"
