@@ -44,6 +44,7 @@ ohos_unittest("FmsFormSingletonQueueBaseTest") {
   ]
 
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "ffrt:libffrt",
     "hilog:libhilog",
     "hisysevent:libhisysevent",

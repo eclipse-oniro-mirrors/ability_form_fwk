@@ -24,6 +24,7 @@ config("formmgr_test_config") {
 public_configs = [ ":formmgr_test_config" ]
 
 external_deps = [
+  "ability_runtime:ability_connect_callback_stub",
   "c_utils:utils",
   "googletest:gmock_main",
   "googletest:gtest_main",
@@ -117,7 +118,6 @@ group("unittest") {
     "unittest/fms_observer_record_test:unittest",
     "unittest/fms_net_conn_callback_observer_test:unittest",
     "unittest/fms_param_manager_test:unittest",
-    "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/fms_provider_acquire_error_handler_test:unittest",
     "unittest/fms_provider_connection_error_handler_test:unittest",
     "unittest/fms_provider_refresh_error_handler_test:unittest",

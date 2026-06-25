@@ -35,6 +35,7 @@ ohos_fuzztest("FormEventReportFuzzTest") {
     "${form_fwk_path}:form_common_info",
   ]
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "hisysevent:libhisysevent",
     "ability_base:want",
     "form_fwk:form_manager",

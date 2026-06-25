@@ -17,7 +17,7 @@
 #define OHOS_FORM_FWK_FORM_ABILITY_CONNECTION_H
 
 #include "app_mgr_interface.h"
-#include "provider_connect_stub.h"
+#include "ability_connect_callback_stub.h"
 #include "want.h"
 
 namespace OHOS {
@@ -37,7 +37,7 @@ constexpr int32_t DISCONNECT_ERROR = -1;
  * Form Ability Connection Stub. Uses template method pattern for connection handling.
  * Note: FormRenderConnection does not participate in this refactoring and keeps original impl.
  */
-class FormAbilityConnection : public ProviderConnectStub {
+class FormAbilityConnection : public AAFwk::AbilityConnectionStub {
 public:
     FormAbilityConnection() = default;
     virtual ~FormAbilityConnection() = default;

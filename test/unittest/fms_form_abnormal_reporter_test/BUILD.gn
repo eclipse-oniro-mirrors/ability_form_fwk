@@ -49,6 +49,7 @@ ohos_unittest("FmsFormAbnormalReporterTest") {
   ]
  
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "googletest:gtest_main",
     "googletest:gmock_main",
     "hilog:libhilog",
