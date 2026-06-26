@@ -59,6 +59,7 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
+    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",

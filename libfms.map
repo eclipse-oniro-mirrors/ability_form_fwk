@@ -81,7 +81,6 @@
         *OHOS::AppExecFwk::FormRecordReport*;
         *OHOS::AppExecFwk::ParamControl*;
         *OHOS::AppExecFwk::RefreshCacheMgr*;
-        *OHOS::AppExecFwk::ProviderConnectStub*;
         *OHOS::AppExecFwk::ThemeManagerThemeFormInfoByParcel*;
         *OHOS::AppExecFwk::FormHostProxy*;
         *OHOS::AbilityRuntime::JsFormStateObserverProxy*;

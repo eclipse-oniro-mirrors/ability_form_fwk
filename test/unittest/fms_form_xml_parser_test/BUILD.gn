@@ -45,6 +45,7 @@ ohos_unittest("FmsFormXmlParserTest") {
   ]
 
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "form_fwk:form_manager",
     "hilog:libhilog",
     "libxml2:libxml2",

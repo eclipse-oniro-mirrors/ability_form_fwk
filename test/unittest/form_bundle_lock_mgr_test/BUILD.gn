@@ -38,6 +38,7 @@ ohos_unittest("FormBundleLockTest") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:ability_context_native",
     "ability_runtime:ability_deps_wrapper",
     "ability_runtime:app_manager",

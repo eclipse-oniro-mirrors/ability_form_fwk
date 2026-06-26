@@ -40,6 +40,7 @@ ohos_unittest("FmsFormSerialQueueTest") {
   ]
 
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "ffrt:libffrt",
     "form_fwk:form_manager",
     "hicollie:libhicollie",

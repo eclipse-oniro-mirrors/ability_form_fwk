@@ -123,7 +123,6 @@
                     "form_render_stub.h",
                     "form_supply_interface.h",
                     "form_supply_stub.h",
-                    "provider_connect_stub.h",
                     "form_constants.h",
                     "form_share_info.h"
                   ]
