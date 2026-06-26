@@ -44,10 +44,6 @@
         *OHOS::AppExecFwk::FormInfoRdbStorageMgr*;
         *OHOS::AppExecFwk::FormItemInfo*;
         *OHOS::AppExecFwk::FormMgrAdapterFacade*;
-        *OHOS::AppExecFwk::FormBasicInfoMgr*;
-        *OHOS::AppExecFwk::FormCallbackAdapter*;
-        *OHOS::AppExecFwk::FormCommonAdapter*;
-        *OHOS::AppExecFwk::FormDataAdapter*;
         *OHOS::AppExecFwk::FormMgrService*;
         *OHOS::AppExecFwk::FormMsgEventConnection*;
         *OHOS::AppExecFwk::FormProviderCaller*;
@@ -78,9 +74,6 @@
         *OHOS::AppExecFwk::FormPublishInterceptorProxy*;
         *OHOS::AppExecFwk::FormMgrStub*;
         *OHOS::AppExecFwk::FormProviderProxy*;
-        *OHOS::AppExecFwk::FormRecordReport*;
-        *OHOS::AppExecFwk::ParamControl*;
-        *OHOS::AppExecFwk::RefreshCacheMgr*;
         *OHOS::AppExecFwk::ThemeManagerThemeFormInfoByParcel*;
         *OHOS::AppExecFwk::FormHostProxy*;
         *OHOS::AbilityRuntime::JsFormStateObserverProxy*;
