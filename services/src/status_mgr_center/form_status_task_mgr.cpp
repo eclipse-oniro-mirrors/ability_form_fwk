@@ -55,8 +55,6 @@ void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, Form
         auto status = FormStatus::GetInstance().GetFormLastStatus(formRecord.formId);
         if (status != FormFsmStatus::RENDERED || !formProviderData.HasData()) {
             (void)FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData);
-            HILOG_INFO("update form lastStatus: %{public}s formId: %{public}" PRId64,
-                FormStatusPrint::FormStatusToString(status).c_str(), formRecord.formId);
         }
     }
 

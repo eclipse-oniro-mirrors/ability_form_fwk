@@ -17,24 +17,20 @@
 
 #include "form_provider/form_provider_mgr.h"
 #include "form_render/form_render_mgr.h"
-#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
 ErrCode RefreshExecMgr::AskForProviderData(const int64_t formId, const FormRecord &record, const Want &want)
 {
-    HILOG_INFO("call, formId:%{public} " PRId64, formId);
     return FormProviderMgr::GetInstance().ConnectAmsForRefresh(formId, record, want);
 }
 
 ErrCode RefreshExecMgr::UpdateByProviderData(
     const int64_t formId, const FormProviderData &formProviderData, bool mergeData)
 {
-    HILOG_INFO("call, formId:%{public} " PRId64, formId);
     WantParams wantParams;
     return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, mergeData);
 }
-
 } // namespace AppExecFwk
 } // namespace OHOS

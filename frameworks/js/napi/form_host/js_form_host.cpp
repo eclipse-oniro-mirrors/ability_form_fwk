@@ -1584,7 +1584,6 @@ private:
         auto formInfoList = std::make_shared<std::vector<FormInfo>>();
         NapiAsyncTask::ExecuteCallback execute = [bName, mName, convertArgc, formInfos = formInfoList,
             errCode = errCodeVal]() {
-            HILOG_INFO("OnGetFormsInfo execute call");
             if (formInfos == nullptr || errCode == nullptr) {
                 HILOG_ERROR("invalid param");
                 return;
@@ -1603,7 +1602,6 @@ private:
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetFormsInfo",
             env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
-        HILOG_INFO("end");
         return result;
     }
 

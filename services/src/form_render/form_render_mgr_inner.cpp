@@ -312,7 +312,6 @@ void FormRenderMgrInner::PostSetRenderGroupEnableFlagTask(int64_t formId, bool i
 
 void FormRenderMgrInner::PostSetVisibleChangeTask(int64_t formId, bool isVisible)
 {
-    HILOG_INFO("call");
     if (isVisible) {
         RecoverFRSOnFormActivity();
     }

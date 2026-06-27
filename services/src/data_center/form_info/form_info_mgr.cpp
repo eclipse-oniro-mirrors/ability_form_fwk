@@ -230,7 +230,7 @@ ErrCode FormInfoMgr::GetFormsInfoByBundle(
     std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     auto bundleFormInfoIter = bundleFormInfoMap_.find(bundleName);
     if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
-        HILOG_ERROR("no forms found");
+        HILOG_DEBUG("no forms found");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
 

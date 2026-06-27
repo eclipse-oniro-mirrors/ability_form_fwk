@@ -99,7 +99,7 @@ bool FormBaseSerialQueue::CancelDelayTask(const TaskKey& taskKey)
     if (it->second != nullptr) {
         int32_t ret = queue_.cancel(it->second);
         if (ret != 0) {
-            HILOG_ERROR("cancel failed, errCode: %{public}d", ret);
+            HILOG_ERROR("Failed,errCode:%{public}d", ret);
             result = false;
         }
     }

@@ -95,7 +95,6 @@ int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     const std::vector<FormDataProxy> &formDataProxies)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("formId:%{public}" PRId64, formId);
 
     if (formId <= 0) {
         HILOG_ERROR("invalid formId");

@@ -851,7 +851,6 @@ int32_t FormMgrStub::HandleDumpFormTimerByFormId(MessageParcel &data, MessagePar
  */
 int32_t FormMgrStub::HandleMessageEvent(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {

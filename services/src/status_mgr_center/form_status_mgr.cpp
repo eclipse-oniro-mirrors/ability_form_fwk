@@ -225,14 +225,14 @@ void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEven
 void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
 {
     if (!HasFormEventQueue(formId)) {
-        HILOG_INFO("formEventQueue is empty, not process.");
+        HILOG_DEBUG("formEventQueue is empty, not process.");
         return;
     }
     std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
 
     FormEventTaskInfo eventTaskInfo{};
     if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
-        HILOG_INFO("formEventQueue is empty, not process.");
+        HILOG_DEBUG("formEventQueue is empty, not process.");
         return;
     }
 

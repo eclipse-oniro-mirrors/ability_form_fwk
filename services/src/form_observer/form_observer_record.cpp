@@ -190,7 +190,7 @@ void FormObserverRecord::HandleFormEvent(
     std::unique_lock<std::mutex> lock(formEventObserversMutex_);
     auto observerVec = formEventObservers_.find(bundleName);
     if (observerVec == formEventObservers_.end()) {
-        HILOG_ERROR("The current package does not have an observer");
+        HILOG_DEBUG("The current package does not have an observer");
         return;
     }
 

@@ -389,7 +389,6 @@ int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &w
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;
     }
-    HILOG_INFO("end");
     return reply.ReadInt32();
 }
 

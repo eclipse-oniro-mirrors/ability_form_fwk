@@ -213,7 +213,7 @@ bool FormCacheMgr::AddImgData(
     }
 
     if (newImgDbData.empty()) {
-        HILOG_INFO("No new imgData");
+        HILOG_DEBUG("No imgData");
         return true;
     }
 
@@ -517,7 +517,7 @@ bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
     if (rowIds.empty()) {
         return false;
     }
-    HILOG_INFO("size:%{public}zu", rowIds.size());
+    HILOG_DEBUG("size:%{public}zu", rowIds.size());
     std::stringstream sql;
     sql << "DELETE FROM " << IMG_CACHE_TABLE << " WHERE " << IMAGE_ID << " IN (";
     for (auto iter = rowIds.begin(); iter != rowIds.end(); ++iter) {

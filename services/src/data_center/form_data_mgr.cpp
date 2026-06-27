@@ -459,7 +459,6 @@ void FormDataMgr::GetConfigParamFormMap(const std::string &key, int32_t &value) 
 
 void FormDataMgr::RecycleAllRecyclableForms() const
 {
-    HILOG_INFO("start");
     std::vector<int64_t> formIds;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -753,7 +752,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info == formRecords_.end()) {
-        HILOG_ERROR("formInfo not find");
+        HILOG_ERROR("Not find");
         return false;
     }
     formRecord = info->second;

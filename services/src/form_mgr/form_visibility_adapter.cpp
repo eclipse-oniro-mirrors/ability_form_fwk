@@ -231,7 +231,7 @@ void FormVisibilityAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<i
     const std::unordered_map<std::string, std::vector<int64_t>> &eventMaps, const int32_t formVisibleType,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("start, formVisibleType:%{public}d", formVisibleType);
+    HILOG_INFO("VisibleType:%{public}d", formVisibleType);
     auto localFormInstanceMaps = formInstanceMaps;
     auto localEventMaps = eventMaps;
     FilterDataByVisibleType(localFormInstanceMaps, localEventMaps, formVisibleType);
@@ -524,7 +524,7 @@ void FormVisibilityAdapter::PostVisibleNotify(const std::vector<int64_t> &formId
     const int32_t formVisibleType, int32_t visibleNotifyDelay,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call, formIds size:%{public}zu", formIds.size());
+    HILOG_INFO("Size:%{public}zu", formIds.size());
 
     auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken]() {
         FormVisibilityAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
