@@ -37,6 +37,20 @@ ohos_fuzztest("FormQueryAdapterFuzzTest") {
   sources = [
     "formqueryadapter_fuzzer.cpp",
     "${form_fwk_path}/services/src/form_mgr/form_query_adapter.cpp",
+    "${form_fwk_path}/services/src/form_mgr/form_common_adapter.cpp",
+    "${form_fwk_path}/services/src/data_center/form_basic_info_mgr.cpp",
+    "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
+    "${form_fwk_path}/services/src/feature/bundle_lock/form_bundle_lock_mgr.cpp",
+    "${form_fwk_path}/services/src/feature/bundle_lock/form_exempt_lock_mgr.cpp",
+    "${form_fwk_path}/services/src/feature/bundle_forbidden/form_bundle_forbid_mgr.cpp",
+    "${form_fwk_path}/services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
+    "${form_fwk_path}/services/src/feature/param_update/param_control.cpp",
+    "${form_fwk_path}/services/src/feature/param_update/param_reader.cpp",
+    "${form_fwk_path}/services/src/feature/param_update/sign_tools.cpp",
+    "${form_fwk_path}/services/src/feature/param_update/param_manager.cpp",
+    "${form_fwk_path}/services/src/feature/param_update/param_common_event.cpp",
+    "${form_fwk_path}/services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
+    "${form_fwk_path}/services/src/form_refresh/strategy/refresh_exec_mgr.cpp",
     "${form_fwk_path}/services/src/form_provider/connection/form_acquire_data_connection.cpp",
     "${form_fwk_path}/services/src/form_provider/form_provider_task_mgr.cpp",
     "${form_fwk_path}/services/src/form_provider/error_handler/provider_connection_error_handler.cpp",
@@ -81,6 +95,7 @@ ohos_fuzztest("FormQueryAdapterFuzzTest") {
     "libxml2:libxml2",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "openssl:libcrypto_shared",
   ]
 }
 
