@@ -100,6 +100,7 @@ export default namespace formInfo {
     TEMPLATE_FORM_DATA = 'ohos.extra.param.key.template_form_data',
     TEMPLATE_FORM_DISPLAY_NAME = 'ohos.extra.param.key.template_form_display_name',
     TEMPLATE_FORM_DESCRIPTION = 'ohos.extra.param.key.template_form_description'
+    UPDATE_FORM_REASON_KEY = 'ohos.extra.param.key.update_form_reason'
   }
 
   export interface FormInfoFilter {
