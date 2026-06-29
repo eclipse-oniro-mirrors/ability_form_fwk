@@ -34,7 +34,6 @@
         *OHOS::AppExecFwk::FormDumpMgr*;
         *OHOS::AppExecFwk::FormEventHandler*;
         *OHOS::AppExecFwk::FormEventNotifyConnection*;
-        *OHOS::AppExecFwk::FormEventReport*;
         *OHOS::AppExecFwk::FormEventUtil*;
         *OHOS::AppExecFwk::FormFreeInstallOperator*;
         *OHOS::AppExecFwk::FormHostCallback*;
@@ -63,18 +62,15 @@
         *OHOS::AppExecFwk::FormShareMgr*;
         *OHOS::AppExecFwk::FormSupplyCallback*;
         *OHOS::AppExecFwk::FormSysEventReceiver*;
-        *OHOS::AppExecFwk::FormTaskMgr*;
         *OHOS::AppExecFwk::FormTimerMgr*;
         *OHOS::AppExecFwk::FormUtil*;
         *OHOS::AppExecFwk::FreeInstallStatusCallBack*;
         *OHOS::AppExecFwk::InnerFormInfo*;
-        *OHOS::AppExecFwk::KvStoreDeathRecipientCallbackFormInfoStorage*;
         *OHOS::AppExecFwk::FormSystemloadListener*;
         *OHOS::AppExecFwk::FormSupplyStub*;
         *OHOS::AppExecFwk::FormPublishInterceptorProxy*;
         *OHOS::AppExecFwk::FormMgrStub*;
         *OHOS::AppExecFwk::FormProviderProxy*;
-        *OHOS::AppExecFwk::ThemeManagerThemeFormInfoByParcel*;
         *OHOS::AppExecFwk::FormHostProxy*;
         *OHOS::AbilityRuntime::JsFormStateObserverProxy*;
     };
