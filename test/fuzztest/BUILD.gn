@@ -77,7 +77,6 @@ group("fuzztest") {
     "formprovidermgr_fuzzer:fuzztest",
     "formproviderproxy_fuzzer:fuzztest",
     "formproviderrefreshimpl_fuzzer:fuzztest",
-    "formprovidertaskmgr_fuzzer:fuzztest",
     "formproviderstub_fuzzer:fuzztest",
     "formrefresh_fuzzer:fuzztest",
     "formrefreshafteruncontrolimpl_fuzzer:fuzztest",
