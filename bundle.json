@@ -80,7 +80,8 @@
               "window_manager",
               "graphic_2d",
               "qos_manager",
-              "input"
+              "input",
+              "image_framework"
 
           ],
           "third_party": [
