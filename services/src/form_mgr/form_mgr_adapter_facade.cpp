@@ -475,13 +475,11 @@ ErrCode FormMgrAdapterFacade::ReloadForms(int32_t &reloadNum, const std::vector<
 
 bool FormMgrAdapterFacade::IsDeleteCacheInUpgradeScene(const FormRecord &record)
 {
-    HILOG_INFO("IsDeleteCacheInUpgradeScene called");
     return FormDataAdapter::GetInstance().IsDeleteCacheInUpgradeScene(record);
 }
 
 int32_t FormMgrAdapterFacade::OnNotifyRefreshForm(const int64_t &formId)
 {
-    HILOG_INFO("OnNotifyRefreshForm called, formId:%{public}" PRId64, formId);
     return FormDataAdapter::GetInstance().OnNotifyRefreshForm(formId);
 }
 

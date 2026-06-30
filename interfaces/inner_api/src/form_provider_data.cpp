@@ -440,7 +440,7 @@ bool FormProviderData::HandleImageDataStateAdded(Parcel &parcel)
     if (imageDataNum > READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE) {
         return false;
     }
-    HILOG_INFO("imageDataNum is %{public}d", imageDataNum);
+    HILOG_INFO("Num is %{public}d", imageDataNum);
     for (int32_t i = 0; i < imageDataNum; i++) {
         sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
         if (formAshmem == nullptr) {

@@ -146,7 +146,6 @@ int FormSupplyCallback::OnEventHandle(const Want &want)
     FormProviderQueue::GetInstance().CancelDelayTask(
         std::make_pair(static_cast<int64_t>(Constants::DETECT_FORM_EXIT_DELAY_TASK), static_cast<int64_t>(connectId)));
     RemoveConnection(connectId);
-    HILOG_INFO("end");
     return ERR_OK;
 }
 
@@ -236,20 +235,17 @@ bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
         HILOG_ERROR("null connection");
         return false;
     }
-    HILOG_INFO("call");
     int count = 0;
     std::lock_guard<std::mutex> lock(conMutex_);
     for (auto &conn : connections_) {
         if (connection->GetProviderKey() == conn.second->GetProviderKey()) {
-            HILOG_INFO("key:%{public}s", conn.second->GetProviderKey().c_str());
+            HILOG_DEBUG("key:%{public}s", conn.second->GetProviderKey().c_str());
             count++;
             if (count >= 1) {
-                HILOG_INFO("true count:%{public}d", count);
                 return true;
             }
         }
     }
-    HILOG_INFO("false count:%{public}d", count);
     return false;
 }
 

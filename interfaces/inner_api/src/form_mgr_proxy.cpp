@@ -924,7 +924,6 @@ int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std:
 
     error = reply.ReadInt32();
     if (error != ERR_OK) {
-        HILOG_ERROR("read reply result fail");
         return error;
     }
 
@@ -957,7 +956,6 @@ int FormMgrProxy::GetPublishedFormInfos(IFormMgr::Message code, MessageParcel &d
 
     error = reply.ReadInt32();
     if (error != ERR_OK) {
-        HILOG_ERROR("read reply result fail");
         return error;
     }
 
@@ -1269,12 +1267,7 @@ int FormMgrProxy::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_ALL_FORMS_INFO, data, formInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetAllFormsInfo:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_ALL_FORMS_INFO, data, formInfos);
 }
 
 /**
@@ -1290,12 +1283,7 @@ int FormMgrProxy::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO, data, formInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetAllTemplateFormsInfo:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO, data, formInfos);
 }
 
 /**
@@ -1306,7 +1294,6 @@ int FormMgrProxy::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
@@ -1318,12 +1305,7 @@ int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInf
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_APP, data, formInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetFormsInfoByApp:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_APP, data, formInfos);
 }
 
 /**
@@ -1334,7 +1316,6 @@ int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInf
  */
 int FormMgrProxy::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
@@ -1346,12 +1327,7 @@ int FormMgrProxy::GetTemplateFormsInfoByApp(const std::string &bundleName, std::
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_APP, data, formInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetTemplateFormsInfoByApp:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_APP, data, formInfos);
 }
 
 /**
@@ -1380,12 +1356,7 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE, data, formInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetFormsInfoByModule:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE, data, formInfos);
 }
 
 /**
@@ -1414,12 +1385,7 @@ int FormMgrProxy::GetTemplateFormsInfoByModule(const std::string &bundleName, co
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE, data, formInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetFormsInfoByModule:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE, data, formInfos);
 }
 
 int FormMgrProxy::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
@@ -1450,12 +1416,7 @@ int FormMgrProxy::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER, data, formInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetFormsInfoByFilter:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER, data, formInfos);
 }
 
 ErrCode FormMgrProxy::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
@@ -1471,11 +1432,7 @@ ErrCode FormMgrProxy::GetRunningFormInfos(bool isUnusedInclude, std::vector<Runn
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    ErrCode error = GetRunningFormInfos(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS, data, runningFormInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetRunningFormInfos:%{public}d", error);
-    }
-    return error;
+    return GetRunningFormInfos(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS, data, runningFormInfos);
 }
 
 ErrCode FormMgrProxy::GetRunningFormInfosByBundleName(
@@ -1497,12 +1454,8 @@ ErrCode FormMgrProxy::GetRunningFormInfosByBundleName(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    ErrCode error = GetRunningFormInfos(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE,
+    return GetRunningFormInfos(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE,
         data, runningFormInfos);
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetRunningFormInfosByBundleName:%{public}d", error);
-    }
-    return error;
 }
 
 int32_t FormMgrProxy::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
@@ -1519,13 +1472,8 @@ int32_t FormMgrProxy::GetFormsInfo(const FormInfoFilter &filter, std::vector<For
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     // call private GetFormsInfo with Message which will send request to tell stub which handle function to be used.
-    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO, data, formInfos);
     // formInfos should have been fulfilled at this point.
-    if (error != ERR_OK) {
-        HILOG_ERROR("fail GetAllFormsInfo:%{public}d", error);
-    }
-
-    return error;
+    return GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO, data, formInfos);
 }
 
 int32_t FormMgrProxy::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
@@ -3448,7 +3396,6 @@ ErrCode FormMgrProxy::GetFormIdsByFormLocation(int32_t formLocation, std::vector
  
     error = reply.ReadInt32();
     if (error != ERR_OK) {
-        HILOG_ERROR("read reply result fail");
         return error;
     }
     if (!reply.ReadStringVector(&formIds)) {

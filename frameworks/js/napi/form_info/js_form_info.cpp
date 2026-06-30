@@ -264,8 +264,6 @@ napi_value CreateJsSceneAnimationTriggerType(napi_env engine)
 
 napi_value FormInfoInit(napi_env engine, napi_value exportObj)
 {
-    HILOG_INFO("call");
-
     napi_set_named_property(engine, exportObj, "FormType", CreateJsFormType(engine));
     napi_set_named_property(engine, exportObj, "ColorMode", CreateJsColorMode(engine));
     napi_set_named_property(engine, exportObj, "RenderingMode", CreateJsRenderingMode(engine));
@@ -280,7 +278,6 @@ napi_value FormInfoInit(napi_env engine, napi_value exportObj)
     napi_set_named_property(engine, exportObj, "FormShape", CreateJsFormShape(engine));
     napi_set_named_property(engine, exportObj, "FormUpdateReason", CreateJsFormUpdateReason(engine));
     napi_set_named_property(engine, exportObj, "SceneAnimationTriggerType", CreateJsSceneAnimationTriggerType(engine));
-    HILOG_INFO("end");
     return exportObj;
 }
 }  // namespace AbilityRuntime

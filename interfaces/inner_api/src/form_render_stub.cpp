@@ -294,7 +294,6 @@ int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &re
     int32_t result = RecoverForm(*formJsInfo, *want);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
-    HILOG_INFO("end");
     return result;
 }
 

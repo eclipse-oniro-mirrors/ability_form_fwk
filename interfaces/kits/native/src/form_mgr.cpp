@@ -1252,7 +1252,7 @@ int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &f
     std::vector<FormInfo> inputFormInfos;
     int resultCode = remoteProxy_->GetFormsInfoByApp(bundleName, inputFormInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("fail GetFormsInfoByApp,errCode %{public}d", resultCode);
+        HILOG_ERROR("Failed,errCode %{public}d", resultCode);
     } else {
         FilterTemplateForm(inputFormInfos, formInfos);
     }

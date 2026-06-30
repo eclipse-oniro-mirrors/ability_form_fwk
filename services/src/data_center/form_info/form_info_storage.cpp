@@ -41,7 +41,7 @@ FormInfoStorage::FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::F
 
 void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("GetAllFormsInfo, caller userId is %{public}d, this userId is %{public}d", userId, this->userId);
+    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         HILOG_ERROR("Invalid userId");
         return;
@@ -57,7 +57,7 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
 
 void FormInfoStorage::GetAllTemplateFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("GetAllTemplateFormsInfo, caller userId is %{public}d, this userId is %{public}d", userId, this->userId);
+    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         HILOG_ERROR("Invalid userId");
         return;
@@ -128,7 +128,7 @@ static bool find_rect_shape(const std::vector<int32_t> &supportShapes)
 void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
     const AppExecFwk::FormInfoFilter &filter, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller userId is:%{public}d, this userId is %{public}d", userId, this->userId);
+    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         HILOG_ERROR("Invalid userId");
         return;
@@ -163,7 +163,7 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
 void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &moduleName,
     std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller userId is:%{public}d, this userId is %{public}d", userId, this->userId);
+    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         HILOG_ERROR("Invalid userId");
         return;
@@ -181,7 +181,7 @@ void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &mo
 void FormInfoStorage::GetTemplateFormsInfoByModule(int32_t userId, const std::string &moduleName,
     std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller userId is:%{public}d, this userId is %{public}d", userId, this->userId);
+    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         HILOG_ERROR("Invalid userId");
         return;

@@ -37,7 +37,6 @@ FormEventQueue::~FormEventQueue()
 bool FormEventQueue::PushFormEvent(FormEventTaskInfo &eventInfo)
 {
     std::lock_guard<std::mutex> lock(eventQueueMutex_);
-    HILOG_INFO("formId :%{public}" PRId64 ". ", formId_);
     if (eventInfo.getFormId() != formId_) {
         HILOG_ERROR("formId is invalid");
         return false;
@@ -56,10 +55,8 @@ bool FormEventQueue::PopFormEvent(FormEventTaskInfo &eventInfo)
 {
     std::lock_guard<std::mutex> lock(eventQueueMutex_);
     if (eventQueue_.empty()) {
-        HILOG_INFO("eventQueue_ is empty, formId :%{public}" PRId64 ". ", formId_);
         return false;
     }
-    HILOG_INFO("eventQueue_ not empty, formId :%{public}" PRId64 ". ", formId_);
     eventInfo = eventQueue_.front();
     eventQueue_.pop();
     return true;
@@ -69,10 +66,8 @@ bool FormEventQueue::IsEventQueueEmpty()
 {
     std::lock_guard<std::mutex> lock(eventQueueMutex_);
     if (eventQueue_.empty()) {
-        HILOG_INFO("eventQueue_ is empty, formId :%{public}" PRId64 ".", formId_);
         return true;
     }
-    HILOG_INFO("eventQueue_ not empty, formId :%{public}" PRId64 ". ", formId_);
     return false;
 }
 

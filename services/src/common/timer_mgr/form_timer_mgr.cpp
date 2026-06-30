@@ -910,7 +910,6 @@ bool FormTimerMgr::DeleteIntervalTimer(int64_t formId)
  */
 bool FormTimerMgr::DeleteUpdateAtTimer(int64_t formId)
 {
-    HILOG_INFO("start");
     {
         std::lock_guard<std::mutex> lock(updateAtMutex_);
         std::list<UpdateAtItem>::iterator itItem;
@@ -1006,7 +1005,6 @@ void FormTimerMgr::OnIntervalTimeOut()
             ExecTimerTask(task);
         }
     }
-    HILOG_INFO("end");
 }
 
 /**
@@ -1047,9 +1045,7 @@ void FormTimerMgr::ClearUpdateAtTimerResource()
 {
     HILOG_INFO("start");
     if (updateAtTimerId_ != 0L) {
-        HILOG_INFO("clear update at timer start");
         MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(updateAtTimerId_);
-        HILOG_INFO("clear update at timer end");
         updateAtTimerId_ = 0L;
     }
     if (currentUpdateAtWantAgent_ != nullptr) {
@@ -1065,15 +1061,13 @@ void FormTimerMgr::ClearUpdateAtTimerResource()
  */
 bool FormTimerMgr::UpdateLimiterAlarm()
 {
-    HILOG_INFO("start");
     if (limiterTimerId_.load() != 0L) {
-        HILOG_INFO("stop limiter timer start");
+        HILOG_INFO("stop limiter");
         int32_t retCode = MiscServices::TimeServiceClient::GetInstance()->StopTimerV9(limiterTimerId_.load());
         if (retCode == MiscServices::E_TIME_DEAL_FAILED) {
             HILOG_WARN("reset limiter timer");
             limiterTimerId_.store(0L);
         }
-        HILOG_INFO("stop limiter timer end");
     }
 
     // make limiter wakeup time
@@ -1098,7 +1092,6 @@ bool FormTimerMgr::UpdateLimiterAlarm()
         HILOG_ERROR("init limiter timer task error");
         return false;
     }
-    HILOG_INFO("end");
     return true;
 }
 /**
@@ -1123,7 +1116,6 @@ void FormTimerMgr::ClearLimiterTimerResource()
 
 bool FormTimerMgr::CreateLimiterTimer()
 {
-    HILOG_INFO("start");
     auto timerOption = std::make_shared<FormTimerOption>();
     timerOption->SetType(timerOption->TIMER_TYPE_EXACT);
     timerOption->SetRepeat(false);
@@ -1140,7 +1132,6 @@ bool FormTimerMgr::CreateLimiterTimer()
         std::lock_guard<std::mutex> lock(currentLimiterWantAgentMutex_);
         currentLimiterWantAgent_ = wantAgent;
     }
-    HILOG_INFO("end");
     return true;
 }
 
@@ -1522,7 +1513,6 @@ void FormTimerMgr::ExecTimerTaskCore(const FormTimer &timerTask)
 void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 #endif // RES_SCHEDULE_ENABLE
 {
-    HILOG_BRIEF("userId:%{public}d", timerTask.userId);
     RefreshData data;
     data.formId = timerTask.formId;
     data.formTimer = timerTask;

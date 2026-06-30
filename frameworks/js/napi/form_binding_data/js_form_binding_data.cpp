@@ -30,7 +30,6 @@ public:
 
     static void Finalizer(napi_env env, void* data, void* hint)
     {
-        HILOG_INFO("call");
         std::unique_ptr<JsFormBindingData>(static_cast<JsFormBindingData*>(data));
     }
 
@@ -75,15 +74,12 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
 
 napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj)
 {
-    HILOG_DEBUG("call");
-
     auto formBindingData = std::make_unique<JsFormBindingData>();
     napi_wrap(env, exportObj, formBindingData.release(), JsFormBindingData::Finalizer, nullptr, nullptr);
 
     const char *moduleName = "JsFormBindingData";
     BindNativeFunction(env, exportObj, "createFormBindingData", moduleName, JsFormBindingData::CreateFormBindingData);
 
-    HILOG_INFO("end");
     return exportObj;
 }
 } // namespace AbilityRuntime
