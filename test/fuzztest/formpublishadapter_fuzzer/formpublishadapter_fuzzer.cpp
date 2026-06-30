@@ -110,7 +110,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     return 0;
 }
 
