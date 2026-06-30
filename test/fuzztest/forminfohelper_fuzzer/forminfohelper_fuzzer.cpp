@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
+#include <thread>
 
 #define private public
 #define protected public
@@ -110,6 +112,12 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
     return true;
 }
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 0;
 }
 
 /* Fuzzer entry point */

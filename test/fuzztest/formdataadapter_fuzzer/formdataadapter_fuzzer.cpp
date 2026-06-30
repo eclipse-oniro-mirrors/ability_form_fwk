@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
+#include <thread>
 #include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 #include <vector>
@@ -388,6 +390,12 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     return true;
 }
 } // namespace OHOS
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 0;
+}
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
+#include <thread>
 #include <fuzzer/FuzzedDataProvider.h>
 
 #include "data_center/form_info/form_info_storage.h"
@@ -160,6 +162,12 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     OHOS::FormSerialQueueTest(fdp);
     return formSupplyCallback.IsRemoveConnection(formId, hostToken);
 }
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 0;
 }
 
 /* Fuzzer entry point */
