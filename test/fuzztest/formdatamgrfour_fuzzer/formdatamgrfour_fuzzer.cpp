@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
+#include <thread>
 #include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
@@ -73,6 +75,12 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormDataMgr::GetInstance().SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
     return true;
 }
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    return 0;
 }
 
 /* Fuzzer entry point */

@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
+#include <thread>
 #include <fuzzer/FuzzedDataProvider.h>
 #include "form_constants.h"
 #include "form_supply_stub.h"
@@ -120,6 +122,12 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().DeleteRenderRecordByUid(str1, search);
     return true;
 }
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 0;
 }
 
 /* Fuzzer entry point */

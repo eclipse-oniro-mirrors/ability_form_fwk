@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
+#include <thread>
 
 #include "feature/form_share/form_free_install_operator.h"
 #include "form_host/form_host_callback.h"
@@ -81,6 +83,12 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
     return formFreeInstallOperator.StartFreeInstall(bundleName, moduleName, abilityName, userId);
 }
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 0;
 }
 
 /* Fuzzer entry point */
