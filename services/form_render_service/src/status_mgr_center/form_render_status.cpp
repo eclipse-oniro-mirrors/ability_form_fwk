@@ -60,7 +60,7 @@ void FormRenderStatus::SetFormStatus(const int64_t formId, FormFsmStatus formSta
 
     iter->second = formStatus;
     HILOG_INFO(
-        "set form status, formId:%{public}" PRId64 ", status is %{public}d.", formId, static_cast<int32_t>(formStatus));
+        "formId:%{public}" PRId64 ", status is %{public}d.", formId, static_cast<int32_t>(formStatus));
 }
 
 void FormRenderStatus::DeleteFormStatus(const int64_t formId)

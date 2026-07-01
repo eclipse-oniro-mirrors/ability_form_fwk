@@ -148,7 +148,6 @@ FormRenderRecord::FormRenderRecord(
 
 FormRenderRecord::~FormRenderRecord()
 {
-    HILOG_INFO("call");
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
         HILOG_WARN("null eventHandler");
@@ -304,7 +303,6 @@ void FormRenderRecord::OnNotifyRefreshForm(const int64_t &formId)
     }
 
     formSupplyClient->OnNotifyRefreshForm(formId);
-    HILOG_WARN("Without this form:%{public}" PRId64 "", formId);
 }
 
 void FormRenderRecord::Timer()
@@ -465,7 +463,6 @@ void FormRenderRecord::HandleUpdateRenderRecord(const FormJsInfo &formJsInfo, co
         // after FRS restart, if form invisible, need to reset form invisible status.
         HandleSetVisibleChange(formJsInfo.formId, isVisible);
     }
-    HILOG_INFO("HandleUpdateRenderRecord end");
 }
 
 void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId,
@@ -1221,7 +1218,6 @@ void FormRenderRecord::RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds,
 
 void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient)
 {
-    HILOG_INFO("ReAdd all recycled forms start");
     if (GetEventHandler(false, true) == nullptr) {
         HILOG_ERROR("CheckEventHandler failed");
         return;
@@ -1239,8 +1235,6 @@ void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupply
     }
 
     RecoverFormsByConfigUpdate(formIds, formSupplyClient);
-
-    HILOG_INFO("ReAdd all recycled forms end");
 }
 
 void FormRenderRecord::PostReAddRecycledForms(const FormJsInfo &formJsInfo, const Want &want)
@@ -1322,7 +1316,7 @@ void FormRenderRecord::HandleDestroyInJsThread()
 
 void FormRenderRecord::ReleaseHapFileHandle()
 {
-    HILOG_INFO("ReleaseHapFileHandle:%{public}s", hapPath_.c_str());
+    HILOG_INFO("%{public}s", hapPath_.c_str());
     if (hapPath_.empty()) {
         return;
     }
@@ -1433,7 +1427,6 @@ void FormRenderRecord::UpdateAllFormRequest(const std::vector<FormJsInfo> &formJ
 
 int32_t FormRenderRecord::OnUnlock()
 {
-    HILOG_DEBUG("call");
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto task = [thisWeakPtr]() {
         HILOG_DEBUG("HandleOnUnlock begin");
@@ -1455,7 +1448,6 @@ int32_t FormRenderRecord::OnUnlock()
 
 int32_t FormRenderRecord::HandleOnUnlock()
 {
-    HILOG_INFO("call");
     {
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
         for (auto& formRequests : formRequests_) {
@@ -1475,7 +1467,7 @@ int32_t FormRenderRecord::HandleOnUnlock()
 
 int32_t FormRenderRecord::SetRenderGroupEnableFlag(const int64_t formId, bool isEnable)
 {
-    HILOG_INFO("SetRenderGroupEnableFlag, formId:%{public}" PRId64 ",isEnable:%{public}d", formId, isEnable);
+    HILOG_INFO("formId:%{public}" PRId64 ",isEnable:%{public}d", formId, isEnable);
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
         HILOG_ERROR("null eventHandler formId:%{public}" PRId64, formId);
@@ -1497,7 +1489,7 @@ int32_t FormRenderRecord::SetRenderGroupEnableFlag(const int64_t formId, bool is
 
 int32_t FormRenderRecord::HandleSetRenderGroupEnableFlag(const int64_t formId, bool isEnable)
 {
-    HILOG_INFO("HandleSetRenderGroupEnableFlag begin,formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     MarkThreadAlive();
 
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
@@ -1516,7 +1508,7 @@ int32_t FormRenderRecord::HandleSetRenderGroupEnableFlag(const int64_t formId, b
 
 int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible)
 {
-    HILOG_INFO("SetVisibleChange, formId:%{public}s", std::to_string(formId).c_str());
+    HILOG_INFO("formId:%{public}s", std::to_string(formId).c_str());
     RecordFormVisibility(formId, isVisible);
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
@@ -1539,7 +1531,7 @@ int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible
 
 int32_t FormRenderRecord::HandleSetVisibleChange(const int64_t &formId, bool isVisible)
 {
-    HILOG_INFO("HandleSetVisibleChange begin,formId:%{public}s", std::to_string(formId).c_str());
+    HILOG_INFO("formId:%{public}s", std::to_string(formId).c_str());
     MarkThreadAlive();
 
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
@@ -1594,7 +1586,6 @@ size_t FormRenderRecord::FormCount()
 void FormRenderRecord::UpdateConfiguration(
     const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config, const sptr<IFormSupply> &formSupplyClient)
 {
-    HILOG_INFO("UpdateConfiguration begin");
     if (!config) {
         HILOG_ERROR("UpdateConfiguration failed due to null config");
         return;
@@ -1631,7 +1622,6 @@ void FormRenderRecord::UpdateConfiguration(
 void FormRenderRecord::HandleUpdateConfiguration(
     const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
-    HILOG_INFO("HandleUpdateConfiguration begin");
     MarkThreadAlive();
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     if (!config) {

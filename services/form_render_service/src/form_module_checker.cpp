@@ -227,7 +227,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
     std::unique_ptr<ApiAllowListChecker> &apiAllowListChecker, bool isAppModule)
 {
     if (isAppModule) {
-        HILOG_ERROR("module is not system, moduleName= %{public}s", moduleName);
+        HILOG_DEBUG("module is not system, moduleName= %{public}s", moduleName);
         return false;
     }
 

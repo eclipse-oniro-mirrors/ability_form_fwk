@@ -34,7 +34,6 @@ const static std::unordered_map<std::string, Ace::FormJsXNodeLoadMode> FORM_IMPE
 
 void JsFormRuntime::SetTemplateFormImperativeFwk(const std::string &templateFormImperativeFwk)
 {
-    HILOG_INFO("templateFormImperativeFwk:%{public}s", templateFormImperativeFwk.c_str());
     auto nativeEngine = GetNativeEnginePointer();
     if (nativeEngine == nullptr) {
         HILOG_ERROR("nativeEngine is nullptr");
@@ -78,7 +77,6 @@ JsFormRuntime::~JsFormRuntime()
 
     DestroyHapPath();
 
-    HILOG_WARN("DestroyLocalInstance.");
     auto envId = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(env));
     Rosen::FontCollectionMgr::GetInstance().DestroyLocalInstance(envId);
 }
