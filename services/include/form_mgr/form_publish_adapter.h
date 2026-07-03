@@ -100,6 +100,10 @@ private:
     ErrCode RequestPublishFormToHost(Want &want, int32_t userId);
     int32_t GetCallerType(const std::string &bundleName);
     bool GetBundleName(std::string &bundleName, bool needCheckFormPermission = true);
+    ErrCode ValidatePublishFormParamsForCrossUser(const Want &want, int32_t userId);
+    ErrCode ValidateParamsForCrossUser(const Want &want, std::string &bundleName, std::string &moduleName);
+    ErrCode ValidateFormInfoMatchForCrossUser(const Want &want, int32_t userId,
+        const std::string &bundleName, const std::string &moduleName);
 
     std::unique_ptr<FormSerialQueue> serialQueue_;
     std::map<int64_t, AddFormResultErrorCodes> formIdMap_;

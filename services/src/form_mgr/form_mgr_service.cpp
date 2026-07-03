@@ -495,6 +495,10 @@ ErrCode FormMgrService::RequestPublishFormCrossUser(Want &want, int32_t userId, 
         HILOG_ERROR("Across local accounts permission failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
+    if (!FormUtil::IsForegroundUser(userId)) {
+        HILOG_ERROR("userId:%{public}d is not foreground user", userId);
+        return ERR_APPEXECFWK_FORM_USER_NOT_FOREGROUND;
+    }
     return FormMgrAdapterFacade::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
 }
 
