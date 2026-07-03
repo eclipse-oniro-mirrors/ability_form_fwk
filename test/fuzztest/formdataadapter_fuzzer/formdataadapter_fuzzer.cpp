@@ -387,6 +387,25 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     // Fuzz SetReUpdateFormMap
     adapter.SetReUpdateFormMap(reUpdateFormId);
 
+    // Fuzz InnerAcquireProviderFormInfoAsync (private, accessible via macro)
+    int64_t innerAcquireFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    FormItemInfo innerFormItemInfo = GenerateFormItemInfo(fdp);
+    WantParams innerWantParams;
+    adapter.InnerAcquireProviderFormInfoAsync(innerAcquireFormId, innerFormItemInfo, innerWantParams);
+
+    // Fuzz UpdateFormRenderParamsAfterReload (private)
+    int64_t reloadRenderParamFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    adapter.UpdateFormRenderParamsAfterReload(reloadRenderParamFormId);
+
+    // Fuzz GetUpdateDurationFromAdditionalInfo (private)
+    std::string additionalInfo = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    adapter.GetUpdateDurationFromAdditionalInfo(additionalInfo);
+
+    // Fuzz PostEnterpriseAppInstallFailedRetryTask (private)
+    FormRecord enterpriseRecord = GenerateFormRecord(fdp);
+    Want enterpriseWant = GenerateWant(fdp);
+    adapter.PostEnterpriseAppInstallFailedRetryTask(enterpriseRecord, enterpriseWant);
+
     return true;
 }
 } // namespace OHOS

@@ -48,6 +48,8 @@ constexpr int32_t MIN_DIMENSION_ID = 0;
 constexpr int32_t MAX_FORM_LOCATION = 4;
 constexpr int32_t MAX_HOUR = 23;
 constexpr int32_t MAX_MINUTE = 59;
+constexpr int32_t MAX_USER_ID = 1000;
+constexpr int32_t MIN_USER_ID = 0;
 
 std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
 {
@@ -140,6 +142,17 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int32_t openResult2 = 0;
     int32_t openType2 = fdp->ConsumeIntegralInRange<int32_t>(MIN_OPEN_TYPE, MAX_OPEN_TYPE);
     adapter.OpenByOpenType(openType2, openRecord2, openCallerToken, openWant2, openResult2);
+
+    // Fuzz NotifyFormClickEvent (private, exposed via #define private public)
+    int64_t clickFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    std::string clickType = GenerateSafeString(fdp, MAX_LENGTH);
+    int32_t clickUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    adapter.NotifyFormClickEvent(clickFormId, clickType, clickUserId);
+
+    // Fuzz CheckKeepBackgroundRunningPermission with nullptr iBundleMgr (error path)
+    sptr<IBundleMgr> bundleMgr = nullptr;
+    std::string keepBundleName = GenerateSafeString(fdp, MAX_LENGTH);
+    adapter.CheckKeepBackgroundRunningPermission(bundleMgr, keepBundleName);
 
     return true;
 }

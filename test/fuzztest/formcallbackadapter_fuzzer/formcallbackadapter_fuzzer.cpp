@@ -273,6 +273,25 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     adapter.SetFormPublishInterceptor(interceptor);
     adapter.GetFormPublishInterceptor();
 
+    // Fuzz NotifyAllHosts (private): pass a registry built with a fuzzed tag and a no-op callback.
+    FormProxyRegistry notifyRegistry(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+    std::string notifyTag = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::function<ErrCode(const sptr<IFormHostDelegate> &)> notifyCallback =
+        [](const sptr<IFormHostDelegate> &) -> ErrCode { return 0; };
+    adapter.NotifyAllHosts(notifyRegistry, notifyTag, notifyCallback);
+
+    // Fuzz IsForegroundApp (private)
+    (void)adapter.IsForegroundApp();
+
+    // Fuzz GetMatchedFormIds (private): out-param populated from fuzzed filters.
+    std::vector<FormRecordFilter> matchedFilters = GenerateFormRecordFilters(fdp);
+    std::vector<std::string> matchedFormIds;
+    adapter.GetMatchedFormIds(matchedFilters, matchedFormIds);
+
+    // Fuzz NotifyCachedFormConfigs (private): nullptr caller token is the safe default.
+    sptr<IRemoteObject> cachedCallerToken = nullptr;
+    adapter.NotifyCachedFormConfigs(cachedCallerToken);
+
     return true;
 }
 } // namespace OHOS

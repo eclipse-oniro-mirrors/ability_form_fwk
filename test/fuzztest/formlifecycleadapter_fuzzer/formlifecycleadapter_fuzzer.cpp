@@ -32,9 +32,12 @@
 
 #include "configuration.h"
 #include "form_constants.h"
+#include "form_item_info.h"
 #include "form_js_info.h"
+#include "form_record.h"
 #include "running_form_info.h"
 #include "want.h"
+#include "want_params.h"
 
 using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
@@ -99,6 +102,36 @@ RunningFormInfo GenerateRunningFormInfo(FuzzedDataProvider *fdp)
     runningFormInfo.dimension = fdp->ConsumeIntegralInRange<int32_t>(MIN_DIMENSION_ID, MAX_DIMENSION_ID);
     runningFormInfo.userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
     return runningFormInfo;
+}
+
+FormItemInfo GenerateFormItemInfo(FuzzedDataProvider *fdp)
+{
+    FormItemInfo formItemInfo;
+    formItemInfo.SetFormId(fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID));
+    formItemInfo.SetProviderBundleName(GenerateSafeString(fdp, MAX_LENGTH));
+    formItemInfo.SetModuleName(GenerateSafeString(fdp, MAX_LENGTH));
+    formItemInfo.SetAbilityName(GenerateSafeString(fdp, MAX_LENGTH));
+    formItemInfo.SetFormName(GenerateSafeString(fdp, MAX_LENGTH));
+    return formItemInfo;
+}
+
+FormRecord GenerateFormRecord(FuzzedDataProvider *fdp)
+{
+    FormRecord formRecord;
+    formRecord.formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    formRecord.bundleName = GenerateSafeString(fdp, MAX_LENGTH);
+    formRecord.moduleName = GenerateSafeString(fdp, MAX_LENGTH);
+    formRecord.abilityName = GenerateSafeString(fdp, MAX_LENGTH);
+    formRecord.formName = GenerateSafeString(fdp, MAX_LENGTH);
+    formRecord.userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    return formRecord;
+}
+
+WantParams GenerateWantParams(FuzzedDataProvider *fdp)
+{
+    (void)fdp;
+    WantParams wantParams;
+    return wantParams;
 }
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
@@ -189,6 +222,115 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     // Fuzz HandleFormRemoveObserver
     RunningFormInfo removeObserverInfo = GenerateRunningFormInfo(fdp);
     adapter.HandleFormRemoveObserver(removeObserverInfo);
+
+    // Fuzz AllotFormById (private, exposed via #define private public)
+    FormItemInfo allotByIdInfo = GenerateFormItemInfo(fdp);
+    sptr<IRemoteObject> allotByIdToken = nullptr;
+    WantParams allotByIdParams = GenerateWantParams(fdp);
+    FormJsInfo allotByIdFormInfo;
+    adapter.AllotFormById(allotByIdInfo, allotByIdToken, allotByIdParams, allotByIdFormInfo);
+
+    // Fuzz AllotFormByInfo
+    FormItemInfo allotByInfoInfo = GenerateFormItemInfo(fdp);
+    sptr<IRemoteObject> allotByInfoToken = nullptr;
+    WantParams allotByInfoParams = GenerateWantParams(fdp);
+    FormJsInfo allotByInfoFormInfo;
+    adapter.AllotFormByInfo(allotByInfoInfo, allotByInfoToken, allotByInfoParams, allotByInfoFormInfo);
+
+    // Fuzz AllotFormBySpecificId
+    FormItemInfo allotBySpecInfo = GenerateFormItemInfo(fdp);
+    sptr<IRemoteObject> allotBySpecToken = nullptr;
+    WantParams allotBySpecParams = GenerateWantParams(fdp);
+    FormJsInfo allotBySpecFormInfo;
+    adapter.AllotFormBySpecificId(allotBySpecInfo, allotBySpecToken, allotBySpecParams, allotBySpecFormInfo);
+
+    // Fuzz AddNewFormRecord
+    FormItemInfo newRecordInfo = GenerateFormItemInfo(fdp);
+    int64_t newRecordFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    sptr<IRemoteObject> newRecordToken = nullptr;
+    WantParams newRecordParams = GenerateWantParams(fdp);
+    FormJsInfo newRecordFormJsInfo;
+    adapter.AddNewFormRecord(newRecordInfo, newRecordFormId, newRecordToken, newRecordParams, newRecordFormJsInfo);
+
+    // Fuzz AddExistFormRecord
+    FormItemInfo existRecordInfo = GenerateFormItemInfo(fdp);
+    sptr<IRemoteObject> existRecordToken = nullptr;
+    FormRecord existFormRecord = GenerateFormRecord(fdp);
+    int64_t existRecordFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    WantParams existRecordParams = GenerateWantParams(fdp);
+    FormJsInfo existRecordFormInfo;
+    adapter.AddExistFormRecord(existRecordInfo, existRecordToken, existFormRecord,
+        existRecordFormId, existRecordParams, existRecordFormInfo);
+
+    // Fuzz AddRequestPublishForm
+    FormItemInfo publishInfo = GenerateFormItemInfo(fdp);
+    Want publishWant = GenerateWant(fdp);
+    sptr<IRemoteObject> publishToken = nullptr;
+    FormJsInfo publishFormJsInfo;
+    adapter.AddRequestPublishForm(publishInfo, publishWant, publishToken, publishFormJsInfo);
+
+    // Fuzz AllotForm (5-param signature per header)
+    int64_t allotFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    Want allotFormWant = GenerateWant(fdp);
+    sptr<IRemoteObject> allotFormToken = nullptr;
+    FormJsInfo allotFormJsInfo;
+    FormItemInfo allotFormItemInfo = GenerateFormItemInfo(fdp);
+    adapter.AllotForm(allotFormId, allotFormWant, allotFormToken, allotFormJsInfo, allotFormItemInfo);
+
+    // Fuzz DeleteCommonForm with nullptr callerToken
+    int64_t commonFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    sptr<IRemoteObject> commonToken = nullptr;
+    int32_t commonUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    adapter.DeleteCommonForm(commonFormId, commonToken, commonUserId);
+
+    // Fuzz HandleDeleteForm with nullptr callerToken
+    int64_t handleDelFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    sptr<IRemoteObject> handleDelToken = nullptr;
+    adapter.HandleDeleteForm(handleDelFormId, handleDelToken);
+
+    // Fuzz HandleDeleteTempForm with nullptr callerToken
+    int64_t handleDelTempFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    sptr<IRemoteObject> handleDelTempToken = nullptr;
+    adapter.HandleDeleteTempForm(handleDelTempFormId, handleDelTempToken);
+
+    // Fuzz HandleReleaseForm with nullptr callerToken
+    int64_t handleReleaseFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    sptr<IRemoteObject> handleReleaseToken = nullptr;
+    adapter.HandleReleaseForm(handleReleaseFormId, handleReleaseToken);
+
+    // Fuzz HandleCastTempForm (header signature: int64_t + FormRecord)
+    int64_t handleCastFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    FormRecord handleCastFormRecord = GenerateFormRecord(fdp);
+    adapter.HandleCastTempForm(handleCastFormId, handleCastFormRecord);
+
+    // Fuzz HandleDeleteFormCache
+    FormRecord delCacheRecord = GenerateFormRecord(fdp);
+    int32_t delCacheUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    int64_t delCacheFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    adapter.HandleDeleteFormCache(delCacheRecord, delCacheUid, delCacheFormId);
+
+    // Fuzz SetTimerTaskNeeded
+    bool timerTaskNeeded = fdp->ConsumeBool();
+    adapter.SetTimerTaskNeeded(timerTaskNeeded);
+
+    // Fuzz CheckFormCountLimit
+    int64_t checkCountFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    Want checkCountWant = GenerateWant(fdp);
+    adapter.CheckFormCountLimit(checkCountFormId, checkCountWant);
+
+    // Fuzz CheckIsAddFormByHost
+    FormRecord checkHostRecord = GenerateFormRecord(fdp);
+    Want checkHostWant = GenerateWant(fdp);
+    adapter.CheckIsAddFormByHost(checkHostRecord, checkHostWant);
+
+    // Fuzz IsFormRenderServiceCall
+    int32_t renderServiceUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    adapter.IsFormRenderServiceCall(renderServiceUid);
+
+    // Fuzz CheckAddRequestPublishForm
+    Want checkPublishWant = GenerateWant(fdp);
+    Want checkPublishFormProviderWant = GenerateWant(fdp);
+    adapter.CheckAddRequestPublishForm(checkPublishWant, checkPublishFormProviderWant);
 
     return true;
 }
