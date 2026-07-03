@@ -118,9 +118,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::unique_ptr<FormProviderData> formBindingData = nullptr;
     int64_t publishFormId = 0;
     std::vector<FormDataProxy> formDataProxies;
-    bool needCheckFormPermission = fdp->ConsumeBool();
+    bool needCheckFormPermissionPublish = fdp->ConsumeBool();
     adapter.RequestPublishForm(publishWant, withFormBindingData, formBindingData, publishFormId,
-        formDataProxies, needCheckFormPermission);
+        formDataProxies, needCheckFormPermissionPublish);
 
     // Fuzz CheckFormBundleName (private; bundleName is out-param)
     Want bundleNameWant = GenerateWant(fdp);
@@ -131,7 +131,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     // Fuzz IsValidPublishEvent (private; pass nullptr IBundleMgr to hit error path)
     Want publishEventWant = GenerateWant(fdp);
     std::string publishEventBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    sptr<OHOS::IBundleMgr> nullBundleMgr = nullptr;
+    sptr<IBundleMgr> nullBundleMgr = nullptr;
     bool publishEventCheckPermission = fdp->ConsumeBool();
     adapter.IsValidPublishEvent(nullBundleMgr, publishEventBundleName, publishEventWant,
         publishEventCheckPermission);

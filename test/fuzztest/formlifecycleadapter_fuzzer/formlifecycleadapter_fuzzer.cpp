@@ -32,9 +32,9 @@
 
 #include "configuration.h"
 #include "form_constants.h"
-#include "form_item_info.h"
+#include "data_center/form_info/form_item_info.h"
 #include "form_js_info.h"
-#include "form_record.h"
+#include "data_center/form_record/form_record.h"
 #include "running_form_info.h"
 #include "want.h"
 #include "want_params.h"
@@ -309,9 +309,11 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int64_t delCacheFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     adapter.HandleDeleteFormCache(delCacheRecord, delCacheUid, delCacheFormId);
 
-    // Fuzz SetTimerTaskNeeded
+#ifdef RES_SCHEDULE_ENABLE
+    // Fuzz SetTimerTaskNeeded (only available when RES_SCHEDULE_ENABLE is defined)
     bool timerTaskNeeded = fdp->ConsumeBool();
     adapter.SetTimerTaskNeeded(timerTaskNeeded);
+#endif
 
     // Fuzz CheckFormCountLimit
     int64_t checkCountFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
