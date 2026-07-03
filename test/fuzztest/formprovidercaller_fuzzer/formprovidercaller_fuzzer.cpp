@@ -25,6 +25,7 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "form_constants.h"
 
 using namespace OHOS::AppExecFwk;
 
@@ -57,6 +58,24 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormProviderInfo formProviderInfo;
     AAFwk::Want want;
     formProviderCaller.OnAcquire(formProviderInfo, want, token);
+
+    // FormProviderCallerRecipient::OnRemoteDied
+    FormProviderCallerRecipient::RemoteDiedHandler handler = [](const wptr<IRemoteObject> &) {};
+    FormProviderCallerRecipient recipient(handler);
+    wptr<IRemoteObject> diedRemote = nullptr;
+    recipient.OnRemoteDied(diedRemote);
+
+    // OnAcquire - strFormId non-empty branch: set PARAM_FORM_IDENTITY_KEY in want
+    AAFwk::Want wantWithFormId;
+    int64_t formIdForWant = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+    wantWithFormId.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formIdForWant));
+    wantWithFormId.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
+    formProviderCaller.OnAcquire(formProviderInfo, wantWithFormId, token);
+
+    // AddDeathRecipient
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formProviderCaller.AddDeathRecipient(deathRecipient);
+
     return formProviderCaller.HasForm(formId);
 }
 }

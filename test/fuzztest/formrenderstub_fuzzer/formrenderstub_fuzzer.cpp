@@ -92,6 +92,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderStub->HandleOnUnlock(datas, reply);
     formRenderStub->HandleSetVisibleChange(datas, reply);
     formRenderStub->HandleRecoverForm(datas, reply);
+    formRenderStub->HandleSetRenderGroupEnableFlag(datas, reply);
+    formRenderStub->HandleRecycleForm(datas, reply);
+    formRenderStub->HandleUpdateFormSize(datas, reply);
+    formRenderStub->HandleSetRenderGroupParams(datas, reply);
     return true;
 }
 }
