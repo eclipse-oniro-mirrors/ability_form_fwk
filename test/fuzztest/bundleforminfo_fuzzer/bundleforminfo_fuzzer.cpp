@@ -15,9 +15,11 @@
 
 #include "bundleforminfo_fuzzer.h"
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
+#include <thread>
 
 #define private public
 #define protected public
@@ -31,7 +33,34 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
-constexpr int32_t MIN_NUM = -10000;
+constexpr int32_t MIN_NUM = 0;
+constexpr int32_t MAX_LOOP_COUNT = 10;
+
+FormInfo GenerateFuzzedFormInfo(FuzzedDataProvider *fdp)
+{
+    FormInfo formInfo;
+    if (fdp == nullptr) {
+        return formInfo;
+    }
+    formInfo.name = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    return formInfo;
+}
+
+FormCustomConfig GenerateFuzzedFormCustomConfig(FuzzedDataProvider *fdp)
+{
+    FormCustomConfig config;
+    if (fdp == nullptr) {
+        return config;
+    }
+    config.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    return config;
+}
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
@@ -100,8 +129,52 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     bundleFormInfo.ClearDistributedFormInfos(userId);
 
+    // NEW: UpdateStaticFormInfos
+    std::vector<FormInfo> updateFormInfos;
+    int32_t updateSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < updateSize; i++) {
+        updateFormInfos.push_back(GenerateFuzzedFormInfo(fdp));
+    }
+    bundleFormInfo.UpdateStaticFormInfos(updateFormInfos, userId);
+
+    // NEW: IsFormInfoMatched
+    FormInfo matchFormInfo = GenerateFuzzedFormInfo(fdp);
+    FormCustomConfig matchConfig;
+    matchConfig.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    matchConfig.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    matchConfig.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    matchConfig.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    bundleFormInfo.IsFormInfoMatched(matchFormInfo, matchConfig);
+
+    // NEW: UpdateFormShowConfigInCustomizeDatas
+    FormInfo showFormInfo = GenerateFuzzedFormInfo(fdp);
+    bool isShow = fdp->ConsumeBool();
+    bundleFormInfo.UpdateFormShowConfigInCustomizeDatas(showFormInfo, isShow);
+
+    // NEW: ApplyConfigToStorages
+    FormCustomConfig applyConfig;
+    applyConfig.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    applyConfig.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    applyConfig.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    applyConfig.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    bundleFormInfo.ApplyConfigToStorages(applyConfig);
+
+    // NEW: UpdateFormShowConfigs
+    std::vector<FormCustomConfig> showConfigs;
+    int32_t showSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < showSize; i++) {
+        showConfigs.push_back(GenerateFuzzedFormCustomConfig(fdp));
+    }
+    bundleFormInfo.UpdateFormShowConfigs(showConfigs);
+
     return true;
 }
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    return 0;
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
