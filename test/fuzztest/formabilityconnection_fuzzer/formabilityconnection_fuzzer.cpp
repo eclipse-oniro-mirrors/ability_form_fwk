@@ -131,6 +131,25 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formAbilityConnection->GetBundleName();
     formAbilityConnection->GetAppFormPid();
     formAbilityConnection->OnAbilityDisconnectDone(element, resultCode);
+
+    // ValidateResult
+    AppExecFwk::ElementName validateElement;
+    int validateResultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formAbilityConnection->ValidateResult(validateResultCode, validateElement);
+
+    // GetConnectState / SetConnectState
+    ConnectState state = fdp->ConsumeBool() ? ConnectState::CONNECTED : ConnectState::DISCONNECTED;
+    formAbilityConnection->SetConnectState(state);
+    ConnectState getState = formAbilityConnection->GetConnectState();
+
+    // GetUserId
+    int32_t getUserId = formAbilityConnection->GetUserId();
+
+    // ProcessFreeInstall
+    AppExecFwk::ElementName procElement;
+    sptr<IRemoteObject> procRemoteObject = nullptr;
+    int procResultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formAbilityConnection->ProcessFreeInstall(procElement, procRemoteObject, procResultCode);
     
     DoSomethingInterestingPart2(fdp);
     

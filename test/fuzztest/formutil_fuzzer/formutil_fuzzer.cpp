@@ -99,6 +99,21 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int32_t callingUid = fdp->ConsumeIntegral<int32_t>();
     FormUtil::GetCallerUserId(callingUid);
 
+    // VerifyPermissionByBundleName
+    int32_t vpUserId = fdp->ConsumeIntegral<int32_t>();
+    std::string vpBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::string vpPermissionName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    FormUtil::VerifyPermissionByBundleName(vpUserId, vpBundleName, vpPermissionName);
+
+    // ConvertStringToInt64 - regex_match=true branch (positive number string)
+    std::string int64StrValid = std::to_string(fdp->ConsumeIntegral<int64_t>());
+    int64_t int64ValueOut = 0;
+    FormUtil::ConvertStringToInt64(int64StrValid, int64ValueOut);
+
+    // ParseFormUpdateLevels
+    std::string additionalInfo = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    FormUtil::ParseFormUpdateLevels(additionalInfo);
+
     return true;
 }
 }

@@ -49,7 +49,18 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formJsInfo.Unmarshalling(parcel);
     formJsInfo.ReadImageData(parcel);
     formJsInfo.ConvertRawImageData();
-    return formJsInfo.WriteImageData(parcel);
+    formJsInfo.WriteImageData(parcel);
+
+    // WriteAshmemFormData - test with valid data
+    std::string ashmemData = fdp->ConsumeRandomLengthString(MAX_NUM);
+    int32_t ashmemSize = static_cast<int32_t>(ashmemData.length());
+    formJsInfo.WriteAshmemFormData(parcel, ashmemSize, ashmemData.c_str());
+
+    // WriteFdToParcel - test with valid fd
+    int testFd = fdp->ConsumeIntegralInRange(0, 1024);
+    formJsInfo.WriteFdToParcel(parcel, testFd);
+
+    return true;
 }
 }
 

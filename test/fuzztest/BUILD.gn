@@ -48,6 +48,7 @@ group("fuzztest") {
     "formhostrecord_fuzzer:fuzztest",
     "formhostrefreshimpl_fuzzer:fuzztest",
     "formhoststub_fuzzer:fuzztest",
+    "formhisyseventbuilder_fuzzer:fuzztest",
     "forminfomgr_fuzzer:fuzztest",
     "forminfomgrthree_fuzzer:fuzztest",
     "forminfomgrTwo_fuzzer:fuzztest",
@@ -67,6 +68,7 @@ group("fuzztest") {
     "formprovidercaller_fuzzer:fuzztest",
     "formproviderdata_fuzzer:fuzztest",
     "formproviderinfo_fuzzer:fuzztest",
+    "formproxyregistry_fuzzer:fuzztest",
     "formprovidermgr_fuzzer:fuzztest",
     "formproviderproxy_fuzzer:fuzztest",
     "formproviderrefreshimpl_fuzzer:fuzztest",
@@ -106,6 +108,7 @@ group("fuzztest") {
     "formeventadapter_fuzzer:fuzztest",
     "formlifecycleadapter_fuzzer:fuzztest",
     "formvisibilityadapter_fuzzer:fuzztest",
+    "formwant_fuzzer:fuzztest",
   ]
 
   if (ability_runtime_graphics) {
