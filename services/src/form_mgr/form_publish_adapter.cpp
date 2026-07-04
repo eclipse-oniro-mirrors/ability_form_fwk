@@ -688,12 +688,7 @@ ErrCode FormPublishAdapter::ValidatePublishFormParamsForCrossUser(const Want &wa
         return errCode;
     }
 
-    errCode = ValidateFormInfoMatchForCrossUser(want, userId, bundleName, moduleName);
-    if (errCode != ERR_OK) {
-        return errCode;
-    }
-
-    return ERR_OK;
+    return ValidateFormInfoMatchForCrossUser(want, userId, bundleName, moduleName);
 }
 
 ErrCode FormPublishAdapter::ValidateParamsForCrossUser(
@@ -738,7 +733,7 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModuleWithoutCheck(
         bundleName, moduleName, formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("fail get forms info for bundle:%{public}s, module:%{public}s, userId:%{public}d",
+        HILOG_ERROR("Get forms info failed, bundle:%{public}s, module:%{public}s, userId:%{public}d",
             bundleName.c_str(), moduleName.c_str(), userId);
         return errCode;
     }
@@ -746,15 +741,15 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(
     // dimensionId existence already validated by HasParameter in ValidateParamsForCrossUser
     // GetIntParam requires default value argument; 0 is safe here since existence is confirmed
     int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
-    for (auto &formInfo : formInfos) {
+    for (const auto &formInfo : formInfos) {
         if ((formInfo.abilityName == abilityName) && (formInfo.name == formName) &&
             (FormCommonAdapter::GetInstance().IsDimensionValid(formInfo, dimensionId))) {
             return ERR_OK;
         }
     }
 
-    HILOG_ERROR("fail find match form info for bundle:%{public}s, module:%{public}s",
-        bundleName.c_str(), moduleName.c_str());
+    HILOG_ERROR("No matching form info found, ability:%{public}s, formName:%{public}s, dimensionId:%{public}d",
+        abilityName.c_str(), formName.c_str(), dimensionId);
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 

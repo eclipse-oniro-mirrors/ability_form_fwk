@@ -370,13 +370,6 @@ void FormUtil::GetForegroundUsers(std::vector<int32_t> &foregroundList)
         foregroundList.push_back(account.localId);
     }
 }
-bool FormUtil::IsForegroundUser(const int32_t userId)
-{
-    std::vector<int32_t> foregroundList;
-    GetForegroundUsers(foregroundList);
-    auto iter = std::find(foregroundList.begin(), foregroundList.end(), userId);
-    return iter != foregroundList.end();
-}
 
 std::vector<int> FormUtil::ParseFormUpdateLevels(const std::string &additionalInfo)
 {

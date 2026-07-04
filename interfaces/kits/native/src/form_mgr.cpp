@@ -634,7 +634,7 @@ ErrCode FormMgr::RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
     if (bundleName.empty() || abilityName.empty()) {
-        HILOG_ERROR("bundleName:%{public}s,abilityName:%{public}s",
+        HILOG_ERROR("Param invalid, bundleName:%{public}s,abilityName:%{public}s",
             bundleName.c_str(), abilityName.c_str());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -642,12 +642,12 @@ ErrCode FormMgr::RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
     if (formName.empty() || moduleName.empty() || dimensionId == 0) {
-        HILOG_ERROR("formName:%{public}s,moduleName:%{public}s,dimensionId:%{public}d",
+        HILOG_ERROR("Param invalid, formName:%{public}s,moduleName:%{public}s,dimensionId:%{public}d",
             formName.c_str(), moduleName.c_str(), dimensionId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     if (userId == Constants::INVALID_USER_ID) {
-        HILOG_ERROR("invalid userId:%{public}d", userId);
+        HILOG_ERROR("Param invalid, userId:%{public}d", userId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 

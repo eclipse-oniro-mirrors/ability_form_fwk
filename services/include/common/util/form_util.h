@@ -135,8 +135,6 @@ public:
     static void GetActiveUsers(std::vector<int32_t> &activeList);
 
     static void GetForegroundUsers(std::vector<int32_t> &foregroundList);
-    static bool IsForegroundUser(const int32_t userId);
-
 
     /**
      * @brief Parse formUpdateLevel values from additionalInfo string.
