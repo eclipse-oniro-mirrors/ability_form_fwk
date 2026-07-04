@@ -206,6 +206,50 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     adapter.HandlerNotifyWhetherVisibleForms(handlerFormIds, handlerInstanceMaps, handlerEventMaps,
         handlerVisibleType, handlerCallerToken);
 
+    // Fuzz SetVisibleChange (private)
+    int64_t setVisibleFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t setVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    int32_t setUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    adapter.SetVisibleChange(setVisibleFormId, setVisibleType, setUserId);
+
+    // Fuzz HandleEventNotify (private). Use a provider key with delimiters to exercise both
+    // success path and error path (no delimiter) via fuzzed string.
+    std::string providerKey = GenerateSafeString(fdp, MAX_LENGTH);
+    std::vector<int64_t> eventFormIds = GenerateFormIdVector(fdp);
+    int32_t eventVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    adapter.HandleEventNotify(providerKey, eventFormIds, eventVisibleType);
+
+    // Fuzz PostVisibleNotify (private) with minimal inputs and nullptr callerToken
+    std::vector<int64_t> postVisibleFormIds = GenerateFormIdVector(fdp);
+    std::unordered_map<std::string, std::vector<FormInstance>> postInstanceMaps;
+    std::unordered_map<std::string, std::vector<int64_t>> postEventMaps;
+    int32_t postVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    int32_t postNotifyDelay = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_VECTOR_SIZE);
+    sptr<IRemoteObject> postCallerToken = nullptr;
+    adapter.PostVisibleNotify(postVisibleFormIds, postInstanceMaps, postEventMaps, postVisibleType,
+        postNotifyDelay, postCallerToken);
+
+    // Fuzz CreateHandleEventMap (private)
+    int64_t createHandleFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    FormRecord createHandleRecord = GenerateFormRecord(fdp);
+    std::unordered_map<std::string, std::vector<int64_t>> createHandleEventMaps = GenerateEventMaps(fdp);
+    adapter.CreateHandleEventMap(createHandleFormId, createHandleRecord, createHandleEventMaps);
+
+    // Fuzz UpdateProviderInfoToHost (private) with nullptr callerToken
+    int64_t updateFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t updateUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    sptr<IRemoteObject> updateCallerToken = nullptr;
+    int32_t updateVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    FormRecord updateRecord = GenerateFormRecord(fdp);
+    adapter.UpdateProviderInfoToHost(updateFormId, updateUserId, updateCallerToken, updateVisibleType, updateRecord);
+
+    // Fuzz isFormShouldUpdateProviderInfoToHost (private) with nullptr callerToken
+    int64_t checkFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t checkUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    sptr<IRemoteObject> checkCallerToken = nullptr;
+    FormRecord checkRecord = GenerateFormRecord(fdp);
+    adapter.isFormShouldUpdateProviderInfoToHost(checkFormId, checkUserId, checkCallerToken, checkRecord);
+
     return true;
 }
 } // namespace OHOS
