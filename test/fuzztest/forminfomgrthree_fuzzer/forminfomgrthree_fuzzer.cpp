@@ -47,6 +47,17 @@ void CreateFormInfoFilter(FuzzedDataProvider *fdp, FormInfoFilter &filter)
     filter.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
 }
 
+void CreateFormCustomConfig(FuzzedDataProvider *fdp, FormCustomConfig &config)
+{
+    config.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.relatedBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.isShowInFormCenter = fdp->ConsumeBool();
+    config.isRepeatAdditionSupported = fdp->ConsumeBool();
+}
+
 void TestGetFormsInfoByFilter(FuzzedDataProvider *fdp)
 {
     FormInfoMgr formInfoMgr;
@@ -219,6 +230,38 @@ void TestReloadFormInfosEdgeCases()
     formInfoMgr.ReloadFormInfos(INT32_MAX);
 }
 
+void TestUpdateFormShowConfigs(FuzzedDataProvider *fdp)
+{
+    FormInfoMgr formInfoMgr;
+    formInfoMgr.Start();
+
+    constexpr int32_t MAX_CONFIG_COUNT = 10;
+    int32_t configCount = fdp->ConsumeIntegralInRange<int32_t>(1, MAX_CONFIG_COUNT);
+    std::vector<FormCustomConfig> configs;
+    for (int32_t i = 0; i < configCount; ++i) {
+        FormCustomConfig config;
+        CreateFormCustomConfig(fdp, config);
+        configs.push_back(config);
+    }
+
+    formInfoMgr.UpdateFormShowConfigs(configs);
+}
+
+void TestUpdateFormShowConfigsEdgeCases(FuzzedDataProvider *fdp)
+{
+    FormInfoMgr formInfoMgr;
+    formInfoMgr.Start();
+
+    std::vector<FormCustomConfig> emptyConfigs;
+    formInfoMgr.UpdateFormShowConfigs(emptyConfigs);
+
+    FormCustomConfig config;
+    CreateFormCustomConfig(fdp, config);
+    std::vector<FormCustomConfig> singleConfig;
+    singleConfig.push_back(config);
+    formInfoMgr.UpdateFormShowConfigs(singleConfig);
+}
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
@@ -269,6 +312,12 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
             break;
         case 13:
             TestReloadFormInfosEdgeCases();
+            break;
+        case 14:
+            TestUpdateFormShowConfigs(fdp);
+            break;
+        case 15:
+            TestUpdateFormShowConfigsEdgeCases(fdp);
             break;
         default:
             TestGetFormsInfoByFilter(fdp);
