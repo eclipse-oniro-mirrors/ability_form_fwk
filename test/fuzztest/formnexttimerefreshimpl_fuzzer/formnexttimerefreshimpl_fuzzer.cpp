@@ -15,8 +15,11 @@
 
 #include "formnexttimerefreshimpl_fuzzer.h"
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
+#include <thread>
 
 #define private public
 #define protected public
@@ -24,68 +27,66 @@
 #include "form_refresh/strategy/refresh_config.h"
 #undef private
 #undef protected
-#include "securec.h"
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+constexpr int32_t MAX_LENGTH = 256;
+constexpr int32_t MAX_NUM = 10000;
+constexpr int32_t MIN_NUM = 0;
+
+RefreshData GenerateFuzzedRefreshData(FuzzedDataProvider *fdp)
 {
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
+    RefreshData data;
+    if (fdp == nullptr) {
+        return data;
+    }
+    data.formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+    data.nextTime = fdp->ConsumeIntegral<int64_t>();
+    data.callingUid = fdp->ConsumeIntegral<int32_t>();
+    data.record.formId = data.formId;
+    data.record.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.isEnableUpdate = fdp->ConsumeBool();
+    data.record.updateDuration = fdp->ConsumeIntegral<int64_t>();
+    data.record.isDataProxy = fdp->ConsumeBool();
+    data.formTimer.formId = data.formId;
+    data.formTimer.refreshTime = fdp->ConsumeIntegral<int64_t>();
+    data.formTimer.userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_NUM, MAX_NUM);
+    data.callerToken = nullptr;
+    return data;
 }
 
-void DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
+    if (fdp == nullptr) {
+        return true;
+    }
+
     FormNextTimeRefreshImpl formNextTimeRefresh;
+    RefreshData data = GenerateFuzzedRefreshData(fdp);
 
-    RefreshData refreshData;
-    refreshData.formId = static_cast<int64_t>(GetU32Data(data));
-    refreshData.callingUid = static_cast<int32_t>(GetU32Data(data));
-    refreshData.nextTime = static_cast<int32_t>(GetU32Data(data));
+    // Test public method
+    formNextTimeRefresh.RefreshFormRequest(data);
 
-    FormRecord record;
-    record.formId = refreshData.formId;
-    record.bundleName = std::string(data, size);
-    record.isDataProxy = (GetU32Data(data) % 2 == 0);
-    refreshData.record = record;
+    // Test protected method DoRefresh (override)
+    formNextTimeRefresh.DoRefresh(data);
 
-    Want want;
-    want.SetParam("test_param", std::string(data, size));
-    refreshData.want = want;
-
-    FormProviderData providerData;
-    refreshData.providerData = providerData;
-
-    formNextTimeRefresh.RefreshFormRequest(refreshData);
+    return true;
+}
 }
 
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    return 0;
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }

@@ -15,9 +15,11 @@
 
 #include "formrenderservicemgr_fuzzer.h"
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
+#include <thread>
 
 #define private public
 #define protected public
@@ -29,7 +31,7 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::FormRender;
 
 namespace OHOS {
-constexpr int32_t MAX_LENGTH = 15;
+constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
@@ -58,8 +60,33 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().SetCriticalFalseOnAllFormInvisible();
     FormRenderServiceMgr::GetInstance().CacheAppliedConfig();
     FormRenderServiceMgr::GetInstance().SetRenderGroupParams(formId, want);
+
+    // Test ConfirmUnlockState
+    Want renderWant;
+    FormRenderServiceMgr::GetInstance().ConfirmUnlockState(renderWant);
+
+    // Test UpdateRenderRecordByUid
+    std::string updateUid = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    Want formRenderWant;
+    FormJsInfo updateFormJsInfo = {};
+    updateFormJsInfo.formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+    updateFormJsInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    sptr<IFormSupply> formSupplyClient = nullptr;
+    FormRenderServiceMgr::GetInstance().UpdateRenderRecordByUid(updateUid, formRenderWant, updateFormJsInfo, formSupplyClient);
+
+    // Test DeleteRenderRecordByUid
+    std::string deleteUid = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::shared_ptr<FormRenderRecord> searchRecord = nullptr;
+    FormRenderServiceMgr::GetInstance().DeleteRenderRecordByUid(deleteUid, searchRecord);
+
     return true;
 }
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    return 0;
 }
 
 /* Fuzzer entry point */

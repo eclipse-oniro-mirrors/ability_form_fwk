@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formnetconnrefreshimpl_fuzzer.h"
+#include "formdatarefreshimpl_fuzzer.h"
 
 #include <chrono>
 #include <cstddef>
@@ -23,7 +23,7 @@
 
 #define private public
 #define protected public
-#include "form_refresh/refresh_impl/form_net_conn_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_data_refresh_impl.h"
 #include "form_refresh/strategy/refresh_config.h"
 #undef private
 #undef protected
@@ -49,7 +49,6 @@ RefreshData GenerateFuzzedRefreshData(FuzzedDataProvider *fdp)
     data.record.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     data.record.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     data.record.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    data.record.isSystemApp = fdp->ConsumeBool();
     data.record.isEnableUpdate = fdp->ConsumeBool();
     data.record.updateDuration = fdp->ConsumeIntegral<int64_t>();
     data.formTimer.formId = data.formId;
@@ -65,14 +64,14 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
         return true;
     }
 
-    FormNetConnRefreshImpl formNetConnRefresh;
+    FormDataRefreshImpl &formDataRefresh = FormDataRefreshImpl::GetInstance();
     RefreshData data = GenerateFuzzedRefreshData(fdp);
 
     // Test public method
-    formNetConnRefresh.RefreshFormRequest(data);
+    formDataRefresh.RefreshFormRequest(data);
 
     // Test protected method DoRefresh (override)
-    formNetConnRefresh.DoRefresh(data);
+    formDataRefresh.DoRefresh(data);
 
     return true;
 }

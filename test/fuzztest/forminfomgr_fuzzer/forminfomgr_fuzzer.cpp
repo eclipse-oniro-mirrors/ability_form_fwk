@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You can obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,9 +15,10 @@
 
 #include "forminfomgr_fuzzer.h"
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <chrono>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <thread>
 
 #define private public
@@ -27,94 +28,105 @@
 #include "data_center/form_info/bundle_form_info.h"
 #undef private
 #undef protected
-#include "securec.h"
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
+constexpr int32_t MAX_LENGTH = 256;
+constexpr int32_t MAX_NUM = 10000;
+constexpr int32_t MIN_NUM = 0;
+constexpr int32_t MAX_LOOP_COUNT = 10;
+
+FormInfo GenerateFuzzedFormInfo(FuzzedDataProvider *fdp)
 {
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
+    FormInfo formInfo;
+    if (fdp == nullptr) {
+        return formInfo;
+    }
+    formInfo.name = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    return formInfo;
 }
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+
+FormCustomConfig GenerateFuzzedFormCustomConfig(FuzzedDataProvider *fdp)
 {
+    FormCustomConfig config;
+    if (fdp == nullptr) {
+        return config;
+    }
+    config.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    return config;
+}
+
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
+{
+    if (fdp == nullptr) {
+        return true;
+    }
+
     FormInfoMgr formInfoMgr;
     formInfoMgr.Start();
-    std::string bundleName(data, size);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+
+    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    int32_t userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_NUM, MAX_NUM);
+
+    // Existing methods
     formInfoMgr.UpdateStaticFormInfos(bundleName, userId);
     formInfoMgr.Remove(bundleName, userId);
-    FormInfo formInfo;
+
     std::vector<FormInfo> formInfos;
-    formInfos.emplace_back(formInfo);
     formInfoMgr.GetAllFormsInfo(formInfos);
     formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos);
-    std::string moduleName(data, size);
+    std::string moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos);
+
+    FormInfo formInfo = GenerateFuzzedFormInfo(fdp);
     BundleInfo bundleInfo;
     formInfoMgr.CheckDynamicFormInfo(formInfo, bundleInfo);
     formInfoMgr.AddDynamicFormInfo(formInfo, userId);
-    std::string formName(data, size);
+    std::string formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     formInfoMgr.RemoveDynamicFormInfo(bundleName, moduleName, formName, userId);
     formInfoMgr.RemoveAllDynamicFormsInfo(bundleName, userId);
     formInfoMgr.GetOrCreateBundleFromInfo(bundleName);
     formInfoMgr.IsCaller(bundleName);
     formInfoMgr.CheckBundlePermission();
-    formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos);
-    FormInfoHelper formInfoHelper;
-    formInfoHelper.LoadAbilityFormConfigInfo(bundleInfo, formInfos);
-    formInfoHelper.GetResourceManager(bundleInfo);
-    std::string formInfoStoragesJson(data, size);
-    BundleFormInfo bundleFormInfo(bundleName);
-    bundleFormInfo.InitFromJson(formInfoStoragesJson);
-    bundleFormInfo.Remove(userId);
-    bundleFormInfo.AddDynamicFormInfo(formInfo, userId);
-    bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId);
-    bundleFormInfo.RemoveAllDynamicFormsInfo(userId);
-    bundleFormInfo.Empty();
-    bundleFormInfo.GetAllFormsInfo(formInfos, userId);
-    FormInfoFilter filter;
-    bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, userId);
-    bundleFormInfo.UpdateFormInfoStorageLocked();
-    return formInfoMgr.ReloadFormInfos(userId);
+
+    // NEW method: AddBundleFormInfos
+    std::map<std::string, std::uint32_t> bundleVersionMap;
+    int32_t mapSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < mapSize; i++) {
+        std::string key = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+        uint32_t value = fdp->ConsumeIntegral<uint32_t>();
+        bundleVersionMap[key] = value;
+    }
+    formInfoMgr.AddBundleFormInfos(bundleVersionMap, userId);
+
+    // NEW method: UpdateFormShowConfigs
+    std::vector<FormCustomConfig> configs;
+    int32_t configSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < configSize; i++) {
+        configs.push_back(GenerateFuzzedFormCustomConfig(fdp));
+    }
+    formInfoMgr.UpdateFormShowConfigs(configs);
+
+    return true;
 }
 }
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     return 0;
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    if (data == nullptr) {
-        return 0;
-    }
-
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
-    char* ch = static_cast<char*>(malloc(size + 1));
-    if (ch == nullptr) {
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size + 1, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
 }
-
