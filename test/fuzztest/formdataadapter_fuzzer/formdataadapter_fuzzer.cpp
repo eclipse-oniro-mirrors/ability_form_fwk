@@ -397,10 +397,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int64_t reloadRenderParamFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     adapter.UpdateFormRenderParamsAfterReload(reloadRenderParamFormId);
 
-    // Fuzz GetUpdateDurationFromAdditionalInfo (private)
-    std::string additionalInfo = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    adapter.GetUpdateDurationFromAdditionalInfo(additionalInfo);
-
     // Fuzz PostEnterpriseAppInstallFailedRetryTask (private)
     FormRecord enterpriseRecord = GenerateFormRecord(fdp);
     Want enterpriseWant = GenerateWant(fdp);
