@@ -565,14 +565,13 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
 {
     HILOG_INFO("RequestPublishFormCrossUser called, userId:%{public}d", userId);
 
-    // Parameter validation for CrossUser
     ErrCode errCode = ValidatePublishFormParamsForCrossUser(want, userId);
     if (errCode != ERR_OK) {
         HILOG_ERROR("ValidatePublishFormParamsForCrossUser failed");
         return errCode;
     }
 
-    // Fix isTemporary flag: published form should not be temporary
+    // Published form should not be temporary
     bool isTemporary = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     if (isTemporary) {
         HILOG_WARN("The published form should not be temp");
@@ -681,53 +680,50 @@ void FormPublishAdapter::RemoveFormIdMapElement(const int64_t formId)
 
 ErrCode FormPublishAdapter::ValidatePublishFormParamsForCrossUser(const Want &want, int32_t userId)
 {
-    std::string bundleName;
-    std::string moduleName;
-    ErrCode errCode = ValidateParamsForCrossUser(want, bundleName, moduleName);
+    ErrCode errCode = ValidateParamsForCrossUser(want);
     if (errCode != ERR_OK) {
         return errCode;
     }
 
-    return ValidateFormInfoMatchForCrossUser(want, userId, bundleName, moduleName);
+    return ValidateFormInfoMatchForCrossUser(want, userId);
 }
 
-ErrCode FormPublishAdapter::ValidateParamsForCrossUser(
-    const Want &want, std::string &bundleName, std::string &moduleName)
+ErrCode FormPublishAdapter::ValidateParamsForCrossUser(const Want &want)
 {
-    bundleName = want.GetElement().GetBundleName();
-    if (bundleName.empty()) {
-        HILOG_ERROR("bundleName is empty");
+    if (want.GetElement().GetBundleName().empty()) {
+        HILOG_ERROR("Param invalid, bundleName is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
-    if (moduleName.empty()) {
-        HILOG_ERROR("moduleName is empty");
+    if (want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY).empty()) {
+        HILOG_ERROR("Param invalid, moduleName is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (want.GetElement().GetAbilityName().empty()) {
+        HILOG_ERROR("Param invalid, abilityName is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (want.GetStringParam(Constants::PARAM_FORM_NAME_KEY).empty()) {
+        HILOG_ERROR("Param invalid, formName is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (!want.HasParameter(Constants::PARAM_FORM_DIMENSION_KEY)) {
-        HILOG_ERROR("dimensionId is not set");
+        HILOG_ERROR("Param invalid, dimensionId is not set");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     return ERR_OK;
 }
 
-ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(
-    const Want &want, int32_t userId, const std::string &bundleName,
-    const std::string &moduleName)
+ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(const Want &want, int32_t userId)
 {
+    std::string bundleName = want.GetElement().GetBundleName();
+    std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    if (abilityName.empty()) {
-        HILOG_ERROR("abilityName is empty");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-    if (formName.empty()) {
-        HILOG_ERROR("formName is empty");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
 
     std::vector<FormInfo> formInfos;
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModuleWithoutCheck(
@@ -739,7 +735,6 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(
     }
 
     // dimensionId existence already validated by HasParameter in ValidateParamsForCrossUser
-    // GetIntParam requires default value argument; 0 is safe here since existence is confirmed
     int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
     for (const auto &formInfo : formInfos) {
         if ((formInfo.abilityName == abilityName) && (formInfo.name == formName) &&
