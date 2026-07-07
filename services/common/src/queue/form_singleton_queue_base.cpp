@@ -34,23 +34,23 @@ FormSingletonQueueBase::~FormSingletonQueueBase()
     HILOG_INFO("destroy queue: %{public}s", queueName_.c_str());
 }
 
-bool FormSingletonQueueBase::ScheduleTask(uint64_t ms, std::function<void()> func)
+bool FormSingletonQueueBase::ScheduleTask(uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return false;
     }
-    return serialQueue_->ScheduleTask(ms, strategy_->Wrap(std::move(func)));
+    return serialQueue_->ScheduleTask(ms, strategy_->Wrap(std::move(func)), qos);
 }
 
 bool FormSingletonQueueBase::ScheduleDelayTask(
-    const TaskKey &taskKey, uint64_t ms, std::function<void()> func)
+    const TaskKey &taskKey, uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return false;
     }
-    return serialQueue_->ScheduleDelayTask(taskKey, ms, strategy_->Wrap(std::move(func)));
+    return serialQueue_->ScheduleDelayTask(taskKey, ms, strategy_->Wrap(std::move(func)), qos);
 }
 
 bool FormSingletonQueueBase::CancelDelayTask(const TaskKey &taskKey)

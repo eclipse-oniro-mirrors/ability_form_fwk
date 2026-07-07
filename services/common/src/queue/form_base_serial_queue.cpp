@@ -24,6 +24,19 @@ namespace AppExecFwk {
 namespace Common {
 namespace {
 constexpr uint32_t CONVERSION_FACTOR = 1000; // ms to us
+
+int Convert2FfrtQos(TaskQos qos)
+{
+    switch (qos) {
+        case TaskQos::QOS_DEFAULT:
+            return ffrt::qos_default;
+        case TaskQos::QOS_DEADLINE_REQUEST:
+            return ffrt::qos_deadline_request;
+        default:
+            break;
+    }
+    return ffrt::qos_default;
+}
 }
 
 FormBaseSerialQueue::FormBaseSerialQueue(const std::string &queueName)
@@ -44,7 +57,7 @@ FormBaseSerialQueue::~FormBaseSerialQueue()
     taskMap_.clear();
 }
 
-bool FormBaseSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
+bool FormBaseSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     HILOG_DEBUG("ScheduleTask");
     if (ms > (std::numeric_limits<uint64_t>::max() / CONVERSION_FACTOR)) {
@@ -54,7 +67,7 @@ bool FormBaseSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
 
     std::lock_guard<std::mutex> lock(mutex_);
     ffrt::task_handle handle = queue_.submit_h(func,
-        ffrt::task_attr().delay(ms * CONVERSION_FACTOR));
+        ffrt::task_attr().delay(ms * CONVERSION_FACTOR).qos(Convert2FfrtQos(qos)));
     if (handle == nullptr) {
         HILOG_ERROR("submit_h return null");
         return false;
@@ -63,7 +76,7 @@ bool FormBaseSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
 }
 
 bool FormBaseSerialQueue::ScheduleDelayTask(const TaskKey& taskKey,
-    uint64_t ms, std::function<void()> func)
+    uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     HILOG_DEBUG("ScheduleDelayTask");
     if (ms > (std::numeric_limits<uint64_t>::max() / CONVERSION_FACTOR)) {
@@ -81,7 +94,7 @@ bool FormBaseSerialQueue::ScheduleDelayTask(const TaskKey& taskKey,
     }
 
     ffrt::task_handle handle = queue_.submit_h(func,
-        ffrt::task_attr().delay(ms * CONVERSION_FACTOR));
+        ffrt::task_attr().delay(ms * CONVERSION_FACTOR).qos(Convert2FfrtQos(qos)));
     if (handle == nullptr) {
         HILOG_ERROR("submit_h return null");
         return false;

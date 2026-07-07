@@ -62,18 +62,21 @@ public:
      * @brief Schedule a one-shot task.
      * @param ms Delay time in milliseconds.
      * @param func Task function to execute.
+     * @param qos ffrt scheduling priority, default QOS_DEFAULT.
      * @return true if scheduled successfully, false otherwise.
      */
-    bool ScheduleTask(uint64_t ms, std::function<void()> func);
+    bool ScheduleTask(uint64_t ms, std::function<void()> func, TaskQos qos = TaskQos::QOS_DEFAULT);
 
     /**
      * @brief Schedule a delayed task with unified TaskKey.
      * @param taskKey Task identifier (auto-deduced type).
      * @param ms Delay time in milliseconds.
      * @param func Task function to execute.
+     * @param qos ffrt scheduling priority, default QOS_DEFAULT.
      * @return true if scheduled successfully, false otherwise.
      */
-    bool ScheduleDelayTask(const TaskKey &taskKey, uint64_t ms, std::function<void()> func);
+    bool ScheduleDelayTask(const TaskKey &taskKey, uint64_t ms, std::function<void()> func,
+        TaskQos qos = TaskQos::QOS_DEFAULT);
 
     /**
      * @brief Cancel a delayed task with unified TaskKey.

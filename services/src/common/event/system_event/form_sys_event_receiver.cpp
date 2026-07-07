@@ -189,6 +189,7 @@ void FormSysEventReceiver::HandleBundleScanFinished()
 void FormSysEventReceiver::InitFormInfosAndRegister()
 {
     HILOG_INFO("schedule init form infos and register bundle event callback");
+    // ReloadFormInfos is time-consuming, elevate task priority
     FormMgrQueue::GetInstance().ScheduleTask(TASK_DELAY_TIME, []() {
         FormBmsHelper::GetInstance().RegisterBundleEventCallback();
         std::vector<int32_t> activeUsers;
@@ -200,7 +201,7 @@ void FormSysEventReceiver::InitFormInfosAndRegister()
         for (int32_t userId : activeUsers) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         }
-    });
+    }, Common::TaskQos::QOS_DEADLINE_REQUEST);
 }
 
 void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &eventData)
@@ -218,12 +219,12 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
             lastUserId_ = userId;
             return;
         }
- 
+
         if (lastUserId_ == userId) {
             HILOG_WARN("same userId");
             return;
         }
- 
+
         lastUserId_ = userId;
         HILOG_INFO("switch to userId: (%{public}d)", userId);
     }
@@ -282,7 +283,7 @@ void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
         FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
     };
-    FormMgrQueue::GetInstance().ScheduleTask(0, task);
+    FormMgrQueue::GetInstance().ScheduleTask(0, task, Common::TaskQos::QOS_DEADLINE_REQUEST);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

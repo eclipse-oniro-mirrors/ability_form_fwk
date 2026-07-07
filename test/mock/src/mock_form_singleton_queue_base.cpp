@@ -20,13 +20,13 @@ FormSingletonQueueBase::FormSingletonQueueBase(const std::string &queueName,
 
 FormSingletonQueueBase::~FormSingletonQueueBase() {}
 
-bool FormSingletonQueueBase::ScheduleTask(uint64_t ms, std::function<void()> func)
+bool FormSingletonQueueBase::ScheduleTask(uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     return false;
 }
 
 bool FormSingletonQueueBase::ScheduleDelayTask(
-    const TaskKey &taskKey, uint64_t ms, std::function<void()> func)
+    const TaskKey &taskKey, uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     return false;
 }
