@@ -267,4 +267,36 @@ HWTEST_F(FmsFormBaseSerialQueueTest, FmsFormBaseSerialQueueTest_ScheduleDelayTas
     EXPECT_TRUE(helper.WaitForResult()) << "Delay task with pair<string> key should execute";
     GTEST_LOG_(INFO) << "FmsFormBaseSerialQueueTest_ScheduleDelayTask_PairStringKey_001 end";
 }
+
+/**
+ * @tc.name: FmsFormBaseSerialQueueTest_ScheduleTask_Qos_001
+ * @tc.desc: Verify ScheduleTask with different TaskQos levels executes correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBaseSerialQueueTest, FmsFormBaseSerialQueueTest_ScheduleTask_Qos_001, TestSize.Level1)
+{
+    for (auto qos : { TaskQos::QOS_DEFAULT, TaskQos::QOS_DEADLINE_REQUEST }) {
+        FormBaseSerialQueue queue("test_queue_qos");
+        TaskSyncHelper helper;
+        EXPECT_TRUE(queue.ScheduleTask(0, helper.CreateTask(), qos));
+        EXPECT_TRUE(helper.WaitForResult()) << "ScheduleTask with qos should execute";
+    }
+}
+
+/**
+ * @tc.name: FmsFormBaseSerialQueueTest_ScheduleTask_QosOverflow_001
+ * @tc.desc: Verify ScheduleTask with QOS_DEADLINE_REQUEST returns false on ms overflow
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBaseSerialQueueTest, FmsFormBaseSerialQueueTest_ScheduleTask_QosOverflow_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormBaseSerialQueueTest_ScheduleTask_QosOverflow_001 start";
+    FormBaseSerialQueue queue("test_queue_qos_overflow");
+    TaskSyncHelper helper;
+    uint64_t overflowMs = std::numeric_limits<uint64_t>::max();
+    EXPECT_FALSE(queue.ScheduleTask(overflowMs, helper.CreateTask(), TaskQos::QOS_DEADLINE_REQUEST));
+    EXPECT_FALSE(helper.IsTaskExecuted()) << "Task should not execute on overflow failure";
+    GTEST_LOG_(INFO) << "FmsFormBaseSerialQueueTest_ScheduleTask_QosOverflow_001 end";
+}
+
 }

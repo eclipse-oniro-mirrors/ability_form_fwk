@@ -370,4 +370,60 @@ HWTEST_F(FmsFormSingletonQueueBaseTest, FmsFormSingletonQueueBaseTest_NoWrapStra
     EXPECT_TRUE(taskExecuted) << "NoWrap should execute original task unchanged";
     GTEST_LOG_(INFO) << "FmsFormSingletonQueueBaseTest_NoWrapStrategy_001 end";
 }
+
+/**
+ * @tc.name: FmsFormSingletonQueueBaseTest_ScheduleTask_Qos_001
+ * @tc.desc: Verify ScheduleTask with different TaskQos levels executes correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSingletonQueueBaseTest, FmsFormSingletonQueueBaseTest_ScheduleTask_Qos_001, TestSize.Level1)
+{
+    for (auto qos : { TaskQos::QOS_DEFAULT, TaskQos::QOS_DEADLINE_REQUEST }) {
+        std::string queueName = GenerateUniqueQueueName();
+        FormSingletonQueueBase queue(queueName);
+        std::atomic<bool> taskExecuted(false);
+        std::mutex mtx;
+        std::condition_variable cv;
+        auto task = [&taskExecuted, &mtx, &cv]() {
+            taskExecuted = true;
+            std::lock_guard<std::mutex> lock(mtx);
+            cv.notify_one();
+        };
+        EXPECT_TRUE(queue.ScheduleTask(0, task, qos));
+        std::unique_lock<std::mutex> lock(mtx);
+        bool result = cv.wait_for(lock, std::chrono::milliseconds(WAIT_TIMEOUT_MS), [&taskExecuted]() {
+            return taskExecuted.load();
+        });
+        EXPECT_TRUE(result) << "ScheduleTask with qos should execute";
+    }
+}
+
+/**
+ * @tc.name: FmsFormSingletonQueueBaseTest_ScheduleTask_QosDeadline_002
+ * @tc.desc: Verify ScheduleTask with QOS_DEADLINE_REQUEST and XCollieTimeoutStrategy wraps correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSingletonQueueBaseTest, FmsFormSingletonQueueBaseTest_ScheduleTask_QosDeadline_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSingletonQueueBaseTest_ScheduleTask_QosDeadline_002 start";
+    std::string queueName = GenerateUniqueQueueName();
+    auto strategy = std::make_shared<XCollieTimeoutStrategy>(5, "TestQosQueue");
+    FormSingletonQueueBase queue(queueName, strategy);
+    std::atomic<bool> taskExecuted(false);
+    std::mutex mtx;
+    std::condition_variable cv;
+    auto task = [&taskExecuted, &mtx, &cv]() {
+        taskExecuted = true;
+        std::lock_guard<std::mutex> lock(mtx);
+        cv.notify_one();
+    };
+    EXPECT_TRUE(queue.ScheduleTask(0, task, TaskQos::QOS_DEADLINE_REQUEST));
+    std::unique_lock<std::mutex> lock(mtx);
+    bool result = cv.wait_for(lock, std::chrono::milliseconds(WAIT_TIMEOUT_MS), [&taskExecuted]() {
+        return taskExecuted.load();
+    });
+    EXPECT_TRUE(result) << "Task with QOS_DEADLINE_REQUEST and XCollie wrapper should execute";
+    GTEST_LOG_(INFO) << "FmsFormSingletonQueueBaseTest_ScheduleTask_QosDeadline_002 end";
+}
+
 }
