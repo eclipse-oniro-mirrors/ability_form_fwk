@@ -565,7 +565,20 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
 {
     HILOG_INFO("RequestPublishFormCrossUser called, userId:%{public}d", userId);
 
-    ErrCode errCode = RequestPublishFormCommon(want, userId, formId);
+    ErrCode errCode = ValidatePublishFormParamsForCrossUser(want, userId);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("ValidatePublishFormParamsForCrossUser failed");
+        return errCode;
+    }
+
+    // Published form should not be temporary
+    bool isTemporary = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+    if (isTemporary) {
+        HILOG_WARN("The published form should not be temp");
+        want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+    }
+
+    errCode = RequestPublishFormCommon(want, userId, formId);
     if (errCode != ERR_OK) {
         HILOG_ERROR("RequestPublishFormCommon failed");
         return errCode;
@@ -663,6 +676,76 @@ void FormPublishAdapter::RemoveFormIdMapElement(const int64_t formId)
     if (formIdMap_.find(formId) != formIdMap_.end()) {
         formIdMap_.erase(formId);
     }
+}
+
+ErrCode FormPublishAdapter::ValidatePublishFormParamsForCrossUser(const Want &want, int32_t userId)
+{
+    ErrCode errCode = ValidateParamsForCrossUser(want);
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+
+    return ValidateFormInfoMatchForCrossUser(want, userId);
+}
+
+ErrCode FormPublishAdapter::ValidateParamsForCrossUser(const Want &want)
+{
+    if (want.GetElement().GetBundleName().empty()) {
+        HILOG_ERROR("Param invalid, bundleName is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY).empty()) {
+        HILOG_ERROR("Param invalid, moduleName is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (want.GetElement().GetAbilityName().empty()) {
+        HILOG_ERROR("Param invalid, abilityName is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (want.GetStringParam(Constants::PARAM_FORM_NAME_KEY).empty()) {
+        HILOG_ERROR("Param invalid, formName is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (!want.HasParameter(Constants::PARAM_FORM_DIMENSION_KEY)) {
+        HILOG_ERROR("Param invalid, dimensionId is not set");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(const Want &want, int32_t userId)
+{
+    std::string bundleName = want.GetElement().GetBundleName();
+    std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
+    std::string abilityName = want.GetElement().GetAbilityName();
+    std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
+
+    std::vector<FormInfo> formInfos;
+    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModuleWithoutCheck(
+        bundleName, moduleName, formInfos, userId);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Get forms info failed, bundle:%{public}s, module:%{public}s, userId:%{public}d",
+            bundleName.c_str(), moduleName.c_str(), userId);
+        return errCode;
+    }
+
+    // dimensionId existence already validated by HasParameter in ValidateParamsForCrossUser
+    int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
+    for (const auto &formInfo : formInfos) {
+        if ((formInfo.abilityName == abilityName) && (formInfo.name == formName) &&
+            (FormCommonAdapter::GetInstance().IsDimensionValid(formInfo, dimensionId))) {
+            return ERR_OK;
+        }
+    }
+
+    HILOG_ERROR("No matching form info found, ability:%{public}s, formName:%{public}s, dimensionId:%{public}d",
+        abilityName.c_str(), formName.c_str(), dimensionId);
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
 } // namespace AppExecFwk

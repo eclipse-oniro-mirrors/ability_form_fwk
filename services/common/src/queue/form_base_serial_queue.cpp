@@ -35,6 +35,13 @@ FormBaseSerialQueue::FormBaseSerialQueue(const std::string &queueName)
 FormBaseSerialQueue::~FormBaseSerialQueue()
 {
     HILOG_DEBUG("destroy FormBaseSerialQueue");
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto &it : taskMap_) {
+        if (it.second != nullptr) {
+            queue_.cancel(it.second);
+        }
+    }
+    taskMap_.clear();
 }
 
 bool FormBaseSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
