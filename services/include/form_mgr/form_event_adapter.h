@@ -64,12 +64,10 @@ private:
 
     /**
      * @brief Check if the app has permission to keep background running
-     * @param iBundleMgr Bundle manager interface
      * @param bundleName Bundle name of the app
      * @return true if the app has permission, false otherwise
      */
-    bool CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr,
-        const std::string &bundleName);
+    bool CheckKeepBackgroundRunningPermission(const std::string &bundleName);
 };
 
 } // namespace AppExecFwk

@@ -89,10 +89,9 @@ public:
 
 private:
     ErrCode CheckFormBundleName(Want &want, std::string &bundleName, bool needCheckFormPermission);
-    bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want,
+    bool IsValidPublishEvent(const std::string &bundleName, const Want &want,
         bool needCheckFormPermission = true);
-    bool CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
-        const int32_t &userId, const std::string &bundleName);
+    bool CheckIsSystemAppByBundleName(const int32_t &userId, const std::string &bundleName);
     bool IsErmsSupportPublishForm(const std::string &bundleName, std::vector<Want> wants);
     bool CheckSnapshotWant(const Want &want);
     void IncreaseAddFormRequestTimeOutTask(const int64_t formId);

@@ -167,12 +167,6 @@ ErrCode FormCommonAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bu
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     int32_t currentUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, currentUserId, bundleInfo);
     if (errCode != ERR_OK) {
@@ -442,17 +436,10 @@ ErrCode FormCommonAdapter::GetFormInfoByFormRecord(const FormRecord &record, For
 int32_t FormCommonAdapter::GetCallerType(const std::string &bundleName)
 {
     HILOG_DEBUG("GetCallerType called, bundleName: %{public}s", bundleName.c_str());
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return FormErmsCallerInfo::TYPE_INVALID;
-    }
-
     AppExecFwk::ApplicationInfo callerAppInfo;
     auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
     int32_t userId = GetCallingUserId();
-    bool getCallerResult = IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName, flag, userId, callerAppInfo));
-    if (!getCallerResult) {
+    if (!FormBmsHelper::GetInstance().GetApplicationInfoByFlag(bundleName, flag, userId, callerAppInfo)) {
         HILOG_ERROR("Get callerAppInfo failed");
         return FormErmsCallerInfo::TYPE_INVALID;
     }
@@ -760,15 +747,8 @@ bool FormCommonAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t
 void FormCommonAdapter::UpdateFormCloudUpdateDuration(const std::string &bundleName)
 {
     HILOG_DEBUG("call");
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        formDataMgr_->RemoveFormCloudUpdateDuration(bundleName);
-        return;
-    }
-
     std::string additionalInfo;
-    if (IN_PROCESS_CALL(iBundleMgr->GetAdditionalInfo(bundleName, additionalInfo)) != ERR_OK) {
+    if (FormBmsHelper::GetInstance().GetAdditionalInfo(bundleName, additionalInfo) != ERR_OK) {
         HILOG_ERROR("fail get additionalInfo");
         formDataMgr_->RemoveFormCloudUpdateDuration(bundleName);
         return;

@@ -984,13 +984,11 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckIsSystemAppByBundleName_001, TestSize.L
 {
     GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_001 start";
 
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(TEST_BUNDLE_NAME, TEST_USER_ID, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_INVALID_PARAM));
 
     auto result = FormPublishAdapter::GetInstance().CheckIsSystemAppByBundleName(
-        bundleMgr, TEST_USER_ID, TEST_BUNDLE_NAME);
+        TEST_USER_ID, TEST_BUNDLE_NAME);
     EXPECT_FALSE(result);
 
     GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_001 end";
@@ -1005,15 +1003,13 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckIsSystemAppByBundleName_002, TestSize.L
 {
     GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_002 start";
 
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
     ApplicationInfo appInfo;
     appInfo.isSystemApp = true;
-    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(TEST_BUNDLE_NAME, TEST_USER_ID, _))
+        .WillOnce(DoAll(SetArgReferee<2>(appInfo), Return(ERR_OK)));
 
     auto result = FormPublishAdapter::GetInstance().CheckIsSystemAppByBundleName(
-        bundleMgr, TEST_USER_ID, TEST_BUNDLE_NAME);
+        TEST_USER_ID, TEST_BUNDLE_NAME);
     EXPECT_TRUE(result);
 
     GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_002 end";
@@ -1028,15 +1024,13 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckIsSystemAppByBundleName_003, TestSize.L
 {
     GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_003 start";
 
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
     ApplicationInfo appInfo;
     appInfo.isSystemApp = false;
-    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(TEST_BUNDLE_NAME, TEST_USER_ID, _))
+        .WillOnce(DoAll(SetArgReferee<2>(appInfo), Return(ERR_OK)));
 
     auto result = FormPublishAdapter::GetInstance().CheckIsSystemAppByBundleName(
-        bundleMgr, TEST_USER_ID, TEST_BUNDLE_NAME);
+        TEST_USER_ID, TEST_BUNDLE_NAME);
     EXPECT_FALSE(result);
 
     GTEST_LOG_(INFO) << "CheckIsSystemAppByBundleName_003 end";
@@ -1053,9 +1047,7 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "IsValidPublishEvent_001 start";
 
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*bundleMgr, GetApplicationInfoV9(_, _, _, _))
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(TEST_BUNDLE_NAME, _, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_INVALID_PARAM));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
@@ -1064,7 +1056,7 @@ HWTEST_F(FmsFormPublishAdapterTest, IsValidPublishEvent_001, TestSize.Level1)
 
     Want want;
     auto result = FormPublishAdapter::GetInstance().IsValidPublishEvent(
-        bundleMgr, TEST_BUNDLE_NAME, want, true);
+        TEST_BUNDLE_NAME, want, true);
     EXPECT_FALSE(result);
 
     GTEST_LOG_(INFO) << "IsValidPublishEvent_001 end";

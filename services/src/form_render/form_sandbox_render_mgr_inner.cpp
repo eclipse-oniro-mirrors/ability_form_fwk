@@ -38,17 +38,9 @@ FormSandboxRenderMgrInner::~FormSandboxRenderMgrInner()
 
 ErrCode FormSandboxRenderMgrInner::IsSandboxFRSInstalled() const
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
     BundleInfo info;
-    std::string identity = IPCSkeleton::ResetCallingIdentity();
-    ErrCode ret = iBundleMgr->GetSandboxBundleInfo(
+    return FormBmsHelper::GetInstance().GetSandboxBundleInfo(
         Constants::FRS_BUNDLE_NAME, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX, Constants::DEFAULT_USER_ID, info);
-    IPCSkeleton::SetCallingIdentity(identity);
-    return ret;
 }
 
 ErrCode FormSandboxRenderMgrInner::InstallSandboxFRS(int32_t &appIndex) const

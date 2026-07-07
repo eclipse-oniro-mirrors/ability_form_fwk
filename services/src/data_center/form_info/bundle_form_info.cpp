@@ -343,15 +343,9 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
 
 void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return;
-    }
-
     BundleInfo bundleInfo;
     int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName_, flag, bundleInfo, userId))) {
+    if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(bundleName_, flag, userId, bundleInfo)) {
         HILOG_ERROR("get bundleInfo failed");
         return;
     }

@@ -1330,12 +1330,7 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
         HILOG_ERROR("empty AbilityName and uri");
         return ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
     }
-    sptr<AAFwk::IAbilityManager> ams = FormAmsHelper::GetInstance().GetAbilityManager();
-    if (ams == nullptr) {
-        HILOG_ERROR("fail get abilityMgr");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    return ams->StartAbility(want, callerToken, -1, -1);
+    return FormAmsHelper::GetInstance().StartAbilityByCallerToken(want, callerToken);
 }
 
 int32_t FormMgrService::StartAbilityByFms(const Want &want)
@@ -1504,15 +1499,8 @@ void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &
 int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
 {
     HILOG_DEBUG("call");
-    sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (bundleMgr == nullptr) {
-        HILOG_ERROR("error to get bundleMgr");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-    // check if system app
     auto callingUid = IPCSkeleton::GetCallingUid();
-    auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
-    if (!isSystemApp) {
+    if (!FormBmsHelper::GetInstance().CheckIsSystemAppByUid(callingUid)) {
         HILOG_ERROR("no permission");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
@@ -1522,15 +1510,8 @@ int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject>
 int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
 {
     HILOG_DEBUG("call");
-    sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (bundleMgr == nullptr) {
-        HILOG_ERROR("fail get bundleMgr");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-    // check if system app
     auto callingUid = IPCSkeleton::GetCallingUid();
-    auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
-    if (!isSystemApp) {
+    if (!FormBmsHelper::GetInstance().CheckIsSystemAppByUid(callingUid)) {
         HILOG_ERROR("permission denied");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }

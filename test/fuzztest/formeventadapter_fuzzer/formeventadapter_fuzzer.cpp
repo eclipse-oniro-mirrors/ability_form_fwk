@@ -149,10 +149,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int32_t clickUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
     adapter.NotifyFormClickEvent(clickFormId, clickType, clickUserId);
 
-    // Fuzz CheckKeepBackgroundRunningPermission with nullptr iBundleMgr (error path)
-    sptr<IBundleMgr> bundleMgr = nullptr;
+    // Fuzz CheckKeepBackgroundRunningPermission (error path)
     std::string keepBundleName = GenerateSafeString(fdp, MAX_LENGTH);
-    adapter.CheckKeepBackgroundRunningPermission(bundleMgr, keepBundleName);
+    adapter.CheckKeepBackgroundRunningPermission(keepBundleName);
 
     return true;
 }

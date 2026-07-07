@@ -381,11 +381,6 @@ ErrCode FormDataAdapter::AcquireProviderFormInfoByFormRecord(const FormRecord &f
     Want addFormWant;
     addFormWant.SetParams(wantParams);
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
     BundleInfo bundleInfo;
     ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(formRecord.bundleName,
         formRecord.userId, bundleInfo);

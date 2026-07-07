@@ -77,15 +77,9 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     std::vector<BundleInfo> bundleInfos;
-    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->BatchGetBundleInfo(
-        bundleNames, static_cast<int32_t>(GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS), bundleInfos, userId));
+    ErrCode ret = FormBmsHelper::GetInstance().BatchGetBundleInfo(
+        bundleNames, static_cast<int32_t>(GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS), bundleInfos, userId);
     HILOG_INFO("bundleInfos size:%{public}zu, bundleNames size:%{public}zu", bundleInfos.size(), bundleNames.size());
     if (ret != ERR_OK) {
         HILOG_ERROR("batch get bundleInfo failed, erroCode:%{public}d", ret);
@@ -236,16 +230,11 @@ void FormInfoHelper::SendLoadStageFormConfigEvent(const FormInfo &formInfo)
 
 ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
     const std::string &bundleName = bundleInfo.name;
     for (const auto &moduleInfo: bundleInfo.hapModuleInfos) {
         const std::string &moduleName = moduleInfo.moduleName;
         std::vector<FormInfo> formInfoVec {};
-        if (!IN_PROCESS_CALL(iBundleMgr->GetFormsInfoByModule(bundleName, moduleName, formInfoVec))) {
+        if (!FormBmsHelper::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfoVec)) {
             continue;
         }
         for (auto &formInfo: formInfoVec) {
@@ -360,14 +349,8 @@ void FormInfoHelper::UpdateFormInfoFormStandby(const BundleInfo &bundleInfo, int
 bool FormInfoHelper::CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
     const std::string &capabilityKey)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return false;
-    }
-
     AppProvisionInfo appProvisionInfo;
-    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetAppProvisionInfo(bundleName, userId, appProvisionInfo));
+    ErrCode ret = FormBmsHelper::GetInstance().GetAppProvisionInfo(bundleName, userId, appProvisionInfo);
     if (ret != ERR_OK) {
         HILOG_ERROR("get AppProvisionInfo failed");
         return false;
