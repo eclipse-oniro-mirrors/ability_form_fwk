@@ -877,20 +877,24 @@ private:
         }
         convertArgc++;
 
-        auto complete = [formIds](napi_env env, NapiAsyncTask &task, int32_t status) {
-            auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, FormHostClient::GetInstance(),
+        auto apiResult = std::make_shared<int32_t>();
+        auto execute = [formIds, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, FormHostClient::GetInstance(),
                 Constants::FORM_VISIBLE);
-            if (ret == ERR_OK) {
+        };
+
+        auto complete = [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
+            if (*ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
             }
         };
 
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }
 
@@ -913,20 +917,24 @@ private:
         }
         convertArgc++;
 
-        auto complete = [formIds](napi_env env, NapiAsyncTask &task, int32_t status) {
-            auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, FormHostClient::GetInstance(),
+        auto apiResult = std::make_shared<int32_t>();
+        auto execute = [formIds, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, FormHostClient::GetInstance(),
                 Constants::FORM_INVISIBLE);
-            if (ret == ERR_OK) {
+        };
+
+        auto complete = [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
+            if (*ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
             }
         };
 
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }
 
