@@ -112,12 +112,12 @@ public:
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
      * @param callerToken The caller token of the ability to start.
      * @param userId Designation User ID.
-     * @param isDebug Whether the ability is debug.
+     * @param promotePriority Whether to promote priority for sa.
      * @param isManuallyClick Whether the ability is manually clicked.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode StartAbilityByCall(const Want &want, const sptr<AAFwk::IAbilityConnection> &connect,
-        const sptr<IRemoteObject> &callerToken, int32_t userId, bool isDebug, bool isManuallyClick);
+        const sptr<IRemoteObject> &callerToken, int32_t userId, bool promotePriority, bool isManuallyClick);
     /**
      * @brief OpenLink, open link with ability manager service.
      * @param want The want of the link to open.

@@ -259,12 +259,12 @@ ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteO
  * @param connect Callback used to notify caller the result of connecting or disconnecting.
  * @param callerToken The caller token of the ability to start.
  * @param userId Designation User ID.
- * @param isDebug Whether the ability is debug.
+ * @param promotePriority Whether to promote priority for sa.
  * @param isManuallyClick Whether the ability is manually clicked.
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::StartAbilityByCall(const Want &want, const sptr<AAFwk::IAbilityConnection> &connect,
-    const sptr<IRemoteObject> &callerToken, int32_t userId, bool isDebug, bool isManuallyClick)
+    const sptr<IRemoteObject> &callerToken, int32_t userId, bool promotePriority, bool isManuallyClick)
 {
     HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
@@ -272,7 +272,7 @@ ErrCode FormAmsHelper::StartAbilityByCall(const Want &want, const sptr<AAFwk::IA
         HILOG_ERROR("null ams");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    return IN_PROCESS_CALL(ams->StartAbilityByCall(want, connect, callerToken, userId, isDebug, isManuallyClick));
+    return IN_PROCESS_CALL(ams->StartAbilityByCall(want, connect, callerToken, userId, promotePriority, isManuallyClick));
 }
 
 /**
