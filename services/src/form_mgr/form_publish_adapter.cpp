@@ -75,32 +75,23 @@ ErrCode FormPublishAdapter::CheckFormBundleName(Want &want, std::string &bundleN
 
 bool FormPublishAdapter::GetBundleName(std::string &bundleName, bool needCheckFormPermission)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return false;
-    }
-
     int uid = IPCSkeleton::GetCallingUid();
-    if (needCheckFormPermission && !IN_PROCESS_CALL(iBundleMgr->CheckIsSystemAppByUid(uid))) {
+    if (needCheckFormPermission && !FormBmsHelper::GetInstance().CheckIsSystemAppByUid(uid)) {
         HILOG_ERROR("form not systemApp.uid:%{public}d", uid);
         return false;
     }
 
-    int32_t result = IN_PROCESS_CALL(iBundleMgr->GetNameForUid(uid, bundleName));
-    if (result != ERR_OK || bundleName.empty()) {
+    if (FormBmsHelper::GetInstance().GetBundleNameByUid(uid, bundleName) != ERR_OK || bundleName.empty()) {
         HILOG_ERROR("not get bundleName by uid:%{public}d", uid);
         return false;
     }
     return true;
 }
 
-bool FormPublishAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
-    const int32_t &userId, const std::string &bundleName)
+bool FormPublishAdapter::CheckIsSystemAppByBundleName(const int32_t &userId, const std::string &bundleName)
 {
     AppExecFwk::ApplicationInfo appInfo;
-    if (IN_PROCESS_CALL(iBundleMgr->GetApplicationInfoV9(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
-        userId, appInfo)) != ERR_OK) {
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(bundleName, userId, appInfo) != ERR_OK) {
         HILOG_ERROR("get ApplicationInfo failed");
         return false;
     }
@@ -109,11 +100,11 @@ bool FormPublishAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iB
     return appInfo.isSystemApp;
 }
 
-bool FormPublishAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
-    const std::string &bundleName, const Want &want, bool needCheckFormPermission)
+bool FormPublishAdapter::IsValidPublishEvent(const std::string &bundleName, const Want &want,
+    bool needCheckFormPermission)
 {
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
-    if (needCheckFormPermission && !CheckIsSystemAppByBundleName(iBundleMgr, userId, bundleName)) {
+    if (needCheckFormPermission && !CheckIsSystemAppByBundleName(userId, bundleName)) {
         HILOG_ERROR("Only system app can request publish form");
         return false;
     }
@@ -145,17 +136,10 @@ bool FormPublishAdapter::IsErmsSupportPublishForm(const std::string &bundleName,
 
 int32_t FormPublishAdapter::GetCallerType(const std::string &bundleName)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return FormErmsCallerInfo::TYPE_INVALID;
-    }
-
     AppExecFwk::ApplicationInfo callerAppInfo;
     auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
-    bool getCallerResult = IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName, flag, userId, callerAppInfo));
-    if (!getCallerResult) {
+    if (!FormBmsHelper::GetInstance().GetApplicationInfoByFlag(bundleName, flag, userId, callerAppInfo)) {
         HILOG_ERROR("Get callerAppInfo failed");
         return FormErmsCallerInfo::TYPE_INVALID;
     }
@@ -217,13 +201,7 @@ ErrCode FormPublishAdapter::CheckPublishForm(Want &want, bool needCheckFormPermi
         return errCode;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
-    if (needCheckFormPermission && !IsValidPublishEvent(iBundleMgr, bundleName, want)) {
+    if (needCheckFormPermission && !IsValidPublishEvent(bundleName, want)) {
         HILOG_ERROR("Check valid publish event failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }

@@ -72,12 +72,6 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     int64_t matchedFormId = 0;
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);

@@ -47,19 +47,14 @@ int32_t FormFreeInstallOperator::StartFreeInstall(const std::string &bundleName,
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     Want want;
     want.SetElementName(bundleName, abilityName);
     want.SetModuleName(moduleName);
     AbilityInfo abilityInfo = {};
     constexpr auto flag = AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_WITH_APPLICATION |
         AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_EXCLUDE_EXT;
-    if (iBundleMgr->QueryAbilityInfo(want, flag, userId, abilityInfo, freeInstallStatusCallBack_)) {
+    if (FormBmsHelper::GetInstance().QueryAbilityInfoWithCallback(
+        want, flag, userId, abilityInfo, freeInstallStatusCallBack_)) {
         HILOG_DEBUG("The app has installed");
     }
 

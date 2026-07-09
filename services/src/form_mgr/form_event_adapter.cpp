@@ -140,12 +140,6 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     if (record.bundleName != want.GetBundle() && want.GetUriString().empty()) {
         if (!record.isSystemApp) {
             HILOG_WARN("Only system apps can launch the ability of the other apps");
@@ -223,16 +217,11 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
     if (want.GetBundle().empty() || record.bundleName != want.GetBundle()) {
         HILOG_DEBUG("The parameter contains the wrong bundleName or the empty bundleName");
         want.SetBundle(record.bundleName);
     }
-    if (!CheckKeepBackgroundRunningPermission(iBundleMgr, record.bundleName)) {
+    if (!CheckKeepBackgroundRunningPermission(record.bundleName)) {
         HILOG_ERROR("The app does not have permission for keeping background running");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
@@ -260,8 +249,8 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     bool isManuallyClick = want.GetBoolParam(Constants::PARAM_FORM_MANUAL_CLICK_KEY, false);
     HILOG_INFO("StartAbilityByCall, MANUAL_CLICK:%{public}d", isManuallyClick);
-    int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
-        formBackgroundConnection, callerToken, record.providerUserId, true, isManuallyClick));
+    int32_t result = FormAmsHelper::GetInstance().StartAbilityByCall(want,
+        formBackgroundConnection, callerToken, record.providerUserId, true, isManuallyClick);
     if (result != ERR_OK) {
         HILOG_ERROR("fail StartAbilityByCall, result:%{public}d", result);
         return result;
@@ -303,8 +292,7 @@ bool FormEventAdapter::OpenByOpenType(const int32_t openType, const FormRecord &
             return true;
         }
         want.SetParam(Want::PARAM_RESV_CALLER_BUNDLE_NAME, bundleName);
-        int32_t result = IN_PROCESS_CALL(
-            FormAmsHelper::GetInstance().GetAbilityManager()->OpenLink(want, callerToken));
+        int32_t result = FormAmsHelper::GetInstance().OpenLink(want, callerToken);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
             HILOG_ERROR("failed OpenLink, result:%{public}d", result);
             openResult = result;
@@ -317,8 +305,7 @@ bool FormEventAdapter::OpenByOpenType(const int32_t openType, const FormRecord &
     if (openType == static_cast<int32_t>(Constants::CardActionParamOpenType::OPEN_ATOMIC_SERVICE)) {
         want.SetUri("");
         StartOptions startOptions;
-        int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->OpenAtomicService(
-            want, startOptions, callerToken));
+        int32_t result = FormAmsHelper::GetInstance().OpenAtomicService(want, startOptions, callerToken);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
             HILOG_ERROR("failed OpenAtomicService, result:%{public}d", result);
             openResult = result;
@@ -354,8 +341,7 @@ void FormEventAdapter::NotifyFormClickEvent(int64_t formId, const std::string &f
     FormObserverRecord::GetInstance().HandleFormEvent(EMPTY_BUNDLE, formClickType, runningFormInfo);
 }
 
-bool FormEventAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr,
-    const std::string &bundleName)
+bool FormEventAdapter::CheckKeepBackgroundRunningPermission(const std::string &bundleName)
 {
     BundleInfo bundleInfo;
     if (FormBmsHelper::GetInstance().GetBundleInfoWithPermission(bundleName,

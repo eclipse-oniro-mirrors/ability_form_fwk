@@ -21,6 +21,7 @@
 #include "bundle_mgr_interface.h"
 #include "bundle_installer_interface.h"
 #include "bms_mgr/form_bundle_event_callback.h"
+#include "form_info.h"
 #include "want.h"
 
 namespace OHOS {
@@ -49,12 +50,6 @@ public:
      * @param moduleName Provider ability moduleName.
      */
     void NotifyModuleNotRemovable(const std::string &bundleName, const std::string &moduleName);
-
-    /**
-     * @brief Acquire a bundle manager, if it not existed,
-     * @return returns the bundle manager ipc object, or nullptr for failed.
-     */
-    sptr<IBundleMgr> GetBundleMgr();
 
     /**
      * @brief Acquire a bundle install manager, if it not existed,
@@ -174,6 +169,106 @@ public:
 
     ErrCode RegisterBundleEventCallback();
     ErrCode UnregisterBundleEventCallback();
+
+    /**
+     * @brief Check whether the specified uid belongs to a system app.
+     * @param uid Indicates the uid to check.
+     * @return Returns true if the uid belongs to a system app, false otherwise or on BMS failure.
+     */
+    bool CheckIsSystemAppByUid(int32_t uid);
+
+    /**
+     * @brief Get application info by application flag.
+     * @param bundleName Indicates the bundle name.
+     * @param flag Indicates the application flag.
+     * @param userId Indicates the user ID.
+     * @param appInfo Indicates the obtained ApplicationInfo object.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetApplicationInfoByFlag(const std::string &bundleName, int32_t flag,
+        int32_t userId, ApplicationInfo &appInfo);
+
+    /**
+     * @brief Get additional info of a bundle.
+     * @param bundleName Indicates the bundle name.
+     * @param additionalInfo Indicates the obtained additional info string.
+     * @return Returns ERR_OK on success, error code on failure.
+     */
+    ErrCode GetAdditionalInfo(const std::string &bundleName, std::string &additionalInfo);
+
+    /**
+     * @brief Query ability info with install callback.
+     * @param want Indicates the want containing ability info to query.
+     * @param flag Indicates the ability info flag.
+     * @param userId Indicates the user ID.
+     * @param abilityInfo Indicates the obtained AbilityInfo object.
+     * @param callback Indicates the install callback.
+     * @return Returns true on success, false on failure.
+     */
+    bool QueryAbilityInfoWithCallback(const Want &want, int32_t flag, int32_t userId,
+        AbilityInfo &abilityInfo, const sptr<IRemoteObject> &callback);
+
+    /**
+     * @brief Get sandbox bundle info.
+     * @param bundleName Indicates the bundle name.
+     * @param appIndex Indicates the app index.
+     * @param userId Indicates the user ID.
+     * @param info Indicates the obtained BundleInfo object.
+     * @return Returns ERR_OK on success, error code on failure.
+     */
+    ErrCode GetSandboxBundleInfo(const std::string &bundleName, int32_t appIndex,
+        int32_t userId, BundleInfo &info);
+
+    /**
+     * @brief Query extension ability infos by type.
+     * @param type Indicates the extension ability type.
+     * @param userId Indicates the user ID.
+     * @param infos Indicates the obtained ExtensionAbilityInfo vector.
+     * @return Returns true on success, false on failure.
+     */
+    bool QueryExtensionAbilityInfosByType(ExtensionAbilityType type, int32_t userId,
+        std::vector<ExtensionAbilityInfo> &infos);
+
+    /**
+     * @brief Batch get bundle info for multiple bundles.
+     * @param bundleNames Indicates the bundle names to query.
+     * @param flag Indicates the bundle info flag.
+     * @param bundleInfos Indicates the obtained BundleInfo vector.
+     * @param userId Indicates the user ID.
+     * @return Returns ERR_OK on success, error code on failure.
+     */
+    ErrCode BatchGetBundleInfo(const std::vector<std::string> &bundleNames, int32_t flag,
+        std::vector<BundleInfo> &bundleInfos, int32_t userId);
+
+    /**
+     * @brief Get forms info by module.
+     * @param bundleName Indicates the bundle name.
+     * @param moduleName Indicates the module name.
+     * @param formInfos Indicates the obtained FormInfo vector.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+        std::vector<FormInfo> &formInfos);
+
+    /**
+     * @brief Get app provision info.
+     * @param bundleName Indicates the bundle name.
+     * @param userId Indicates the user ID.
+     * @param appProvisionInfo Indicates the obtained AppProvisionInfo object.
+     * @return Returns ERR_OK on success, error code on failure.
+     */
+    ErrCode GetAppProvisionInfo(const std::string &bundleName, int32_t userId,
+        AppProvisionInfo &appProvisionInfo);
+
+    /**
+     * @brief Get bundle infos by flag.
+     * @param flag Indicates the bundle info flag.
+     * @param bundleInfos Indicates the obtained BundleInfo vector.
+     * @param userId Indicates the user ID.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetBundleInfos(int32_t flag, std::vector<BundleInfo> &bundleInfos, int32_t userId);
+
     static constexpr int64_t INVALID_UID = -1;
 private:
     /**
@@ -183,6 +278,8 @@ private:
      * @return Module key.
      */
     std::string GenerateModuleKey(const std::string &bundleName, const std::string &moduleName) const;
+
+    sptr<IBundleMgr> GetBundleMgr();
 
 private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;

@@ -396,15 +396,9 @@ ErrCode FormInfoMgr::CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &
 
 ErrCode FormInfoMgr::AddDynamicFormInfo(FormInfo &formInfo, int32_t userId)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     BundleInfo bundleInfo;
     int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(formInfo.bundleName, flag, bundleInfo, userId))) {
+    if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(formInfo.bundleName, flag, userId, bundleInfo)) {
         HILOG_ERROR("get bundleInfo failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
@@ -478,15 +472,9 @@ std::shared_ptr<BundleFormInfo> FormInfoMgr::GetOrCreateBundleFromInfo(const std
 
 bool FormInfoMgr::IsCaller(const std::string& bundleName)
 {
-    auto bms = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (bms == nullptr) {
-        HILOG_ERROR("fail get Bundle Mgr");
-        return false;
-    }
     AppExecFwk::BundleInfo bundleInfo;
-    bool ret = IN_PROCESS_CALL(
-        bms->GetBundleInfo(bundleName, GET_BUNDLE_DEFAULT, bundleInfo, FormUtil::GetCurrentAccountId()));
-    if (!ret) {
+    if (!FormBmsHelper::GetInstance().GetBundleInfoDefault(
+        bundleName, FormUtil::GetCurrentAccountId(), bundleInfo)) {
         HILOG_ERROR("get bundleInfo failed");
         return false;
     }
@@ -574,21 +562,16 @@ bool FormInfoMgr::HasReloadedFormInfos(int32_t userId)
 
 ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     std::vector<ExtensionAbilityInfo> extensionInfos {};
-    if (!IN_PROCESS_CALL(iBundleMgr->QueryExtensionAbilityInfos(ExtensionAbilityType::FORM, userId, extensionInfos))) {
+    if (!FormBmsHelper::GetInstance().QueryExtensionAbilityInfosByType(
+        ExtensionAbilityType::FORM, userId, extensionInfos)) {
         HILOG_ERROR("get extension infos failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
     std::vector<BundleInfo> bundleInfos {};
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfos(
-        static_cast<int32_t>(GET_BUNDLE_INFO_WITH_ABILITY_EXTENSIONS), bundleInfos, userId))) {
+    if (!FormBmsHelper::GetInstance().GetBundleInfos(
+        static_cast<int32_t>(GET_BUNDLE_INFO_WITH_ABILITY_EXTENSIONS), bundleInfos, userId)) {
         HILOG_ERROR("get bundle infos failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
@@ -643,14 +626,9 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
     std::lock_guard<std::mutex> lock(appFormVisibleNotifyMapMutex_);
     auto iter = appFormVisibleNotifyMap_.find(bundleName);
     if (iter == appFormVisibleNotifyMap_.end()) {
-        sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-        if (iBundleMgr == nullptr) {
-            HILOG_ERROR("get IBundleMgr failed");
-            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-        }
         AppExecFwk::ApplicationInfo info;
-        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName,
-            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, providerUserId, info))) {
+        if (!FormBmsHelper::GetInstance().GetApplicationInfoByFlag(bundleName,
+            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, providerUserId, info)) {
             HILOG_ERROR("get ApplicationInfo failed");
             return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
         }

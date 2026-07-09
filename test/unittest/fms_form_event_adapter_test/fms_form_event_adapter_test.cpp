@@ -476,14 +476,13 @@ HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_001, Test
 {
     GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_001 start";
 
-    sptr<IBundleMgr> iBundleMgr = new MockBundleMgrStub();
     std::string bundleName = "com.test.bundle";
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
         .WillOnce(Return(false));
 
     auto result = FormEventAdapter::GetInstance().CheckKeepBackgroundRunningPermission(
-        iBundleMgr, bundleName);
+        bundleName);
     EXPECT_FALSE(result);
 
     GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_001 end";
@@ -499,14 +498,13 @@ HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_002, Test
 {
     GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_002 start";
 
-    sptr<IBundleMgr> iBundleMgr = new MockBundleMgrStub();
     std::string bundleName = "com.test.bundle";
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(BundleInfo()), Return(true)));
 
     auto result = FormEventAdapter::GetInstance().CheckKeepBackgroundRunningPermission(
-        iBundleMgr, bundleName);
+        bundleName);
     EXPECT_FALSE(result);
 
     GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_002 end";
@@ -522,7 +520,6 @@ HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_003, Test
 {
     GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_003 start";
 
-    sptr<IBundleMgr> iBundleMgr = new MockBundleMgrStub();
     std::string bundleName = "com.test.bundle";
 
     BundleInfo bundleInfo;
@@ -531,7 +528,7 @@ HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_003, Test
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
 
     auto result = FormEventAdapter::GetInstance().CheckKeepBackgroundRunningPermission(
-        iBundleMgr, bundleName);
+        bundleName);
     EXPECT_TRUE(result);
 
     GTEST_LOG_(INFO) << "CheckKeepBackgroundRunningPermission_003 end";

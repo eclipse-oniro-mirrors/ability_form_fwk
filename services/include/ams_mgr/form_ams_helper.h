@@ -23,6 +23,7 @@
 #include "common/event/form_event_handler.h"
 #include "common/util/form_serial_queue.h"
 #include "iconfiguration_observer.h"
+#include "start_options.h"
 #include "uri.h"
 
 namespace OHOS {
@@ -38,11 +39,6 @@ class FormAmsHelper final : public DelayedRefSingleton<FormAmsHelper> {
     DECLARE_DELAYED_REF_SINGLETON(FormAmsHelper)
 public:
     DISALLOW_COPY_AND_MOVE(FormAmsHelper);
-    /**
-     * @brief acquire a form ability manager if it not existed,
-     * @return returns the ability manager ipc object or nullptr for failed.
-     */
-    sptr<AAFwk::IAbilityManager> GetAbilityManager();
     /**
      * @brief Connect session with service ability.
      * @param want Special want for service type's ability.
@@ -110,7 +106,48 @@ public:
      */
     ErrCode StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject> &callerToken,
         uint32_t specifyTokenId, const int32_t userId);
+    /**
+     * @brief StartAbilityByCall, start ability by call with service ability.
+     * @param want Special want for service type's ability.
+     * @param connect Callback used to notify caller the result of connecting or disconnecting.
+     * @param callerToken The caller token of the ability to start.
+     * @param userId Designation User ID.
+     * @param isSilent Whether show window when start fail by interceptorExecuter.
+     * @param promotePriority Promote priority for sa when is manually clicked.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartAbilityByCall(const Want &want,
+        const sptr<AAFwk::IAbilityConnection> &connect, const sptr<IRemoteObject> &callerToken,
+        int32_t userId, bool isSilent, bool promotePriority);
+    /**
+     * @brief OpenLink, open link with ability manager service.
+     * @param want The want of the link to open.
+     * @param callerToken The caller token of the ability to start.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode OpenLink(const Want &want, const sptr<IRemoteObject> &callerToken);
+    /**
+     * @brief OpenAtomicService, open atomic service with ability manager service.
+     * @param want The want of the atomic service to open.
+     * @param startOptions The start options for the atomic service.
+     * @param callerToken The caller token of the ability to start.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode OpenAtomicService(Want &want, const StartOptions &startOptions,
+        const sptr<IRemoteObject> &callerToken);
+    /**
+     * @brief StartAbilityByCallerToken, start ability by caller token with ability manager service.
+     * @param want The want of the ability to start.
+     * @param callerToken The caller token of the ability to start.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartAbilityByCallerToken(const Want &want, const sptr<IRemoteObject> &callerToken);
 private:
+    /**
+     * @brief acquire a form ability manager, if it not existed,
+     * @return returns the ability manager ipc object, or nullptr for failed.
+     */
+    sptr<AAFwk::IAbilityManager> GetAbilityManager();
     /**
      * @brief Disconnect ability task, disconnect session with service ability.
      * @param want Special want for service type's ability.
@@ -119,6 +156,7 @@ private:
     void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
+    std::mutex abilityManagerMutex_;
     sptr<IConfigurationObserver> configurationObserver_ = nullptr;
     std::mutex configObserverMutex_;
 };

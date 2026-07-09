@@ -30,6 +30,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+constexpr int32_t DEFAULT_INVAL_VALUE = -1;
+
 FormAmsHelper::FormAmsHelper()
 {}
 
@@ -42,22 +44,28 @@ FormAmsHelper::~FormAmsHelper()
  */
 sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
 {
+    HILOG_DEBUG("call");
     if (abilityManager_ == nullptr) {
-        sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (systemManager == nullptr) {
-            HILOG_ERROR("get registry failed");
-            return nullptr;
+        std::lock_guard<std::mutex> lock(abilityManagerMutex_);
+        if (abilityManager_ == nullptr) {
+            sptr<ISystemAbilityManager> systemManager =
+                SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+            if (systemManager == nullptr) {
+                HILOG_ERROR("fail get system ability manager");
+                return nullptr;
+            }
+            auto remoteObject = systemManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
+            if (remoteObject == nullptr) {
+                HILOG_ERROR("fail get ability manager service");
+                return nullptr;
+            }
+            abilityManager_ = iface_cast<AAFwk::IAbilityManager>(remoteObject);
+            if (abilityManager_ == nullptr) {
+                HILOG_ERROR("fail iface_cast ability manager service");
+                return nullptr;
+            }
         }
-        sptr<IRemoteObject> remoteObject = systemManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
-        if (remoteObject == nullptr) {
-            HILOG_ERROR("connect AbilityMgrService failed");
-            return nullptr;
-        }
-        HILOG_DEBUG("connect AbilityMgrService success");
-
-        abilityManager_ = iface_cast<AAFwk::IAbilityManager>(remoteObject);
     }
-
     return abilityManager_;
 }
 
@@ -243,6 +251,82 @@ ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteO
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return IN_PROCESS_CALL(ams->StartAbilityWithSpecifyTokenId(want, callerToken, specifyTokenId, userId));
+}
+
+/**
+ * @brief StartAbilityByCall, start ability by call with service ability.
+ * @param want Special want for service type's ability.
+ * @param connect Callback used to notify caller the result of connecting or disconnecting.
+ * @param callerToken The caller token of the ability to start.
+ * @param userId Designation User ID.
+ * @param isSilent Whether show window when start fail by interceptorExecuter.
+ * @param promotePriority Promote priority for sa when is manually clicked.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormAmsHelper::StartAbilityByCall(const Want &want,
+    const sptr<AAFwk::IAbilityConnection> &connect, const sptr<IRemoteObject> &callerToken,
+    int32_t userId, bool isSilent, bool promotePriority)
+{
+    HILOG_DEBUG("call");
+    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("null ams");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return IN_PROCESS_CALL(ams->StartAbilityByCall(want, connect, callerToken, userId, isSilent, promotePriority));
+}
+
+/**
+ * @brief OpenLink, open link with ability manager service.
+ * @param want The want of the link to open.
+ * @param callerToken The caller token of the ability to start.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormAmsHelper::OpenLink(const Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("null ams");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return IN_PROCESS_CALL(ams->OpenLink(want, callerToken));
+}
+
+/**
+ * @brief OpenAtomicService, open atomic service with ability manager service.
+ * @param want The want of the atomic service to open.
+ * @param startOptions The start options for the atomic service.
+ * @param callerToken The caller token of the ability to start.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormAmsHelper::OpenAtomicService(Want &want, const StartOptions &startOptions,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("null ams");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return IN_PROCESS_CALL(ams->OpenAtomicService(want, startOptions, callerToken));
+}
+
+/**
+ * @brief StartAbilityByCallerToken, start ability by caller token with ability manager service.
+ * @param want The want of the ability to start.
+ * @param callerToken The caller token of the ability to start.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("null ams");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return IN_PROCESS_CALL(ams->StartAbility(want, callerToken, DEFAULT_INVAL_VALUE, DEFAULT_INVAL_VALUE));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
