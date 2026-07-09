@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formcallbackadapter_fuzzer.h"
+#include "formcallbackadaptertwo_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -164,31 +164,39 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormCallbackAdapter::GetInstance();
 
-    // Fuzz RegisterFormRouterProxy / UnregisterFormRouterProxy
-    std::vector<int64_t> formIds = GenerateFormIds(fdp);
-    sptr<IRemoteObject> callerToken = nullptr;
-    adapter.RegisterFormRouterProxy(formIds, callerToken);
-    adapter.UnregisterFormRouterProxy(formIds);
+    // Fuzz RegisterOverflowProxy / UnregisterOverflowProxy
+    sptr<IRemoteObject> overflowCallerToken = nullptr;
+    adapter.RegisterOverflowProxy(overflowCallerToken);
+    adapter.UnregisterOverflowProxy();
 
-    // Fuzz RegisterPublishFormInterceptor / UnregisterPublishFormInterceptor
-    sptr<IRemoteObject> interceptorCallback = nullptr;
-    adapter.RegisterPublishFormInterceptor(interceptorCallback);
-    adapter.UnregisterPublishFormInterceptor(interceptorCallback);
+    // Fuzz RequestOverflow
+    int64_t overflowFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t overflowCallingUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    OverflowInfo overflowInfo = GenerateOverflowInfo(fdp);
+    bool isOverflow = fdp->ConsumeBool();
+    adapter.RequestOverflow(overflowFormId, overflowCallingUid, overflowInfo, isOverflow);
 
-    // Fuzz RegisterFormWantCallback / UnregisterFormWantCallback
-    int32_t wantCallingUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
-    sptr<IRemoteObject> wantToken = nullptr;
-    adapter.RegisterFormWantCallback(wantCallingUid, wantToken);
-    adapter.UnregisterFormWantCallback(wantCallingUid);
+    // Fuzz RegisterChangeSceneAnimationStateProxy / UnregisterChangeSceneAnimationStateProxy
+    sptr<IRemoteObject> sceneAnimationToken = nullptr;
+    adapter.RegisterChangeSceneAnimationStateProxy(sceneAnimationToken);
+    adapter.UnregisterChangeSceneAnimationStateProxy();
 
-    // Fuzz GetWantCallbackProxy
-    sptr<IRemoteObject> wantProxy;
-    adapter.GetWantCallbackProxy(wantCallingUid, wantProxy);
+    // Fuzz ChangeSceneAnimationState
+    int64_t sceneFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t sceneCallingUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    int32_t state = fdp->ConsumeIntegralInRange<int32_t>(MIN_STATE, MAX_STATE);
+    adapter.ChangeSceneAnimationState(sceneFormId, sceneCallingUid, state);
 
-    // Fuzz SetFormPublishInterceptor / GetFormPublishInterceptor
-    sptr<IFormPublishInterceptor> interceptor = nullptr;
-    adapter.SetFormPublishInterceptor(interceptor);
-    adapter.GetFormPublishInterceptor();
+    // Fuzz RegisterGetFormRectProxy / UnregisterGetFormRectProxy
+    sptr<IRemoteObject> formRectToken = nullptr;
+    adapter.RegisterGetFormRectProxy(formRectToken);
+    adapter.UnregisterGetFormRectProxy();
+
+    // Fuzz GetFormRect
+    int64_t formRectFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t formRectCallingUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    Rect rect;
+    adapter.GetFormRect(formRectFormId, formRectCallingUid, rect);
 
     return true;
 }
