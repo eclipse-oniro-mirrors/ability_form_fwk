@@ -872,8 +872,18 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_001, TestSize.Le
     GTEST_LOG_(INFO) << "RequestPublishFormCrossUser_001 start";
 
     Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, TEST_FORM_NAME);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, TEST_DIMENSION_ID);
     int64_t formId = 0;
 
+    FormInfo formInfo;
+    formInfo.abilityName = TEST_ABILITY_NAME;
+    formInfo.name = TEST_FORM_NAME;
+    formInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
     EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
         .WillOnce(Return(-1));
 
@@ -893,9 +903,18 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_002, TestSize.Le
     GTEST_LOG_(INFO) << "RequestPublishFormCrossUser_002 start";
 
     Want want;
-    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, TEST_FORM_NAME);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, TEST_DIMENSION_ID);
     int64_t formId = 0;
 
+    FormInfo formInfo;
+    formInfo.abilityName = TEST_ABILITY_NAME;
+    formInfo.name = TEST_FORM_NAME;
+    formInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
     EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
         .WillOnce(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, AddRequestPublishFormInfo(_, _, _))
