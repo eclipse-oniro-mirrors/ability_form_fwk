@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formcallbackadapter_fuzzer.h"
+#include "formcallbackadapterfour_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -164,31 +164,42 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormCallbackAdapter::GetInstance();
 
-    // Fuzz RegisterFormRouterProxy / UnregisterFormRouterProxy
-    std::vector<int64_t> formIds = GenerateFormIds(fdp);
-    sptr<IRemoteObject> callerToken = nullptr;
-    adapter.RegisterFormRouterProxy(formIds, callerToken);
-    adapter.UnregisterFormRouterProxy(formIds);
+    // Fuzz RegisterUpdateFormsConfigCallback / UnregisterUpdateFormsConfigCallback
+    sptr<IRemoteObject> configToken = nullptr;
+    adapter.RegisterUpdateFormsConfigCallback(configToken);
+    adapter.UnregisterUpdateFormsConfigCallback();
 
-    // Fuzz RegisterPublishFormInterceptor / UnregisterPublishFormInterceptor
-    sptr<IRemoteObject> interceptorCallback = nullptr;
-    adapter.RegisterPublishFormInterceptor(interceptorCallback);
-    adapter.UnregisterPublishFormInterceptor(interceptorCallback);
+    // Fuzz UpdateFormsConfig
+    std::vector<FormCustomConfig> configs = GenerateFormCustomConfigs(fdp);
+    adapter.UpdateFormsConfig(configs);
 
-    // Fuzz RegisterFormWantCallback / UnregisterFormWantCallback
-    int32_t wantCallingUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
-    sptr<IRemoteObject> wantToken = nullptr;
-    adapter.RegisterFormWantCallback(wantCallingUid, wantToken);
-    adapter.UnregisterFormWantCallback(wantCallingUid);
+    // Fuzz RegisterDeleteFormsCallback / UnregisterDeleteFormsCallback
+    sptr<IRemoteObject> deleteToken = nullptr;
+    adapter.RegisterDeleteFormsCallback(deleteToken);
+    adapter.UnregisterDeleteFormsCallback();
 
-    // Fuzz GetWantCallbackProxy
-    sptr<IRemoteObject> wantProxy;
-    adapter.GetWantCallbackProxy(wantCallingUid, wantProxy);
+    // Fuzz DeleteForms
+    std::vector<FormRecordFilter> filters = GenerateFormRecordFilters(fdp);
+    adapter.DeleteForms(filters);
 
-    // Fuzz SetFormPublishInterceptor / GetFormPublishInterceptor
-    sptr<IFormPublishInterceptor> interceptor = nullptr;
-    adapter.SetFormPublishInterceptor(interceptor);
-    adapter.GetFormPublishInterceptor();
+    // Fuzz NotifyAllHosts (private): pass a registry built with a fuzzed tag and a no-op callback.
+    FormProxyRegistry notifyRegistry(fdp->ConsumeRandomLengthString(MAX_LENGTH));
+    std::string notifyTag = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::function<ErrCode(const sptr<IFormHostDelegate> &)> notifyCallback =
+        [](const sptr<IFormHostDelegate> &) -> ErrCode { return 0; };
+    adapter.NotifyAllHosts(notifyRegistry, notifyTag, notifyCallback);
+
+    // Fuzz IsForegroundApp (private)
+    (void)adapter.IsForegroundApp();
+
+    // Fuzz GetMatchedFormIds (private): out-param populated from fuzzed filters.
+    std::vector<FormRecordFilter> matchedFilters = GenerateFormRecordFilters(fdp);
+    std::vector<std::string> matchedFormIds;
+    adapter.GetMatchedFormIds(matchedFilters, matchedFormIds);
+
+    // Fuzz NotifyCachedFormConfigs (private): nullptr caller token is the safe default.
+    sptr<IRemoteObject> cachedCallerToken = nullptr;
+    adapter.NotifyCachedFormConfigs(cachedCallerToken);
 
     return true;
 }

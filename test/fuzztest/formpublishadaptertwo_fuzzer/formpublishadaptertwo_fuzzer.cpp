@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formpublishadapter_fuzzer.h"
+#include "formpublishadaptertwo_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -92,39 +92,66 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormPublishAdapter::GetInstance();
 
-    // Fuzz IsRequestPublishFormSupported
-    adapter.IsRequestPublishFormSupported();
+    // Fuzz GetCallerType
+    std::string callerBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    adapter.GetCallerType(callerBundleName);
 
-    // Fuzz IsActionAllowToPublish
-    std::string action = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    adapter.IsActionAllowToPublish(action);
+    // Fuzz CheckSnapshotWant
+    Want snapshotWant = GenerateWant(fdp);
+    adapter.CheckSnapshotWant(snapshotWant);
 
-    // Fuzz CheckPublishForm
-    Want checkWant = GenerateWant(fdp);
-    bool needCheckFormPermission = fdp->ConsumeBool();
-    adapter.CheckPublishForm(checkWant, needCheckFormPermission);
+    // Fuzz QueryPublishFormToHost
+    Want wantToHost = GenerateWant(fdp);
+    adapter.QueryPublishFormToHost(wantToHost);
 
-    // Fuzz CheckFormBundleName (private; bundleName is out-param)
-    Want bundleNameWant = GenerateWant(fdp);
-    std::string bundleNameOut;
-    bool bundleNameCheckPermission = fdp->ConsumeBool();
-    adapter.CheckFormBundleName(bundleNameWant, bundleNameOut, bundleNameCheckPermission);
+    // Fuzz QueryPublishFormToHost with userId
+    Want wantToHostUser = GenerateWant(fdp);
+    int32_t userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    adapter.QueryPublishFormToHost(wantToHostUser, userId);
 
-    // Fuzz IsValidPublishEvent (private)
-    Want publishEventWant = GenerateWant(fdp);
-    std::string publishEventBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    bool publishEventCheckPermission = fdp->ConsumeBool();
-    adapter.IsValidPublishEvent(publishEventBundleName, publishEventWant, publishEventCheckPermission);
+    // Fuzz RequestPublishFormCommon with proper setup
+    Want commonWant = CreateValidFormWant(fdp);
+    int32_t commonUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    int64_t commonFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    adapter.RequestPublishFormCommon(commonWant, commonUserId, commonFormId);
 
-    // Fuzz IsErmsSupportPublishForm
-    std::string ermsBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    std::vector<Want> ermsWants;
-    adapter.IsErmsSupportPublishForm(ermsBundleName, ermsWants);
+    // Fuzz RemoveFormIdMapElement
+    int64_t removeFormId;
+    SetupFormIdMapWithState(adapter, fdp, removeFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::UNKNOWN);
+    adapter.RemoveFormIdMapElement(removeFormId);
 
-    // Fuzz CheckIsSystemAppByBundleName (private)
-    int32_t systemAppUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
-    std::string systemAppBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    adapter.CheckIsSystemAppByBundleName(systemAppUserId, systemAppBundleName);
+    // Fuzz CheckAddFormTaskTimeoutOrFailed with FAILED state
+    int64_t checkFormId;
+    SetupFormIdMapWithState(adapter, fdp, checkFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::FAILED);
+    AddFormResultErrorCodes formStates;
+    adapter.CheckAddFormTaskTimeoutOrFailed(checkFormId, formStates);
+
+    // Fuzz CheckAddFormTaskTimeoutOrFailed with TIMEOUT state
+    int64_t checkFormId2;
+    SetupFormIdMapWithState(adapter, fdp, checkFormId2, OHOS::AppExecFwk::AddFormResultErrorCodes::TIMEOUT);
+    AddFormResultErrorCodes formStates2;
+    adapter.CheckAddFormTaskTimeoutOrFailed(checkFormId2, formStates2);
+
+    // Fuzz CheckAddFormTaskTimeoutOrFailed with UNKNOWN state
+    int64_t checkFormId3;
+    SetupFormIdMapWithState(adapter, fdp, checkFormId3, OHOS::AppExecFwk::AddFormResultErrorCodes::UNKNOWN);
+    AddFormResultErrorCodes formStates3;
+    adapter.CheckAddFormTaskTimeoutOrFailed(checkFormId3, formStates3);
+
+    // Fuzz AcquireAddFormResult with SUCCESS state
+    int64_t acquireFormId;
+    SetupFormIdMapWithState(adapter, fdp, acquireFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::SUCCESS);
+    adapter.AcquireAddFormResult(acquireFormId);
+
+    // Fuzz AcquireAddFormResult with FAILED state
+    int64_t acquireFormId2;
+    SetupFormIdMapWithState(adapter, fdp, acquireFormId2, OHOS::AppExecFwk::AddFormResultErrorCodes::FAILED);
+    adapter.AcquireAddFormResult(acquireFormId2);
+
+    // Fuzz AcquireAddFormResult with TIMEOUT state
+    int64_t acquireFormId3;
+    SetupFormIdMapWithState(adapter, fdp, acquireFormId3, OHOS::AppExecFwk::AddFormResultErrorCodes::TIMEOUT);
+    adapter.AcquireAddFormResult(acquireFormId3);
 
     return true;
 }

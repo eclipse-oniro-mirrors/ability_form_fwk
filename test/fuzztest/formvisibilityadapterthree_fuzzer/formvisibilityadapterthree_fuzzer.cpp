@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formvisibilityadapter_fuzzer.h"
+#include "formvisibilityadapterthree_fuzzer.h"
 
 #include <cctype>
 #include <cstddef>
@@ -157,27 +157,56 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormVisibilityAdapter::GetInstance();
 
-    // Fuzz Init
-    adapter.Init();
+    // Fuzz NotifyWhetherVisibleForms with nullptr callerToken (tests error path).
+    // High-risk: routes through FormMgrQueue::ScheduleTask (ffrt).
+    std::vector<int64_t> visibleFormIds = GenerateFormIdVector(fdp);
+    sptr<IRemoteObject> visibleCallerToken = nullptr;
+    int32_t formVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    adapter.NotifyWhetherVisibleForms(visibleFormIds, visibleCallerToken, formVisibleType);
 
-    // Fuzz HasFormVisible
-    uint32_t tokenId = static_cast<uint32_t>(fdp->ConsumeIntegralInRange<int32_t>(MIN_TOKEN_ID, MAX_TOKEN_ID));
-    adapter.HasFormVisible(tokenId);
+    // Fuzz NotifyFormsEnableUpdate with nullptr callerToken.
+    // High-risk: routes through FormMgrQueue::ScheduleTask (ffrt).
+    std::vector<int64_t> enableUpdateFormIds = GenerateFormIdVector(fdp);
+    bool isEnableUpdate = fdp->ConsumeBool();
+    sptr<IRemoteObject> enableUpdateCallerToken = nullptr;
+    adapter.NotifyFormsEnableUpdate(enableUpdateFormIds, isEnableUpdate, enableUpdateCallerToken);
 
-    // Fuzz NotifyFormsVisible with nullptr callerToken
-    std::vector<int64_t> notifyVisibleFormIds = GenerateFormIdVector(fdp);
-    bool isVisible = fdp->ConsumeBool();
-    sptr<IRemoteObject> notifyVisibleCallerToken = nullptr;
-    adapter.NotifyFormsVisible(notifyVisibleFormIds, isVisible, notifyVisibleCallerToken);
+    // Fuzz SetVisibleChange (private).
+    // High-risk: invoked on ffrt-scheduled path.
+    int64_t setVisibleFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t setVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    int32_t setUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    adapter.SetVisibleChange(setVisibleFormId, setVisibleType, setUserId);
 
-    // Fuzz SetFormsRecyclable
-    std::vector<int64_t> recyclableFormIds = GenerateFormIdVector(fdp);
-    adapter.SetFormsRecyclable(recyclableFormIds);
+    // Fuzz HandlerNotifyWhetherVisibleForms with nullptr callerToken.
+    // High-risk: routes through FormMgrQueue::ScheduleTask (ffrt).
+    std::vector<int64_t> handlerFormIds = GenerateFormIdVector(fdp);
+    std::unordered_map<std::string, std::vector<FormInstance>> handlerInstanceMaps = GenerateFormInstanceMaps(fdp);
+    std::unordered_map<std::string, std::vector<int64_t>> handlerEventMaps = GenerateEventMaps(fdp);
+    int32_t handlerVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    sptr<IRemoteObject> handlerCallerToken = nullptr;
+    adapter.HandlerNotifyWhetherVisibleForms(handlerFormIds, handlerInstanceMaps, handlerEventMaps,
+        handlerVisibleType, handlerCallerToken);
 
-    // Fuzz NotifyFormLocked
-    int64_t lockedFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
-    bool isLocked = fdp->ConsumeBool();
-    adapter.NotifyFormLocked(lockedFormId, isLocked);
+    // Fuzz PostVisibleNotify (private) with minimal inputs and nullptr callerToken.
+    // High-risk: posts delayed task via ffrt.
+    std::vector<int64_t> postVisibleFormIds = GenerateFormIdVector(fdp);
+    std::unordered_map<std::string, std::vector<FormInstance>> postInstanceMaps;
+    std::unordered_map<std::string, std::vector<int64_t>> postEventMaps;
+    int32_t postVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    int32_t postNotifyDelay = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_VECTOR_SIZE);
+    sptr<IRemoteObject> postCallerToken = nullptr;
+    adapter.PostVisibleNotify(postVisibleFormIds, postInstanceMaps, postEventMaps, postVisibleType,
+        postNotifyDelay, postCallerToken);
+
+    // Fuzz UpdateProviderInfoToHost (private) with nullptr callerToken.
+    // High-risk: routes through FormRenderQueue::ScheduleTask (ffrt).
+    int64_t updateFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t updateUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    sptr<IRemoteObject> updateCallerToken = nullptr;
+    int32_t updateVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    FormRecord updateRecord = GenerateFormRecord(fdp);
+    adapter.UpdateProviderInfoToHost(updateFormId, updateUserId, updateCallerToken, updateVisibleType, updateRecord);
 
     return true;
 }

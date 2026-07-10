@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formeventadapter_fuzzer.h"
+#include "formeventadaptertwo_fuzzer.h"
 
 #include <cctype>
 #include <cstddef>
@@ -104,14 +104,27 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormEventAdapter::GetInstance();
 
-    // Fuzz SetFreeInstallFlag
-    FormRecord freeInstallRecord = GenerateFormRecord(fdp);
-    Want freeInstallWant = GenerateWant(fdp);
-    adapter.SetFreeInstallFlag(freeInstallRecord, freeInstallWant);
+    // Fuzz MessageEvent with nullptr callerToken (tests error path)
+    // High risk: routes through NotifyFormClickEvent -> FormMgrQueue::ScheduleTask -> ffrt
+    int64_t messageFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    Want messageWant = GenerateWant(fdp);
+    messageWant.SetParam(Constants::PARAM_MESSAGE_KEY, GenerateSafeString(fdp, MAX_LENGTH));
+    sptr<IRemoteObject> messageCallerToken = nullptr;
+    adapter.MessageEvent(messageFormId, messageWant, messageCallerToken);
 
-    // Fuzz CheckKeepBackgroundRunningPermission (error path)
-    std::string keepBundleName = GenerateSafeString(fdp, MAX_LENGTH);
-    adapter.CheckKeepBackgroundRunningPermission(keepBundleName);
+    // Fuzz RouterEvent with nullptr callerToken
+    // High risk: routes through NotifyFormClickEvent -> FormMgrQueue::ScheduleTask -> ffrt
+    int64_t routerFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    Want routerWant = GenerateWant(fdp);
+    sptr<IRemoteObject> routerCallerToken = nullptr;
+    adapter.RouterEvent(routerFormId, routerWant, routerCallerToken);
+
+    // Fuzz BackgroundEvent with nullptr callerToken
+    // High risk: routes through NotifyFormClickEvent -> FormMgrQueue::ScheduleTask -> ffrt
+    int64_t backgroundFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    Want backgroundWant = GenerateWant(fdp);
+    sptr<IRemoteObject> backgroundCallerToken = nullptr;
+    adapter.BackgroundEvent(backgroundFormId, backgroundWant, backgroundCallerToken);
 
     return true;
 }

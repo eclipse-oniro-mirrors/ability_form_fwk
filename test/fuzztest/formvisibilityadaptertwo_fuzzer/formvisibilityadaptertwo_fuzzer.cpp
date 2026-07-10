@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formvisibilityadapter_fuzzer.h"
+#include "formvisibilityadaptertwo_fuzzer.h"
 
 #include <cctype>
 #include <cstddef>
@@ -157,27 +157,31 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormVisibilityAdapter::GetInstance();
 
-    // Fuzz Init
-    adapter.Init();
+    // Fuzz PaddingNotifyVisibleFormsMap
+    int32_t paddingVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    int64_t paddingFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    std::unordered_map<std::string, std::vector<FormInstance>> paddingMaps = GenerateFormInstanceMaps(fdp);
+    adapter.PaddingNotifyVisibleFormsMap(paddingVisibleType, paddingFormId, paddingMaps);
 
-    // Fuzz HasFormVisible
-    uint32_t tokenId = static_cast<uint32_t>(fdp->ConsumeIntegralInRange<int32_t>(MIN_TOKEN_ID, MAX_TOKEN_ID));
-    adapter.HasFormVisible(tokenId);
+    // Fuzz HandleEventNotify (private). Use a provider key with delimiters to exercise both
+    // success path and error path (no delimiter) via fuzzed string.
+    std::string providerKey = GenerateSafeString(fdp, MAX_LENGTH);
+    std::vector<int64_t> eventFormIds = GenerateFormIdVector(fdp);
+    int32_t eventVisibleType = fdp->ConsumeIntegralInRange<int32_t>(MIN_FORM_VISIBLE_TYPE, MAX_FORM_VISIBLE_TYPE);
+    adapter.HandleEventNotify(providerKey, eventFormIds, eventVisibleType);
 
-    // Fuzz NotifyFormsVisible with nullptr callerToken
-    std::vector<int64_t> notifyVisibleFormIds = GenerateFormIdVector(fdp);
-    bool isVisible = fdp->ConsumeBool();
-    sptr<IRemoteObject> notifyVisibleCallerToken = nullptr;
-    adapter.NotifyFormsVisible(notifyVisibleFormIds, isVisible, notifyVisibleCallerToken);
+    // Fuzz CreateHandleEventMap (private)
+    int64_t createHandleFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    FormRecord createHandleRecord = GenerateFormRecord(fdp);
+    std::unordered_map<std::string, std::vector<int64_t>> createHandleEventMaps = GenerateEventMaps(fdp);
+    adapter.CreateHandleEventMap(createHandleFormId, createHandleRecord, createHandleEventMaps);
 
-    // Fuzz SetFormsRecyclable
-    std::vector<int64_t> recyclableFormIds = GenerateFormIdVector(fdp);
-    adapter.SetFormsRecyclable(recyclableFormIds);
-
-    // Fuzz NotifyFormLocked
-    int64_t lockedFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
-    bool isLocked = fdp->ConsumeBool();
-    adapter.NotifyFormLocked(lockedFormId, isLocked);
+    // Fuzz isFormShouldUpdateProviderInfoToHost (private) with nullptr callerToken
+    int64_t checkFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    int32_t checkUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
+    sptr<IRemoteObject> checkCallerToken = nullptr;
+    FormRecord checkRecord = GenerateFormRecord(fdp);
+    adapter.isFormShouldUpdateProviderInfoToHost(checkFormId, checkUserId, checkCallerToken, checkRecord);
 
     return true;
 }

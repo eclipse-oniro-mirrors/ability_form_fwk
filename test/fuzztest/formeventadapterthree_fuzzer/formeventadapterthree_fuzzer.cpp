@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formeventadapter_fuzzer.h"
+#include "formeventadapterthree_fuzzer.h"
 
 #include <cctype>
 #include <cstddef>
@@ -104,14 +104,29 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormEventAdapter::GetInstance();
 
-    // Fuzz SetFreeInstallFlag
-    FormRecord freeInstallRecord = GenerateFormRecord(fdp);
-    Want freeInstallWant = GenerateWant(fdp);
-    adapter.SetFreeInstallFlag(freeInstallRecord, freeInstallWant);
+    // Fuzz OpenByOpenType with varied openType values (covers all enum branches)
+    // High risk: routes through NotifyFormClickEvent -> FormMgrQueue::ScheduleTask -> ffrt
+    FormRecord openRecord = GenerateFormRecord(fdp);
+    Want openWant = GenerateWant(fdp);
+    sptr<IRemoteObject> openCallerToken = nullptr;
+    int32_t openResult = 0;
+    int32_t openType = fdp->ConsumeIntegralInRange<int32_t>(MIN_OPEN_TYPE, MAX_OPEN_TYPE);
+    adapter.OpenByOpenType(openType, openRecord, openCallerToken, openWant, openResult);
 
-    // Fuzz CheckKeepBackgroundRunningPermission (error path)
-    std::string keepBundleName = GenerateSafeString(fdp, MAX_LENGTH);
-    adapter.CheckKeepBackgroundRunningPermission(keepBundleName);
+    // Fuzz OpenByOpenType with another random openType for more branch coverage
+    // High risk: routes through NotifyFormClickEvent -> FormMgrQueue::ScheduleTask -> ffrt
+    FormRecord openRecord2 = GenerateFormRecord(fdp);
+    Want openWant2 = GenerateWant(fdp);
+    int32_t openResult2 = 0;
+    int32_t openType2 = fdp->ConsumeIntegralInRange<int32_t>(MIN_OPEN_TYPE, MAX_OPEN_TYPE);
+    adapter.OpenByOpenType(openType2, openRecord2, openCallerToken, openWant2, openResult2);
+
+    // Fuzz NotifyFormClickEvent (private, exposed via #define private public)
+    // High risk: directly submits to FormMgrQueue::ScheduleTask -> ffrt
+    int64_t clickFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    std::string clickType = GenerateSafeString(fdp, MAX_LENGTH);
+    int32_t clickUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    adapter.NotifyFormClickEvent(clickFormId, clickType, clickUserId);
 
     return true;
 }

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formcallbackadapter_fuzzer.h"
+#include "formcallbackadapterthree_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -164,31 +164,36 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormCallbackAdapter::GetInstance();
 
-    // Fuzz RegisterFormRouterProxy / UnregisterFormRouterProxy
-    std::vector<int64_t> formIds = GenerateFormIds(fdp);
-    sptr<IRemoteObject> callerToken = nullptr;
-    adapter.RegisterFormRouterProxy(formIds, callerToken);
-    adapter.UnregisterFormRouterProxy(formIds);
+    // Fuzz RegisterGetLiveFormStatusProxy / UnregisterGetLiveFormStatusProxy
+    sptr<IRemoteObject> liveFormStatusToken = nullptr;
+    adapter.RegisterGetLiveFormStatusProxy(liveFormStatusToken);
+    adapter.UnregisterGetLiveFormStatusProxy();
 
-    // Fuzz RegisterPublishFormInterceptor / UnregisterPublishFormInterceptor
-    sptr<IRemoteObject> interceptorCallback = nullptr;
-    adapter.RegisterPublishFormInterceptor(interceptorCallback);
-    adapter.UnregisterPublishFormInterceptor(interceptorCallback);
+    // Fuzz GetLiveFormStatus
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    adapter.GetLiveFormStatus(liveFormStatusMap);
 
-    // Fuzz RegisterFormWantCallback / UnregisterFormWantCallback
-    int32_t wantCallingUid = fdp->ConsumeIntegralInRange<int32_t>(MIN_CALLING_UID, MAX_CALLING_UID);
-    sptr<IRemoteObject> wantToken = nullptr;
-    adapter.RegisterFormWantCallback(wantCallingUid, wantToken);
-    adapter.UnregisterFormWantCallback(wantCallingUid);
+    // Fuzz StartAbilityByFms
+    Want want = GenerateWant(fdp);
+    adapter.StartAbilityByFms(want);
 
-    // Fuzz GetWantCallbackProxy
-    sptr<IRemoteObject> wantProxy;
-    adapter.GetWantCallbackProxy(wantCallingUid, wantProxy);
+    // Fuzz RegisterPublishFormCrossBundleControl / UnregisterPublishFormCrossBundleControl
+    sptr<IRemoteObject> crossBundleToken = nullptr;
+    adapter.RegisterPublishFormCrossBundleControl(crossBundleToken);
+    adapter.UnregisterPublishFormCrossBundleControl();
 
-    // Fuzz SetFormPublishInterceptor / GetFormPublishInterceptor
-    sptr<IFormPublishInterceptor> interceptor = nullptr;
-    adapter.SetFormPublishInterceptor(interceptor);
-    adapter.GetFormPublishInterceptor();
+    // Fuzz PublishFormCrossBundleControl
+    PublishFormCrossBundleInfo bundleInfo = GeneratePublishFormCrossBundleInfo(fdp);
+    adapter.PublishFormCrossBundleControl(bundleInfo);
+
+    // Fuzz RegisterTemplateFormDetailInfoChange / UnregisterTemplateFormDetailInfoChange
+    sptr<IRemoteObject> templateToken = nullptr;
+    adapter.RegisterTemplateFormDetailInfoChange(templateToken);
+    adapter.UnregisterTemplateFormDetailInfoChange();
+
+    // Fuzz UpdateTemplateFormDetailInfo
+    std::vector<TemplateFormDetailInfo> templateFormInfo = GenerateTemplateFormDetailInfos(fdp);
+    adapter.UpdateTemplateFormDetailInfo(templateFormInfo);
 
     return true;
 }

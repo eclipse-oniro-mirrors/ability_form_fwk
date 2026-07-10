@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formpublishadapter_fuzzer.h"
+#include "formpublishadapterthree_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -92,39 +92,53 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormPublishAdapter::GetInstance();
 
-    // Fuzz IsRequestPublishFormSupported
-    adapter.IsRequestPublishFormSupported();
+    // Fuzz IncreaseAddFormRequestTimeOutTask
+    int64_t increaseFormId;
+    SetupFormIdMapWithState(adapter, fdp, increaseFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::UNKNOWN);
+    adapter.IncreaseAddFormRequestTimeOutTask(increaseFormId);
 
-    // Fuzz IsActionAllowToPublish
-    std::string action = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    adapter.IsActionAllowToPublish(action);
+    // Fuzz CancelAddFormRequestTimeOutTask
+    int64_t cancelFormId;
+    SetupFormIdMapWithState(adapter, fdp, cancelFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::UNKNOWN);
+    int32_t cancelResult = fdp->ConsumeIntegralInRange<int32_t>(MIN_RESULT, MAX_RESULT);
+    adapter.CancelAddFormRequestTimeOutTask(cancelFormId, cancelResult);
 
-    // Fuzz CheckPublishForm
-    Want checkWant = GenerateWant(fdp);
-    bool needCheckFormPermission = fdp->ConsumeBool();
-    adapter.CheckPublishForm(checkWant, needCheckFormPermission);
+    // Fuzz SetPublishFormResult with existing formId (covers state update branches)
+    int64_t resultFormId;
+    SetupFormIdMapWithState(adapter, fdp, resultFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::UNKNOWN);
+    Constants::PublishFormResult errorCodeInfo;
+    errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(fdp->ConsumeIntegralInRange<int32_t>(0, 10));
+    errorCodeInfo.message = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    adapter.SetPublishFormResult(resultFormId, errorCodeInfo);
 
-    // Fuzz CheckFormBundleName (private; bundleName is out-param)
-    Want bundleNameWant = GenerateWant(fdp);
-    std::string bundleNameOut;
-    bool bundleNameCheckPermission = fdp->ConsumeBool();
-    adapter.CheckFormBundleName(bundleNameWant, bundleNameOut, bundleNameCheckPermission);
+    // Fuzz RequestPublishForm (5-arg variant with binding data + formId out-param) with proper setup
+    Want publishWant = CreateValidFormWant(fdp);
+    bool withFormBindingData = fdp->ConsumeBool();
+    std::unique_ptr<FormProviderData> formBindingData = nullptr;
+    int64_t publishFormId = 0;
+    std::vector<FormDataProxy> formDataProxies;
+    bool needCheckFormPermissionPublish = fdp->ConsumeBool();
+    adapter.RequestPublishForm(publishWant, withFormBindingData, formBindingData, publishFormId,
+        formDataProxies, needCheckFormPermissionPublish);
 
-    // Fuzz IsValidPublishEvent (private)
-    Want publishEventWant = GenerateWant(fdp);
-    std::string publishEventBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    bool publishEventCheckPermission = fdp->ConsumeBool();
-    adapter.IsValidPublishEvent(publishEventBundleName, publishEventWant, publishEventCheckPermission);
+    // Fuzz RequestPublishFormToHost (private, single-arg) with proper setup
+    Want toHostWant = CreateValidFormWant(fdp);
+    int64_t toHostFormId;
+    SetupFormIdMapWithState(adapter, fdp, toHostFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::UNKNOWN);
+    adapter.RequestPublishFormToHost(toHostWant);
 
-    // Fuzz IsErmsSupportPublishForm
-    std::string ermsBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    std::vector<Want> ermsWants;
-    adapter.IsErmsSupportPublishForm(ermsBundleName, ermsWants);
+    // Fuzz RequestPublishFormToHost (private, two-arg with userId) with proper setup
+    Want toHostUserWant = CreateValidFormWant(fdp);
+    int64_t toHostUserFormId;
+    SetupFormIdMapWithState(adapter, fdp, toHostUserFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::SUCCESS);
+    int32_t toHostUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    adapter.RequestPublishFormToHost(toHostUserWant, toHostUserId);
 
-    // Fuzz CheckIsSystemAppByBundleName (private)
-    int32_t systemAppUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
-    std::string systemAppBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    adapter.CheckIsSystemAppByBundleName(systemAppUserId, systemAppBundleName);
+    // Fuzz RequestPublishFormCrossUser with proper setup
+    Want crossUserWant = CreateValidFormWant(fdp);
+    int32_t crossUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    int64_t crossUserFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
+    adapter.RequestPublishFormCrossUser(crossUserWant, crossUserId, crossUserFormId);
 
     return true;
 }
