@@ -40,6 +40,16 @@ enum class ArrayType {
     NOT_ARRAY,
 };
 
+constexpr int32_t MAX_JSON_PARSE_DEPTH = 128;
+
+/**
+ * @brief Parse JSON string with depth limit to prevent stack overflow.
+ * @param jsonStr JSON string to parse.
+ * @param allowExceptions Whether to throw exceptions on parse error.
+ * @return Parsed json object if depth within limit; discarded json if depth exceeds MAX_JSON_PARSE_DEPTH.
+ */
+nlohmann::json SafeJsonParse(const std::string &jsonStr, bool allowExceptions = false);
+
 template<typename T, typename dataType>
 void CheckArrayType(const nlohmann::json &jsonObject, const std::string &key,
     dataType &data, ArrayType arrayType, int32_t &parseResult)
@@ -173,7 +183,7 @@ bool ParseInfoFromJsonStr(const char *data, T &t)
         return false;
     }
 
-    nlohmann::json jsonObject = nlohmann::json::parse(data, nullptr, false);
+    nlohmann::json jsonObject = SafeJsonParse(data, false);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("data is discarded");
         return false;
