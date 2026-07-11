@@ -51,7 +51,8 @@ enum class AddFormResultErrorCodes : int8_t {
     UNKNOWN = 0,
     SUCCESS,
     FAILED,
-    TIMEOUT
+    TIMEOUT,
+    NO_SPACE
 };
 
 /**

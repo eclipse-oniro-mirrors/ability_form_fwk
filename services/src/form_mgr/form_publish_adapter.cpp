@@ -341,6 +341,10 @@ ErrCode FormPublishAdapter::AcquireAddFormResult(const int64_t formId)
                 HILOG_INFO("Acquire the result of the success");
                 *ret = ERR_OK;
                 return true;
+            } else if (iter->second == AddFormResultErrorCodes::NO_SPACE) {
+                HILOG_ERROR("Acquire the result of no space");
+                *ret = ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE;
+                return true;
             } else if (iter->second == AddFormResultErrorCodes::FAILED) {
                 HILOG_ERROR("Acquire the result of the failed");
                 *ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -375,10 +379,10 @@ ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants
     if (iter != formIdMap_.end()) {
         if (errorCodeInfo.code == Constants::PublishFormErrorCode::SUCCESS) {
             iter->second = AddFormResultErrorCodes::SUCCESS;
-            errorCodeInfo.message = "set add form success, PublishFormErrorCode is success";
+        } else if (errorCodeInfo.code == Constants::PublishFormErrorCode::NO_SPACE) {
+            iter->second = AddFormResultErrorCodes::NO_SPACE;
         } else {
             iter->second = AddFormResultErrorCodes::FAILED;
-            errorCodeInfo.message = "set add form fail, PublishFormErrorCode is not success";
         }
         condition_.notify_all();
         return ERR_OK;
@@ -634,7 +638,8 @@ ErrCode FormPublishAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId
     std::lock_guard<std::mutex> lock(formResultMutex_);
     auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [formId, &formStates] (const auto elem) {
         if (elem.first == formId) {
-            if (elem.second == AddFormResultErrorCodes::FAILED || elem.second == AddFormResultErrorCodes::TIMEOUT) {
+            if (elem.second == AddFormResultErrorCodes::FAILED || elem.second == AddFormResultErrorCodes::TIMEOUT
+                || elem.second == AddFormResultErrorCodes::NO_SPACE) {
                 return true;
             }
             formStates = elem.second;

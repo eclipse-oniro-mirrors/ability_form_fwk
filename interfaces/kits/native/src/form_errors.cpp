@@ -303,6 +303,10 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
             ERR_FORM_EXTERNAL_PERMISSION_DENIED,
             "check permission denied, need to request ohos.permission.FORM_CUSTOM_CONFIG."
         }
+    },
+    {
+        ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "there is no space to publish form" }
     }
 };
 
