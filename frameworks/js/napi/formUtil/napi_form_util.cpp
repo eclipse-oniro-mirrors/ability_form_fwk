@@ -413,6 +413,9 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
+        if (asyncCallbackInfo->callback != nullptr) {
+            napi_delete_reference(env, callbackInfo->callback);
+        }
         delete asyncCallbackInfo;
         return nullptr;
     }

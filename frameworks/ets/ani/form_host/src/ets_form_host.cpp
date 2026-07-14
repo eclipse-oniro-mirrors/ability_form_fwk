@@ -1426,7 +1426,13 @@ public:
     {
         if (handler_) {
             handler_->PostSyncTask(
-                [client = shared_from_this(), state]() { client->task_(static_cast<int32_t>(state), client->want_); });
+                [client = shared_from_this(), state]() {
+                    if (client == nullptr) {
+                        HILOG_ERROR("client is nullptr");
+                        return;
+                    }
+                    client->task_(static_cast<int32_t>(state), client->want_);
+                });
         }
     }
 

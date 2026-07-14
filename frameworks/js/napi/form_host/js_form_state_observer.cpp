@@ -45,7 +45,9 @@ FormAddCallbackClient::FormAddCallbackClient(napi_env env, napi_ref callbackRef)
 
 FormAddCallbackClient::~FormAddCallbackClient()
 {
-    napi_delete_reference(env_, callbackRef_);
+    if (callbackRef_ != nullptr) {
+        napi_delete_reference(env_, callbackRef_);
+    }
 }
 
 void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
@@ -99,7 +101,9 @@ FormRemoveCallbackClient::FormRemoveCallbackClient(napi_env env, napi_ref callba
 
 FormRemoveCallbackClient::~FormRemoveCallbackClient()
 {
-    napi_delete_reference(env_, callbackRef_);
+    if (callbackRef_ != nullptr) {
+        napi_delete_reference(env_, callbackRef_);
+    }
 }
 
 void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
@@ -187,7 +191,7 @@ bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
     const std::string &bundleName, const napi_value callback)
 {
     HILOG_DEBUG("start");
-    napi_ref callbackRef;
+    napi_ref callbackRef = nullptr;
     napi_create_reference(env, callback, REF_COUNT, &callbackRef);
     std::shared_ptr<FormAddCallbackClient> callbackClient = std::make_shared<FormAddCallbackClient>(env,
         callbackRef);
@@ -216,7 +220,7 @@ bool JsFormStateObserver::RegisterFormRemoveCallback(const napi_env env,
     const std::string &bundleName, const napi_value callback)
 {
     HILOG_DEBUG("start");
-    napi_ref callbackRef;
+    napi_ref callbackRef = nullptr;
     napi_create_reference(env, callback, REF_COUNT, &callbackRef);
     std::shared_ptr<FormRemoveCallbackClient> callbackClient =
         std::make_shared<FormRemoveCallbackClient>(env, callbackRef);
@@ -692,7 +696,7 @@ void FormEventCallbackList::PushCallback(napi_value call)
         return;
     }
     if (!ContainEqualCallback(call)) {
-        napi_ref callbackRef;
+        napi_ref callbackRef = nullptr;
         napi_create_reference(env_, call, REF_COUNT, &callbackRef);
         if (callbackRef != nullptr) {
             callbacks_.emplace_back(callbackRef);

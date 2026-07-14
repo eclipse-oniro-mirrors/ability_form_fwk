@@ -1344,6 +1344,7 @@ napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env,
     ErrCode result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
         JsFormProviderProxyMgr::GetInstance());
     if (result != ERR_OK) {
+        napi_delete_reference(env, callbackRef);
         if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
             result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
         }

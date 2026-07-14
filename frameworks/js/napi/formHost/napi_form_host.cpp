@@ -283,6 +283,10 @@ public:
         }
         // When uv_queue_work_with_qos returns 0, asyncCallbackInfo_ and work will be freed in the callback function.
         if (result != 0) {
+            if (asyncCallbackInfo_->callback != nullptr) {
+                napi_delete_reference(asyncCallbackInfo_->env, asyncCallbackInfo_->callback);
+                asyncCallbackInfo_->callback = nullptr;
+            }
             delete asyncCallbackInfo_;
             asyncCallbackInfo_ = nullptr;
             delete work;
@@ -471,6 +475,9 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
         HILOG_ERROR("async work failed!");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        }
+        if (asyncCallbackInfo->callback != nullptr) {
+            napi_delete_reference(env, asyncCallbackInfo->callback);
         }
         delete asyncCallbackInfo;
         return nullptr;

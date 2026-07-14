@@ -19,6 +19,7 @@
 #include "data_center/form_data_mgr.h"
 #include "common/event/form_event_handler.h"
 #include "form_mgr_errors.h"
+#include "form_host/form_host_record.h"
 #include "form_host_interface.h"
 #include "form_provider_interface.h"
 #include "common/util/form_serial_queue.h"
@@ -35,6 +36,7 @@ namespace {
 constexpr int64_t FORM_SHARE_INFO_DELAY_TIMER = 50000;
 constexpr int64_t FORM_PACKAGE_FREE_INSTALL_TIMER = 40000;
 constexpr int64_t FORM_SHARE_INFO_MAX_SIZE = 32;
+constexpr size_t MAX_FORM_SHARE_INFO_KEY_LENGTH = 510;
 constexpr const char* ACTION_SHARE_FORM = "action.form.share";
 }
 
@@ -60,6 +62,13 @@ int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, con
     if (!isFormRecExist) {
         HILOG_ERROR("form share info get formRecord failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+
+    FormHostRecord formHostRecord;
+    bool hasRecord = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
+    if (!hasRecord) {
+        HILOG_ERROR("form share info get matched host client failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     {
@@ -212,7 +221,12 @@ bool FormShareMgr::CheckFormShareInfo(const FormShareInfo &info)
 
 std::string FormShareMgr::MakeFormShareInfoKey(const FormShareInfo &info)
 {
-    return (info.bundleName + info.moduleName + info.abilityName + info.formName);
+    std::string key = info.bundleName + info.moduleName + info.abilityName + info.formName;
+    if (key.length() > MAX_FORM_SHARE_INFO_KEY_LENGTH) {
+        HILOG_WARN("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
+        key.resize(MAX_FORM_SHARE_INFO_KEY_LENGTH);
+    }
+    return key;
 }
 
 std::string FormShareMgr::MakeFormShareInfoKey(const Want &want)
@@ -221,7 +235,12 @@ std::string FormShareMgr::MakeFormShareInfoKey(const Want &want)
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    return (bundleName + moduleName + abilityName + formName);
+    std::string key = bundleName + moduleName + abilityName + formName;
+    if (key.length() > MAX_FORM_SHARE_INFO_KEY_LENGTH) {
+        HILOG_WARN("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
+        key.resize(MAX_FORM_SHARE_INFO_KEY_LENGTH);
+    }
+    return key;
 }
 
 void FormShareMgr::StartFormUser(const FormShareInfo &info, const int32_t userId)

@@ -44,6 +44,11 @@ bool SignTools::VerifyFileSign(const std::string &pubKeyPath, const std::string 
 
     BIO *bio = BIO_new_file(pubKeyPath.c_str(), "r");
 
+    if (bio == nullptr) {
+        HILOG_ERROR("open pubKey file is failed");
+        return false;
+    }
+
     RSA *pubKey = RSA_new();
 
     if (PEM_read_bio_RSA_PUBKEY(bio, &pubKey, NULL, NULL) == NULL) {
