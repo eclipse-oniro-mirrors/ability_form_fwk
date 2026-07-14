@@ -29,6 +29,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t SEGMENT_LENGTH = 3;
+// Maximum number of digits for the long type
 constexpr size_t MAX_SAFE_DIGITS = 19;
 constexpr const char *PARAM_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
 constexpr const char *FORM_MGR_CONFIG_VERSION = "FormMgrConfig_version";

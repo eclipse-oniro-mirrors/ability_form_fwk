@@ -1338,13 +1338,15 @@ napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env,
         return CreateJsUndefined(env);
     }
     napi_value callback = argv[PARAM0];
-    napi_ref callbackRef;
+    napi_ref callbackRef = nullptr;
     napi_create_reference(env, callback, REF_COUNT, &callbackRef);
 
     ErrCode result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
         JsFormProviderProxyMgr::GetInstance());
     if (result != ERR_OK) {
-        napi_delete_reference(env, callbackRef);
+        if (callbackRef != nullptr) {
+            napi_delete_reference(env, callbackRef);
+        }
         if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
             result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
         }

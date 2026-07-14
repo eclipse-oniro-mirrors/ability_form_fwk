@@ -382,9 +382,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
-        env,
-        nullptr,
-        resourceName,
+        env, nullptr, resourceName,
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
             AsyncErrMsgCallbackInfo *callbackInfo = static_cast<AsyncErrMsgCallbackInfo*>(data);
@@ -405,8 +403,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
             }
             delete callbackInfo;
         },
-        static_cast<void *>(asyncCallbackInfo),
-        &asyncCallbackInfo->asyncWork);
+        static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
@@ -414,7 +411,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
         if (asyncCallbackInfo->callback != nullptr) {
-            napi_delete_reference(env, callbackInfo->callback);
+            napi_delete_reference(env, asyncCallbackInfo->callback);
         }
         delete asyncCallbackInfo;
         return nullptr;

@@ -36,6 +36,7 @@ namespace {
 constexpr int64_t FORM_SHARE_INFO_DELAY_TIMER = 50000;
 constexpr int64_t FORM_PACKAGE_FREE_INSTALL_TIMER = 40000;
 constexpr int64_t FORM_SHARE_INFO_MAX_SIZE = 32;
+// The specification limits for bundleName, moduleName, abilityName, and formName are 128, 128, 127, and 127.
 constexpr size_t MAX_FORM_SHARE_INFO_KEY_LENGTH = 510;
 constexpr const char* ACTION_SHARE_FORM = "action.form.share";
 }
@@ -223,8 +224,8 @@ std::string FormShareMgr::MakeFormShareInfoKey(const FormShareInfo &info)
 {
     std::string key = info.bundleName + info.moduleName + info.abilityName + info.formName;
     if (key.length() > MAX_FORM_SHARE_INFO_KEY_LENGTH) {
-        HILOG_WARN("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
-        key.resize(MAX_FORM_SHARE_INFO_KEY_LENGTH);
+        HILOG_ERROR("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
+        key = "";
     }
     return key;
 }
@@ -237,8 +238,8 @@ std::string FormShareMgr::MakeFormShareInfoKey(const Want &want)
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     std::string key = bundleName + moduleName + abilityName + formName;
     if (key.length() > MAX_FORM_SHARE_INFO_KEY_LENGTH) {
-        HILOG_WARN("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
-        key.resize(MAX_FORM_SHARE_INFO_KEY_LENGTH);
+        HILOG_ERROR("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
+        key = "";
     }
     return key;
 }
