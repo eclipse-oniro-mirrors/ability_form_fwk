@@ -540,6 +540,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     options.loadAce = true;
     options.isBundle = true;
     options.isUnique = true;
+    options.isFormRender = true;
     options.moduleCheckerDelegate = std::make_shared<FormModuleChecker>();
 
     SetPkgContextInfoMap(formJsInfo, options);
