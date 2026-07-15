@@ -70,5 +70,21 @@ uint64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::
     }
     return totalSize;
 }
+
+std::string FormFileUtil::GetMaskedPath(const std::string &path)
+{
+    size_t lastDelimiterPos = path.find_last_of('/');
+    if (lastDelimiterPos == std::string::npos || lastDelimiterPos == 0) {
+        return path;
+    }
+
+    std::string maskedPath = path;
+    for (size_t i = 0; i < lastDelimiterPos; ++i) {
+        if (maskedPath[i] != '/') {
+            maskedPath[i] = '*';
+        }
+    }
+    return maskedPath;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

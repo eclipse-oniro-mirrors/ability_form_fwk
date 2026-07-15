@@ -18,6 +18,7 @@
 #define private public
 #include "common/util/form_util.h"
 #include "form_constants.h"
+#include "form_file_util.h"
 #include "form_mgr_errors.h"
 #include "os_account_manager_wrapper.h"
 #undef private
@@ -367,6 +368,44 @@ HWTEST_F(FormUtilTest, FormUtilTest_022, TestSize.Level1)
     int64_t int64Value = 0;
     auto result = FormUtil::ConvertStringToInt64(strInfo, int64Value);
     EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: FormUtilTest_023
+ * @tc.desc: Verify GetMaskedPath with a relative path
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_023, TestSize.Level1)
+{
+    const std::string path = "bundle/xxx/xxx/xxx/hspPath";
+
+    EXPECT_EQ("******/***/***/***/hspPath", FormFileUtil::GetMaskedPath(path));
+    EXPECT_EQ("bundle/xxx/xxx/xxx/hspPath", path);
+}
+
+/**
+ * @tc.name: FormUtilTest_024
+ * @tc.desc: Verify GetMaskedPath with absolute and single-directory paths
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_024, TestSize.Level1)
+{
+    EXPECT_EQ("/****/***/module.hsp", FormFileUtil::GetMaskedPath("/data/app/module.hsp"));
+    EXPECT_EQ("******/hspPath", FormFileUtil::GetMaskedPath("bundle/hspPath"));
+}
+
+/**
+ * @tc.name: FormUtilTest_025
+ * @tc.desc: Verify GetMaskedPath with boundary path formats
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_025, TestSize.Level1)
+{
+    EXPECT_EQ("", FormFileUtil::GetMaskedPath(""));
+    EXPECT_EQ("hspPath", FormFileUtil::GetMaskedPath("hspPath"));
+    EXPECT_EQ("/", FormFileUtil::GetMaskedPath("/"));
+    EXPECT_EQ("/****//***/module.hsp", FormFileUtil::GetMaskedPath("/data//app/module.hsp"));
+    EXPECT_EQ("******/***/", FormFileUtil::GetMaskedPath("bundle/xxx/"));
 }
 
 }  // namespace AppExecFwk
