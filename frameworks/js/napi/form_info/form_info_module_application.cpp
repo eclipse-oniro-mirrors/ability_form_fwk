@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,12 +18,12 @@
 
 static napi_module _module = {
     .nm_version = 0,
-    .nm_filename = "app/form/libforminfo_napi.so/formInfo.js",
+    .nm_filename = "application/libforminfo_napi.so/formInfo.js",
     .nm_register_func = OHOS::AbilityRuntime::FormInfoInit,
-    .nm_modname = "app.form.formInfo",
+    .nm_modname = "application.formInfo",
 };
 
-extern "C" __attribute__((constructor)) void NAPI_app_form_formInfo_AutoRegister()
+extern "C" __attribute__((constructor)) void NAPI_application_formInfo_AutoRegister()
 {
     napi_module_register(&_module);
 }
