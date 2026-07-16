@@ -39,6 +39,12 @@ public:
     DISALLOW_COPY_AND_MOVE(FormBmsHelper);
 
     /**
+     * @brief Check whether the cached bundle manager proxy is valid.
+     * @return Returns true if iBundleMgr_ is not null, false otherwise.
+     */
+    bool IsBundleMgrValid();
+
+    /**
      * @brief Notify module removable.
      * @param bundleName Provider ability bundleName.
      * @param moduleName Provider ability moduleName.
@@ -56,12 +62,6 @@ public:
      * @return returns the bundle manager ipc object, or nullptr for failed.
      */
     sptr<IBundleInstaller> GetBundleInstaller();
-
-    /**
-     * @brief Add the bundle manager instance for debug.
-     * @param bundleManager the bundle manager ipc object.
-     */
-    void SetBundleManager(const sptr<IBundleMgr> &bundleManager);
 
     /**
      * @brief Get bundle package info.
@@ -280,6 +280,8 @@ private:
     std::string GenerateModuleKey(const std::string &bundleName, const std::string &moduleName) const;
 
     sptr<IBundleMgr> GetBundleMgr();
+
+    void SetBundleManager(const sptr<IBundleMgr> &bundleManager);
 
 private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;

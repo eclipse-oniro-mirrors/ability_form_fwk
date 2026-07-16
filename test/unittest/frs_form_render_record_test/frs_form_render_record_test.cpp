@@ -1158,6 +1158,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_058, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_058 start";
     EXPECT_TRUE(formRenderRecordPtr_);
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     formRenderRecordPtr_->GetEventHandler(true, false);
     formRenderRecordPtr_->threadState_ = std::make_unique<ThreadState>(1);
     formRenderRecordPtr_->threadIsAlive_ = false;

@@ -17,12 +17,12 @@
 
 #include "accesstoken_kit.h"
 #include "appexecfwk_errors.h"
-#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #include "data_center/database/form_db_info.h"
 #define private public
+#include "bms_mgr/form_bms_helper.h"
 #include "form_mgr.h"
 #undef private
 #include "form_mgr_errors.h"

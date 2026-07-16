@@ -107,7 +107,7 @@ HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherVisibleForms_001, TestSize.L
 
 /**
  * @tc.name: NotifyWhetherVisibleForms_002
- * @tc.desc: Verify GetBundleMgr returns nullptr returns ERR_APPEXECFWK_FORM_GET_BMS_FAILED
+ * @tc.desc: Verify non-existent formId is skipped and returns ERR_OK
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherVisibleForms_002, TestSize.Level1)
@@ -116,12 +116,12 @@ HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherVisibleForms_002, TestSize.L
     sptr<IRemoteObject> callerToken = new MockIRemoteObject();
     std::vector<int64_t> formIds = {TEST_FORM_ID};
 
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(0L));
 
     auto result = FormVisibilityAdapter::GetInstance().NotifyWhetherVisibleForms(
         formIds, callerToken, Constants::FORM_VISIBLE);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "NotifyWhetherVisibleForms_002 end";
 }
 
@@ -136,8 +136,6 @@ HWTEST_F(FmsFormVisibilityAdapterTest, NotifyWhetherVisibleForms_003, TestSize.L
     sptr<IRemoteObject> callerToken = new MockIRemoteObject();
     std::vector<int64_t> formIds;
 
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
 

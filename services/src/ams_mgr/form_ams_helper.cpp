@@ -324,7 +324,7 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
         HILOG_ERROR("null ams");
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return IN_PROCESS_CALL(ams->StartAbility(want, callerToken, DEFAULT_INVAL_VALUE, DEFAULT_INVAL_VALUE));
 }

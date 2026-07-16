@@ -19,6 +19,7 @@
 #include "appexecfwk_errors.h"
 #include "data_center/form_data_mgr.h"
 #define private public
+#include "bms_mgr/form_bms_helper.h"
 #include "form_mgr.h"
 #undef private
 #include "form_mgr_errors.h"

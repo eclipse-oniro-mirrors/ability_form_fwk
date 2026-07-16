@@ -19,8 +19,8 @@
 #include "common/connection/form_ability_connection.h"
 #undef private
 #include "ams_mgr/form_ams_helper.h"
-#include "bms_mgr/form_bms_helper.h"
 #define private public
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #undef private

@@ -244,7 +244,7 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_003, TestSize.Level1)
 
 /**
  * @tc.name: RouterEvent_004
- * @tc.desc: Verify null IBundleMgr returns ERR_APPEXECFWK_FORM_GET_BMS_FAILED
+ * @tc.desc: Verify GetApplicationInfo failure returns ERR_APPEXECFWK_FORM_GET_BMS_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormEventAdapterTest, RouterEvent_004, TestSize.Level1)
@@ -261,8 +261,6 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_004, TestSize.Level1)
         .WillOnce(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
 
     auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
@@ -315,7 +313,7 @@ HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_002, TestSize.Level1)
 
 /**
  * @tc.name: BackgroundEvent_003
- * @tc.desc: Verify null IBundleMgr returns ERR_APPEXECFWK_FORM_GET_BMS_FAILED
+ * @tc.desc: Verify CheckKeepBackgroundRunningPermission failure returns ERR_APPEXECFWK_FORM_PERMISSION_DENY
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_003, TestSize.Level1)
@@ -326,6 +324,7 @@ HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_003, TestSize.Level1)
     want.SetBundle("com.test.bundle");
     want.SetElementName("com.test.bundle", "MainAbility");
     sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
     FormRecord record;
     record.formId = TEST_FORM_ID;
     record.bundleName = "com.test.bundle";
@@ -335,10 +334,12 @@ HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_003, TestSize.Level1)
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
+        .WillOnce(Return(false));
 
     auto result = FormEventAdapter::GetInstance().BackgroundEvent(TEST_FORM_ID, want, callerToken);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
 
     GTEST_LOG_(INFO) << "BackgroundEvent_003 end";
 }

@@ -140,6 +140,13 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
+    {
+        if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
+            HILOG_ERROR("get bundleMgr failed");
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+    }
+
     if (record.bundleName != want.GetBundle() && want.GetUriString().empty()) {
         if (!record.isSystemApp) {
             HILOG_WARN("Only system apps can launch the ability of the other apps");
@@ -215,6 +222,13 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     if (!bGetRecord) {
         HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    {
+        if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
+            HILOG_ERROR("get bundleMgr failed");
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
     }
 
     if (want.GetBundle().empty() || record.bundleName != want.GetBundle()) {

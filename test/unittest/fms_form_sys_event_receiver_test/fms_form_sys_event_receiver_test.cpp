@@ -22,6 +22,7 @@
 #include "ams_mgr/form_ams_helper.h"
 #include "form_constants.h"
 #define private public
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #include "form_host_interface.h"
@@ -37,7 +38,6 @@
 #include "common/event/system_event/form_sys_event_receiver.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
-#include "bms_mgr/form_bms_helper.h"
 #include "iservice_registry.h"
 
 #include "mock_ability_manager.h"

@@ -298,7 +298,7 @@ HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_003, TestSize.Level1)
 
 /**
  * @tc.name: GetBundleInfo_004
- * @tc.desc: Verify nullptr IBundleMgr returns ERR_APPEXECFWK_FORM_GET_BMS_FAILED
+ * @tc.desc: Verify GetBundleInfoV9 failure returns ERR_APPEXECFWK_FORM_GET_BMS_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_004, TestSize.Level1)
@@ -312,8 +312,8 @@ HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_004, TestSize.Level1)
     BundleInfo bundleInfo;
     std::string packageName;
 
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
+        .WillRepeatedly(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 
     auto result = FormCommonAdapter::GetInstance().GetBundleInfo(want, bundleInfo, packageName);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
@@ -1394,9 +1394,9 @@ HWTEST_F(FmsFormCommonAdapterTest, CheckFormDueControl_002, TestSize.Level1)
     formMajorInfo.dimension = 2;
 
     EXPECT_CALL(*MockParamControl::obj, IsDueDisableCtrlEmpty())
-        .WillOnce(Return(false));
+        .WillRepeatedly(Return(false));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+        .WillRepeatedly(Return(nullptr));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
 
@@ -2583,8 +2583,6 @@ HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_005, TestSize.Level1)
     BundleInfo bundleInfo;
     std::string packageName;
 
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
