@@ -2900,7 +2900,7 @@ HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_005, TestSize.Level1)
 
 /**
  * @tc.name: AddForm_006
- * @tc.desc: Verify AddForm with formId>0 and GetBundleMgr returning null fails
+ * @tc.desc: Verify AddForm with formId>0 and GetBundleInfoV9 failure returns GET_BMS_FAILED
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_006, TestSize.Level1)
@@ -2917,8 +2917,8 @@ HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_006, TestSize.Level1)
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 
     auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
@@ -2968,8 +2968,8 @@ HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_008, TestSize.Level1)
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr)); // Returns null, causing GetBundleInfo to fail
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED)); // Returns error, causing GetBundleInfo to fail
 
     auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
     EXPECT_NE(result, ERR_OK);
@@ -2998,8 +2998,8 @@ HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_009, TestSize.Level1)
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 
     auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
     EXPECT_NE(result, ERR_OK);
@@ -3026,8 +3026,8 @@ HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_010, TestSize.Level1)
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 
     auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
     EXPECT_NE(result, ERR_OK);
@@ -3054,8 +3054,8 @@ HWTEST_F(FmsFormLifecycleAdapterTest, AddForm_011, TestSize.Level1)
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 
     auto result = FormLifecycleAdapter::GetInstance().AddForm(TEST_FORM_ID, want, callerToken, formJsInfo);
     EXPECT_NE(result, ERR_OK);

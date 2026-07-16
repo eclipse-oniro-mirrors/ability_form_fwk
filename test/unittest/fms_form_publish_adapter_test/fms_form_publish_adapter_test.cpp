@@ -1520,7 +1520,7 @@ HWTEST_F(FmsFormPublishAdapterTest, GetBundleName_003, TestSize.Level1)
     sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
  
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
+        .WillRepeatedly(Return(bundleMgr));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(SYSTEM_UID));
     EXPECT_CALL(*bundleMgr, CheckIsSystemAppByUid(SYSTEM_UID))
@@ -1547,7 +1547,7 @@ HWTEST_F(FmsFormPublishAdapterTest, GetBundleName_004, TestSize.Level1)
     sptr<MockBundleMgrStub> bundleMgr = new MockBundleMgrStub();
  
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
+        .WillRepeatedly(Return(bundleMgr));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(SYSTEM_UID));
     EXPECT_CALL(*bundleMgr, CheckIsSystemAppByUid(SYSTEM_UID))

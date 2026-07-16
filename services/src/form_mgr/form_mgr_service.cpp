@@ -1500,6 +1500,14 @@ int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject>
 {
     HILOG_DEBUG("call");
     auto callingUid = IPCSkeleton::GetCallingUid();
+
+    {
+        if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
+            HILOG_ERROR("get bundleMgr failed");
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+    }
+
     if (!FormBmsHelper::GetInstance().CheckIsSystemAppByUid(callingUid)) {
         HILOG_ERROR("no permission");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
@@ -1511,6 +1519,14 @@ int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 {
     HILOG_DEBUG("call");
     auto callingUid = IPCSkeleton::GetCallingUid();
+
+    {
+        if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
+            HILOG_ERROR("get bundleMgr failed");
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+    }
+
     if (!FormBmsHelper::GetInstance().CheckIsSystemAppByUid(callingUid)) {
         HILOG_ERROR("permission denied");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;

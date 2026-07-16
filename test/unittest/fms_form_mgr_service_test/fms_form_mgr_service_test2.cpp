@@ -24,6 +24,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "common/event/form_event_util.h"
 #include "form_mgr/form_mgr_service.h"
@@ -35,7 +36,6 @@
 #include "fms_log_wrapper.h"
 #include "accesstoken_kit.h"
 #include "ams_mgr/form_ams_helper.h"
-#include "bms_mgr/form_bms_helper.h"
 #include "ability_info.h"
 #include "bundle_mgr_interface.h"
 #include "gmock/gmock.h"

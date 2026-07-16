@@ -36,6 +36,12 @@ FormBmsHelper::~FormBmsHelper()
     HILOG_INFO("call");
 }
 
+bool FormBmsHelper::IsBundleMgrValid()
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    return iBundleMgr != nullptr;
+}
+
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 {
     HILOG_DEBUG("call");

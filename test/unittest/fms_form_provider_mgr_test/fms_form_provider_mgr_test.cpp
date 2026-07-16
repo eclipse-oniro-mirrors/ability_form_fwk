@@ -17,8 +17,8 @@
 
 #include "accesstoken_kit.h"
 #include "ams_mgr/form_ams_helper.h"
-#include "bms_mgr/form_bms_helper.h"
 #define private public
+#include "bms_mgr/form_bms_helper.h"
 #include "common/timer_mgr/form_refresh_limiter.h"
 #include "common/util/form_util.h"
 #include "data_center/database/form_db_cache.h"
