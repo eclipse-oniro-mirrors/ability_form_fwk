@@ -66,8 +66,7 @@ int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, con
     }
 
     FormHostRecord formHostRecord;
-    bool hasRecord = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
-    if (!hasRecord) {
+    if (!FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord)) {
         HILOG_ERROR("form share info get matched host client failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }

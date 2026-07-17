@@ -322,7 +322,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_001
- * @tc.desc: Share form success.
+ * @tc.desc: The caller does not have permission, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI581YL
  */
@@ -418,7 +418,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_004
- * @tc.desc: Share form success.
+ * @tc.desc: The caller does not have permission, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI581YL
  */
