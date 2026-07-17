@@ -554,8 +554,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Init runtime Failed");
     }
     hapPath_ = formJsInfo.jsFormCodePath;
-    std::string maskedHapPath = FormFileUtil::GetMaskedPath(hapPath_);
-    HILOG_DEBUG("origin: %{public}s, masked: %{public}s", hapPath_.c_str(), maskedHapPath.c_str());
+    
     runtime_->SetLocalFontCollectionMaxSize();
     RegisterResolveBufferCallback();
     bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
@@ -874,6 +873,8 @@ void FormRenderRecord::UpdateFormRequest(const FormJsInfo &formJsInfo, const Wan
 int32_t FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
 {
     HILOG_INFO("Update record in js thread, formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+    std::string maskedHapPath = FormFileUtil::GetMaskedPath(formJsInfo.jsFormCodePath);
+    HILOG_INFO("origin: %{public}s, masked: %{public}s", hapPath_.c_str(), maskedHapPath.c_str());
     bool ret = BeforeHandleUpdateForm(formJsInfo);
     if (!ret) {
         HILOG_ERROR("Handle Update Form prepare failed");
