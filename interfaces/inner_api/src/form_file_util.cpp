@@ -73,17 +73,23 @@ uint64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::
 
 std::string FormFileUtil::GetMaskedPath(const std::string &path)
 {
+    if (path.empty()) {
+        HILOG_ERROR("path is empty");
+        return "";
+    }
+
     size_t lastDelimiterPos = path.find_last_of('/');
-    if (lastDelimiterPos == std::string::npos || lastDelimiterPos == 0) {
+    if (lastDelimiterPos == std::string::npos) {
         return path;
     }
 
-    std::string maskedPath = path;
-    for (size_t i = 0; i < lastDelimiterPos; ++i) {
-        if (maskedPath[i] != '/') {
-            maskedPath[i] = '*';
-        }
+    if (lastDelimiterPos + 1 == path.size()) {
+        HILOG_ERROR("path end with a separator");
+        return "";
     }
+
+    std::string maskedPath = path.substr(lastDelimiterPos + 1);
+
     return maskedPath;
 }
 } // namespace AppExecFwk

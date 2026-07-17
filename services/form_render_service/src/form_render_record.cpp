@@ -554,6 +554,8 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Init runtime Failed");
     }
     hapPath_ = formJsInfo.jsFormCodePath;
+    std::string maskedHapPath = FormFileUtil::GetMaskedPath(hapPath_);
+    HILOG_DEBUG("origin: %{public}s, masked: %{public}s", hapPath_.c_str(), maskedHapPath.c_str());
     runtime_->SetLocalFontCollectionMaxSize();
     RegisterResolveBufferCallback();
     bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
