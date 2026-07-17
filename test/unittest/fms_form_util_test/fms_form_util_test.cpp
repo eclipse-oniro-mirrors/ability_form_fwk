@@ -377,10 +377,10 @@ HWTEST_F(FormUtilTest, FormUtilTest_022, TestSize.Level1)
  */
 HWTEST_F(FormUtilTest, FormUtilTest_023, TestSize.Level1)
 {
-    const std::string path = "bundle/hjj.123/123.def/abc.def/huawei.com";
+    const std::string path = "bundle/hjj.123/123.def/abc.def/def.com";
 
-    EXPECT_EQ("huawei.com", FormFileUtil::GetMaskedPath(path));
-    EXPECT_EQ("bundle/hjj.123/123.def/abc.def/huawei.com", path);
+    EXPECT_EQ("def.com", FormFileUtil::GetMaskedPath(path));
+    EXPECT_EQ("bundle/hjj.123/123.def/abc.def/def.com", path);
 }
 
 /**
@@ -391,7 +391,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_023, TestSize.Level1)
 HWTEST_F(FormUtilTest, FormUtilTest_024, TestSize.Level1)
 {
     EXPECT_EQ("module.hsp", FormFileUtil::GetMaskedPath("/data/app.hap/module.hsp"));
-    EXPECT_EQ("huawei.com", FormFileUtil::GetMaskedPath("bundle/huawei.com"));
+    EXPECT_EQ("def.com", FormFileUtil::GetMaskedPath("bundle/def.com"));
 }
 
 /**
@@ -403,9 +403,9 @@ HWTEST_F(FormUtilTest, FormUtilTest_025, TestSize.Level1)
 {
     EXPECT_EQ("", FormFileUtil::GetMaskedPath(""));
     EXPECT_EQ("hspPath", FormFileUtil::GetMaskedPath("hspPath"));
-    EXPECT_EQ("huawei.com", FormFileUtil::GetMaskedPath("huawei.com"));
+    EXPECT_EQ("def.com", FormFileUtil::GetMaskedPath("def.com"));
     EXPECT_EQ("", FormFileUtil::GetMaskedPath("/"));
-    EXPECT_EQ("module.hsp", FormFileUtil::GetMaskedPath("/data/abc.huawei.com/app/module.hsp"));
+    EXPECT_EQ("module.hsp", FormFileUtil::GetMaskedPath("/data/abc.def.com/app/module.hsp"));
     EXPECT_EQ("", FormFileUtil::GetMaskedPath("bundle/abc/"));
 }
 
