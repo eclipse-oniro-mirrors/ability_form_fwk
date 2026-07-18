@@ -123,9 +123,8 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
  * @brief Delete form data in DbCache and DB with formId.
  * @param formId form data Id.
  * @param removedDBForms Removed db form infos
- * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
+void FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
     std::vector<FormDBInfo> &removedDBForms)
 {
     HILOG_INFO("bundleName: %{public}s", bundleName.c_str());
@@ -140,7 +139,6 @@ ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, c
             iter = removedDBForms.erase(iter);
         }
     }
-    return ERR_OK;
 }
 
 /**

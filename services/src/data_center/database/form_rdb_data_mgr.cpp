@@ -58,7 +58,7 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnCreate(NativeRdb::RdbStore &rdbSt
 int32_t RdbStoreDataCallBackFormInfoStorage::OnUpgrade(
     NativeRdb::RdbStore &rdbStore, int currentVersion, int targetVersion)
 {
-    HILOG_DEBUG("OnUpgrade currentVersion: %{plubic}d, targetVersion: %{plubic}d",
+    HILOG_DEBUG("OnUpgrade currentVersion: %{public}d, targetVersion: %{public}d",
         currentVersion, targetVersion);
     return NativeRdb::E_OK;
 }
@@ -66,7 +66,7 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnUpgrade(
 int32_t RdbStoreDataCallBackFormInfoStorage::OnDowngrade(
     NativeRdb::RdbStore &rdbStore, int currentVersion, int targetVersion)
 {
-    HILOG_DEBUG("OnDowngrade  currentVersion: %{plubic}d, targetVersion: %{plubic}d",
+    HILOG_DEBUG("OnDowngrade  currentVersion: %{public}d, targetVersion: %{public}d",
         currentVersion, targetVersion);
     return NativeRdb::E_OK;
 }

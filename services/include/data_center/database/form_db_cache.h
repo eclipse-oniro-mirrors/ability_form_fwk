@@ -115,9 +115,8 @@ public:
      * @param bundleName BundleName.
      * @param userId user ID.
      * @param removedDBForms Removed db form infos
-     * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
+    void DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
         std::vector<FormDBInfo> &removedDBForms);
 
     /**

@@ -215,7 +215,7 @@ void FormSupplyCallback::RemoveConnection(int32_t connectId)
     }
 
     if (connection != nullptr) {
-        if (CanDisconnect(connection)) {
+        if (ShouldDisconnectImmediately(connection)) {
             FormAmsHelper::GetInstance().DisconnectServiceAbility(connection);
             HILOG_INFO("disconnect service ability, connectId:%{public}d", connectId);
         } else {
@@ -226,24 +226,21 @@ void FormSupplyCallback::RemoveConnection(int32_t connectId)
     HILOG_DEBUG("end");
 }
 /**
- * @brief check if disconnect ability or not.
+ * @brief Check if should disconnect ability immediately.
  * @param connection The ability connection.
+ * @return True if should disconnect immediately, false if should delay disconnect.
  */
-bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
+bool FormSupplyCallback::ShouldDisconnectImmediately(sptr<FormAbilityConnection> &connection)
 {
     if (connection == nullptr) {
         HILOG_ERROR("null connection");
         return false;
     }
-    int count = 0;
+    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(conMutex_);
     for (auto &conn : connections_) {
         if (connection->GetProviderKey() == conn.second->GetProviderKey()) {
-            HILOG_DEBUG("key:%{public}s", conn.second->GetProviderKey().c_str());
-            count++;
-            if (count >= 1) {
-                return true;
-            }
+            return true;
         }
     }
     return false;

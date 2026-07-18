@@ -167,10 +167,11 @@ public:
 
 private:
     /**
-     * @brief check if disconnect ability or not.
+     * @brief Check if should disconnect ability immediately.
      * @param connection The ability connection.
+     * @return True if should disconnect immediately, false if should delay disconnect.
      */
-    bool CanDisconnect(sptr<FormAbilityConnection> &connection);
+    bool ShouldDisconnectImmediately(sptr<FormAbilityConnection> &connection);
 
     bool IsRemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken);
 

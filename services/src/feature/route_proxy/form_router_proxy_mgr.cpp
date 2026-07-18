@@ -73,8 +73,8 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
 ErrCode FormRouterProxyMgr::RemoveFormRouterProxy(const std::vector<int64_t> &formIds)
 {
     HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     for (int64_t formId : formIds) {
-        std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
         auto formRouterProxys = formRouterProxyMap_.find(formId);
         if (formRouterProxys == formRouterProxyMap_.end()) {
             HILOG_INFO("no formRouterProxy has been register");
