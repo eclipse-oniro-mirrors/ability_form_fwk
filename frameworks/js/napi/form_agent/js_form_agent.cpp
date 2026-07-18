@@ -200,9 +200,10 @@ napi_value JsFormAgent::OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_
         napi_close_handle_scope(env, scope);
     };
 
+    napi_value lastParam = (argc <= ARGS_SIZE_TWO) ? nullptr : argv[ARGS_SIZE_TWO];
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnUpdateFormCrossBundle",
-        env, CreateAsyncTask(env, std::move(execute), std::move(complete), &result));
+        env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }
 }  // namespace AbilityRuntime
