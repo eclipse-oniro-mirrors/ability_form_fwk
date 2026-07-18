@@ -18,17 +18,16 @@
 #include <cinttypes>
 #include <fstream>
 #include <iostream>
+#include <sys/mman.h>
 #include <sys/types.h>
-#include <unistd.h>
 
+#include "ashmem.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "ipc_file_descriptor.h"
+#include "json_util_form.h"
 #include "message_parcel.h"
 #include "string_ex.h"
-
-#include <sys/mman.h>
-#include "ashmem.h"
-#include "ipc_file_descriptor.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -234,7 +233,7 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
     if (jsonDataString.empty()) {
         jsonDataString = JSON_EMPTY_STRING;
     }
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
+    nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("fail parse jsonDataString: %{private}s.", jsonDataString.c_str());
         return;
@@ -329,7 +328,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     } else {
         jsonDataString = Str16ToStr8(parcel.ReadString16());
     }
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
+    nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("fail parse jsonDataString: %{private}s.", jsonDataString.c_str());
         return false;

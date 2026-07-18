@@ -37,12 +37,13 @@
 #include "feature/route_proxy/form_router_proxy_mgr.h"
 #include "form_constants.h"
 #include "form_host/form_host_record.h"
+#include "form_mgr/form_adapter_constants.h"
 #include "form_mgr/form_common_adapter.h"
 #include "form_observer/form_observer_record.h"
 #include "form_provider/connection/form_background_connection.h"
 #include "form_provider/form_provider_mgr.h"
+#include "json_util_form.h"
 
-#include "form_mgr/form_adapter_constants.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -241,7 +242,7 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     }
 
     std::string params = want.GetStringParam(Constants::FORM_CALL_EVENT_PARAMS);
-    nlohmann::json jsonObject = nlohmann::json::parse(params, nullptr, false);
+    nlohmann::json jsonObject = SafeJsonParse(params, false);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("fail parse jsonDataString:%{public}s", params.c_str());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
