@@ -1682,6 +1682,51 @@ HWTEST_F(FmsFormProviderDataTest, ParseImagesData_NonIntegerFd_001, TestSize.Lev
 }
 
 /**
+ * @tc.name: ParseImagesData_DiscardedJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseImagesData when jsonFormProviderData_ is discarded.
+ */
+HWTEST_F(FmsFormProviderDataTest, ParseImagesData_DiscardedJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseImagesData_DiscardedJson_001 start";
+    FormProviderData formProviderData("{}");
+    formProviderData.jsonFormProviderData_ = nlohmann::json::parse("invalid_json{{{]", nullptr, false);
+    formProviderData.ParseImagesData();
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "ParseImagesData_DiscardedJson_001 end";
+}
+
+/**
+ * @tc.name: ParseImagesData_FormImagesNotObject_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseImagesData when formImages value is not an object.
+ */
+HWTEST_F(FmsFormProviderDataTest, ParseImagesData_FormImagesNotObject_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseImagesData_FormImagesNotObject_001 start";
+    std::string jsonStr = R"({"formImages": [1, 2, 3]})";
+    FormProviderData formProviderData(jsonStr);
+    formProviderData.ParseImagesData();
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "ParseImagesData_FormImagesNotObject_001 end";
+}
+
+/**
+ * @tc.name: ParseImagesData_EmptyFormImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseImagesData when formImages is an empty object.
+ */
+HWTEST_F(FmsFormProviderDataTest, ParseImagesData_EmptyFormImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseImagesData_EmptyFormImages_001 start";
+    std::string jsonStr = R"({"formImages": {}})";
+    FormProviderData formProviderData(jsonStr);
+    formProviderData.ParseImagesData();
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "ParseImagesData_EmptyFormImages_001 end";
+}
+
+/**
  * @tc.name: ReadFromParcel_BigDataNullRawData_001
  * @tc.type: FUNC
  * @tc.desc: Verify ReadFromParcel when ReadAshmemDataFromParcel returns nullptr for big data.

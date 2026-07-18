@@ -198,14 +198,18 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
 
 void FormProviderData::ParseImagesData()
 {
-    if (jsonFormProviderData_ == nullptr) {
-        HILOG_ERROR("null jsonFormProviderData_");
+    if (jsonFormProviderData_ == nullptr || jsonFormProviderData_.is_discarded()) {
+        HILOG_ERROR("null or discarded jsonFormProviderData_");
         return;
     }
     if (!jsonFormProviderData_.contains(JSON_IMAGES_STRING)) {
         return;
     }
     nlohmann::json jsonImages = jsonFormProviderData_.at(JSON_IMAGES_STRING);
+    if (!jsonImages.is_object()) {
+        HILOG_ERROR("formImages is not an object, skip parsing");
+        return;
+    }
     for (auto iter = jsonImages.begin(); iter != jsonImages.end(); iter++) {
         if (iter->is_number_integer()) {
             AddImageData(iter.key(), iter.value());
