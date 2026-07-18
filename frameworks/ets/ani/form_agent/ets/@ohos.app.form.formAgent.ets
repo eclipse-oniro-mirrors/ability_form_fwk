@@ -15,7 +15,7 @@
 
 import { BusinessError, AsyncCallback } from '@ohos.base';
 import Want from '@ohos.app.ability.Want';
-import { FormBindingData } from '@ohos.app.form.formBindingData';
+import formBindingData from '@ohos.app.form.formBindingData';
 
 export default class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => {}
@@ -34,7 +34,7 @@ export namespace formAgent {
 
   export native function nativeRequestPublishForm(want: Want, callback: AsyncCallbackWrapper<string>): void;
   export native function nativeUpdateFormCrossBundle(formId: string,
-    formBindingData: FormBindingData, callback: AsyncCallbackWrapper<void>): void;
+    bindingData: formBindingData.FormBindingData, callback: AsyncCallbackWrapper<void>): void;
   export native function checkWantParam(want: Want): void;
 
   export function requestPublishForm(want: Want, callback: AsyncCallback<string>): void {
@@ -64,17 +64,17 @@ export namespace formAgent {
   }
 
   export function updateFormCrossBundle(formId: string,
-    formBindingData: FormBindingData): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (err: BusinessError) => void): void => {
+    bindingData: formBindingData.FormBindingData): Promise<void> {
+    return new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
       let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
         if (err == null || err.code == 0) {
-          resolve();
+          resolve(undefined);
         } else {
           reject(err);
         }
       });
       taskpool.execute((): void => {
-        formAgent.nativeUpdateFormCrossBundle(formId, formBindingData, myCall);
+        formAgent.nativeUpdateFormCrossBundle(formId, bindingData, myCall);
       });
     });
   }
