@@ -110,5 +110,100 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
         env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }
+
+napi_value JsFormAgent::UpdateFormCrossBundle(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnUpdateFormCrossBundle);
+}
+
+napi_value JsFormAgent::OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value* argv)
+{
+    FormHistogramUtils::ReportHistogramBoolean("Form.Agent.updateFormCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
+    HILOG_INFO("call");
+    if (env == nullptr || argc < ARGS_SIZE_TWO) {
+        HILOG_ERROR("invalid argc");
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
+        return CreateJsUndefined(env);
+    }
+
+    auto asyncCallbackInfo = std::make_shared<UpdateFormCrossBundleCallbackInfo>();
+
+    // 1. parse formId
+    std::string formIdStr;
+    if (!ConvertFromJsValue(env, argv[0], formIdStr) || formIdStr.empty()) {
+        HILOG_ERROR("formId is invalid");
+        NapiFormUtil::ThrowParamError(env, "formId is invalid");
+        return CreateJsUndefined(env);
+    }
+    asyncCallbackInfo->formId = std::atoll(formIdStr.c_str());
+
+    // 2. parse FormBindingData: accept either plain JSON string or { data: string } object
+    std::string formDataStr;
+    napi_valuetype secondType = napi_undefined;
+    napi_typeof(env, argv[1], &secondType);
+    if (secondType == napi_string) {
+        if (!ConvertFromJsValue(env, argv[1], formDataStr)) {
+            NapiFormUtil::ThrowParamError(env, "formBindingData is invalid");
+            return CreateJsUndefined(env);
+        }
+    } else if (secondType == napi_object) {
+        napi_value dataValue = nullptr;
+        napi_get_named_property(env, argv[1], "data", &dataValue);
+        napi_valuetype dataType = napi_undefined;
+        if (dataValue != nullptr) {
+            napi_typeof(env, dataValue, &dataType);
+        }
+        if (dataType == napi_string) {
+            ConvertFromJsValue(env, dataValue, formDataStr);
+        } else if (dataType == napi_object) {
+            napi_value globalValue = nullptr;
+            napi_get_global(env, &globalValue);
+            napi_value jsonValue = nullptr;
+            napi_get_named_property(env, globalValue, "JSON", &jsonValue);
+            napi_value stringifyValue = nullptr;
+            napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+            napi_value funcArgv[1] = { dataValue };
+            napi_value transValue = nullptr;
+            napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            ConvertFromJsValue(env, transValue, formDataStr);
+        } else {
+            NapiFormUtil::ThrowParamError(env, "formBindingData.data is invalid");
+            return CreateJsUndefined(env);
+        }
+    } else {
+        NapiFormUtil::ThrowParamError(env, "formBindingData type invalid");
+        return CreateJsUndefined(env);
+    }
+    asyncCallbackInfo->formBindingData =
+        std::make_shared<OHOS::AppExecFwk::FormProviderData>(formDataStr);
+
+    // 3. async dispatch
+    auto apiResult = std::make_shared<int32_t>();
+    NapiAsyncTask::ExecuteCallback execute = [asyncCallbackInfo, ret = apiResult]() {
+        *ret = FormMgr::GetInstance().UpdateFormCrossBundle(
+            asyncCallbackInfo->formId, *asyncCallbackInfo->formBindingData);
+    };
+
+    NapiAsyncTask::CompleteCallback complete =
+        [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t /*status*/) {
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            HILOG_ERROR("null scope");
+            return;
+        }
+        if (*ret == ERR_OK) {
+            task.ResolveWithNoError(env, CreateJsUndefined(env));
+        } else {
+            task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+        }
+        napi_close_handle_scope(env, scope);
+    };
+
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnUpdateFormCrossBundle",
+        env, CreateAsyncTask(env, std::move(execute), std::move(complete), &result));
+    return result;
+}
 }  // namespace AbilityRuntime
 }  // namespace OHOS

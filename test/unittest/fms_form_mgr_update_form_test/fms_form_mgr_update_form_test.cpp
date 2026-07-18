@@ -33,6 +33,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
+#include "mock_form_mgr_proxy.h"
 #include "remote_native_token.h"
 #include "running_process_info.h"
 #include "system_ability_definition.h"
@@ -423,5 +424,130 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
     token_->Wait();
 
     GTEST_LOG_(INFO) << "UpdateForm_008 test end";
+}
+
+/**
+ * @tc.name: UpdateFormCrossBundle_001
+ * @tc.desc: Verify UpdateFormCrossBundle through Kit layer with valid data.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_001 start";
+    int64_t formId {1001L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"shenzhen001\"}"));
+
+    FormItemInfo formItemInfo;
+    formItemInfo.SetFormId(formId);
+    formItemInfo.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    formItemInfo.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    formItemInfo.SetTemporaryFlag(false);
+    formItemInfo.SetProviderUid(callingUid);
+    FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid);
+
+    FormItemInfo itemInfo;
+    itemInfo.SetHostBundleName(FORM_HOST_BUNDLE_NAME);
+    FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
+
+    MockGetCallingUid(callingUid);
+    MockRequestRefreshRet(true);
+    EXPECT_EQ(ERR_OK, FormMgrAdapterFacade::GetInstance().UpdateFormCrossBundle(
+        formId, callingUid, formProviderData));
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_001 end";
+}
+
+/**
+ * @tc.name: UpdateFormCrossBundle_002
+ * @tc.desc: Verify UpdateFormCrossBundle rejects invalid formId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_002 start";
+    int64_t formId {-1L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"shenzhen002\"}"));
+
+    MockGetCallingUid(callingUid);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
+        FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData));
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_002 end";
+}
+
+/**
+ * @tc.name: UpdateFormCrossBundle_003
+ * @tc.desc: Verify UpdateFormCrossBundle rejects empty formBindingData.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_003 start";
+    int64_t formId {1003L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData;
+
+    MockGetCallingUid(callingUid);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY,
+        FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData));
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_003 end";
+}
+
+/**
+ * @tc.name: UpdateFormCrossBundle_004
+ * @tc.desc: Verify UpdateFormCrossBundle returns NOT_EXIST when formId is not registered.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_004 start";
+    int64_t formId {99999999L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"unknown\"}"));
+
+    MockGetCallingUid(callingUid);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+        formyMgrServ_->UpdateFormCrossBundle(formId, formProviderData));
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_004 end";
+}
+
+/**
+ * @tc.name: UpdateFormCrossBundle_005
+ * @tc.desc: Verify UpdateFormCrossBundle rejects calls while FMS is in IN_RECOVERING.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_005 start";
+    int64_t formId {2005L};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\":\"shenzhen005\"}"));
+
+    // IN_RECOVERING short-circuits before Connect/IPC and surfaces 16500060.
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR,
+        FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_005 end";
+}
+
+/**
+ * @tc.name: UpdateFormCrossBundle_009
+ * @tc.desc: Verify Kit layer forwards UpdateFormCrossBundle to the remote proxy.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_009, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_009 start";
+    int64_t formId {2009L};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"k\":\"v\"}"));
+
+    sptr<IRemoteObject> impl = nullptr;
+    sptr<MockFormMgrProxy> mockProxy = new (std::nothrow) MockFormMgrProxy(impl);
+    ASSERT_NE(mockProxy, nullptr);
+    FormMgr::GetInstance().SetFormMgrService(mockProxy);
+
+    EXPECT_CALL(*mockProxy, UpdateFormCrossBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
+        FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData));
+
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
+    mockProxy = nullptr;
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_009 end";
 }
 }

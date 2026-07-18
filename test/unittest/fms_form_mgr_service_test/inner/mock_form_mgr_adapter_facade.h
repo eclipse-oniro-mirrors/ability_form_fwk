@@ -43,6 +43,7 @@ void MockUnregisterFormWantCallback(int mockRet);
 void MockRegisterDeleteFormsCallback(int mockRet);
 void MockUnregisterDeleteFormsCallback(int mockRet);
 void MockDeleteForms(int mockRet);
+void MockUpdateFormCrossBundle(int mockRet);
 
 }  // namespace AppExecFwk
 }  // namespace OHOS

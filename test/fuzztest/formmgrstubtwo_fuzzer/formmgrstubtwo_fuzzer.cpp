@@ -31,7 +31,7 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr uint32_t MESSAGE_BASE = 3001;
-constexpr uint32_t MESSAGE_LAST = 3090;
+constexpr uint32_t MESSAGE_LAST = 3091;
 constexpr uint32_t MESSAGE_RANGE = MESSAGE_LAST - MESSAGE_BASE;
 constexpr int32_t MAX_LENGTH = 256;
 
@@ -57,6 +57,10 @@ public:
         return ZERO_NUM;
     }
     int UpdateForm(const int64_t formId, const FormProviderData &formProviderData) override
+    {
+        return ZERO_NUM;
+    }
+    int UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formProviderData) override
     {
         return ZERO_NUM;
     }

@@ -307,6 +307,13 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     {
         ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE,
         { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "there is no space to publish form" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE,
+        {
+            ERR_FORM_EXTERNAL_PERMISSION_DENIED,
+            "check permission denied, need to request ohos.permission.UPDATE_FORM_CROSS_BUNDLE."
+        }
     }
 };
 

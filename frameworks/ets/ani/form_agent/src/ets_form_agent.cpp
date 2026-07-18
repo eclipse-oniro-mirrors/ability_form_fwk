@@ -23,6 +23,7 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
+#include "form_provider_data.h"
 #include "form_provider_info.h"
 #include "form_histogram_utils.h"
 #include "ipc_skeleton.h"
@@ -103,6 +104,60 @@ void CheckWantParam(ani_env *env, ani_object aniWant, ani_object callback)
     }
 }
 
+void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_object aniFormBindingData,
+    ani_object callback)
+{
+    FormHistogramUtils::ReportHistogramBoolean("Form.Agent.updateFormCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
+    HILOG_INFO("call");
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
+    std::string formIdStr = (aniFormId != nullptr) ? FormAniUtil::AniStringToStdString(env, aniFormId) : "";
+    if (formIdStr.empty()) {
+        HILOG_ERROR("formId is invalid");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+    int64_t formId = std::atoll(formIdStr.c_str());
+
+    // Use FormAniUtil::UnwrapFormBindingData if available, otherwise parse the 'data' field via reflection.
+    std::string formDataStr;
+    if (aniFormBindingData != nullptr) {
+        constexpr const char *FB_CLASS_NAME = "@ohos.app.form.formBindingData.FormBindingDataInner";
+        constexpr const char *FB_GET_DATA_METHOD = "getData";
+        constexpr const char *FB_GET_DATA_SIGNATURE = ":C{std.core.Object}";
+        ani_class dataCls = nullptr;
+        ani_method dataMethod = nullptr;
+        if (env->FindClass(FB_CLASS_NAME, &dataCls) == ANI_OK && dataCls != nullptr
+            && env->Class_FindMethod(dataCls, FB_GET_DATA_METHOD, FB_GET_DATA_SIGNATURE, &dataMethod) == ANI_OK
+            && dataMethod != nullptr) {
+            ani_ref dataRef = nullptr;
+            if (env->Object_CallMethod_Ref(aniFormBindingData, dataMethod, &dataRef) == ANI_OK
+                && dataRef != nullptr) {
+                ani_string dataAniStr = static_cast<ani_string>(dataRef);
+                formDataStr = FormAniUtil::AniStringToStdString(env, dataAniStr);
+            }
+        }
+    }
+    if (formDataStr.empty()) {
+        HILOG_ERROR("formBindingData is invalid");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY), nullptr);
+        return;
+    }
+
+    auto formProviderData = std::make_unique<OHOS::AppExecFwk::FormProviderData>(formDataStr);
+    int32_t ret = FormMgr::GetInstance().UpdateFormCrossBundle(formId, *formProviderData);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("UpdateFormCrossBundle failed, error code: %{public}d", static_cast<int32_t>(ret));
+        InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        return;
+    }
+    InvokeAsyncWithBusinessError(env, callback, ERR_OK, nullptr);
+}
+
 } // anonymous namespace
 
 void EtsFormAgentInit(ani_env* env)
@@ -122,6 +177,8 @@ void EtsFormAgentInit(ani_env* env)
     std::array methods = {
         ani_native_function {
             "nativeRequestPublishForm", nullptr, reinterpret_cast<void *>(RequestPublishForm)},
+        ani_native_function {
+            "nativeUpdateFormCrossBundle", nullptr, reinterpret_cast<void *>(UpdateFormCrossBundle)},
         ani_native_function {
             "checkWantParam", nullptr, reinterpret_cast<void *>(CheckWantParam)},
     };

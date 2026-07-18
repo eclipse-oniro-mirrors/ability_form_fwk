@@ -4141,4 +4141,50 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_007 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_001
+ * @tc.name: Verify HandleUpdateFormCrossBundle with a valid FormProviderData parcelable.
+ * @tc.desc: test that valid formId and FormProviderData are forwarded and reply echoes result.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1001L;
+    FormProviderData formBindingData = FormProviderData(std::string("{\"city\":\"shenzhen\"}"));
+    MessageParcel data;
+    MessageParcel reply;
+
+    data.WriteInt64(formId);
+    data.WriteParcelable(&formBindingData);
+
+    EXPECT_CALL(*mockFormMgrService, UpdateFormCrossBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto errCode = mockFormMgrService->HandleUpdateFormCrossBundle(data, reply);
+    EXPECT_EQ(errCode, ERR_OK);
+    EXPECT_EQ(reply.ReadInt32(), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_002
+ * @tc.name: Verify HandleUpdateFormCrossBundle with a missing FormProviderData payload.
+ * @tc.desc: test that a missing FormProviderData returns PARCEL_ERROR and skips the call.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1002L;
+    MessageParcel data;
+    MessageParcel reply;
+
+    // Intentionally omit FormProviderData so ReadParcelable returns nullptr.
+    data.WriteInt64(formId);
+
+    EXPECT_CALL(*mockFormMgrService, UpdateFormCrossBundle(_, _)).Times(0);
+    EXPECT_EQ(mockFormMgrService->HandleUpdateFormCrossBundle(data, reply),
+        ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 ends";
+}
 }

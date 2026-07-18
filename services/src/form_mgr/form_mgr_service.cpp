@@ -393,6 +393,33 @@ int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &for
 }
 
 /**
+ * @brief Update form by cross bundle, restricted to system apps with UPDATE_FORM_CROSS_BUNDLE permission.
+ * @param formId The Id of the form to update.
+ * @param formBindingData Form binding data.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData)
+{
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    // Inline the three permission checks so we can return a dedicated error code for the missing
+    // UPDATE_FORM_CROSS_BUNDLE permission (see form_errors.cpp mapping).
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("updateFormCrossBundle caller is not system app");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_UPDATE_FORM_CROSS_BUNDLE)) {
+        HILOG_ERROR("updateFormCrossBundle permission denied");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("updateFormCrossBundle across local accounts permission failed");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapterFacade::GetInstance().UpdateFormCrossBundle(formId, callingUid, formBindingData);
+}
+
+/**
  * @brief Request form with formId and want, send formId and want to form manager service.
  * @param formId The Id of the form to update.
  * @param callerToken Caller ability token.

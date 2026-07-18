@@ -55,7 +55,10 @@ public:
 
     int UpdateForm(const int64_t formId, const int32_t callingUid,
         const FormProviderData &formProviderData,
-        const std::vector<FormDataProxy> &formDataProxies);
+        const std::vector<FormDataProxy> &formDataProxies = {});
+
+    ErrCode UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
+        const FormProviderData &formProviderData);
 
     int RequestForm(const int64_t formId,
         const sptr<IRemoteObject> &callerToken, const Want &want);
