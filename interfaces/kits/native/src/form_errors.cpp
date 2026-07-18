@@ -314,6 +314,10 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
             ERR_FORM_EXTERNAL_PERMISSION_DENIED,
             "check permission denied, need to request ohos.permission.UPDATE_FORM_CROSS_BUNDLE."
         }
+    },
+    {
+        ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "This card does not support publishing" }
     }
 };
 

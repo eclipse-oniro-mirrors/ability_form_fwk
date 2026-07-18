@@ -102,6 +102,7 @@ private:
     ErrCode ValidatePublishFormParamsForCrossUser(const Want &want, int32_t userId);
     ErrCode ValidateParamsForCrossUser(const Want &want);
     ErrCode ValidateFormInfoMatchForCrossUser(const Want &want, int32_t userId);
+    ErrCode CheckFormCountLimit(const Want &want, int32_t userId);
 
     std::unique_ptr<FormSerialQueue> serialQueue_;
     std::map<int64_t, AddFormResultErrorCodes> formIdMap_;
