@@ -542,7 +542,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_009, TestSize.Level1) {
 
     EXPECT_CALL(*mockProxy, UpdateFormCrossBundle(_, _))
         .Times(1)
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+        .WillOnce(testing::Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
         FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData));
 
