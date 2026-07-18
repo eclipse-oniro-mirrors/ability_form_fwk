@@ -729,12 +729,11 @@ public:
     * @param want The want of the form to publish.
     * @param withFormBindingData Indicates whether the formBindingData is carried with.
     * @param formBindingData Indicates the form data.
-    * @param formId Return the form id to be published.
+     * @param formId Return the form id to be published.
     * @return Returns ERR_OK on success, others on failure.
     */
     ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
-        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-        const std::vector<FormDataProxy> &formDataProxies = {});
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId);
 
     /**
      * @brief Update form with formRefreshType, send to form manager service.

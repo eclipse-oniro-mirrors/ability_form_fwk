@@ -2131,8 +2131,7 @@ ErrCode FormMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLo
 }
 
 ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
-    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies)
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
     HILOG_INFO("call");
 #ifdef NO_RUNTIME_EMULATOR

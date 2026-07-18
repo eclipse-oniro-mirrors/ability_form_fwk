@@ -444,10 +444,10 @@ bool FormPublishAdapter::IsRequestPublishFormSupported()
 
 ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_DEBUG("call");
-    ErrCode errCode = CheckPublishForm(want, needCheckFormPermission);
+    ErrCode errCode = CheckPublishForm(want, true);
     if (errCode != ERR_OK) {
         return errCode;
     }
@@ -483,6 +483,41 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     if (!formDataProxies.empty()) {
         FormDataProxyMgr::GetInstance().ProduceFormDataProxies(formId, formDataProxies);
     }
+    return errCode;
+}
+
+ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = CheckPublishForm(want, false);
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    // WithSnapshot path: skip pre-check, rely on post-check (AddForm CheckFormCountLimit)
+    int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
+    errCode = RequestPublishFormCommon(want, userId, formId);
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    if (withFormBindingData) {
+        errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, formBindingData);
+    } else {
+        std::unique_ptr<FormProviderData> noFormBindingData = nullptr;
+        errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
+    }
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("add form info error");
+        return errCode;
+    }
+    errCode = RequestPublishFormToHost(want);
+    if (errCode != ERR_OK) {
+        FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
+        NewFormEventInfo eventInfo;
+        FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
+            HiSysEventType::STATISTIC, eventInfo, want);
+    }
+    IncreaseAddFormRequestTimeOutTask(formId);
     return errCode;
 }
 

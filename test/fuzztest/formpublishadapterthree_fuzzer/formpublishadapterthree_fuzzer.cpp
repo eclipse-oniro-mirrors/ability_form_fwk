@@ -117,9 +117,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::unique_ptr<FormProviderData> formBindingData = nullptr;
     int64_t publishFormId = 0;
     std::vector<FormDataProxy> formDataProxies;
-    bool needCheckFormPermissionPublish = fdp->ConsumeBool();
     adapter.RequestPublishForm(publishWant, withFormBindingData, formBindingData, publishFormId,
-        formDataProxies, needCheckFormPermissionPublish);
+        formDataProxies);
 
     // Fuzz RequestPublishFormToHost (private, single-arg) with proper setup
     Want toHostWant = CreateValidFormWant(fdp);

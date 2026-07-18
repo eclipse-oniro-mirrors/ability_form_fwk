@@ -1988,8 +1988,8 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     FormEventReport::SendRequestPublicFormEvent(bundleName, formName,
         RequestFormType::REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    auto ret = FormMgrAdapterFacade::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
-        formId, {}, false);
+    auto ret = FormMgrAdapterFacade::GetInstance().RequestPublishFormWithSnapshot(want, withFormBindingData,
+        formBindingData, formId);
     if (ret == ERR_OK) {
         std::lock_guard<std::mutex> lock(snapshotSetMutex_);
         requestPublishFormWithSnapshotSet_.insert(formId);
