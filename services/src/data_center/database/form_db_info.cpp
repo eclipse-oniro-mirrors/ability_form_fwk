@@ -15,7 +15,7 @@
 
 #include "data_center/database/form_db_info.h"
 
-#include "common/util/json_util_form.h"
+#include "json_util_form.h"
 
 namespace OHOS {
 namespace AppExecFwk {
