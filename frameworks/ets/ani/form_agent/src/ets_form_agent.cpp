@@ -116,7 +116,7 @@ void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_object aniFor
     std::string formIdStr = (aniFormId != nullptr) ? FormAniUtil::AniStringToStdString(env, aniFormId) : "";
     if (formIdStr.empty()) {
         HILOG_ERROR("formId is invalid");
-        InvokeAsyncWithBusinessError(env, callback,
+        FormAniUtil::InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
@@ -143,7 +143,7 @@ void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_object aniFor
     }
     if (formDataStr.empty()) {
         HILOG_ERROR("formBindingData is invalid");
-        InvokeAsyncWithBusinessError(env, callback,
+        FormAniUtil::InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY), nullptr);
         return;
     }
@@ -152,10 +152,10 @@ void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_object aniFor
     int32_t ret = FormMgr::GetInstance().UpdateFormCrossBundle(formId, *formProviderData);
     if (ret != ERR_OK) {
         HILOG_ERROR("UpdateFormCrossBundle failed, error code: %{public}d", static_cast<int32_t>(ret));
-        InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+        FormAniUtil::InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
         return;
     }
-    InvokeAsyncWithBusinessError(env, callback, ERR_OK, nullptr);
+    FormAniUtil::InvokeAsyncWithBusinessError(env, callback, ERR_OK, nullptr);
 }
 
 } // anonymous namespace
