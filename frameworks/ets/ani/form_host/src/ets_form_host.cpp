@@ -1426,7 +1426,7 @@ public:
     {
         if (handler_) {
             handler_->PostSyncTask(
-                [client = shared_from_this(), state]() {
+                [client = weak_from_this(), state]() {
                     if (client == nullptr) {
                         HILOG_ERROR("client is nullptr");
                         return;
