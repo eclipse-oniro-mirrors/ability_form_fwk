@@ -305,8 +305,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         }
     },
     {
-        ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE,
-        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "there is no space to publish form" }
+        ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE, { ERR_FORM_EXTERNAL_PUBLISH_NO_SPACE, "" }
     },
     {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE,
@@ -316,8 +315,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         }
     },
     {
-        ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT,
-        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "This card does not support publishing" }
+        ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT, { ERR_FORM_EXTERNAL_PUBLISH_NOT_SUPPORT, "" }
     }
 };
 
@@ -352,6 +350,8 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_FORM_ABILITY_NOT_FOREGROUND,  "The app is not in the foreground." },
     { ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,     "Cannot close the widget editing page opened by other apps." },
     { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID,        "The location of the widget is invalid." },
+    { ERR_FORM_EXTERNAL_PUBLISH_NO_SPACE,             "There is no space to publish form." },
+    { ERR_FORM_EXTERNAL_PUBLISH_NOT_SUPPORT,          "This form does not support publishing" },
 };
 }
 
