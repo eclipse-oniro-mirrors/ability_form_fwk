@@ -1426,13 +1426,13 @@ public:
     {
         if (handler_) {
             handler_->PostSyncTask(
-                [client = weak_from_this(), state]() {
-                    auto clientPtr = client.lock();
+                [clientWeak = weak_from_this(), state]() {
+                    auto clientPtr = clientWeak.lock();
                     if (!clientPtr) {
                         HILOG_ERROR("client is nullptr");
                         return;
                     }
-                    client->task_(static_cast<int32_t>(state), clientPtr->want_);
+                    clientPtr->task_(static_cast<int32_t>(state), clientPtr->want_);
                 });
         }
     }
