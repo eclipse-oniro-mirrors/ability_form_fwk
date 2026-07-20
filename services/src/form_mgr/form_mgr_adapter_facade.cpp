@@ -51,11 +51,6 @@ void FormMgrAdapterFacade::Init()
     FormVisibilityAdapter::GetInstance().Init();
 }
 
-ErrCode FormMgrAdapterFacade::QueryPublishFormToHost(Want &want)
-{
-    return FormPublishAdapter::GetInstance().QueryPublishFormToHost(want);
-}
-
 ErrCode FormMgrAdapterFacade::QueryPublishFormToHost(Want &want, int32_t userId)
 {
     return FormPublishAdapter::GetInstance().QueryPublishFormToHost(want, userId);

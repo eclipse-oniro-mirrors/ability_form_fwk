@@ -352,135 +352,6 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckPublishForm_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "CheckPublishForm_001 end";
 }
 
-// ========== QueryPublishFormToHost Tests ==========
-
-/**
- * @tc.name: QueryPublishFormToHost_001
- * @tc.desc: Verify empty action defaults to FORM_PUBLISH_ACTION and GetAbilityInfoByAction fails
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_001 start";
-
-    Want wantToHost;
-    // No action set, should default to FORM_PUBLISH_ACTION
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(Return(false));
-
-    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
-
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_001 end";
-}
-
-/**
- * @tc.name: QueryPublishFormToHost_002
- * @tc.desc: Verify empty ability names returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_002 start";
-
-    Want wantToHost;
-    // No action set, should default to FORM_PUBLISH_ACTION
-
-    AbilityInfo emptyAbilityInfo;
-    ExtensionAbilityInfo emptyExtAbilityInfo;
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(emptyAbilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
-            Return(true)));
-
-    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
-
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_002 end";
-}
-
-/**
- * @tc.name: QueryPublishFormToHost_003
- * @tc.desc: Verify disallowed action returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_003 start";
-
-    Want wantToHost;
-    wantToHost.SetAction(TEST_INVALID_ACTION);
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-
-    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
-
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_003 end";
-}
-
-/**
- * @tc.name: QueryPublishFormToHost_004
- * @tc.desc: Verify success with ability info returns ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_004 start";
-
-    Want wantToHost;
-
-    AbilityInfo abilityInfo;
-    abilityInfo.name = TEST_ABILITY_NAME;
-    abilityInfo.bundleName = TEST_BUNDLE_NAME;
-    ExtensionAbilityInfo emptyExtAbilityInfo;
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(abilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
-            Return(true)));
-
-    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_004 end";
-}
-
-/**
- * @tc.name: QueryPublishFormToHost_005
- * @tc.desc: Verify success with extension ability info returns ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_005, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_005 start";
-
-    Want wantToHost;
-
-    AbilityInfo emptyAbilityInfo;
-    ExtensionAbilityInfo extAbilityInfo;
-    extAbilityInfo.name = "ExtAbility";
-    extAbilityInfo.bundleName = TEST_BUNDLE_NAME;
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(emptyAbilityInfo), SetArgReferee<3>(extAbilityInfo),
-            Return(true)));
-
-    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "QueryPublishFormToHost_005 end";
-}
-
 // ========== CheckAddFormTaskTimeoutOrFailed Tests ==========
 
 /**
@@ -926,7 +797,62 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_002, TestSize.Le
     GTEST_LOG_(INFO) << "RequestPublishFormCrossUser_002 end";
 }
 
-// ========== QueryPublishFormToHost(userId) Tests ==========
+// ========== QueryPublishFormToHost Tests ==========
+
+/**
+ * @tc.name: QueryPublishFormToHost_002
+ * @tc.desc: Verify empty ability names returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_002 start";
+
+    Want wantToHost;
+    // No action set, should default to FORM_PUBLISH_ACTION
+
+    AbilityInfo emptyAbilityInfo;
+    ExtensionAbilityInfo emptyExtAbilityInfo;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(emptyAbilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
+            Return(true)));
+
+    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_002 end";
+}
+
+/**
+ * @tc.name: QueryPublishFormToHost_005
+ * @tc.desc: Verify success with extension ability info returns ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_005 start";
+
+    Want wantToHost;
+
+    AbilityInfo emptyAbilityInfo;
+    ExtensionAbilityInfo extAbilityInfo;
+    extAbilityInfo.name = "ExtAbility";
+    extAbilityInfo.bundleName = TEST_BUNDLE_NAME;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(emptyAbilityInfo), SetArgReferee<3>(extAbilityInfo),
+            Return(true)));
+
+    auto result = FormPublishAdapter::GetInstance().QueryPublishFormToHost(wantToHost, TEST_USER_ID);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "QueryPublishFormToHost_005 end";
+}
 
 /**
  * @tc.name: QueryPublishFormToHost_006
@@ -1241,95 +1167,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishForm_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "RequestPublishForm_001 end";
 }
 
-// ========== RequestPublishFormToHost (1-arg) Tests ==========
-
-/**
- * @tc.name: RequestPublishFormToHost_001
- * @tc.desc: Verify StartAbility fails returns error code
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_001 start";
-
-    Want want;
-    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
-    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    AbilityInfo abilityInfo;
-    abilityInfo.name = TEST_ABILITY_NAME;
-    abilityInfo.bundleName = "com.host.bundle";
-    ExtensionAbilityInfo emptyExtAbilityInfo;
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(abilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
-            Return(true)));
-    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
-    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
-        .WillRepeatedly(Return(nullptr));
-
-    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
-
-    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_001 end";
-}
-
-/**
- * @tc.name: RequestPublishFormToHost_002
- * @tc.desc: Verify formId parse fails returns ERR_APPEXECFWK_FORM_INVALID_PARAM
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_002 start";
-
-    Want want;
-    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
-    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::string("invalid_form_id"));
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(Return(false));
-
-    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_002 end";
-}
-
-/**
- * @tc.name: RequestPublishFormToHost_003
- * @tc.desc: Verify interceptor nullptr calls AcquireAddFormResult
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_003 start";
-
-    Want want;
-    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
-    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
-        .WillOnce(Return(nullptr));
-
-    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
-
-    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_003 end";
-}
-
 /**
  * @tc.name: RequestPublishFormToHost_004
  * @tc.desc: Verify interceptor ProcessPublishForm succeeds calls AcquireAddFormResult
@@ -1357,7 +1194,7 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_004, TestSize.Level
 
     FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
 
-    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want, TEST_USER_ID);
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "RequestPublishFormToHost_004 end";
@@ -1392,13 +1229,13 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_005, TestSize.Level
 
     FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
 
-    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want);
+    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want, TEST_USER_ID);
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "RequestPublishFormToHost_005 end";
 }
 
-// ========== RequestPublishFormToHost (2-arg) Tests ==========
+// ========== RequestPublishFormToHost Tests ==========
 
 /**
  * @tc.name: RequestPublishFormToHost_006

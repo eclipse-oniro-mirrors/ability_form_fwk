@@ -263,13 +263,6 @@ ErrCode FormPublishAdapter::CheckPublishForm(Want &want, bool needCheckFormPermi
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost)
-{
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    return QueryPublishFormToHost(wantToHost, userId);
-}
-
 ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost, int32_t userId)
 {
     HILOG_INFO("QueryPublishFormToHost called with userId:%{public}d", userId);
@@ -472,7 +465,7 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
         HILOG_ERROR("add form info error");
         return errCode;
     }
-    errCode = RequestPublishFormToHost(want);
+    errCode = RequestPublishFormToHost(want, userId);
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
@@ -510,7 +503,7 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
         HILOG_ERROR("add form info error");
         return errCode;
     }
-    errCode = RequestPublishFormToHost(want);
+    errCode = RequestPublishFormToHost(want, userId);
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
@@ -519,50 +512,6 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
     }
     IncreaseAddFormRequestTimeOutTask(formId);
     return errCode;
-}
-
-ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want)
-{
-    Want wantToHost(want);
-    ElementName elementName = want.GetElement();
-    wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, elementName.GetBundleName());
-    wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, elementName.GetAbilityName());
-    std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
-    std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
-    wantToHost.SetElementName(bundleName, abilityName);
-    wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
-    CheckSnapshotWant(wantToHost);
-
-    ErrCode errCode = QueryPublishFormToHost(wantToHost);
-    if (errCode == ERR_OK) {
-        int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
-        int ret = FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("fail StartAbility");
-            return ret;
-        }
-    }
-
-    // Handle by interceptor callback when the system handler is not found.
-    int64_t formId = 0;
-    if (!FormUtil::ConvertStringToInt64(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY), formId)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    sptr<IFormPublishInterceptor> interceptor = FormCallbackAdapter::GetInstance().GetFormPublishInterceptor();
-    if (interceptor == nullptr) {
-        return AcquireAddFormResult(formId);
-    }
-
-    int ret = interceptor->ProcessPublishForm(wantToHost);
-    if (ret == ERR_OK) {
-        HILOG_DEBUG("success to ProcessPublishForm");
-        return AcquireAddFormResult(formId);
-    } else {
-        HILOG_ERROR("fail ProcessPublishForm");
-    }
-    return ret;
 }
 
 ErrCode FormPublishAdapter::RequestPublishFormCommon(Want &want, int32_t userId, int64_t &formId)

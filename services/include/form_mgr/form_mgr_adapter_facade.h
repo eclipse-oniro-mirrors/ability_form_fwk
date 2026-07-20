@@ -274,8 +274,6 @@ public:
     ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId);
 
-    ErrCode QueryPublishFormToHost(Want &want);
-
     ErrCode QueryPublishFormToHost(Want &want, int32_t userId);
 
     ErrCode RequestPublishFormCommon(Want &want, int32_t userId, int64_t &formId);

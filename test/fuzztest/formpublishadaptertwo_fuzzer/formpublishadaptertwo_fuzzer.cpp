@@ -101,10 +101,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     adapter.CheckSnapshotWant(snapshotWant);
 
     // Fuzz QueryPublishFormToHost
-    Want wantToHost = GenerateWant(fdp);
-    adapter.QueryPublishFormToHost(wantToHost);
-
-    // Fuzz QueryPublishFormToHost with userId
     Want wantToHostUser = GenerateWant(fdp);
     int32_t userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
     adapter.QueryPublishFormToHost(wantToHostUser, userId);

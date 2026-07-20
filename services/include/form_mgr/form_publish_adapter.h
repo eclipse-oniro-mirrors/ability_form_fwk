@@ -67,8 +67,6 @@ public:
     ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId);
 
-    ErrCode QueryPublishFormToHost(Want &wantToHost);
-
     ErrCode QueryPublishFormToHost(Want &wantToHost, int32_t userId);
 
     ErrCode CheckPublishForm(Want &want, bool needCheckFormPermission);
@@ -98,7 +96,6 @@ private:
     bool IsErmsSupportPublishForm(const std::string &bundleName, std::vector<Want> wants);
     bool CheckSnapshotWant(const Want &want);
     void IncreaseAddFormRequestTimeOutTask(const int64_t formId);
-    ErrCode RequestPublishFormToHost(Want &want);
     ErrCode RequestPublishFormToHost(Want &want, int32_t userId);
     int32_t GetCallerType(const std::string &bundleName);
     bool GetBundleName(std::string &bundleName, bool needCheckFormPermission = true);

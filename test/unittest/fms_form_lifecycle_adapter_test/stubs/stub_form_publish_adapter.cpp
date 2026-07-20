@@ -36,11 +36,6 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
     return ERR_OK;
 }
 
-ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost)
-{
-    return ERR_OK;
-}
-
 ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost, int32_t userId)
 {
     return ERR_OK;
