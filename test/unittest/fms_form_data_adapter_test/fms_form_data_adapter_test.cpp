@@ -1296,8 +1296,8 @@ HWTEST_F(FmsFormDataAdapterTest, AcquireProviderFormInfoByFormRecord_001, TestSi
     record.formName = "widget";
     WantParams wantParams;
 
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(nullptr));
 
     auto result = FormDataAdapter::GetInstance().AcquireProviderFormInfoByFormRecord(record, wantParams);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
@@ -1323,7 +1323,7 @@ HWTEST_F(FmsFormDataAdapterTest, AcquireProviderFormInfoByFormRecord_002, TestSi
     WantParams wantParams;
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+        .WillRepeatedly(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
 
     auto result = FormDataAdapter::GetInstance().AcquireProviderFormInfoByFormRecord(record, wantParams);
     EXPECT_NE(result, ERR_OK);

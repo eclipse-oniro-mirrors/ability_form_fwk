@@ -1431,7 +1431,7 @@ HWTEST_F(FmsFormCommonAdapterTest, CheckFormDueControl_003, TestSize.Level1)
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillRepeatedly(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockParamControl::obj, IsFormDisable(_))
@@ -1468,7 +1468,7 @@ HWTEST_F(FmsFormCommonAdapterTest, CheckFormDueControl_004, TestSize.Level1)
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillRepeatedly(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockParamControl::obj, IsFormRemove(_))
