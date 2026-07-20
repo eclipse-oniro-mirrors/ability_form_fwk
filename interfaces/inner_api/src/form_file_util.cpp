@@ -77,20 +77,15 @@ std::string FormFileUtil::GetMaskedPath(const std::string &path)
         HILOG_ERROR("path is empty");
         return "";
     }
-
     size_t lastDelimiterPos = path.find_last_of('/');
     if (lastDelimiterPos == std::string::npos) {
         return path;
     }
-
     if (lastDelimiterPos + 1 == path.size()) {
         HILOG_ERROR("path end with a separator");
         return "";
     }
-
-    std::string maskedPath = path.substr(lastDelimiterPos + 1);
-
-    return maskedPath;
+    return path.substr(lastDelimiterPos + 1);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

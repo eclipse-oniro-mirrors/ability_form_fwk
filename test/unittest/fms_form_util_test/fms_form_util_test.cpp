@@ -378,7 +378,6 @@ HWTEST_F(FormUtilTest, FormUtilTest_022, TestSize.Level1)
 HWTEST_F(FormUtilTest, FormUtilTest_023, TestSize.Level1)
 {
     const std::string path = "bundle/hjj.123/123.def/abc.def/def.com";
-
     EXPECT_EQ("def.com", FormFileUtil::GetMaskedPath(path));
     EXPECT_EQ("bundle/hjj.123/123.def/abc.def/def.com", path);
 }
