@@ -127,6 +127,13 @@ FormRecord GenerateFormRecord(FuzzedDataProvider *fdp)
     return formRecord;
 }
 
+WantParams GenerateWantParams(FuzzedDataProvider *fdp)
+{
+    (void)fdp;
+    WantParams wantParams;
+    return wantParams;
+}
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
@@ -219,21 +226,21 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     // Fuzz AllotFormById (private, exposed via #define private public)
     FormItemInfo allotByIdInfo = GenerateFormItemInfo(fdp);
     sptr<IRemoteObject> allotByIdToken = nullptr;
-    WantParams allotByIdParams;
+    WantParams allotByIdParams = GenerateWantParams(fdp);
     FormJsInfo allotByIdFormInfo;
     adapter.AllotFormById(allotByIdInfo, allotByIdToken, allotByIdParams, allotByIdFormInfo);
 
     // Fuzz AllotFormByInfo
     FormItemInfo allotByInfoInfo = GenerateFormItemInfo(fdp);
     sptr<IRemoteObject> allotByInfoToken = nullptr;
-    WantParams allotByInfoParams;
+    WantParams allotByInfoParams = GenerateWantParams(fdp);
     FormJsInfo allotByInfoFormInfo;
     adapter.AllotFormByInfo(allotByInfoInfo, allotByInfoToken, allotByInfoParams, allotByInfoFormInfo);
 
     // Fuzz AllotFormBySpecificId
     FormItemInfo allotBySpecInfo = GenerateFormItemInfo(fdp);
     sptr<IRemoteObject> allotBySpecToken = nullptr;
-    WantParams allotBySpecParams;
+    WantParams allotBySpecParams = GenerateWantParams(fdp);
     FormJsInfo allotBySpecFormInfo;
     adapter.AllotFormBySpecificId(allotBySpecInfo, allotBySpecToken, allotBySpecParams, allotBySpecFormInfo);
 
@@ -241,7 +248,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormItemInfo newRecordInfo = GenerateFormItemInfo(fdp);
     int64_t newRecordFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     sptr<IRemoteObject> newRecordToken = nullptr;
-    WantParams newRecordParams;
+    WantParams newRecordParams = GenerateWantParams(fdp);
     FormJsInfo newRecordFormJsInfo;
     adapter.AddNewFormRecord(newRecordInfo, newRecordFormId, newRecordToken, newRecordParams, newRecordFormJsInfo);
 
@@ -250,7 +257,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     sptr<IRemoteObject> existRecordToken = nullptr;
     FormRecord existFormRecord = GenerateFormRecord(fdp);
     int64_t existRecordFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
-    WantParams existRecordParams;
+    WantParams existRecordParams = GenerateWantParams(fdp);
     FormJsInfo existRecordFormInfo;
     adapter.AddExistFormRecord(existRecordInfo, existRecordToken, existFormRecord,
         existRecordFormId, existRecordParams, existRecordFormInfo);
