@@ -401,8 +401,6 @@ int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &for
 int FormMgrService::UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData)
 {
     HILOG_INFO("call, formId:%{public}" PRId64, formId);
-    // Inline the three permission checks so we can return a dedicated error code for the missing
-    // UPDATE_FORM_CROSS_BUNDLE permission (see form_errors.cpp mapping).
     if (!CheckCallerIsSystemApp()) {
         HILOG_ERROR("updateFormCrossBundle caller is not system app");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
