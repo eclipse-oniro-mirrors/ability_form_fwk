@@ -56,11 +56,13 @@ void FormBasicInfoMgr::DeleteFormBasicInfo(int64_t formId)
 
 void FormBasicInfoMgr::ClearFormBasicInfo()
 {
+    std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     formBasicInfoMap_.clear();
 }
 
 int FormBasicInfoMgr::GetBasicInfoCount() const
 {
+    std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     return formBasicInfoMap_.size();
 }
 

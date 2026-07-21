@@ -29,6 +29,8 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t SEGMENT_LENGTH = 3;
+// Maximum number of digits for the long type
+constexpr size_t MAX_SAFE_DIGITS = 19;
 constexpr const char *PARAM_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
 constexpr const char *FORM_MGR_CONFIG_VERSION = "FormMgrConfig_version";
 constexpr const char *FORM_MGR_CONFIG_DATA = "FormMgrConfig_data";
@@ -173,6 +175,10 @@ bool ParamManager::VersionStrToNumber(const std::string &versionStr, long long &
     for (const auto &token : tokens) {
         auto tokenWithZero = std::string(SEGMENT_LENGTH - token.length(), '0') + token;
         formatVersionStr.append(tokenWithZero);
+    }
+    if (formatVersionStr.size() > MAX_SAFE_DIGITS) {
+        HILOG_ERROR("over MAX_SAFE_DIGITS");
+        return false;
     }
     versionNum = FormUtil::ConvertStringToLongLong(formatVersionStr);
     return true;
