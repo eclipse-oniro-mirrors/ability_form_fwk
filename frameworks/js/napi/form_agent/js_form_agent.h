@@ -52,6 +52,8 @@ public:
 private:
     napi_value OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv);
     napi_value OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value* argv);
+    bool ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, napi_value* argv,
+        std::shared_ptr<UpdateFormCrossBundleCallbackInfo> &callbackInfo, napi_value &lastParam);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
