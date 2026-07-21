@@ -94,8 +94,7 @@ public:
      * @param FormProviderData Form binding data.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int UpdateFormCrossBundle(const int64_t formId,
-        const FormProviderData &formProviderData) override;
+    virtual int UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formProviderData) override;
 
     /**
      * @brief Set next refresh time.
