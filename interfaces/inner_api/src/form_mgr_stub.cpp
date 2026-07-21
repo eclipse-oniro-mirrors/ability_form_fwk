@@ -555,6 +555,7 @@ int32_t FormMgrStub::HandleUpdateFormCrossBundle(MessageParcel &data, MessagePar
     }
     return ERR_OK;
 }
+
 /**
      * @brief handle SetNextRefreshTime message.
      * @param data input param.
