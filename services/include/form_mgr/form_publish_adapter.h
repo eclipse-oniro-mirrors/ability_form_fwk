@@ -74,6 +74,7 @@ public:
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
     ErrCode AcquireAddFormResult(const int64_t formId);
+    bool ResolveAcquireResult(const int64_t formId, ErrCode &result);
 
     bool IsRequestPublishFormSupported();
 

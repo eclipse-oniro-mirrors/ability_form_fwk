@@ -344,30 +344,34 @@ void FormPublishAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, c
 ErrCode FormPublishAdapter::AcquireAddFormResult(const int64_t formId)
 {
     HILOG_INFO("call");
-    auto apiRet = std::make_shared<ErrCode>(ERR_OK);
+    ErrCode result = ERR_OK;
     std::unique_lock<std::mutex> lock(formResultMutex_);
-    condition_.wait(lock, [this, formId, ret = apiRet]() {
-        auto iter = formIdMap_.find(formId);
-        if (iter != formIdMap_.end()) {
-            auto mapIt = ACQUIRE_RESULT_MAP.find(static_cast<int8_t>(iter->second));
-            if (mapIt != ACQUIRE_RESULT_MAP.end()) {
-                *ret = mapIt->second;
-                if (mapIt->second == ERR_OK) {
-                    HILOG_INFO("Acquire the result of the success");
-                } else {
-                    HILOG_ERROR("Acquire the result failed, errCode:%{public}d", mapIt->second);
-                }
-                return true;
-            } else {
-                HILOG_INFO("Add form result state is unknown");
-                return true;
-            }
-        }
-        HILOG_ERROR("The formid hasn't find");
-        *ret = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-        return true;
+    condition_.wait(lock, [this, formId, &result]() {
+        return ResolveAcquireResult(formId, result);
     });
-    return *apiRet;
+    return result;
+}
+
+bool FormPublishAdapter::ResolveAcquireResult(const int64_t formId, ErrCode &result)
+{
+    auto iter = formIdMap_.find(formId);
+    if (iter == formIdMap_.end()) {
+        result = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        HILOG_ERROR("The formid hasn't find");
+        return true;
+    }
+    auto mapIt = ACQUIRE_RESULT_MAP.find(static_cast<int8_t>(iter->second));
+    if (mapIt == ACQUIRE_RESULT_MAP.end()) {
+        HILOG_INFO("Add form result state is unknown");
+        return true;
+    }
+    result = mapIt->second;
+    if (result == ERR_OK) {
+        HILOG_INFO("Acquire the result of the success");
+    } else {
+        HILOG_ERROR("Acquire the result failed, errCode:%{public}d", result);
+    }
+    return true;
 }
 
 ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
@@ -444,7 +448,7 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     if (errCode != ERR_OK) {
         return errCode;
     }
-    // Avoid unnecessary IPC when Host already exceeds form count
+    // Early return if form count exceeds limit
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
     errCode = CheckFormCountLimit(want, userId);
     if (errCode != ERR_OK) {
@@ -487,7 +491,7 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
     if (errCode != ERR_OK) {
         return errCode;
     }
-    // WithSnapshot path: skip pre-check, rely on post-check (AddForm CheckFormCountLimit)
+    // Skip form count pre-check, rely on post-check in AddForm
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
     errCode = RequestPublishFormCommon(want, userId, formId);
     if (errCode != ERR_OK) {
@@ -511,6 +515,12 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
             HiSysEventType::STATISTIC, eventInfo, want);
     }
     IncreaseAddFormRequestTimeOutTask(formId);
+    // Keep external error code unchanged for api compatibility
+    if (errCode == ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE ||
+        errCode == ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT) {
+        HILOG_INFO("map %{public}d to COMMON_CODE", errCode);
+        errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     return errCode;
 }
 
@@ -561,7 +571,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
         want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     }
 
-    // Avoid unnecessary IPC when Host already exceeds form count
+    // Early return if form count exceeds limit
     errCode = CheckFormCountLimit(want, userId);
     if (errCode != ERR_OK) {
         HILOG_ERROR("CheckFormCountLimit failed, code:%{public}d", errCode);
@@ -647,7 +657,8 @@ ErrCode FormPublishAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId
     auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [formId, &formStates] (const auto elem) {
         if (elem.first == formId) {
             if (elem.second == AddFormResultErrorCodes::FAILED || elem.second == AddFormResultErrorCodes::TIMEOUT ||
-                elem.second == AddFormResultErrorCodes::NO_SPACE || elem.second == AddFormResultErrorCodes::NOT_SUPPORT) {
+                elem.second == AddFormResultErrorCodes::NO_SPACE ||
+                elem.second == AddFormResultErrorCodes::NOT_SUPPORT) {
                 return true;
             }
             formStates = elem.second;
