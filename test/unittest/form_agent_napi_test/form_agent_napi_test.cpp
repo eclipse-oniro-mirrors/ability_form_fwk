@@ -12,39 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
-
+ 
 #include "form_mgr_errors.h"
 #include "js_form_agent.h"
-
+ 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AbilityRuntime;
 using namespace OHOS::AppExecFwk;
-
+ 
 namespace {
-/**
- * Test fixture for JsFormAgent::UpdateFormCrossBundle NAPI layer.
- *
- * NOTE on coverage scope:
- *  The form_fwk project does not link against `ace_engine` / `napi_runtime`,
- *  so a full NAPI integration test (creating a real `napi_env`, invoking the
- *  async task scheduler, observing Promise resolve/reject) is not feasible in
- *  this unit-test binary. The cases below instead cover the contract surface
- *  that `JsFormAgent` relies on:
- *    1. The default-constructed `UpdateFormCrossBundleCallbackInfo` matches the
- *       sentinel values that NAPI argument parsing assumes.
- *    2. The internal error-code constants used by `NapiFormUtil::CreateErrorByInternalErrorCode`
- *       have the numerically-stable values that the FORM_ERROR_CODES mapping
- *       table binds to the public error codes (201, 16501001, 16501000, 16501007, ...).
- *    3. The error-message string template built by `NapiFormUtil::ThrowParamNumError`
- *       and `ThrowParamError` (re-implemented here as a static helper to keep
- *       the test runtime-independent) matches the format documented in
- *       docs/新增API需求-方案设计.md §5.4.9.1.
- */
 class FormAgentNapiTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -52,21 +33,21 @@ public:
     void SetUp() {}
     void TearDown() {}
 };
-
+ 
 // Mirror of NapiFormUtil::ThrowParamNumError's message builder. Keep in sync
 // with frameworks/js/napi/formUtil/napi_form_util.cpp:158-162.
 std::string BuildParamNumErrorMessage(const std::string &gotNum, const std::string &expectedNum)
 {
     return "Parameter error. Got " + gotNum + ", expected " + expectedNum;
 }
-
+ 
 // Mirror of NapiFormUtil::ThrowParamError's message builder. Keep in sync with
 // frameworks/js/napi/formUtil/napi_form_util.cpp:164-168.
 std::string BuildParamErrorMessage(const std::string &extraMessage)
 {
     return "Parameter error. " + extraMessage;
 }
-
+ 
 /**
  * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_001
  * @tc.name: Verify UpdateFormCrossBundleCallbackInfo sentinel defaults.
@@ -79,7 +60,7 @@ HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_001, TestSiz
     EXPECT_EQ(info.formBindingData, nullptr);
     GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_001 ends";
 }
-
+ 
 /**
  * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_002
  * @tc.name: Verify parameter-count error message format.
@@ -91,7 +72,7 @@ HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_002, TestSiz
     EXPECT_EQ(msg, "Parameter error. Got 1, expected 2");
     GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_002 ends";
 }
-
+ 
 /**
  * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_003
  * @tc.name: Verify parameter-validation error message format.
@@ -101,12 +82,12 @@ HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_003, TestSiz
     GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_003 starts";
     auto formIdMsg = BuildParamErrorMessage("formId is invalid");
     EXPECT_EQ(formIdMsg, "Parameter error. formId is invalid");
-
+ 
     auto dataMsg = BuildParamErrorMessage("formBindingData is invalid");
     EXPECT_EQ(dataMsg, "Parameter error. formBindingData is invalid");
     GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_003 ends";
 }
-
+ 
 /**
  * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_004
  * @tc.name: Verify FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE value stability.
@@ -114,11 +95,9 @@ HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_003, TestSiz
  */
 HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_004, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_004 starts";
-    ErrCode internalCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE;
-    EXPECT_EQ(internalCode, 2293857);
-
-    constexpr int32_t EXTERNAL_PERMISSION_DENIED = 201;
-    EXPECT_NE(EXTERNAL_PERMISSION_DENIED, 0);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE, 2293857);
+ 
+    EXPECT_EQ(ERR_FORM_EXTERNAL_PERMISSION_DENIED, 201);
     GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_004 ends";
 }
 }  // namespace
