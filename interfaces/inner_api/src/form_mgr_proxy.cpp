@@ -268,6 +268,9 @@ int FormMgrProxy::UpdateFormCrossBundle(const int64_t formId, const FormProvider
         option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
+        if (error == ERR_APPEXECFWK_PARCEL_ERROR) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
