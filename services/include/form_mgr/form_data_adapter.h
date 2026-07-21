@@ -110,7 +110,8 @@ public:
 private:
     ErrCode InnerAcquireProviderFormInfoAsync(const int64_t formId,
         const FormItemInfo &info, const WantParams &wantParams);
-
+    
+    ErrCode ValidateAndGetFormRecord(const int64_t formId, int64_t &matchedFormId, FormRecord &formRecord);
     ErrCode HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate);
     void UpdateFormRenderParamsAfterReload(const int64_t formId);
