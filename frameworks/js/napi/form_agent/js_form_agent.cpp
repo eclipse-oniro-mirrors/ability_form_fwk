@@ -152,6 +152,7 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
         env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }
+
 napi_value JsFormAgent::UpdateFormCrossBundle(napi_env env, napi_callback_info info)
 {
     GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnUpdateFormCrossBundle);
