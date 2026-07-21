@@ -538,7 +538,11 @@ int32_t FormMgrStub::HandleUpdateForm(MessageParcel &data, MessageParcel &reply)
  */
 int32_t FormMgrStub::HandleUpdateFormCrossBundle(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<FormProviderData> formBindingData(data.ReadParcelable<FormProviderData>());
     if (formBindingData == nullptr) {
         HILOG_ERROR("fail get formBindingData");
