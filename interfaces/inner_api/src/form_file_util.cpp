@@ -71,7 +71,7 @@ uint64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::
     return totalSize;
 }
 
-std::string FormFileUtil::GetMaskedPath(const std::string &path)
+std::string_view FormFileUtil::GetMaskedPath(const std::string &path)
 {
     if (path.empty()) {
         HILOG_ERROR("path is empty");
@@ -85,7 +85,7 @@ std::string FormFileUtil::GetMaskedPath(const std::string &path)
         HILOG_ERROR("path end with a separator");
         return "";
     }
-    return path.substr(lastDelimiterPos + 1);
+    return std::string_view(path).substr(lastDelimiterPos + 1);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
