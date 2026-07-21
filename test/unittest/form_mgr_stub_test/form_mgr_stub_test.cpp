@@ -53,7 +53,6 @@ namespace OHOS::AppExecFwk {
 }
 
 namespace {
-class FormMgrStubTest : public testing::Test {
 class FormMgrStubCrossBundleTestTarget : public MockFormMgrService {
 public:
     int32_t updateFormCrossBundleCount = 0;
@@ -64,6 +63,7 @@ public:
     }
 };
 
+class FormMgrStubTest : public testing::Test {
 public:
     void SetUp() override
     {
@@ -4154,47 +4154,52 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
 
 /**
  * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_001
- * @tc.name: Verify HandleUpdateFormCrossBundle with a valid FormProviderData parcelable.
- * @tc.desc: test that valid formId and FormProviderData are forwarded and reply echoes result.
+ * @tc.name: Verify OnRemoteRequest dispatches FORM_MGR_UPDATE_FORM_CROSS_BUNDLE with valid FormProviderData.
+ * @tc.desc: test that valid formId and FormProviderData are deserialized and reply echoes result.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
+    auto stub = new (std::nothrow) FormMgrStubCrossBundleTestTarget();
+    ASSERT_TRUE(stub != nullptr);
     constexpr int64_t formId = 1001L;
     FormProviderData formBindingData = FormProviderData(std::string("{\"city\":\"shenzhen\"}"));
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE);
     MessageParcel data;
     MessageParcel reply;
-
+    MessageOption option{MessageOption::TF_ASYNC};
+ 
+    data.WriteInterfaceToken(FormMgrStubCrossBundleTestTarget::GetDescriptor());
     data.WriteInt64(formId);
     data.WriteParcelable(&formBindingData);
-
-    EXPECT_CALL(*mockFormMgrService, UpdateFormCrossBundle(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    auto errCode = mockFormMgrService->HandleUpdateFormCrossBundle(data, reply);
-    EXPECT_EQ(errCode, ERR_OK);
+ 
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(stub->updateFormCrossBundleCount, 1);
     EXPECT_EQ(reply.ReadInt32(), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 ends";
 }
-
+ 
 /**
  * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_002
- * @tc.name: Verify HandleUpdateFormCrossBundle with a missing FormProviderData payload.
- * @tc.desc: test that a missing FormProviderData returns PARCEL_ERROR and skips the call.
+ * @tc.name: Verify OnRemoteRequest for FORM_MGR_UPDATE_FORM_CROSS_BUNDLE with missing FormProviderData.
+ * @tc.desc: test that a missing FormProviderData returns PARCEL_ERROR via OnRemoteRequest.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_002, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
+    auto stub = new (std::nothrow) FormMgrStubCrossBundleTestTarget();
+    ASSERT_TRUE(stub != nullptr);
     constexpr int64_t formId = 1002L;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE);
     MessageParcel data;
     MessageParcel reply;
-
-    // Intentionally omit FormProviderData so ReadParcelable returns nullptr.
+    MessageOption option{MessageOption::TF_ASYNC};
+ 
+    data.WriteInterfaceToken(FormMgrStubCrossBundleTestTarget::GetDescriptor());
     data.WriteInt64(formId);
-
-    EXPECT_CALL(*mockFormMgrService, UpdateFormCrossBundle(_, _)).Times(0);
-    EXPECT_EQ(mockFormMgrService->HandleUpdateFormCrossBundle(data, reply),
-        ERR_APPEXECFWK_PARCEL_ERROR);
+ 
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(stub->updateFormCrossBundleCount, 0);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 ends";
 }
 }
