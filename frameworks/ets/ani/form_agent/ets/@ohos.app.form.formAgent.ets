@@ -33,8 +33,8 @@ export namespace formAgent {
   loadLibrary("form_agent_ani.z")
 
   export native function nativeRequestPublishForm(want: Want, callback: AsyncCallbackWrapper<string>): void;
-  export native function nativeUpdateFormCrossBundle(formId: string,
-    bindingData: formBindingData.FormBindingData, callback: AsyncCallbackWrapper<void>): void;
+  export native function nativeUpdateFormCrossBundle(formId: string, bindingData: formBindingData.FormBindingData,
+    callback: AsyncCallbackWrapper<void>): void;
   export native function checkWantParam(want: Want): void;
 
   export function requestPublishForm(want: Want, callback: AsyncCallback<string>): void {
@@ -63,18 +63,22 @@ export namespace formAgent {
     return publishFormPromise;
   }
 
-  export function updateFormCrossBundle(formId: string,
-    bindingData: formBindingData.FormBindingData): Promise<void> {
+  export function updateFormCrossBundle(formId: string, bindingData: formBindingData.FormBindingData): Promise<void> {
     return new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
       let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
-        if (err == null || err.code == 0) {
+        if (err === null || err.code === 0) {
           resolve(undefined);
         } else {
           reject(err);
         }
       });
       taskpool.execute((): void => {
-        formAgent.nativeUpdateFormCrossBundle(formId, bindingData, myCall);
+        try {
+          formAgent.nativeUpdateFormCrossBundle(formId, bindingData, myCall);
+        } catch (exception) {
+          let err = exception as BusinessError;
+          myCall.invoke(err, undefined);
+        }
       });
     });
   }
