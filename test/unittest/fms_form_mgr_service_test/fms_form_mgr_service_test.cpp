@@ -1643,32 +1643,21 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_001, TestSize.Level1)
     FormMgrService formMgrService;
     int64_t formId = 1;
     FormProviderData formProviderData;
-
+ 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(false);
     MockCheckAcrossLocalAccountsPermission(true);
-
+ 
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE);
-
-    // With permission granted, success path proceeds (AdapterFacade mock returns ERR_OK).
-    MockVerifyCallingPermission(true);
-    MockUpdateFormCrossBundle(ERR_OK);
-    ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
-    EXPECT_EQ(ret, ERR_OK);
-
-    // Non-system-app caller yields the system-app error, not the dedicated one.
-    MockIsSystemAppByFullTokenID(false);
-    ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_001 end";
 }
-
+ 
 /**
  * @tc.number: UpdateFormCrossBundle_002
- * @tc.name: test UpdateFormCrossBundle rejects non-system-app caller.
- * @tc.desc: Verify FORM_PERMISSION_DENY_SYS is returned for a non-system-app caller.
+ * @tc.name: test UpdateFormCrossBundle success path with permission granted.
+ * @tc.desc: Verify ERR_OK is returned when system-app caller has the permission.
  */
 HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_002, TestSize.Level1)
 {
@@ -1676,18 +1665,41 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_002, TestSize.Level1)
     FormMgrService formMgrService;
     int64_t formId = 1;
     FormProviderData formProviderData;
-
+ 
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    MockUpdateFormCrossBundle(ERR_OK);
+ 
+    ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_002 end";
+}
+ 
+/**
+ * @tc.number: UpdateFormCrossBundle_003
+ * @tc.name: test UpdateFormCrossBundle rejects non-system-app caller.
+ * @tc.desc: Verify FORM_PERMISSION_DENY_SYS is returned for a non-system-app caller.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_003 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    FormProviderData formProviderData;
+ 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     MockVerifyCallingPermission(true);
     MockCheckAcrossLocalAccountsPermission(true);
     MockUpdateFormCrossBundle(ERR_OK);
-
+ 
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_002 end";
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_003 end";
 }
-
+ 
 /**
  * @tc.number: UpdateFormCrossBundle_004
  * @tc.name: test UpdateFormCrossBundle propagates AdapterFacade errors.
@@ -1699,18 +1711,18 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_004, TestSize.Level1)
     FormMgrService formMgrService;
     int64_t formId = -1;
     FormProviderData formProviderData = FormProviderData(std::string("{\"k\":\"v\"}"));
-
+ 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(true);
     MockCheckAcrossLocalAccountsPermission(true);
     MockUpdateFormCrossBundle(ERR_APPEXECFWK_FORM_INVALID_PARAM);
-
+ 
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_004 end";
 }
-
+ 
 /**
  * @tc.number: UpdateFormCrossBundle_005
  * @tc.name: test UpdateFormCrossBundle surfaces FORM_NOT_EXIST_ID.
@@ -1722,18 +1734,18 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_005, TestSize.Level1)
     FormMgrService formMgrService;
     int64_t formId = 99999999L;
     FormProviderData formProviderData = FormProviderData(std::string("{\"k\":\"v\"}"));
-
+ 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(true);
     MockCheckAcrossLocalAccountsPermission(true);
     MockUpdateFormCrossBundle(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-
+ 
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_005 end";
 }
-
+ 
 /**
  * @tc.number: UpdateFormCrossBundle_006
  * @tc.name: test UpdateFormCrossBundle transparently propagates arbitrary errors.
@@ -1745,18 +1757,18 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_006, TestSize.Level1)
     FormMgrService formMgrService;
     int64_t formId = 42;
     FormProviderData formProviderData = FormProviderData(std::string("{\"k\":\"v\"}"));
-
+ 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(true);
     MockCheckAcrossLocalAccountsPermission(true);
     MockUpdateFormCrossBundle(ERR_APPEXECFWK_FORM_NOT_TRUST);
-
+ 
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_TRUST);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_006 end";
 }
-
+ 
 /**
  * @tc.number: UpdateFormCrossBundle_007
  * @tc.name: test UpdateFormCrossBundle rejects cross-local-account callers.
@@ -1768,18 +1780,18 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_007, TestSize.Level1)
     FormMgrService formMgrService;
     int64_t formId = 7;
     FormProviderData formProviderData = FormProviderData(std::string("{\"k\":\"v\"}"));
-
+ 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(true);
     MockCheckAcrossLocalAccountsPermission(false);
     MockUpdateFormCrossBundle(ERR_OK);
-
+ 
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_007 end";
 }
-
+ 
 /**
  * @tc.number: UpdateFormCrossBundle_008
  * @tc.name: test UpdateFormCrossBundle dedicated permission code round-trip.
@@ -1791,13 +1803,13 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_008, TestSize.Level1)
     FormMgrService formMgrService;
     int64_t formId = 1;
     FormProviderData formProviderData = FormProviderData(std::string("{\"k\":\"v\"}"));
-
+ 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(false);
     MockCheckAcrossLocalAccountsPermission(true);
     MockUpdateFormCrossBundle(ERR_OK);
-
+ 
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_008 end";
