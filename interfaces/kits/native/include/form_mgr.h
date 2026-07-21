@@ -136,7 +136,7 @@ public:
         const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
-     * @brief Update form with formId by cross bundle, restricted to system apps with UPDATE_FORM_CROSS_BUNDLE.
+     * @brief Update form with formId by cross bundle.
      * @param formId The Id of the form to update.
      * @param formBindingData Form binding data.
      * @return Returns ERR_OK on success, others on failure.
