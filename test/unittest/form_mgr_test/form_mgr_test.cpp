@@ -5888,7 +5888,6 @@ HWTEST_F(FormMgrTest, FormMgr_UpdateFormsConfig_002, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_UpdateFormsConfig_002 end";
 }
-
 /**
  * @tc.name: FormMgr_UpdateFormCrossBundle_ConnectFailed_001
  * @tc.desc: Verify UpdateFormCrossBundle surfaces FORM_GET_FMS_FAILED when SAMgr has no FMS.
@@ -5905,17 +5904,17 @@ HWTEST_F(FormMgrTest, FormMgr_UpdateFormCrossBundle_ConnectFailed_001, TestSize.
     std::shared_ptr<bool> forceNullGet = std::make_shared<bool>(true);
     mockSamgr->weakGetSystemAbility_ = forceNullGet;
     FormMgr::GetInstance().SetFormMgrService(nullptr);
-
+ 
     int64_t formId = 2001L;
     FormProviderData formBindingData = FormProviderData(std::string("{\"k\":\"v\"}"));
     EXPECT_EQ(FormMgr::GetInstance().UpdateFormCrossBundle(formId, formBindingData),
         ERR_APPEXECFWK_FORM_GET_FMS_FAILED);
-
+ 
     SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = backupSamgr;
     mockSamgr = nullptr;
     GTEST_LOG_(INFO) << "FormMgr_UpdateFormCrossBundle_ConnectFailed_001 end";
 }
-
+ 
 /**
  * @tc.name: FormMgr_UpdateFormCrossBundle_RemoteProxyNull_002
  * @tc.desc: Verify UpdateFormCrossBundle surfaces FORM_COMMON_CODE when remoteProxy_ is null.
@@ -5925,16 +5924,34 @@ HWTEST_F(FormMgrTest, FormMgr_UpdateFormCrossBundle_RemoteProxyNull_002, TestSiz
 {
     GTEST_LOG_(INFO) << "FormMgr_UpdateFormCrossBundle_RemoteProxyNull_002 begin";
     FormMgr::GetInstance().remoteProxy_ = nullptr;
-
+ 
     int64_t formId = 2002L;
     FormProviderData formBindingData = FormProviderData(std::string("{\"k\":\"v\"}"));
     EXPECT_EQ(FormMgr::GetInstance().UpdateFormCrossBundle(formId, formBindingData),
         ERR_APPEXECFWK_FORM_COMMON_CODE);
-
+ 
     // Restore mockProxy so the static destructor doesn't trip on a stale ptr.
     if (mockProxy != nullptr) {
         FormMgr::GetInstance().SetFormMgrService(mockProxy);
     }
     GTEST_LOG_(INFO) << "FormMgr_UpdateFormCrossBundle_RemoteProxyNull_002 end";
+}
+ 
+/**
+ * @tc.name: FormMgr_UpdateFormCrossBundle_RecoverStatus_003
+ * @tc.desc: Verify UpdateFormCrossBundle surfaces FORM_SERVER_STATUS_ERR when FMS is in IN_RECOVERING.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgr_UpdateFormCrossBundle_RecoverStatus_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgr_UpdateFormCrossBundle_RecoverStatus_003 begin";
+    int64_t formId = 2003L;
+    FormProviderData formBindingData = FormProviderData(std::string("{\"k\":\"v\"}"));
+ 
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    EXPECT_EQ(FormMgr::GetInstance().UpdateFormCrossBundle(formId, formBindingData),
+        ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    GTEST_LOG_(INFO) << "FormMgr_UpdateFormCrossBundle_RecoverStatus_003 end";
 }
 } // namespace
