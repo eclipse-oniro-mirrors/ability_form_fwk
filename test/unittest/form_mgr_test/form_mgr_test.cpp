@@ -5888,6 +5888,7 @@ HWTEST_F(FormMgrTest, FormMgr_UpdateFormsConfig_002, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgr_UpdateFormsConfig_002 end";
 }
+
 /**
  * @tc.name: FormMgr_UpdateFormCrossBundle_ConnectFailed_001
  * @tc.desc: Verify UpdateFormCrossBundle surfaces FORM_GET_FMS_FAILED when SAMgr has no FMS.
