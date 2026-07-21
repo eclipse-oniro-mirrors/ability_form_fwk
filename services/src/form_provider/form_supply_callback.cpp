@@ -236,7 +236,7 @@ bool FormSupplyCallback::ShouldDisconnectImmediately(sptr<FormAbilityConnection>
         HILOG_ERROR("null connection");
         return false;
     }
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(conMutex_);
     for (auto &conn : connections_) {
         if (connection->GetProviderKey() == conn.second->GetProviderKey()) {
