@@ -54,6 +54,16 @@ namespace OHOS::AppExecFwk {
 
 namespace {
 class FormMgrStubTest : public testing::Test {
+class FormMgrStubCrossBundleTestTarget : public MockFormMgrService {
+public:
+    int32_t updateFormCrossBundleCount = 0;
+    int32_t UpdateFormCrossBundle(int64_t formId, const FormProviderData &formBindingData) override
+    {
+        updateFormCrossBundleCount++;
+        return ERR_OK;
+    }
+};
+
 public:
     void SetUp() override
     {
