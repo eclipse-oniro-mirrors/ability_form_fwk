@@ -2126,8 +2126,8 @@ void FormRenderRecord::RegisterResolveBufferCallback()
     auto resolveBufferCallback = [vm](
         std::string dirPath, uint8_t **buff, size_t *buffSize, std::string &errorMsg) {
         const std::string errStr = "get hsp buffer failed, not support to load hsp in FormRender";
-        const auto maskedPath = FormFileUtil::GetMaskedPath(dirPath);
-        HILOG_ERROR("%{public}s, hspPath: %{public}.*s", errStr.c_str(), static_cast<int>(maskedPath.size()), maskedPath.data());
+        std::string maskedPath = FormFileUtil::GetMaskedPath(dirPath);
+        HILOG_ERROR("%{public}s, hspPath: %{public}s", errStr.c_str(), maskedPath.c_str());
         if (vm == nullptr) {
             HILOG_ERROR("null vm");
             return false;
