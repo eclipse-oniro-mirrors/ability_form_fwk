@@ -116,13 +116,12 @@ int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     data.callingUid = callingUid;
     data.providerData = formProviderData;
     ret = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
-
     if (ret != ERR_OK) {
         HILOG_ERROR("RequestRefresh failed, ret:%{public}d, skip proxy update for form:%{public}" PRId64,
             ret, matchedFormId);
         return ret;
     }
-    
+
     if (!formDataProxies.empty()) {
         FormDataProxyMgr::GetInstance().UpdateSubscribeFormData(matchedFormId, formDataProxies);
     }
