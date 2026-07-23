@@ -322,7 +322,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_001
- * @tc.desc: Share form success.
+ * @tc.desc: The caller does not have permission, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI581YL
  */
@@ -345,7 +345,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0
 
     int32_t result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
         formInfo1.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
-    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_001  end";
 }
@@ -375,7 +375,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0
 
     int32_t result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
         formJsInfo.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
-    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     int64_t invalidFormId = -1;
     result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
@@ -418,7 +418,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_004
- * @tc.desc: Share form success.
+ * @tc.desc: The caller does not have permission, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI581YL
  */
@@ -444,7 +444,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0
 
     int32_t result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
         formJsInfo.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
-    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_004 end";
 }
