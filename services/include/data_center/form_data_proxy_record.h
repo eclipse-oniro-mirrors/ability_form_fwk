@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_DATA_PROXY_RECORD_H
 #define OHOS_FORM_FWK_FORM_DATA_PROXY_RECORD_H
 
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -86,6 +87,7 @@ private:
         SubscribeMap &originRdbMap, SubscribeMap &newRdbMap,
         SubscribeMap &originPublishMap, SubscribeMap &newPublishMap);
 
+    void SetSubscribeFormDataState(bool subsState);
     ErrCode SetRdbSubsState(const SubscribeMap &rdbSubscribeMap, bool subsState);
     ErrCode SetPublishSubsState(const SubscribeMap &publishSubscribeMap, bool subsState);
 
@@ -112,6 +114,7 @@ private:
     int32_t tokenId_;
     int32_t uid_;
     AAFwk::Want wantCache_;
+    std::mutex subscribeMapMutex_;
     SubscribeMap rdbSubscribeMap_;
     SubscribeMap publishSubscribeMap_;
     std::mutex rdbSubscribeResultMapMutex_;

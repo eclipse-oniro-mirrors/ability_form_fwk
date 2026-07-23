@@ -230,7 +230,18 @@ FormDataProxyRecord::~FormDataProxyRecord()
 ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)
 {
     RegisterPermissionListener(formDataProxies);
-    return SubscribeFormData(formDataProxies, rdbSubscribeMap_, publishSubscribeMap_);
+    SubscribeMap rdbSubscribeMap;
+    SubscribeMap publishSubscribeMap;
+    ErrCode ret = SubscribeFormData(formDataProxies, rdbSubscribeMap, publishSubscribeMap);
+    if (ret != ERR_OK) {
+        return ret;
+    }
+    {
+        std::lock_guard<std::mutex> lock(subscribeMapMutex_);
+        rdbSubscribeMap_ = std::move(rdbSubscribeMap);
+        publishSubscribeMap_ = std::move(publishSubscribeMap);
+    }
+    return ret;
 }
 
 ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies,
@@ -345,7 +356,14 @@ ErrCode FormDataProxyRecord::SubscribePublishFormData(const SubscribeMap &publis
 
 ErrCode FormDataProxyRecord::UnsubscribeFormData()
 {
-    return UnsubscribeFormData(rdbSubscribeMap_, publishSubscribeMap_);
+    SubscribeMap rdbSubscribeMap;
+    SubscribeMap publishSubscribeMap;
+    {
+        std::lock_guard<std::mutex> lock(subscribeMapMutex_);
+        rdbSubscribeMap.swap(rdbSubscribeMap_);
+        publishSubscribeMap.swap(publishSubscribeMap_);
+    }
+    return UnsubscribeFormData(rdbSubscribeMap, publishSubscribeMap);
 }
 
 ErrCode FormDataProxyRecord::UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap)
@@ -560,6 +578,7 @@ void FormDataProxyRecord::UpdateSubscribeMap(const std::vector<FormDataProxy> &f
     SubscribeMap updateMap;
     std::unordered_set<std::string> expectedKeys;
     ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, false, updateMap);
+    std::lock_guard<std::mutex> lock(subscribeMapMutex_);
     for (const auto &record : updateMap) {
         const auto &key = record.first;
         const auto &newSubscribeIds = record.second;
@@ -567,30 +586,44 @@ void FormDataProxyRecord::UpdateSubscribeMap(const std::vector<FormDataProxy> &f
         if (it != rdbSubscribeMap_.end()) {
             originRdbMap[key] = it->second;
             newRdbMap[key] = newSubscribeIds;
-            rdbSubscribeMap_[key] = newSubscribeIds;
+            it->second = newSubscribeIds;
         }
         it = publishSubscribeMap_.find(key);
         if (it != publishSubscribeMap_.end()) {
             originPublishMap[key] = it->second;
             newPublishMap[key] = newSubscribeIds;
-            publishSubscribeMap_[key] = newSubscribeIds;
+            it->second = newSubscribeIds;
         }
     }
 }
 
 void FormDataProxyRecord::EnableSubscribeFormData()
 {
-    HILOG_INFO("enable subscribe form, formId:%{public}" PRId64 ", rdbSize:%{public}zu, publishSize:%{public}zu",
-        formId_, rdbSubscribeMap_.size(), publishSubscribeMap_.size());
-    SetRdbSubsState(rdbSubscribeMap_, true);
-    SetPublishSubsState(publishSubscribeMap_, true);
+    SetSubscribeFormDataState(true);
 }
 
 void FormDataProxyRecord::DisableSubscribeFormData()
 {
-    HILOG_INFO("disable subscribe form, formId:%{public}" PRId64, formId_);
-    SetRdbSubsState(rdbSubscribeMap_, false);
-    SetPublishSubsState(publishSubscribeMap_, false);
+    SetSubscribeFormDataState(false);
+}
+
+void FormDataProxyRecord::SetSubscribeFormDataState(bool subsState)
+{
+    SubscribeMap rdbSubscribeMap;
+    SubscribeMap publishSubscribeMap;
+    {
+        std::lock_guard<std::mutex> lock(subscribeMapMutex_);
+        rdbSubscribeMap = rdbSubscribeMap_;
+        publishSubscribeMap = publishSubscribeMap_;
+    }
+    if (subsState) {
+        HILOG_INFO("enable subscribe form, formId:%{public}" PRId64 ", rdbSize:%{public}zu, publishSize:%{public}zu",
+            formId_, rdbSubscribeMap.size(), publishSubscribeMap.size());
+    } else {
+        HILOG_INFO("disable subscribe form, formId:%{public}" PRId64, formId_);
+    }
+    SetRdbSubsState(rdbSubscribeMap, subsState);
+    SetPublishSubsState(publishSubscribeMap, subsState);
 }
 
 void FormDataProxyRecord::RetryFailureSubscribes()
