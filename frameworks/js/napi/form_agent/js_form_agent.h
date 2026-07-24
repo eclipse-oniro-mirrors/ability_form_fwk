@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_JS_FORM_AGENT_H
 
 #include "ability.h"
+#include "form_provider_data.h"
 #include "form_provider_info.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
@@ -35,6 +36,11 @@ struct RequestPublishFormCallbackInfo {
     std::vector<AppExecFwk::FormDataProxy> formDataProxies;
 };
 
+struct UpdateFormCrossBundleCallbackInfo {
+    int64_t formId = -1;
+    std::shared_ptr<OHOS::AppExecFwk::FormProviderData> formBindingData = nullptr;
+};
+
 class JsFormAgent {
 public:
     JsFormAgent() = default;
@@ -42,8 +48,12 @@ public:
 
     static void Finalizer(napi_env env, void* data, void* hint);
     static napi_value RequestPublishForm(napi_env env, napi_callback_info info);
+    static napi_value UpdateFormCrossBundle(napi_env env, napi_callback_info info);
 private:
     napi_value OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value* argv);
+    bool ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, napi_value* argv,
+        std::shared_ptr<UpdateFormCrossBundleCallbackInfo> &callbackInfo, napi_value &lastParam);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

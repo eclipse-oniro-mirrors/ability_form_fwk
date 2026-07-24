@@ -30,6 +30,7 @@ public:
     MOCK_METHOD2(DeleteForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD3(ReleaseForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache));
     MOCK_METHOD2(UpdateForm, int(const int64_t formId, const FormProviderData &formProviderData));
+    MOCK_METHOD2(UpdateFormCrossBundle, int(const int64_t formId, const FormProviderData &formBindingData));
     MOCK_METHOD2(SetNextRefreshTime, int(const int64_t formId, const int64_t nextTime));
     MOCK_METHOD3(RequestPublishFormCrossUser, ErrCode(Want &want, int32_t userId, int64_t &formId));
     MOCK_METHOD4(RequestPublishForm, ErrCode(Want &want, bool withFormBindingData,

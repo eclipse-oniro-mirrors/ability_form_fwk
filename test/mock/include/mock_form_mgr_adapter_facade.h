@@ -28,6 +28,8 @@ public:
     virtual bool IsDeleteCacheInUpgradeScene(const FormRecord &record) = 0;
     virtual int UpdateForm(int64_t formId, int32_t callingUid,
         const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies) = 0;
+    virtual ErrCode UpdateFormCrossBundle(int64_t formId, int32_t callingUid,
+        const FormProviderData &formProviderData) = 0;
 };
 
 class MockFormMgrAdapterFacade : public AbstractMockFormMgrAdapterFacade {
@@ -37,6 +39,7 @@ public:
     ~MockFormMgrAdapterFacade() override = default;
     MOCK_METHOD1(IsDeleteCacheInUpgradeScene, bool(const FormRecord &record));
     MOCK_METHOD4(UpdateForm, int(int64_t, int32_t, const FormProviderData&, const std::vector<FormDataProxy>&));
+    MOCK_METHOD3(UpdateFormCrossBundle, ErrCode(int64_t, int32_t, const FormProviderData&));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

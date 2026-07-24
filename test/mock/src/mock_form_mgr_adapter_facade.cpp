@@ -42,5 +42,16 @@ int FormMgrAdapterFacade::UpdateForm(int64_t formId, int32_t callingUid,
     }
     return ERR_OK;
 }
+
+ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(int64_t formId, int32_t callingUid,
+    const FormProviderData &formProviderData)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapterFacade::UpdateFormCrossBundle called, formId:" << formId;
+    if (AppExecFwk::MockFormMgrAdapterFacade::obj) {
+        return AppExecFwk::MockFormMgrAdapterFacade::obj->UpdateFormCrossBundle(
+            formId, callingUid, formProviderData);
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

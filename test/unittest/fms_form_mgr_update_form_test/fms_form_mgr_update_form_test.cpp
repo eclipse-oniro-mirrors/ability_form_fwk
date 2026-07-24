@@ -424,4 +424,68 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
 
     GTEST_LOG_(INFO) << "UpdateForm_008 test end";
 }
+
+/**
+ * @tc.name: UpdateFormCrossBundle_001
+ * @tc.desc: Verify UpdateFormCrossBundle through Kit layer with valid data.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_001 start";
+    int64_t formId {1001L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"shenzhen001\"}"));
+ 
+    FormItemInfo formItemInfo;
+    formItemInfo.SetFormId(formId);
+    formItemInfo.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    formItemInfo.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    formItemInfo.SetTemporaryFlag(false);
+    formItemInfo.SetProviderUid(callingUid);
+    FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid);
+ 
+    FormItemInfo itemInfo;
+    itemInfo.SetHostBundleName(FORM_HOST_BUNDLE_NAME);
+    FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
+ 
+    MockGetCallingUid(callingUid);
+    MockRequestRefreshRet(true);
+    EXPECT_EQ(ERR_OK, FormMgrAdapterFacade::GetInstance().UpdateFormCrossBundle(
+        formId, callingUid, formProviderData));
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_001 end";
+}
+ 
+/**
+ * @tc.name: UpdateFormCrossBundle_002
+ * @tc.desc: Verify UpdateFormCrossBundle rejects invalid formId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_002 start";
+    int64_t formId {-1L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"shenzhen002\"}"));
+ 
+    MockGetCallingUid(callingUid);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
+        FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData));
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_002 end";
+}
+ 
+/**
+ * @tc.name: UpdateFormCrossBundle_003
+ * @tc.desc: Verify UpdateFormCrossBundle rejects empty formBindingData.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateFormCrossBundle_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_003 start";
+    int64_t formId {1003L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData;
+ 
+    MockGetCallingUid(callingUid);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY,
+        FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData));
+    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_003 end";
+}
 }

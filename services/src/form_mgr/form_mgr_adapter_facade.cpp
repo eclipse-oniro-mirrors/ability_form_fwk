@@ -181,6 +181,13 @@ int FormMgrAdapterFacade::UpdateForm(const int64_t formId, const int32_t calling
     return FormDataAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData, formDataProxies);
 }
 
+ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
+    const FormProviderData &formProviderData)
+{
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    return FormDataAdapter::GetInstance().UpdateFormCrossBundle(formId, callingUid, formProviderData);
+}
+
 int FormMgrAdapterFacade::RequestForm(const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const Want &want)
 {

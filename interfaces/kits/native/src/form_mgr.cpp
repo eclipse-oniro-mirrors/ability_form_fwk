@@ -284,6 +284,43 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
 }
 
 /**
+ * @brief Update form with formId by cross bundle, restricted to system apps with UPDATE_FORM_CROSS_BUNDLE.
+ * @param formId The Id of the form to update.
+ * @param formBindingData Form binding data.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgr::UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData)
+{
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("UpdateFormCrossBundle failed, form is in recover status");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    if (formId <= 0) {
+        HILOG_ERROR("UpdateFormCrossBundle failed, formId invalid");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    if (formBindingData.GetDataString().empty()) {
+        HILOG_ERROR("UpdateFormCrossBundle failed, null formProviderData");
+        return ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY;
+    }
+
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UpdateFormCrossBundle(formId, formBindingData);
+}
+
+/**
  * @brief Release renderer.
  * @param formId The Id of the forms to release.
  * @param compId The compId of the forms to release.

@@ -79,6 +79,7 @@ namespace {
     int g_updateTemplateFormDetailInfo = OHOS::ERR_OK;
     int g_unregisterPublishFormCrossBundleControl = OHOS::ERR_OK;
     bool g_publishFormCrossBundleControl = true;
+    int g_updateFormCrossBundle = OHOS::ERR_OK;
     bool g_hasFormVisible = true;
     int g_enableForms = OHOS::ERR_OK;
     int g_registerFormWantCallback = OHOS::ERR_OK;
@@ -274,6 +275,11 @@ void MockUnregisterDeleteFormsCallback(int mockRet)
 void MockDeleteForms(int mockRet)
 {
     g_deleteForms = mockRet;
+}
+
+void MockUpdateFormCrossBundle(int mockRet)
+{
+    g_updateFormCrossBundle = mockRet;
 }
 
 int FormMgrAdapterFacade::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
@@ -626,6 +632,12 @@ ErrCode FormMgrAdapterFacade::UnregisterDeleteFormsCallback()
 ErrCode FormMgrAdapterFacade::DeleteForms(const std::vector<FormRecordFilter> &filters)
 {
     return g_deleteForms;
+}
+
+ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
+    const FormProviderData &formProviderData)
+{
+    return g_updateFormCrossBundle;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

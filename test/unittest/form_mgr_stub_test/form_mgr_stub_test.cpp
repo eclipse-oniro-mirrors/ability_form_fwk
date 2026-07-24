@@ -53,6 +53,16 @@ namespace OHOS::AppExecFwk {
 }
 
 namespace {
+class FormMgrStubCrossBundleTestTarget : public MockFormMgrService {
+public:
+    int32_t updateFormCrossBundleCount = 0;
+    int32_t UpdateFormCrossBundle(int64_t formId, const FormProviderData &formBindingData) override
+    {
+        updateFormCrossBundleCount++;
+        return ERR_OK;
+    }
+};
+
 class FormMgrStubTest : public testing::Test {
 public:
     void SetUp() override
@@ -4140,5 +4150,56 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_007 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_001
+ * @tc.name: Verify OnRemoteRequest dispatches FORM_MGR_UPDATE_FORM_CROSS_BUNDLE with valid FormProviderData.
+ * @tc.desc: test that valid formId and FormProviderData are deserialized and reply echoes result.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 starts";
+    auto stub = new (std::nothrow) FormMgrStubCrossBundleTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    constexpr int64_t formId = 1001L;
+    FormProviderData formBindingData = FormProviderData(std::string("{\"city\":\"shenzhen\"}"));
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+ 
+    data.WriteInterfaceToken(FormMgrStubCrossBundleTestTarget::GetDescriptor());
+    data.WriteInt64(formId);
+    data.WriteParcelable(&formBindingData);
+ 
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(stub->updateFormCrossBundleCount, 1);
+    EXPECT_EQ(reply.ReadInt32(), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 ends";
+}
+ 
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_002
+ * @tc.name: Verify OnRemoteRequest for FORM_MGR_UPDATE_FORM_CROSS_BUNDLE with missing FormProviderData.
+ * @tc.desc: test that a missing FormProviderData returns PARCEL_ERROR via OnRemoteRequest.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 starts";
+    auto stub = new (std::nothrow) FormMgrStubCrossBundleTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    constexpr int64_t formId = 1002L;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+ 
+    data.WriteInterfaceToken(FormMgrStubCrossBundleTestTarget::GetDescriptor());
+    data.WriteInt64(formId);
+ 
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(stub->updateFormCrossBundleCount, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 ends";
 }
 }
