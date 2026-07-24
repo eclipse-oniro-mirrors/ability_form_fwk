@@ -104,8 +104,7 @@ void CheckWantParam(ani_env *env, ani_object aniWant, ani_object callback)
     }
 }
  
-void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_object aniFormBindingData,
-    ani_object callback)
+void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_string dataObjStr, ani_object callback)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Agent.updateFormCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
@@ -113,25 +112,19 @@ void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_object aniFor
         HILOG_ERROR("env is nullptr");
         return;
     }
-    int64_t formId = 0;
-    if (!ParseFormId(env, aniFormId, formId, callback)) {
-        return;
-    }
-    std::string formDataStr = ExtractFormBindingData(env, aniFormBindingData);
-    if (formDataStr.empty()) {
-        HILOG_ERROR("formBindingData is invalid");
+    if (FormAniUtil::IsRefUndefined(env, aniFormId) || FormAniUtil::IsRefUndefined(env, dataObjStr)) {
         FormAniUtil::InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY), nullptr);
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
     }
-    auto formProviderData = std::make_unique<OHOS::AppExecFwk::FormProviderData>(formDataStr);
-    int32_t ret = FormMgr::GetInstance().UpdateFormCrossBundle(formId, *formProviderData);
+
+    int64_t formId = FormAniUtil::FormIdAniStrtoInt64(env, aniFormId);
+    auto formProviderData = AppExecFwk::FormProviderData(FormAniUtil::AniStringToStdString(env, dataObjStr));
+    int32_t ret = FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData);
     if (ret != ERR_OK) {
         HILOG_ERROR("UpdateFormCrossBundle failed, error code: %{public}d", static_cast<int32_t>(ret));
-        FormAniUtil::InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
-        return;
     }
-    FormAniUtil::InvokeAsyncWithBusinessError(env, callback, ERR_OK, nullptr);
+    FormAniUtil::InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
 }
 
 } // anonymous namespace
