@@ -33,7 +33,7 @@ export namespace formAgent {
   loadLibrary("form_agent_ani.z")
 
   export native function nativeRequestPublishForm(want: Want, callback: AsyncCallbackWrapper<string>): void;
-  export native function nativeUpdateFormCrossBundle(formId: string, bindingData: formBindingData.FormBindingData,
+  export native function nativeUpdateFormCrossBundle(formId: string, dataObject: string,
     callback: AsyncCallbackWrapper<void>): void;
   export native function checkWantParam(want: Want): void;
 

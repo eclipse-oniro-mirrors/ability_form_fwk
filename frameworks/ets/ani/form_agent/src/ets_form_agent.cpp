@@ -165,9 +165,6 @@ void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_object aniFor
         return;
     }
     int64_t formId = 0;
-    if (!ParseFormId(env, aniFormId, formId, callback)) {
-        return;
-    }
     std::string formDataStr = ExtractFormBindingData(env, aniFormBindingData);
     if (formDataStr.empty()) {
         HILOG_ERROR("formBindingData is invalid");
