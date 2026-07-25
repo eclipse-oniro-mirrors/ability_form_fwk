@@ -73,7 +73,11 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
-    FormRecord newRecord(formRecord_);
+    FormRecord newRecord;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        newRecord = formRecord_;
+    }
     std::string cacheData;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     if (FormCacheMgr::GetInstance().GetData(formRecord_.formId, cacheData, imageDataMap)) {
@@ -124,6 +128,7 @@ void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)
 
 void FormRenderConnection::UpdateFormRecord(const FormRecord &formRecord)
 {
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
     formRecord_ = formRecord;
 }
 }  // namespace AppExecFwk
