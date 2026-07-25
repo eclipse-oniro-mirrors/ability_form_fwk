@@ -140,7 +140,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formSupplyCallback.AddConnection(connection);
     int32_t connectId = fdp->ConsumeIntegral<int32_t>();
     formSupplyCallback.RemoveConnection(connectId);
-    formSupplyCallback.CanDisconnect(connection);
+    formSupplyCallback.ShouldDisconnectImmediately(connection);
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
     std::string remoteDeviceId = fdp->ConsumeRandomLengthString();
     AAFwk::WantParams wantParams;

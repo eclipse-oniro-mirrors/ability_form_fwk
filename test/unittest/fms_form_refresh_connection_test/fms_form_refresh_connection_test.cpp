@@ -481,7 +481,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormSupplyCallback_001, TestSize.Level0)
 
 /**
  * @tc.name: FormSupplyCallback_002
- * @tc.desc: test CanDisconnect function.
+ * @tc.desc: test ShouldDisconnectImmediately function.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormRefreshConnectionTest, FormSupplyCallback_002, TestSize.Level0)
@@ -489,7 +489,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormSupplyCallback_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormSupplyCallback_002 start";
     FormSupplyCallback formSupplyCallback;
     sptr<FormAbilityConnection> connection = nullptr;
-    EXPECT_EQ(false, formSupplyCallback.CanDisconnect(connection));
+    EXPECT_EQ(false, formSupplyCallback.ShouldDisconnectImmediately(connection));
     GTEST_LOG_(INFO) << "FormSupplyCallback_002 end";
 }
 
@@ -519,7 +519,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
 
 /**
  * @tc.name: FormHostRecord_001
- * @tc.desc: test CanDisconnect function.
+ * @tc.desc: test ShouldDisconnectImmediately function.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_001, TestSize.Level0)

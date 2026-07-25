@@ -253,12 +253,9 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_009, TestSize.Level0)
     EXPECT_EQ(ERR_OK, FormDbCache::GetInstance().SaveFormInfoNolock(formDbInfo2));
 
     std::vector<FormDBInfo> removedDBForms;
-    int32_t userId = 102;
-    EXPECT_EQ(ERR_OK, FormDbCache::GetInstance().DeleteFormInfoByBundleName(formRecord_.bundleName,
-                                                                           userId, removedDBForms));
-    EXPECT_EQ(ERR_OK, FormDbCache::GetInstance().DeleteFormInfoByBundleName(formRecord_.bundleName,
-                                                                            formRecord_.providerUserId,
-                                                                            removedDBForms));
+    FormDbCache::GetInstance().DeleteFormInfoByBundleName(formRecord_.bundleName,
+                                                          formRecord_.providerUserId, removedDBForms);
+    EXPECT_FALSE(removedDBForms.empty());
     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_009 end";
 }
 

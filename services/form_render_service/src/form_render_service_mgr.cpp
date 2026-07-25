@@ -851,10 +851,6 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
     return ERR_OK;
 }
 
-/**
- * @note Requires caller to hold FormRenderServiceMgr's renderRecordMutex_
- * The calling context needs to be locked, and locking is not allowed inside the function
- */
 void FormRenderServiceMgr::SetCriticalFalseOnAllFormInvisible()
 {
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
@@ -862,7 +858,6 @@ void FormRenderServiceMgr::SetCriticalFalseOnAllFormInvisible()
     if (!FormMemmgrClient::GetInstance().IsCritical()) {
         return;
     }
-    // No need to lock here, the context needs to have a lock renderRecordMutex_
     for (const auto &iter : renderRecordMap_) {
         if (iter.second && !iter.second->IsAllFormsInvisible()) {
             HILOG_INFO("is not AllFormsInvisible, uid: %{public}s", iter.first.c_str());

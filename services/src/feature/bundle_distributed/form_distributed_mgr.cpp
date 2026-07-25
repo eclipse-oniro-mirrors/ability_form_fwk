@@ -40,6 +40,37 @@ const std::unordered_map<std::string, std::string> TABLE_EXTRA_COLUMNS = {
     { UIMODULE, "TEXT" },
     { VALUE, "TEXT" },
 };
+
+bool ReadDistributedModuleFromResultSet(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+    std::string &key, DistributedModule &module)
+{
+    int32_t ret = resultSet->GetString(KEY_INDEX, key);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("GetString key failed");
+        return false;
+    }
+    ret = resultSet->GetInt(USERID_INDEX, module.userId);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("GetInt userId failed");
+        return false;
+    }
+    ret = resultSet->GetString(ENTRYMODULE_INDEX, module.entryModule);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("GetString entryModule failed");
+        return false;
+    }
+    ret = resultSet->GetString(UIMODULE_INDEX, module.uiModule);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("GetString uiModule failed");
+        return false;
+    }
+    ret = resultSet->GetString(VALUE_INDEX, module.extraValue);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("GetString extraValue failed");
+        return false;
+    }
+    return true;
+}
 }
 
 FormDistributedMgr::FormDistributedMgr()
@@ -186,22 +217,13 @@ void FormDistributedMgr::LoadDataFromDb()
     if (ret == NativeRdb::E_OK) {
         do {
             std::string key;
-            ret += absSharedResultSet->GetString(KEY_INDEX, key);
-
             DistributedModule distributedModule;
-            ret += absSharedResultSet->GetInt(USERID_INDEX, distributedModule.userId);
-            ret += absSharedResultSet->GetString(ENTRYMODULE_INDEX, distributedModule.entryModule);
-            ret += absSharedResultSet->GetString(UIMODULE_INDEX, distributedModule.uiModule);
-            ret += absSharedResultSet->GetString(VALUE_INDEX, distributedModule.extraValue);
-            if (ret != NativeRdb::E_OK) {
-                HILOG_ERROR("GetString field failed");
+            if (!ReadDistributedModuleFromResultSet(absSharedResultSet, key, distributedModule)) {
                 break;
             }
-
             distributedBundleMap_[key] = distributedModule;
         } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
     }
-    absSharedResultSet->Close();
 
     HILOG_INFO("init distributed data size:%{public}zu", distributedBundleMap_.size());
 }
@@ -225,7 +247,7 @@ void FormDistributedMgr::DeleteDataInDb(const std::string &bundleName, int32_t u
     NativeRdb::AbsRdbPredicates absRdbPredicates(DISTRIBUTED_FORM_BUNDLE_TABLE);
     absRdbPredicates.EqualTo(KEY, bundleName + std::to_string(userId));
     bool ret = FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
-    HILOG_INFO("deleta data ret:%{public}d, bundleName:%{public}s, userId:%{public}d", ret, bundleName.c_str(), userId);
+    HILOG_INFO("delete data ret:%{public}d, bundleName:%{public}s, userId:%{public}d", ret, bundleName.c_str(), userId);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

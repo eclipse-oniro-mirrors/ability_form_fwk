@@ -51,13 +51,12 @@ FormDbCache::~FormDbCache()
     HILOG_INFO("FormDbCache is destroyed");
 }
 
-ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
+void FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
     std::vector<FormDBInfo> &removedDBForms)
 {
     FormDBInfo formDBInfo;
     formDBInfo.bundleName = "aa";
     removedDBForms.emplace_back(formDBInfo);
-    return ERR_OK;
 }
 
 int FormDbCache::GetMatchCount(const std::string &bundleName, const std::string &moduleName)
