@@ -486,10 +486,21 @@ int32_t FormMgrStub::HandleDeleteForm(MessageParcel &data, MessageParcel &reply)
  */
 int32_t FormMgrStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
-    std::string compId = data.ReadString();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::string compId;
+    if (!data.ReadString(compId)) {
+        HILOG_ERROR("%{public}s, read compId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int32_t result = StopRenderingForm(formId, compId);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 /**
