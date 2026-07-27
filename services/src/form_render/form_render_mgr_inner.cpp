@@ -261,6 +261,7 @@ void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleNam
 
     want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, static_cast<int32_t>(bundleInfo.compatibleVersion));
     want.SetParam(Constants::FORM_TARGET_VERSION_KEY, static_cast<int32_t>(bundleInfo.targetVersion));
+    want.SetParam(Constants::FORM_IS_SYSTEM_APP_KEY, bundleInfo.applicationInfo.isSystemApp);
 }
 
 void FormRenderMgrInner::PostOnUnlockTask()
