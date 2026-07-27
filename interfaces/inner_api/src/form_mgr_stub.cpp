@@ -649,11 +649,24 @@ ErrCode FormMgrStub::HandleRequestPublishForm(MessageParcel &data, MessageParcel
 
 ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     Constants::PublishFormResult errorCodeInfo;
-    errorCodeInfo.message = data.ReadString();
-    int32_t err = data.ReadInt32();
-    errorCodeInfo.code = (Constants::PublishFormErrorCode)(err) ;
+    std::string message;
+    if (!data.ReadString(message)) {
+        HILOG_ERROR("read message failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    errorCodeInfo.message = message;
+    int32_t err = 0;
+    if (!data.ReadInt32(err)) {
+        HILOG_ERROR("read err failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(err);
     ErrCode result = SetPublishFormResult(formId, errorCodeInfo);
     reply.WriteInt32(result);
     return result;
@@ -661,7 +674,11 @@ ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParc
 
 ErrCode FormMgrStub::HandleAcquireAddFormResult(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = AcquireAddFormResult(formId);
     reply.WriteInt32(result);
     return result;
@@ -753,13 +770,16 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
 int32_t FormMgrStub::HandleHasFormVisible(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    uint32_t tokenId = data.ReadUint32();
+    uint32_t tokenId = 0;
+    if (!data.ReadUint32(tokenId)) {
+        HILOG_ERROR("read tokenId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     bool result = HasFormVisible(tokenId);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write action failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-
     return ERR_OK;
 }
 
@@ -1883,8 +1903,16 @@ int32_t FormMgrStub::HandleRecoverForms(MessageParcel &data, MessageParcel &repl
 ErrCode FormMgrStub::HandleUpdateFormLocation(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    int64_t formId = data.ReadInt64();
-    int32_t formLocation = data.ReadInt32();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t formLocation = 0;
+    if (!data.ReadInt32(formLocation)) {
+        HILOG_ERROR("read formLocation failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = UpdateFormLocation(formId, formLocation);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2073,11 +2101,31 @@ int32_t FormMgrStub::HandleNotifyFormLocked(MessageParcel &data, MessageParcel &
 ErrCode FormMgrStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    int64_t formId = data.ReadInt64();
-    float width = data.ReadFloat();
-    float height = data.ReadFloat();
-    float borderWidth = data.ReadFloat();
-    float formViewScale = data.ReadFloat();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    float width = 0.0f;
+    if (!data.ReadFloat(width)) {
+        HILOG_ERROR("read width failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    float height = 0.0f;
+    if (!data.ReadFloat(height)) {
+        HILOG_ERROR("read height failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    float borderWidth = 0.0f;
+    if (!data.ReadFloat(borderWidth)) {
+        HILOG_ERROR("read borderWidth failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    float formViewScale = 0.0f;
+    if (!data.ReadFloat(formViewScale)) {
+        HILOG_ERROR("read formViewScale failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
