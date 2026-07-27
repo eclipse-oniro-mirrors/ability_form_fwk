@@ -1479,7 +1479,10 @@ int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &repl
     std::vector<FormInfo> infos;
     // call FormMgrService to get formInfos into infos.
     int32_t result = GetFormsInfo(*filter, infos);
-    reply.WriteBool(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (result == ERR_OK) {
         // write fetched formInfos into reply.
         if (!WriteParcelableVector(infos, reply)) {
@@ -1832,7 +1835,11 @@ int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel 
 ErrCode FormMgrStub::HandleGetRunningFormInfos(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    bool isUnusedInclude = data.ReadBool();
+    bool isUnusedInclude = false;
+    if (!data.ReadBool(isUnusedInclude)) {
+        HILOG_ERROR("%{public}s, read isUnusedInclude failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::vector<RunningFormInfo> runningFormInfos;
     ErrCode result = GetRunningFormInfos(isUnusedInclude, runningFormInfos);
     reply.WriteInt32(result);
@@ -1848,8 +1855,16 @@ ErrCode FormMgrStub::HandleGetRunningFormInfos(MessageParcel &data, MessageParce
 ErrCode FormMgrStub::HandleGetRunningFormInfosByBundleName(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    std::string bundleName = data.ReadString();
-    bool isUnusedInclude = data.ReadBool();
+    std::string bundleName;
+    if (!data.ReadString(bundleName)) {
+        HILOG_ERROR("%{public}s, read bundleName failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool isUnusedInclude = false;
+    if (!data.ReadBool(isUnusedInclude)) {
+        HILOG_ERROR("%{public}s, read isUnusedInclude failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::vector<RunningFormInfo> runningFormInfos;
     ErrCode result = GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
     reply.WriteInt32(result);
@@ -2241,13 +2256,25 @@ ErrCode FormMgrStub::HandleBatchRefreshForms(MessageParcel &data, MessageParcel 
 int32_t FormMgrStub::HandleEnableForms(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    std::string bundleName = data.ReadString();
+    std::string bundleName;
+    if (!data.ReadString(bundleName)) {
+        HILOG_ERROR("%{public}s, read bundleName failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (bundleName.empty()) {
         HILOG_ERROR("fail ReadString<bundleName>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t userId = data.ReadInt32();
-    bool enable = data.ReadBool();
+    int32_t userId = 0;
+    if (!data.ReadInt32(userId)) {
+        HILOG_ERROR("%{public}s, read userId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool enable = false;
+    if (!data.ReadBool(enable)) {
+        HILOG_ERROR("%{public}s, read enable failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int32_t result = EnableForms(bundleName, userId, enable);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2561,6 +2588,10 @@ ErrCode FormMgrStub::HandleChangeSceneAnimationState(MessageParcel &data, Messag
         HILOG_ERROR("%{public}s, read state failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    if (state < 0) {
+    HILOG_ERROR("%{public}s, invalid state %{public}d", __func__, state);
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     ErrCode result = ChangeSceneAnimationState(formId, state);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2714,7 +2745,11 @@ ErrCode FormMgrStub::HandleIsFormDueControl(MessageParcel &data, MessageParcel &
         HILOG_ERROR("Read formMajorInfo failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool isDisablePolicy = data.ReadBool();
+    bool isDisablePolicy = false;
+    if (!data.ReadBool(isDisablePolicy)) {
+        HILOG_ERROR("%{public}s, read isDisablePolicy failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     bool result = IsFormDueControl(*formMajorInfo, isDisablePolicy);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write result failed");
