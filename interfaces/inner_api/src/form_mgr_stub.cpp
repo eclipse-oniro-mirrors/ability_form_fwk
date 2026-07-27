@@ -1321,14 +1321,39 @@ int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParc
 {
     HILOG_DEBUG("call");
     FormInfoFilter filter;
-    filter.bundleName = data.ReadString();
-    filter.moduleName = data.ReadString();
-    data.ReadInt32Vector(&filter.supportDimensions);
-    data.ReadInt32Vector(&filter.supportShapes);
+    if (!data.ReadString(filter.bundleName)) {
+        HILOG_ERROR("%{public}s, read bundleName failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.ReadString(filter.moduleName)) {
+        HILOG_ERROR("%{public}s, read moduleName failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.ReadInt32Vector(&filter.supportDimensions)) {
+        HILOG_ERROR("%{public}s, read supportDimensions failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (filter.supportDimensions.size() > Constants::MAX_LAYOUT) {
+        HILOG_ERROR("%{public}s, supportDimensions size %{public}zu exceeds limit %{public}zu",
+            __func__, filter.supportDimensions.size(), Constants::MAX_LAYOUT);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    if (!data.ReadInt32Vector(&filter.supportShapes)) {
+        HILOG_ERROR("%{public}s, read supportShapes failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (filter.supportShapes.size() > Constants::MAX_LAYOUT) {
+        HILOG_ERROR("%{public}s, supportShapes size %{public}zu exceeds limit %{public}zu",
+            __func__, filter.supportShapes.size(), Constants::MAX_LAYOUT);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
 
     std::vector<FormInfo> infos;
     int32_t result = GetFormsInfoByFilter(filter, infos);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (result == ERR_OK && !WriteParcelableVector(infos, reply)) {
         HILOG_ERROR("write failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
