@@ -1307,7 +1307,11 @@ int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &repl
 int32_t FormMgrStub::HandleGetPublishedFormInfoById(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     // write result of calling FMS into reply.
     RunningFormInfo info;
     // call FormMgrService to get formInfo.
@@ -2063,7 +2067,11 @@ ErrCode FormMgrStub::HandleIsFormProtected(MessageParcel &data, MessageParcel &r
 ErrCode FormMgrStub::HandleIsFormDebugSignature(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    std::string bundleName = data.ReadString();
+    std::string bundleName;
+    if (!data.ReadString(bundleName)) {
+        HILOG_ERROR("%{public}s, read bundleName failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     bool result = IsFormBundleDebugSignature(bundleName);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write action failed");
@@ -2137,9 +2145,21 @@ ErrCode FormMgrStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel &re
 ErrCode FormMgrStub::HandleOpenFormEditAbility(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    std::string abilityName = data.ReadString();
-    int64_t formId = data.ReadInt64();
-    bool isMainPage = data.ReadBool();
+    std::string abilityName;
+    if (!data.ReadString(abilityName)) {
+        HILOG_ERROR("%{public}s, read abilityName failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool isMainPage = false;
+    if (!data.ReadBool(isMainPage)) {
+        HILOG_ERROR("%{public}s, read isMainPage failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = OpenFormEditAbility(abilityName, formId, isMainPage);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2168,6 +2188,10 @@ ErrCode FormMgrStub::HandleRegisterOverflowProxy(MessageParcel &data, MessagePar
 {
     HILOG_INFO("Handle save overflow proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s, read callerToken failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = RegisterOverflowProxy(callerToken);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write result failed");
@@ -2190,13 +2214,21 @@ ErrCode FormMgrStub::HandleUnregisterOverflowProxy(MessageParcel &data, MessageP
 ErrCode FormMgrStub::HandleRequestOverflow(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("Call");
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     OverflowInfo* overflowInfoPtr = data.ReadParcelable<OverflowInfo>();
     if (overflowInfoPtr == nullptr) {
         HILOG_ERROR("Read oveflowInfo failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool isOverflow = data.ReadBool();
+    bool isOverflow = false;
+    if (!data.ReadBool(isOverflow)) {
+        HILOG_ERROR("%{public}s, read isOverflow failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = RequestOverflow(formId, *overflowInfoPtr, isOverflow);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write request result failed");
@@ -2211,6 +2243,10 @@ ErrCode FormMgrStub::HandleRegisterChangeSceneAnimationStateProxy(MessageParcel 
 {
     HILOG_INFO("call");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s, read callerToken failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = RegisterChangeSceneAnimationStateProxy(callerToken);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2233,8 +2269,16 @@ ErrCode FormMgrStub::HandleUnregisterChangeSceneAnimationStateProxy(MessageParce
 ErrCode FormMgrStub::HandleChangeSceneAnimationState(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("Call");
-    int64_t formId = data.ReadInt64();
-    int32_t state = data.ReadInt32();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t state = 0;
+    if (!data.ReadInt32(state)) {
+        HILOG_ERROR("%{public}s, read state failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = ChangeSceneAnimationState(formId, state);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2247,6 +2291,10 @@ ErrCode FormMgrStub::HandleRegisterGetFormRectProxy(MessageParcel &data, Message
 {
     HILOG_DEBUG("handle save query proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s, read callerToken failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = RegisterGetFormRectProxy(callerToken);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write proxy failed");
@@ -2268,8 +2316,11 @@ ErrCode FormMgrStub::HandleUnregisterGetFormRectProxy(MessageParcel &data, Messa
 
 ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
-
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     Rect item;
     ErrCode result = GetFormRect(formId, item);
     if (!reply.WriteInt32(result)) {
@@ -2288,8 +2339,16 @@ ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply
 ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("Call");
-    int64_t formId = data.ReadInt64();
-    int32_t newDimension = data.ReadInt32();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t newDimension = 0;
+    if (!data.ReadInt32(newDimension)) {
+        HILOG_ERROR("%{public}s, read newDimension failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
     if (newRect == nullptr) {
         HILOG_ERROR("Read newRect failed");
@@ -2307,6 +2366,10 @@ ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, M
 {
     HILOG_DEBUG("handle save query proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s, read callerToken failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = RegisterGetLiveFormStatusProxy(callerToken);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write proxy failed");
