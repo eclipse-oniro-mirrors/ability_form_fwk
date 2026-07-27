@@ -1017,8 +1017,13 @@ int32_t FormMgrStub::HandleDeleteInvalidForms(MessageParcel &data, MessageParcel
     HILOG_INFO("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
@@ -1081,8 +1086,13 @@ int32_t FormMgrStub::HandleNotifyFormsVisible(MessageParcel &data, MessageParcel
     HILOG_INFO("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isVisible = false;
     if (!data.ReadBool(isVisible)) {
@@ -1108,8 +1118,13 @@ int32_t FormMgrStub::HandleNotifyFormsPrivacyProtected(MessageParcel &data, Mess
     HILOG_DEBUG("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isProtected = false;
     if (!data.ReadBool(isProtected)) {
@@ -1141,8 +1156,13 @@ int32_t FormMgrStub::HandleNotifyFormsEnableUpdate(MessageParcel &data, MessageP
     HILOG_INFO("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isEnableUpdate = false;
     if (!data.ReadBool(isEnableUpdate)) {
@@ -1787,8 +1807,13 @@ ErrCode FormMgrStub::HandleRegisterFormRouterProxy(MessageParcel &data, MessageP
     HILOG_DEBUG("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
@@ -1796,7 +1821,10 @@ ErrCode FormMgrStub::HandleRegisterFormRouterProxy(MessageParcel &data, MessageP
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = RegisterFormRouterProxy(formIds, callerToken);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 
@@ -1805,11 +1833,19 @@ ErrCode FormMgrStub::HandleUnregisterFormRouterProxy(MessageParcel &data, Messag
     HILOG_DEBUG("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
     auto result = UnregisterFormRouterProxy(formIds);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 
@@ -1887,8 +1923,13 @@ int32_t FormMgrStub::HandleSetFormsRecyclable(MessageParcel &data, MessageParcel
     HILOG_DEBUG("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     int32_t result = SetFormsRecyclable(formIds);
     if (!reply.WriteInt32(result)) {
@@ -1903,8 +1944,13 @@ int32_t FormMgrStub::HandleRecycleForms(MessageParcel &data, MessageParcel &repl
     HILOG_DEBUG("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -1924,8 +1970,13 @@ int32_t FormMgrStub::HandleRecoverForms(MessageParcel &data, MessageParcel &repl
     HILOG_DEBUG("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("ReadInt64Vector failed");
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -2569,7 +2620,11 @@ ErrCode FormMgrStub::HandleGetFormIdsByFormLocation(MessageParcel &data, Message
 {
     HILOG_INFO("call");
     std::vector<std::string> formIds;
-    int32_t formLocation = data.ReadInt32();
+    int32_t formLocation = 0;
+    if (!data.ReadInt32(formLocation)) {
+        HILOG_ERROR("%{public}s, read formLocation failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     ErrCode result = GetFormIdsByFormLocation(formLocation, formIds);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
