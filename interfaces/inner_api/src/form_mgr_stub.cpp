@@ -705,16 +705,29 @@ int32_t FormMgrStub::HandleLifecycleUpdate(MessageParcel &data, MessageParcel &r
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
         HILOG_ERROR("get remote object failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool updateType = data.ReadBool();
+    bool updateType = false;
+    if (!data.ReadBool(updateType)) {
+        HILOG_ERROR("%{public}s, read updateType failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int32_t result = LifecycleUpdate(formIds, client, updateType);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 /**
@@ -757,17 +770,29 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
+        HILOG_ERROR("%{public}s, read formIds failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-
+    if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        HILOG_ERROR("%{public}s, formIds size %{public}zu exceeds limit %{public}d",
+            __func__, formIds.size(), Constants::MAX_VISIBLE_NOTIFY_LIST);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
+        HILOG_ERROR("%{public}s, read client failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t formVisibleType = data.ReadInt32();
-
+    int32_t formVisibleType = 0;
+    if (!data.ReadInt32(formVisibleType)) {
+        HILOG_ERROR("%{public}s, read formVisibleType failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int32_t result = NotifyWhetherVisibleForms(formIds, client, formVisibleType);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 
