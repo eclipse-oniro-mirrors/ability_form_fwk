@@ -351,7 +351,7 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_FORM_EDIT_OP_UNSUPPORTED,     "Cannot close the widget editing page opened by other apps." },
     { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID,        "The location of the widget is invalid." },
     { ERR_FORM_EXTERNAL_PUBLISH_NO_SPACE,             "There is no space to publish form." },
-    { ERR_FORM_EXTERNAL_PUBLISH_NOT_SUPPORT,          "This form does not support publishing" },
+    { ERR_FORM_EXTERNAL_PUBLISH_NOT_SUPPORT,          "This form does not support publishing." },
 };
 }
 

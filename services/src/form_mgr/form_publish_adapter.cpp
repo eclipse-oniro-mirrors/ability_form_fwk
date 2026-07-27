@@ -15,6 +15,8 @@
 
 #include "form_mgr/form_publish_adapter.h"
 
+#include <unordered_map>
+
 #include "app_mgr_interface.h"
 #include "app_state_data.h"
 #include "form_ecological_rule_param.h"
@@ -26,7 +28,6 @@
 #include "parameters.h"
 #include "system_ability_definition.h"
 #include "want.h"
-#include <unordered_map>
 
 #include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
@@ -363,7 +364,7 @@ bool FormPublishAdapter::ResolveAcquireResult(const int64_t formId, ErrCode &res
     auto mapIt = ACQUIRE_RESULT_MAP.find(static_cast<int8_t>(iter->second));
     if (mapIt == ACQUIRE_RESULT_MAP.end()) {
         HILOG_INFO("Add form result state is unknown");
-        return true;
+        return false;
     }
     result = mapIt->second;
     if (result == ERR_OK) {
@@ -515,7 +516,8 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
             HiSysEventType::STATISTIC, eventInfo, want);
     }
     IncreaseAddFormRequestTimeOutTask(formId);
-    // Keep external error code unchanged for api compatibility
+    // The public API that calls this method only expects COMMON_CODE for failure cases.
+    // Map specific error codes back to COMMON_CODE to preserve API compatibility
     if (errCode == ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE ||
         errCode == ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT) {
         HILOG_INFO("map %{public}d to COMMON_CODE", errCode);
@@ -753,7 +755,7 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(const Want &want, 
 
 ErrCode FormPublishAdapter::CheckFormCountLimit(const Want &want, int32_t userId)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("call");
 
     std::string hostBundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
     if (hostBundleName.empty()) {
