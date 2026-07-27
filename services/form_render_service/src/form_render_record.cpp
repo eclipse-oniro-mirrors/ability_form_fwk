@@ -760,7 +760,6 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
                 if (apiCompatibleVersion != 0) {
                     applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
                 }
-                applicationInfo->isSystemApp = want.GetBoolParam(Constants::FORM_IS_SYSTEM_APP_KEY, false);
                 HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
                     formJsInfo.bundleName.c_str(),
                     applicationInfo->apiCompatibleVersion);
