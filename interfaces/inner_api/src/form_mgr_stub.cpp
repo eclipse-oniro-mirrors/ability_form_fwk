@@ -662,24 +662,27 @@ ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParc
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     Constants::PublishFormResult errorCodeInfo;
     std::string message;
     if (!data.ReadString(message)) {
-        HILOG_ERROR("read message failed");
+        HILOG_ERROR("%{public}s, read message failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     errorCodeInfo.message = message;
     int32_t err = 0;
     if (!data.ReadInt32(err)) {
-        HILOG_ERROR("read err failed");
+        HILOG_ERROR("%{public}s, read err failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(err);
     ErrCode result = SetPublishFormResult(formId, errorCodeInfo);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 
@@ -687,11 +690,14 @@ ErrCode FormMgrStub::HandleAcquireAddFormResult(MessageParcel &data, MessageParc
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("%{public}s, read formId failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = AcquireAddFormResult(formId);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, write result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 /**
