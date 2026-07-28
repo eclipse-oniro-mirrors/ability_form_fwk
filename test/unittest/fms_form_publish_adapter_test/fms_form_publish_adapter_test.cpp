@@ -32,7 +32,6 @@
 #include "iremote_object.h"
 #include "application_info.h"
 #include "ability_info.h"
-
 #include "mock_form_data_mgr.h"
 #include "mock_form_info_mgr.h"
 #include "mock_form_bms_helper.h"
@@ -747,6 +746,7 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_001, TestSize.Le
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, TEST_FORM_NAME);
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, TEST_DIMENSION_ID);
+    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY, std::string("com.form.host.app600"));
     int64_t formId = 0;
 
     FormInfo formInfo;
@@ -755,6 +755,10 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_001, TestSize.Le
     formInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
+    sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
+    EXPECT_CALL(*bms, GetUidByBundleName(_, _)).WillOnce(Return(600));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(bms));
     EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
         .WillOnce(Return(-1));
 
@@ -778,6 +782,7 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_002, TestSize.Le
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, TEST_FORM_NAME);
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, TEST_DIMENSION_ID);
+    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY, std::string("com.form.host.app600"));
     int64_t formId = 0;
 
     FormInfo formInfo;
@@ -786,6 +791,10 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_002, TestSize.Le
     formInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
+    sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
+    EXPECT_CALL(*bms, GetUidByBundleName(_, _)).WillOnce(Return(600));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillRepeatedly(Return(bms));
     EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
         .WillOnce(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, AddRequestPublishFormInfo(_, _, _))
@@ -814,8 +823,6 @@ HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_002, TestSize.Level1)
     AbilityInfo emptyAbilityInfo;
     ExtensionAbilityInfo emptyExtAbilityInfo;
 
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(emptyAbilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
             Return(true)));
@@ -842,8 +849,6 @@ HWTEST_F(FmsFormPublishAdapterTest, QueryPublishFormToHost_005, TestSize.Level1)
     extAbilityInfo.name = "ExtAbility";
     extAbilityInfo.bundleName = TEST_BUNDLE_NAME;
 
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(emptyAbilityInfo), SetArgReferee<3>(extAbilityInfo),
             Return(true)));
@@ -1180,8 +1185,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_004, TestSize.Level
     want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
 
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
         .WillOnce(Return(false));
 
@@ -1213,8 +1216,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_005, TestSize.Level
     want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
 
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
     AbilityInfo abilityInfo;
     abilityInfo.name = TEST_ABILITY_NAME;
     abilityInfo.bundleName = "com.host.bundle";
