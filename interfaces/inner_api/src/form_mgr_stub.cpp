@@ -735,6 +735,11 @@ ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParc
         HILOG_ERROR("%{public}s, read err failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    if (err < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
+        err > static_cast<int32_t>(Constants::PublishFormErrorCode::INTERNAL_ERROR)) {
+        HILOG_ERROR("%{public}s, invalid PublishFormErrorCode:%{public}d", __func__, err);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(err);
     ErrCode result = SetPublishFormResult(formId, errorCodeInfo);
     if (!reply.WriteInt32(result)) {
