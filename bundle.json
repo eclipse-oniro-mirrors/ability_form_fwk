@@ -83,7 +83,9 @@
               "input",
               "image_framework",
               "bounds_checking_function",
-              "node",
+              "node"
+          ],
+          "third_party": [
               "json"
           ]
         },
