@@ -1590,9 +1590,11 @@ int32_t FormMgrStub::HandleAcquireFormData(MessageParcel &data, MessageParcel &r
         HILOG_ERROR("%{public}s, write result failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!reply.WriteParcelable(&customizeData)) {
-        HILOG_ERROR("%{public}s, write customizeData failed", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+    if (result == ERR_OK) {
+        if (!reply.WriteParcelable(&customizeData)) {
+            HILOG_ERROR("%{public}s, write customizeData failed", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
     }
     return result;
 }
