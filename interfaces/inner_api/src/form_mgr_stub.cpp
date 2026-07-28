@@ -1446,7 +1446,7 @@ int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParc
     if (filter.supportDimensions.size() > Constants::MAX_LAYOUT) {
         HILOG_ERROR("%{public}s, supportDimensions size %{public}zu exceeds limit %{public}zu",
             __func__, filter.supportDimensions.size(), Constants::MAX_LAYOUT);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     if (!data.ReadInt32Vector(&filter.supportShapes)) {
         HILOG_ERROR("%{public}s, read supportShapes failed", __func__);
@@ -1455,7 +1455,7 @@ int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParc
     if (filter.supportShapes.size() > Constants::MAX_LAYOUT) {
         HILOG_ERROR("%{public}s, supportShapes size %{public}zu exceeds limit %{public}zu",
             __func__, filter.supportShapes.size(), Constants::MAX_LAYOUT);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     std::vector<FormInfo> infos;
