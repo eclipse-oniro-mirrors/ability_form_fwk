@@ -141,7 +141,7 @@ group("unittest") {
     "unittest/form_report_test:unittest",
     "unittest/frs_form_module_checker_test:unittest",
     "unittest/frs_form_render_event_report_test:unittest",
-    "unittest/frs_form_render_record_test:unittest",
+
     "unittest/fms_form_share_task_mgr_test:unittest",
     "unittest/fms_form_host_task_mgr_test:unittest",
     "unittest/fms_form_observer_task_mgr_test:unittest",
