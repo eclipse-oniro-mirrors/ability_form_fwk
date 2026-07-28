@@ -426,7 +426,7 @@ int32_t FormMgrStub::HandleAddForm(MessageParcel &data, MessageParcel &reply)
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("fail ReadParcelable<FormReqInfo>");
+        HILOG_ERROR("%{public}s, read want failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
