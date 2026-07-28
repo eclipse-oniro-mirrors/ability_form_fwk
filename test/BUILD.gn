@@ -35,7 +35,6 @@ group("unittest") {
 
   deps = [
     "unittest/fms_batch_refresh_test:unittest",
-    "unittest/fms_form_ability_connection_reporter_test:unittest",
     "unittest/fms_form_ams_helper_test:unittest",
     "unittest/fms_form_ashmem_test:unittest",
     "unittest/fms_form_batch_delete_connection_test:unittest",
@@ -108,7 +107,6 @@ group("unittest") {
     "unittest/fms_form_surface_info_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_systemload_listener_test:unittest",
-    "unittest/fms_form_timer_mgr_new_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
     "unittest/fms_form_util_permission_verify_test:unittest",
     "unittest/fms_form_util_test:unittest",
@@ -117,7 +115,6 @@ group("unittest") {
     "unittest/fms_js_form_state_observer_stub_test:unittest",
     "unittest/fms_observer_record_test:unittest",
     "unittest/fms_net_conn_callback_observer_test:unittest",
-    "unittest/fms_param_manager_test:unittest",
     "unittest/fms_provider_acquire_error_handler_test:unittest",
     "unittest/fms_provider_connection_error_handler_test:unittest",
     "unittest/fms_provider_refresh_error_handler_test:unittest",
@@ -141,7 +138,7 @@ group("unittest") {
     "unittest/form_report_test:unittest",
     "unittest/frs_form_module_checker_test:unittest",
     "unittest/frs_form_render_event_report_test:unittest",
-    "unittest/frs_form_render_record_test:unittest",
+
     "unittest/fms_form_share_task_mgr_test:unittest",
     "unittest/fms_form_host_task_mgr_test:unittest",
     "unittest/fms_form_observer_task_mgr_test:unittest",

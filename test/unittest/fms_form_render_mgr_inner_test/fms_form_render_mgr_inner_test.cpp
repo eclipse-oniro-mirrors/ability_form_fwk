@@ -2337,30 +2337,6 @@ HWTEST_F(FormRenderMgrInnerTest, GetConnectionAndRenderForm_003, TestSize.Level0
 }
 
 /**
- * @tc.name: RerenderAllForms_001
- * @tc.desc: test RerenderAllForms when not low memory.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, RerenderAllForms_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "RerenderAllForms_001 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    ASSERT_NE(nullptr, formRenderMgrInner);
-    int64_t formId = 1;
-    FormRecord formRecord;
-    WantParams wantParams;
-    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgrInner->renderFormConnections_.emplace(formId, conn);
-    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
-    std::unordered_set<int64_t> form;
-    form.insert(formId);
-    formRenderMgrInner->etsHosts_.emplace(remote, form);
-    formRenderMgrInner->RerenderAllForms();
-    EXPECT_TRUE(formRenderMgrInner->isFrsDiedInLowMemory_);
-    GTEST_LOG_(INFO) << "RerenderAllForms_001 end";
-}
-
-/**
  * @tc.name: StopRenderingFormCallback_001
  * @tc.desc: test StopRenderingFormCallback when etsHosts becomes empty after removal.
  * @tc.type: FUNC

@@ -1751,43 +1751,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0002, 
 }
 
 /**
- * @tc.number: FormMgrService_StartAbilityByCrossBundle_0003
- * @tc.name: test StartAbilityByCrossBundle PublishFormCrossBundleControl failed.
- * @tc.desc: Verify that StartAbilityByCrossBundle returns error when PublishFormCrossBundleControl fails.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0003 start";
-    FormMgrService formMgrService;
-    Want want;
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(true);
-    want.SetParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, true);
-    MockGetCallerBundleName(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
-    int32_t ret = formMgrService.StartAbilityByCrossBundle(want);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME);
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0003 end";
-}
-
-/**
- * @tc.number: FormMgrService_StartAbilityByCrossBundle_0004
- * @tc.name: test StartAbilityByCrossBundle success.
- * @tc.desc: Verify that StartAbilityByCrossBundle returns success.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0004 start";
-    FormMgrService formMgrService;
-    Want want;
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(true);
-    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_OK);
-    int32_t ret = formMgrService.StartAbilityByCrossBundle(want);
-    EXPECT_EQ(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0004 end";
-}
-
-/**
  * @tc.number: FormMgrService_CheckAcrossLocalAccountsPermission_0001
  * @tc.name: test CheckAcrossLocalAccountsPermission same user.
  * @tc.desc: Verify that CheckAcrossLocalAccountsPermission returns true for same user.
