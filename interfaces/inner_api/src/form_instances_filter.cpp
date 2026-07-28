@@ -22,12 +22,29 @@ namespace OHOS {
 namespace AppExecFwk {
 bool FormInstancesFilter::ReadFromParcel(Parcel &parcel)
 {
-    bundleName = Str16ToStr8(parcel.ReadString16());
-    formName = Str16ToStr8(parcel.ReadString16());
-    moduleName = Str16ToStr8(parcel.ReadString16());
-    abilityName = Str16ToStr8(parcel.ReadString16());
-    isUnusedIncluded = parcel.ReadBool();
-
+    std::u16string bundleNameStr;
+    if (!parcel.ReadString16(bundleNameStr)) {
+        return false;
+    }
+    bundleName = Str16ToStr8(bundleNameStr);
+    std::u16string formNameStr;
+    if (!parcel.ReadString16(formNameStr)) {
+        return false;
+    }
+    formName = Str16ToStr8(formNameStr);
+    std::u16string moduleNameStr;
+    if (!parcel.ReadString16(moduleNameStr)) {
+        return false;
+    }
+    moduleName = Str16ToStr8(moduleNameStr);
+    std::u16string abilityNameStr;
+    if (!parcel.ReadString16(abilityNameStr)) {
+        return false;
+    }
+    abilityName = Str16ToStr8(abilityNameStr);
+    if (!parcel.ReadBool(isUnusedIncluded)) {
+        return false;
+    }
     return true;
 }
 
