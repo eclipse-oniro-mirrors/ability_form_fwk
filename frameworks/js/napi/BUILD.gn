@@ -62,6 +62,7 @@ ohos_shared_library("formbindingdata_napi") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/application"
@@ -121,6 +122,7 @@ ohos_shared_library("formbindingdata") {
     "image_framework:image_native",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/app/form"
@@ -181,7 +183,10 @@ ohos_shared_library("formextension_napi") {
     ":form_extension_js",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
 
   relative_install_dir = "module/application"
   subsystem_name = "ability"
@@ -240,7 +245,10 @@ ohos_shared_library("formextensionability") {
     ":form_extension_ability_js",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
 
   relative_install_dir = "module/app/form"
   subsystem_name = "ability"
@@ -299,7 +307,10 @@ ohos_shared_library("formextensioncontext_napi") {
     ":form_extension_context_js",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
 
   relative_install_dir = "module/application"
   subsystem_name = "ability"
@@ -343,6 +354,7 @@ ohos_shared_library("forminfo_napi") {
 
   external_deps = [
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   defines = []
@@ -395,6 +407,7 @@ ohos_shared_library("forminfo") {
 
   external_deps = [
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   defines = []
@@ -464,6 +477,7 @@ ohos_shared_library("formhost_napi") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/application"
@@ -533,6 +547,7 @@ ohos_shared_library("formhost") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/app/form"
@@ -610,6 +625,7 @@ ohos_shared_library("formobserver") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/app/form"
@@ -674,6 +690,7 @@ ohos_shared_library("formprovider_napi") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/application"
@@ -742,6 +759,7 @@ ohos_shared_library("formprovider") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/app/form"
@@ -811,6 +829,7 @@ ohos_shared_library("formagent") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/app/form"
@@ -881,6 +900,7 @@ ohos_shared_library("formutil_napi") {
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",
     "napi:ace_napi",
+    "node:node_header_notice",
     "resource_management:global_resmgr",
   ]
 
@@ -943,6 +963,7 @@ ohos_shared_library("formerror_napi") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/application"
@@ -1005,7 +1026,10 @@ ohos_shared_library("formeditextensionability_napi") {
     ":form_edit_extension_ability_js",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
 
   relative_install_dir = "module/app/form"
   subsystem_name = "ability"
@@ -1066,7 +1090,10 @@ ohos_shared_library("formeditextensioncontext_napi") {
     ":form_edit_extension_context_js",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
 
   relative_install_dir = "module/application"
   subsystem_name = "ability"
@@ -1143,6 +1170,7 @@ ohos_shared_library("form_edit_extension") {
     "image_framework:image_native",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "window_manager:libwm",
   ]
 
@@ -1194,6 +1222,7 @@ ohos_shared_library("form_edit_extension_module") {
     "hilog:libhilog",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "window_manager:libwm",
   ]
 
@@ -1279,6 +1308,7 @@ ohos_shared_library("form_edit_extension_ani") {
     "ipc:ipc_core",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "runtime_core:ani",
     "window_manager:libwm",
   ]
@@ -1341,7 +1371,10 @@ ohos_shared_library("liveformextensionability_napi") {
     ":live_form_extension_ability_js",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
 
   relative_install_dir = "module/app/form"
   subsystem_name = "ability"
@@ -1402,7 +1435,10 @@ ohos_shared_library("liveformextensioncontext_napi") {
     ":live_form_extension_context_js",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
 
   relative_install_dir = "module/application"
   subsystem_name = "ability"
@@ -1477,6 +1513,7 @@ ohos_shared_library("live_form_extension") {
     "hitrace:hitrace_meter",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "window_manager:libdm",
   ]
 
@@ -1529,6 +1566,7 @@ ohos_shared_library("live_form_extension_module") {
     "hilog:libhilog",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "window_manager:libwm",
   ]
 
@@ -1613,6 +1651,7 @@ ohos_shared_library("live_form_extension_ani") {
     "ipc:ipc_core",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "runtime_core:ani",
     "window_manager:libwm",
   ]

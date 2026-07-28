@@ -156,6 +156,7 @@ ohos_shared_library("formrender") {
     "ipc:ipc_core",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "samgr:samgr_proxy",
     "graphic_2d:librender_service_client",
     "graphic_2d:rosen_text",
@@ -245,6 +246,7 @@ ohos_shared_library("formrender_service") {
     "ipc:ipc_core",
     "ipc:ipc_napi",
     "napi:ace_napi",
+    "node:node_header_notice",
     "window_manager:libwm",
   ]
 

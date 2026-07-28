@@ -63,6 +63,7 @@ ohos_shared_library("formutil_ani") {
     "hilog:libhilog",
     "image_framework:image_native",
     "napi:ace_napi",
+    "node:node_header_notice",
     "runtime_core:ani",
   ]
 

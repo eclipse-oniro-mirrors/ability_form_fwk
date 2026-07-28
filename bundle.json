@@ -82,7 +82,8 @@
               "qos_manager",
               "input",
               "image_framework",
-              "bounds_checking_function"
+              "bounds_checking_function",
+              "node"
           ],
           "third_party": [
               "node",
