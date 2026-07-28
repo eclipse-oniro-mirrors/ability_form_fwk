@@ -363,7 +363,7 @@ bool FormPublishAdapter::ResolveAcquireResult(const int64_t formId, ErrCode &res
     }
     auto mapIt = ACQUIRE_RESULT_MAP.find(static_cast<int8_t>(iter->second));
     if (mapIt == ACQUIRE_RESULT_MAP.end()) {
-        HILOG_INFO("Add form result state is unknown");
+        HILOG_INFO("Add form result state not ready, keep waiting");
         return false;
     }
     result = mapIt->second;
@@ -468,14 +468,17 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     }
     if (errCode != ERR_OK) {
         HILOG_ERROR("add form info error");
+        RemoveFormIdMapElement(formId);
         return errCode;
     }
     errCode = RequestPublishFormToHost(want, userId);
     if (errCode != ERR_OK) {
+        RemoveFormIdMapElement(formId);
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
         FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
+        return errCode;
     }
     IncreaseAddFormRequestTimeOutTask(formId);
     if (!formDataProxies.empty()) {
@@ -506,23 +509,19 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
     }
     if (errCode != ERR_OK) {
         HILOG_ERROR("add form info error");
+        RemoveFormIdMapElement(formId);
         return errCode;
     }
     errCode = RequestPublishFormToHost(want, userId);
     if (errCode != ERR_OK) {
+        RemoveFormIdMapElement(formId);
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
         FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
+        return errCode;
     }
     IncreaseAddFormRequestTimeOutTask(formId);
-    // The public API that calls this method only expects COMMON_CODE for failure cases.
-    // Map specific error codes back to COMMON_CODE to preserve API compatibility
-    if (errCode == ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE ||
-        errCode == ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT) {
-        HILOG_INFO("map %{public}d to COMMON_CODE", errCode);
-        errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
     return errCode;
 }
 
@@ -589,22 +588,23 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
     std::unique_ptr<FormProviderData> noFormBindingData = nullptr;
     errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
     if (errCode != ERR_OK) {
+        RemoveFormIdMapElement(formId);
         HILOG_ERROR("AddRequestPublishFormInfo failed");
         return errCode;
     }
 
     errCode = RequestPublishFormToHost(want, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("RequestPublishFormToHost failed");
+        RemoveFormIdMapElement(formId);
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
         FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
-        IncreaseAddFormRequestTimeOutTask(formId);
         return errCode;
     }
 
     IncreaseAddFormRequestTimeOutTask(formId);
+
     return ERR_OK;
 }
 
