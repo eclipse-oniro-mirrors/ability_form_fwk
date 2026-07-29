@@ -109,9 +109,13 @@ HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0300, TestSize.Level0)
 HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0400, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0400 start";
-
     FormInstancesFilter formInstanceFilter;
     Parcel parcel;
+    parcel.WriteString16(Str8ToStr16("bundleName"));
+    parcel.WriteString16(Str8ToStr16("formName"));
+    parcel.WriteString16(Str8ToStr16("moduleName"));
+    parcel.WriteString16(Str8ToStr16("abilityName"));
+    parcel.WriteBool(false);
     auto result = formInstanceFilter.Unmarshalling(parcel);
     EXPECT_NE(result, nullptr);
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0400 end";
@@ -142,6 +146,11 @@ HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0600, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0600 start";
     FormInstancesFilter formInstanceFilter;
     Parcel parcel;
+    parcel.WriteString16(Str8ToStr16("bundleName"));
+    parcel.WriteString16(Str8ToStr16("formName"));
+    parcel.WriteString16(Str8ToStr16("moduleName"));
+    parcel.WriteString16(Str8ToStr16("abilityName"));
+    parcel.WriteBool(false);
     auto result = formInstanceFilter.ReadFromParcel(parcel);
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0600 end";
