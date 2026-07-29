@@ -31,6 +31,7 @@ static napi_value JsFormAgentInit(napi_env env, napi_value exports)
 
     const char *moduleName = "JsFormAgent";
     BindNativeFunction(env, exports, "requestPublishForm", moduleName, JsFormAgent::RequestPublishForm);
+    BindNativeFunction(env, exports, "updateFormCrossBundle", moduleName, JsFormAgent::UpdateFormCrossBundle);
     return exports;
 }
 

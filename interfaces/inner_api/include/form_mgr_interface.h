@@ -108,6 +108,17 @@ public:
     virtual int UpdateForm(const int64_t formId, const FormProviderData &formProviderData) = 0;
 
     /**
+     * @brief Update form with formId by cross bundle, restricted to system apps.
+     * @param formId The Id of the form to update.
+     * @param formProviderData Form binding data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formProviderData)
+    {
+        return ERR_OK;
+    }
+
+    /**
      * @brief Set next refresh time.
      * @param formId The Id of the form to update.
      * @param nextTime Next refresh time.
@@ -1288,6 +1299,7 @@ public:
         FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK,
         FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK,
         FORM_MGR_DELETE_FORMS,
+        FORM_MGR_UPDATE_FORM_CROSS_BUNDLE,
     };
 };
 }  // namespace AppExecFwk

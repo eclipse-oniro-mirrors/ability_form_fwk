@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 import { BusinessError, AsyncCallback } from '@ohos.base';
 import Want from '@ohos.app.ability.Want';
+import formBindingData from '@ohos.app.form.formBindingData';
 
 export default class AsyncCallbackWrapper<T, E = void> {
   private myFun_: AsyncCallback<T, E> = (err: BusinessError<E> | null, data: T | undefined) => {}
@@ -32,6 +33,8 @@ export namespace formAgent {
   loadLibrary("form_agent_ani.z")
 
   export native function nativeRequestPublishForm(want: Want, callback: AsyncCallbackWrapper<string>): void;
+  export native function nativeUpdateFormCrossBundle(formId: string, bindingData: formBindingData.FormBindingData,
+    callback: AsyncCallbackWrapper<void>): void;
   export native function checkWantParam(want: Want): void;
 
   export function requestPublishForm(want: Want, callback: AsyncCallback<string>): void {
@@ -58,5 +61,25 @@ export namespace formAgent {
         });
       });
     return publishFormPromise;
+  }
+
+  export function updateFormCrossBundle(formId: string, bindingData: formBindingData.FormBindingData): Promise<void> {
+    return new Promise<void>((resolve: (data: undefined) => void, reject: (err: BusinessError) => void): void => {
+      let myCall = new AsyncCallbackWrapper<void>((err: BusinessError | null) => {
+        if (err === null || err.code === 0) {
+          resolve(undefined);
+        } else {
+          reject(err);
+        }
+      });
+      taskpool.execute((): void => {
+        try {
+          formAgent.nativeUpdateFormCrossBundle(formId, bindingData, myCall);
+        } catch (exception) {
+          let err = exception as BusinessError;
+          myCall.invoke(err, undefined);
+        }
+      });
+    });
   }
 }

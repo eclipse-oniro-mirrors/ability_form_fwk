@@ -89,6 +89,14 @@ public:
     virtual int UpdateForm(const int64_t formId, const FormProviderData &FormProviderData) override;
 
     /**
+     * @brief Update form with formId by cross bundle, restricted to system apps.
+     * @param formId The Id of the form to update.
+     * @param FormProviderData Form binding data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formProviderData) override;
+
+    /**
      * @brief Set next refresh time.
      * @param formId The Id of the form to update.
      * @param nextTime Next refresh time.

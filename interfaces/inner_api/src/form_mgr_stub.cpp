@@ -404,6 +404,8 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleUnregisterDeleteFormsCallback(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORMS):
             return HandleDeleteForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE):
+            return HandleUpdateFormCrossBundle(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -527,6 +529,33 @@ int32_t FormMgrStub::HandleUpdateForm(MessageParcel &data, MessageParcel &reply)
     reply.WriteInt32(result);
     return result;
 }
+
+/**
+ * @brief handle UpdateFormCrossBundle message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleUpdateFormCrossBundle(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<FormProviderData> formBindingData(data.ReadParcelable<FormProviderData>());
+    if (formBindingData == nullptr) {
+        HILOG_ERROR("fail get formBindingData");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = UpdateFormCrossBundle(formId, *formBindingData);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
 /**
      * @brief handle SetNextRefreshTime message.
      * @param data input param.

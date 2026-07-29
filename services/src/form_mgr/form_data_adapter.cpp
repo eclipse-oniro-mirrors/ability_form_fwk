@@ -96,31 +96,47 @@ int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
 
-    if (formId <= 0) {
-        HILOG_ERROR("invalid formId");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-
+    int64_t matchedFormId = 0;
     FormRecord formRecord;
-    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    ErrCode err = ValidateAndGetFormRecord(formId, matchedFormId, formRecord);
+    if (err != ERR_OK) {
+        return err;
     }
 
-    int ret = ERR_OK;
     RefreshData data;
     data.formId = matchedFormId;
     data.record = formRecord;
     data.callingUid = callingUid;
     data.providerData = formProviderData;
-    ret = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
+    int ret = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
 
     if (!formDataProxies.empty()) {
         FormDataProxyMgr::GetInstance().UpdateSubscribeFormData(matchedFormId, formDataProxies);
     }
     return ret;
+}
+
+ErrCode FormDataAdapter::UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
+    const FormProviderData &formProviderData)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+ 
+    int64_t matchedFormId = 0;
+    FormRecord formRecord;
+    ErrCode err = ValidateAndGetFormRecord(formId, matchedFormId, formRecord);
+    if (err != ERR_OK) {
+        return err;
+    }
+ 
+    HILOG_INFO("cross-bundle update: real caller uid=%{public}d, form provider uid=%{public}d, "
+        "formId:%{public}" PRId64, callingUid, formRecord.uid, matchedFormId);
+ 
+    RefreshData data;
+    data.formId = matchedFormId;
+    data.record = formRecord;
+    data.callingUid = formRecord.uid;
+    data.providerData = formProviderData;
+    return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
 }
 
 int FormDataAdapter::RequestForm(const int64_t formId,
