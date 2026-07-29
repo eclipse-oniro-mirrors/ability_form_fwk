@@ -449,13 +449,7 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     if (errCode != ERR_OK) {
         return errCode;
     }
-    // Early return if form count exceeds limit
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
-    errCode = CheckFormCountLimit(want, userId);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("CheckFormCountLimit failed, code:%{public}d", errCode);
-        return errCode;
-    }
     errCode = RequestPublishFormCommon(want, userId, formId);
     if (errCode != ERR_OK) {
         return errCode;
@@ -471,7 +465,7 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
         RemoveFormIdMapElement(formId);
         return errCode;
     }
-    errCode = RequestPublishFormToHost(want, userId);
+    errCode = RequestPublishFormToHost(want, userId, true);
     if (errCode != ERR_OK) {
         RemoveFormIdMapElement(formId);
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
@@ -572,13 +566,6 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
         want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     }
 
-    // Early return if form count exceeds limit
-    errCode = CheckFormCountLimit(want, userId);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("CheckFormCountLimit failed, code:%{public}d", errCode);
-        return errCode;
-    }
-
     errCode = RequestPublishFormCommon(want, userId, formId);
     if (errCode != ERR_OK) {
         HILOG_ERROR("RequestPublishFormCommon failed");
@@ -593,7 +580,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
         return errCode;
     }
 
-    errCode = RequestPublishFormToHost(want, userId);
+    errCode = RequestPublishFormToHost(want, userId, true);
     if (errCode != ERR_OK) {
         RemoveFormIdMapElement(formId);
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
@@ -608,7 +595,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
     return ERR_OK;
 }
 
-ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want, int32_t userId)
+ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want, int32_t userId, bool checkFormCountLimit)
 {
     HILOG_INFO("RequestPublishFormToHost called with userId:%{public}d", userId);
 
@@ -624,6 +611,12 @@ ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want, int32_t userId)
 
     ErrCode errCode = QueryPublishFormToHost(wantToHost, userId);
     if (errCode == ERR_OK) {
+        if (checkFormCountLimit) {
+            ErrCode limitErr = CheckFormCountLimit(wantToHost, userId);
+            if (limitErr != ERR_OK) {
+                return limitErr;
+            }
+        }
         int ret = FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
         if (ret != ERR_OK) {
             HILOG_ERROR("fail StartAbility for userId:%{public}d", userId);
@@ -757,7 +750,7 @@ ErrCode FormPublishAdapter::CheckFormCountLimit(const Want &want, int32_t userId
 {
     HILOG_INFO("call");
 
-    std::string hostBundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
+    std::string hostBundleName = want.GetElement().GetBundleName();
     if (hostBundleName.empty()) {
         HILOG_ERROR("Host bundle name not set in Want");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

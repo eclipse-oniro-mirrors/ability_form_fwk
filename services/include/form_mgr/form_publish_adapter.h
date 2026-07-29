@@ -97,7 +97,7 @@ private:
     bool IsErmsSupportPublishForm(const std::string &bundleName, std::vector<Want> wants);
     bool CheckSnapshotWant(const Want &want);
     void IncreaseAddFormRequestTimeOutTask(const int64_t formId);
-    ErrCode RequestPublishFormToHost(Want &want, int32_t userId);
+    ErrCode RequestPublishFormToHost(Want &want, int32_t userId, bool checkFormCountLimit = false);
     int32_t GetCallerType(const std::string &bundleName);
     bool GetBundleName(std::string &bundleName, bool needCheckFormPermission = true);
     ErrCode ValidatePublishFormParamsForCrossUser(const Want &want, int32_t userId);

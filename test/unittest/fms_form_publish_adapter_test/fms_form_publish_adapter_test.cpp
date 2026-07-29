@@ -746,7 +746,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_001, TestSize.Le
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, TEST_FORM_NAME);
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, TEST_DIMENSION_ID);
-    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY, std::string("com.form.host.app600"));
     int64_t formId = 0;
 
     FormInfo formInfo;
@@ -755,10 +754,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_001, TestSize.Le
     formInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
-    sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
-    EXPECT_CALL(*bms, GetUidByBundleName(_, _)).WillOnce(Return(600));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillRepeatedly(Return(bms));
     EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
         .WillOnce(Return(-1));
 
@@ -782,7 +777,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_002, TestSize.Le
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, TEST_MODULE_NAME);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, TEST_FORM_NAME);
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, TEST_DIMENSION_ID);
-    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY, std::string("com.form.host.app600"));
     int64_t formId = 0;
 
     FormInfo formInfo;
@@ -791,10 +785,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormCrossUser_002, TestSize.Le
     formInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(std::vector<FormInfo>{formInfo}), Return(ERR_OK)));
-    sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
-    EXPECT_CALL(*bms, GetUidByBundleName(_, _)).WillOnce(Return(600));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillRepeatedly(Return(bms));
     EXPECT_CALL(*MockFormDataMgr::obj, GenerateFormId())
         .WillOnce(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, AddRequestPublishFormInfo(_, _, _))
