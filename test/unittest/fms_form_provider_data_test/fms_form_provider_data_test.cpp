@@ -90,8 +90,9 @@ bool FmsFormProviderDataTest::InitJsonData2()
 void FmsFormProviderDataTest::VerifyReadFromParcelState(int32_t imageDataState, bool expectSuccess)
 {
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_PARCEL_VALUE);
-    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    auto dataString = jsonData_.dump();
+    parcel.WriteInt32(dataString.length());
+    parcel.WriteString16(Str8ToStr16(dataString));
     parcel.WriteInt32(imageDataState);
     if (imageDataState == FormProviderData::IMAGE_DATA_STATE_ADDED) {
         parcel.WriteInt32(0);
@@ -560,8 +561,9 @@ HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_Normal_001, TestSize.Level0)
     FormProviderData formProviderData(jsonData_);
 
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_PARCEL_VALUE);
-    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    auto dataString = jsonData_.dump();
+    parcel.WriteInt32(dataString.length());
+    parcel.WriteString16(Str8ToStr16(dataString));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
 
     auto result = formProviderData.ReadFromParcel(parcel);
@@ -812,8 +814,9 @@ HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_NormalImageDataNum_001, TestSiz
     constexpr int32_t size = 1;
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_PARCEL_VALUE);
-    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    auto dataString = jsonData_.dump();
+    parcel.WriteInt32(dataString.length());
+    parcel.WriteString16(Str8ToStr16(dataString));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
     parcel.WriteInt32(imageDataNum);
     formAshmem.WriteToAshmem("ReadFromParcelTest", &data, size);
@@ -839,8 +842,9 @@ HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_NullAshmem_001, TestSize.Level1
     constexpr int32_t imageDataNum = 1;
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_PARCEL_VALUE);
-    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    auto dataString = jsonData_.dump();
+    parcel.WriteInt32(dataString.length());
+    parcel.WriteString16(Str8ToStr16(dataString));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
     parcel.WriteInt32(imageDataNum);
     parcel.WriteParcelable(nullptr);

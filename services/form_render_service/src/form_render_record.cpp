@@ -31,6 +31,7 @@
 #include "extractor.h"
 #include "dfx_dump_catcher.h"
 #include "nlohmann/json.hpp"
+#include "json_util_form.h"
 #include "resource_manager.h"
 #include "xcollie/watchdog.h"
 
@@ -662,7 +663,7 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 {
     std::map<std::string, std::string> pkgContextInfoJsonStringMap;
     for (auto modulePkgNamePair : formJsInfo.modulePkgNameMap) {
-        nlohmann::json moduleInfos = nlohmann::json::parse(modulePkgNamePair.second, nullptr, false);
+        nlohmann::json moduleInfos = SafeJsonParse(modulePkgNamePair.second);
         if (moduleInfos.is_discarded()) {
             HILOG_ERROR("fail parse modulePkgNamePair");
             continue;

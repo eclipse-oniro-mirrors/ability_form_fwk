@@ -25,6 +25,7 @@
 #include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "config_policy_utils.h"
+#include "json_util_form.h"
 
 namespace {
 constexpr const char *FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
@@ -286,15 +287,19 @@ std::vector<std::string> FormModuleChecker::GetModuleAllowList()
         return result;
     }
     HILOG_INFO("success to open config file");
-    nlohmann::json jsonData;
-    file >> jsonData;
+    std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
+    nlohmann::json jsonData = OHOS::AppExecFwk::SafeJsonParse(fileContent);
+    if (jsonData.is_discarded()) {
+        HILOG_ERROR("failed to parse config file as JSON");
+        return result;
+    }
     if (jsonData.contains(KEY_MODULE_ALLOW) && jsonData[KEY_MODULE_ALLOW].is_array()) {
         for (const auto& module : jsonData[KEY_MODULE_ALLOW]) {
             HILOG_INFO("read moduleAllowList module: %{public}s", std::string(module).c_str());
             result.push_back(module);
         }
     }
-    file.close();
     return result;
 }
 

@@ -31,6 +31,7 @@
 #include "accesstoken_kit.h"
 #include "form_event_report.h"
 #include "form_mgr/form_mgr_queue.h"
+#include "json_util_form.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -476,9 +477,9 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
             PrepareImageData(iter, object, imageDataMap);
         } else {
             auto value = std::get<std::string>(iter.value_);
-            nlohmann::json dataObject = nlohmann::json::parse(value, nullptr, false);
-            if (dataObject.is_discarded()) {
-                HILOG_ERROR("fail parse data:%{public}s", value.c_str());
+            nlohmann::json dataObject = SafeJsonParse(value);
+            if (dataObject.is_discarded() || !dataObject.is_object()) {
+                HILOG_ERROR("fail parse data or not object:%{public}s", value.c_str());
                 continue;
             }
             object[iter.key_] = dataObject;
@@ -518,9 +519,9 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     nlohmann::json object;
     for (const auto& iter : data) {
         HILOG_DEBUG("iter: %{private}s.", iter.c_str());
-        nlohmann::json dataObject = nlohmann::json::parse(iter, nullptr, false);
-        if (dataObject.is_discarded()) {
-            HILOG_ERROR("fail parse data:%{public}s", iter.c_str());
+        nlohmann::json dataObject = SafeJsonParse(iter);
+        if (dataObject.is_discarded() || !dataObject.is_object()) {
+            HILOG_ERROR("fail parse data or not object:%{public}s", iter.c_str());
             continue;
         }
         object.merge_patch(dataObject);
