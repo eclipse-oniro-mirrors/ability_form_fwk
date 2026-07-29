@@ -18,7 +18,6 @@
 #include "appexecfwk_errors.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "form_constants.h"
 #include "running_form_info.h"
 #include "string_ex.h"
 
@@ -504,11 +503,6 @@ int FormMgrProxy::LifecycleUpdate(
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -593,12 +587,6 @@ int FormMgrProxy::NotifyWhetherVisibleForms(
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     if (!data.WriteInt64Vector(formIds)) {
@@ -1131,11 +1119,6 @@ int FormMgrProxy::DeleteInvalidForms(const std::vector<int64_t> &formIds, const 
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1247,11 +1230,6 @@ int FormMgrProxy::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool i
         HILOG_ERROR("error to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("error to write vector formIds");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1292,11 +1270,6 @@ int FormMgrProxy::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formId
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
@@ -1345,11 +1318,6 @@ int FormMgrProxy::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, b
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
@@ -2087,12 +2055,7 @@ ErrCode FormMgrProxy::RegisterFormRemoveObserverByBundle(const std::string bundl
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    int32_t result = 0;
-    if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return result;
+    return reply.ReadInt32();
 }
 
 int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
@@ -2216,11 +2179,7 @@ ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &dat
     if (error != ERR_OK) {
         return error;
     }
-    error = 0;
-    if (!reply.ReadInt32(error)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
+    error = reply.ReadInt32();
     if (error != ERR_OK) {
         HILOG_ERROR("read replyResult failed");
         return error;
@@ -2296,11 +2255,6 @@ ErrCode FormMgrProxy::RegisterFormRouterProxy(const std::vector<int64_t> &formId
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2327,11 +2281,6 @@ ErrCode FormMgrProxy::UnregisterFormRouterProxy(const std::vector<int64_t> &form
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
@@ -2446,17 +2395,14 @@ int32_t FormMgrProxy::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &
 {
     HILOG_DEBUG("start");
     MessageParcel data;
-    // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("error to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    // write in interceptor
     if (!data.WriteRemoteObject(interceptorCallback)) {
         HILOG_ERROR("error to write interceptor");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    // send request.
     MessageParcel reply;
     MessageOption option;
     int error = SendTransactCmd(
@@ -2468,7 +2414,6 @@ int32_t FormMgrProxy::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;
     }
-    // retrieve and return result.
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
         HILOG_ERROR("%{public}s, read result failed", __func__);
@@ -2481,12 +2426,10 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
 {
     HILOG_DEBUG("start");
     MessageParcel data;
-    // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    // write in interceptor
     if (!data.WriteRemoteObject(interceptorCallback)) {
         HILOG_ERROR("fail write interceptor");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2591,11 +2534,6 @@ int32_t FormMgrProxy::SetFormsRecyclable(const std::vector<int64_t> &formIds)
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2623,11 +2561,6 @@ int32_t FormMgrProxy::RecycleForms(const std::vector<int64_t> &formIds, const Wa
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2653,11 +2586,6 @@ int32_t FormMgrProxy::RecoverForms(const std::vector<int64_t> &formIds, const Wa
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     if (!data.WriteInt64Vector(formIds)) {
         HILOG_ERROR("write vector formIds failed");
@@ -3058,6 +2986,7 @@ ErrCode FormMgrProxy::OpenFormEditAbility(const std::string &abilityName, const 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteString(abilityName)) {
+<<<<<<< HEAD
         HILOG_ERROR("fail write abilityName");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -3067,6 +2996,17 @@ ErrCode FormMgrProxy::OpenFormEditAbility(const std::string &abilityName, const 
     }
     if (!data.WriteBool(isMainPage)) {
         HILOG_ERROR("fail write isMainPage");
+=======
+        HILOG_ERROR("write abilityName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isMainPage)) {
+        HILOG_ERROR("write isMainPage failed");
+>>>>>>> e0f913ff2 (fix(form): 修复form_mgr_proxy.cpp IPC 多个响应反序列化缺陷)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -3343,6 +3283,44 @@ ErrCode FormMgrProxy::GetFormRect(const int64_t formId, Rect &rect)
     return ERR_OK;
 }
 
+<<<<<<< HEAD
+=======
+ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
+{
+    HILOG_INFO("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("Write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(newDimension)) {
+        HILOG_ERROR("Write newDimension failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&newRect)) {
+        HILOG_ERROR("Write newRect failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest failed: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("%{public}s, read result failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+>>>>>>> e0f913ff2 (fix(form): 修复form_mgr_proxy.cpp IPC 多个响应反序列化缺陷)
 ErrCode FormMgrProxy::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
     MessageParcel data;
@@ -3413,12 +3391,7 @@ ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const int32_t newDime
         HILOG_ERROR("SendRequest failed: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    int32_t result = 0;
-    if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return result;
+    return reply.ReadInt32();
 }
 
 bool FormMgrProxy::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
