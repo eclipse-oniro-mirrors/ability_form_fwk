@@ -3538,6 +3538,25 @@ ErrCode FormMgrProxy::RegisterPublishFormCrossBundleControl(const sptr<IRemoteOb
     return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::UnregisterPublishFormCrossBundleControl()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
 ErrCode FormMgrProxy::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
@@ -3615,25 +3634,6 @@ ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::UnregisterPublishFormCrossBundleControl()
-{
-    HILOG_DEBUG("call");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    ErrCode error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return error;
-    }
-    return reply.ReadInt32();
-}
-
 ErrCode FormMgrProxy::GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
 {
     HILOG_DEBUG("call");
@@ -3667,6 +3667,31 @@ ErrCode FormMgrProxy::GetFormIdsByFormLocation(int32_t formLocation, std::vector
     }
 
     return ERR_OK;
+}
+
+ErrCode FormMgrProxy::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
 }
 
 ErrCode FormMgrProxy::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
@@ -3704,30 +3729,6 @@ ErrCode FormMgrProxy::UnregisterFormWantCallback()
         IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-ErrCode FormMgrProxy::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
-{
-    HILOG_DEBUG("call");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed.");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("write callerToken failed.");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
