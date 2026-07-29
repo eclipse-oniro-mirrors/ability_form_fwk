@@ -134,6 +134,7 @@ ohos_shared_library("cj_formProvider_ffi") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   innerapi_tags = [ "platformsdk" ]
