@@ -86,7 +86,6 @@
               "node"
           ],
           "third_party": [
-              "node",
               "json"
           ]
         },
