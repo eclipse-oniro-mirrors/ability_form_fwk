@@ -17,6 +17,7 @@
 
 #include "fms_log_wrapper.h"
 #include "json_serializer.h"
+#include "json_util_form.h"
 #include "data_center/form_data_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
@@ -49,7 +50,7 @@ void ParamControl::DealDueParam(const std::string &jsonStr)
         return;
     }
 
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonStr, nullptr, false);
+    nlohmann::json jsonObject = SafeJsonParse(jsonStr);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("fail parse jsonStr: %{public}s.", jsonStr.c_str());
         return;

@@ -68,6 +68,8 @@ ErrCode FormInfoMgr::LoadFormInfosFromDb()
         auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleName);
         errCode = bundleFormInfoPtr->InitFromJson(formInfoStoragesJson);
         if (errCode != ERR_OK) {
+            HILOG_ERROR("InitFromJson failed for %{public}s, removing corrupted entry", bundleName.c_str());
+            FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
             continue;
         }
         HILOG_INFO("load bundle %{public}s form infos success.", bundleName.c_str());

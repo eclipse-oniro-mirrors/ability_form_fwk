@@ -25,6 +25,7 @@
 #include "hitrace_meter.h"
 #include "in_process_call_wrapper.h"
 #include "data_center/form_data_mgr.h"
+#include "json_util_form.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -355,7 +356,7 @@ bool FormInfoHelper::CheckAppServicesCapability(int32_t userId, const std::strin
         HILOG_ERROR("get AppProvisionInfo failed");
         return false;
     } else {
-        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities, nullptr, false);
+        nlohmann::json jsonObject = SafeJsonParse(appProvisionInfo.appServiceCapabilities);
         if (jsonObject.is_discarded()) {
             HILOG_ERROR("fail parse appServiceCapabilities");
             return false;

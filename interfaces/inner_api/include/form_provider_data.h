@@ -231,9 +231,9 @@ public:
     static constexpr int IMAGE_DATA_STATE_REMOVED = -1;
     static constexpr int IMAGE_DATA_STATE_NO_OPERATION = 0;
     static constexpr int IMAGE_DATA_STATE_ADDED = 1;
-    nlohmann::json jsonFormProviderData_;
 
 private:
+    nlohmann::json jsonFormProviderData_;
     bool WriteImageDataToParcel(Parcel &parcel, const std::string &picName, const std::shared_ptr<char> &data,
         int32_t size) const;
 
