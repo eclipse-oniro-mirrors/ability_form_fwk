@@ -3780,6 +3780,26 @@ ErrCode FormMgrProxy::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &cal
     return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::UnregisterDeleteFormsCallback()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 ErrCode FormMgrProxy::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
 {
     MessageParcel data;
@@ -3815,26 +3835,6 @@ ErrCode FormMgrProxy::UnregisterFormWantCallback()
         IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
-ErrCode FormMgrProxy::UnregisterDeleteFormsCallback()
-{
-    HILOG_DEBUG("call");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed.");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    ErrCode error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
