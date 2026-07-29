@@ -566,7 +566,7 @@ bool FormRenderMgrInner::RegisterRenderDeathRecipient(const sptr<IRemoteObject> 
                 return;
             }
             HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
-                renderMgrInner->userId_, renderMgrInner->isActiveUser_);
+                renderMgrInner->userId_, renderMgrInner->isActiveUser_.load());
             if (renderMgrInner->isActiveUser_) {
                 renderMgrInner->RerenderAllForms();
             } else {
