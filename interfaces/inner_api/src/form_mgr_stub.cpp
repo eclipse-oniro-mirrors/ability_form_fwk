@@ -426,7 +426,7 @@ int32_t FormMgrStub::HandleAddForm(MessageParcel &data, MessageParcel &reply)
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("fail ReadParcelable<FormReqInfo>");
+        HILOG_ERROR("%{public}s, read want failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -733,6 +733,11 @@ ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParc
     int32_t err = 0;
     if (!data.ReadInt32(err)) {
         HILOG_ERROR("%{public}s, read err failed", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (err < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
+        err > static_cast<int32_t>(Constants::PublishFormErrorCode::INTERNAL_ERROR)) {
+        HILOG_ERROR("%{public}s, invalid PublishFormErrorCode:%{public}d", __func__, err);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(err);
@@ -1441,7 +1446,7 @@ int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParc
     if (filter.supportDimensions.size() > Constants::MAX_LAYOUT) {
         HILOG_ERROR("%{public}s, supportDimensions size %{public}zu exceeds limit %{public}zu",
             __func__, filter.supportDimensions.size(), Constants::MAX_LAYOUT);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     if (!data.ReadInt32Vector(&filter.supportShapes)) {
         HILOG_ERROR("%{public}s, read supportShapes failed", __func__);
@@ -1450,7 +1455,7 @@ int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParc
     if (filter.supportShapes.size() > Constants::MAX_LAYOUT) {
         HILOG_ERROR("%{public}s, supportShapes size %{public}zu exceeds limit %{public}zu",
             __func__, filter.supportShapes.size(), Constants::MAX_LAYOUT);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     std::vector<FormInfo> infos;
@@ -1585,9 +1590,11 @@ int32_t FormMgrStub::HandleAcquireFormData(MessageParcel &data, MessageParcel &r
         HILOG_ERROR("%{public}s, write result failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!reply.WriteParcelable(&customizeData)) {
-        HILOG_ERROR("%{public}s, write customizeData failed", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+    if (result == ERR_OK) {
+        if (!reply.WriteParcelable(&customizeData)) {
+            HILOG_ERROR("%{public}s, write customizeData failed", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
     }
     return result;
 }
