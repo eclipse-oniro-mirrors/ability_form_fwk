@@ -3350,26 +3350,6 @@ ErrCode FormMgrProxy::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::UnregisterGetLiveFormStatusProxy()
-{
-    HILOG_DEBUG("call");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    ErrCode error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return error;
-    }
-    return reply.ReadInt32();
-}
-
 ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
 {
     HILOG_INFO("call");
@@ -3403,6 +3383,26 @@ ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const int32_t newDime
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+ErrCode FormMgrProxy::UnregisterGetLiveFormStatusProxy()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    return reply.ReadInt32();
 }
 
 bool FormMgrProxy::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
