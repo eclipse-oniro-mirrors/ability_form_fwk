@@ -177,7 +177,7 @@ private:
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
     // userId_ is Active User
-    bool isActiveUser_ = true;
+    std::atomic_bool isActiveUser_ = true;
     int32_t userId_ = 0;
     std::atomic_bool isFrsDiedInLowMemory_ = false;
 };

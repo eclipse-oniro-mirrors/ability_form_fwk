@@ -65,7 +65,7 @@ public:
     void InsertFormId(int64_t formId);
     void RemoveFormId(int64_t formId);
     bool HasFormId(int64_t formId);
-    std::unordered_map<int64_t, FormStatistic>& GetStatistic();
+    std::unordered_map<int64_t, FormStatistic> GetStatistic();
 
 private:
     mutable std::mutex formReport_;

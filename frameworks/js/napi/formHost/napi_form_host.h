@@ -51,7 +51,7 @@ struct AsyncNotifyFormsVisibleCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
-    napi_ref callback;
+    napi_ref callback = nullptr;
     std::vector<int64_t> formIds;
     bool isVisible = false;
     int result = OHOS::ERR_OK;
