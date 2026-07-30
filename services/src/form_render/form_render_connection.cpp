@@ -67,20 +67,19 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     connectState_ = ConnectState::CONNECTED;
     failedTimes = 0;
     int32_t compileMode = 0;
-    if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
-        formRecord_.providerUserId, compileMode)) {
-        HILOG_ERROR("get compile mode failed");
-        return;
-    }
-
     FormRecord newRecord;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         newRecord = formRecord_;
     }
+    if (!FormBmsHelper::GetInstance().GetCompileMode(newRecord.bundleName, newRecord.moduleName,
+        newRecord.providerUserId, compileMode)) {
+        HILOG_ERROR("get compile mode failed");
+        return;
+    }
     std::string cacheData;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    if (FormCacheMgr::GetInstance().GetData(formRecord_.formId, cacheData, imageDataMap)) {
+    if (FormCacheMgr::GetInstance().GetData(newRecord.formId, cacheData, imageDataMap)) {
         newRecord.formProviderInfo.SetFormDataString(cacheData);
         newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
     }
