@@ -74,7 +74,6 @@ public:
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
     ErrCode AcquireAddFormResult(const int64_t formId);
-    bool ResolveAcquireResult(const int64_t formId, ErrCode &result);
 
     bool IsRequestPublishFormSupported();
 
@@ -104,6 +103,7 @@ private:
     ErrCode ValidateParamsForCrossUser(const Want &want);
     ErrCode ValidateFormInfoMatchForCrossUser(const Want &want, int32_t userId);
     ErrCode CheckFormCountLimit(const Want &want, int32_t userId);
+    bool ResolveAcquireResult(const int64_t formId, ErrCode &result);
 
     std::unique_ptr<FormSerialQueue> serialQueue_;
     std::map<int64_t, AddFormResultErrorCodes> formIdMap_;

@@ -391,6 +391,8 @@ ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants
         if (mapIt != PUBLISH_RESULT_MAP.end()) {
             iter->second = mapIt->second;
         } else {
+            HILOG_ERROR("Unknown PublishFormErrorCode:%{public}d, fallback to FAILED",
+                static_cast<int32_t>(errorCodeInfo.code));
             iter->second = AddFormResultErrorCodes::FAILED;
         }
         condition_.notify_all();
@@ -649,7 +651,7 @@ ErrCode FormPublishAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId
 {
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formResultMutex_);
-    auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [formId, &formStates] (const auto elem) {
+    auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [formId, &formStates] (const auto &elem) {
         if (elem.first == formId) {
             if (elem.second == AddFormResultErrorCodes::FAILED || elem.second == AddFormResultErrorCodes::TIMEOUT ||
                 elem.second == AddFormResultErrorCodes::NO_SPACE ||
@@ -757,7 +759,7 @@ ErrCode FormPublishAdapter::CheckFormCountLimit(const Want &want, int32_t userId
     }
 
     int32_t hostUid = FormBmsHelper::GetInstance().GetUidByBundleName(hostBundleName, userId);
-    if (hostUid <= 0) {
+    if (hostUid == FormBmsHelper::INVALID_UID) {
         HILOG_ERROR("Failed to get Host uid by bundleName:%{public}s", hostBundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
