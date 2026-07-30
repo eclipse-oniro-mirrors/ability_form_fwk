@@ -15,6 +15,8 @@
 
 #include "form_mgr/form_publish_adapter.h"
 
+#include <unordered_map>
+
 #include "app_mgr_interface.h"
 #include "app_state_data.h"
 #include "form_ecological_rule_param.h"
@@ -47,6 +49,24 @@
 namespace OHOS {
 namespace AppExecFwk {
 using namespace FormAdapterConstants;
+
+namespace {
+// AcquireAddFormResult: AddFormResultErrorCodes -> ErrCode
+const std::unordered_map<int8_t, ErrCode> ACQUIRE_RESULT_MAP = {
+    {static_cast<int8_t>(AddFormResultErrorCodes::SUCCESS), ERR_OK},
+    {static_cast<int8_t>(AddFormResultErrorCodes::NO_SPACE), ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE},
+    {static_cast<int8_t>(AddFormResultErrorCodes::NOT_SUPPORT), ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT},
+    {static_cast<int8_t>(AddFormResultErrorCodes::FAILED), ERR_APPEXECFWK_FORM_COMMON_CODE},
+    {static_cast<int8_t>(AddFormResultErrorCodes::TIMEOUT), ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT},
+};
+
+// SetPublishFormResult: PublishFormErrorCode -> AddFormResultErrorCodes
+const std::unordered_map<int8_t, AddFormResultErrorCodes> PUBLISH_RESULT_MAP = {
+    {static_cast<int8_t>(Constants::PublishFormErrorCode::SUCCESS), AddFormResultErrorCodes::SUCCESS},
+    {static_cast<int8_t>(Constants::PublishFormErrorCode::NO_SPACE), AddFormResultErrorCodes::NO_SPACE},
+    {static_cast<int8_t>(Constants::PublishFormErrorCode::NOT_SUPPORT), AddFormResultErrorCodes::NOT_SUPPORT},
+};
+} // namespace
 
 FormPublishAdapter::FormPublishAdapter()
 {
@@ -244,13 +264,6 @@ ErrCode FormPublishAdapter::CheckPublishForm(Want &want, bool needCheckFormPermi
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost)
-{
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    return QueryPublishFormToHost(wantToHost, userId);
-}
-
 ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost, int32_t userId)
 {
     HILOG_INFO("QueryPublishFormToHost called with userId:%{public}d", userId);
@@ -332,37 +345,34 @@ void FormPublishAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, c
 ErrCode FormPublishAdapter::AcquireAddFormResult(const int64_t formId)
 {
     HILOG_INFO("call");
-    auto apiRet = std::make_shared<ErrCode>(ERR_OK);
+    ErrCode result = ERR_OK;
     std::unique_lock<std::mutex> lock(formResultMutex_);
-    condition_.wait(lock, [this, formId, ret = apiRet]() {
-        auto iter = formIdMap_.find(formId);
-        if (iter != formIdMap_.end()) {
-            if (iter->second == AddFormResultErrorCodes::SUCCESS) {
-                HILOG_INFO("Acquire the result of the success");
-                *ret = ERR_OK;
-                return true;
-            } else if (iter->second == AddFormResultErrorCodes::NO_SPACE) {
-                HILOG_ERROR("Acquire the result of no space");
-                *ret = ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE;
-                return true;
-            } else if (iter->second == AddFormResultErrorCodes::FAILED) {
-                HILOG_ERROR("Acquire the result of the failed");
-                *ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
-                return true;
-            } else if (iter->second == AddFormResultErrorCodes::TIMEOUT) {
-                HILOG_ERROR("Acquire the result of the timeout");
-                *ret = ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT;
-                return true;
-            } else {
-                HILOG_INFO("Add form result state is unknown");
-                return true;
-            }
-        }
-        HILOG_ERROR("The formid hasn't find");
-        *ret = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-        return true;
+    condition_.wait(lock, [this, formId, &result]() {
+        return ResolveAcquireResult(formId, result);
     });
-    return *apiRet;
+    return result;
+}
+
+bool FormPublishAdapter::ResolveAcquireResult(const int64_t formId, ErrCode &result)
+{
+    auto iter = formIdMap_.find(formId);
+    if (iter == formIdMap_.end()) {
+        result = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        HILOG_ERROR("The formid hasn't find");
+        return true;
+    }
+    auto mapIt = ACQUIRE_RESULT_MAP.find(static_cast<int8_t>(iter->second));
+    if (mapIt == ACQUIRE_RESULT_MAP.end()) {
+        HILOG_INFO("Add form result state not ready, keep waiting");
+        return false;
+    }
+    result = mapIt->second;
+    if (result == ERR_OK) {
+        HILOG_INFO("Acquire the result of the success");
+    } else {
+        HILOG_ERROR("Acquire the result failed, errCode:%{public}d", result);
+    }
+    return true;
 }
 
 ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
@@ -377,11 +387,12 @@ ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants
     std::lock_guard<std::mutex> lock(formResultMutex_);
     auto iter = formIdMap_.find(formId);
     if (iter != formIdMap_.end()) {
-        if (errorCodeInfo.code == Constants::PublishFormErrorCode::SUCCESS) {
-            iter->second = AddFormResultErrorCodes::SUCCESS;
-        } else if (errorCodeInfo.code == Constants::PublishFormErrorCode::NO_SPACE) {
-            iter->second = AddFormResultErrorCodes::NO_SPACE;
+        auto mapIt = PUBLISH_RESULT_MAP.find(static_cast<int8_t>(errorCodeInfo.code));
+        if (mapIt != PUBLISH_RESULT_MAP.end()) {
+            iter->second = mapIt->second;
         } else {
+            HILOG_ERROR("Unknown PublishFormErrorCode:%{public}d, fallback to FAILED",
+                static_cast<int32_t>(errorCodeInfo.code));
             iter->second = AddFormResultErrorCodes::FAILED;
         }
         condition_.notify_all();
@@ -433,10 +444,10 @@ bool FormPublishAdapter::IsRequestPublishFormSupported()
 
 ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_DEBUG("call");
-    ErrCode errCode = CheckPublishForm(want, needCheckFormPermission);
+    ErrCode errCode = CheckPublishForm(want, true);
     if (errCode != ERR_OK) {
         return errCode;
     }
@@ -453,14 +464,17 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     }
     if (errCode != ERR_OK) {
         HILOG_ERROR("add form info error");
+        RemoveFormIdMapElement(formId);
         return errCode;
     }
-    errCode = RequestPublishFormToHost(want);
+    errCode = RequestPublishFormToHost(want, userId, true);
     if (errCode != ERR_OK) {
+        RemoveFormIdMapElement(formId);
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
         FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
+        return errCode;
     }
     IncreaseAddFormRequestTimeOutTask(formId);
     if (!formDataProxies.empty()) {
@@ -469,48 +483,42 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     return errCode;
 }
 
-ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want)
+ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
-    Want wantToHost(want);
-    ElementName elementName = want.GetElement();
-    wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, elementName.GetBundleName());
-    wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, elementName.GetAbilityName());
-    std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
-    std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
-    wantToHost.SetElementName(bundleName, abilityName);
-    wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
-    CheckSnapshotWant(wantToHost);
-
-    ErrCode errCode = QueryPublishFormToHost(wantToHost);
-    if (errCode == ERR_OK) {
-        int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
-        int ret = FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("fail StartAbility");
-            return ret;
-        }
+    HILOG_DEBUG("call");
+    ErrCode errCode = CheckPublishForm(want, false);
+    if (errCode != ERR_OK) {
+        return errCode;
     }
-
-    // Handle by interceptor callback when the system handler is not found.
-    int64_t formId = 0;
-    if (!FormUtil::ConvertStringToInt64(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY), formId)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    // Skip form count pre-check, rely on post-check in AddForm
+    int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
+    errCode = RequestPublishFormCommon(want, userId, formId);
+    if (errCode != ERR_OK) {
+        return errCode;
     }
-
-    sptr<IFormPublishInterceptor> interceptor = FormCallbackAdapter::GetInstance().GetFormPublishInterceptor();
-    if (interceptor == nullptr) {
-        return AcquireAddFormResult(formId);
-    }
-
-    int ret = interceptor->ProcessPublishForm(wantToHost);
-    if (ret == ERR_OK) {
-        HILOG_DEBUG("success to ProcessPublishForm");
-        return AcquireAddFormResult(formId);
+    if (withFormBindingData) {
+        errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, formBindingData);
     } else {
-        HILOG_ERROR("fail ProcessPublishForm");
+        std::unique_ptr<FormProviderData> noFormBindingData = nullptr;
+        errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
     }
-    return ret;
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("add form info error");
+        RemoveFormIdMapElement(formId);
+        return errCode;
+    }
+    errCode = RequestPublishFormToHost(want, userId);
+    if (errCode != ERR_OK) {
+        RemoveFormIdMapElement(formId);
+        FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
+        NewFormEventInfo eventInfo;
+        FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
+            HiSysEventType::STATISTIC, eventInfo, want);
+        return errCode;
+    }
+    IncreaseAddFormRequestTimeOutTask(formId);
+    return errCode;
 }
 
 ErrCode FormPublishAdapter::RequestPublishFormCommon(Want &want, int32_t userId, int64_t &formId)
@@ -569,26 +577,27 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
     std::unique_ptr<FormProviderData> noFormBindingData = nullptr;
     errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
     if (errCode != ERR_OK) {
+        RemoveFormIdMapElement(formId);
         HILOG_ERROR("AddRequestPublishFormInfo failed");
         return errCode;
     }
 
-    errCode = RequestPublishFormToHost(want, userId);
+    errCode = RequestPublishFormToHost(want, userId, true);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("RequestPublishFormToHost failed");
+        RemoveFormIdMapElement(formId);
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
         FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
-        IncreaseAddFormRequestTimeOutTask(formId);
         return errCode;
     }
 
     IncreaseAddFormRequestTimeOutTask(formId);
+
     return ERR_OK;
 }
 
-ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want, int32_t userId)
+ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want, int32_t userId, bool checkFormCountLimit)
 {
     HILOG_INFO("RequestPublishFormToHost called with userId:%{public}d", userId);
 
@@ -604,6 +613,12 @@ ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want, int32_t userId)
 
     ErrCode errCode = QueryPublishFormToHost(wantToHost, userId);
     if (errCode == ERR_OK) {
+        if (checkFormCountLimit) {
+            ErrCode limitErr = CheckFormCountLimit(wantToHost, userId);
+            if (limitErr != ERR_OK) {
+                return limitErr;
+            }
+        }
         int ret = FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
         if (ret != ERR_OK) {
             HILOG_ERROR("fail StartAbility for userId:%{public}d", userId);
@@ -636,10 +651,11 @@ ErrCode FormPublishAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId
 {
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formResultMutex_);
-    auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [formId, &formStates] (const auto elem) {
+    auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [formId, &formStates] (const auto &elem) {
         if (elem.first == formId) {
-            if (elem.second == AddFormResultErrorCodes::FAILED || elem.second == AddFormResultErrorCodes::TIMEOUT
-                || elem.second == AddFormResultErrorCodes::NO_SPACE) {
+            if (elem.second == AddFormResultErrorCodes::FAILED || elem.second == AddFormResultErrorCodes::TIMEOUT ||
+                elem.second == AddFormResultErrorCodes::NO_SPACE ||
+                elem.second == AddFormResultErrorCodes::NOT_SUPPORT) {
                 return true;
             }
             formStates = elem.second;
@@ -731,5 +747,30 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(const Want &want, 
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
+
+ErrCode FormPublishAdapter::CheckFormCountLimit(const Want &want, int32_t userId)
+{
+    HILOG_INFO("call");
+
+    std::string hostBundleName = want.GetElement().GetBundleName();
+    if (hostBundleName.empty()) {
+        HILOG_ERROR("Host bundle name not set in Want");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    int32_t hostUid = FormBmsHelper::GetInstance().GetUidByBundleName(hostBundleName, userId);
+    if (hostUid == FormBmsHelper::INVALID_UID) {
+        HILOG_ERROR("Failed to get Host uid by bundleName:%{public}s", hostBundleName.c_str());
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+
+    ErrCode errCode = FormDataMgr::GetInstance().CheckEnoughForm(hostUid, userId);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Form number exceeds limit, errCode:%{public}d", errCode);
+        return errCode;
+    }
+
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

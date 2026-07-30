@@ -355,6 +355,7 @@ namespace Constants {
         NO_SPACE,
         PARAM_ERROR,
         INTERNAL_ERROR,
+        NOT_SUPPORT,
     };
  
     enum FormUpdateReason : int8_t {

@@ -59,7 +59,7 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
 
 ErrCode FormMgrAdapterFacade::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     if (formId == 1) {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;

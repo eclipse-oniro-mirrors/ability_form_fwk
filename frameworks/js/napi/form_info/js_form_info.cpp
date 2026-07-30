@@ -239,6 +239,8 @@ napi_value CreateJsPublishFormErrorCode(napi_env engine)
         CreateJsValue(engine, AppExecFwk::Constants::PublishFormErrorCode::PARAM_ERROR));
     napi_set_named_property(engine, objValue, "INTERNAL_ERROR",
         CreateJsValue(engine, AppExecFwk::Constants::PublishFormErrorCode::INTERNAL_ERROR));
+    napi_set_named_property(engine, objValue, "NOT_SUPPORT",
+        CreateJsValue(engine, AppExecFwk::Constants::PublishFormErrorCode::NOT_SUPPORT));
     return objValue;
 }
 

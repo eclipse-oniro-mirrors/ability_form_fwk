@@ -1988,8 +1988,8 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     FormEventReport::SendRequestPublicFormEvent(bundleName, formName,
         RequestFormType::REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    auto ret = FormMgrAdapterFacade::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
-        formId, {}, false);
+    auto ret = FormMgrAdapterFacade::GetInstance().RequestPublishFormWithSnapshot(want, withFormBindingData,
+        formBindingData, formId);
     if (ret == ERR_OK) {
         std::lock_guard<std::mutex> lock(snapshotSetMutex_);
         requestPublishFormWithSnapshotSet_.insert(formId);
@@ -2007,6 +2007,13 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
                 fmservice->requestPublishFormWithSnapshotSet_.erase(formId);
                 FormMgrQueue::GetInstance().CancelDelayTask(taskId);
             });
+    }
+    // Public API (FormMenuItem) only expects COMMON_CODE for failure cases.
+    // Map specific error codes to COMMON_CODE for API compatibility.
+    if (ret == ERR_APPEXECFWK_FORM_PUBLISH_NO_SPACE ||
+        ret == ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT) {
+        HILOG_INFO("map %{public}d to COMMON_CODE for public API compatibility", ret);
+        ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ret;
 }
