@@ -278,8 +278,10 @@ ErrCode FormCommonAdapter::CreateFormItemInfo(const BundleInfo& bundleInfo,
     itemInfo.SetJsComponentName(formInfo.jsComponentName);
     itemInfo.SetFormVisibleNotify(formInfo.formVisibleNotify);
     auto formSrc = formInfo.src;
-    if (formSrc.rfind(POINT_ETS) == formSrc.size() - strlen(POINT_ETS)) {
-        formSrc.erase(formSrc.end() - strlen(POINT_ETS), formSrc.end());
+    size_t pointEtsLen = strlen(POINT_ETS);
+    if (formSrc.size() >= pointEtsLen &&
+        formSrc.rfind(POINT_ETS) == formSrc.size() - pointEtsLen) {
+        formSrc.erase(formSrc.end() - pointEtsLen, formSrc.end());
     }
     itemInfo.SetFormSrc(formSrc);
     itemInfo.SetFormWindow(formInfo.window);

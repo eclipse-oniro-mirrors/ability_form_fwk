@@ -73,7 +73,9 @@ void JsLiveFormExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRec
         std::shared_ptr<Context> moduleContext = context->CreateModuleContext(abilityInfo->moduleName);
         if (moduleContext != nullptr) {
             auto rm = moduleContext->GetResourceManager();
-            context->SetResourceManager(rm);
+            if (rm != nullptr) {
+                context->SetResourceManager(rm);
+            }
         }
     }
 

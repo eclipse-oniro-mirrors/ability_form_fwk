@@ -20,7 +20,6 @@
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "ipc_skeleton.h"
 #include "running_form_info.h"
@@ -32,6 +31,10 @@ namespace AbilityRuntime {
 using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
+
+namespace {
+constexpr size_t MAX_SIZE = 1024;
+}
 
 int32_t CreateErrorByInternalErrorCode(int32_t internalErrorCode)
 {
@@ -203,6 +206,10 @@ bool ConvertFromDataProxies(const CArrProxyData& cArrProxyData, std::vector<Form
         return false;
     }
     int32_t len = cArrProxyData.size;
+    if (len < 0 || len > static_cast<int32_t>(MAX_SIZE)) {
+        HILOG_ERROR("invalid size: %{public}d", len);
+        return false;
+    }
     for (int32_t i = 0; i < len; i++) {
         FormDataProxy formDataProxy("", "");
         CProxyData element = cArrProxyData.head[i];

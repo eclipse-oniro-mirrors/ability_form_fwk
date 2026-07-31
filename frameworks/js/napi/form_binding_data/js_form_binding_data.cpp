@@ -52,15 +52,31 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
             nativeValue = argv[0];
         } else if (type == napi_object) {
             napi_value globalValue = nullptr;
-            napi_get_global(env, &globalValue);
-            napi_value jsonValue;
-            napi_get_named_property(env, globalValue, "JSON", &jsonValue);
+            napi_status status = napi_get_global(env, &globalValue);
+            if (status != napi_ok || globalValue == nullptr) {
+                HILOG_ERROR("Failed to get global object");
+                return CreateJsUndefined(env);
+            }
+            napi_value jsonValue = nullptr;
+            status = napi_get_named_property(env, globalValue, "JSON", &jsonValue);
+            if (status != napi_ok || jsonValue == nullptr) {
+                HILOG_ERROR("Failed to get JSON property");
+                return CreateJsUndefined(env);
+            }
 
             napi_value stringifyValue = nullptr;
-            napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+            status = napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+            if (status != napi_ok || stringifyValue == nullptr) {
+                HILOG_ERROR("Failed to get stringify property");
+                return CreateJsUndefined(env);
+            }
             napi_value funcArgv[1] = { argv[0] };
             napi_value transValue = nullptr;
-            napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            status = napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            if (status != napi_ok || transValue == nullptr) {
+                HILOG_ERROR("Failed to call JSON.stringify");
+                return CreateJsUndefined(env);
+            }
             nativeValue = transValue;
         }
         ConvertFromJsValue(env, nativeValue, formDataStr);
@@ -76,6 +92,11 @@ napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj)
 {
     auto formBindingData = std::make_unique<JsFormBindingData>();
     napi_wrap(env, exportObj, formBindingData.release(), JsFormBindingData::Finalizer, nullptr, nullptr);
+    napi_status status = napi_wrap(env, exportObj, formBindingData.release(), JsFormBindingData::Finalizer, nullptr, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR("Failed to wrap formBindingData");
+        return nullptr;
+    }
 
     const char *moduleName = "JsFormBindingData";
     BindNativeFunction(env, exportObj, "createFormBindingData", moduleName, JsFormBindingData::CreateFormBindingData);

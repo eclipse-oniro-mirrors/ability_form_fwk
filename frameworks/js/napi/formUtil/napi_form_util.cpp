@@ -714,12 +714,33 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
     }
     prop = nullptr;
     napi_get_named_property(env, args, "formName", &prop);
+    if (prop != nullptr) {
+        napi_typeof(env, prop, &valueType);
+        if (valueType != napi_string) {
+            HILOG_ERROR("input formName not string");
+            return false;
+        }
+    }
     filter.formName = GetStringFromNapi(env, prop);
     prop = nullptr;
     napi_get_named_property(env, args, "moduleName", &prop);
+    if (prop != nullptr) {
+        napi_typeof(env, prop, &valueType);
+        if (valueType != napi_string) {
+            HILOG_ERROR("input moduleName not string");
+            return false;
+        }
+    }
     filter.moduleName = GetStringFromNapi(env, prop);
     prop = nullptr;
     napi_get_named_property(env, args, "abilityName", &prop);
+    if (prop != nullptr) {
+        napi_typeof(env, prop, &valueType);
+        if (valueType != napi_string) {
+            HILOG_ERROR("input abilityName not string");
+            return false;
+        }
+    }
     filter.abilityName = GetStringFromNapi(env, prop);
     bool hasIsUnusedIncluded = false;
     napi_has_named_property(env, args, "isUnusedIncluded", &hasIsUnusedIncluded);

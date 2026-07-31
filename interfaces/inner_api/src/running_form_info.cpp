@@ -31,9 +31,26 @@ bool RunningFormInfo::ReadFromParcel(Parcel &parcel)
     dimension = parcel.ReadInt32();
     hostBundleName = Str16ToStr8(parcel.ReadString16());
     int32_t formVisiblityInt = parcel.ReadInt32();
-    formVisiblity = (FormVisibilityType)formVisiblityInt;
-    formUsageState = static_cast<FormUsageState>(parcel.ReadInt32());
-    formLocation = static_cast<Constants::FormLocation>(parcel.ReadInt32());
+    if (formVisiblityInt < static_cast<int32_t>(FormVisibilityType::UNKNOWN) ||
+        formVisiblityInt > static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
+        HILOG_ERROR("Invalid formVisiblity value: %{public}d", formVisiblityInt);
+        return false;
+    }
+    formVisiblity = static_cast<FormVisibilityType>(formVisiblityInt);
+    int32_t formUsageStateInt = parcel.ReadInt32();
+    if (formUsageStateInt < static_cast<int32_t>(FormUsageState::USED) ||
+        formUsageStateInt > static_cast<int32_t>(FormUsageState::UNUSED)) {
+        HILOG_ERROR("Invalid formUsageState value: %{public}d", formUsageStateInt);
+        return false;
+    }
+    formUsageState = static_cast<FormUsageState>(formUsageStateInt);
+    int32_t formLocationInt = parcel.ReadInt32();
+    if (formLocationInt < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+        formLocationInt >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
+        HILOG_ERROR("Invalid formLocation value: %{public}d", formLocationInt);
+        return false;
+    }
+    formLocation = static_cast<Constants::FormLocation>(formLocationInt);
     appIndex = parcel.ReadInt32();
     userId = parcel.ReadInt32();
     return true;
