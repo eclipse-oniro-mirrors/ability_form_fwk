@@ -23,6 +23,9 @@
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 
+#include <cmath>
+#include <limits>
+
 namespace OHOS {
 namespace AbilityRuntime {
 using namespace OHOS::AppExecFwk;
@@ -60,8 +63,8 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    if (std::islessequal(layoutScale, 0.0f)) {
-        HILOG_ERROR("not satisfied within (0, 1), layoutScale: %{public}f", layoutScale);
+    if (std::islessequal(layoutScale, 0.0f) || std::isgreaterequal(layoutScale, 1000.0f)) {
+        HILOG_ERROR("layoutScale out of range (0, 1000), layoutScale: %{public}f", layoutScale);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     HILOG_INFO("SetUIExtCustomDensity layoutScale: %{public}f", layoutScale);
@@ -77,6 +80,11 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     float density = displayInfo->GetDensityInCurResolution();
+
+    if (density > 0.0f && layoutScale > std::numeric_limits<float>::max() / density) {
+        HILOG_ERROR("layoutScale too large, would cause overflow: %{public}f", layoutScale);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     density = density * layoutScale;
     Rosen::WMError ret = uiWindow->SetUIExtCustomDensity(density);
     if (ret != Rosen::WMError::WM_OK) {

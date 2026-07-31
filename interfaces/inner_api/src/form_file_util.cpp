@@ -16,6 +16,7 @@
 #include "form_file_util.h"
 
 #include <dirent.h>
+#include <limits>
 #include "directory_ex.h"
 
 #include "fms_log_wrapper.h"
@@ -62,8 +63,13 @@ uint64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::
         auto ret = stat(file.c_str(), &statbuf);
         int err = errno;
         if (ret == 0) {
-            filesSize.emplace_back(static_cast<uint64_t>(statbuf.st_size));
-            totalSize += static_cast<uint64_t>(statbuf.st_size);
+            uint64_t fileSize = static_cast<uint64_t>(statbuf.st_size);
+            if (totalSize > std::numeric_limits<uint64_t>::max() - fileSize) {
+                HILOG_ERROR("Integer overflow detected in total size calculation, file: %{public}s", file.c_str());
+                return totalSize;
+            }
+            filesSize.emplace_back(fileSize);
+            totalSize += fileSize;
         } else {
             HILOG_WARN("failed to stat file, errno: %{public}d", err);
         }

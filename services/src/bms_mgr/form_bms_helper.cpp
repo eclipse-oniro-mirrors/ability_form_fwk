@@ -45,29 +45,26 @@ bool FormBmsHelper::IsBundleMgrValid()
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 {
     HILOG_DEBUG("call");
-    if (iBundleMgr_ == nullptr) {
-        std::lock_guard<std::mutex> lock(ibundleMutex_);
-        if (iBundleMgr_ == nullptr) {
-            sptr<ISystemAbilityManager> systemAbilityManager =
-            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-            if (systemAbilityManager == nullptr) {
-                HILOG_ERROR("fail get system ability manager");
-                return nullptr;
-            }
-            auto remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-            if (remoteObject == nullptr) {
-                HILOG_ERROR("fail get bundle manager service");
-                return nullptr;
-            }
-
-            iBundleMgr_ = iface_cast<IBundleMgr>(remoteObject);
-            if (iBundleMgr_ == nullptr) {
-                HILOG_ERROR("fail get bundle manager service");
-                return nullptr;
-            }
-        }
+    std::lock_guard<std::mutex> lock(ibundleMutex_);
+    if (iBundleMgr_ != nullptr) {
+        return iBundleMgr_;
     }
-
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        HILOG_ERROR("fail get system ability manager");
+        return nullptr;
+    }
+    auto remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("fail get bundle manager service");
+        return nullptr;
+    }
+    iBundleMgr_ = iface_cast<IBundleMgr>(remoteObject);
+    if (iBundleMgr_ == nullptr) {
+        HILOG_ERROR("fail get bundle manager service");
+        return nullptr;
+    }
     return iBundleMgr_;
 }
 

@@ -22,6 +22,11 @@ namespace AbilityRuntime {
 extern "C" {
 RetFormBindingData FfiFormBindingDataCreateFormBindingData(char *obj)
 {
+    if (obj == nullptr) {
+        RetFormBindingData ret {};
+        ret.errCode = ERR_CJ_INVALID_PARAM;
+        return ret;
+    }
     CjFormBindingDataImpl instance;
     return instance.createFormBindingData(obj);
 }

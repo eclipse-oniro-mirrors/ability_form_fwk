@@ -38,7 +38,8 @@ struct RetFormBindingData {
 };
 
 enum CjErrCode {
-    ERR_CJ_OK = 0
+    ERR_CJ_OK = 0,
+    ERR_CJ_INVALID_PARAM = 401
 };
 
 #endif
