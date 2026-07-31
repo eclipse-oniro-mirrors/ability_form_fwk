@@ -15,6 +15,7 @@
 
 #include "form_binding_data_impl.h"
 
+#include "fms_log_wrapper.h"
 #include "form_binding_data_common.h"
 #include "form_binding_data_defination.h"
 
