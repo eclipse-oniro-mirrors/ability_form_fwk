@@ -150,8 +150,8 @@ FormRenderRecord::FormRenderRecord(
 
 FormRenderRecord::~FormRenderRecord()
 {
-    Release();
     RemoveWatchDogThreadMonitor();
+    Release();
 }
 
 bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
