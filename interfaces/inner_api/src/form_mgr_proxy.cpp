@@ -128,7 +128,7 @@ int FormMgrProxy::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &ca
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -242,7 +242,7 @@ int FormMgrProxy::UpdateForm(const int64_t formId, const FormProviderData &FormP
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -628,7 +628,7 @@ int FormMgrProxy::NotifyWhetherVisibleForms(
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -669,7 +669,7 @@ bool FormMgrProxy::HasFormVisible(const uint32_t tokenId)
     // retrieve and return result.
     bool result = false;
     if (!reply.ReadBool(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return false;
     }
     return result;
@@ -883,7 +883,7 @@ int FormMgrProxy::BackgroundEvent(const int64_t formId, Want &want, const sptr<I
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -927,7 +927,7 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want, const sptr<IRemo
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -938,7 +938,7 @@ int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parc
 {
     int32_t infoSize = 0;
     if (!reply.ReadInt32(infoSize)) {
-        HILOG_ERROR("%{public}s, read infoSize failed", __func__);
+        HILOG_ERROR("read infoSize failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
@@ -977,7 +977,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
 
     error = 0;
     if (!reply.ReadInt32(error)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (error != ERR_OK) {
@@ -1158,7 +1158,7 @@ int FormMgrProxy::DeleteInvalidForms(const std::vector<int64_t> &formIds, const 
 
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result != ERR_OK) {
@@ -1166,7 +1166,7 @@ int FormMgrProxy::DeleteInvalidForms(const std::vector<int64_t> &formIds, const 
         return result;
     }
     if (!reply.ReadInt32(numFormsDeleted)) {
-        HILOG_ERROR("%{public}s, read numFormsDeleted failed", __func__);
+        HILOG_ERROR("read numFormsDeleted failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1209,7 +1209,7 @@ int FormMgrProxy::AcquireFormState(const Want &want, const sptr<IRemoteObject> &
 
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result != ERR_OK) {
@@ -1218,12 +1218,12 @@ int FormMgrProxy::AcquireFormState(const Want &want, const sptr<IRemoteObject> &
     }
     int32_t state = 0;
     if (!reply.ReadInt32(state)) {
-        HILOG_ERROR("%{public}s, read state failed", __func__);
+        HILOG_ERROR("read state failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (state < static_cast<int32_t>(FormState::DEFAULT) ||
         state > static_cast<int32_t>(FormState::READY)) {
-        HILOG_ERROR("%{public}s, invalid state %{public}d", __func__, state);
+        HILOG_ERROR("invalid state %{public}d", state);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     stateInfo.state = static_cast<FormState>(state);
@@ -1734,7 +1734,7 @@ int32_t FormMgrProxy::StartAbilityByFms(const Want &want)
     // retrieve and return result.
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1950,7 +1950,7 @@ bool FormMgrProxy::IsSystemAppForm(const std::string &bundleName)
     }
     bool result = false;
     if (!reply.ReadBool(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return false;
     }
     return result;
@@ -2008,14 +2008,14 @@ int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result != ERR_OK) {
         return result;
     }
     if (!reply.ReadInt32(formCount)) {
-        HILOG_ERROR("%{public}s, read formCount failed", __func__);
+        HILOG_ERROR("read formCount failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2051,7 +2051,7 @@ ErrCode FormMgrProxy::RegisterFormAddObserverByBundle(const std::string bundleNa
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2111,14 +2111,14 @@ int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCo
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result != ERR_OK) {
         return result;
     }
     if (!reply.ReadInt32(formCount)) {
-        HILOG_ERROR("%{public}s, read formCount failed", __func__);
+        HILOG_ERROR("read formCount failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2160,7 +2160,7 @@ ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, FormInstance &fo
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteBool(false)) {
-        HILOG_ERROR("%{public}s, write isUnusedInclude failed", __func__);
+        HILOG_ERROR("write isUnusedInclude failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto error = GetParcelableInfo<FormInstance>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
@@ -2457,7 +2457,7 @@ int32_t FormMgrProxy::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2489,7 +2489,7 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2593,7 +2593,7 @@ int32_t FormMgrProxy::SetFormsRecyclable(const std::vector<int64_t> &formIds)
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2724,12 +2724,12 @@ ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBi
     }
     ErrCode errCode = 0;
     if (!reply.ReadInt32(errCode)) {
-        HILOG_ERROR("%{public}s, read errCode failed", __func__);
+        HILOG_ERROR("read errCode failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (errCode == ERR_OK) {
         if (!reply.ReadInt64(formId)) {
-            HILOG_ERROR("%{public}s, read formId failed", __func__);
+            HILOG_ERROR("read formId failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -2756,7 +2756,7 @@ int32_t FormMgrProxy::BatchRefreshForms(const int32_t formRefreshType)
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2813,12 +2813,12 @@ bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
         IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return true;
+        return false;
     }
     bool result = false;
     if (!reply.ReadBool(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
-        return true;
+        HILOG_ERROR("read result failed");
+        return false;
     }
     return result;
 }
@@ -2885,8 +2885,8 @@ bool FormMgrProxy::IsFormBundleProtected(const std::string &bundleName, int64_t 
     }
     bool result = false;
     if (!reply.ReadBool(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
-        return true;
+        HILOG_ERROR("read result failed");
+        return false;
     }
     return result;
 }
@@ -2914,7 +2914,7 @@ bool FormMgrProxy::IsFormBundleDebugSignature(const std::string &bundleName)
     }
     bool result = false;
     if (!reply.ReadBool(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return false;
     }
     return result;
@@ -2943,8 +2943,8 @@ bool FormMgrProxy::IsFormBundleExempt(int64_t formId)
     }
     bool result = false;
     if (!reply.ReadBool(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
-        return true;
+        HILOG_ERROR("read result failed");
+        return false;
     }
     return result;
 }
@@ -2979,7 +2979,7 @@ int32_t FormMgrProxy::NotifyFormLocked(const int64_t &formId, bool isLocked)
 
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result != ERR_OK) {
@@ -3027,7 +3027,7 @@ ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float h
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -3063,7 +3063,7 @@ ErrCode FormMgrProxy::OpenFormEditAbility(const std::string &abilityName, const 
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -3091,7 +3091,7 @@ ErrCode FormMgrProxy::CloseFormEditAbility(bool isMainPage)
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -3118,7 +3118,7 @@ ErrCode FormMgrProxy::RegisterOverflowProxy(const sptr<IRemoteObject> &callerTok
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
+        HILOG_ERROR("read result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -3327,41 +3327,6 @@ ErrCode FormMgrProxy::GetFormRect(const int64_t formId, Rect &rect)
     return ERR_OK;
 }
 
-ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
-{
-    HILOG_INFO("call");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("Write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("Write formId failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteInt32(newDimension)) {
-        HILOG_ERROR("Write newDimension failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteParcelable(&newRect)) {
-        HILOG_ERROR("Write newRect failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    ErrCode error = SendTransactCmd(IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest failed: %{public}d", error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    int32_t result = 0;
-    if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("%{public}s, read result failed", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return result;
-}
-
 ErrCode FormMgrProxy::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
     MessageParcel data;
@@ -3403,6 +3368,68 @@ ErrCode FormMgrProxy::UnregisterGetLiveFormStatusProxy()
         return error;
     }
     return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
+{
+    HILOG_INFO("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("Write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(newDimension)) {
+        HILOG_ERROR("Write newDimension failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&newRect)) {
+        HILOG_ERROR("Write newRect failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest failed: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+bool FormMgrProxy::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return false;
+    }
+    if (!data.WriteParcelable(&formMajorInfo)) {
+        HILOG_ERROR("Write formMajorInfo failed");
+        return false;
+    }
+    if (!data.WriteBool(isDisablePolicy)) {
+        HILOG_ERROR("write isDisablePolicy failed");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_DUE_CONTROL, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
 }
 
 ErrCode FormMgrProxy::ReloadForms(int32_t &reloadNum, const std::string &moduleName, const std::string &abilityName,
@@ -3456,33 +3483,6 @@ ErrCode FormMgrProxy::ReloadAllForms(int32_t &reloadNum)
     return reply.ReadInt32();
 }
 
-bool FormMgrProxy::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
-{
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return false;
-    }
-    if (!data.WriteParcelable(&formMajorInfo)) {
-        HILOG_ERROR("Write formMajorInfo failed");
-        return false;
-    }
-    if (!data.WriteBool(isDisablePolicy)) {
-        HILOG_ERROR("write isDisablePolicy failed");
-        return false;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_IS_FORM_DUE_CONTROL, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return false;
-    }
-    return reply.ReadBool();
-}
-
 ErrCode FormMgrProxy::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
 {
     MessageParcel data;
@@ -3503,53 +3503,6 @@ ErrCode FormMgrProxy::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
     MessageOption option;
     int error = SendTransactCmd(
         IFormMgr::Message::FORM_MGR_SEND_NON_TRANSPARENT_RATIO, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return error;
-    }
-    return reply.ReadInt32();
-}
-
-ErrCode FormMgrProxy::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
-{
-    HILOG_DEBUG("call");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("Failed to write interface token");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("Failed to write callerToken");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
-        return error;
-    }
-    return reply.ReadInt32();
-}
-
-ErrCode FormMgrProxy::UnregisterPublishFormCrossBundleControl()
-{
-    HILOG_DEBUG("call");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    ErrCode error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;
@@ -3634,6 +3587,53 @@ ErrCode FormMgrProxy::UpdateTemplateFormDetailInfo(
     return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("Failed to write callerToken");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::UnregisterPublishFormCrossBundleControl()
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
 ErrCode FormMgrProxy::GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
 {
     HILOG_DEBUG("call");
@@ -3669,6 +3669,45 @@ ErrCode FormMgrProxy::GetFormIdsByFormLocation(int32_t formLocation, std::vector
     return ERR_OK;
 }
 
+ErrCode FormMgrProxy::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageOption option;
+    MessageParcel reply;
+    int32_t error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::UnregisterFormWantCallback()
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageOption option;
+    MessageParcel reply;
+    int32_t error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
 ErrCode FormMgrProxy::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
@@ -3840,46 +3879,5 @@ ErrCode FormMgrProxy::DeleteForms(const std::vector<FormRecordFilter> &filters)
     }
     return reply.ReadInt32();
 }
-
-ErrCode FormMgrProxy::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
-{
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("write callerToken failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    MessageOption option;
-    MessageParcel reply;
-    int32_t error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
-ErrCode FormMgrProxy::UnregisterFormWantCallback()
-{
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    MessageOption option;
-    MessageParcel reply;
-    int32_t error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
 }  // namespace AppExecFwk
 }  // namespace OHOS
