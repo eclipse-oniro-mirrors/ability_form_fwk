@@ -91,8 +91,8 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
 napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj)
 {
     auto formBindingData = std::make_unique<JsFormBindingData>();
-    napi_wrap(env, exportObj, formBindingData.release(), JsFormBindingData::Finalizer, nullptr, nullptr);
-    napi_status status = napi_wrap(env, exportObj, formBindingData.release(), JsFormBindingData::Finalizer, nullptr, nullptr);
+    napi_status status = napi_wrap(env, exportObj, formBindingData.release(),
+        JsFormBindingData::Finalizer, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR("Failed to wrap formBindingData");
         return nullptr;

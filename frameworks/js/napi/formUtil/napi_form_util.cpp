@@ -692,6 +692,8 @@ napi_value CreateSceneAnimationParamsDatas(napi_env env, const FormSceneAnimatio
     return objContext;
 }
 
+
+
 bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
 {
     napi_valuetype valueType;
@@ -712,36 +714,11 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
         HILOG_ERROR("empty inputBundleName");
         return false;
     }
-    prop = nullptr;
-    napi_get_named_property(env, args, "formName", &prop);
-    if (prop != nullptr) {
-        napi_typeof(env, prop, &valueType);
-        if (valueType != napi_string) {
-            HILOG_ERROR("input formName not string");
-            return false;
-        }
+    if (!GetStringPropFromNapi(env, args, "formName", filter.formName) ||
+        !GetStringPropFromNapi(env, args, "moduleName", filter.moduleName) ||
+        !GetStringPropFromNapi(env, args, "abilityName", filter.abilityName)) {
+        return false;
     }
-    filter.formName = GetStringFromNapi(env, prop);
-    prop = nullptr;
-    napi_get_named_property(env, args, "moduleName", &prop);
-    if (prop != nullptr) {
-        napi_typeof(env, prop, &valueType);
-        if (valueType != napi_string) {
-            HILOG_ERROR("input moduleName not string");
-            return false;
-        }
-    }
-    filter.moduleName = GetStringFromNapi(env, prop);
-    prop = nullptr;
-    napi_get_named_property(env, args, "abilityName", &prop);
-    if (prop != nullptr) {
-        napi_typeof(env, prop, &valueType);
-        if (valueType != napi_string) {
-            HILOG_ERROR("input abilityName not string");
-            return false;
-        }
-    }
-    filter.abilityName = GetStringFromNapi(env, prop);
     bool hasIsUnusedIncluded = false;
     napi_has_named_property(env, args, "isUnusedIncluded", &hasIsUnusedIncluded);
     if (hasIsUnusedIncluded) {
@@ -751,6 +728,22 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
             return false;
         }
     }
+    return true;
+}
+
+bool GetStringPropFromNapi(napi_env env, napi_value args, const char *name, std::string &out)
+{
+    napi_value prop = nullptr;
+    napi_get_named_property(env, args, name, &prop);
+    if (prop != nullptr) {
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, prop, &valueType);
+        if (valueType != napi_string) {
+            HILOG_ERROR("input %{public}s not string", name);
+            return false;
+        }
+    }
+    out = GetStringFromNapi(env, prop);
     return true;
 }
 
