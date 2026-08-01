@@ -205,7 +205,7 @@ public:
     {
         return 0;
     }
-    int ContinueAbility(const std::string &deviceId, int32_t missionId, uint32_t versionCode) override
+    int ContinueAbility(const std::string &deviceId, int32_t missionId, uint32_t versionCode, int32_t userId) override
     {
         return 0;
     }
@@ -589,7 +589,7 @@ public:
     {
         return 0;
     }
-    int ContinueAbility(const std::string &deviceId, int32_t missionId, uint32_t versionCode) override
+    int ContinueAbility(const std::string &deviceId, int32_t missionId, uint32_t versionCode, int32_t userId) override
     {
         return 0;
     }
