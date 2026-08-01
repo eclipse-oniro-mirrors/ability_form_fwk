@@ -692,8 +692,6 @@ napi_value CreateSceneAnimationParamsDatas(napi_env env, const FormSceneAnimatio
     return objContext;
 }
 
-
-
 bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
 {
     napi_valuetype valueType;
