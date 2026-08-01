@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 #include <vector>
-
+#include "form_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
