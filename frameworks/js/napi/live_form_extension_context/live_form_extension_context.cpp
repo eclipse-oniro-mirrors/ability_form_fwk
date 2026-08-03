@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace AbilityRuntime {
 using namespace OHOS::AppExecFwk;
-const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
+const size_t LiveFormExtensionContext::contextTypeId(std::hash<const char *>{}("LiveFormExtensionContext"));
 const std::string REQUEST_METHOD = "startAbilityByLiveForm";
 const std::string TRANSPARENT_COLOR = "#00FFFFFF";
 constexpr float MAX_LAYOUT_SCALE = 100.0f;
