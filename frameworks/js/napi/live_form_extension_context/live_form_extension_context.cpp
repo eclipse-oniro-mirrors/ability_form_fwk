@@ -81,7 +81,6 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     float density = displayInfo->GetDensityInCurResolution();
-
     if (density > 0.0f && layoutScale > std::numeric_limits<float>::max() / density) {
         HILOG_ERROR("layoutScale too large, would cause overflow: layoutScale: %{public}f, density: %{public}f",
             layoutScale, density);
