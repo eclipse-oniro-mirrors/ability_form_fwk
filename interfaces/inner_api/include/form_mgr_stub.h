@@ -987,6 +987,14 @@ private:
      */
     ErrCode HandleDeleteForms(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle SetBackgroundFunction message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleSetBackgroundFunction(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 

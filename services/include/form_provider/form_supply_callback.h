@@ -189,7 +189,6 @@ private:
         const Want &want, int32_t callerUserId);
 private:
     static std::mutex mutex_;
-    static std::once_flag initFlag_;
     static sptr<FormSupplyCallback> instance_;
 
     mutable std::mutex conMutex_;

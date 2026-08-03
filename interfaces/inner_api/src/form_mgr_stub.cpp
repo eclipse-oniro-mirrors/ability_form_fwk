@@ -406,6 +406,8 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleDeleteForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE):
             return HandleUpdateFormCrossBundle(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_BACKGROUND_FUNCTION):
+            return HandleSetBackgroundFunction(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -2581,6 +2583,18 @@ ErrCode FormMgrStub::HandleUnregisterFormWantCallback(MessageParcel &data, Messa
 {
     HILOG_INFO("call");
     ErrCode result = UnregisterFormWantCallback();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleSetBackgroundFunction(MessageParcel &data, MessageParcel &reply)
+{
+    std::string funcName = Str16ToStr8(data.ReadString16());
+    std::string params = Str16ToStr8(data.ReadString16());
+    int32_t result = SetBackgroundFunction(funcName, params);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

@@ -39,7 +39,7 @@ struct RetFormBindingData {
 
 enum CjErrCode {
     ERR_CJ_OK = 0,
-    ERR_CJ_INVALID_PARAM = 401
+    ERR_CJ_INVALID_PARAM = 401  // Aligned with OpenHarmony common error code for invalid input parameter
 };
 
 #endif

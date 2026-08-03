@@ -32,6 +32,7 @@ using namespace OHOS::AppExecFwk;
 const size_t LiveFormExtensionContext::CONTEXT_TYPE_ID(std::hash<const char *>{}("LiveFormExtensionContext"));
 const std::string REQUEST_METHOD = "startAbilityByLiveForm";
 const std::string TRANSPARENT_COLOR = "#00FFFFFF";
+constexpr float MAX_LAYOUT_SCALE = 100.0f;
 
 bool LiveFormExtensionContext::SetWindowBackgroundColor()
 {
@@ -63,8 +64,8 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    if (std::islessequal(layoutScale, 0.0f) || std::isgreaterequal(layoutScale, 1000.0f)) {
-        HILOG_ERROR("layoutScale out of range (0, 1000), layoutScale: %{public}f", layoutScale);
+    if (std::islessequal(layoutScale, 0.0f) || std::isgreaterequal(layoutScale, MAX_LAYOUT_SCALE)) {
+        HILOG_ERROR("layoutScale out of range (0, %{public}f), layoutScale: %{public}f", MAX_LAYOUT_SCALE, layoutScale);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     HILOG_INFO("SetUIExtCustomDensity layoutScale: %{public}f", layoutScale);
@@ -82,7 +83,8 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
     float density = displayInfo->GetDensityInCurResolution();
 
     if (density > 0.0f && layoutScale > std::numeric_limits<float>::max() / density) {
-        HILOG_ERROR("layoutScale too large, would cause overflow: %{public}f", layoutScale);
+        HILOG_ERROR("layoutScale too large, would cause overflow: layoutScale: %{public}f, density: %{public}f",
+            layoutScale, density);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     density = density * layoutScale;

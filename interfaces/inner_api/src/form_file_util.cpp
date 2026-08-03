@@ -65,7 +65,9 @@ uint64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::
         if (ret == 0) {
             uint64_t fileSize = static_cast<uint64_t>(statbuf.st_size);
             if (totalSize > std::numeric_limits<uint64_t>::max() - fileSize) {
-                HILOG_ERROR("Integer overflow detected in total size calculation, file: %{public}s", file.c_str());
+                filesSize.emplace_back(fileSize);
+                HILOG_ERROR("Integer overflow detected, return partial size %{public}llu, file %{public}s not counted",
+                    static_cast<unsigned long long>(totalSize), file.c_str());
                 return totalSize;
             }
             filesSize.emplace_back(fileSize);

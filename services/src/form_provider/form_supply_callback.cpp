@@ -44,16 +44,16 @@ namespace OHOS {
 namespace AppExecFwk {
 sptr<FormSupplyCallback> FormSupplyCallback::instance_ = nullptr;
 std::mutex FormSupplyCallback::mutex_;
-std::once_flag FormSupplyCallback::initFlag_;
 
 sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
 {
-    std::call_once(initFlag_, []() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (instance_ == nullptr) {
         instance_ = new (std::nothrow) FormSupplyCallback();
         if (instance_ == nullptr) {
             HILOG_ERROR("create FormSupplyCallback failed");
         }
-    });
+    }
     return instance_;
 }
 

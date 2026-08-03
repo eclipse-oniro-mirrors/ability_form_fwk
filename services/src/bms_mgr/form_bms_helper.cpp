@@ -84,6 +84,7 @@ sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
     HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(ibundleMutex_);
     iBundleMgr_ = bundleManager;
 }
 
