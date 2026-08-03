@@ -74,6 +74,12 @@ public:
     virtual ErrCode GetFormConfigInfo(const Want& want, FormItemInfo &formItemInfo);
 
     /**
+     * @brief Align appIndex and providerUid to the enabled clone instance
+     * @param formItemInfo Form item info to align
+     */
+    virtual void AlignCloneProviderUid(FormItemInfo &formItemInfo);
+
+    /**
      * @brief Get bundle info
      * @param want The want of the request
      * @param bundleInfo Bundle info

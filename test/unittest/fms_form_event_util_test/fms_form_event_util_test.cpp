@@ -56,7 +56,6 @@ extern void MockGetBundlePackInfo(bool mockRet);
 extern void MockSetFormTempFlag(bool mockRet);
 extern void MockGetMatchCount(bool mockRet);
 extern void MockGetReCreateFormRecordsByBundleName(bool mockRet);
-extern void MockGetUidByBundleName(bool mockRet);
 extern void MockGetUpdatedForm(bool mockRet);
 extern void MockGetPackageForm(bool mockRet);
 extern void MockGetNoHostDBFormsOne(bool mockRet);
@@ -155,7 +154,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_005, TestSize.Level0)
     std::string bundleName = "aa";
     int32_t userId = 1;
     MockGetReCreateFormRecordsByBundleName(true);
-    MockGetUidByBundleName(true);
     FormEventUtil::HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_005 end";
 }
@@ -171,7 +169,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_006, TestSize.Level0)
     std::string bundleName = "aa";
     int32_t userId = 1;
     MockGetReCreateFormRecordsByBundleName(false);
-    MockGetUidByBundleName(false);
     FormEventUtil::HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_006 end";
 }

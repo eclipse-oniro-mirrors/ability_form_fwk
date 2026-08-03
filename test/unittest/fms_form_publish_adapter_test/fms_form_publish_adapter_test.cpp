@@ -1092,8 +1092,8 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetCallerType_001 start";
 
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 
     auto result = FormPublishAdapter::GetInstance().GetCallerType(TEST_BUNDLE_NAME);
     EXPECT_EQ(result, FormErmsCallerInfo::TYPE_INVALID);
@@ -1110,10 +1110,8 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetCallerType_002 start";
 
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
 
@@ -1132,10 +1130,10 @@ HWTEST_F(FmsFormPublishAdapterTest, GetCallerType_005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetCallerType_005 start";
 
-    sptr<MockBundleMgrStub> bundleMgr = new (std::nothrow) MockBundleMgrStub();
-    ASSERT_NE(bundleMgr, nullptr);
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(bundleMgr));
+    ApplicationInfo appInfo;
+    appInfo.bundleType = BundleType::SHARED;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(appInfo), Return(ERR_OK)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
 

@@ -35,7 +35,8 @@ public:
     static void HandleProviderUpdated(const std::string &bundleName, const int userId, const bool needReload = true,
         const bool needCheckVersion = true);
     static void HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId);
-    static void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
+    static void HandleProviderRemoved(const std::string &bundleName, const int32_t userId,
+        const int32_t appIndex = Constants::MAIN_APP_INDEX);
     static void HandleBundleDataCleared(const std::string &bundleName, int32_t userId);
     static void HandleFormHostDataCleared(const int uid);
     static bool ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,

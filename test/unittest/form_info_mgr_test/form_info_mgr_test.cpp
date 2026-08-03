@@ -531,7 +531,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0100, TestSize.Level1)
     sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bms;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo,
+        int32_t userId) -> ErrCode {
         std::vector<AbilityInfo> abilityInfos;
         HapModuleInfo moduleInfo;
         AbilityInfo abilityInfo;
@@ -542,9 +543,9 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0100, TestSize.Level1)
         abilityInfo.moduleName = PARAM_MODULE_NAME_TEST;
         moduleInfo.abilityInfos.push_back(abilityInfo);
         bundleInfo.hapModuleInfos.emplace_back(moduleInfo);
-        return true;
+        return ERR_OK;
     };
-    EXPECT_CALL(*bms, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bms, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
 
     formInfo = GetTestFormInfo();
     EXPECT_EQ(ERR_OK, formInfoMgr_.AddDynamicFormInfo(formInfo, USER_ID));
@@ -563,7 +564,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0200, TestSize.Level1)
     sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bms;
-    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo,
+        int32_t userId) -> ErrCode {
         std::vector<AbilityInfo> abilityInfos;
         HapModuleInfo moduleInfo;
         AbilityInfo abilityInfo;
@@ -574,9 +576,9 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0200, TestSize.Level1)
         abilityInfo.moduleName = PARAM_MODULE_NAME_TEST;
         moduleInfo.abilityInfos.push_back(abilityInfo);
         bundleInfo.hapModuleInfos.emplace_back(moduleInfo);
-        return true;
+        return ERR_OK;
     };
-    EXPECT_CALL(*bms, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bms, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
 
     FormInfo formInfo = GetTestFormInfo();
     auto bundleFormInfoIter = formInfoMgr_.bundleFormInfoMap_.find(FORM_BUNDLE_NAME_TEST);

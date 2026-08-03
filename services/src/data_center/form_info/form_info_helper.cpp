@@ -38,7 +38,8 @@ constexpr uint32_t GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS =
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) |
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_METADATA) |
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) |
-    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
+    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT) |
+    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_DISABLE);
 }  // namespace
 
 bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)
