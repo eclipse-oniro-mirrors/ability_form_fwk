@@ -42,6 +42,7 @@
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
 #include "mock_form_provider_client.h"
+#include "mock_ipc_skeleton.h"
 #include "running_process_info.h"
 #include "system_ability_definition.h"
 
@@ -69,6 +70,8 @@ const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
+constexpr int32_t DEFAULT_CALLING_UID = 20000000;
+constexpr int32_t SYSTEM_UID = 1000;
 
 class FmsFormHostRecordTest : public testing::Test {
 public:
@@ -87,12 +90,17 @@ void FmsFormHostRecordTest::SetUpTestCase()
     mockBundleMgrService = new BundleMgrService();
     FormBmsHelper::GetInstance().SetBundleManager(mockBundleMgrService);
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    MockIPCSkeleton::obj = new MockIPCSkeleton();
+    ON_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillByDefault(testing::Return(DEFAULT_CALLING_UID));
 }
 
 sptr<BundleMgrService> FmsFormHostRecordTest::mockBundleMgrService = nullptr;
 
 void FmsFormHostRecordTest::TearDownTestCase()
-{}
+{
+    delete MockIPCSkeleton::obj;
+    MockIPCSkeleton::obj = nullptr;
+}
 
 void FmsFormHostRecordTest::SetUp()
 {
@@ -792,6 +800,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_001, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_dump_002 start";
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillRepeatedly(testing::Return(SYSTEM_UID));
     FormMgrService formMgrService;
     std::vector<std::u16string> args = {u"-h"};
     std::string result;
@@ -816,6 +825,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_002, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_dump_003 start";
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillRepeatedly(testing::Return(SYSTEM_UID));
     FormMgrService formMgrService;
     std::vector<std::u16string> args = {u"-s"};
     std::string result;
@@ -880,6 +890,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_005, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_dump_005 start";
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillRepeatedly(testing::Return(SYSTEM_UID));
     FormMgrService formMgrService;
     std::vector<std::u16string> args = {u"-t"};
     std::string result;
@@ -904,6 +915,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_006, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_dump_007 start";
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillRepeatedly(testing::Return(SYSTEM_UID));
     FormMgrService formMgrService;
     std::vector<std::u16string> args = {u"-b"};
     std::string result;
@@ -928,6 +940,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_007, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_dump_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_dump_008 start";
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillRepeatedly(testing::Return(SYSTEM_UID));
     FormMgrService formMgrService;
     std::vector<std::u16string> args = {u"-r"};
     std::string result;
