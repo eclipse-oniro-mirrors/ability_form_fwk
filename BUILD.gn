@@ -149,7 +149,7 @@ config("formmgr_config") {
   ]
 }
 
-ohos_shared_library("libfms") {
+ohos_static_library("libfms_internal_static") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
@@ -159,22 +159,6 @@ ohos_shared_library("libfms") {
     cfi_vcall_icall_only = true
     debug = false
   }
-
-  shlib_type = "sa"
-  version_script = "libfms.map"
-  cflags_cc = [
-    "-fdata-sections",
-    "-ffunction-sections",
-    "-Oz",
-  ]
-
-  ldflags = [
-    "-flto=full",
-    "-Wl,--exclude-libs=ALL",
-    "-Wl,--gc-sections",
-  ]
-  include_dirs =
-      [ "${form_fwk_napi_path}/form_host/form_state_observer/include" ]
 
   sources = [
     "interfaces/inner_api/src/form_publish_interceptor_proxy.cpp",
@@ -334,6 +318,14 @@ ohos_shared_library("libfms") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz",
+  ]
+  include_dirs =
+      [ "${form_fwk_napi_path}/form_host/form_state_observer/include" ]
+
   deps = [
     ":form_config",
     ":form_host_delegate_proxy",
@@ -429,6 +421,55 @@ ohos_shared_library("libfms") {
     external_deps += [ "api_metrics:histogrammanager" ]
     defines += [ "FORM_FWK_SUPPORT_API_METRICS" ]
   }
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_shared_library("libfms") {
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
+  shlib_type = "sa"
+  version_script = "libfms.map"
+
+  ldflags = [
+    "-flto=full",
+    "-Wl,--exclude-libs=ALL",
+    "-Wl,--gc-sections",
+    "-Wl,--whole-archive",
+  ]
+
+  deps = [ ":libfms_internal_static" ]
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_shared_library("libfms_test") {
+  testonly = true
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
+  ldflags = [
+    "-Wl,--whole-archive",
+  ]
+
+  deps = [ ":libfms_internal_static" ]
 
   subsystem_name = "ability"
   part_name = "form_fwk"

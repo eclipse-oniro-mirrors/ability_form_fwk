@@ -34,8 +34,7 @@ ohos_unittest("FmsFormSupplyProxyTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_test",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -46,7 +45,6 @@ ohos_unittest("FmsFormSupplyProxyTest") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_connect_callback_stub",
-    "ability_runtime:app_manager",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libnativetoken",

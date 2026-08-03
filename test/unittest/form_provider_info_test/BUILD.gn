@@ -25,7 +25,7 @@ ohos_unittest("FmsFormProviderInfoTest") {
   sources = [ "form_provider_info_test.cpp" ]
 
   deps = [
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_test",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
