@@ -2592,8 +2592,18 @@ ErrCode FormMgrStub::HandleUnregisterFormWantCallback(MessageParcel &data, Messa
 
 int32_t FormMgrStub::HandleSetBackgroundFunction(MessageParcel &data, MessageParcel &reply)
 {
+    HILOG_DEBUG("call");
     std::string funcName = Str16ToStr8(data.ReadString16());
     std::string params = Str16ToStr8(data.ReadString16());
+    if (funcName.empty() || params.empty()) {
+        HILOG_ERROR("invalid param, funcName empty:%{public}d, params empty:%{public}d",
+            funcName.empty(), params.empty());
+        if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {
+            HILOG_ERROR("write error code failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
     int32_t result = SetBackgroundFunction(funcName, params);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
