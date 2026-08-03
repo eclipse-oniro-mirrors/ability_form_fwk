@@ -150,7 +150,19 @@ int FormSupplyStub::HandleOnEventHandle(MessageParcel &data, MessageParcel &repl
  */
 int FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageParcel &reply)
 {
-    auto state = (FormState) data.ReadInt32();
+    int32_t stateValue;
+    if (!data.ReadInt32(stateValue)) {
+        HILOG_ERROR("ReadInt32<FormState> failed");
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (stateValue < static_cast<int32_t>(FormState::UNKNOWN) ||
+        stateValue > static_cast<int32_t>(FormState::READY)) {
+        HILOG_ERROR("Invalid FormState value: %{public}d", stateValue);
+        reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto state = static_cast<FormState>(stateValue);
     std::string provider = data.ReadString();
     std::unique_ptr<Want> wantArg(data.ReadParcelable<Want>());
     if (!wantArg) {
