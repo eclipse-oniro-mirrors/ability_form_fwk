@@ -733,13 +733,14 @@ bool GetStringPropFromNapi(napi_env env, napi_value args, const char *name, std:
 {
     napi_value prop = nullptr;
     napi_get_named_property(env, args, name, &prop);
-    if (prop != nullptr) {
-        napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, prop, &valueType);
-        if (valueType != napi_string) {
-            HILOG_ERROR("input %{public}s not string", name);
-            return false;
-        }
+    if (prop == nullptr) {
+        return false;
+    }
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, prop, &valueType);
+    if (valueType != napi_string) {
+        HILOG_ERROR("input %{public}s not string", name);
+        return false;
     }
     out = GetStringFromNapi(env, prop);
     return true;

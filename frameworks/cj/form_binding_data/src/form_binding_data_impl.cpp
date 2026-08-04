@@ -65,7 +65,7 @@ CArrProxyData CjFormBindingDataImpl::Convert2CArrProxyData(const std::vector<Pro
         res.head[i].subscribeId = MallocCString(item.subscribeId);
         if (res.head[i].key == nullptr || res.head[i].subscribeId == nullptr) {
             HILOG_ERROR("Failed to allocate memory for proxy data fields");
-            for (int64_t j = 0; j < i; j++) {
+            for (int64_t j = 0; j <= i; j++) {
                 free(res.head[j].key);
                 free(res.head[j].subscribeId);
             }

@@ -52,6 +52,10 @@ bool RunningFormInfo::ReadFromParcel(Parcel &parcel)
     }
     formLocation = static_cast<Constants::FormLocation>(formLocationInt);
     appIndex = parcel.ReadInt32();
+    if (appIndex < 0) {
+        HILOG_ERROR("Invalid appIndex value: %{public}d", appIndex);
+        return false;
+    }
     userId = parcel.ReadInt32();
     return true;
 }
