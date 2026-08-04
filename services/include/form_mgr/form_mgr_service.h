@@ -1073,6 +1073,7 @@ private:
     std::string onStartPublishTime_;
     std::string onStartEndTime_;
     std::string onKvDataServiceAddTime_;
+    std::mutex onKvDataServiceAddTimeMutex_;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
