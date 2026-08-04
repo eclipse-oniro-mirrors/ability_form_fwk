@@ -185,7 +185,10 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
         HILOG_ERROR("invalid formId:%{public}" PRId64, formId);
         return;
     }
-    bool alreadyExists = HasFormId(formId);
+    if (HasFormId(formId)) {
+        HILOG_ERROR("hisysevent yet formid:%{public}" PRId64, formId);
+        return;
+    }
     NewFormEventInfo eventInfo;
     {
         std::lock_guard<std::mutex> guard(formReport_);
@@ -194,10 +197,6 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
             return;
         }
         auto &record = formStatisticMap_[formId];
-        if (alreadyExists) {
-            HILOG_ERROR("hisysevent yet formid:%{public}" PRId64, formId);
-            return;
-        }
         eventInfo.sessionId = 0;
         eventInfo.formId = formId;
         eventInfo.bundleName = record.bundleName_;
@@ -209,19 +208,19 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
             eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
         } else {
             eventInfo.bindDuration = 0;
-            HILOG_ERROR("bindDuration error formid:%{public}" PRId64, formId);
+            HILOG_ERROR("bindDuration error formId:%{public}" PRId64, formId);
         }
         if (record.endGetTime_ > record.startGetTime_) {
             eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
         } else {
             eventInfo.getDuration = 0;
-            HILOG_ERROR("getDuration error formid:%{public}" PRId64, formId);
+            HILOG_ERROR("getDuration error formId:%{public}" PRId64, formId);
         }
         if (record.endAquireTime_ > record.startAquireTime_) {
             eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
         } else {
             eventInfo.acquireDuration = 0;
-            HILOG_ERROR("acquireDuration error formid:%{public}" PRId64, formId);
+            HILOG_ERROR("acquireDuration error formId:%{public}" PRId64, formId);
         }
     }
 
