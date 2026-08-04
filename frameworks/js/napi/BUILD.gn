@@ -1103,6 +1103,7 @@ ohos_shared_library("formeditextensioncontext_napi") {
 ################################### gen_form_edit_extension_ability ########################################
 ohos_shared_library("form_edit_extension") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -1180,6 +1181,7 @@ ohos_shared_library("form_edit_extension") {
 
 ohos_shared_library("form_edit_extension_module") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -1448,6 +1450,7 @@ ohos_shared_library("liveformextensioncontext_napi") {
 ################################### gen_live_form_extension_ability ########################################
 ohos_shared_library("live_form_extension") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -1523,6 +1526,7 @@ ohos_shared_library("live_form_extension") {
 
 ohos_shared_library("live_form_extension_module") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true

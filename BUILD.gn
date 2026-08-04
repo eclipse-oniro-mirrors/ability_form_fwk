@@ -448,6 +448,7 @@ config("fmskit_public_config") {
 
 ohos_shared_library("fmskit_native") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -548,6 +549,7 @@ config("fmskit_provider_public_config") {
 
 ohos_shared_library("fmskit_provider_client") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -799,6 +801,7 @@ ohos_shared_library("form_utils") {
 ################################### form_common_info ########################################
 ohos_shared_library("form_common_info") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
  
   sanitize = {
     cfi = true
@@ -864,6 +867,7 @@ ohos_shared_library("form_common_info") {
 ################################### form_render_info ########################################
 ohos_shared_library("form_render_info") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
  
   sanitize = {
     cfi = true
