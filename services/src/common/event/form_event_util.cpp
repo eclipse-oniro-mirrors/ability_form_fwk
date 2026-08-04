@@ -181,13 +181,15 @@ void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, i
     FormDataMgr::GetInstance().RemoveFormCloudUpdateDuration(bundleName);
 }
 
-void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const int32_t userId)
+void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const int32_t userId,
+    const int32_t appIndex)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d, appIndex:%{public}d",
+        bundleName.c_str(), userId, appIndex);
     // clean removed form in DB
     std::set<int64_t> removedForms;
     std::vector<FormDBInfo> removedDBForm;
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(bundleName, userId, removedDBForm);
+    FormDbCache::GetInstance().DeleteFormInfoByBundleName(bundleName, userId, removedDBForm, appIndex);
     for (const auto &dbForm : removedDBForm) {
         removedForms.emplace(dbForm.formId);
         int32_t matchCount = FormDbCache::GetInstance().GetMatchCount(dbForm.bundleName, dbForm.moduleName);
@@ -218,18 +220,25 @@ void FormEventUtil::HandleBundleDataCleared(const std::string &bundleName, int32
     // clear dynamic form info
     FormInfoMgr::GetInstance().RemoveAllDynamicFormsInfo(bundleName, userId);
 
-    // as provider data is cleared
-    std::set<int64_t> reCreateForms;
-    FormDataMgr::GetInstance().GetReCreateFormRecordsByBundleName(bundleName, reCreateForms);
-    if (!reCreateForms.empty()) {
-        for (int64_t formId : reCreateForms) {
-            ReCreateForm(formId);
-        }
+    // The event carries no instance id; main app and clones never coexist enabled, so the enabled one is it.
+    int32_t appIndex = Constants::MAIN_APP_INDEX;
+    ErrCode ret = FormBmsHelper::GetInstance().GetEnabledCloneIndex(userId, bundleName, appIndex);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail resolve appIndex, bundleName:%{public}s, ret:%{public}d", bundleName.c_str(), ret);
+        return;
     }
 
-    int32_t uid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId);
+    // as provider data is cleared
+    std::set<int64_t> reCreateForms;
+    FormDataMgr::GetInstance().GetReCreateFormRecordsByBundleName(bundleName, reCreateForms, appIndex);
+    for (int64_t formId : reCreateForms) {
+        ReCreateForm(formId);
+    }
+
+    // the appIndex-less overload would always resolve to the main app
+    int32_t uid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId, appIndex);
     if (uid == FormBmsHelper::INVALID_UID) {
-        HILOG_ERROR("invalid uid");
+        HILOG_ERROR("invalid uid, appIndex:%{public}d", appIndex);
         return;
     }
     // as form host data is cleared

@@ -181,6 +181,10 @@ bool FormReport::HasFormId(int64_t formId)
 
 void FormReport::HandleAddFormStatistic(int64_t formId)
 {
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId:%{public}" PRId64, formId);
+        return;
+    }
     bool alreadyExists = HasFormId(formId);
     NewFormEventInfo eventInfo;
     {

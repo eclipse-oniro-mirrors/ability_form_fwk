@@ -22,6 +22,7 @@
 namespace {
     int32_t getCallerBundleName = OHOS::ERR_OK;
     std::string g_mockBundleName;
+    int32_t g_mockCallerAppIndex = OHOS::AppExecFwk::Constants::MAIN_APP_INDEX;
     bool g_mockGetBundleInfoByFlagsRet = true;
     std::string g_mockAppProvisionType;
     int32_t g_mockGetBundleNameByUidRet = OHOS::ERR_OK;
@@ -31,10 +32,11 @@ namespace {
 namespace OHOS {
 namespace AppExecFwk {
 
-void MockGetCallerBundleName(int32_t mockRet, const std::string &bundleName)
+void MockGetCallerBundleName(int32_t mockRet, const std::string &bundleName, int32_t appIndex)
 {
     getCallerBundleName = mockRet;
     g_mockBundleName = bundleName;
+    g_mockCallerAppIndex = appIndex;
 }
 
 void MockFormBmsHelperGetBundleInfoByFlags(bool mockRet, const std::string &appProvisionType)
@@ -58,6 +60,14 @@ int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
 {
     GTEST_LOG_(INFO) << "GetCallerBundleName called " << getCallerBundleName;
     callerBundleName = g_mockBundleName;
+    return getCallerBundleName;
+}
+
+int32_t FormBmsHelper::GetCallerBundleNameAndAppIndex(std::string &callerBundleName, int32_t &appIndex)
+{
+    GTEST_LOG_(INFO) << "GetCallerBundleNameAndAppIndex called " << getCallerBundleName;
+    callerBundleName = g_mockBundleName;
+    appIndex = g_mockCallerAppIndex;
     return getCallerBundleName;
 }
 

@@ -355,6 +355,7 @@ static void initFormRecord(FormRecord &newRecord, const FormItemInfo &formInfo)
     newRecord.enableForm = formInfo.IsEnableForm();
     newRecord.lockForm = formInfo.IsLockForm();
     newRecord.protectForm = formInfo.IsProtectForm();
+    newRecord.appIndex = formInfo.GetAppIndex();
 }
 
 /**
@@ -1603,16 +1604,23 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
 }
 /**
  * @brief Get recreate form records.
+ * @param bundleName The bundle name of the provider.
  * @param reCreateForms The id list of the forms.
+ * @param appIndex The app clone index to match, MAIN_APP_INDEX by default.
  */
-void FormDataMgr::GetReCreateFormRecordsByBundleName(const std::string &bundleName, std::set<int64_t> &reCreateForms)
+void FormDataMgr::GetReCreateFormRecordsByBundleName(const std::string &bundleName, std::set<int64_t> &reCreateForms,
+    const int32_t appIndex)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     std::map<int64_t, FormRecord>::iterator itFormRecord;
     for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-        if (bundleName == itFormRecord->second.bundleName) {
-            reCreateForms.emplace(itFormRecord->second.formId);
+        if (bundleName != itFormRecord->second.bundleName) {
+            continue;
         }
+        if (appIndex != itFormRecord->second.appIndex) {
+            continue;
+        }
+        reCreateForms.emplace(itFormRecord->second.formId);
     }
 }
 /**
@@ -2645,7 +2653,7 @@ int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &f
 }
 
 void FormDataMgr::GetUnusedFormInstancesByFilter(
-    const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances)
+    const FormInstancesFilter &formInstancesFilter, int32_t appIndex, std::vector<FormInstance> &formInstances)
 {
     HILOG_DEBUG("call");
     std::vector<FormDBInfo> formDBInfos;
@@ -2659,6 +2667,8 @@ void FormDataMgr::GetUnusedFormInstancesByFilter(
         } else if (!formInstancesFilter.abilityName.empty() && formInstancesFilter.abilityName != dbInfo.abilityName) {
             continue;
         } else if (!formInstancesFilter.formName.empty() && formInstancesFilter.formName != dbInfo.formName) {
+            continue;
+        } else if (appIndex != dbInfo.appIndex) {
             continue;
         }
         auto item = std::find_if(formInstances.begin(), formInstances.end(),
@@ -2681,6 +2691,7 @@ void FormDataMgr::GetUnusedFormInstancesByFilter(
         instance.formName = dbRecord.formName;
         instance.formUsageState = FormUsageState::UNUSED;
         instance.description = dbRecord.description;
+        instance.appIndex = dbInfo.appIndex;
         if (!dbRecord.formUserUids.empty()) {
             auto ret =
                 FormBmsHelper::GetInstance().GetBundleNameByUid(*dbRecord.formUserUids.begin(), instance.formHostName);
@@ -2697,50 +2708,69 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
     std::vector<FormInstance> &formInstances)
 {
     HILOG_DEBUG("get form instances by filter");
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    std::map<int64_t, FormRecord>::iterator itFormRecord;
     if (formInstancesFilter.bundleName.empty()) {
         HILOG_ERROR("null formInstancesFilter.bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-        if (formInstancesFilter.bundleName == itFormRecord->second.bundleName) {
-            bool Needgetformhostrecordflag = true;
-            if (!formInstancesFilter.moduleName.empty() &&
-                formInstancesFilter.moduleName != itFormRecord->second.moduleName) {
-                Needgetformhostrecordflag = false;
-            } else if (!formInstancesFilter.abilityName.empty() &&
-                formInstancesFilter.abilityName != itFormRecord->second.abilityName) {
-                Needgetformhostrecordflag = false;
-            } else if (!formInstancesFilter.formName.empty() &&
-                formInstancesFilter.formName != itFormRecord->second.formName) {
-                Needgetformhostrecordflag = false;
-            }
-            std::vector<FormHostRecord> formHostRecords;
-            GetFormHostRecord(itFormRecord->second.formId, formHostRecords);
-            if (Needgetformhostrecordflag) {
-                FormInstance instance;
-                for (auto formHostRecord : formHostRecords) {
-                    instance.formHostName = formHostRecord.GetHostBundleName();
-                    instance.formId = itFormRecord->second.formId;
-                    instance.specification = itFormRecord->second.specification;
-                    instance.formVisiblity =
-                        static_cast<FormVisibilityType>(itFormRecord->second.formVisibleNotifyState);
-                    instance.bundleName = itFormRecord->second.bundleName;
-                    instance.moduleName = itFormRecord->second.moduleName;
-                    instance.abilityName = itFormRecord->second.abilityName;
-                    instance.formName = itFormRecord->second.formName;
-                    instance.description = itFormRecord->second.description;
-                    formInstances.emplace_back(instance);
-                }
-            }
+    // appIndex is server-resolved; queried before the lock because it issues a synchronous IPC
+    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    int32_t appIndex = Constants::MAIN_APP_INDEX;
+    FormBmsHelper::GetInstance().GetEnabledCloneIndex(userId, formInstancesFilter.bundleName, appIndex);
+
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (const auto &pair : formRecords_) {
+        if (formInstancesFilter.bundleName != pair.second.bundleName) {
+            continue;
+        }
+        if (!IsRecordMatchFilter(formInstancesFilter, pair.second, appIndex)) {
+            continue;
+        }
+        std::vector<FormHostRecord> formHostRecords;
+        GetFormHostRecord(pair.second.formId, formHostRecords);
+        FormInstance instance;
+        for (const auto &formHostRecord : formHostRecords) {
+            BuildFormInstanceByFromRecord(pair.second, formHostRecord, instance);
+            formInstances.emplace_back(instance);
         }
     }
     if (formInstancesFilter.isUnusedIncluded) {
-        GetUnusedFormInstancesByFilter(formInstancesFilter, formInstances);
+        GetUnusedFormInstancesByFilter(formInstancesFilter, appIndex, formInstances);
     }
     return (formInstances.size() == 0) ? ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED : ERR_OK;
+}
+
+bool FormDataMgr::IsRecordMatchFilter(const FormInstancesFilter &formInstancesFilter,
+    const FormRecord &record, int32_t appIndex) const
+{
+    if (!formInstancesFilter.moduleName.empty() &&
+        formInstancesFilter.moduleName != record.moduleName) {
+        return false;
+    }
+    if (!formInstancesFilter.abilityName.empty() &&
+        formInstancesFilter.abilityName != record.abilityName) {
+        return false;
+    }
+    if (!formInstancesFilter.formName.empty() &&
+        formInstancesFilter.formName != record.formName) {
+        return false;
+    }
+    return appIndex == record.appIndex;
+}
+
+void FormDataMgr::BuildFormInstanceByFromRecord(const FormRecord &record,
+    const FormHostRecord &hostRecord, FormInstance &instance) const
+{
+    instance.formHostName = hostRecord.GetHostBundleName();
+    instance.formId = record.formId;
+    instance.specification = record.specification;
+    instance.formVisiblity = static_cast<FormVisibilityType>(record.formVisibleNotifyState);
+    instance.bundleName = record.bundleName;
+    instance.moduleName = record.moduleName;
+    instance.abilityName = record.abilityName;
+    instance.formName = record.formName;
+    instance.description = record.description;
+    instance.appIndex = record.appIndex;
 }
 
 ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
@@ -2769,6 +2799,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
         formInstance.userId = formRecord.userId;
+        formInstance.appIndex = formRecord.appIndex;
     } else {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
@@ -2804,6 +2835,7 @@ ErrCode FormDataMgr::GetUnusedFormInstanceById(const int64_t formId, FormInstanc
     formInstance.formUsageState = FormUsageState::UNUSED;
     formInstance.description = dbRecord.description;
     formInstance.userId = dbRecord.userId;
+    formInstance.appIndex = dbRecord.appIndex;
     return ERR_OK;
 }
 

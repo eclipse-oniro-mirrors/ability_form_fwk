@@ -54,11 +54,37 @@ ThemeManagerThemeFormInfoByParcel *ThemeManagerThemeFormInfoByParcel::Unmarshall
         HILOG_ERROR("new ThemeManagerThemeFormInfoByParcel is nullptr");
         return nullptr;
     }
-    obj->themeFormInfo_.themeFormId = parcel.ReadString();
-    obj->themeFormInfo_.formId = parcel.ReadInt64();
-    obj->themeFormInfo_.themeId = parcel.ReadString();
-    int32_t themeFormDimensionValue = parcel.ReadInt32();
-    int32_t themeFormLocationValue = parcel.ReadInt32();
+    if (!parcel.ReadString(obj->themeFormInfo_.themeFormId)) {
+        HILOG_ERROR("read themeFormId failed");
+        delete obj;
+        return nullptr;
+    }
+    if (!parcel.ReadInt64(obj->themeFormInfo_.formId)) {
+        HILOG_ERROR("read formId failed");
+        delete obj;
+        return nullptr;
+    }
+    if (!parcel.ReadString(obj->themeFormInfo_.themeId)) {
+        HILOG_ERROR("read themeId failed");
+        delete obj;
+        return nullptr;
+    }
+    int32_t themeFormDimensionValue = 0;
+    if (!parcel.ReadInt32(themeFormDimensionValue) ||
+        themeFormDimensionValue < 0 ||
+        themeFormDimensionValue > static_cast<int32_t>(ThemeFormDimension::DIMENSION_6_4)) {
+        HILOG_ERROR("read themeFormDimension failed, value: %{public}d", themeFormDimensionValue);
+        delete obj;
+        return nullptr;
+    }
+    int32_t themeFormLocationValue = 0;
+    if (!parcel.ReadInt32(themeFormLocationValue) ||
+        themeFormLocationValue < 0 ||
+        themeFormLocationValue > static_cast<int32_t>(ThemeFormLocation::LOCATION_NEGATIVE_SCREEN)) {
+        HILOG_ERROR("read themeFormLocation failed, value: %{public}d", themeFormLocationValue);
+        delete obj;
+        return nullptr;
+    }
     obj->themeFormInfo_.themeFormDimension = static_cast<ThemeFormDimension>(themeFormDimensionValue);
     obj->themeFormInfo_.themeFormLocation = static_cast<ThemeFormLocation>(themeFormLocationValue);
     return obj;
