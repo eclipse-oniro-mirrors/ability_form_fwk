@@ -49,6 +49,11 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
+        if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
+            HILOG_ERROR("callback is undefined");
+            EtsFormErrorUtil::ThrowParamError(env, "callback is required");
+            return;
+        }
         if (!FormAniUtil::CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -127,6 +132,11 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
+        if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
+            HILOG_ERROR("callback is undefined");
+            EtsFormErrorUtil::ThrowParamError(env, "callback is required");
+            return;
+        }
         std::string stdFormId = "";
         if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
             HILOG_ERROR("GetStdString failed");
@@ -167,6 +177,11 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
+        if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
+            HILOG_ERROR("callback is undefined");
+            EtsFormErrorUtil::ThrowParamError(env, "callback is required");
+            return;
+        }
         std::string stdBundleName = "";
         if (!FormAniUtil::GetStdString(env, hostBundleName, stdBundleName)) {
             HILOG_ERROR("GetStdString failed");
@@ -201,6 +216,11 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
+        if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
+            HILOG_ERROR("callback is undefined");
+            EtsFormErrorUtil::ThrowParamError(env, "callback is required");
+            return;
+        }
         bool isUnusedIncluded = static_cast<bool>(aniIsUnusedIncludedValue);
         std::vector<AppExecFwk::RunningFormInfo> runningFormInfos;
         ErrCode ret = FormMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
@@ -227,10 +247,21 @@ public:
             HILOG_ERROR("env is nullptr");
             return;
         }
+        if (IsUndefined(env, reinterpret_cast<ani_ref>(aniFormProviderFilter))) {
+            HILOG_ERROR("aniFormProviderFilter is undefined");
+            EtsFormErrorUtil::ThrowParamError(env, "formProviderFilter is required");
+            return;
+        }
+        if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
+            HILOG_ERROR("callback is undefined");
+            EtsFormErrorUtil::ThrowParamError(env, "callback is required");
+            return;
+        }
         AppExecFwk::FormInstancesFilter filter;
         if (!FormAniUtil::ParseProviderFilter(env, aniFormProviderFilter, filter)) {
             HILOG_ERROR("Input params parse failed");
             EtsFormErrorUtil::ThrowParamTypeError(env, "formProviderFilter", "object");
+            return;
         }
         auto formInstances = std::make_shared<std::vector<AppExecFwk::FormInstance>>();
         ErrCode ret = FormMgr::GetInstance().GetFormInstancesByFilter(filter, *formInstances);
