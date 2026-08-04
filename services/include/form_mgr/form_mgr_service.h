@@ -1062,6 +1062,8 @@ private:
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
     bool PublishFormCrossBundleControl(const Want &want);
+    void SetOnKvDataServiceAddTime(const std::string &time);
+    std::string GetOnKvDataServiceAddTime() const;
 
 private:
     std::mutex snapshotSetMutex_;
