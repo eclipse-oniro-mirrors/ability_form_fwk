@@ -25,6 +25,7 @@ namespace AppExecFwk {
 namespace {
 constexpr const char *BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
 constexpr const char *KEY_USER_ID = "userId";
+constexpr const char *KEY_APP_INDEX = "appIndex";
 } // namespace
 
 FormBundleEventCallback::FormBundleEventCallback()
@@ -63,24 +64,10 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         HandleBundleChange(bundleName, userId, false);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
-        int appIndex = want.GetIntParam("appIndex", 0);
-        if (appIndex > 0) {
-            HILOG_INFO("this application is a simulation. not support to remove the form.\
-                appIndex: %{public}d", appIndex);
-            return;
-        }
-        HILOG_WARN("package removed, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
-        FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userId);
-        std::function<void()> taskFunc = [bundleName, userId]() {
-            FormEventUtil::HandleProviderRemoved(bundleName, userId);
-            // Ensure clear forbidden form db when bundle uninstall
-            // Health contol will set again when reinstall
-            FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
-            DistributedModule distributedModule;
-            distributedModule.userId = userId;
-            FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleName, false, distributedModule);
-        };
-        FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
+        int appIndex = want.GetIntParam(KEY_APP_INDEX, Constants::MAIN_APP_INDEX);
+        HILOG_WARN("package removed, bundleName:%{public}s, userId:%{public}d, appIndex:%{public}d",
+            bundleName.c_str(), userId, appIndex);
+        HandlePackageRemoved(bundleName, userId, appIndex);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {
         // additional info changed
         HILOG_INFO("bundleName:%{public}s additional info changed", bundleName.c_str());
@@ -110,6 +97,30 @@ void FormBundleEventCallback::HandleBundleChange(const std::string &bundleName, 
         };
         FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
     }
+}
+
+void FormBundleEventCallback::HandlePackageRemoved(const std::string &bundleName, int32_t userId,
+    int32_t appIndex)
+{
+    if (appIndex != Constants::MAIN_APP_INDEX) {
+        // Clone removed: only remove this clone's forms
+        std::function<void()> taskFunc = [bundleName, userId, appIndex]() {
+            FormEventUtil::HandleProviderRemoved(bundleName, userId, appIndex);
+        };
+        FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
+        return;
+    }
+    // Main app removed: remove all forms and clean bundle-level state
+    FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userId);
+    std::function<void()> taskFunc = [bundleName, userId]() {
+        FormEventUtil::HandleProviderRemoved(bundleName, userId, Constants::MAIN_APP_INDEX);
+        // Clear forbidden form db on uninstall; health control resets on reinstall
+        FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
+        DistributedModule distributedModule;
+        distributedModule.userId = userId;
+        FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleName, false, distributedModule);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

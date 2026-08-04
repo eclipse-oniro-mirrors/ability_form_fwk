@@ -399,7 +399,9 @@ ErrCode FormInfoMgr::CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &
 ErrCode FormInfoMgr::AddDynamicFormInfo(FormInfo &formInfo, int32_t userId)
 {
     BundleInfo bundleInfo;
-    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
+    int32_t flag = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) |
+        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_ABILITY) |
+        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY);
     if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(formInfo.bundleName, flag, userId, bundleInfo)) {
         HILOG_ERROR("get bundleInfo failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
@@ -629,8 +631,7 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
     auto iter = appFormVisibleNotifyMap_.find(bundleName);
     if (iter == appFormVisibleNotifyMap_.end()) {
         AppExecFwk::ApplicationInfo info;
-        if (!FormBmsHelper::GetInstance().GetApplicationInfoByFlag(bundleName,
-            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, providerUserId, info)) {
+        if (FormBmsHelper::GetInstance().GetApplicationInfo(bundleName, providerUserId, info) != ERR_OK) {
             HILOG_ERROR("get ApplicationInfo failed");
             return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
         }
@@ -724,6 +725,17 @@ void FormInfoMgr::ProcessBundleVersionMap(bool isNeedUpdateAll, int32_t userId,
         const std::string& bundleName = bundleFormInfoPair.first;
         auto bundleVersionPair = bundleVersionMap.find(bundleName);
         if (bundleVersionPair == bundleVersionMap.end()) {
+            // versionMap is built by QueryExtensionAbilityInfosByType which skips disabled apps
+            BundleInfo bundleInfo;
+            int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION);
+            bool bundleExists = FormBmsHelper::GetInstance().GetBundleInfoByFlags(
+                bundleName, flags, userId, bundleInfo);
+            if (bundleExists) {
+                HILOG_WARN("bundle %{public}s not in versionMap but still installed(disabled), skip Remove",
+                    bundleName.c_str());
+                continue;
+            }
+            HILOG_WARN("bundle %{public}s not in versionMap and not installed, Remove", bundleName.c_str());
             bundleFormInfoPair.second->Remove(userId);
             continue;
         }

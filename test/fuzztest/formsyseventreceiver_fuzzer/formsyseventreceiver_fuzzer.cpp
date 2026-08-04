@@ -58,8 +58,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormEventUtil::HandleBundleFormInfoChanged(bundleName, userIds, needReload);
     FormEventUtil::HandleUpdateFormCloud(bundleName);
     FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userIds);
-    FormEventUtil::HandleBundleDataCleared(bundleName, userIds);
     int uid = fdp->ConsumeIntegral<int>();
+    FormEventUtil::HandleBundleDataCleared(bundleName, userIds);
     FormEventUtil::HandleFormHostDataCleared(uid);
     AAFwk::Want want;
     formSysEventReceiver.HandlePackageDataCleared(bundleName, userId);

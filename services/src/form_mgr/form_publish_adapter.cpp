@@ -157,9 +157,8 @@ bool FormPublishAdapter::IsErmsSupportPublishForm(const std::string &bundleName,
 int32_t FormPublishAdapter::GetCallerType(const std::string &bundleName)
 {
     AppExecFwk::ApplicationInfo callerAppInfo;
-    auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
-    if (!FormBmsHelper::GetInstance().GetApplicationInfoByFlag(bundleName, flag, userId, callerAppInfo)) {
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(bundleName, userId, callerAppInfo) != ERR_OK) {
         HILOG_ERROR("Get callerAppInfo failed");
         return FormErmsCallerInfo::TYPE_INVALID;
     }

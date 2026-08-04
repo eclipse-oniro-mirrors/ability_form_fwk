@@ -434,9 +434,12 @@ public:
         std::set<int64_t> &removedForms);
     /**
      * @brief Get recreate form records.
+     * @param bundleName The bundle name of the provider.
      * @param reCreateForms The id list of the forms.
+     * @param appIndex The app clone index to match, MAIN_APP_INDEX by default.
      */
-    void GetReCreateFormRecordsByBundleName(const std::string &bundleName, std::set<int64_t> &reCreateForms);
+    void GetReCreateFormRecordsByBundleName(const std::string &bundleName, std::set<int64_t> &reCreateForms,
+        const int32_t appIndex = Constants::MAIN_APP_INDEX);
     /**
      * @brief Set form isInited = true.
      * @param formId The Id of the form.
@@ -767,6 +770,25 @@ public:
      */
     ErrCode GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances);
+
+    /**
+     * @brief Check whether the form record matches the filter.
+     * @param formInstancesFilter The filter to match.
+     * @param record The form record to check.
+     * @param appIndex The clone appIndex to match.
+     * @return Returns true if matched, false otherwise.
+     */
+    bool IsRecordMatchFilter(const FormInstancesFilter &formInstancesFilter, const FormRecord &record,
+        int32_t appIndex) const;
+
+    /**
+     * @brief Build a form instance from the form record and host record.
+     * @param record The form record.
+     * @param hostRecord The form host record.
+     * @param instance The form instance to build.
+     */
+    void BuildFormInstanceByFromRecord(const FormRecord &record, const FormHostRecord &hostRecord,
+        FormInstance &instance) const;
 
     /**
      * @brief Get form instance by formId.
@@ -1287,7 +1309,7 @@ private:
 
 private:
     void GetUnusedFormInstancesByFilter(
-        const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances);
+        const FormInstancesFilter &formInstancesFilter, int32_t appIndex, std::vector<FormInstance> &formInstances);
     ErrCode GetUnusedFormInstanceById(const int64_t formId, FormInstance &formInstance);
     void GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
     void GetUnusedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos);

@@ -2106,7 +2106,8 @@ bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
     }
     BundleInfo bundleInfo;
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
-    int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO);
+    int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) |
+        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO);
     bool ret = FormBmsHelper::GetInstance().GetBundleInfoByFlags(bundleName, flags, userId, bundleInfo);
     if (!ret) {
         HILOG_ERROR("Get GetBundleInfoByFlags failed");
@@ -2322,19 +2323,23 @@ ErrCode FormMgrService::ReloadForms(int32_t &reloadNum, const std::string &modul
 {
     HILOG_INFO("call");
     std::string callerBundleName;
-    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    // the caller's own index comes from its uid, not from enable state
+    int32_t appIndex = Constants::MAIN_APP_INDEX;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleNameAndAppIndex(callerBundleName, appIndex);
     if (ret != ERR_OK) {
         HILOG_ERROR("get BundleName failed");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
+
     std::vector<FormRecord> callerBundleForms;
     FormDataMgr::GetInstance().GetFormRecord(callerBundleName, callerBundleForms);
     std::vector<FormRecord> refreshForms;
     std::copy_if(callerBundleForms.begin(), callerBundleForms.end(), std::back_inserter(refreshForms),
-        [&moduleName, &abilityName, &formName] (const FormRecord &formRecord) {
+        [&moduleName, &abilityName, &formName, appIndex] (const FormRecord &formRecord) {
             return formRecord.moduleName == moduleName &&
                    formRecord.abilityName == abilityName &&
-                   formRecord.formName == formName;
+                   formRecord.formName == formName &&
+                   formRecord.appIndex == appIndex;
         });
     return FormMgrAdapterFacade::GetInstance().ReloadForms(reloadNum, refreshForms);
 }
@@ -2343,13 +2348,21 @@ ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
 {
     HILOG_INFO("call");
     std::string callerBundleName;
-    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    // the caller's own index comes from its uid, not from enable state
+    int32_t appIndex = Constants::MAIN_APP_INDEX;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleNameAndAppIndex(callerBundleName, appIndex);
     if (ret != ERR_OK) {
         HILOG_ERROR("get BundleName failed");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
+
+    std::vector<FormRecord> allForms;
+    FormDataMgr::GetInstance().GetFormRecord(callerBundleName, allForms);
     std::vector<FormRecord> refreshForms;
-    FormDataMgr::GetInstance().GetFormRecord(callerBundleName, refreshForms);
+    std::copy_if(allForms.begin(), allForms.end(), std::back_inserter(refreshForms),
+        [appIndex] (const FormRecord &formRecord) {
+            return formRecord.appIndex == appIndex;
+        });
     return FormMgrAdapterFacade::GetInstance().ReloadForms(reloadNum, refreshForms);
 }
 

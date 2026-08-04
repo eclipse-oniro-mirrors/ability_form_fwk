@@ -111,8 +111,24 @@ ErrCode FormCommonAdapter::GetFormConfigInfo(const Want& want, FormItemInfo &for
     formItemInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
 
     SetFormEnableAndLockState(formInfo, formItemInfo, formLocation);
+    AlignCloneProviderUid(formItemInfo);
 
     return ERR_OK;
+}
+
+void FormCommonAdapter::AlignCloneProviderUid(FormItemInfo &formItemInfo)
+{
+    // Align appIndex and providerUid to the enabled clone instance so updateForm uid check passes
+    int32_t currentUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    int32_t appIndex = Constants::MAIN_APP_INDEX;
+    FormBmsHelper::GetInstance().GetEnabledCloneIndex(
+        currentUserId, formItemInfo.GetProviderBundleName(), appIndex);
+    formItemInfo.SetAppIndex(appIndex);
+    int32_t providerUid = FormBmsHelper::GetInstance().GetUidByBundleName(
+        formItemInfo.GetProviderBundleName(), currentUserId, appIndex);
+    if (providerUid != FormBmsHelper::INVALID_UID) {
+        formItemInfo.SetProviderUid(providerUid);
+    }
 }
 
 void FormCommonAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation)
@@ -437,9 +453,8 @@ int32_t FormCommonAdapter::GetCallerType(const std::string &bundleName)
 {
     HILOG_DEBUG("GetCallerType called, bundleName: %{public}s", bundleName.c_str());
     AppExecFwk::ApplicationInfo callerAppInfo;
-    auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
     int32_t userId = GetCallingUserId();
-    if (!FormBmsHelper::GetInstance().GetApplicationInfoByFlag(bundleName, flag, userId, callerAppInfo)) {
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(bundleName, userId, callerAppInfo) != ERR_OK) {
         HILOG_ERROR("Get callerAppInfo failed");
         return FormErmsCallerInfo::TYPE_INVALID;
     }

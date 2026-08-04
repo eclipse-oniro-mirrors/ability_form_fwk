@@ -724,7 +724,7 @@ HWTEST_F(FmsFormCommonAdapterTest, GetValidFormUpdateDuration_003, TestSize.Leve
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(appInfo), Return(ERR_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<2>(appInfo), Return(ERR_OK)));
 
     auto result = FormCommonAdapter::GetInstance().GetValidFormUpdateDuration(TEST_FORM_ID, updateDuration);
     EXPECT_TRUE(result);
@@ -1307,8 +1307,8 @@ HWTEST_F(FmsFormCommonAdapterTest, GetCallerType_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetCallerType_001 start";
 
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
 
@@ -2869,9 +2869,8 @@ HWTEST_F(FmsFormCommonAdapterTest, GetCallerType_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetCallerType_002 start";
 
-    auto mockBundleMgr = sptr<IBundleMgr>(new MockBundleMgrStub());
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
 

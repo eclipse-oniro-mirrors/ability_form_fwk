@@ -144,11 +144,6 @@ bool FormVisibilityAdapter::HasFormVisible(const uint32_t tokenId)
     HILOG_DEBUG("bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d", bundleName.c_str(), userId,
         hapTokenInfo.instIndex);
 
-    if (hapTokenInfo.instIndex != 0) {
-        HILOG_INFO("The app is a clone application.");
-        return false;
-    }
-
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         return false;
@@ -157,7 +152,7 @@ bool FormVisibilityAdapter::HasFormVisible(const uint32_t tokenId)
     for (const auto& formRecord : formInfos) {
         HILOG_DEBUG("query record, visible:%{public}d, userId:%{public}d", formRecord.formVisibleNotifyState, userId);
         if (formRecord.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE) &&
-            formRecord.userId == userId) {
+            formRecord.userId == userId && formRecord.appIndex == hapTokenInfo.instIndex) {
                 return true;
         }
     }
