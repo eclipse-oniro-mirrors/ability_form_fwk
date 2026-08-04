@@ -85,6 +85,7 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "form_fwk:form_manager",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
