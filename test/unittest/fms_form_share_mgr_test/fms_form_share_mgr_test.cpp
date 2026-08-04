@@ -1847,10 +1847,21 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_044, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_045, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_045 start";
+    // Default mock returns success for GetBundleInfoV9; inject failing BMS to hit get-info-failed.
+    sptr<MockBundleMgrService> bms = new (std::nothrow) MockBundleMgrService();
+    ASSERT_NE(nullptr, bms);
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bms;
+    EXPECT_CALL(*bms, GetBundleInfoV9(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR));
+
     FormInfoMgr formInfoMgr;
     FormInfo formInfo;
     int32_t userId = 1;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formInfoMgr.AddDynamicFormInfo(formInfo, userId));
+
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_045 end";
 }
 
@@ -4245,12 +4256,19 @@ HWTEST_F(FmsFormShareMgrTest, IsExistFormPackage_002, TestSize.Level1)
     std::string moduleName = PARAM_PROVIDER_MODULE_NAME;
     int32_t userId = USER_ID;
 
-    BundleInfo bundleInfo;
-    bundleInfo.moduleNames.push_back(PARAM_PROVIDER_MODULE_NAME);
-    bundleMgr_->SetBundleInfo(bundleName, userId, bundleInfo);
+    // Default mock returns success for GetBundleInfoV9; inject failing BMS so IsExistFormPackage is false.
+    sptr<MockBundleMgrService> bms = new (std::nothrow) MockBundleMgrService();
+    ASSERT_NE(nullptr, bms);
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bms;
+    EXPECT_CALL(*bms, GetBundleInfoV9(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR));
 
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->IsExistFormPackage(bundleName, moduleName, userId);
     EXPECT_FALSE(result);
+
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest IsExistFormPackage_002 end";
 }
 
@@ -4376,9 +4394,15 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_001, TestSize.Level1)
     std::string moduleName = PARAM_PROVIDER_MODULE_NAME;
     int32_t userId = USER_ID;
 
-    BundleInfo bundleInfo;
-    bundleInfo.moduleNames.push_back(PARAM_PROVIDER_MODULE_NAME);
-    bundleMgr_->SetBundleInfo(bundleName, userId, bundleInfo);
+    // Default mock returns success for GetBundleInfoV9; inject failing BMS to take the free-install path.
+    sptr<MockBundleMgrService> bms = new (std::nothrow) MockBundleMgrService();
+    ASSERT_NE(nullptr, bms);
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bms;
+    EXPECT_CALL(*bms, GetBundleInfoV9(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR));
+    EXPECT_CALL(*bms, QueryAbilityInfo(_, _, _, _, _)).WillRepeatedly(Return(false));
 
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
@@ -4395,6 +4419,7 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_001, TestSize.Level1)
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->CheckFormPackage(info, key, userId);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_FREE_INSTALLATION);
 
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_001 end";
 }
 
@@ -4488,6 +4513,16 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_004, TestSize.Level1)
 HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_005 start";
+    // Default mock returns success for GetBundleInfoV9; inject failing BMS to take the free-install path.
+    sptr<MockBundleMgrService> bms = new (std::nothrow) MockBundleMgrService();
+    ASSERT_NE(nullptr, bms);
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bms;
+    EXPECT_CALL(*bms, GetBundleInfoV9(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR));
+    EXPECT_CALL(*bms, QueryAbilityInfo(_, _, _, _, _)).WillRepeatedly(Return(false));
+
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
@@ -4506,5 +4541,6 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_005, TestSize.Level1)
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->CheckFormPackage(info, key, userId);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_FREE_INSTALLATION);
 
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_005 end";
 }

@@ -111,7 +111,6 @@ ErrCode FormCommonAdapter::GetFormConfigInfo(const Want& want, FormItemInfo &for
     formItemInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
 
     SetFormEnableAndLockState(formInfo, formItemInfo, formLocation);
-    AlignCloneProviderUid(formItemInfo);
 
     return ERR_OK;
 }
@@ -121,8 +120,12 @@ void FormCommonAdapter::AlignCloneProviderUid(FormItemInfo &formItemInfo)
     // Align appIndex and providerUid to the enabled clone instance so updateForm uid check passes
     int32_t currentUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     int32_t appIndex = Constants::MAIN_APP_INDEX;
-    FormBmsHelper::GetInstance().GetEnabledCloneIndex(
+    ErrCode ret = FormBmsHelper::GetInstance().GetEnabledCloneIndex(
         currentUserId, formItemInfo.GetProviderBundleName(), appIndex);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("GetEnabledCloneIndex failed, keep caller appIndex");
+        return;
+    }
     formItemInfo.SetAppIndex(appIndex);
     int32_t providerUid = FormBmsHelper::GetInstance().GetUidByBundleName(
         formItemInfo.GetProviderBundleName(), currentUserId, appIndex);
@@ -320,6 +323,7 @@ ErrCode FormCommonAdapter::CreateFormItemInfo(const BundleInfo& bundleInfo,
     itemInfo.SetUiModuleName(FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, userId));
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     itemInfo.SetIsTemplateForm(formInfo.isTemplateForm);
+    AlignCloneProviderUid(itemInfo);
     return ERR_OK;
 }
 
