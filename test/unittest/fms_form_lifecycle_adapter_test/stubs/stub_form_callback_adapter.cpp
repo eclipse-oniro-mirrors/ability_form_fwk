@@ -183,7 +183,7 @@ sptr<IFormPublishInterceptor> FormCallbackAdapter::GetFormPublishInterceptor()
     return nullptr;
 }
 
-ErrCode FormCallbackAdapter::CancelOverflow(const int64_t formId)
+void FormCallbackAdapter::CancelOverflow(const int64_t formId)
 {
     return ERR_OK;
 }

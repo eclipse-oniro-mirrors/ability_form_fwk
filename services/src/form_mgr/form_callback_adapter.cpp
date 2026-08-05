@@ -793,23 +793,22 @@ ErrCode FormCallbackAdapter::GetWantCallbackProxy(int32_t callingUid, sptr<IRemo
     return wantCallbackRegistry_.Get(callingUid, proxy);
 }
 
-ErrCode FormCallbackAdapter::CancelOverflow(const int64_t formId)
+void FormCallbackAdapter::CancelOverflow(const int64_t formId)
 {
-    ErrCode result = ERR_OK;
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64, formId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        return;
     }
     FormInfo formInfo;
-    result = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
+    ErrCode result = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
     if (result != ERR_OK) {
         HILOG_ERROR("Get target form info failed");
-        return result;
+        return;
     }
     if (formInfo.sceneAnimationParams.abilityName.empty()) {
         HILOG_ERROR("SceneAnimationParams abilityName is empty");
-        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+        return;
     }
     for (int uid : formRecord.formUserUids) {
         sptr<IRemoteObject> callerToken;
@@ -822,9 +821,8 @@ ErrCode FormCallbackAdapter::CancelOverflow(const int64_t formId)
         }
         OverflowInfo overflowInfo;
         result = proxy->RequestOverflow(formId, overflowInfo, false);
+        HILOG_INFO("formid:%{public}" PRId64 ",result: %{public}d", formId, result);
     }
-    HILOG_INFO("formid:%{public}" PRId64 ",result: %{public}d", formId, result);
-    return result;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
