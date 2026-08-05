@@ -740,7 +740,7 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
 bool GetStringPropFromNapi(napi_env env, napi_value args, const char *name, std::string &out)
 {
     napi_value prop = nullptr;
-    napi_get_named_property(env, args, name, &prop);
+    status = napi_get_named_property(env, args, name, &prop);
     if (status != napi_ok || prop == nullptr) {
         HILOG_ERROR("GetStringPropFromNapi, get property value fail, propertyName:%{public}s",
             name);
