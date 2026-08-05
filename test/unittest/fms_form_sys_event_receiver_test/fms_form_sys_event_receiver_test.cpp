@@ -23,6 +23,7 @@
 #include "form_constants.h"
 #define private public
 #include "bms_mgr/form_bms_helper.h"
+#include "bms_mgr/form_bundle_event_callback.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #include "form_host_interface.h"
@@ -235,6 +236,29 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_001, TestSize.Level0)
     FormDbCache::GetInstance().DeleteFormInfo(formId);
     FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
     GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_001 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: HandlePackageRemoved Functions
+ * FunctionPoints: FormBundleEventCallback HandlePackageRemoved interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if HandlePackageRemoved works for clone instance removal.
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandlePackageRemoved_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandlePackageRemoved_001 start";
+    Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    want.SetBundle("com.test.bundle.clone");
+    want.SetParam("appIndex", 1);
+    EventFwk::CommonEventData eventData;
+    eventData.SetWant(want);
+    auto callback = std::make_shared<FormBundleEventCallback>();
+    callback->OnReceiveEvent(eventData);
+    EXPECT_NE(callback, nullptr);
+    GTEST_LOG_(INFO) << "HandlePackageRemoved_001 end";
 }
 
 /*

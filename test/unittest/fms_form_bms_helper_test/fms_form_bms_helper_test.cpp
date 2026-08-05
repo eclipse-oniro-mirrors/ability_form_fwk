@@ -174,9 +174,33 @@ public:
         return g_mockUnregisterBundleEventCallback;
     }
 
+    ErrCode GetMainAndCloneBundleInfo(const std::string &bundleName, uint32_t flags,
+        int32_t userId, std::vector<BundleInfo> &bundleInfos) override
+    {
+        bundleInfos = cloneBundleInfos_;
+        return getMainAndCloneRet_;
+    }
+
+    ErrCode GetNameAndIndexForUid(const int32_t uid, std::string &bundleName, int32_t &appIndex) override
+    {
+        bundleName = "com.form.provider.service";
+        appIndex = callerAppIndex_;
+        return getNameAndIndexRet_;
+    }
+
+    int32_t GetUidByBundleName(const std::string &bundleName, const int32_t userId, int32_t appIndex) override
+    {
+        return uidByBundleClone_;
+    }
+
     ErrCode GetBundlePackInfo_ = ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR;
     bool setModuleRemovable_ = false;
     int32_t GetNameForUid_ = ERR_OK + 1;
+    ErrCode getMainAndCloneRet_ = ERR_OK;
+    std::vector<BundleInfo> cloneBundleInfos_;
+    ErrCode getNameAndIndexRet_ = ERR_OK;
+    int32_t callerAppIndex_ = 0;
+    int32_t uidByBundleClone_ = -1;
 };
 
 /**
@@ -2859,6 +2883,200 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_2128, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_2128 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetEnabledCloneIndex_001
+ * @tc.desc: Verify GetEnabledCloneIndex returns failure when BundleMgr is null.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_001 start";
+    FormBmsHelper formBmsHelper;
+    formBmsHelper.SetBundleManager(nullptr);
+    int32_t appIndex = 1;
+    EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex),
+        ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    EXPECT_EQ(appIndex, 0);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_001 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetEnabledCloneIndex_002
+ * @tc.desc: Verify GetEnabledCloneIndex returns failure when GetMainAndCloneBundleInfo fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_002 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->getMainAndCloneRet_ = ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR;
+    bundleManager->cloneBundleInfos_.clear();
+    formBmsHelper.SetBundleManager(bundleManager);
+    int32_t appIndex = 1;
+    EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex),
+        ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_002 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetEnabledCloneIndex_003
+ * @tc.desc: Verify GetEnabledCloneIndex returns failure when bundleInfos is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_003 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->getMainAndCloneRet_ = ERR_OK;
+    bundleManager->cloneBundleInfos_.clear();
+    formBmsHelper.SetBundleManager(bundleManager);
+    int32_t appIndex = 1;
+    EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex),
+        ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_003 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetEnabledCloneIndex_004
+ * @tc.desc: Verify GetEnabledCloneIndex prefers main app index when main app exists.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_004 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    BundleInfo cloneInfo;
+    cloneInfo.appIndex = 1;
+    BundleInfo mainInfo;
+    mainInfo.appIndex = 0;
+    bundleManager->cloneBundleInfos_ = {cloneInfo, mainInfo};
+    bundleManager->getMainAndCloneRet_ = ERR_OK;
+    formBmsHelper.SetBundleManager(bundleManager);
+    int32_t appIndex = -1;
+    EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex), ERR_OK);
+    EXPECT_EQ(appIndex, 0);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_004 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetEnabledCloneIndex_005
+ * @tc.desc: Verify GetEnabledCloneIndex falls back to first clone when main app absent.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_005 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    BundleInfo cloneInfo;
+    cloneInfo.appIndex = 2;
+    bundleManager->cloneBundleInfos_ = {cloneInfo};
+    bundleManager->getMainAndCloneRet_ = ERR_OK;
+    formBmsHelper.SetBundleManager(bundleManager);
+    int32_t appIndex = -1;
+    EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex), ERR_OK);
+    EXPECT_EQ(appIndex, 2);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_005 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001
+ * @tc.desc: Verify GetCallerBundleNameAndAppIndex returns failure when BundleMgr is null.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001 start";
+    FormBmsHelper formBmsHelper;
+    formBmsHelper.SetBundleManager(nullptr);
+    std::string callerBundleName = "init";
+    int32_t appIndex = 1;
+    EXPECT_EQ(formBmsHelper.GetCallerBundleNameAndAppIndex(callerBundleName, appIndex),
+        ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    EXPECT_EQ(appIndex, 0);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002
+ * @tc.desc: Verify GetCallerBundleNameAndAppIndex returns failure when GetNameAndIndexForUid fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->getNameAndIndexRet_ = ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string callerBundleName;
+    int32_t appIndex = 0;
+    EXPECT_EQ(formBmsHelper.GetCallerBundleNameAndAppIndex(callerBundleName, appIndex),
+        ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_003
+ * @tc.desc: Verify GetCallerBundleNameAndAppIndex succeeds and populates out-params.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_003 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->getNameAndIndexRet_ = ERR_OK;
+    bundleManager->callerAppIndex_ = 1;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string callerBundleName;
+    int32_t appIndex = 0;
+    EXPECT_EQ(formBmsHelper.GetCallerBundleNameAndAppIndex(callerBundleName, appIndex), ERR_OK);
+    EXPECT_EQ(appIndex, 1);
+    EXPECT_FALSE(callerBundleName.empty());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_003 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetUidByBundleName_001
+ * @tc.desc: Verify GetUidByBundleName with appIndex returns INVALID_UID when BundleMgr is null.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetUidByBundleName_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_001 start";
+    FormBmsHelper formBmsHelper;
+    formBmsHelper.SetBundleManager(nullptr);
+    EXPECT_EQ(formBmsHelper.GetUidByBundleName("com.test", 1, 1), -1);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_001 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_GetUidByBundleName_002
+ * @tc.desc: Verify GetUidByBundleName with appIndex returns uid from BundleMgr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetUidByBundleName_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_002 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->uidByBundleClone_ = 600;
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(formBmsHelper.GetUidByBundleName("com.test", 1, 1), 600);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_002 end";
 }
 } // namespace AppExecFwk
 } // namespace OHOS
