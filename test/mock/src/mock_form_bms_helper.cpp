@@ -81,5 +81,14 @@ bool FormBmsHelper::GetBundleInfoWithPermission(const std::string &bundleName, i
     }
     return false;
 }
+
+ErrCode FormBmsHelper::GetEnabledCloneIndex(int32_t userId, const std::string &bundleName, int32_t &appIndex)
+{
+    GTEST_LOG_(INFO) << "GetEnabledCloneIndex called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetEnabledCloneIndex(userId, bundleName, appIndex);
+    }
+    return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

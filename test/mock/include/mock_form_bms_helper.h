@@ -36,6 +36,8 @@ public:
         AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo) = 0;
     virtual bool GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId,
         BundleInfo &bundleInfo) = 0;
+    virtual ErrCode GetEnabledCloneIndex(int32_t userId, const std::string &bundleName,
+        int32_t &appIndex) = 0;
 };
 
 class MockFormBmsHelper : public AbstractMockFormBmsHelper {
@@ -51,6 +53,7 @@ public:
         AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo));
     MOCK_METHOD3(GetBundleInfoWithPermission, bool(const std::string &bundleName, int32_t userId,
         BundleInfo &bundleInfo));
+    MOCK_METHOD3(GetEnabledCloneIndex, ErrCode(int32_t userId, const std::string &bundleName, int32_t &appIndex));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

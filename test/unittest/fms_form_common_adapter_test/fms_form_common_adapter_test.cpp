@@ -105,6 +105,9 @@ void FmsFormCommonAdapterTest::TearDownTestCase()
 
 void FmsFormCommonAdapterTest::SetUp()
 {
+    // Default fail keeps AlignCloneProviderUid on caller appIndex so tests need no clone setup
+    ON_CALL(*MockFormBmsHelper::obj, GetEnabledCloneIndex(_, _, _))
+        .WillByDefault(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
 }
 
 void FmsFormCommonAdapterTest::TearDown()
