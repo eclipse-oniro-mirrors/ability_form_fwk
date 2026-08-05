@@ -701,7 +701,11 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
         return false;
     }
     napi_value prop = nullptr;
-    napi_get_named_property(env, args, "bundleName", &prop);
+    napi_status status = napi_get_named_property(env, args, "bundleName", &prop);
+    if (status != napi_ok || prop == nullptr) {
+        HILOG_ERROR("ParseParam, get property value fail, propertyName:bundleName");
+        return false;
+    }
     napi_typeof(env, prop, &valueType);
     if (valueType != napi_string) {
         HILOG_ERROR("input bundleName not string");
@@ -712,24 +716,43 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
         HILOG_ERROR("empty inputBundleName");
         return false;
     }
-    prop = nullptr;
-    napi_get_named_property(env, args, "formName", &prop);
-    filter.formName = GetStringFromNapi(env, prop);
-    prop = nullptr;
-    napi_get_named_property(env, args, "moduleName", &prop);
-    filter.moduleName = GetStringFromNapi(env, prop);
-    prop = nullptr;
-    napi_get_named_property(env, args, "abilityName", &prop);
-    filter.abilityName = GetStringFromNapi(env, prop);
+    if (!GetStringPropFromNapi(env, args, "formName", filter.formName) ||
+        !GetStringPropFromNapi(env, args, "moduleName", filter.moduleName) ||
+        !GetStringPropFromNapi(env, args, "abilityName", filter.abilityName)) {
+        return false;
+    }
     bool hasIsUnusedIncluded = false;
     napi_has_named_property(env, args, "isUnusedIncluded", &hasIsUnusedIncluded);
     if (hasIsUnusedIncluded) {
         prop = nullptr;
-        napi_get_named_property(env, args, "isUnusedIncluded", &prop);
+        status = napi_get_named_property(env, args, "isUnusedIncluded", &prop);
+        if (status != napi_ok || prop == nullptr) {
+            HILOG_ERROR("ParseParam, get property value fail, propertyName:isUnusedIncluded");
+            return false;
+        }
         if (napi_get_value_bool(env, prop, &filter.isUnusedIncluded) != napi_ok) {
             return false;
         }
     }
+    return true;
+}
+
+bool GetStringPropFromNapi(napi_env env, napi_value args, const char *name, std::string &out)
+{
+    napi_value prop = nullptr;
+    napi_status status = napi_get_named_property(env, args, name, &prop);
+    if (status != napi_ok || prop == nullptr) {
+        HILOG_ERROR("GetStringPropFromNapi, get property value fail, propertyName:%{public}s",
+            name);
+        return false;
+    }
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, prop, &valueType);
+    if (valueType != napi_string) {
+        HILOG_ERROR("input %{public}s not string", name);
+        return false;
+    }
+    out = GetStringFromNapi(env, prop);
     return true;
 }
 
@@ -800,7 +823,11 @@ bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoF
     }
 
     napi_value nativeDataValue = nullptr;
-    napi_get_named_property(env, value, "moduleName", &nativeDataValue);
+    napi_status status = napi_get_named_property(env, value, "moduleName", &nativeDataValue);
+    if (status != napi_ok) {
+        HILOG_ERROR("ConvertFormInfoFilter, get property value fail, propertyName: moduleName");
+        return false;
+    }
     napi_valuetype nativeDataValueType = napi_undefined;
     napi_typeof(env, nativeDataValue, &nativeDataValueType);
     if (nativeDataValue == nullptr || (nativeDataValueType != napi_undefined &&
@@ -879,7 +906,11 @@ int NapiFormUtil::CatchErrorCode(napi_env env)
     napi_value errResult;
     if (napi_get_and_clear_last_exception(env, &errResult) == napi_ok) {
         napi_value errCode;
-        napi_get_named_property(env, errResult, "code", &errCode);
+        napi_status status = napi_get_named_property(env, errResult, "code", &errCode);
+        if (status != napi_ok) {
+            HILOG_ERROR("CatchErrorCode, get property value fail, propertyName:code");
+            return false;
+        }
         napi_valuetype errCodeType;
         napi_typeof(env, errCode, &errCodeType);
         if (errCodeType == napi_number) {
