@@ -35,16 +35,11 @@ ohos_fuzztest("ParamManagerFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "${form_fwk_path}/services/src/feature/param_update/param_control.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_manager.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_reader.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/sign_tools.cpp",
-    "${form_fwk_path}/services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
     "parammanager_fuzzer.cpp"
   ]
 
   deps = [
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",

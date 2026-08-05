@@ -35,13 +35,11 @@ ohos_fuzztest("FormEditServiceFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "${form_fwk_path}/services/src/ams_mgr/form_app_mgr_helper.cpp",
-    "${form_fwk_path}/services/src/form_mgr/form_edit_service.cpp",
     "formeditservice_fuzzer.cpp"
   ]
 
   deps = [
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",

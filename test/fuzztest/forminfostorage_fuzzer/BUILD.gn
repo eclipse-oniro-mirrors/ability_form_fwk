@@ -39,7 +39,7 @@ ohos_fuzztest("FormInfoStorageFuzzTest") {
   ]
 
   deps = [
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",

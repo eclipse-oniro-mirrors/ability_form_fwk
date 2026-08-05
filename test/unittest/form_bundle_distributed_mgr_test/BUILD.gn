@@ -28,10 +28,6 @@ ohos_unittest("FormBundleDistributedTest") {
   configs = [ ":Form_Bundle_Distributed_config" ]
 
   sources = [
-    "${form_fwk_path}/interfaces/inner_api/src/form_event_report.cpp",
-    "${form_fwk_path}/services/src/common/util/form_util.cpp",
-    "${form_fwk_path}/services/src/data_center/database/form_rdb_data_mgr.cpp",
-    "${form_fwk_path}/services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
     "form_bundle_distributed_mgr_test.cpp",
   ]
 
@@ -40,6 +36,7 @@ ohos_unittest("FormBundleDistributedTest") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:libfms_internal_static",
   ]
 
   external_deps = [

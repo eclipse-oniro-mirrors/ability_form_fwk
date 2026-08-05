@@ -35,13 +35,12 @@ ohos_fuzztest("FormDistributedMgrFuzzTest") {
   ]
 
   sources = [
-    "${form_fwk_path}/services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
     "formdistributedmgr_fuzzer.cpp"
   ]
 
   deps = [
     "${form_fwk_path}:form_manager",
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
   ]
 

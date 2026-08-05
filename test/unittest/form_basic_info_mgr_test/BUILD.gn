@@ -28,13 +28,12 @@ ohos_unittest("FormBasicInfoMgrTest") {
   configs = [ ":Form_basic_info_mgr_config" ]
 
   sources = [
-    "${form_fwk_path}/services/src/data_center/form_basic_info_mgr.cpp",
     "form_basic_info_mgr_test.cpp",
   ]
 
   deps = [
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

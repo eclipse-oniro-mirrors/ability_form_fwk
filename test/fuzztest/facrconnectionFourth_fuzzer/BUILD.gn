@@ -38,14 +38,13 @@ ohos_fuzztest("facrconnectionFourthFuzzTest") {
   ]
 
   sources = [
-    "${form_fwk_path}/services/src/data_center/form_basic_info_mgr.cpp",
     "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
     "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
     "facrconnectionFourth_fuzzer.cpp",
   ]
 
   deps = [
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",

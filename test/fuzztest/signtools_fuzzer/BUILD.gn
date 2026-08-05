@@ -35,12 +35,11 @@ ohos_fuzztest("SignToolsFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "${form_fwk_path}/services/src/feature/param_update/sign_tools.cpp",
     "signtools_fuzzer.cpp",
   ]
 
   deps = [
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",

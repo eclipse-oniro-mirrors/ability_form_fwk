@@ -36,11 +36,10 @@ ohos_fuzztest("FormWantFuzzTest") {
 
   sources = [
     "formwant_fuzzer.cpp",
-    "${form_fwk_path}/interfaces/inner_api/src/form_want.cpp",
   ]
 
   deps = [
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
   ]
 
   external_deps = [

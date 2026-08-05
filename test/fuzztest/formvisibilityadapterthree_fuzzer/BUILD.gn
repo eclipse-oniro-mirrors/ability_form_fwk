@@ -36,27 +36,10 @@ ohos_fuzztest("FormVisibilityAdapterThreeFuzzTest") {
   ]
   sources = [
     "formvisibilityadapterthree_fuzzer.cpp",
-    "${form_fwk_path}/services/src/form_mgr/form_visibility_adapter.cpp",
-    "${form_fwk_path}/services/src/form_mgr/form_common_adapter.cpp",
-    "${form_fwk_path}/services/src/data_center/form_data_proxy_mgr.cpp",
-    "${form_fwk_path}/services/src/data_center/form_data_proxy_record.cpp",
-    "${form_fwk_path}/services/src/data_center/form_basic_info_mgr.cpp",
-    "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
-    "${form_fwk_path}/services/src/feature/bundle_lock/form_bundle_lock_mgr.cpp",
-    "${form_fwk_path}/services/src/feature/bundle_lock/form_exempt_lock_mgr.cpp",
-    "${form_fwk_path}/services/src/feature/bundle_forbidden/form_bundle_forbid_mgr.cpp",
-    "${form_fwk_path}/services/src/feature/bundle_distributed/form_distributed_mgr.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_control.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_reader.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/sign_tools.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_manager.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_common_event.cpp",
-    "${form_fwk_path}/services/src/form_refresh/strategy/refresh_cache_mgr.cpp",
-    "${form_fwk_path}/services/src/form_refresh/strategy/refresh_exec_mgr.cpp",
   ]
 
   deps = [
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",

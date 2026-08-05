@@ -29,7 +29,7 @@ ohos_unittest("FmsFormMemmgrClientTest") {
   deps = [
     "${form_fwk_path}/services/form_render_service:formrender",
     "${form_fwk_path}/services/form_render_service:formrender_service",
-    "${form_fwk_path}:libfms_test",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

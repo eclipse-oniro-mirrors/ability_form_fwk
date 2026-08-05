@@ -442,9 +442,7 @@ ohos_shared_library("libfms") {
 
   ldflags = [
     "-flto=full",
-    "-Wl,--exclude-libs=ALL",
     "-Wl,--gc-sections",
-    "-Wl,--whole-archive",
   ]
 
   deps = [ ":libfms_internal_static" ]
@@ -452,29 +450,6 @@ ohos_shared_library("libfms") {
   subsystem_name = "ability"
   part_name = "form_fwk"
 }
-
-ohos_shared_library("libfms_test") {
-  testonly = true
-  branch_protector_ret = "pac_ret"
-
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    cfi_no_nvcall = true
-    cfi_vcall_icall_only = true
-    debug = false
-  }
-
-  ldflags = [
-    "-Wl,--whole-archive",
-  ]
-
-  deps = [ ":libfms_internal_static" ]
-
-  subsystem_name = "ability"
-  part_name = "form_fwk"
-}
-
 ################################### fmskit_native ########################################
 config("fmskit_config") {
   defines = [ "FMS_LOG_TAG = \"FmskitNative\"" ]
