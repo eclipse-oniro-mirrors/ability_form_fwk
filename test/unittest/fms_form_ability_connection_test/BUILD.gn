@@ -73,6 +73,7 @@ ohos_unittest("FmsFormAbilityConnectionTest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "huks:libhukssdk",
     "ipc:ipc_core",
     "libxml2:libxml2",

@@ -96,10 +96,11 @@ ohos_unittest("FmsFormCheckMgrTest") {
     "form_fwk:form_manager",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "libxml2:libxml2",
-    "hisysevent:libhisysevent",
     "jsoncpp:jsoncpp",
   ]
 }
@@ -186,10 +187,11 @@ ohos_unittest("FmsFormCheckMgrTest2") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "hicollie:libhicollie",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "libxml2:libxml2",
-    "hisysevent:libhisysevent",
     "jsoncpp:jsoncpp",
   ]
 

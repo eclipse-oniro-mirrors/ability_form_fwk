@@ -103,10 +103,11 @@ ohos_unittest("FmsParamManagerTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "hicollie:libhicollie",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
-    "hisysevent:libhisysevent",
     "libxml2:libxml2",
   ]
 }

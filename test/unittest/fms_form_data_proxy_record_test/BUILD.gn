@@ -76,6 +76,7 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",

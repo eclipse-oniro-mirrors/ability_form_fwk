@@ -61,6 +61,7 @@ ohos_fuzztest("FormAbnormalReporterFuzzTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "ffrt:libffrt",
+    "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "libxml2:libxml2",
