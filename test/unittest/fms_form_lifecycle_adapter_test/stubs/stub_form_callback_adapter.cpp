@@ -183,9 +183,6 @@ sptr<IFormPublishInterceptor> FormCallbackAdapter::GetFormPublishInterceptor()
     return nullptr;
 }
 
-void FormCallbackAdapter::CancelOverflow(const int64_t formId)
-{
-    return ERR_OK;
-}
+void FormCallbackAdapter::CancelOverflow(const int64_t formId) {}
 }  // namespace AppExecFwk
 }  // namespace OHOS
