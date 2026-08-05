@@ -49,6 +49,8 @@ ohos_unittest("FmsFormLifecycleAdapterTest") {
     "${form_fwk_path}/test/mock/src/mock_refresh_cache_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_theme_form_client.cpp",
     "${form_fwk_path}/test/mock/src/form_refresh/mock_form_refresh_mgr.cpp",
+    "${form_fwk_path}/services/src/common/util/form_proxy_registry.cpp",
+    "stubs/stub_form_callback_adapter.cpp"
     "stubs/stub_form_publish_adapter.cpp",
     "stubs/stub_form_data_adapter.cpp",
     "stubs/stub_form_cache_mgr.cpp",
