@@ -90,6 +90,21 @@ ErrCode FormDataAdapter::UpdateTimer(const int64_t formId, const FormRecord &rec
     return ERR_OK;
 }
 
+ErrCode FormDataAdapter::ValidateAndGetFormRecord(
+    const int64_t formId, int64_t &matchedFormId, FormRecord &formRecord)
+{
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    return ERR_OK;
+}
+
 int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     const FormProviderData &formProviderData,
     const std::vector<FormDataProxy> &formDataProxies)
