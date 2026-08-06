@@ -60,6 +60,7 @@ ohos_shared_library("formbindingdata_napi") {
     "ability_runtime:runtime",
     "c_utils:utils",
     "hilog:libhilog",
+    "libuv:uv",
     "ipc:ipc_core",
     "napi:ace_napi",
     "node:node_header_notice",
@@ -184,6 +185,7 @@ ohos_shared_library("formextension_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -246,6 +248,7 @@ ohos_shared_library("formextensionability") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -308,6 +311,7 @@ ohos_shared_library("formextensioncontext_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1024,6 +1028,7 @@ ohos_shared_library("formeditextensionability_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1088,6 +1093,7 @@ ohos_shared_library("formeditextensioncontext_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1369,6 +1375,7 @@ ohos_shared_library("liveformextensionability_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1433,6 +1440,7 @@ ohos_shared_library("liveformextensioncontext_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
