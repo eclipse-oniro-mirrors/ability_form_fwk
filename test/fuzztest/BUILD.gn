@@ -115,6 +115,7 @@ group("fuzztest") {
     "formlifecycleadapter_fuzzer:fuzztest",
     "formvisibilityadapter_fuzzer:fuzztest",
     "formwant_fuzzer:fuzztest",
+    "jsonutilform_fuzzer:fuzztest",
   ]
 
   if (ability_runtime_graphics) {
