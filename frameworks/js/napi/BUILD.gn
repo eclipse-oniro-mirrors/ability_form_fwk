@@ -527,7 +527,6 @@ ohos_shared_library("formhost") {
     "${form_fwk_path}:form_host_delegate_stub",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_utils",
   ]
 
@@ -738,7 +737,6 @@ ohos_shared_library("formprovider") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -813,7 +811,6 @@ ohos_shared_library("formagent") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -1150,7 +1147,6 @@ ohos_shared_library("form_edit_extension") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -1288,7 +1284,6 @@ ohos_shared_library("form_edit_extension_ani") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [

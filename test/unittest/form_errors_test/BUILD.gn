@@ -26,13 +26,12 @@ ohos_unittest("FmsFormErrorsTest") {
   configs = [ ":form_errors_test_config" ]
 
   sources = [
-    "${form_fwk_path}/interfaces/kits/native/src/form_errors.cpp",
     "form_errors_test.cpp",
   ]
 
   deps = [
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

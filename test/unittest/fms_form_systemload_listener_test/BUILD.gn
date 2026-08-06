@@ -24,7 +24,7 @@ ohos_unittest("FmsFormSystemloadListenerTest") {
   include_dirs = [ "${form_fwk_path}/services/include" ]
 
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
   ]
 
   external_deps = [ 
