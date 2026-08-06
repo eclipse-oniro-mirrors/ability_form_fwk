@@ -406,8 +406,6 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleDeleteForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE):
             return HandleUpdateFormCrossBundle(data, reply);
-        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_BACKGROUND_FUNCTION):
-            return HandleSetBackgroundFunction(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -2583,37 +2581,6 @@ ErrCode FormMgrStub::HandleUnregisterFormWantCallback(MessageParcel &data, Messa
 {
     HILOG_INFO("call");
     ErrCode result = UnregisterFormWantCallback();
-    if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return ERR_OK;
-}
-
-int32_t FormMgrStub::HandleSetBackgroundFunction(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_DEBUG("call");
-    std::string funcName = Str16ToStr8(data.ReadString16());
-    std::string params = Str16ToStr8(data.ReadString16());
-    if (funcName.empty() || params.empty()) {
-        HILOG_ERROR("invalid param, funcName empty:%{public}d, params empty:%{public}d",
-            funcName.empty(), params.empty());
-        if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {
-            HILOG_ERROR("write error code failed");
-            return ERR_APPEXECFWK_PARCEL_ERROR;
-        }
-        return ERR_OK;
-    }
-    if (funcName.size() > Constants::MAX_FUNCTION_NAME_LENGTH || params.size() > Constants::MAX_PARAMS_LENGTH) {
-        HILOG_ERROR("param too long, funcName len:%{public}zu, params len:%{public}zu",
-            funcName.size(), params.size());
-        if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {
-            HILOG_ERROR("write error code failed");
-            return ERR_APPEXECFWK_PARCEL_ERROR;
-        }
-        return ERR_OK;
-    }
-    int32_t result = SetBackgroundFunction(funcName, params);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
