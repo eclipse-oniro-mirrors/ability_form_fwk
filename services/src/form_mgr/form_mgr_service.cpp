@@ -225,7 +225,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
@@ -257,7 +257,7 @@ int FormMgrService::CreateForm(const Want &want, RunningFormInfo &runningFormInf
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
@@ -295,7 +295,7 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -365,7 +365,7 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
@@ -428,7 +428,7 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("request form permission denied");
@@ -477,7 +477,7 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     bool isFormAgent = want.GetBoolParam(Constants::IS_FORM_AGENT, false);
     HILOG_INFO("isFormAgent:%{public}d", isFormAgent);
     if (isFormAgent) {
@@ -507,7 +507,7 @@ ErrCode FormMgrService::RequestPublishFormCrossUser(Want &want, int32_t userId, 
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     if (userId == Constants::INVALID_USER_ID) {
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -701,7 +701,7 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("request form permission denied");
@@ -739,7 +739,7 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("request form permission denied");
@@ -782,7 +782,7 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
 {
     HILOG_INFO("begin:%{public}s,publish:%{public}s,end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("request form permission denied");
@@ -835,7 +835,7 @@ void FormMgrService::OnStart()
 #endif // RES_SCHEDULE_ENABLE
     onStartEndTime_ = GetCurrentDateTime();
     HILOG_INFO("success,time:%{public}s,onKvDataServiceAddTime:%{public}s",
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     FormEventReport::SendDiskUseEvent();
     FormTimerMgr::GetInstance().StartDiskUseInfoReportTimer();
 }
@@ -1071,7 +1071,7 @@ int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("notify form visible permission denied");
@@ -1344,7 +1344,7 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_START_ABILITIES_FROM_BACKGROUND);
     if (ret != ERR_OK) {
         HILOG_ERROR("start ability check permission denied");
@@ -1590,9 +1590,9 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
     if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         return;
     }
-    onKvDataServiceAddTime_ = GetCurrentDateTime();
+    SetOnKvDataServiceAddTime(GetCurrentDateTime());
     FormDataProxyMgr::GetInstance().RetryFailureSubscribes();
-    HILOG_INFO("FMS KV data service add time:%{public}s", onKvDataServiceAddTime_.c_str());
+    HILOG_INFO("FMS KV data service add time:%{public}s", GetOnKvDataServiceAddTime().c_str());
 }
 
 bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value,
@@ -1981,7 +1981,7 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
 {
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+        onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     std::string bundleName;
     FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
@@ -2597,6 +2597,18 @@ ErrCode FormMgrService::UnregisterFormWantCallback()
     }
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().UnregisterFormWantCallback(callingUid);
+}
+
+void FormMgrService::SetOnKvDataServiceAddTime(const std::string &time)
+{
+    std::lock_guard<std::mutex> lock(onKvDataServiceAddTimeMutex_);
+    onKvDataServiceAddTime_ = time;
+}
+
+std::string FormMgrService::GetOnKvDataServiceAddTime() const
+{
+    std::lock_guard<std::mutex> lock(onKvDataServiceAddTimeMutex_);
+    return onKvDataServiceAddTime_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
