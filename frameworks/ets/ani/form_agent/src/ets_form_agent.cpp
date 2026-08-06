@@ -23,6 +23,7 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
+#include "form_provider_data.h"
 #include "form_provider_info.h"
 #include "form_histogram_utils.h"
 #include "ipc_skeleton.h"
@@ -102,6 +103,28 @@ void CheckWantParam(ani_env *env, ani_object aniWant, ani_object callback)
         return;
     }
 }
+ 
+void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_string dataObjStr, ani_object callback)
+{
+    FormHistogramUtils::ReportHistogramBoolean("Form.Agent.updateFormCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
+    HILOG_INFO("call");
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return;
+    }
+    if (FormAniUtil::IsRefUndefined(env, aniFormId) || FormAniUtil::IsRefUndefined(env, dataObjStr)) {
+        FormAniUtil::InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+    int64_t formId = FormAniUtil::FormIdAniStrtoInt64(env, aniFormId);
+    auto formProviderData = AppExecFwk::FormProviderData(FormAniUtil::AniStringToStdString(env, dataObjStr));
+    int32_t ret = FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("UpdateFormCrossBundle failed, error code: %{public}d", static_cast<int32_t>(ret));
+    }
+    FormAniUtil::InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
+}
 
 } // anonymous namespace
 
@@ -122,6 +145,8 @@ void EtsFormAgentInit(ani_env* env)
     std::array methods = {
         ani_native_function {
             "nativeRequestPublishForm", nullptr, reinterpret_cast<void *>(RequestPublishForm)},
+        ani_native_function {
+            "nativeUpdateFormCrossBundle", nullptr, reinterpret_cast<void *>(UpdateFormCrossBundle)},
         ani_native_function {
             "checkWantParam", nullptr, reinterpret_cast<void *>(CheckWantParam)},
     };

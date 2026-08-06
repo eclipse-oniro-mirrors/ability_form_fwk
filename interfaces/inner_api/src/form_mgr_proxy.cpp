@@ -238,6 +238,45 @@ int FormMgrProxy::UpdateForm(const int64_t formId, const FormProviderData &FormP
 }
 
 /**
+ * @brief Update form with formId by cross bundle, restricted to system apps.
+ * @param formId The Id of the form to update.
+ * @param formBindingData Form binding data.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrProxy::UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData)
+{
+    HILOG_DEBUG("call, formId:%{public}" PRId64, formId);
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&formBindingData)) {
+        HILOG_ERROR("write formBindingData failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        if (error == ERR_APPEXECFWK_PARCEL_ERROR) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
+/**
  * @brief Set next refresh time.
  * @param formId The Id of the form to update.
  * @param bundleName Provider ability bundleName.

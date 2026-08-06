@@ -41,6 +41,48 @@ constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 const std::string IS_FORM_AGENT = "isFormAgent";
+
+bool UnwrapFormBindingData(napi_env env, napi_value value, std::string &out)
+{
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, value, &type);
+    if (type == napi_string) {
+        return ConvertFromJsValue(env, value, out);
+    }
+    if (type != napi_object) {
+        return false;
+    }
+    napi_value dataValue = nullptr;
+    napi_get_named_property(env, value, "data", &dataValue);
+    napi_valuetype dataType = napi_undefined;
+    if (dataValue != nullptr) {
+        napi_typeof(env, dataValue, &dataType);
+    }
+    if (dataType == napi_string) {
+        return ConvertFromJsValue(env, dataValue, out);
+    }
+    if (dataType == napi_object) {
+        napi_value globalValue = nullptr;
+        napi_get_global(env, &globalValue);
+        napi_value jsonValue = nullptr;
+        napi_get_named_property(env, globalValue, "JSON", &jsonValue);
+        napi_value stringifyValue = nullptr;
+        napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+        if (stringifyValue == nullptr) {
+            HILOG_ERROR("stringifyValue is nullptr");
+            return false;
+        }
+        napi_value funcArgv[1] = { dataValue };
+        napi_value transValue = nullptr;
+        napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+        if (transValue == nullptr) {
+            HILOG_ERROR("transValue is nullptr");
+            return false;
+        }
+        return ConvertFromJsValue(env, transValue, out);
+    }
+    return false;
+}
 }
 
 void JsFormAgent::Finalizer(napi_env env, void *data, void *hint)
@@ -107,6 +149,84 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
     napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnRequestPublishForm",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormAgent::UpdateFormCrossBundle(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnUpdateFormCrossBundle);
+}
+ 
+bool JsFormAgent::ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, napi_value *argv,
+    std::shared_ptr<UpdateFormCrossBundleCallbackInfo> &callbackInfo, napi_value &lastParam)
+{
+    if (env == nullptr || argc < ARGS_SIZE_TWO) {
+        HILOG_ERROR("invalid argc");
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
+        return false;
+    }
+ 
+    std::string formIdStr;
+    if (!ConvertFromJsValue(env, argv[0], formIdStr) || formIdStr.empty()) {
+        HILOG_ERROR("formId is invalid");
+        NapiFormUtil::ThrowParamError(env, "formId is invalid");
+        return false;
+    }
+ 
+    std::string formDataStr;
+    if (!UnwrapFormBindingData(env, argv[1], formDataStr)) {
+        NapiFormUtil::ThrowParamError(env, "formBindingData is invalid");
+        return false;
+    }
+ 
+    callbackInfo = std::make_shared<UpdateFormCrossBundleCallbackInfo>();
+    if (!ConvertStringToInt64(formIdStr, callbackInfo->formId)) {
+        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        NapiFormUtil::ThrowParamError(env, "formId is invalid");
+        return false;
+    }
+    callbackInfo->formBindingData = std::make_shared<OHOS::AppExecFwk::FormProviderData>(formDataStr);
+ 
+    lastParam = (argc <= ARGS_SIZE_TWO) ? nullptr : argv[ARGS_SIZE_TWO];
+    return true;
+}
+ 
+napi_value JsFormAgent::OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value *argv)
+{
+    FormHistogramUtils::ReportHistogramBoolean("Form.Agent.updateFormCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
+    HILOG_INFO("call");
+ 
+    std::shared_ptr<UpdateFormCrossBundleCallbackInfo> asyncCallbackInfo;
+    napi_value lastParam = nullptr;
+    if (!ParseUpdateFormCrossBundleParams(env, argc, argv, asyncCallbackInfo, lastParam)) {
+        return CreateJsUndefined(env);
+    }
+ 
+    auto apiResult = std::make_shared<int32_t>();
+    NapiAsyncTask::ExecuteCallback execute = [asyncCallbackInfo, ret = apiResult]() {
+        *ret = FormMgr::GetInstance().UpdateFormCrossBundle(
+            asyncCallbackInfo->formId, *asyncCallbackInfo->formBindingData);
+    };
+ 
+    NapiAsyncTask::CompleteCallback complete =
+        [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t /*status*/) {
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            HILOG_ERROR("null scope");
+            return;
+        }
+        if (*ret == ERR_OK) {
+            task.ResolveWithNoError(env, CreateJsUndefined(env));
+        } else {
+            task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+        }
+        napi_close_handle_scope(env, scope);
+    };
+ 
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnUpdateFormCrossBundle",
         env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }

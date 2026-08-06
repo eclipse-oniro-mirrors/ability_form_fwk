@@ -136,6 +136,14 @@ public:
         const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
+     * @brief Update form with formId by cross bundle.
+     * @param formId The Id of the form to update.
+     * @param formBindingData Form binding data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData);
+
+    /**
      * @brief Notify the form service that the form user's lifecycle is updated.
      *
      * This should be called when form user request form.

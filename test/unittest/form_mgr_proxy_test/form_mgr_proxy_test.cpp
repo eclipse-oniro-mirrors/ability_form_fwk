@@ -3880,4 +3880,54 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsConfig_004, TestSize.Leve
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_004 ends";
 }
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormCrossBundle_001
+ * @tc.name: Verify UpdateFormCrossBundle happy path.
+ * @tc.desc: test that ERR_OK reply round-trips and FormProviderData passes through.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormCrossBundle_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormCrossBundle_001 starts";
+    constexpr int64_t formId = 12345L;
+    FormProviderData formBindingData = FormProviderData(std::string("{\"city\":\"shenzhen\"}"));
+    EXPECT_CALL(*mockFormMgrService, UpdateFormCrossBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(formMgrProxy->UpdateFormCrossBundle(formId, formBindingData), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormCrossBundle_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormCrossBundle_002
+ * @tc.name: Verify UpdateFormCrossBundle propagates a non-OK reply as-is.
+ * @tc.desc: test that the dedicated permission code is surfaced unchanged to callers.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormCrossBundle_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormCrossBundle_002 starts";
+    constexpr int64_t formId = 12345L;
+    FormProviderData formBindingData = FormProviderData(std::string("{\"k\":\"v\"}"));
+    EXPECT_CALL(*mockFormMgrService, UpdateFormCrossBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE));
+    EXPECT_EQ(formMgrProxy->UpdateFormCrossBundle(formId, formBindingData),
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormCrossBundle_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormCrossBundle_003
+ * @tc.name: Verify UpdateFormCrossBundle forwards FORM_NOT_EXIST_ID error.
+ * @tc.desc: test that the proxy surfaces FORM_NOT_EXIST_ID (mapped to external 16501001).
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormCrossBundle_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormCrossBundle_003 starts";
+    constexpr int64_t formId = 99999999L;
+    FormProviderData formBindingData = FormProviderData(std::string("{\"k\":\"v\"}"));
+    EXPECT_CALL(*mockFormMgrService, UpdateFormCrossBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    EXPECT_EQ(formMgrProxy->UpdateFormCrossBundle(formId, formBindingData),
+        ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormCrossBundle_003 ends";
+}
 }
