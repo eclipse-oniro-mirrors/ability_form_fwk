@@ -105,8 +105,13 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
 // After the report is successfully submitted, the data will be deleted.
 void FormRecordReport::HandleFormRefreshCount()
 {
-    std::lock_guard<std::mutex> guard(formRecordReportMutex_);
-    for (auto& entry : formRecordReportMap_) {
+    std::map<int64_t, std::queue<FormRecordReportInfo>> tempMap;
+    {
+        std::lock_guard<std::mutex> guard(formRecordReportMutex_);
+        tempMap = formRecordReportMap_;
+    }
+
+    for (auto& entry : tempMap) {
         int64_t formId = entry.first;
         auto &queue = entry.second;
         if (formId <= 0 || queue.empty()) {
@@ -117,7 +122,7 @@ void FormRecordReport::HandleFormRefreshCount()
             HILOG_ERROR("GetFormRecord failed for formId: %{public}" PRId64, formId);
             continue;
         }
-        FormRecordReportInfo record = queue.front();
+        FormRecordReportInfo &record = queue.front();
         NewFormEventInfo eventInfo;
         eventInfo.formId = formId;
         eventInfo.abilityName = FormBasicInfoMgr::GetInstance().GetFormAbilityName(formId);
@@ -140,8 +145,14 @@ void FormRecordReport::HandleFormRefreshCount()
         eventInfo.actualProxyRefreshTimes = record.actualProxyRefreshTimes;
         FormEventReport::SendFormRefreshCountEvent(FormEventName::UPDATE_FORM_REFRESH_TIMES,
             HiSysEventType::STATISTIC, eventInfo);
-        while (queue.size() > REPORT_INFO_QUEUE_MIN_LEN) {
-            queue.pop();
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(formRecordReportMutex_);
+        for (auto& entry : formRecordReportMap_) {
+            while (entry.second.size() > REPORT_INFO_QUEUE_MIN_LEN) {
+                entry.second.pop();
+            }
         }
     }
 }

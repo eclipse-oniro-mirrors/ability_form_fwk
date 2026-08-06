@@ -317,6 +317,7 @@ private:
     sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
     std::mutex ibundleMutex_;
     std::mutex registerMutex_;
+    std::mutex iBundleInstallerMutex_;
     bool hasRegisterBundleEvent_ = false;
 };
 }  // namespace AppExecFwk

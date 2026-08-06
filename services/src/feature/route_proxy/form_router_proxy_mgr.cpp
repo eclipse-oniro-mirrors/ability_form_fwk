@@ -126,11 +126,16 @@ void FormRouterProxyMgr::CleanResource(const wptr<IRemoteObject> &remote)
         }
     }
 
-    std::lock_guard<std::mutex> deathLock(deathRecipientsMutex_);
-    auto iter = deathRecipients_.find(object);
-    if (iter != deathRecipients_.end()) {
-        auto deathRecipient = iter->second;
-        deathRecipients_.erase(iter);
+    sptr<IRemoteObject::DeathRecipient> deathRecipient;
+    {
+        std::lock_guard<std::mutex> deathLock(deathRecipientsMutex_);
+        auto iter = deathRecipients_.find(object);
+        if (iter != deathRecipients_.end()) {
+            deathRecipient = iter->second;
+            deathRecipients_.erase(iter);
+        }
+    }
+    if (deathRecipient != nullptr) {
         object->RemoveDeathRecipient(deathRecipient);
     }
     HILOG_DEBUG("End");

@@ -74,6 +74,7 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()
 {
     HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(iBundleInstallerMutex_);
     if (bundleInstallerProxy_ == nullptr) {
         sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
         if (iBundleMgr != nullptr) {
@@ -87,6 +88,7 @@ sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
     HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(ibundleMutex_);
     iBundleMgr_ = bundleManager;
 }
 
@@ -418,32 +420,30 @@ ErrCode FormBmsHelper::GetApplicationInfo(const std::string &bundleName, int32_t
 
 ErrCode FormBmsHelper::RegisterBundleEventCallback()
 {
+    std::lock_guard<std::mutex> lock(registerMutex_);
     if (!hasRegisterBundleEvent_) {
-        std::lock_guard<std::mutex> lock(registerMutex_);
-        if (!hasRegisterBundleEvent_) {
-            HILOG_INFO("call");
-            sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
-            if (iBundleMgr == nullptr) {
-                return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-            }
-            formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
-            if (formBundleEventCallback_ == nullptr) {
-                HILOG_ERROR("allocate formBundleEventCallback_ failed");
-                return ERR_APPEXECFWK_FORM_COMMON_CODE;
-            }
-            if (!iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_)) {
-                HILOG_ERROR("RegisterBundleEventCallback failed");
-                return ERR_APPEXECFWK_FORM_COMMON_CODE;
-            }
-            hasRegisterBundleEvent_ = true;
+        HILOG_INFO("call");
+        sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+        if (iBundleMgr == nullptr) {
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
         }
+        formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
+        if (formBundleEventCallback_ == nullptr) {
+            HILOG_ERROR("allocate formBundleEventCallback_ failed");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        if (!iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_)) {
+            HILOG_ERROR("RegisterBundleEventCallback failed");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        hasRegisterBundleEvent_ = true;
     }
-
     return ERR_OK;
 }
 
 ErrCode FormBmsHelper::UnregisterBundleEventCallback()
 {
+    std::lock_guard<std::mutex> lock(registerMutex_);
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
