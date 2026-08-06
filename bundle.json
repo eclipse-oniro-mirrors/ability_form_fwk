@@ -83,7 +83,8 @@
               "input",
               "image_framework",
               "bounds_checking_function",
-              "node"
+              "node",
+              "libuv"
           ],
           "third_party": [
               "json"
