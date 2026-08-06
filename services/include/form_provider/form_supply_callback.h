@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -165,6 +165,14 @@ public:
      */
     int32_t OnDeleteFormDone(const int64_t formId, const Want &want) override;
 
+protected:
+    /**
+     * @brief Verify caller identity based on caller type.
+     * @param callerType Caller type (PROVIDER or FRS).
+     * @return true if authorized, false if rejected.
+     */
+    bool VerifyCaller(CallerType callerType) override;
+
 private:
     /**
      * @brief Check if should disconnect ability immediately.
@@ -174,6 +182,21 @@ private:
     bool ShouldDisconnectImmediately(sptr<FormAbilityConnection> &connection);
 
     bool IsRemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken);
+
+    /**
+     * @brief Check whether the caller owns the specified form.
+     * @param formId The Id of the form.
+     * @return Returns ERR_OK if caller owns the form, error code otherwise.
+     */
+    int32_t CheckCallerOwnsForm(int64_t formId);
+
+    /**
+     * @brief Validate acquire request parameters and caller identity.
+     * @param want Input data from IPC.
+     * @param formId Output form ID extracted from want.
+     * @return Returns ERR_OK on success, error code on validation failure.
+     */
+    int32_t ValidateAcquireRequest(const Want &want, int64_t &formId);
 
     /**
      * @brief Handle render form.
