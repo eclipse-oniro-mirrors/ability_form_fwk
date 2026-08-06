@@ -628,7 +628,10 @@ ohos_shared_library("fmskit_provider_client") {
 ################################### form_manager ########################################
 config("formmgr_sdk_config") {
   visibility = [ ":*" ]
-  include_dirs = [ "interfaces/inner_api/include/" ]
+  include_dirs = [
+    "common/include",
+    "interfaces/inner_api/include/",
+  ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -758,8 +761,9 @@ ohos_shared_library("form_utils") {
   ]
   sources = [
     "common/src/form_hisysevent_wrapper.cpp",
-    "interfaces/inner_api/src/form_file_util.cpp",
+    "common/src/json_util_form.cpp",
     "interfaces/inner_api/src/form_event_report.cpp",
+    "interfaces/inner_api/src/form_file_util.cpp",
     "services/src/common/util/form_histogram_utils.cpp",
   ]
  
@@ -773,6 +777,7 @@ ohos_shared_library("form_utils") {
 
   external_deps = [
     "ability_base:want",
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "ipc:ipc_single",
     "hilog:libhilog",
@@ -878,7 +883,7 @@ ohos_shared_library("form_render_info") {
     "-Wl,--gc-sections",
   ]
   cflags = []
-  include_dirs = []
+  include_dirs = [ "services/include" ]
   sources = [
     "interfaces/inner_api/src/form_surface_info.cpp",
     "interfaces/inner_api/src/form_js_info.cpp",
@@ -890,9 +895,9 @@ ohos_shared_library("form_render_info") {
   public_configs = [
     ":formmgr_sdk_config",
   ]
- 
   deps = [
     ":form_config",
+    ":form_utils",
   ]
  
   external_deps = [
