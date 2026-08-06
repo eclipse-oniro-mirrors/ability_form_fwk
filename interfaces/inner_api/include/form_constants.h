@@ -426,6 +426,8 @@ namespace Constants {
     constexpr const char* FORM_CALL_EVENT_PARAMS = "params";
     constexpr const char* PARAM_FORM_CALL_EVENT_METHOD_KEY = "method";
     constexpr int32_t EVENT_CALL_NOTIFY = 1;
+    constexpr size_t MAX_FUNCTION_NAME_LENGTH = 256;
+    constexpr size_t MAX_PARAMS_LENGTH = 65536;
     //arquireFormData
     constexpr const char* LAUNCH_REASON_KEY = "ohos.extra.param.key.form_launch_reason";
     // The form launch reason which means that the form is default.

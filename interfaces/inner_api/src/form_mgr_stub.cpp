@@ -2604,6 +2604,15 @@ int32_t FormMgrStub::HandleSetBackgroundFunction(MessageParcel &data, MessagePar
         }
         return ERR_OK;
     }
+    if (funcName.size() > Constants::MAX_FUNCTION_NAME_LENGTH || params.size() > Constants::MAX_PARAMS_LENGTH) {
+        HILOG_ERROR("param too long, funcName len:%{public}zu, params len:%{public}zu",
+            funcName.size(), params.size());
+        if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {
+            HILOG_ERROR("write error code failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
     int32_t result = SetBackgroundFunction(funcName, params);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
