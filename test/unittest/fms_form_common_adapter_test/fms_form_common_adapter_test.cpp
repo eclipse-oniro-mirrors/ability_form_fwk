@@ -3928,32 +3928,12 @@ HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_004, TestSize.Level1)
 
 /**
  * @tc.name: AlignCloneProviderUid_001
- * @tc.desc: Verify AlignCloneProviderUid keeps caller appIndex when GetEnabledCloneIndex fails
+ * @tc.desc: Verify AlignCloneProviderUid sets appIndex but skips uid when GetUidByBundleName is invalid
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormCommonAdapterTest, AlignCloneProviderUid_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AlignCloneProviderUid_001 start";
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    // GetEnabledCloneIndex fails by SetUp default
-    FormItemInfo itemInfo;
-    itemInfo.SetProviderBundleName("com.test.bundle");
-    itemInfo.SetProviderUid(100);
-    FormCommonAdapter::GetInstance().AlignCloneProviderUid(itemInfo);
-    EXPECT_EQ(itemInfo.GetAppIndex(), 0);
-    EXPECT_EQ(itemInfo.GetProviderUid(), 100);
-    GTEST_LOG_(INFO) << "AlignCloneProviderUid_001 end";
-}
-
-/**
- * @tc.name: AlignCloneProviderUid_002
- * @tc.desc: Verify AlignCloneProviderUid sets appIndex but skips uid when GetUidByBundleName is invalid
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, AlignCloneProviderUid_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "AlignCloneProviderUid_002 start";
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetEnabledCloneIndex(_, _, _))
@@ -3966,17 +3946,17 @@ HWTEST_F(FmsFormCommonAdapterTest, AlignCloneProviderUid_002, TestSize.Level1)
     FormCommonAdapter::GetInstance().AlignCloneProviderUid(itemInfo);
     EXPECT_EQ(itemInfo.GetAppIndex(), 1);
     EXPECT_EQ(itemInfo.GetProviderUid(), 100);
-    GTEST_LOG_(INFO) << "AlignCloneProviderUid_002 end";
+    GTEST_LOG_(INFO) << "AlignCloneProviderUid_001 end";
 }
 
 /**
- * @tc.name: AlignCloneProviderUid_003
+ * @tc.name: AlignCloneProviderUid_002
  * @tc.desc: Verify AlignCloneProviderUid sets appIndex and providerUid when clone uid is valid
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormCommonAdapterTest, AlignCloneProviderUid_003, TestSize.Level1)
+HWTEST_F(FmsFormCommonAdapterTest, AlignCloneProviderUid_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AlignCloneProviderUid_003 start";
+    GTEST_LOG_(INFO) << "AlignCloneProviderUid_002 start";
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillRepeatedly(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetEnabledCloneIndex(_, _, _))
@@ -3989,7 +3969,7 @@ HWTEST_F(FmsFormCommonAdapterTest, AlignCloneProviderUid_003, TestSize.Level1)
     FormCommonAdapter::GetInstance().AlignCloneProviderUid(itemInfo);
     EXPECT_EQ(itemInfo.GetAppIndex(), 1);
     EXPECT_EQ(itemInfo.GetProviderUid(), 600);
-    GTEST_LOG_(INFO) << "AlignCloneProviderUid_003 end";
+    GTEST_LOG_(INFO) << "AlignCloneProviderUid_002 end";
 }
 
 }  // namespace AppExecFwk
