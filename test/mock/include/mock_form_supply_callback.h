@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,11 @@ public:
         int64_t requestCode, const bool& result) override;
     int32_t OnRenderTaskDone(int64_t formId, const Want &want) override;
     int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override;
+    bool VerifyCaller(CallerType callerType) override;
+
+    // Configurable VerifyCaller results; tests set these to exercise allow/deny paths. Default true (allow).
+    bool verifyProviderResult_ = true;
+    bool verifyFrsResult_ = true;
 
 private:
     static std::mutex mutex;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,11 +26,53 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+constexpr FormSupplyStub::HandlerEntry FormSupplyStub::handlerTable_[] = {
+    // Form provider callbacks — CallerType::PROVIDER
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED),
+      CallerType::PROVIDER, &FormSupplyStub::HandleOnAcquire },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_EVENT_HANDLE),
+      CallerType::PROVIDER, &FormSupplyStub::HandleOnEventHandle },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED),
+      CallerType::PROVIDER, &FormSupplyStub::HandleOnAcquireStateResult },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED),
+      CallerType::PROVIDER, &FormSupplyStub::HandleOnShareAcquire },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA),
+      CallerType::PROVIDER, &FormSupplyStub::HandleOnAcquireDataResult },
+    // Form render service callbacks — CallerType::FRS
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE),
+      CallerType::FRS, &FormSupplyStub::HandleOnRenderTaskDone },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE),
+      CallerType::FRS, &FormSupplyStub::HandleOnStopRenderingTaskDone },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK),
+      CallerType::FRS, &FormSupplyStub::HandleOnRenderingBlock },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM),
+      CallerType::FRS, &FormSupplyStub::HandleOnRecycleForm },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE),
+      CallerType::FRS, &FormSupplyStub::HandleOnRecoverFormsByConfigUpdate },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_NOTIFY_REFRESH),
+      CallerType::FRS, &FormSupplyStub::HandleOnNotifyRefreshForm },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_FORM_DONE),
+      CallerType::FRS, &FormSupplyStub::HandleOnRenderFormDone },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_DONE),
+      CallerType::FRS, &FormSupplyStub::HandleOnRecoverFormDone },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM_DONE),
+      CallerType::FRS, &FormSupplyStub::HandleOnRecycleFormDone },
+    { static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_DELETE_FORM_DONE),
+      CallerType::FRS, &FormSupplyStub::HandleOnDeleteFormDone },
+};
+
 FormSupplyStub::FormSupplyStub()
 {}
 
 FormSupplyStub::~FormSupplyStub()
 {}
+
+bool FormSupplyStub::VerifyCaller(CallerType callerType)
+{
+    // Default: deny. Subclasses must override to grant access for specific caller types.
+    return false;
+}
+
 /**
  * @brief handle remote request.
  * @param data input param.
@@ -48,48 +90,27 @@ int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    switch (code) {
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED):
-            return HandleOnAcquire(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_EVENT_HANDLE):
-            return HandleOnEventHandle(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED):
-            return HandleOnAcquireStateResult(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED):
-            return HandleOnShareAcquire(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE):
-            return HandleOnRenderTaskDone(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE):
-            return HandleOnStopRenderingTaskDone(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA):
-            return HandleOnAcquireDataResult(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK):
-            return HandleOnRenderingBlock(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM):
-            return HandleOnRecycleForm(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE):
-            return HandleOnRecoverFormsByConfigUpdate(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_NOTIFY_REFRESH):
-            return HandleOnNotifyRefreshForm(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_FORM_DONE):
-            return HandleOnRenderFormDone(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_DONE):
-            return HandleOnRecoverFormDone(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM_DONE):
-            return HandleOnRecycleFormDone(data, reply);
-        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_DELETE_FORM_DONE):
-            return HandleOnDeleteFormDone(data, reply);
-        default:
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    for (const auto &entry : handlerTable_) {
+        if (entry.code == code) {
+            if (!VerifyCaller(entry.callerType)) {
+                HILOG_ERROR("Caller verification failed, code:%{public}u, callerType:%{public}d",
+                    code, static_cast<int>(entry.callerType));
+                return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+            }
+            return (this->*(entry.handler))(data, reply);
+        }
     }
+
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
+
 /**
  * @brief handle OnAcquire message.
  * @param data input param.
  * @param reply output param.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormSupplyStub::HandleOnAcquire(MessageParcel &data, MessageParcel &reply)
+int32_t FormSupplyStub::HandleOnAcquire(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -128,7 +149,7 @@ int FormSupplyStub::HandleOnAcquire(MessageParcel &data, MessageParcel &reply)
  * @param reply output param.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormSupplyStub::HandleOnEventHandle(MessageParcel &data, MessageParcel &reply)
+int32_t FormSupplyStub::HandleOnEventHandle(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -148,7 +169,7 @@ int FormSupplyStub::HandleOnEventHandle(MessageParcel &data, MessageParcel &repl
  * @param reply output param.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageParcel &reply)
+int32_t FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageParcel &reply)
 {
     int32_t stateValue;
     if (!data.ReadInt32(stateValue)) {
@@ -164,6 +185,12 @@ int FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageParce
     }
     auto state = static_cast<FormState>(stateValue);
     std::string provider = data.ReadString();
+    if (provider.empty()) {
+        HILOG_ERROR("empty provider");
+        reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
     std::unique_ptr<Want> wantArg(data.ReadParcelable<Want>());
     if (!wantArg) {
         HILOG_ERROR("ReadParcelable<Want> failed");

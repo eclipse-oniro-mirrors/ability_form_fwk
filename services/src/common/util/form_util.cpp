@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include <regex>
 
 #include "accesstoken_kit.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "bundle_constants.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
@@ -400,6 +401,17 @@ std::vector<int> FormUtil::ParseFormUpdateLevels(const std::string &additionalIn
         }
     }
     return durationArray;
+}
+
+bool FormUtil::CheckIsFRSCall()
+{
+    std::string callerBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("GetCallerBundleName failed");
+        return false;
+    }
+    return callerBundleName == Constants::FRS_BUNDLE_NAME;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

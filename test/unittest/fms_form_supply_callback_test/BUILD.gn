@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -32,6 +32,7 @@ ohos_unittest("FmsFormSupplyCallbackTest") {
     "${form_fwk_path}/test/mock/src/mock_form_mgr_adapter_facade.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_render_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_bms_helper.cpp",
   ]
   sources += [ "form_supply_callback_test.cpp" ]
 
