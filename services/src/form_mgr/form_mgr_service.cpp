@@ -47,6 +47,7 @@
 #include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "form_xml_parser.h"
+#include "form_resource_param.h"
 #include "running_form_info.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
@@ -815,6 +816,12 @@ void FormMgrService::OnStart()
     }
 
     onStartBeginTime_ = GetCurrentDateTime();
+
+    if (FormResourceParam::IsBopdMode()) {
+        state_ = ServiceRunningState::STATE_RUNNING;
+        HILOG_ERROR("is bopd mode");
+        return;
+    }
     HILOG_INFO("start,time:%{public}s", onStartBeginTime_.c_str());
     ErrCode errCode = Init();
     if (errCode != ERR_OK) {
