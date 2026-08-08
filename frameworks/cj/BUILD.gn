@@ -67,6 +67,7 @@ ohos_shared_library("cj_formBindingData_ffi") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   innerapi_tags = [ "platformsdk" ]
