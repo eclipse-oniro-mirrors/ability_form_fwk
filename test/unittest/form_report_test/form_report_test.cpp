@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
+#define private public
 #include "common/util/form_report.h"
+#undef private
 #include "want.h"
 #include "form_event_report.h"
 
@@ -50,7 +52,7 @@ void FormReportTest::SetUp()
 
 void FormReportTest::TearDown()
 {
-    formReport.GetStatistic().clear();
+    formReport.formStatisticMap_.clear();
 }
 
 /**
@@ -61,8 +63,8 @@ void FormReportTest::TearDown()
 HWTEST_F(FormReportTest, FormReport_001, TestSize.Level1)
 {
     formReport.SetFormRecordInfo(testFormId, want);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    ASSERT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    ASSERT_NE(statisticIt, formReport.formStatisticMap_.end());
     FormStatistic &statistic = statisticIt->second;
     EXPECT_EQ(statistic.bundleName_, BUNDLE);
     EXPECT_EQ(statistic.moduleName_, MODULENAME);
@@ -78,8 +80,8 @@ HWTEST_F(FormReportTest, FormReport_002, TestSize.Level1)
 {
     int64_t startTime = 1000;
     formReport.SetStartGetTime(testFormId, startTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     EXPECT_EQ(statisticIt->second.startGetTime_, startTime);
 }
 
@@ -92,8 +94,8 @@ HWTEST_F(FormReportTest, FormReport_003, TestSize.Level1)
 {
     int64_t endTime = 2000;
     formReport.SetEndGetTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**
@@ -107,8 +109,8 @@ HWTEST_F(FormReportTest, FormReport_004, TestSize.Level1)
     int64_t startTime = 1000;
     formReport.SetStartGetTime(testFormId, startTime);
     formReport.SetEndGetTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     EXPECT_EQ(statisticIt->second.endGetTime_, endTime);
 }
 
@@ -123,8 +125,8 @@ HWTEST_F(FormReportTest, FormReport_005, TestSize.Level1)
     int64_t startTime = 1* 1000;
     formReport.SetDurationStartTime(testFormId, startTime);
     formReport.SetDurationEndTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**
@@ -136,8 +138,8 @@ HWTEST_F(FormReportTest, FormReport_006, TestSize.Level1)
 {
     int64_t startTime = 1* 1000;
     formReport.SetDurationStartTime(testFormId, startTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     EXPECT_EQ(statisticIt->second.durationStartTime_, startTime);
 }
 
@@ -150,8 +152,8 @@ HWTEST_F(FormReportTest, FormReport_007, TestSize.Level1)
 {
     int64_t endTime = 12 * 1000;
     formReport.SetDurationEndTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**
@@ -163,8 +165,8 @@ HWTEST_F(FormReportTest, FormReport_008, TestSize.Level1)
 {
     int64_t startTime = 1000;
     formReport.SetStartAquireTime(testFormId, startTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     EXPECT_EQ(statisticIt->second.startAquireTime_, startTime);
 }
 
@@ -177,8 +179,8 @@ HWTEST_F(FormReportTest, FormReport_009, TestSize.Level1)
 {
     int64_t endTime = 1000;
     formReport.SetEndAquireTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**
@@ -193,8 +195,8 @@ HWTEST_F(FormReportTest, FormReport_010, TestSize.Level1)
     int64_t startTime = 1000;
     formReport.SetStartAquireTime(testFormId, startTime);
     formReport.SetEndAquireTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     formReport.GetEndAquireTime(testFormId, endTime1);
     EXPECT_EQ(endTime1, endTime);
 }
@@ -208,8 +210,8 @@ HWTEST_F(FormReportTest, FormReport_011, TestSize.Level1)
 {
     int64_t startTime = 1000;
     formReport.SetStartBindTime(testFormId, startTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     EXPECT_EQ(statisticIt->second.startBindTime_, startTime);
 }
 
@@ -222,8 +224,8 @@ HWTEST_F(FormReportTest, FormReport_012, TestSize.Level1)
 {
     int64_t endTime = 10 * 1000;
     formReport.SetEndBindTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_EQ(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_EQ(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**
@@ -237,8 +239,8 @@ HWTEST_F(FormReportTest, FormReport_013, TestSize.Level1)
     int64_t startTime = 1000;
     formReport.SetStartBindTime(testFormId, startTime);
     formReport.SetEndBindTime(testFormId, endTime);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     EXPECT_EQ(statisticIt->second.endBindTime_, endTime);
 }
 
@@ -251,8 +253,8 @@ HWTEST_F(FormReportTest, FormReport_014, TestSize.Level1)
 {
     formReport.SetFormRecordInfo(testFormId, want);
     formReport.HandleAddFormStatistic(testFormId);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**
@@ -265,8 +267,8 @@ HWTEST_F(FormReportTest, FormReport_015, TestSize.Level1)
     formReport.SetFormRecordInfo(testFormId, want);
     formReport.InsertFormId(testFormId);
     formReport.HandleAddFormStatistic(testFormId);
-    auto statisticIt = formReport.GetStatistic().find(testFormId);
-    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
+    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**

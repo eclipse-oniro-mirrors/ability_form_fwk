@@ -155,9 +155,11 @@ void ThemeFormClient::OnRemoteSaDied(const wptr<IRemoteObject> &object)
 
 sptr<IThemeManagerService> ThemeFormClient::GetProxy()
 {
-    std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
-    if (themeSvcProxy_) {
-        return themeSvcProxy_;
+    {
+        std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
+        if (themeSvcProxy_) {
+            return themeSvcProxy_;
+        }
     }
 
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -172,6 +174,10 @@ sptr<IThemeManagerService> ThemeFormClient::GetProxy()
     }
 
     if (object != nullptr) {
+        std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
+        if (themeSvcProxy_) {
+            return themeSvcProxy_;
+        }
         deathRecipient_ = new (std::nothrow) ThemeFormDeathRecipient();
         if (deathRecipient_ == nullptr) {
             HILOG_ERROR("Create ThemeFormDeathRecipient failed!");

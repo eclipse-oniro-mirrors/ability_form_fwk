@@ -256,10 +256,5 @@ void FormReport::HandleFirstUpdateStatistic(int64_t formId)
         }
     }
 }
-
-std::unordered_map<int64_t, FormStatistic>& FormReport::GetStatistic()
-{
-    return formStatisticMap_;
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS

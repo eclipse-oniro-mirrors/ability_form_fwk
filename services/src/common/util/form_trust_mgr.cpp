@@ -56,6 +56,7 @@ bool FormTrustMgr::IsTrust(const std::string &bundleName)
 
 void FormTrustMgr::GetUntrustAppNameList(std::string &result)
 {
+    std::lock_guard<std::mutex> lock(unTrustListMutex_);
     std::map<std::string, int32_t>::iterator it = unTrustList_.begin();
     for (; it != unTrustList_.end(); it++) {
         if (it->second > UNTRUST_THRESHOLD) {

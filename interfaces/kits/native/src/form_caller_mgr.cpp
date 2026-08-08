@@ -196,19 +196,16 @@ void FormCallerMgr::HandleProviderCallBackDiedTask(const sptr<IRemoteObject> &re
 std::shared_ptr<EventHandler> FormCallerMgr::GetEventHandler()
 {
     HILOG_DEBUG("call");
-    if (eventHandler_ == nullptr) {
+    static std::once_flag initFlag;
+    std::call_once(initFlag, [this]() {
         auto runner = EventRunner::Create(NAME_FORM_CALLER_MGR);
         if (runner == nullptr) {
             HILOG_ERROR("create runner error");
-            return nullptr;
+            return;
         }
 
         eventHandler_ = std::make_shared<EventHandler>(runner);
-        if (eventHandler_ == nullptr) {
-            HILOG_ERROR("create event handler error");
-            return nullptr;
-        }
-    }
+    });
 
     return eventHandler_;
 }
