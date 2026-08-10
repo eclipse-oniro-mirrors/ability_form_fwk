@@ -818,7 +818,6 @@ void FormMgrService::OnStart()
     onStartBeginTime_ = GetCurrentDateTime();
 
     if (FormResourceParam::IsBopdMode()) {
-        state_ = ServiceRunningState::STATE_RUNNING;
         HILOG_ERROR("is bopd mode");
         return;
     }
