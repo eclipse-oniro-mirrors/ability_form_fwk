@@ -938,7 +938,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
     std::vector<std::string> stringInfoList;
     if (!reply.ReadStringVector(&stringInfoList)) {
         HILOG_ERROR("fail read string vector from reply");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     if (stringInfoList.empty()) {
         HILOG_INFO("No string info");
@@ -1860,7 +1860,10 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
 {
     HILOG_DEBUG("start");
     MessageParcel data;
-    // write in token to help identify which stub to be called
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (!data.WriteString16(Str8ToStr16(funcName))) {
         HILOG_ERROR("write funcName failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1869,20 +1872,13 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
         HILOG_ERROR("write params failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    // send request
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
-    sptr<IRemoteObject> remote = Remote();
-    if (!remote) {
-        HILOG_ERROR("get remoteObject failed");
-        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
-    }
-    int error = remote->SendRequest(Constants::EVENT_CALL_NOTIFY, data, reply, option);
+    MessageOption option;
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_SET_BACKGROUND_FUNCTION, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        HILOG_ERROR("SendTransactCmd:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    // retrieve and return result;
     return reply.ReadInt32();
 }
 

@@ -19,6 +19,8 @@
 #include "common/connection/form_ability_connection.h"
 #include "form_supply_stub.h"
 
+#include <mutex>
+
 namespace OHOS {
 namespace AppExecFwk {
 /**

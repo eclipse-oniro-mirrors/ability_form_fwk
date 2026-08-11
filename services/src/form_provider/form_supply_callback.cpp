@@ -48,13 +48,11 @@ std::mutex FormSupplyCallback::mutex_;
 
 sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
+        instance_ = new (std::nothrow) FormSupplyCallback();
         if (instance_ == nullptr) {
-            instance_ = new (std::nothrow) FormSupplyCallback();
-            if (instance_ == nullptr) {
-                HILOG_ERROR("create FormSupplyCallback failed");
-            }
+            HILOG_ERROR("create FormSupplyCallback failed");
         }
     }
     return instance_;

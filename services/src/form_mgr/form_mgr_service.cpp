@@ -1495,6 +1495,10 @@ int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 
 void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &result)
 {
+    if (!CheckCallerIsSystemApp()) {
+        result = "error: permission denied.";
+        return;
+    }
     DumpKey key;
     std::string value;
     if (!ParseOption(args, key, value, result)) {
@@ -1579,6 +1583,10 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
         };
         sptr<FormSystemloadListener> formSystemloadListener
             = new (std::nothrow) FormSystemloadListener(formSystemloadLevelCb);
+        if (formSystemloadListener == nullptr) {
+            HILOG_ERROR("Failed to create FormSystemloadListener");
+            return;
+        }
         ResourceSchedule::ResSchedClient::GetInstance().RegisterSystemloadNotifier(formSystemloadListener);
         HILOG_INFO("RegisterSystemloadNotifier for Systemloadlevel change");
         return;
