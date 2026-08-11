@@ -1873,8 +1873,13 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageParcel reply;
-    MessageOption option;
-    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_SET_BACKGROUND_FUNCTION, data, reply, option);
+    MessageOption option(MessageOption::TF_ASYNC);
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("get remoteObject failed");
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int error = remote->SendRequest(Constants::EVENT_CALL_NOTIFY, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendTransactCmd:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
