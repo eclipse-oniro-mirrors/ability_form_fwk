@@ -1274,7 +1274,7 @@ int FormMgr::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("bundleName is %{public}s", bundleName.c_str());
+    HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
     if (bundleName.empty()) {
         HILOG_WARN("fail Get forms info,because empty bundle name");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
@@ -1351,7 +1351,7 @@ int FormMgr::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vecto
 int FormMgr::GetFullFormsInfoByModule(std::string &bundleName, std::string &moduleName,
     std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("bundleName is %{public}s, moduleName is %{public}s", bundleName.c_str(), moduleName.c_str());
+    HILOG_INFO("bundleName:%{public}s, moduleName:%{public}s", bundleName.c_str(), moduleName.c_str());
     if (bundleName.empty()) {
         HILOG_WARN("fail Get forms info,because empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;

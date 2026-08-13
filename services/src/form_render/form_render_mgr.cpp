@@ -432,7 +432,6 @@ void FormRenderMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable)
 
 void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible, int32_t userId)
 {
-    HILOG_INFO("call.");
     if (userId == Constants::INVALID_USER_ID) {
         userId = FormUtil::GetCurrentAccountId();
     }
