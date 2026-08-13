@@ -45,7 +45,7 @@ using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 
 namespace {
-    constexpr uint32_t MAX_FORM_IDS_COUNT = 256;
+    constexpr uint32_t MAX_FORM_IDS_COUNT = 1024;
     constexpr int REF_COUNT = 1;
     // NANOSECONDS mean 10^9 nano second
     constexpr int64_t NANOSECONDS = 1000000000;

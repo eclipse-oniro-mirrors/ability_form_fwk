@@ -36,7 +36,7 @@ napi_value AttachUIExtensionContext(napi_env env, void *value, void *)
         return nullptr;
     }
 
-    auto ptr = (*reinterpret_cast<std::shared_ptr<FormEditExtensionContext> *>(value));
+    auto ptr = reinterpret_cast<std::weak_ptr<FormEditExtensionContext> *>(value)->lock();
     if (ptr == nullptr) {
         TAG_LOGE(AAFwkTag::UI_EXT, "Invalid context");
         return nullptr;
@@ -118,10 +118,10 @@ void JsFormEditExtensionImpl::BindContext()
     napi_status status = napi_wrap(env, contextObj, workContext,
         [](napi_env, void *data, void *) {
             if (data == nullptr) {
-                TAG_LOGE(AAFwkTag::UI_EXT, "Finalizer for shared_ptr is nullptr");
+                TAG_LOGE(AAFwkTag::UI_EXT, "Finalizer for weak_ptr is nullptr");
                 return;
             }
-            delete static_cast<std::shared_ptr<FormEditExtensionContext> *>(data);
+            delete static_cast<std::weak_ptr<FormEditExtensionContext> *>(data);
         }, nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
         TAG_LOGE(AAFwkTag::UI_EXT, "napi_wrap Failed: %{public}d", status);
