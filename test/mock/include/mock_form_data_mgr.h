@@ -83,6 +83,7 @@ public:
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate,
         std::vector<int64_t> &refreshForms) = 0;
     virtual void SetFormVisible(int64_t formId, bool isVisible) = 0;
+    virtual void DeleteFormVisible(int64_t formId) = 0;
     virtual ErrCode SetFormLock(const int64_t formId, const bool lock) = 0;
     virtual void SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled) = 0;
     virtual void SetExpectRecycledStatusVec(const std::vector<int64_t> &formIds, bool isExpectRecycled) = 0;
@@ -154,6 +155,7 @@ public:
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate,
         std::vector<int64_t> &refreshForms));
     MOCK_METHOD2(SetFormVisible, void(int64_t formId, bool isVisible));
+    MOCK_METHOD1(DeleteFormVisible, void(int64_t formId));
     MOCK_METHOD2(SetFormLock, ErrCode(const int64_t formId, const bool lock));
     MOCK_METHOD2(SetExpectRecycledStatus, void(int64_t formId, bool isExpectRecycled));
     MOCK_METHOD2(SetExpectRecycledStatusVec, void(const std::vector<int64_t> &formIds, bool isExpectRecycled));

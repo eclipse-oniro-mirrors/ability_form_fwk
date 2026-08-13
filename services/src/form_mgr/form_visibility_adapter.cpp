@@ -86,9 +86,13 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-        FormRecord formRecord;
 
+        // Set visible before validity check to shrink the GetFormVisible/SetFormVisible race window.
+        FormDataMgr::GetInstance().SetFormVisible(matchedFormId, formVisibleType == Constants::FORM_VISIBLE);
+
+        FormRecord formRecord;
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
+            FormDataMgr::GetInstance().DeleteFormVisible(matchedFormId);
             continue;
         }
         SetVisibleChange(matchedFormId, formVisibleType, userId);
@@ -178,7 +182,6 @@ void FormVisibilityAdapter::SetVisibleChange(const int64_t formId, const int32_t
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible, userId);
 
-    FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
         FormDataMgr::GetInstance().SetExpectRecycledStatus(formId, false);
         RefreshCacheMgr::GetInstance().ConsumeRenderTask(formId);
