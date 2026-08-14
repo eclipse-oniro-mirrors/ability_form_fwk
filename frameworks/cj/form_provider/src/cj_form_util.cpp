@@ -206,16 +206,16 @@ bool ConvertFromDataProxies(const CArrProxyData& cArrProxyData, std::vector<Form
         HILOG_ERROR("null head");
         return false;
     }
-    int32_t len = cArrProxyData.size;
-    if (len < 0 || len > static_cast<int32_t>(MAX_SIZE)) {
-        HILOG_ERROR("invalid size: %{public}d", len);
+    int64_t len = cArrProxyData.size;
+    if (len < 0 || len > static_cast<int64_t>(MAX_SIZE)) {
+        HILOG_ERROR("invalid size: %{public}" PRId64, len);
         return false;
     }
-    for (int32_t i = 0; i < len; i++) {
+    for (int64_t i = 0; i < len; i++) {
         FormDataProxy formDataProxy("", "");
         CProxyData element = cArrProxyData.head[i];
         if (!ConvertFormDataProxy(element, formDataProxy)) {
-            HILOG_ERROR("GetElement [%{public}u] error", i);
+            HILOG_ERROR("GetElement [%{public}" PRId64 "] error", i);
             continue;
         }
         formDataProxies.push_back(formDataProxy);
