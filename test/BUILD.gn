@@ -36,6 +36,7 @@ group("unittest") {
   deps = [
     "unittest/fms_form_ashmem_test:unittest",
     "unittest/fms_form_caller_mgr_test:unittest",
+    "unittest/fms_form_constants_test:unittest",
     "unittest/fms_form_event_report_test:unittest",
     "unittest/fms_form_host_client_test:unittest",
     "unittest/fms_form_host_delegate_stub_test:unittest",

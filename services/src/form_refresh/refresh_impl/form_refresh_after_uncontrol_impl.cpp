@@ -21,6 +21,7 @@
 #include "form_refresh/strategy/refresh_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "common/util/form_util.h"
+#include "form_constants_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -87,7 +88,7 @@ bool FormRefreshAfterUncontrolImpl::DetectControlPoint(
     if (refreshType == Constants::REFRESHTYPE_VISIABLE) {
         FormDataMgr::GetInstance().GetRefreshType(data.formId, refreshType);
         HILOG_INFO("refreshType:%{public}d, formId:%{public}" PRId64, refreshType, data.formId);
-        if (Constants::CONDITION_REFRESHTYPE_SET.find(refreshType) != Constants::CONDITION_REFRESHTYPE_SET.end()) {
+        if (FormConstantsUtil::IsConditionRefreshType(refreshType)) {
             isCountTimerRefresh = false;
         }
     }
