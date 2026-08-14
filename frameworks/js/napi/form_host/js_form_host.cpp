@@ -3207,67 +3207,52 @@ void CallBackReturn(const Rect &item, std::shared_ptr<LiveFormInterfaceParam> li
 void JsFormRouterProxyMgr::GetFormRectInner(std::shared_ptr<LiveFormInterfaceParam> dataParam)
 {
     HILOG_INFO("call");
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(getFormRectEnv_, &scope);
-    if (scope == nullptr) {
-        HILOG_ERROR("null scope");
-        return;
-    }
+    AbilityRuntime::HandleScope scopeGuard(getFormRectEnv_);
     AbilityRuntime::HandleEscape handleEscape(getFormRectEnv_);
     napi_value callbackValue;
-    if (napi_create_string_utf8(getFormRectEnv_, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &callbackValue) != napi_ok) {
+    if (napi_create_string_utf8(getFormRectEnv_, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &callbackValue) !=
+        napi_ok) {
         HILOG_ERROR("napi_create_string_utf8 failed");
-        napi_close_handle_scope(getFormRectEnv_, scope);
         return;
     }
-
     napi_value myCallback = nullptr;
     {
         std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
         if (napi_get_reference_value(getFormRectEnv_, getFormRectCallbackRef_, &myCallback) != napi_ok) {
             HILOG_ERROR("napi_get_reference_value failed");
-            napi_close_handle_scope(getFormRectEnv_, scope);
             return;
         }
     }
     napi_valuetype valueType;
     napi_typeof(getFormRectEnv_, myCallback, &valueType);
-
     if (valueType != napi_function) {
         dataParam->result = false;
-        napi_close_handle_scope(getFormRectEnv_, scope);
         return;
     }
     napi_value callResult = nullptr;
-    napi_status status =
-        napi_call_function(getFormRectEnv_, nullptr, myCallback, ARGS_ONE, &callbackValue, &callResult);
+    napi_status status = napi_call_function(getFormRectEnv_, nullptr, myCallback, ARGS_ONE,
+        &callbackValue, &callResult);
     if (status != napi_ok) {
         dataParam->result = false;
-        napi_close_handle_scope(getFormRectEnv_, scope);
         return;
     }
-
     napi_valuetype returnType;
     napi_typeof(getFormRectEnv_, callResult, &returnType);
-
     if (returnType == napi_undefined) {
         dataParam->result = false;
-        napi_close_handle_scope(getFormRectEnv_, scope);
         return;
     }
-    bool isPromise = false;
     napi_value funcResult = handleEscape.Escape(callResult);
+    bool isPromise = false;
     napi_is_promise(getFormRectEnv_, funcResult, &isPromise);
     if (!isPromise) {
         HILOG_INFO("result not promise");
         std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
         bool ret = ConvertFunctionResult(getFormRectEnv_, funcResult, *item);
         CallBackReturn(*item, dataParam, ret);
-        napi_close_handle_scope(getFormRectEnv_, scope);
-        return;
+    } else {
+        CallPromise(funcResult, dataParam);
     }
-    CallPromise(funcResult, dataParam);
-    napi_close_handle_scope(getFormRectEnv_, scope);
 }
 
 void JsFormRouterProxyMgr::CallPromise(napi_value funcResult, std::shared_ptr<LiveFormInterfaceParam> params)

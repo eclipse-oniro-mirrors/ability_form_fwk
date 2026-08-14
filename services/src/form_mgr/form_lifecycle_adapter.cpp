@@ -197,11 +197,6 @@ ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const
     HILOG_WARN("add exist formRecord, formId:%{public}" PRId64, formId);
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
-    int callerUserId = FormUtil::GetCallerUserId(callingUid);
-    if (callerUserId != record.providerUserId) {
-        HILOG_ERROR("callerUserId not belong to card provider, formId:%{public}" PRId64, formId);
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
     bool isCreated = FormDataMgr::GetInstance().AllotFormHostRecord(info, callerToken, formId, callingUid);
     if (!isCreated) {
         HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord, formId:%{public}" PRId64, formId);
