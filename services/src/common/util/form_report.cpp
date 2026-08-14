@@ -185,43 +185,41 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
         HILOG_ERROR("invalid formId:%{public}" PRId64, formId);
         return;
     }
+    std::lock_guard<std::mutex> guard(formReport_);
     if (HasFormId(formId)) {
         HILOG_ERROR("hisysevent yet formid:%{public}" PRId64, formId);
         return;
     }
+    if (formStatisticMap_.count(formId) == 0) {
+        HILOG_INFO("invalid formId:%{public}" PRId64, formId);
+        return;
+    }
+    auto &record = formStatisticMap_[formId];
     NewFormEventInfo eventInfo;
-    {
-        std::lock_guard<std::mutex> guard(formReport_);
-        if (formStatisticMap_.count(formId) == 0) {
-            HILOG_INFO("invalid formId:%{public}" PRId64, formId);
-            return;
-        }
-        auto &record = formStatisticMap_[formId];
-        eventInfo.sessionId = 0;
-        eventInfo.formId = formId;
-        eventInfo.bundleName = record.bundleName_;
-        eventInfo.moduleName = record.moduleName_;
-        eventInfo.abilityName = record.abilityName_;
-        eventInfo.formName = record.formName_;
-        eventInfo.formDimension = record.dimensionId_;
-        if (record.endBindTime_ > record.startBindTime_) {
-            eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
-        } else {
-            eventInfo.bindDuration = 0;
-            HILOG_ERROR("bindDuration error formId:%{public}" PRId64, formId);
-        }
-        if (record.endGetTime_ > record.startGetTime_) {
-            eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
-        } else {
-            eventInfo.getDuration = 0;
-            HILOG_ERROR("getDuration error formId:%{public}" PRId64, formId);
-        }
-        if (record.endAquireTime_ > record.startAquireTime_) {
-            eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
-        } else {
-            eventInfo.acquireDuration = 0;
-            HILOG_ERROR("acquireDuration error formId:%{public}" PRId64, formId);
-        }
+    eventInfo.sessionId = 0;
+    eventInfo.formId = formId;
+    eventInfo.bundleName = record.bundleName_;
+    eventInfo.moduleName = record.moduleName_;
+    eventInfo.abilityName = record.abilityName_;
+    eventInfo.formName = record.formName_;
+    eventInfo.formDimension = record.dimensionId_;
+    if (record.endBindTime_ > record.startBindTime_) {
+        eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
+    } else {
+        eventInfo.bindDuration = 0;
+        HILOG_ERROR("bindDuration error formId:%{public}" PRId64, formId);
+    }
+    if (record.endGetTime_ > record.startGetTime_) {
+        eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
+    } else {
+        eventInfo.getDuration = 0;
+        HILOG_ERROR("getDuration error formId:%{public}" PRId64, formId);
+    }
+    if (record.endAquireTime_ > record.startAquireTime_) {
+        eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
+    } else {
+        eventInfo.acquireDuration = 0;
+        HILOG_ERROR("acquireDuration error formId:%{public}" PRId64, formId);
     }
 
     FormEventReport::SendFirstAddFormEvent(FormEventName::FIRST_ADD_FORM_DURATION,

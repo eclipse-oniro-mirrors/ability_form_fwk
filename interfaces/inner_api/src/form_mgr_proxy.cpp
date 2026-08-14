@@ -1860,10 +1860,6 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
 {
     HILOG_DEBUG("start");
     MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
     if (!data.WriteString16(Str8ToStr16(funcName))) {
         HILOG_ERROR("write funcName failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1881,7 +1877,7 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
     }
     int error = remote->SendRequest(Constants::EVENT_CALL_NOTIFY, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("SendTransactCmd:%{public}d failed", error);
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
