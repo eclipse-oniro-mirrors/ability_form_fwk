@@ -416,7 +416,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     {
         // Some resources need to be initialized in a JS thread
         if (GetEventHandler(true, formJsInfo.isDynamic) == nullptr) {
-            HILOG_ERROR("null eventHandler_ ");
+            HILOG_ERROR("null eventHandler");
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
         std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
@@ -442,7 +442,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             renderRecord->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType);
         };
         if (eventHandler == nullptr) {
-            HILOG_ERROR("null eventHandler_ ");
+            HILOG_ERROR("null eventHandler");
             return RENDER_FORM_FAILED;
         }
         eventHandler->PostTask(task, "UpdateRenderRecord");
@@ -1165,11 +1165,13 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
 
 void FormRenderRecord::Release()
 {
-    std::shared_ptr<EventHandler> eventHandler = eventHandler_;
-    std::shared_ptr<EventRunner> eventRunner = eventRunner_;
+    std::shared_ptr<EventHandler> eventHandler;
+    std::shared_ptr<EventRunner> eventRunner;
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-        if (eventHandler_ == nullptr) {
+        eventHandler = eventHandler_;
+        eventRunner = eventRunner_;
+        if (eventHandler == nullptr) {
             HILOG_INFO("null eventHandler");
             return;
         }
@@ -1443,7 +1445,7 @@ int32_t FormRenderRecord::OnUnlock()
     };
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("null eventHandler_");
+        HILOG_ERROR("null eventHandler");
         return RENDER_FORM_FAILED;
     }
     eventHandler->PostTask(task, "OnUnlock");
@@ -1597,7 +1599,8 @@ void FormRenderRecord::UpdateConfiguration(
 
     SetConfiguration(config);
     UpdateContextConfiguration();
-    if (eventHandler_ == nullptr) {
+    auto eventHandler = GetEventHandler();
+    if (eventHandler == nullptr) {
         if (GetEventHandler(true, true) == nullptr) {
             HILOG_ERROR("null eventHandler");
             return;
@@ -1617,9 +1620,7 @@ void FormRenderRecord::UpdateConfiguration(
         renderRecord->HandleUpdateConfiguration(config);
     };
 
-    auto eventHandler = GetEventHandler();
-    if (eventHandler != nullptr)
-        eventHandler->PostTask(task, "UpdateConfiguration");
+    eventHandler->PostTask(task, "UpdateConfiguration");
     ReAddAllRecycledForms(formSupplyClient);
 }
 
@@ -1642,6 +1643,12 @@ void FormRenderRecord::HandleUpdateConfiguration(
 
 void FormRenderRecord::FormRenderGC()
 {
+    auto eventHandler = GetEventHandler();
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("null eventHandler");
+        return;
+    }
+
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto task = [thisWeakPtr]() {
         auto renderRecord = thisWeakPtr.lock();
@@ -1651,13 +1658,7 @@ void FormRenderRecord::FormRenderGC()
         }
         renderRecord->HandleFormRenderGC();
     };
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("null eventHandler_");
-        return;
-    }
-    auto eventHandler = GetEventHandler();
-    if (eventHandler != nullptr)
-        eventHandler->PostSyncTask(task, "HandleFormRenderGC");
+    eventHandler->PostSyncTask(task, "HandleFormRenderGC");
 }
 
 void FormRenderRecord::HandleFormRenderGC()
@@ -1676,7 +1677,7 @@ int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &status
     HILOG_INFO("RecycleForm begin, formId:%{public}s", std::to_string(formId).c_str());
     int32_t result = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (GetEventHandler(true, true) == nullptr) {
-        HILOG_ERROR("null eventHandler_");
+        HILOG_ERROR("null eventHandler");
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
 
@@ -1724,7 +1725,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId:%{public}s", std::to_string(formId).c_str());
     if (GetEventHandler(true, true) == nullptr) {
-        HILOG_ERROR("null eventHandler_");
+        HILOG_ERROR("null eventHandler");
         return RENDER_FORM_FAILED;
     }
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
@@ -1751,7 +1752,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
             FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
     };
     if (eventHandler == nullptr) {
-        HILOG_ERROR("null eventHandler_ ");
+        HILOG_ERROR("null eventHandler");
         return RENDER_FORM_FAILED;
     }
     eventHandler->PostTask(task, "RecoverForm");
