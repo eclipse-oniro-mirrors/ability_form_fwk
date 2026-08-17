@@ -694,6 +694,7 @@ napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info
         DelFormUninstallCallback(argv[1]);
         return nullptr;
     } else {
+        HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", type.c_str());
         ClearFormUninstallCallback();
         return nullptr;
     }

@@ -1322,6 +1322,7 @@ private:
             return CreateJsUndefined(env);
         }
 
+        HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", type.c_str());
         if (type == FORM_UNINSTALL) {
             ClearFormUninstallCallback();
         } else if (type == FORM_OVERFLOW) {

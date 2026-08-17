@@ -321,6 +321,8 @@ private:
                 DelFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, argv[funcPos], formObserver_);
             return CreateJsUndefined(env);
         }
+        HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s",
+            isVisibility ? "notifyVisible" : "notifyInvisible");
         // If there is only one argument.
         JsFormStateObserver::GetInstance()->
             ClearFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, formObserver_);
@@ -343,6 +345,7 @@ private:
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formRemove");
             JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle(bundleName);
             return CreateJsUndefined(env);
         } else {
@@ -388,6 +391,7 @@ private:
 
         if (argc == ARGS_ONE) {
             // If there is only one argument, all listening will be cancelled.
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formRemove");
             JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle("all");
             return CreateJsUndefined(env);
         } else if (argc == ARGS_TWO) {
@@ -413,6 +417,7 @@ private:
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formAdd");
             JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle(bundleName);
             return CreateJsUndefined(env);
         } else {
@@ -458,6 +463,7 @@ private:
 
         if (argc == ARGS_ONE) {
             // If there is only one argument, full listening will be cancelled.
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formAdd");
             JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle("all");
             return CreateJsUndefined(env);
         } else if (argc == ARGS_TWO) {
@@ -775,18 +781,21 @@ private:
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_ONE) {
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", type.c_str());
             JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, EMPTY_BUNDLE);
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_TWO) {
             if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
                 HILOG_DEBUG("secondParam bundlename not string");
+                HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", type.c_str());
                 JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, EMPTY_BUNDLE);
                 return CreateJsUndefined(env);
             } else if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
                 HILOG_ERROR("Convert bundleName failed");
                 return CreateJsUndefined(env);
             }
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", type.c_str());
             JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
             return CreateJsUndefined(env);
         }
@@ -799,6 +808,7 @@ private:
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_null) ||
             AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_undefined)) {
             HILOG_DEBUG("null or undefined thirdParam");
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", type.c_str());
             JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
             return CreateJsUndefined(env);
         } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
