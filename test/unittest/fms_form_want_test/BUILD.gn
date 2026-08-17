@@ -33,7 +33,7 @@ ohos_unittest("FmsFormWantTest") {
   cflags = []
   
   deps = [
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_manager",
   ]
   

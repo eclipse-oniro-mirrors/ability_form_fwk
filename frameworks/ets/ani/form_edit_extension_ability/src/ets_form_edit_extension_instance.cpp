@@ -29,25 +29,29 @@ constexpr const char *ETS_ANI_LIBNAME = "libform_edit_extension_ani.z.so";
 constexpr const char *ETS_ANI_CREATE_FUNC = "OHOS_ETS_Form_Edit_Extension_Create";
 using CreateETSFormEditExtensionFunc = FormEditExtension*(*)(const std::unique_ptr<Runtime>&);
 CreateETSFormEditExtensionFunc g_etsCreateFunc = nullptr;
+std::once_flag g_initFlag;
 }
 
 FormEditExtension *CreateETSFormEditExtension(const std::unique_ptr<Runtime> &runtime)
 {
-    if (g_etsCreateFunc != nullptr) {
-        return g_etsCreateFunc(runtime);
-    }
-    auto handle = dlopen(ETS_ANI_LIBNAME, RTLD_LAZY);
-    if (handle == nullptr) {
-        HILOG_ERROR("dlopen failed %{public}s, %{public}s", ETS_ANI_LIBNAME, dlerror());
+    std::call_once(g_initFlag, []() {
+        auto handle = dlopen(ETS_ANI_LIBNAME, RTLD_LAZY);
+        if (handle == nullptr) {
+            HILOG_ERROR("dlopen failed %{public}s, %{public}s", ETS_ANI_LIBNAME, dlerror());
+            return;
+        }
+        auto symbol = dlsym(handle, ETS_ANI_CREATE_FUNC);
+        if (symbol == nullptr) {
+            HILOG_ERROR("dlsym failed %{public}s, %{public}s", ETS_ANI_CREATE_FUNC, dlerror());
+            dlclose(handle);
+            return;
+        }
+        g_etsCreateFunc = reinterpret_cast<CreateETSFormEditExtensionFunc>(symbol);
+    });
+    
+    if (g_etsCreateFunc == nullptr) {
         return nullptr;
     }
-    auto symbol = dlsym(handle, ETS_ANI_CREATE_FUNC);
-    if (symbol == nullptr) {
-        HILOG_ERROR("dlsym failed %{public}s, %{public}s", ETS_ANI_CREATE_FUNC, dlerror());
-        dlclose(handle);
-        return nullptr;
-    }
-    g_etsCreateFunc = reinterpret_cast<CreateETSFormEditExtensionFunc>(symbol);
     return g_etsCreateFunc(runtime);
 }
 } // namespace AbilityRuntime

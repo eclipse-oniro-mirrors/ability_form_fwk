@@ -253,6 +253,10 @@ namespace Constants {
     constexpr int32_t MAX_RECORD_PER_USER = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
+    constexpr int32_t MAX_FORM_NAME_LENGTH = 128;
+    constexpr int32_t MAX_BUNDLE_NAME_LENGTH = 128;
+    constexpr int32_t MAX_ABILITY_NAME_LENGTH = 128;
+    constexpr int32_t MAX_MODULE_NAME_LENGTH = 128;
     constexpr int32_t DEFAULT_VISIBLE_NOTIFY_DELAY = 1000;
 
     constexpr char MAX_NORMAL_FORM_SIZE [] = "maxNormalFormSize";
@@ -355,6 +359,7 @@ namespace Constants {
         NO_SPACE,
         PARAM_ERROR,
         INTERNAL_ERROR,
+        NOT_SUPPORT,
     };
  
     enum FormUpdateReason : int8_t {

@@ -269,9 +269,10 @@ public:
 
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-        const std::vector<FormDataProxy> &formDataProxies = {}, bool needCheckFormPermission = true);
+        const std::vector<FormDataProxy> &formDataProxies = {});
 
-    ErrCode QueryPublishFormToHost(Want &want);
+    ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId);
 
     ErrCode QueryPublishFormToHost(Want &want, int32_t userId);
 

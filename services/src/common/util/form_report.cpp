@@ -181,16 +181,20 @@ bool FormReport::HasFormId(int64_t formId)
 
 void FormReport::HandleAddFormStatistic(int64_t formId)
 {
-    std::lock_guard<std::mutex> guard(formReport_);
-    auto &record = formStatisticMap_[formId];
-    if (formStatisticMap_.count(formId) == 0) {
-        HILOG_INFO("invalid formId:%{public}" PRId64, formId);
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId:%{public}" PRId64, formId);
         return;
     }
+    std::lock_guard<std::mutex> guard(formReport_);
     if (HasFormId(formId)) {
         HILOG_ERROR("hisysevent yet formid:%{public}" PRId64, formId);
         return;
     }
+    if (formStatisticMap_.count(formId) == 0) {
+        HILOG_INFO("invalid formId:%{public}" PRId64, formId);
+        return;
+    }
+    auto &record = formStatisticMap_[formId];
     NewFormEventInfo eventInfo;
     eventInfo.sessionId = 0;
     eventInfo.formId = formId;
@@ -203,15 +207,21 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
         eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
     } else {
         eventInfo.bindDuration = 0;
-        HILOG_ERROR("bindDuration error formid:%{public}" PRId64, formId);
+        HILOG_ERROR("bindDuration error formId:%{public}" PRId64, formId);
     }
     if (record.endGetTime_ > record.startGetTime_) {
         eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
     } else {
-        eventInfo.bindDuration = 0;
-        HILOG_ERROR("getDuration error formid:%{public}" PRId64, formId);
+        eventInfo.getDuration = 0;
+        HILOG_ERROR("getDuration error formId:%{public}" PRId64, formId);
     }
-    eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
+    if (record.endAquireTime_ > record.startAquireTime_) {
+        eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
+    } else {
+        eventInfo.acquireDuration = 0;
+        HILOG_ERROR("acquireDuration error formId:%{public}" PRId64, formId);
+    }
+
     FormEventReport::SendFirstAddFormEvent(FormEventName::FIRST_ADD_FORM_DURATION,
         HiSysEventType::STATISTIC, eventInfo);
     InsertFormId(formId);
@@ -243,12 +253,6 @@ void FormReport::HandleFirstUpdateStatistic(int64_t formId)
             iter->second.durationStartTime_ = 0;
         }
     }
-}
-
-std::unordered_map<int64_t, FormStatistic> FormReport::GetStatistic()
-{
-    std::lock_guard<std::mutex> guard(formReport_);
-    return formStatisticMap_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

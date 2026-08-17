@@ -21,6 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_event_report.h"
+#include "json_util_form.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -95,6 +96,11 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
     }
 
     HILOG_DEBUG("FormInfoRdbStorageMgr update form info, bundleName=%{public}s", bundleName.c_str());
+    nlohmann::json checkJson = SafeJsonParse(formInfoStorages);
+    if (checkJson.is_discarded()) {
+        HILOG_ERROR("formInfoStorages is not valid JSON for bundle %{public}s", bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
     std::string value = formInfoStorages;
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
@@ -110,7 +116,7 @@ void FormInfoRdbStorageMgr::SaveEntries(
 {
     for (const auto &item : value) {
         InnerFormInfo innerFormInfo;
-        nlohmann::json jsonObject = nlohmann::json::parse(item.second, nullptr, false);
+        nlohmann::json jsonObject = SafeJsonParse(item.second);
         if (jsonObject.is_discarded() || innerFormInfo.FromJson(jsonObject) != true) {
             HILOG_ERROR("error key: %{private}s", item.first.c_str());
             FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, item.first);

@@ -392,7 +392,13 @@ bool FormMgrAdapterFacade::IsRequestPublishFormSupported()
 
 ErrCode FormMgrAdapterFacade::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    return g_requestPublishForm;
+}
+
+ErrCode FormMgrAdapterFacade::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
     return g_requestPublishForm;
 }

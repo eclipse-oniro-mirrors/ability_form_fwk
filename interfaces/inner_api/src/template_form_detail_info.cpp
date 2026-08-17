@@ -14,10 +14,28 @@
  */
 #include "template_form_detail_info.h"
 #include "fms_log_wrapper.h"
+#include "form_constants.h"
 #include "string_ex.h"
- 
+
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+bool ReadStringField(Parcel &parcel, const char *fieldName, std::string &out, size_t maxLength = 0)
+{
+    std::u16string u16;
+    if (!parcel.ReadString16(u16)) {
+        HILOG_ERROR("read %{public}s failed", fieldName);
+        return false;
+    }
+    out = Str16ToStr8(u16);
+    if (maxLength > 0 && (out.empty() || out.size() > maxLength)) {
+        HILOG_ERROR("invalid %{public}s, length:%{public}zu", fieldName, out.size());
+        return false;
+    }
+    return true;
+}
+} // namespace
+
 bool TemplateFormDetailInfo::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString16(Str8ToStr16(bundleName))) {
@@ -29,12 +47,12 @@ bool TemplateFormDetailInfo::Marshalling(Parcel &parcel) const
         HILOG_ERROR("marshal moduleName failed");
         return false;
     }
- 
+
     if (!parcel.WriteString16(Str8ToStr16(abilityName))) {
         HILOG_ERROR("marshal abilityName failed");
         return false;
     }
- 
+
     if (!parcel.WriteString16(Str8ToStr16(formName))) {
         HILOG_ERROR("marshal formName failed");
         return false;
@@ -44,38 +62,45 @@ bool TemplateFormDetailInfo::Marshalling(Parcel &parcel) const
         HILOG_ERROR("marshal dimension failed");
         return false;
     }
- 
+
     if (!parcel.WriteString16(Str8ToStr16(detailId))) {
         HILOG_ERROR("marshal detailId failed");
         return false;
     }
- 
+
     if (!parcel.WriteString16(Str8ToStr16(displayName))) {
         HILOG_ERROR("marshal displayName failed");
         return false;
     }
- 
+
     if (!parcel.WriteString16(Str8ToStr16(description))) {
         HILOG_ERROR("marshal description failed");
         return false;
     }
- 
+
     return true;
 }
- 
+
 bool TemplateFormDetailInfo::ReadFromParcel(Parcel &parcel)
 {
-    bundleName = Str16ToStr8(parcel.ReadString16());
-    moduleName = Str16ToStr8(parcel.ReadString16());
-    abilityName = Str16ToStr8(parcel.ReadString16());
-    formName = Str16ToStr8(parcel.ReadString16());
-    dimension = parcel.ReadInt32();
-    detailId = Str16ToStr8(parcel.ReadString16());
-    displayName = Str16ToStr8(parcel.ReadString16());
-    description = Str16ToStr8(parcel.ReadString16());
+    if (!ReadStringField(parcel, "bundleName", bundleName, Constants::MAX_BUNDLE_NAME_LENGTH) ||
+        !ReadStringField(parcel, "moduleName", moduleName, Constants::MAX_MODULE_NAME_LENGTH) ||
+        !ReadStringField(parcel, "abilityName", abilityName, Constants::MAX_ABILITY_NAME_LENGTH) ||
+        !ReadStringField(parcel, "formName", formName, Constants::MAX_FORM_NAME_LENGTH)) {
+        return false;
+    }
+    if (!parcel.ReadInt32(dimension)) {
+        HILOG_ERROR("read dimension failed");
+        return false;
+    }
+    if (!ReadStringField(parcel, "detailId", detailId) ||
+        !ReadStringField(parcel, "displayName", displayName) ||
+        !ReadStringField(parcel, "description", description)) {
+        return false;
+    }
     return true;
 }
- 
+
 TemplateFormDetailInfo *TemplateFormDetailInfo::Unmarshalling(Parcel &parcel)
 {
     std::unique_ptr<TemplateFormDetailInfo> templateFormDetailInfo = std::make_unique<TemplateFormDetailInfo>();

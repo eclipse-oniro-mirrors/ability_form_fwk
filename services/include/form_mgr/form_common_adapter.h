@@ -52,7 +52,8 @@ enum class AddFormResultErrorCodes : int8_t {
     SUCCESS,
     FAILED,
     TIMEOUT,
-    NO_SPACE
+    NO_SPACE,
+    NOT_SUPPORT
 };
 
 /**
@@ -72,6 +73,12 @@ public:
      * @return Returns ERR_OK on success, others on failure
      */
     virtual ErrCode GetFormConfigInfo(const Want& want, FormItemInfo &formItemInfo);
+
+    /**
+     * @brief Align appIndex and providerUid to the enabled clone instance
+     * @param formItemInfo Form item info to align
+     */
+    virtual void AlignCloneProviderUid(FormItemInfo &formItemInfo);
 
     /**
      * @brief Get bundle info

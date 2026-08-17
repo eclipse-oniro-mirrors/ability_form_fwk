@@ -46,9 +46,8 @@ ohos_unittest("FmsFormMgrServiceTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -77,6 +76,7 @@ ohos_unittest("FmsFormMgrServiceTest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",
@@ -149,7 +149,7 @@ ohos_unittest("FmsFormMgrServiceTest2") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
@@ -178,6 +178,7 @@ ohos_unittest("FmsFormMgrServiceTest2") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",

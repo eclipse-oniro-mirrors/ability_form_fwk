@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include "ipc_skeleton.h"
 #include "fms_log_wrapper.h"
 #include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_constants.h"
 #include "data_center/form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"
@@ -47,16 +48,77 @@ std::mutex FormSupplyCallback::mutex_;
 
 sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
+        instance_ = new (std::nothrow) FormSupplyCallback();
         if (instance_ == nullptr) {
-            instance_ = new (std::nothrow) FormSupplyCallback();
-            if (instance_ == nullptr) {
-                HILOG_ERROR("create FormSupplyCallback failed");
-            }
+            HILOG_ERROR("create FormSupplyCallback failed");
         }
     }
     return instance_;
+}
+
+bool FormSupplyCallback::VerifyCaller(CallerType callerType)
+{
+    if (callerType == CallerType::PROVIDER) {
+        return true;
+    }
+
+    if (callerType == CallerType::FRS) {
+        // FRS callbacks: only com.ohos.formrenderservice process is allowed.
+        if (!FormUtil::CheckIsFRSCall()) {
+            HILOG_ERROR("FRS request from non-FRS process rejected");
+            return false;
+        }
+        return true;
+    }
+
+    HILOG_ERROR("Unknown caller type rejected");
+    return false;
+}
+
+int32_t FormSupplyCallback::CheckCallerOwnsForm(int64_t formId)
+{
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    std::string callerBundle;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundle);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get caller bundle failed, formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    FormRecord record;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
+        HILOG_ERROR("form record not exist, formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if (callerBundle != record.bundleName) {
+        HILOG_ERROR("provider not owner, caller:%{public}s, owner:%{public}s, formId:%{public}" PRId64,
+            callerBundle.c_str(), record.bundleName.c_str(), formId);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::ValidateAcquireRequest(const Want &want, int64_t &formId)
+{
+    int errCode = want.GetIntParam(Constants::PROVIDER_FLAG, ERR_OK);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("provider flag error, errCode:%{public}d", errCode);
+        return errCode;
+    }
+    std::string strFormId = want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY);
+    if (strFormId.empty()) {
+        HILOG_ERROR("empty formId in want");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (!FormUtil::ConvertStringToInt64(strFormId, formId)) {
+        HILOG_ERROR("convert formId failed, strFormId:%{public}s", strFormId.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return CheckCallerOwnsForm(formId);
 }
 
 void FormSupplyCallback::ProcessFormAcquisition(int64_t formId)
@@ -81,23 +143,14 @@ void FormSupplyCallback::ProcessFormAcquisition(int64_t formId)
 int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, const Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("call");
-    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    int errCode = want.GetIntParam(Constants::PROVIDER_FLAG, ERR_OK);
-    if (errCode != ERR_OK) {
-        RemoveConnection(connectId);
-        HILOG_ERROR("errCode:%{public}d", errCode);
-        return errCode;
-    }
-
-    std::string strFormId = want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY);
-    if (strFormId.empty()) {
-        HILOG_ERROR("empty formId");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
+    int32_t connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     int64_t formId = 0;
-    if (!FormUtil::ConvertStringToInt64(strFormId, formId)) {
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    int32_t validRet = ValidateAcquireRequest(want, formId);
+    if (validRet != ERR_OK) {
+        HILOG_ERROR("validate acquire request failed, formId:%{public}" PRId64 ", connectId:%{public}d, ret:%{public}d",
+            formId, connectId, validRet);
+        RemoveConnection(connectId);
+        return validRet;
     }
     int32_t callerUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId, callerUserId);
@@ -161,6 +214,23 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
     const std::string &provider, const Want &wantArg, const Want &want)
 {
     HILOG_INFO("call");
+
+    // State result caller must be the queried provider itself
+    std::string targetBundle = wantArg.GetElement().GetBundleName();
+    if (targetBundle.empty()) {
+        HILOG_ERROR("state result wantArg has empty target bundle, reject");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    std::string callerBundle;
+    if (FormBmsHelper::GetInstance().GetCallerBundleName(callerBundle) != ERR_OK) {
+        HILOG_ERROR("get caller bundle failed for state result");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    if (callerBundle != targetBundle) {
+        HILOG_ERROR("provider not owner of state query, caller:%{public}s, target:%{public}s",
+            callerBundle.c_str(), targetBundle.c_str());
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     RemoveConnection(connectId);
 
@@ -250,6 +320,13 @@ void FormSupplyCallback::OnShareAcquire(int64_t formId, const std::string &remot
     const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
 {
     HILOG_DEBUG("formId %{public}" PRId64 " call", formId);
+
+    // Provider may only share its own form
+    int32_t ownRet = CheckCallerOwnsForm(formId);
+    if (ownRet != ERR_OK) {
+        HILOG_ERROR("CheckCallerOwnsForm failed, formId:%{public}" PRId64 ", ret:%{public}d", formId, ownRet);
+        return;
+    }
     DelayedSingleton<FormShareMgr>::GetInstance()->HandleProviderShareData(
         formId, remoteDeviceId, wantParams, requestCode, result);
 }

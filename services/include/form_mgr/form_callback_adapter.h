@@ -126,6 +126,8 @@ public:
 
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
 
+    void CancelOverflow(const int64_t formId);
+
 private:
     void GetMatchedFormIds(const std::vector<FormRecordFilter> &filters, std::vector<std::string> &formIds);
     ErrCode NotifyAllHosts(FormProxyRegistry &registry, const std::string &tag,

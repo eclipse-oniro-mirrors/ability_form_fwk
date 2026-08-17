@@ -37,11 +37,10 @@ ohos_fuzztest("FormHiSysEventBuilderFuzzTest") {
 
   sources = [
     "formhisyseventbuilder_fuzzer.cpp",
-    "${form_fwk_path}/common/src/form_hisysevent_wrapper.cpp",
   ]
 
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
   ]
 
   external_deps = [

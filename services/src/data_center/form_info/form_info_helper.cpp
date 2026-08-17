@@ -25,6 +25,7 @@
 #include "hitrace_meter.h"
 #include "in_process_call_wrapper.h"
 #include "data_center/form_data_mgr.h"
+#include "json_util_form.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -38,7 +39,8 @@ constexpr uint32_t GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS =
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) |
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_METADATA) |
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) |
-    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
+    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT) |
+    static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_DISABLE);
 }  // namespace
 
 bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared)
@@ -355,7 +357,7 @@ bool FormInfoHelper::CheckAppServicesCapability(int32_t userId, const std::strin
         HILOG_ERROR("get AppProvisionInfo failed");
         return false;
     } else {
-        nlohmann::json jsonObject = nlohmann::json::parse(appProvisionInfo.appServiceCapabilities, nullptr, false);
+        nlohmann::json jsonObject = SafeJsonParse(appProvisionInfo.appServiceCapabilities);
         if (jsonObject.is_discarded()) {
             HILOG_ERROR("fail parse appServiceCapabilities");
             return false;

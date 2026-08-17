@@ -153,7 +153,8 @@ export default namespace formInfo {
     SUCCESS = 0,
     NO_SPACE = 1,
     PARAM_ERROR = 2,
-    INTERNAL_ERROR = 3
+    INTERNAL_ERROR = 3,
+    NOT_SUPPORT = 4
   }
 
   export interface FormProviderFilter {

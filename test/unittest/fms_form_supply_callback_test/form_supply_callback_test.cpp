@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,13 @@
 #include <gtest/gtest.h>
 #include <memory>
 #define private public
+#define protected public
 #include "data_center/form_cache_mgr.h"
 #include "common/event/form_event_handler.h"
 #include "form_provider/form_supply_callback.h"
 #include "feature/form_share/form_share_mgr.h"
 #undef private
+#undef protected
 #include "status_mgr_center/form_status_mgr.h"
 #include "appexecfwk_errors.h"
 #include "common/connection/form_ability_connection.h"
@@ -37,6 +39,9 @@
 #include "mock_form_mgr_adapter_facade.h"
 #include "mock_form_render_mgr.h"
 #include "mock_form_data_mgr.h"
+#include "form_constants.h"
+#include "mock_form_bms_helper.h"
+#include "common/util/form_util.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -46,6 +51,16 @@ using namespace OHOS::AppExecFwk;
 namespace {
 const std::string FORM_BUNDLE_NAME = "ohos.samples.ut.form";
 const std::string FORM_ABILITY_NAME = "FormAbility";
+const std::string TEST_CALLER_BUNDLE = "com.test.caller";
+const std::string TEST_OWNER_BUNDLE = "com.test.owner";
+
+Want MakeAcquireWant(const std::string &formIdStr)
+{
+    Want want;
+    want.SetParam(Constants::PROVIDER_FLAG, ERR_OK);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formIdStr);
+    return want;
+}
 
 class FmsFormSupplyCallbackTest : public testing::Test {
 public:
@@ -67,10 +82,16 @@ void FmsFormSupplyCallbackTest::TearDownTestCase()
 {}
 
 void FmsFormSupplyCallbackTest::SetUp()
-{}
+{
+    MockFormBmsHelper::obj = std::make_shared<MockFormBmsHelper>();
+    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
+}
 
 void FmsFormSupplyCallbackTest::TearDown()
-{}
+{
+    MockFormBmsHelper::obj = nullptr;
+    MockFormDataMgr::obj = nullptr;
+}
 
 /**
  * @tc.name: FormAcquireConnectionTest_0001
@@ -299,7 +320,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0018, TestSize.Lev
 
 /**
  * @tc.name: FormAcquireConnectionTest_0019
- * @tc.desc: Test OnAcquireStateResult function.
+ * @tc.desc: Test OnAcquireStateResult returns error when targetBundle is empty.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0019, TestSize.Level0)
@@ -308,10 +329,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0019, TestSize.Lev
     Want want;
     Want wantArg;
     std::string str1 = "pro";
-    want.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_PARCEL_ERROR);
     FormSupplyCallback formSupplyCallback;
-    EXPECT_EQ(formSupplyCallback.OnAcquireStateResult(AppExecFwk::FormState::UNKNOWN, str1, wantArg, want), ERR_OK);
-
+    EXPECT_EQ(formSupplyCallback.OnAcquireStateResult(
+        AppExecFwk::FormState::UNKNOWN, str1, wantArg, want),
+        ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0019 end";
 }
 
@@ -690,4 +711,191 @@ HWTEST_F(FmsFormSupplyCallbackTest, HandleRenderFormTest_002, TestSize.Level1)
     
     GTEST_LOG_(INFO) << "HandleRenderFormTest_002 end";
 }
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_VerifyCaller_001
+ * @tc.desc: VerifyCaller returns true for CallerType::PROVIDER
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_VerifyCaller_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_001 start";
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_)).Times(0);
+    FormSupplyCallback formSupplyCallback;
+    bool result = formSupplyCallback.VerifyCaller(FormSupplyStub::CallerType::PROVIDER);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_001 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_VerifyCaller_002
+ * @tc.desc: VerifyCaller returns true for CallerType::FRS when caller is FRS process
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_VerifyCaller_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_002 start";
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::string(Constants::FRS_BUNDLE_NAME)), Return(ERR_OK)));
+    FormSupplyCallback formSupplyCallback;
+    bool result = formSupplyCallback.VerifyCaller(FormSupplyStub::CallerType::FRS);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_002 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_VerifyCaller_003
+ * @tc.desc: VerifyCaller returns false for CallerType::FRS when caller bundle is not FRS
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_VerifyCaller_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_003 start";
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::string("com.some.other.app")), Return(ERR_OK)));
+    FormSupplyCallback formSupplyCallback;
+    bool result = formSupplyCallback.VerifyCaller(FormSupplyStub::CallerType::FRS);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_003 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_VerifyCaller_004
+ * @tc.desc: VerifyCaller returns false for CallerType::FRS when GetCallerBundleName fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_VerifyCaller_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_004 start";
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_INVALID_PARAM));
+    FormSupplyCallback formSupplyCallback;
+    bool result = formSupplyCallback.VerifyCaller(FormSupplyStub::CallerType::FRS);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_004 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_VerifyCaller_005
+ * @tc.desc: VerifyCaller returns false for unknown caller type
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_VerifyCaller_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_005 start";
+    FormSupplyCallback formSupplyCallback;
+    bool result = formSupplyCallback.VerifyCaller(
+        static_cast<FormSupplyStub::CallerType>(999));
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_VerifyCaller_005 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnAcquireStateResult_002
+ * @tc.desc: OnAcquireStateResult returns error when GetCallerBundleName fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquireStateResult_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquireStateResult_002 start";
+    Want want;
+    Want wantArg;
+    wantArg.SetElementName("com.target.app", "Module", "Ability");
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnAcquireStateResult(
+        AppExecFwk::FormState::UNKNOWN, "pro", wantArg, want),
+        ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquireStateResult_002 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnAcquireStateResult_003
+ * @tc.desc: OnAcquireStateResult returns error when callerBundle != targetBundle
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquireStateResult_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquireStateResult_003 start";
+    Want want;
+    Want wantArg;
+    wantArg.SetElementName("com.target.app", "Module", "Ability");
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::string("com.other.app")), Return(ERR_OK)));
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnAcquireStateResult(
+        AppExecFwk::FormState::UNKNOWN, "pro", wantArg, want),
+        ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquireStateResult_003 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_001
+ * @tc.desc: OnAcquire rejects formId <= 0
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_001 start";
+    FormProviderInfo formProviderInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_)).Times(0);
+    EXPECT_EQ(FormSupplyCallback().OnAcquire(formProviderInfo, MakeAcquireWant("0")),
+        ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_001 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_002
+ * @tc.desc: OnAcquire rejects when GetCallerBundleName fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_002 start";
+    FormProviderInfo formProviderInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+    EXPECT_EQ(FormSupplyCallback().OnAcquire(formProviderInfo, MakeAcquireWant("100")),
+        ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_002 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_003
+ * @tc.desc: OnAcquire rejects when form record not found
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_003 start";
+    FormProviderInfo formProviderInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_CALLER_BUNDLE), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).WillOnce(Return(false));
+    EXPECT_EQ(FormSupplyCallback().OnAcquire(formProviderInfo, MakeAcquireWant("100")),
+        ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_003 end";
+}
+
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_004
+ * @tc.desc: OnAcquire rejects when caller is not form owner
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_004 start";
+    FormProviderInfo formProviderInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_CALLER_BUNDLE), Return(ERR_OK)));
+    FormRecord record;
+    record.bundleName = TEST_OWNER_BUNDLE;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_EQ(FormSupplyCallback().OnAcquire(formProviderInfo, MakeAcquireWant("100")),
+        ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_004 end";
+}
+
 }

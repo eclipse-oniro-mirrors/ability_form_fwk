@@ -15,6 +15,7 @@
 #ifndef OHOS_FORM_FWK_PARAM_CONTROL_H
 #define OHOS_FORM_FWK_PARAM_CONTROL_H
 
+#include <mutex>
 #include <singleton.h>
 #include <string>
 #include "nlohmann/json.hpp"
@@ -57,6 +58,8 @@ private:
         const ParamCtrl &paramCtrl, const std::vector<ParamCtrl> &compareCtrls);
     bool IsSamePolicy(const FormRecord &formRecord,
         const ParamCtrl &paramCtrl, const std::vector<ParamCtrl> &compareCtrls);
+    std::vector<ParamCtrl> GetCompareUpdateCtrls(const bool isApply);
+    std::vector<ParamCtrl> GetCompareDisableCtrls(const bool isApply);
     void ExecUpdateDurationCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
         const bool isAppUpgrade = false);
     void ExecDisableCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
@@ -64,6 +67,7 @@ private:
     bool ShouldProcessForm(const FormRecord &formRecord, const ParamCtrl &item,
         const bool isApply, const bool isAppUpgrade);
 
+    std::mutex ctrlMutex_;
     std::vector<ParamCtrl> preUpdateDurationCtrl_;
     std::vector<ParamCtrl> preDisableCtrl_;
 

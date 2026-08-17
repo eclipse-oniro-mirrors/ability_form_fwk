@@ -60,6 +60,7 @@ ohos_shared_library("formbindingdata_napi") {
     "ability_runtime:runtime",
     "c_utils:utils",
     "hilog:libhilog",
+    "libuv:uv",
     "ipc:ipc_core",
     "napi:ace_napi",
     "node:node_header_notice",
@@ -184,6 +185,7 @@ ohos_shared_library("formextension_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -246,6 +248,7 @@ ohos_shared_library("formextensionability") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -308,6 +311,7 @@ ohos_shared_library("formextensioncontext_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -527,7 +531,6 @@ ohos_shared_library("formhost") {
     "${form_fwk_path}:form_host_delegate_stub",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_utils",
   ]
 
@@ -738,7 +741,6 @@ ohos_shared_library("formprovider") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -813,7 +815,6 @@ ohos_shared_library("formagent") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -1027,6 +1028,7 @@ ohos_shared_library("formeditextensionability_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1091,6 +1093,7 @@ ohos_shared_library("formeditextensioncontext_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1103,6 +1106,7 @@ ohos_shared_library("formeditextensioncontext_napi") {
 ################################### gen_form_edit_extension_ability ########################################
 ohos_shared_library("form_edit_extension") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -1149,7 +1153,6 @@ ohos_shared_library("form_edit_extension") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -1180,6 +1183,7 @@ ohos_shared_library("form_edit_extension") {
 
 ohos_shared_library("form_edit_extension_module") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -1286,7 +1290,6 @@ ohos_shared_library("form_edit_extension_ani") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
-    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -1372,6 +1375,7 @@ ohos_shared_library("liveformextensionability_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1436,6 +1440,7 @@ ohos_shared_library("liveformextensioncontext_napi") {
   ]
 
   external_deps = [
+    "libuv:uv",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
@@ -1448,6 +1453,7 @@ ohos_shared_library("liveformextensioncontext_napi") {
 ################################### gen_live_form_extension_ability ########################################
 ohos_shared_library("live_form_extension") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -1523,6 +1529,7 @@ ohos_shared_library("live_form_extension") {
 
 ohos_shared_library("live_form_extension_module") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true

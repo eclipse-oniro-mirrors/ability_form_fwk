@@ -26,8 +26,10 @@ public:
 
     static std::string GetSystemColorMode();
 
+    static bool IsBopdMode();
+
 private:
-    static std::string GetSystemParam(const std::string &key);
+    static std::string GetSystemParam(const char *key);
 };
 } // AppExecFwk
 } // OHOS

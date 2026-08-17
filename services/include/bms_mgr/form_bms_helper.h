@@ -146,12 +146,29 @@ public:
     int32_t GetCallerBundleName(std::string &callerBundleName);
 
     /**
+     * @brief Get caller bundle name and its app clone index, resolved from the calling uid.
+     * @param callerBundleName Indicates the caller bundle name. Cleared on failure.
+     * @param appIndex Output: the caller's own app index, MAIN_APP_INDEX on failure.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t GetCallerBundleNameAndAppIndex(std::string &callerBundleName, int32_t &appIndex);
+
+    /**
      * @brief Obtains the application UID based on the given bundle name and user ID.
      * @param bundleName Indicates the bundle name of the application.
      * @param userId Indicates the user ID.
      * @return Returns the uid if successfully obtained; returns -1 otherwise.
      */
     int32_t GetUidByBundleName(const std::string &bundleName, int32_t userId);
+
+    /**
+     * @brief Obtains the application UID of a specific app clone instance.
+     * @param bundleName Indicates the bundle name of the application.
+     * @param userId Indicates the user ID.
+     * @param appIndex Indicates the app clone index.
+     * @return Returns the uid if successfully obtained; returns -1 otherwise.
+     */
+    int32_t GetUidByBundleName(const std::string &bundleName, int32_t userId, int32_t appIndex);
 
     bool GetCompileMode(const std::string &bundleName, const std::string &moduleName,
         int32_t userId, int32_t &compileMode);
@@ -166,6 +183,17 @@ public:
     ErrCode GetAllProxyDataInfos(int32_t userId, std::vector<ProxyData> &proxyData);
 
     ErrCode GetApplicationInfo(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo);
+
+    /**
+     * @brief Get the enabled instance index for a given bundle. The main app and its clones are
+     *        never enabled at the same time, so the single enabled instance is the active one.
+     * @param userId Indicates the user ID.
+     * @param bundleName Indicates the bundle name.
+     * @param appIndex Output: the enabled app index. Left as MAIN_APP_INDEX on failure.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetEnabledCloneIndex(int32_t userId, const std::string &bundleName,
+        int32_t &appIndex);
 
     ErrCode RegisterBundleEventCallback();
     ErrCode UnregisterBundleEventCallback();
@@ -289,6 +317,7 @@ private:
     sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
     std::mutex ibundleMutex_;
     std::mutex registerMutex_;
+    std::mutex iBundleInstallerMutex_;
     bool hasRegisterBundleEvent_ = false;
 };
 }  // namespace AppExecFwk

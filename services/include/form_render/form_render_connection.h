@@ -76,6 +76,7 @@ private:
     FormRecord formRecord_;
     WantParams wantParams_;
     ConnectState connectState_ = ConnectState::DISCONNECTED;
+    std::mutex formRecordMutex_;
     int32_t failedTimes = 0;
     DISALLOW_COPY_AND_MOVE(FormRenderConnection);
 };

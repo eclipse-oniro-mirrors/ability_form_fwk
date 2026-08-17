@@ -25,12 +25,13 @@ void FormPublishAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, c
 
 ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     return ERR_OK;
 }
 
-ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost)
+ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
     return ERR_OK;
 }

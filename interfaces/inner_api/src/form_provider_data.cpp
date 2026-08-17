@@ -95,7 +95,12 @@ FormProviderData::FormProviderData(std::string jsonDataString, bool isUsedInFRS)
  */
 void FormProviderData::UpdateData(nlohmann::json &jsonData)
 {
+    if (!jsonData.is_object()) {
+        HILOG_ERROR("jsonData not object");
+        return;
+    }
     jsonFormProviderData_ = jsonData;
+    ParseImagesData();
 }
 /**
  * @brief Obtains the form data stored in this {@code FormProviderData} object.
@@ -237,6 +242,10 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
     if (jsonDataString.empty()) {
         jsonDataString = JSON_EMPTY_STRING;
     }
+    if (jsonDataString.size() > MAX_BUFFER_SIZE) {
+        HILOG_ERROR("jsonDataString too large: %{public}zu", jsonDataString.size());
+        return;
+    }
     nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("fail parse jsonDataString: %{private}s.", jsonDataString.c_str());
@@ -318,6 +327,9 @@ void FormProviderData::SetImageDataMap(std::map<std::string, std::pair<sptr<Form
 bool FormProviderData::ReadFromParcel(Parcel &parcel)
 {
     int32_t formDataLength = parcel.ReadInt32();
+    if (formDataLength <= 0) {
+        return false;
+    }
     HILOG_DEBUG("ReadFromParcel data length is %{public}d ", formDataLength);
     std::string jsonDataString;
     if (formDataLength > BIG_DATA) {

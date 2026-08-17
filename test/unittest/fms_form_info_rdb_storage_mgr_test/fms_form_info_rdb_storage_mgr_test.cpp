@@ -75,7 +75,7 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_001, TestSiz
 HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_002, TestSize.Level0)
 {
     std::string bundleName = "testKey";
-    std::string formInfoStorages = "formInfo";
+    std::string formInfoStorages = "{ \"formInfo\": \"abc\"}";
     auto result = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName, formInfoStorages);
     EXPECT_EQ(result, ERR_OK);
 }

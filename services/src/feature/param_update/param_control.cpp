@@ -17,6 +17,7 @@
 
 #include "fms_log_wrapper.h"
 #include "json_serializer.h"
+#include "json_util_form.h"
 #include "data_center/form_data_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "form_refresh/strategy/refresh_cache_mgr.h"
@@ -49,7 +50,7 @@ void ParamControl::DealDueParam(const std::string &jsonStr)
         return;
     }
 
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonStr, nullptr, false);
+    nlohmann::json jsonObject = SafeJsonParse(jsonStr);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("fail parse jsonStr: %{public}s.", jsonStr.c_str());
         return;
@@ -59,20 +60,32 @@ void ParamControl::DealDueParam(const std::string &jsonStr)
         return;
     }
 
-    ParamTransfer();
-    ParseJsonToObj(jsonObject);
+    std::vector<ParamCtrl> preUpdate;
+    std::vector<ParamCtrl> preDisable;
+    std::vector<ParamCtrl> nextUpdate;
+    std::vector<ParamCtrl> nextDisable;
+    {
+        std::lock_guard<std::mutex> lock(ctrlMutex_);
+        ParamTransfer();
+        ParseJsonToObj(jsonObject);
+        preUpdate = preUpdateDurationCtrl_;
+        preDisable = preDisableCtrl_;
+        nextUpdate = nextUpdateDurationCtrl_;
+        nextDisable = nextDisableCtrl_;
+    }
 
-    // Restore old configuration
-    ExecUpdateDurationCtrl(false, preUpdateDurationCtrl_);
-    ExecDisableCtrl(false, preDisableCtrl_);
+    // Restore old configuration (outside lock, Exec* may call back into ParamControl)
+    ExecUpdateDurationCtrl(false, preUpdate);
+    ExecDisableCtrl(false, preDisable);
 
     // Apply new configuration
-    ExecUpdateDurationCtrl(true, nextUpdateDurationCtrl_);
-    ExecDisableCtrl(true, nextDisableCtrl_);
+    ExecUpdateDurationCtrl(true, nextUpdate);
+    ExecDisableCtrl(true, nextDisable);
 }
 
 int32_t ParamControl::GetDueUpdateDuration(const FormRecord &formRecord)
 {
+    std::lock_guard<std::mutex> lock(ctrlMutex_);
     if (nextUpdateDurationCtrl_.empty()) {
         // due update duration not configured
         return Constants::DUE_INVALID_UPDATE_DURATION;
@@ -92,6 +105,7 @@ int32_t ParamControl::GetDueUpdateDuration(const FormRecord &formRecord)
 
 bool ParamControl::IsFormDisable(const FormRecord &formRecord)
 {
+    std::lock_guard<std::mutex> lock(ctrlMutex_);
     for (const auto &item : nextDisableCtrl_) {
         if (item.policy != DUE_POLICY_DISABLE) {
             continue;
@@ -106,6 +120,7 @@ bool ParamControl::IsFormDisable(const FormRecord &formRecord)
 
 bool ParamControl::IsFormRemove(const FormRecord &formRecord)
 {
+    std::lock_guard<std::mutex> lock(ctrlMutex_);
     for (const auto &item : nextDisableCtrl_) {
         if (item.policy != DUE_POLICY_REMOVE) {
             continue;
@@ -125,17 +140,26 @@ void ParamControl::ReloadDueControlByAppUpgrade(const std::vector<FormRecord> &f
         return;
     }
 
-    // Restore old formrecord
-    ExecUpdateDurationCtrl(false, nextUpdateDurationCtrl_, true);
-    ExecDisableCtrl(false, nextDisableCtrl_, true);
+    std::vector<ParamCtrl> nextUpdate;
+    std::vector<ParamCtrl> nextDisable;
+    {
+        std::lock_guard<std::mutex> lock(ctrlMutex_);
+        nextUpdate = nextUpdateDurationCtrl_;
+        nextDisable = nextDisableCtrl_;
+    }
+
+    // Restore old formrecord (outside lock, Exec* may call back into ParamControl)
+    ExecUpdateDurationCtrl(false, nextUpdate, true);
+    ExecDisableCtrl(false, nextDisable, true);
 
     // Apply new formrecord
-    ExecUpdateDurationCtrl(true, nextUpdateDurationCtrl_, true);
-    ExecDisableCtrl(true, nextDisableCtrl_, true);
+    ExecUpdateDurationCtrl(true, nextUpdate, true);
+    ExecDisableCtrl(true, nextDisable, true);
 }
 
 bool ParamControl::IsDueDisableCtrlEmpty()
 {
+    std::lock_guard<std::mutex> lock(ctrlMutex_);
     return nextDisableCtrl_.empty();
 }
 
@@ -261,6 +285,18 @@ bool ParamControl::IsSamePolicy(const FormRecord &formRecord,
     return false;
 }
 
+std::vector<ParamCtrl> ParamControl::GetCompareUpdateCtrls(const bool isApply)
+{
+    std::lock_guard<std::mutex> lock(ctrlMutex_);
+    return isApply ? preUpdateDurationCtrl_ : nextUpdateDurationCtrl_;
+}
+
+std::vector<ParamCtrl> ParamControl::GetCompareDisableCtrls(const bool isApply)
+{
+    std::lock_guard<std::mutex> lock(ctrlMutex_);
+    return isApply ? preDisableCtrl_ : nextDisableCtrl_;
+}
+
 void ParamControl::ExecUpdateDurationCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
     const bool isAppUpgrade)
 {
@@ -297,6 +333,7 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
     const bool isAppUpgrade)
 {
     HILOG_INFO("call, isApply:%{public}d, isAppUpgrade:%{public}d", isApply, isAppUpgrade);
+    std::vector<ParamCtrl> compareCtrls = GetCompareDisableCtrls(isApply);
     std::vector<FormRecord> disableFormRecords;
     std::vector<FormRecord> removeFormRecords;
     for (const auto &item : paramCtrls) {
@@ -316,14 +353,14 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
             }
 
             if (item.policy == DUE_POLICY_DISABLE &&
-                (isAppUpgrade || !IsSamePolicy(formRecord, item, (isApply ? preDisableCtrl_ : nextDisableCtrl_)))) {
+                (isAppUpgrade || !IsSamePolicy(formRecord, item, compareCtrls))) {
                 HILOG_INFO("exec disable ctrl, formId:%{public}" PRId64, formRecord.formId);
                 disableFormRecords.push_back(formRecord);
                 continue;
             }
 
             if (item.policy == DUE_POLICY_REMOVE &&
-                (isAppUpgrade || !IsSamePolicy(formRecord, item, (isApply ? preDisableCtrl_ : nextDisableCtrl_)))) {
+                (isAppUpgrade || !IsSamePolicy(formRecord, item, compareCtrls))) {
                 HILOG_INFO("exec remove ctrl, formId:%{public}" PRId64, formRecord.formId);
                 removeFormRecords.push_back(formRecord);
                 continue;
@@ -354,8 +391,8 @@ bool ParamControl::ShouldProcessForm(const FormRecord &formRecord, const ParamCt
         return false;
     }
 
-    if (!isAppUpgrade &&
-        IsSameUpdateDuration(formRecord, item, (isApply ? preUpdateDurationCtrl_ : nextUpdateDurationCtrl_))) {
+    std::vector<ParamCtrl> compareCtrls = GetCompareUpdateCtrls(isApply);
+    if (!isAppUpgrade && IsSameUpdateDuration(formRecord, item, compareCtrls)) {
         return false;
     }
 

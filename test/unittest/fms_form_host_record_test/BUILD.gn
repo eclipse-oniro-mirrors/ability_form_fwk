@@ -23,6 +23,7 @@ ohos_unittest("FmsFormHostRecordTest") {
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/mock/src/mock_ipc_skeleton.cpp",
   ]
   sources += [ "fms_form_host_record_test.cpp" ]
 
@@ -36,9 +37,8 @@ ohos_unittest("FmsFormHostRecordTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

@@ -61,13 +61,13 @@ public:
     void SetDurationStartTime(int64_t formId, int64_t startTime);
     void SetDurationEndTime(int64_t formId, int64_t endTime);
     void HandleAddFormStatistic(int64_t formId);
-    void HandleFirstUpdateStatistic(int64_t formId);
     void InsertFormId(int64_t formId);
     void RemoveFormId(int64_t formId);
     bool HasFormId(int64_t formId);
-    std::unordered_map<int64_t, FormStatistic> GetStatistic();
 
 private:
+    void HandleFirstUpdateStatistic(int64_t formId);
+
     mutable std::mutex formReport_;
     mutable std::mutex formIdsMutex_;
     std::unordered_map<int64_t, FormStatistic> formStatisticMap_;

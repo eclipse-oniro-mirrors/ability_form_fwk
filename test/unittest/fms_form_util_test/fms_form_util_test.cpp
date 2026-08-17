@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <ctime>
 #define private public
+#include "bms_mgr/form_bms_helper.h"
 #include "common/util/form_util.h"
 #include "form_constants.h"
 #include "form_file_util.h"
@@ -26,6 +27,13 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+    bool g_mockQueryActiveOsAccountIdsRetVal = true;
+    bool g_mockQueryActiveOsAccountIdsParams = false;
+    ErrCode g_mockGetCallerBundleNameRet = ERR_OK;
+    std::string g_mockCallerBundleName = Constants::FRS_BUNDLE_NAME;
+}
+
 class FormUtilTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -36,6 +44,7 @@ public:
 
     void TearDown();
 };
+
 void FormUtilTest::SetUpTestCase()
 {}
 
@@ -46,11 +55,11 @@ void FormUtilTest::SetUp()
 {}
 
 void FormUtilTest::TearDown()
-{}
-
-namespace {
-    bool g_mockQueryActiveOsAccountIdsRetVal = true;
-    bool g_mockQueryActiveOsAccountIdsParams = false;
+{
+    g_mockGetCallerBundleNameRet = ERR_OK;
+    g_mockCallerBundleName = Constants::FRS_BUNDLE_NAME;
+    g_mockQueryActiveOsAccountIdsRetVal = true;
+    g_mockQueryActiveOsAccountIdsParams = false;
 }
 
 void MockQueryActiveOsAccountIdsRetVal(bool mockRet)
@@ -69,6 +78,12 @@ ErrCode OsAccountManagerWrapper::QueryActiveOsAccountIds(std::vector<int32_t>& i
         ids.push_back(99);
     }
     return g_mockQueryActiveOsAccountIdsRetVal ? ERR_OK : ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
+int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
+{
+    callerBundleName = g_mockCallerBundleName;
+    return g_mockGetCallerBundleNameRet;
 }
 
 /**
@@ -406,6 +421,41 @@ HWTEST_F(FormUtilTest, FormUtilTest_025, TestSize.Level1)
     EXPECT_EQ("", FormFileUtil::GetMaskedPath("/"));
     EXPECT_EQ("module.hsp", FormFileUtil::GetMaskedPath("/data/abc.def.com/app/module.hsp"));
     EXPECT_EQ("", FormFileUtil::GetMaskedPath("bundle/abc/"));
+}
+
+/**
+ * @tc.name: FormUtilTest_026
+ * @tc.desc: Verify CheckIsFRSCall returns true when caller bundle is FRS
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_026, TestSize.Level1)
+{
+    g_mockGetCallerBundleNameRet = ERR_OK;
+    g_mockCallerBundleName = Constants::FRS_BUNDLE_NAME;
+    EXPECT_TRUE(FormUtil::CheckIsFRSCall());
+}
+
+/**
+ * @tc.name: FormUtilTest_027
+ * @tc.desc: Verify CheckIsFRSCall returns false when caller bundle is not FRS
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_027, TestSize.Level1)
+{
+    g_mockGetCallerBundleNameRet = ERR_OK;
+    g_mockCallerBundleName = "com.some.other.app";
+    EXPECT_FALSE(FormUtil::CheckIsFRSCall());
+}
+
+/**
+ * @tc.name: FormUtilTest_028
+ * @tc.desc: Verify CheckIsFRSCall returns false when GetCallerBundleName fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_028, TestSize.Level1)
+{
+    g_mockGetCallerBundleNameRet = ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    EXPECT_FALSE(FormUtil::CheckIsFRSCall());
 }
 
 }  // namespace AppExecFwk

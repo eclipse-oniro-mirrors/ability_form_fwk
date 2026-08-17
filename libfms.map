@@ -13,67 +13,6 @@
 
 {
   global:
-    extern "C++" {
-        *OHOS::AAFwk::FormInfoStorage*;
-        *OHOS::AbilityRuntime::WantAgent*;
-        *OHOS::AppExecFwk::BundleFormInfo*;
-        *OHOS::AppExecFwk::FormAbilityConnection*;
-        *OHOS::AppExecFwk::FormAcquireConnection*;
-        *OHOS::AppExecFwk::FormAcquireStateConnection*;
-        *OHOS::AppExecFwk::FormAmsHelper*;
-        *OHOS::AppExecFwk::FormBatchDeleteConnection*;
-        *OHOS::AppExecFwk::FormBmsHelper*;
-        *OHOS::AppExecFwk::FormBundleEventCallback*;
-        *OHOS::AppExecFwk::FormCacheMgr*;
-        *OHOS::AppExecFwk::FormCallerMgr*;
-        *OHOS::AppExecFwk::FormCastTempConnection*;
-        *OHOS::AppExecFwk::FormDataMgr*;
-        *OHOS::AppExecFwk::FormDbCache*;
-        *OHOS::AppExecFwk::FormDeleteConnection*;
-        *OHOS::AppExecFwk::FormDistributedClient*;
-        *OHOS::AppExecFwk::FormDumpMgr*;
-        *OHOS::AppExecFwk::FormEventHandler*;
-        *OHOS::AppExecFwk::FormEventNotifyConnection*;
-        *OHOS::AppExecFwk::FormEventUtil*;
-        *OHOS::AppExecFwk::FormFreeInstallOperator*;
-        *OHOS::AppExecFwk::FormHostCallback*;
-        *OHOS::AppExecFwk::FormHostRecord*;
-        *OHOS::AppExecFwk::FormInfoHelper*;
-        *OHOS::AppExecFwk::FormInfoMgr*;
-        *OHOS::AppExecFwk::FormInfoRdbStorageMgr*;
-        *OHOS::AppExecFwk::FormItemInfo*;
-        *OHOS::AppExecFwk::FormMgrAdapterFacade*;
-        *OHOS::AppExecFwk::FormMgrService*;
-        *OHOS::AppExecFwk::FormMsgEventConnection*;
-        *OHOS::AppExecFwk::FormProviderCaller*;
-        *OHOS::AppExecFwk::FormProviderData*;
-        *OHOS::AppExecFwk::FormProviderMgr*;
-        *OHOS::AppExecFwk::FormRdbDataMgr*;
-        *OHOS::AppExecFwk::FormRefreshConnection*;
-        *OHOS::AppExecFwk::FormRefreshLimiter*;
-        *OHOS::AppExecFwk::FormRefreshMgr*;
-        *OHOS::AppExecFwk::FormRenderConnection*;
-        *OHOS::AppExecFwk::FormRenderMgr*;
-        *OHOS::AppExecFwk::FormRenderMgrInner*;
-        *OHOS::AppExecFwk::FormRouterProxyMgr*;
-        *OHOS::AppExecFwk::FormSandboxRenderMgrInner*;
-        *OHOS::AppExecFwk::FormSerialQueue*;
-        *OHOS::AppExecFwk::FormShareConnection*;
-        *OHOS::AppExecFwk::FormShareMgr*;
-        *OHOS::AppExecFwk::FormSupplyCallback*;
-        *OHOS::AppExecFwk::FormSysEventReceiver*;
-        *OHOS::AppExecFwk::FormTimerMgr*;
-        *OHOS::AppExecFwk::FormUtil*;
-        *OHOS::AppExecFwk::FreeInstallStatusCallBack*;
-        *OHOS::AppExecFwk::InnerFormInfo*;
-        *OHOS::AppExecFwk::FormSystemloadListener*;
-        *OHOS::AppExecFwk::FormSupplyStub*;
-        *OHOS::AppExecFwk::FormPublishInterceptorProxy*;
-        *OHOS::AppExecFwk::FormMgrStub*;
-        *OHOS::AppExecFwk::FormProviderProxy*;
-        *OHOS::AppExecFwk::FormHostProxy*;
-        *OHOS::AbilityRuntime::JsFormStateObserverProxy*;
-    };
   local:
     *;
 };

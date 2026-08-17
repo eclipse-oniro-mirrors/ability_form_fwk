@@ -31,6 +31,7 @@ const std::u16string DMS_PROXY_INTERFACE_TOKEN = u"ohos.distributedschedule.acce
 void FormDistributedClient::GetDmsServiceProxy()
 {
     HILOG_DEBUG("SHAREFORM:: func call");
+    std::lock_guard<std::mutex> lock(dmsProxyMutex_);
     if (dmsProxy_ != nullptr) {
         HILOG_DEBUG("dms proxy already get");
         return;
@@ -54,7 +55,12 @@ int32_t FormDistributedClient::ShareForm(
     }
 
     GetDmsServiceProxy();
-    if (dmsProxy_ == nullptr) {
+    sptr<IRemoteObject> proxy;
+    {
+        std::lock_guard<std::mutex> lock(dmsProxyMutex_);
+        proxy = dmsProxy_;
+    }
+    if (proxy == nullptr) {
         HILOG_ERROR("get dmsProxy failed");
         return ERR_APPEXECFWK_FORM_GET_DMS_PROXY_FAILED;
     }
@@ -77,7 +83,7 @@ int32_t FormDistributedClient::ShareForm(
         return ERR_FLATTEN_OBJECT;
     }
 
-    int32_t error = dmsProxy_->SendRequest(START_REMOTE_SHARE_FORM, data, reply, option);
+    int32_t error = proxy->SendRequest(START_REMOTE_SHARE_FORM, data, reply, option);
     if (error != NO_ERROR) {
         HILOG_ERROR("request failed, error:%{public}d", error);
         return error;
@@ -89,6 +95,7 @@ int32_t FormDistributedClient::ShareForm(
 
 void FormDistributedClient::SetDmsProxy(const sptr<IRemoteObject> &dmsProxy)
 {
+    std::lock_guard<std::mutex> lock(dmsProxyMutex_);
     dmsProxy_ = dmsProxy;
 }
 } // namespace AppExecFwk

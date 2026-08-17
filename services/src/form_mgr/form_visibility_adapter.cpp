@@ -86,9 +86,13 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-        FormRecord formRecord;
 
+        // Set visible before validity check to shrink the GetFormVisible/SetFormVisible race window.
+        FormDataMgr::GetInstance().SetFormVisible(matchedFormId, formVisibleType == Constants::FORM_VISIBLE);
+
+        FormRecord formRecord;
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
+            FormDataMgr::GetInstance().DeleteFormVisible(matchedFormId);
             continue;
         }
         SetVisibleChange(matchedFormId, formVisibleType, userId);
@@ -144,11 +148,6 @@ bool FormVisibilityAdapter::HasFormVisible(const uint32_t tokenId)
     HILOG_DEBUG("bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d", bundleName.c_str(), userId,
         hapTokenInfo.instIndex);
 
-    if (hapTokenInfo.instIndex != 0) {
-        HILOG_INFO("The app is a clone application.");
-        return false;
-    }
-
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         return false;
@@ -157,7 +156,7 @@ bool FormVisibilityAdapter::HasFormVisible(const uint32_t tokenId)
     for (const auto& formRecord : formInfos) {
         HILOG_DEBUG("query record, visible:%{public}d, userId:%{public}d", formRecord.formVisibleNotifyState, userId);
         if (formRecord.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE) &&
-            formRecord.userId == userId) {
+            formRecord.userId == userId && formRecord.appIndex == hapTokenInfo.instIndex) {
                 return true;
         }
     }
@@ -183,7 +182,6 @@ void FormVisibilityAdapter::SetVisibleChange(const int64_t formId, const int32_t
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible, userId);
 
-    FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
     if (isVisible) {
         FormDataMgr::GetInstance().SetExpectRecycledStatus(formId, false);
         RefreshCacheMgr::GetInstance().ConsumeRenderTask(formId);

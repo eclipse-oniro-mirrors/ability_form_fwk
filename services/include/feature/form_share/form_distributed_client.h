@@ -41,6 +41,7 @@ private:
     void GetDmsServiceProxy();
     void SetDmsProxy(const sptr<IRemoteObject> &dmsProxy);
     sptr<IRemoteObject> dmsProxy_ = nullptr;
+    std::mutex dmsProxyMutex_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

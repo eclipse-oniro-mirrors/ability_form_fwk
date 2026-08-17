@@ -20,7 +20,6 @@ ohos_unittest("FmsSignToolsTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/feature/param_update/sign_tools.cpp",
     "fms_sign_tools_test.cpp",
   ]
 
@@ -39,7 +38,7 @@ ohos_unittest("FmsSignToolsTest") {
   }
 
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
   ]

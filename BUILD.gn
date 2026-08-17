@@ -149,7 +149,7 @@ config("formmgr_config") {
   ]
 }
 
-ohos_shared_library("libfms") {
+ohos_static_library("libfms_internal_static") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
@@ -159,22 +159,6 @@ ohos_shared_library("libfms") {
     cfi_vcall_icall_only = true
     debug = false
   }
-
-  shlib_type = "sa"
-  version_script = "libfms.map"
-  cflags_cc = [
-    "-fdata-sections",
-    "-ffunction-sections",
-    "-Oz",
-  ]
-
-  ldflags = [
-    "-flto=full",
-    "-Wl,--exclude-libs=ALL",
-    "-Wl,--gc-sections",
-  ]
-  include_dirs =
-      [ "${form_fwk_napi_path}/form_host/form_state_observer/include" ]
 
   sources = [
     "interfaces/inner_api/src/form_publish_interceptor_proxy.cpp",
@@ -334,6 +318,14 @@ ohos_shared_library("libfms") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
+  cflags_cc = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-Oz",
+  ]
+  include_dirs =
+      [ "${form_fwk_napi_path}/form_host/form_state_observer/include" ]
+
   deps = [
     ":form_config",
     ":form_host_delegate_proxy",
@@ -434,6 +426,30 @@ ohos_shared_library("libfms") {
   part_name = "form_fwk"
 }
 
+ohos_shared_library("libfms") {
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_no_nvcall = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
+  shlib_type = "sa"
+  version_script = "libfms.map"
+
+  ldflags = [
+    "-flto=full",
+    "-Wl,--gc-sections",
+  ]
+
+  deps = [ ":libfms_internal_static" ]
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
 ################################### fmskit_native ########################################
 config("fmskit_config") {
   defines = [ "FMS_LOG_TAG = \"FmskitNative\"" ]
@@ -448,6 +464,7 @@ config("fmskit_public_config") {
 
 ohos_shared_library("fmskit_native") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -548,6 +565,7 @@ config("fmskit_provider_public_config") {
 
 ohos_shared_library("fmskit_provider_client") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
 
   sanitize = {
     cfi = true
@@ -799,6 +817,7 @@ ohos_shared_library("form_utils") {
 ################################### form_common_info ########################################
 ohos_shared_library("form_common_info") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
  
   sanitize = {
     cfi = true
@@ -864,6 +883,7 @@ ohos_shared_library("form_common_info") {
 ################################### form_render_info ########################################
 ohos_shared_library("form_render_info") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
  
   sanitize = {
     cfi = true

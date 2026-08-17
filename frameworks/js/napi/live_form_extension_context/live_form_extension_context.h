@@ -26,7 +26,7 @@ public:
 
     virtual ~LiveFormExtensionContext() = default;
 
-    static const size_t CONTEXT_TYPE_ID;
+    static const size_t contextTypeId;
 
     bool SetWindowBackgroundColor();
 

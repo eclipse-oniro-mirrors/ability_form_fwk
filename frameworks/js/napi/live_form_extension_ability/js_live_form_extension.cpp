@@ -70,10 +70,16 @@ void JsLiveFormExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRec
     context->InitHapModuleInfo(abilityInfo);
     context->SetConfiguration(appContext->GetConfiguration());
     if (abilityInfo->applicationInfo.multiProjects) {
+        if (abilityInfo->moduleName.empty()) {
+            HILOG_ERROR("moduleName is empty");
+            return;
+        }
         std::shared_ptr<Context> moduleContext = context->CreateModuleContext(abilityInfo->moduleName);
         if (moduleContext != nullptr) {
             auto rm = moduleContext->GetResourceManager();
-            context->SetResourceManager(rm);
+            if (rm != nullptr) {
+                context->SetResourceManager(rm);
+            }
         }
     }
 
