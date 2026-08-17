@@ -345,7 +345,7 @@ private:
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
-            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formRemove");
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=formRemove");
             JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle(bundleName);
             return CreateJsUndefined(env);
         } else {
@@ -391,7 +391,7 @@ private:
 
         if (argc == ARGS_ONE) {
             // If there is only one argument, all listening will be cancelled.
-            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formRemove");
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=formRemove");
             JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle("all");
             return CreateJsUndefined(env);
         } else if (argc == ARGS_TWO) {
@@ -417,7 +417,7 @@ private:
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
-            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formAdd");
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=formAdd");
             JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle(bundleName);
             return CreateJsUndefined(env);
         } else {
@@ -463,7 +463,7 @@ private:
 
         if (argc == ARGS_ONE) {
             // If there is only one argument, full listening will be cancelled.
-            HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", "formAdd");
+            HILOG_INFO("SubEvent op=off_all kit=FormKit event=formAdd");
             JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle("all");
             return CreateJsUndefined(env);
         } else if (argc == ARGS_TWO) {
