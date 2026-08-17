@@ -1169,12 +1169,12 @@ void FormRenderRecord::Release()
     std::shared_ptr<EventRunner> eventRunner;
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-        eventHandler = eventHandler_;
-        eventRunner = eventRunner_;
-        if (eventHandler == nullptr) {
+        if (eventHandler_ == nullptr) {
             HILOG_INFO("null eventHandler");
             return;
         }
+        eventHandler = eventHandler_;
+        eventRunner = eventRunner_;
         eventHandler_ = nullptr;
         eventRunner_ = nullptr;
     }
