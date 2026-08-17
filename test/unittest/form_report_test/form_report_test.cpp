@@ -28,7 +28,6 @@ const std::string BUNDLE = "test_bundle";
 const std::string ABILITY = "test_ability";
 const std::string MODULENAME = "test_modulename";
 int64_t FORMID = 12345;
-int64_t UNUSED_FORMID = 54321;
 
 class FormReportTest : public testing::Test {
 public:
