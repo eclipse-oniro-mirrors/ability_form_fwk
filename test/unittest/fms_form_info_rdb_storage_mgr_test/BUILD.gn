@@ -33,6 +33,8 @@ ohos_unittest("FmsFormInfoRdbStorageMgrTest") {
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }

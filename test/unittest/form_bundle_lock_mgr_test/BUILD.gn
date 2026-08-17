@@ -28,6 +28,8 @@ ohos_unittest("FormBundleLockTest") {
     "form_bundle_lock_mgr_test.cpp",
   ]
 
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   deps = [
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:libfms_internal_static",
@@ -66,5 +68,6 @@ ohos_unittest("FormBundleLockTest") {
 
 group("unittest") {
   testonly = true
+
   deps = [ ":FormBundleLockTest" ]
 }

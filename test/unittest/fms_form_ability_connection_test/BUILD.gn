@@ -46,6 +46,8 @@ ohos_unittest("FmsFormAbilityConnectionTest") {
 
   configs = []
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }

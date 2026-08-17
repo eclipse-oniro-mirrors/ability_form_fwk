@@ -36,6 +36,8 @@ ohos_unittest("FormReportTest") {
     "form_report_test.cpp",
   ]
 
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   deps = [
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:libfms_internal_static",
@@ -62,5 +64,6 @@ ohos_unittest("FormReportTest") {
 
 group("unittest") {
   testonly = true
+
   deps = [ ":FormReportTest" ]
 }
