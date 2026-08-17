@@ -25,6 +25,8 @@ ohos_unittest("FmsFormInfoMgrTest") {
   ]
   include_dirs = [ "${form_fwk_path}/test/mock/include" ]
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
