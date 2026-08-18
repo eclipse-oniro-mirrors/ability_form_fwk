@@ -470,6 +470,10 @@ int FormMgr::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &calle
         HILOG_ERROR("passing in form id can't be negative");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return ERR_INVALID_VALUE;
+    }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
@@ -848,6 +852,7 @@ void FormMgr::RegisterDeathCallback(const std::shared_ptr<FormCallbackInterface>
         HILOG_ERROR("null formDeathCallback");
         return;
     }
+    std::unique_lock<std::shared_mutex> lock(formDeathCallbacksMutex_);
     formDeathCallbacks_.emplace_back(formDeathCallback);
 }
 
@@ -864,7 +869,7 @@ void FormMgr::UnRegisterDeathCallback(const std::shared_ptr<FormCallbackInterfac
         return;
     }
 
-    // Remove the specified death callback in the vector of death callback
+    std::unique_lock<std::shared_mutex> lock(formDeathCallbacksMutex_);
     auto iter = std::find(formDeathCallbacks_.begin(), formDeathCallbacks_.end(), formDeathCallback);
     if (iter != formDeathCallbacks_.end()) {
         formDeathCallbacks_.erase(iter);
@@ -889,6 +894,7 @@ sptr<IRemoteObject::DeathRecipient> FormMgr::GetDeathRecipient() const
 bool FormMgr::CheckIsDeathCallbackRegistered(const std::shared_ptr<FormCallbackInterface> &formDeathCallback)
 {
     HILOG_INFO("call");
+    std::shared_lock<std::shared_mutex> lock(formDeathCallbacksMutex_);
     auto iter = std::find(formDeathCallbacks_.begin(), formDeathCallbacks_.end(), formDeathCallback);
     if (iter != formDeathCallbacks_.end()) {
         return true;
@@ -920,9 +926,12 @@ void FormMgr::FormMgrDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &rem
         FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
         return;
     }
-
-    // refresh form host.
-    for (auto &deathCallback : FormMgr::GetInstance().formDeathCallbacks_) {
+    std::vector<std::shared_ptr<FormCallbackInterface>> callbacksSnapshot;
+    {
+        std::shared_lock<std::shared_mutex> lock(FormMgr::GetInstance().formDeathCallbacksMutex_);
+        callbacksSnapshot = FormMgr::GetInstance().formDeathCallbacks_;
+    }
+    for (auto &deathCallback : callbacksSnapshot) {
         deathCallback->OnDeathReceived();
     }
     FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
@@ -2112,6 +2121,11 @@ ErrCode FormMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLo
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+        formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
+        HILOG_ERROR("invalid formLocation:%{public}d", formLocation);
+        return ERR_APPEXECFWK_FORM_LOCATION_INVALID;
     }
 
     ErrCode errCode = Connect();
