@@ -95,7 +95,7 @@ public:
 private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
     ani_ref callbackRef_ = nullptr;
-    ani_env* env_;
+    ani_env* env_ = nullptr;
 };
 
 class EtsFormStateObserver : public JsFormStateObserverStub,

@@ -486,7 +486,7 @@ ErrCode EtsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::st
     ani_env* env = GetAniEnv(ani_vm_);
     if (env == nullptr) {
         HILOG_ERROR("GetAniEnv failed");
-        return false;
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     ani_boolean isEqual = false;
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
@@ -568,9 +568,16 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
             if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
                 std::string bundleNameNew = std::regex_replace(bundleName,
                     std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
-                auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
-                if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
-                    ani_ref res = visibleCallback->second->aniRef;
+                std::shared_ptr<AppExecFwk::ETSNativeReference> callback;
+                {
+                    std::lock_guard<std::mutex> lock(sharedThis->formIsvisibleCallbackMutex_);
+                    auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
+                    if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
+                        callback = visibleCallback->second;
+                    }
+                }
+                if (callback != nullptr) {
+                    ani_ref res = callback->aniRef;
                     ani_object aniValue = FormAniUtil::CreateFormInstances(env, formInstances);
                     bool bRet = FormAniUtil::Callback(env, static_cast<ani_object>(res), aniValue,
                         CLASSNAME_CALLBACK_WRAPPER);
@@ -585,9 +592,16 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
             if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
                 std::string bundleNameNew =
                     std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
-                auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
-                if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
-                    ani_ref res = invisibleCallback->second->aniRef;
+                std::shared_ptr<AppExecFwk::ETSNativeReference> callback;
+                {
+                    std::lock_guard<std::mutex> lock(sharedThis->formIsvisibleCallbackMutex_);
+                    auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
+                    if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
+                        callback = invisibleCallback->second;
+                    }
+                }
+                if (callback != nullptr) {
+                    ani_ref res = callback->aniRef;
                     ani_object aniValue = FormAniUtil::CreateFormInstances(env, formInstances);
                     bool bRet = FormAniUtil::Callback(env, static_cast<ani_object>(res), aniValue,
                         CLASSNAME_CALLBACK_WRAPPER);

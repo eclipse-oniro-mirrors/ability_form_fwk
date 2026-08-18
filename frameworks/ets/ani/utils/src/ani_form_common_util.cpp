@@ -78,25 +78,31 @@ bool CreateRunningFormInfoEnum(ani_env *env,
     }
     ani_status status = ANI_ERROR;
     ani_enum_item visibilityType {};
-    AniEnumConvertUtil::EnumConvert_NativeToEts(env,
-        ENUMNAME_VISIBILITYTYPE,
-        runningFormInfo.formVisiblity, visibilityType);
+    if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env,
+        ENUMNAME_VISIBILITYTYPE, runningFormInfo.formVisiblity, visibilityType)) {
+        HILOG_ERROR("visibilityType convert failed");
+        return false;
+    }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "visibilityType", visibilityType)) != ANI_OK) {
         HILOG_ERROR("visibilityType failed status:%{public}d", status);
         return false;
     }
     ani_enum_item formUsageState {};
-    AniEnumConvertUtil::EnumConvert_NativeToEts(env,
-        ENUMNAME_FORMUSAGESTATE,
-        runningFormInfo.formUsageState, formUsageState);
+    if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env,
+        ENUMNAME_FORMUSAGESTATE, runningFormInfo.formUsageState, formUsageState)) {
+        HILOG_ERROR("formUsageState convert failed");
+        return false;
+    }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "formUsageState", formUsageState)) != ANI_OK) {
         HILOG_ERROR("formUsageState failed status:%{public}d", status);
         return false;
     }
     ani_enum_item formLocation {};
-    AniEnumConvertUtil::EnumConvert_NativeToEts(env,
-        ENUMNAME_FORMLOCATION,
-        runningFormInfo.formLocation, formLocation);
+    if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env,
+        ENUMNAME_FORMLOCATION, runningFormInfo.formLocation, formLocation)) {
+        HILOG_ERROR("formLocation convert failed");
+        return false;
+    }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "formLocation", formLocation)) != ANI_OK) {
         HILOG_ERROR("formLocation failed status:%{public}d", status);
         return false;
@@ -111,7 +117,11 @@ void SetStringProperty(ani_env *env, ani_object obj, const char *propName, const
         return;
     }
     ani_string anistr{};
-    env->String_NewUTF8(value.c_str(), value.size(), &anistr);
+    ani_status status = env->String_NewUTF8(value.c_str(), value.size(), &anistr);
+    if (status != ANI_OK) {
+        HILOG_ERROR("String_NewUTF8 failed, status: %{public}d", status);
+        return;
+    }
     env->Object_SetPropertyByName_Ref(obj, propName, anistr);
 }
 
@@ -254,23 +264,20 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
         ani_string aniKey = nullptr;
         status = env->String_NewUTF8(item.name.c_str(), item.name.length(), &aniKey);
         if (status != ANI_OK) {
-            HILOG_ERROR("String_NewUTF8 for key '%{public}s' failed, status: %{public}d",
-                item.name.c_str(), status);
+            HILOG_ERROR("String_NewUTF8 for key failed, status: %{public}d", status);
             return false;
         }
 
         ani_string aniValue = nullptr;
         status = env->String_NewUTF8(item.value.c_str(), item.value.length(), &aniValue);
         if (status != ANI_OK) {
-            HILOG_ERROR("String_NewUTF8 for value '%{public}s' failed, status: %{public}d",
-                item.value.c_str(), status);
+            HILOG_ERROR("String_NewUTF8 for value failed, status: %{public}d", status);
             return false;
         }
 
         status = env->Object_CallMethod_Void(recordObject, setFunc, aniKey, (ani_ref)aniValue);
         if (status != ANI_OK) {
-            HILOG_ERROR("Set key-value failed. key: %{public}s, value: %{public}s, status: %{public}d",
-                item.name.c_str(), item.value.c_str(), status);
+            HILOG_ERROR("Set key-value failed, status: %{public}d", status);
             return false;
         }
     }
@@ -291,8 +298,13 @@ ani_enum_item CreateSceneAnimationTriggerType(ani_env *env, AppExecFwk::SceneAni
         return nullptr;
     }
 
+    int32_t triggerTypeValue = static_cast<int32_t>(triggerType);
+    if (triggerTypeValue <= 0) {
+        HILOG_ERROR("Invalid SceneAnimationTriggerType value: %{public}d", triggerTypeValue);
+        return nullptr;
+    }
     ani_enum_item item;
-    status = env->Enum_GetEnumItemByIndex(triggerTypeEnum, static_cast<ani_size>(triggerType) - 1, &item);
+    status = env->Enum_GetEnumItemByIndex(triggerTypeEnum, static_cast<ani_size>(triggerTypeValue - 1), &item);
     if (status != ANI_OK) {
         HILOG_ERROR("Cannot get enum item.");
         return nullptr;
@@ -523,7 +535,11 @@ bool SetPropertyStringByName(ani_env* env, ani_object object, const char *name, 
     }
     ani_status status = ANI_ERROR;
     ani_string aniString = nullptr;
-    env->String_NewUTF8(string.c_str(), string.size(), &aniString);
+    status = env->String_NewUTF8(string.c_str(), string.size(), &aniString);
+    if (status != ANI_OK) {
+        HILOG_ERROR("String_NewUTF8 failed, status: %{public}d", status);
+        return false;
+    }
     if ((status = env->Object_SetPropertyByName_Ref(object, name, aniString)) != ANI_OK) {
         HILOG_ERROR("name is: %{public}s SetProperty status: %{public}d", name, status);
         return false;
@@ -857,11 +873,11 @@ ani_object CreateFormInstances(ani_env *env, const std::vector<AppExecFwk::FormI
         return nullptr;
     }
 
-    ani_object arrayObj;
+    ani_object arrayObj = nullptr;
     status = env->Object_New(arrayCls, arrayCtor, &arrayObj, formInstances.size());
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New array status: %{public}d", status);
-        return arrayObj;
+        return nullptr;
     }
     ani_size index = 0;
     for (auto &iter : formInstances) {
@@ -916,15 +932,21 @@ ani_object CreateFormInstance(ani_env *env, const AppExecFwk::FormInstance &form
             return nullptr;
     }
     ani_enum_item visibilityType {};
-    AniEnumConvertUtil::EnumConvert_NativeToEts(env, ENUMNAME_VISIBILITYTYPE,
-        formInstance.formVisiblity, visibilityType);
+    if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env, ENUMNAME_VISIBILITYTYPE,
+        formInstance.formVisiblity, visibilityType)) {
+        HILOG_ERROR("visibilityType convert failed");
+        return nullptr;
+    }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "visibilityType", visibilityType)) != ANI_OK) {
         HILOG_ERROR("visibilityType failed status:%{public}d", status);
         return nullptr;
     }
     ani_enum_item formUsageState {};
-    AniEnumConvertUtil::EnumConvert_NativeToEts(env, ENUMNAME_FORMUSAGESTATE,
-        formInstance.formUsageState, formUsageState);
+    if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env, ENUMNAME_FORMUSAGESTATE,
+        formInstance.formUsageState, formUsageState)) {
+        HILOG_ERROR("formUsageState convert failed");
+        return nullptr;
+    }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "formUsageState", formUsageState)) != ANI_OK) {
         HILOG_ERROR("formUsageState failed status:%{public}d", status);
         return nullptr;
@@ -954,23 +976,23 @@ ani_object CreateRunningFormInfos(ani_env *env, const std::vector<AppExecFwk::Ru
         return nullptr;
     }
 
-    ani_object arrayObj;
+    ani_object arrayObj = nullptr;
     status = env->Object_New(arrayCls, arrayCtor, &arrayObj, runningFormInfos.size());
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New array status: %{public}d", status);
-        return arrayObj;
+        return nullptr;
     }
     ani_size index = 0;
     for (auto &iter : runningFormInfos) {
         ani_object aniInfo = CreateRunningFormInfo(env, iter);
         if (aniInfo == nullptr) {
             HILOG_WARN("null aniInfo");
-            break;
+            return nullptr;
         }
         status = env->Object_CallMethodByName_Void(arrayObj, ANI_SETTER_MARKER, ANI_SET_SIGNATURE, index, aniInfo);
         if (status != ANI_OK) {
             HILOG_WARN("Object_CallMethodByName_Void failed status: %{public}d", status);
-            break;
+            return nullptr;
         }
         index++;
     }
@@ -1186,6 +1208,11 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
         HILOG_INFO("Cannot create FormStateInfoInner object");
         return nullptr;
     }
+    if (state < static_cast<int32_t>(AppExecFwk::FormState::UNKNOWN) ||
+        state > static_cast<int32_t>(AppExecFwk::FormState::READY)) {
+        HILOG_INFO("Invalid FormState value: %{public}d", state);
+        return nullptr;
+    }
     ani_enum formState;
     ani_status status = env->FindEnum(FORM_STATE_CLASS_NAME, &formState);
     if (status != ANI_OK) {
@@ -1234,11 +1261,11 @@ ani_object GetAniArray(ani_env *env, size_t array_size)
         return nullptr;
     }
 
-    ani_object arrayObj;
+    ani_object arrayObj = nullptr;
     status = env->Object_New(arrayCls, arrayCtor, &arrayObj, array_size);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New Array failed");
-        return arrayObj;
+        return nullptr;
     }
     return arrayObj;
 }
@@ -1406,7 +1433,10 @@ int64_t SystemTimeMillis() noexcept
     struct timespec t;
     t.tv_sec = 0;
     t.tv_nsec = 0;
-    clock_gettime(CLOCK_MONOTONIC, &t);
+    if (clock_gettime(CLOCK_MONOTONIC, &t) != 0) {
+        HILOG_ERROR("clock_gettime failed");
+        return 0;
+    }
     return static_cast<int64_t>(((t.tv_sec) * NANOSECONDS + t.tv_nsec) / MICROSECONDS);
 }
 
@@ -1433,20 +1463,32 @@ void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &fo
         return;
     }
     size_t formDataProxiesArrayLen = 0;
-    env->Array_GetLength(static_cast<ani_array>(proxiesArrayRef), &formDataProxiesArrayLen);
+    ani_status status = env->Array_GetLength(static_cast<ani_array>(proxiesArrayRef), &formDataProxiesArrayLen);
+    if (status != ANI_OK) {
+        HILOG_ERROR("Array_GetLength failed, status: %{public}d", status);
+        return;
+    }
 
     for (size_t i = 0; i < formDataProxiesArrayLen; i++) {
-        ani_ref element;
+        ani_ref element = nullptr;
         if (ANI_OK != env->Object_CallMethodByName_Ref(
             static_cast<ani_array>(proxiesArrayRef), ANI_GETTER_MARKER, "i:Y", &element, (ani_int)i)) {
             HILOG_ERROR("Object_CallMethodByName_Ref failed");
             return;
         }
 
-        ani_ref key;
-        ani_ref subscriberId;
-        env->Object_GetPropertyByName_Ref(static_cast<ani_object>(element), "key", &key);
-        env->Object_GetPropertyByName_Ref(static_cast<ani_object>(element), "subscriberId", &subscriberId);
+        ani_ref key = nullptr;
+        ani_ref subscriberId = nullptr;
+        status = env->Object_GetPropertyByName_Ref(static_cast<ani_object>(element), "key", &key);
+        if (status != ANI_OK) {
+            HILOG_ERROR("Get key failed, status: %{public}d", status);
+            return;
+        }
+        status = env->Object_GetPropertyByName_Ref(static_cast<ani_object>(element), "subscriberId", &subscriberId);
+        if (status != ANI_OK) {
+            HILOG_ERROR("Get subscriberId failed, status: %{public}d", status);
+            return;
+        }
         std::string stdKey = AniStringToStdString(env, static_cast<ani_string>(key));
         std::string stdSubscriberId  = AniStringToStdString(env, static_cast<ani_string>(subscriberId));
         HILOG_DEBUG("Key is %{public}s subscriberId %{public}s", stdKey.c_str(), stdSubscriberId.c_str());
