@@ -23,7 +23,9 @@
 namespace OHOS {
 namespace AppExecFwk {
 
-void MockGetCallerBundleName(int32_t mockRet, const std::string &bundleName = "");
+// Shared by both GetCallerBundleName and GetCallerBundleNameAndAppIndex mocks.
+void MockGetCallerBundleName(int32_t mockRet, const std::string &bundleName = "",
+    int32_t appIndex = Constants::MAIN_APP_INDEX);
 void MockFormBmsHelperGetBundleInfoByFlags(bool mockRet, const std::string &appProvisionType = "");
 void MockFormBmsHelperGetBundleNameByUid(int32_t mockRet, const std::string &bundleName = "");
 

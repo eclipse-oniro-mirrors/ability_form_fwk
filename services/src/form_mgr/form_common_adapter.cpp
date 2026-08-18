@@ -115,6 +115,25 @@ ErrCode FormCommonAdapter::GetFormConfigInfo(const Want& want, FormItemInfo &for
     return ERR_OK;
 }
 
+void FormCommonAdapter::AlignCloneProviderUid(FormItemInfo &formItemInfo)
+{
+    // Align appIndex and providerUid to the enabled clone instance so updateForm uid check passes
+    int32_t currentUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    int32_t appIndex = Constants::MAIN_APP_INDEX;
+    ErrCode ret = FormBmsHelper::GetInstance().GetEnabledCloneIndex(
+        currentUserId, formItemInfo.GetProviderBundleName(), appIndex);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("GetEnabledCloneIndex failed, keep caller appIndex");
+        return;
+    }
+    formItemInfo.SetAppIndex(appIndex);
+    int32_t providerUid = FormBmsHelper::GetInstance().GetUidByBundleName(
+        formItemInfo.GetProviderBundleName(), currentUserId, appIndex);
+    if (providerUid != FormBmsHelper::INVALID_UID) {
+        formItemInfo.SetProviderUid(providerUid);
+    }
+}
+
 void FormCommonAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation)
 {
     bool isFormBundleForbidden =
@@ -278,8 +297,10 @@ ErrCode FormCommonAdapter::CreateFormItemInfo(const BundleInfo& bundleInfo,
     itemInfo.SetJsComponentName(formInfo.jsComponentName);
     itemInfo.SetFormVisibleNotify(formInfo.formVisibleNotify);
     auto formSrc = formInfo.src;
-    if (formSrc.rfind(POINT_ETS) == formSrc.size() - strlen(POINT_ETS)) {
-        formSrc.erase(formSrc.end() - strlen(POINT_ETS), formSrc.end());
+    size_t pointEtsLen = strlen(POINT_ETS);
+    if (formSrc.size() >= pointEtsLen &&
+        formSrc.rfind(POINT_ETS) == formSrc.size() - pointEtsLen) {
+        formSrc.erase(formSrc.end() - pointEtsLen, formSrc.end());
     }
     itemInfo.SetFormSrc(formSrc);
     itemInfo.SetFormWindow(formInfo.window);
@@ -304,6 +325,7 @@ ErrCode FormCommonAdapter::CreateFormItemInfo(const BundleInfo& bundleInfo,
     itemInfo.SetUiModuleName(FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, userId));
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     itemInfo.SetIsTemplateForm(formInfo.isTemplateForm);
+    AlignCloneProviderUid(itemInfo);
     return ERR_OK;
 }
 
@@ -437,9 +459,8 @@ int32_t FormCommonAdapter::GetCallerType(const std::string &bundleName)
 {
     HILOG_DEBUG("GetCallerType called, bundleName: %{public}s", bundleName.c_str());
     AppExecFwk::ApplicationInfo callerAppInfo;
-    auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
     int32_t userId = GetCallingUserId();
-    if (!FormBmsHelper::GetInstance().GetApplicationInfoByFlag(bundleName, flag, userId, callerAppInfo)) {
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(bundleName, userId, callerAppInfo) != ERR_OK) {
         HILOG_ERROR("Get callerAppInfo failed");
         return FormErmsCallerInfo::TYPE_INVALID;
     }

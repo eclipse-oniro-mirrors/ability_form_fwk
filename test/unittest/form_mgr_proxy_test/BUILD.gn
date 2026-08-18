@@ -27,9 +27,11 @@ ohos_unittest("FmsFormMgrProxyTempTest") {
 
   sources = [ "form_mgr_proxy_test.cpp" ]
 
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   deps = [
     "${form_fwk_path}:form_manager",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -62,5 +64,6 @@ ohos_unittest("FmsFormMgrProxyTempTest") {
 
 group("unittest") {
   testonly = true
+
   deps = [ ":FmsFormMgrProxyTempTest" ]
 }

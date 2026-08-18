@@ -793,5 +793,36 @@ ErrCode FormCallbackAdapter::GetWantCallbackProxy(int32_t callingUid, sptr<IRemo
     return wantCallbackRegistry_.Get(callingUid, proxy);
 }
 
+void FormCallbackAdapter::CancelOverflow(const int64_t formId)
+{
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64, formId);
+        return;
+    }
+    FormInfo formInfo;
+    ErrCode result = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
+    if (result != ERR_OK) {
+        HILOG_ERROR("Get target form info failed");
+        return;
+    }
+    if (formInfo.sceneAnimationParams.abilityName.empty()) {
+        HILOG_ERROR("SceneAnimationParams abilityName is empty");
+        return;
+    }
+    for (int uid : formRecord.formUserUids) {
+        sptr<IRemoteObject> callerToken;
+        if (overflowRegistry_.Get(uid, callerToken) != ERR_OK) {
+            continue;
+        }
+        sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
+        if (proxy == nullptr) {
+            continue;
+        }
+        OverflowInfo overflowInfo;
+        result = proxy->RequestOverflow(formId, overflowInfo, false);
+        HILOG_INFO("formid:%{public}" PRId64 ",result: %{public}d", formId, result);
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -117,10 +117,20 @@ void ThemeFormClient::CreateThemeFormParcel(const FormNotifyInfo& info, ThemeMan
     auto& themeFormInfo = parcel.themeFormInfo_;
     themeFormInfo.formId = info.formId;
     auto& want = info.want;
-    themeFormInfo.themeFormDimension =
-        static_cast<ThemeFormDimension>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
-    themeFormInfo.themeFormLocation =
-        static_cast<ThemeFormLocation>(want.GetIntParam(Constants::FORM_LOCATION_KEY, 0));
+    int32_t dimensionValue = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
+    if (dimensionValue < 0 || dimensionValue > static_cast<int32_t>(ThemeFormDimension::DIMENSION_6_4)) {
+        HILOG_ERROR("Invalid themeFormDimension: %{public}d", dimensionValue);
+        themeFormInfo.themeFormDimension = ThemeFormDimension::DIMENSION_1_1;
+    } else {
+        themeFormInfo.themeFormDimension = static_cast<ThemeFormDimension>(dimensionValue);
+    }
+    int32_t locationValue = want.GetIntParam(Constants::FORM_LOCATION_KEY, 0);
+    if (locationValue < 0 || locationValue > static_cast<int32_t>(ThemeFormLocation::LOCATION_NEGATIVE_SCREEN)) {
+        HILOG_ERROR("Invalid themeFormLocation: %{public}d", locationValue);
+        themeFormInfo.themeFormLocation = ThemeFormLocation::LOCATION_LAUNCHER;
+    } else {
+        themeFormInfo.themeFormLocation = static_cast<ThemeFormLocation>(locationValue);
+    }
     themeFormInfo.themeFormId = want.GetStringParam(Constants::PARAM_THEME_THEME_FORM_ID);
     themeFormInfo.themeId = want.GetStringParam(Constants::PARAM_THEME_THEME_ID);
 
@@ -145,9 +155,11 @@ void ThemeFormClient::OnRemoteSaDied(const wptr<IRemoteObject> &object)
 
 sptr<IThemeManagerService> ThemeFormClient::GetProxy()
 {
-    std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
-    if (themeSvcProxy_) {
-        return themeSvcProxy_;
+    {
+        std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
+        if (themeSvcProxy_) {
+            return themeSvcProxy_;
+        }
     }
 
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -162,6 +174,10 @@ sptr<IThemeManagerService> ThemeFormClient::GetProxy()
     }
 
     if (object != nullptr) {
+        std::lock_guard<std::mutex> lock(themeSvcProxyMutex_);
+        if (themeSvcProxy_) {
+            return themeSvcProxy_;
+        }
         deathRecipient_ = new (std::nothrow) ThemeFormDeathRecipient();
         if (deathRecipient_ == nullptr) {
             HILOG_ERROR("Create ThemeFormDeathRecipient failed!");

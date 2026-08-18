@@ -70,7 +70,7 @@ public:
      * @param formDBInfos all db form infos
      */
     void GetAllFormDBInfoByBundleName(const std::string &bundleName, const int32_t userId,
-        std::vector<FormDBInfo> &formDBInfos);
+        std::vector<FormDBInfo> &formDBInfos, const int32_t appIndex = Constants::MAIN_APP_INDEX);
 
     /**
      * @brief Save or update form data to DbCache and DB.
@@ -117,7 +117,7 @@ public:
      * @param removedDBForms Removed db form infos
      */
     void DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
-        std::vector<FormDBInfo> &removedDBForms);
+        std::vector<FormDBInfo> &removedDBForms, const int32_t appIndex = Constants::MAIN_APP_INDEX);
 
     /**
      * @brief Get no host db record.

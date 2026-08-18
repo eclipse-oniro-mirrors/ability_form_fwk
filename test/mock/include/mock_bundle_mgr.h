@@ -34,6 +34,7 @@ public:
         ErrCode(const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId));
     MOCK_METHOD1(CheckIsSystemAppByUid, bool(const int));
     MOCK_METHOD2(GetNameForUid, int32_t(const int, std::string &));
+    MOCK_METHOD2(GetUidByBundleName, int(const std::string &, const int));
     int OnRemoteRequest(
         uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override
     {

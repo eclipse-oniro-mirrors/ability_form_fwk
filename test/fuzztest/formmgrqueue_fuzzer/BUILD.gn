@@ -36,7 +36,6 @@ ohos_fuzztest("FormMgrQueueFuzzTest") {
   ]
 
   sources = [
-    "${form_fwk_path}/services/src/common/util/form_serial_queue.cpp",
     "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
     "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
     "formmgrqueue_fuzzer.cpp"
@@ -44,9 +43,8 @@ ohos_fuzztest("FormMgrQueueFuzzTest") {
 
   deps = [
     "${form_fwk_path}:form_manager",
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

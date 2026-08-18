@@ -125,10 +125,15 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
  * @param removedDBForms Removed db form infos
  */
 void FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
-    std::vector<FormDBInfo> &removedDBForms)
+    std::vector<FormDBInfo> &removedDBForms, const int32_t appIndex)
 {
-    HILOG_INFO("bundleName: %{public}s", bundleName.c_str());
+    HILOG_INFO("bundleName: %{public}s, appIndex: %{public}d", bundleName.c_str(), appIndex);
     GetFormDBInfoCacheByBundleName(bundleName, userId, removedDBForms);
+    if (appIndex != Constants::MAIN_APP_INDEX) {
+        removedDBForms.erase(std::remove_if(removedDBForms.begin(), removedDBForms.end(),
+            [appIndex](const FormDBInfo &info) { return info.appIndex != appIndex; }),
+            removedDBForms.end());
+    }
 
     for (auto iter = removedDBForms.begin(); iter != removedDBForms.end();) {
         if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(iter->formId)) == ERR_OK) {
@@ -160,11 +165,12 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
  * @param formDBInfos all db form infos
  */
 void FormDbCache::GetAllFormDBInfoByBundleName(const std::string &bundleName, const int32_t userId,
-    std::vector<FormDBInfo> &formDBInfos)
+    std::vector<FormDBInfo> &formDBInfos, const int32_t appIndex)
 {
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (auto dbInfo : formDBInfos_) {
-        if (bundleName == dbInfo.bundleName && dbInfo.userId == userId) {
+        if (bundleName == dbInfo.bundleName && dbInfo.userId == userId &&
+            (appIndex == Constants::MAIN_APP_INDEX || dbInfo.appIndex == appIndex)) {
             formDBInfos.push_back(dbInfo);
         }
     }

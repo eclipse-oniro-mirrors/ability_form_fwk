@@ -66,12 +66,13 @@ ohos_unittest("FmsFormCheckMgrTest") {
 
   configs = []
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -96,10 +97,11 @@ ohos_unittest("FmsFormCheckMgrTest") {
     "form_fwk:form_manager",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "libxml2:libxml2",
-    "hisysevent:libhisysevent",
     "jsoncpp:jsoncpp",
   ]
 }
@@ -157,12 +159,13 @@ ohos_unittest("FmsFormCheckMgrTest2") {
 
   configs = []
   cflags = []
+
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -186,10 +189,11 @@ ohos_unittest("FmsFormCheckMgrTest2") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "hicollie:libhicollie",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "libxml2:libxml2",
-    "hisysevent:libhisysevent",
     "jsoncpp:jsoncpp",
   ]
 

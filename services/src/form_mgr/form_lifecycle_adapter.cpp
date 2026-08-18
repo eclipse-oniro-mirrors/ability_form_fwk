@@ -51,6 +51,7 @@
 #include "feature/param_update/param_control.h"
 #include "form_event_report.h"
 #include "form_host/form_host_record.h"
+#include "form_mgr/form_callback_adapter.h"
 #include "form_mgr/form_common_adapter.h"
 #include "form_mgr/form_data_adapter.h"
 #include "form_mgr/form_publish_adapter.h"
@@ -1018,6 +1019,9 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         iter->protectForm = protect;
         FormDataMgr::GetInstance().SetFormProtect(iter->formId, protect);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
+        if (protect) {
+            FormCallbackAdapter::GetInstance().CancelOverflow(iter->formId);
+        }
         ++iter;
     }
     if (!formInfos.empty()) {

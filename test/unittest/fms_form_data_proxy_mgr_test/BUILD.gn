@@ -20,9 +20,6 @@ ohos_unittest("FmsFormDataProxyMgrTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/data_center/form_data_proxy_mgr.cpp",
-    "${form_fwk_path}/services/src/data_center/form_data_proxy_record.cpp",
-    "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
     "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
     "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_proxy_mgr_test/fms_form_data_proxy_mgr_test.cpp",
@@ -37,13 +34,13 @@ ohos_unittest("FmsFormDataProxyMgrTest") {
 
   configs = []
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
-    "${form_fwk_path}:libfms",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -70,6 +67,7 @@ ohos_unittest("FmsFormDataProxyMgrTest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",

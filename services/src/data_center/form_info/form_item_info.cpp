@@ -720,5 +720,15 @@ bool FormItemInfo::GetIsTemplateForm() const
 {
     return isTemplateForm_;
 }
+
+int32_t FormItemInfo::GetAppIndex() const
+{
+    return appIndex_;
+}
+
+void FormItemInfo::SetAppIndex(int32_t appIndex)
+{
+    appIndex_ = appIndex;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

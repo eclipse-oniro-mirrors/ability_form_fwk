@@ -325,6 +325,14 @@ void FormDataMgr::SetFormVisible(int64_t formId, bool isVisible)
     }
 }
 
+void FormDataMgr::DeleteFormVisible(int64_t formId)
+{
+    GTEST_LOG_(INFO) << "DeleteFormVisible called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->DeleteFormVisible(formId);
+    }
+}
+
 void FormDataMgr::SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled)
 {
     GTEST_LOG_(INFO) << "SetExpectRecycledStatus(int64_t) called";

@@ -564,11 +564,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     // ========== 8. Publish Management ==========
 
-    // QueryPublishFormToHost (1)
-    Want publishWant1 = GenerateWant(fdp);
-    facade.QueryPublishFormToHost(publishWant1);
-
-    // QueryPublishFormToHost (2)
+    // QueryPublishFormToHost
     Want publishWant2 = GenerateWant(fdp);
     int32_t publishUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
     facade.QueryPublishFormToHost(publishWant2, publishUserId);

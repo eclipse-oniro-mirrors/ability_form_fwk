@@ -20,7 +20,6 @@ ohos_unittest("FmsFormXmlParserTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/config/form_xml_parser.cpp",
     "${form_fwk_path}/test/unittest/fms_form_xml_parser_test/fms_form_xml_parser_test.cpp",
   ]
 
@@ -38,7 +37,7 @@ ohos_unittest("FmsFormXmlParserTest") {
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_config",
     "${form_fwk_path}:form_manager",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

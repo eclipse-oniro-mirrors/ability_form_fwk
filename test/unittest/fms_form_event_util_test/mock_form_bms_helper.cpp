@@ -20,17 +20,11 @@
 
 namespace {
     bool g_mockGetBundlePackInfoRet = true;
-    bool g_mockGetUidByBundleNameRet = true;
 }
 
 void MockGetBundlePackInfo(bool mockRet)
 {
     g_mockGetBundlePackInfoRet = mockRet;
-}
-
-void MockGetUidByBundleName(bool mockRet)
-{
-    g_mockGetUidByBundleNameRet = mockRet;
 }
 
 namespace OHOS {
@@ -45,14 +39,6 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
     BundlePackInfo &bundlePackInfo)
 {
     return g_mockGetBundlePackInfoRet;
-}
-
-int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const int32_t userId)
-{
-    if (true == g_mockGetUidByBundleNameRet) {
-        return INVALID_UID;
-    }
-    return 10;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

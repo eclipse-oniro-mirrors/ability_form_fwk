@@ -1074,14 +1074,14 @@ HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_002, TestSize.Level1)
 
 /**
  * @tc.name: SetVisibleChange_003
- * @tc.desc: Verify FORM_VISIBLE calls SetFormVisible and SetExpectRecycledStatus
+ * @tc.desc: Verify FORM_VISIBLE does NOT call SetFormVisible (moved to NotifyWhetherVisibleForms)
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "SetVisibleChange_003 start";
-    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(TEST_FORM_ID, true))
-        .Times(1);
+    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(_, _))
+        .Times(0);
     EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatus(TEST_FORM_ID, false))
         .Times(1);
     FormVisibilityAdapter::GetInstance().SetVisibleChange(TEST_FORM_ID, Constants::FORM_VISIBLE, TEST_USER_ID);
@@ -1090,14 +1090,14 @@ HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_003, TestSize.Level1)
 
 /**
  * @tc.name: SetVisibleChange_004
- * @tc.desc: Verify FORM_INVISIBLE calls SetFormVisible but NOT SetExpectRecycledStatus
+ * @tc.desc: Verify FORM_INVISIBLE does NOT call SetFormVisible or SetExpectRecycledStatus
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormVisibilityAdapterTest, SetVisibleChange_004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "SetVisibleChange_004 start";
-    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(TEST_FORM_ID, false))
-        .Times(1);
+    EXPECT_CALL(*MockFormDataMgr::obj, SetFormVisible(_, _))
+        .Times(0);
     EXPECT_CALL(*MockFormDataMgr::obj, SetExpectRecycledStatus(_, _))
         .Times(0);
     FormVisibilityAdapter::GetInstance().SetVisibleChange(TEST_FORM_ID, Constants::FORM_INVISIBLE, TEST_USER_ID);

@@ -76,7 +76,7 @@ ErrCode FormRenderMgrInner::RenderForm(
         AddHostToken(hostToken, formRecord.formId);
         want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
     }
-    if (!isActiveUser_) {
+    if (!isActiveUser_.load()) {
         HILOG_WARN("isActiveUser is false, return");
         return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
     }
@@ -261,6 +261,7 @@ void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleNam
 
     want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, static_cast<int32_t>(bundleInfo.compatibleVersion));
     want.SetParam(Constants::FORM_TARGET_VERSION_KEY, static_cast<int32_t>(bundleInfo.targetVersion));
+    want.SetParam(Constants::FORM_IS_SYSTEM_APP_KEY, bundleInfo.applicationInfo.isSystemApp);
 }
 
 void FormRenderMgrInner::PostOnUnlockTask()
@@ -495,7 +496,7 @@ void FormRenderMgrInner::RerenderAllForms()
         NotifyHostRenderServiceIsDead();
     } else {
         FormRenderReport::GetInstance().RecordFRSDead();
-        isFrsDiedInLowMemory_ = true;
+        isFrsDiedInLowMemory_.store(true);
         HILOG_ERROR("Low memory killed FRS");
     }
 }
@@ -560,8 +561,8 @@ bool FormRenderMgrInner::RegisterRenderDeathRecipient(const sptr<IRemoteObject> 
                 return;
             }
             HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
-                renderMgrInner->userId_, renderMgrInner->isActiveUser_);
-            if (renderMgrInner->isActiveUser_) {
+                renderMgrInner->userId_.load(), renderMgrInner->isActiveUser_.load());
+            if (renderMgrInner->isActiveUser_.load()) {
                 renderMgrInner->RerenderAllForms();
             } else {
                 std::unique_lock<std::shared_mutex> guard(renderMgrInner->renderRemoteObjMutex_);
@@ -609,12 +610,12 @@ inline ErrCode FormRenderMgrInner::ConnectRenderService(
 
 void FormRenderMgrInner::SetUserId(int32_t userId)
 {
-    userId_ = userId;
+    userId_.store(userId);
 }
 
 int32_t FormRenderMgrInner::GetUserId() const
 {
-    return userId_;
+    return userId_.load();
 }
 
 void FormRenderMgrInner::RerenderAllFormsImmediate()
@@ -622,7 +623,7 @@ void FormRenderMgrInner::RerenderAllFormsImmediate()
     HILOG_INFO("Called");
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
-        isActiveUser_ = true;
+        isActiveUser_.store(true);
         if (etsHosts_.empty()) {
             HILOG_WARN("All hosts died, no need to rerender.");
             return;
@@ -641,7 +642,7 @@ void FormRenderMgrInner::DisconnectAllRenderConnections()
         iter = renderFormConnections_.erase(iter);
         size--;
     }
-    isActiveUser_ = false;
+    isActiveUser_.store(false);
 }
 
 void FormRenderMgrInner::DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const
@@ -1013,7 +1014,7 @@ void FormRenderMgrInner::RecoverFRSOnFormActivity()
 bool FormRenderMgrInner::GetIsFRSDiedInLowMemory()
 {
     HILOG_INFO("call isFrsDiedInLowMemory_ %{public}d", isFrsDiedInLowMemory_.load());
-    return isFrsDiedInLowMemory_;
+    return isFrsDiedInLowMemory_.load();
 }
 
 void FormRenderMgrInner::PostSetRenderGroupParamsTask(const int64_t formId, const Want &want)

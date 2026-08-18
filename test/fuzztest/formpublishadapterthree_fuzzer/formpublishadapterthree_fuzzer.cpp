@@ -117,17 +117,10 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::unique_ptr<FormProviderData> formBindingData = nullptr;
     int64_t publishFormId = 0;
     std::vector<FormDataProxy> formDataProxies;
-    bool needCheckFormPermissionPublish = fdp->ConsumeBool();
     adapter.RequestPublishForm(publishWant, withFormBindingData, formBindingData, publishFormId,
-        formDataProxies, needCheckFormPermissionPublish);
+        formDataProxies);
 
-    // Fuzz RequestPublishFormToHost (private, single-arg) with proper setup
-    Want toHostWant = CreateValidFormWant(fdp);
-    int64_t toHostFormId;
-    SetupFormIdMapWithState(adapter, fdp, toHostFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::UNKNOWN);
-    adapter.RequestPublishFormToHost(toHostWant);
-
-    // Fuzz RequestPublishFormToHost (private, two-arg with userId) with proper setup
+    // Fuzz RequestPublishFormToHost with proper setup
     Want toHostUserWant = CreateValidFormWant(fdp);
     int64_t toHostUserFormId;
     SetupFormIdMapWithState(adapter, fdp, toHostUserFormId, OHOS::AppExecFwk::AddFormResultErrorCodes::SUCCESS);

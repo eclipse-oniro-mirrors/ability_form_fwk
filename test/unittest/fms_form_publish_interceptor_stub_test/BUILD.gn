@@ -20,7 +20,6 @@ ohos_unittest("FmsFormPublishInterceptorStubTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/interfaces/inner_api/src/form_publish_interceptor_stub.cpp",
     "${form_fwk_path}/test/unittest/fms_form_publish_interceptor_stub_test/fms_form_publish_interceptor_stub_test.cpp",
   ]
 
@@ -36,8 +35,7 @@ ohos_unittest("FmsFormPublishInterceptorStubTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${form_fwk_path}:fms_target",
-    "${form_fwk_path}:libfms",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

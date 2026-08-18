@@ -29,7 +29,6 @@ ohos_unittest("FmsFormHiSysEventWrapperTest") {
   configs = [ ":FmsFormHiSysEventWrapperTest_config" ]
 
   sources = [
-    "${form_fwk_path}/common/src/form_hisysevent_wrapper.cpp",
     "fms_form_hisysevent_wrapper_test.cpp",
   ]
 

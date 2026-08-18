@@ -32,6 +32,7 @@ void FormHostProxy::OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObj
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
+        return;
     }
 
     if (!data.WriteParcelable(&formInfo)) {
@@ -72,6 +73,7 @@ void FormHostProxy::OnUpdate(const FormJsInfo &formInfo)
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
+        return;
     }
 
     if (!data.WriteParcelable(&formInfo)) {
@@ -98,6 +100,7 @@ void  FormHostProxy::OnUninstall(const std::vector<int64_t> &formIds)
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
+        return;
     }
 
     if (!data.WriteInt64Vector(formIds)) {

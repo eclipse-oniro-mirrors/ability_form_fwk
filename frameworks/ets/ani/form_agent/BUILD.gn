@@ -68,6 +68,7 @@ ohos_shared_library("form_agent_ani") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
   ]

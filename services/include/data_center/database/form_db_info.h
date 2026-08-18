@@ -37,6 +37,7 @@ struct FormDBInfo {
     bool isThemeForm = false;
     bool enableForm = true;
     bool lockForm = false;
+    int32_t appIndex = Constants::MAIN_APP_INDEX;
     /**
      * @brief Constructors
      *
@@ -61,6 +62,7 @@ struct FormDBInfo {
         isThemeForm = formRecord.isThemeForm;
         enableForm = formRecord.enableForm;
         lockForm = formRecord.lockForm;
+        appIndex = formRecord.appIndex;
     }
     bool Contains(const int uId) const
     {
@@ -123,6 +125,9 @@ struct FormDBInfo {
         if (lockForm != formDBInfo.lockForm) {
             return false;
         }
+        if (appIndex != formDBInfo.appIndex) {
+            return false;
+        }
 
         return true;
     }
@@ -155,6 +160,7 @@ public:
         formDBInfo_.isThemeForm = formDBInfo.isThemeForm;
         formDBInfo_.enableForm = formDBInfo.enableForm;
         formDBInfo_.lockForm = formDBInfo.lockForm;
+        formDBInfo_.appIndex = formDBInfo.appIndex;
     }
     /**
      * @brief Constructors
@@ -174,6 +180,7 @@ public:
         formDBInfo_.isThemeForm = innerFormInfo.formDBInfo_.isThemeForm;
         formDBInfo_.enableForm = innerFormInfo.formDBInfo_.enableForm;
         formDBInfo_.lockForm = innerFormInfo.formDBInfo_.lockForm;
+        formDBInfo_.appIndex = innerFormInfo.formDBInfo_.appIndex;
     }
      /**
      * @brief Constructors
@@ -193,6 +200,7 @@ public:
         formDBInfo_.isThemeForm = formRecord.isThemeForm;
         formDBInfo_.enableForm = formRecord.enableForm;
         formDBInfo_.lockForm = formRecord.lockForm;
+        formDBInfo_.appIndex = formRecord.appIndex;
     }
     std::string ToString() const
     {
@@ -209,6 +217,7 @@ public:
         obj["isThemeForm"] = formDBInfo_.isThemeForm;
         obj["enableForm"] = formDBInfo_.enableForm;
         obj["lockForm"] = formDBInfo_.lockForm;
+        obj["appIndex"] = formDBInfo_.appIndex;
         return obj.dump();
     }
     /**

@@ -15,11 +15,17 @@
 
 #include "form_binding_data_impl.h"
 
+#include "fms_log_wrapper.h"
 #include "form_binding_data_common.h"
 #include "form_binding_data_defination.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
+
+namespace {
+constexpr size_t MAX_PROXY_DATA_COUNT = 1024;
+}
+
 RetFormBindingData CjFormBindingDataImpl::createFormBindingData(std::string obj)
 {
     RetFormBindingData ret {};
@@ -43,14 +49,30 @@ CArrProxyData CjFormBindingDataImpl::Convert2CArrProxyData(const std::vector<Pro
     if (in.size() <= 0) {
         return res;
     }
-    res.head = static_cast<CProxyData *>(malloc(sizeof(CProxyData) * in.size()));
+    if (in.size() > MAX_PROXY_DATA_COUNT) {
+        HILOG_ERROR("ProxyData count exceeds limit: %{public}zu", in.size());
+        return res;
+    }
+    size_t allocSize = sizeof(CProxyData) * in.size();
+    res.head = static_cast<CProxyData *>(malloc(allocSize));
     if (res.head == nullptr) {
+        HILOG_ERROR("Failed to allocate memory for proxy data");
         return res;
     }
     int64_t i = 0;
     for (auto item : in) {
         res.head[i].key = MallocCString(item.key);
         res.head[i].subscribeId = MallocCString(item.subscribeId);
+        if (res.head[i].key == nullptr || res.head[i].subscribeId == nullptr) {
+            HILOG_ERROR("Failed to allocate memory for proxy data fields");
+            for (int64_t j = 0; j <= i; j++) {
+                free(res.head[j].key);
+                free(res.head[j].subscribeId);
+            }
+            free(res.head);
+            res.head = nullptr;
+            return res;
+        }
         i++;
     }
     res.size = i;

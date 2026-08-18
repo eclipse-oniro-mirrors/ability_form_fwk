@@ -34,17 +34,14 @@ ohos_fuzztest("FormAbnormalReporterFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "${form_fwk_path}/services/src/feature/form_check/form_abnormal_reporter.cpp",
-    "${form_fwk_path}/services/src/feature/param_update/param_control.cpp",
     "formabnormalreporter_fuzzer.cpp"
 
   ]
 
   deps = [
     "${form_fwk_path}:form_manager",
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
@@ -61,6 +58,7 @@ ohos_fuzztest("FormAbnormalReporterFuzzTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "ffrt:libffrt",
+    "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "libxml2:libxml2",

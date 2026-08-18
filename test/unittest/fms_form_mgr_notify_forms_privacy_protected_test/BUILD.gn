@@ -32,6 +32,8 @@ ohos_unittest("FmsFormMgrNotifyFormsPrivacyProtectedTest") {
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
@@ -43,9 +45,8 @@ ohos_unittest("FmsFormMgrNotifyFormsPrivacyProtectedTest") {
   }
 
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:libfms",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",

@@ -1822,6 +1822,50 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetReCreateFormRecordsByBundleNa
 }
 
 /**
+ * @tc.number: FmsFormDataMgrTest_GetReCreateFormRecordsByBundleName_002
+ * @tc.name: GetReCreateFormRecordsByBundleName
+ * @tc.desc: Verify that a concrete appIndex only matches forms of that clone instance.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetReCreateFormRecordsByBundleName_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetReCreateFormRecordsByBundleName_002 start";
+
+    constexpr int64_t mainFormId = 1;
+    constexpr int64_t cloneFormId = 2;
+    constexpr int32_t cloneAppIndex = 1;
+    const std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    const int callingUid = 0;
+
+    FormItemInfo mainItemInfo;
+    InitFormItemInfo(mainFormId, mainItemInfo);
+    mainItemInfo.SetProviderBundleName(bundleName);
+    FormRecord mainRecord = formDataMgr_.CreateFormRecord(mainItemInfo, callingUid);
+    mainRecord.appIndex = Constants::MAIN_APP_INDEX;
+    formDataMgr_.formRecords_.emplace(mainFormId, mainRecord);
+
+    FormItemInfo cloneItemInfo;
+    InitFormItemInfo(cloneFormId, cloneItemInfo);
+    cloneItemInfo.SetProviderBundleName(bundleName);
+    FormRecord cloneRecord = formDataMgr_.CreateFormRecord(cloneItemInfo, callingUid);
+    cloneRecord.appIndex = cloneAppIndex;
+    formDataMgr_.formRecords_.emplace(cloneFormId, cloneRecord);
+
+    // the clone's index must not pull in the main app's form
+    std::set<int64_t> cloneForms;
+    formDataMgr_.GetReCreateFormRecordsByBundleName(bundleName, cloneForms, cloneAppIndex);
+    EXPECT_EQ(true, cloneForms.count(cloneFormId) > 0);
+    EXPECT_EQ(false, cloneForms.count(mainFormId) > 0);
+
+    // the main app's index must not pull in the clone's form
+    std::set<int64_t> mainForms;
+    formDataMgr_.GetReCreateFormRecordsByBundleName(bundleName, mainForms, Constants::MAIN_APP_INDEX);
+    EXPECT_EQ(true, mainForms.count(mainFormId) > 0);
+    EXPECT_EQ(false, mainForms.count(cloneFormId) > 0);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetReCreateFormRecordsByBundleName_002 end";
+}
+
+/**
  * @tc.number: FmsFormDataMgrTest_SetFormCacheInited_001
  * @tc.name: SetFormCacheInited
  * @tc.desc: Verify that the return value is correct.
@@ -2607,7 +2651,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0
     FormInstancesFilter formInstancesFilter;
     formInstancesFilter.bundleName = FORM_HOST_BUNDLE_NAME;
     std::vector<FormInstance> formInstances;
-    formDataMgr_.GetUnusedFormInstancesByFilter(formInstancesFilter, formInstances);
+    formDataMgr_.GetUnusedFormInstancesByFilter(formInstancesFilter, Constants::MAIN_APP_INDEX, formInstances);
     EXPECT_EQ(formInstances.size(), 0);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0100 end";
 }

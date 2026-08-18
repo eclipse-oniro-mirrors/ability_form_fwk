@@ -23,6 +23,7 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "in_process_call_wrapper.h"
+#include "json_util_form.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -37,7 +38,7 @@ BundleFormInfo::BundleFormInfo(const std::string &bundleName) : bundleName_(bund
 
 ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(formInfoStoragesJson, nullptr, false);
+    nlohmann::json jsonObject = SafeJsonParse(formInfoStoragesJson);
     if (jsonObject.is_discarded() || !jsonObject.is_array()) {
         HILOG_ERROR("bad profile");
         return ERR_APPEXECFWK_PARSE_BAD_PROFILE;
@@ -344,7 +345,7 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
 void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
 {
     BundleInfo bundleInfo;
-    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES | GET_BUNDLE_INFO_EXCLUDE_EXT;
+    int32_t flag = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE);
     if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(bundleName_, flag, userId, bundleInfo)) {
         HILOG_ERROR("get bundleInfo failed");
         return;

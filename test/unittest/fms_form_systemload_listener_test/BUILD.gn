@@ -23,8 +23,10 @@ ohos_unittest("FmsFormSystemloadListenerTest") {
 
   include_dirs = [ "${form_fwk_path}/services/include" ]
 
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   deps = [
-    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:libfms_internal_static",
   ]
 
   external_deps = [ 
@@ -47,5 +49,6 @@ ohos_unittest("FmsFormSystemloadListenerTest") {
 
 group("unittest") {
   testonly = true
+
   deps = [ ":FmsFormSystemloadListenerTest" ]
 }

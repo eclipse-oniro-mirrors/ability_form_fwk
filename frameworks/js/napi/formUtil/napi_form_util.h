@@ -145,6 +145,7 @@ napi_value CreateRunningFormInfos(napi_env env,
 napi_value CreateRunningFormInfo(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo);
 napi_value CreateFormCustomizeDatas(
     napi_env env, const std::vector<OHOS::AppExecFwk::FormCustomizeData> &customizeDatas);
+bool GetStringPropFromNapi(napi_env env, napi_value args, const char *name, std::string &out);
 bool ParseParam(napi_env env, napi_value args, AppExecFwk::FormInstancesFilter &filter);
 std::string GetStringFromNapi(napi_env env, napi_value value);
 napi_value CreateFormInstances(napi_env env, const std::vector<AppExecFwk::FormInstance> &formInstances);

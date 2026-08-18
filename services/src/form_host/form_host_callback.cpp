@@ -33,7 +33,15 @@ namespace AppExecFwk {
 void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("FormHostCallback OnAcquired, formId:%{public}" PRId64 "", formId);
+    HILOG_DEBUG("FormHostCallback OnAcquired, formId:%{public}" PRId64, formId);
+    if (formId <= 0) {
+        HILOG_ERROR("OnAcquired invalid param, formId:%{public}" PRId64, formId);
+        return;
+    }
+    if (callerToken == nullptr) {
+        HILOG_ERROR("OnAcquired null callerToken");
+        return;
+    }
     FormHostTaskMgr::GetInstance().PostAcquireTaskToHost(formId, record, callerToken);
 }
 

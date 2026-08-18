@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -149,7 +149,14 @@ public:
      * @return Returns user ID.
      */
     static int32_t GetCallerUserId(const int callingUid);
+
+    /**
+     * @brief Check if the current IPC caller is Form Render Service (FRS).
+     * @return Returns true if the caller bundle name matches FRS_BUNDLE_NAME; returns false otherwise.
+     */
+    static bool CheckIsFRSCall();
 };
+
 } // namespace AppExecFwk
 } // namespace OHOS
 #endif // OHOS_FORM_FWK_FORM_UTIL_H

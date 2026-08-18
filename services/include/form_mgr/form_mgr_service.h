@@ -1062,6 +1062,8 @@ private:
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
     bool PublishFormCrossBundleControl(const Want &want);
+    void SetOnKvDataServiceAddTime(const std::string &time);
+    std::string GetOnKvDataServiceAddTime() const;
 
 private:
     std::mutex snapshotSetMutex_;
@@ -1071,6 +1073,7 @@ private:
     std::string onStartPublishTime_;
     std::string onStartEndTime_;
     std::string onKvDataServiceAddTime_;
+    mutable std::mutex onKvDataServiceAddTimeMutex_;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;

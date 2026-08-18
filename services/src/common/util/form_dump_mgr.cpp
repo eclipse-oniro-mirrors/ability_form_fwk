@@ -226,6 +226,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     formInfo += "    versionName [" + formRecordInfo.versionName + "]\n";
     formInfo += "    compatibleVersion [" + std::to_string(formRecordInfo.compatibleVersion) + "]\n";
     formInfo += "    userId [" + std::to_string(formRecordInfo.userId) + "]\n";
+    formInfo += "    appIndex [" + std::to_string(formRecordInfo.appIndex) + "]\n";
     formInfo += "    type [" + std::string(formRecordInfo.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
     formInfo += "    isDynamic [" + std::to_string(formRecordInfo.isDynamic) + "]\n";
     formInfo += "    transparencyEnabled [" + std::to_string(formRecordInfo.transparencyEnabled) + "]\n";

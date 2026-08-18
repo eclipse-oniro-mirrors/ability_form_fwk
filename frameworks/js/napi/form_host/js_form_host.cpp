@@ -606,7 +606,7 @@ private:
             return false;
         }
         if (formErrorCode < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
-                formErrorCode > static_cast<int32_t>(Constants::PublishFormErrorCode::INTERNAL_ERROR)) {
+                formErrorCode > static_cast<int32_t>(Constants::PublishFormErrorCode::NOT_SUPPORT)) {
             HILOG_ERROR("PublishFormResult is convert fail");
             return false;
         }
@@ -1322,6 +1322,7 @@ private:
             return CreateJsUndefined(env);
         }
 
+        HILOG_INFO("SubEvent op=off_all kit=FormKit event=%{public}s", type.c_str());
         if (type == FORM_UNINSTALL) {
             ClearFormUninstallCallback();
         } else if (type == FORM_OVERFLOW) {

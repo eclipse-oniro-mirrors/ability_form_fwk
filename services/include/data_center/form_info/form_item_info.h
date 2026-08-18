@@ -537,6 +537,17 @@ public:
      */
     bool GetIsTemplateForm() const;
 
+    /**
+     * @brief Get appIndex.
+     * @return appIndex.
+     */
+    int32_t GetAppIndex() const;
+    /**
+     * @brief Set value of appIndex.
+     * @param appIndex App index for clone application.
+     */
+    void SetAppIndex(int32_t appIndex);
+
 private:
     /**
      * @brief Equal or not.
@@ -595,6 +606,7 @@ private:
     std::string uiModule_ = ""; // widget module name
     std::string templateFormImperativeFwk_ = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool isTemplateForm_ = false;
+    int32_t appIndex_ = Constants::MAIN_APP_INDEX;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -52,7 +52,7 @@ FormDbCache::~FormDbCache()
 }
 
 void FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
-    std::vector<FormDBInfo> &removedDBForms)
+    std::vector<FormDBInfo> &removedDBForms, const int32_t appIndex)
 {
     FormDBInfo formDBInfo;
     formDBInfo.bundleName = "aa";

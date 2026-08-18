@@ -19,6 +19,7 @@
 
 #include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
+#include "json_util_form.h"
 #include "common/util/scope_guard.h"
 #include "common/util/form_util.h"
 #include "common/util/form_report.h"
@@ -110,7 +111,7 @@ bool FormCacheMgr::GetData(const int64_t formId, std::string &data,
 
     bool hasContent = false;
     if (HasContent(formCache.dataCache)) {
-        nlohmann::json dataCacheObj = nlohmann::json::parse(formCache.dataCache, nullptr, false);
+        nlohmann::json dataCacheObj = SafeJsonParse(formCache.dataCache);
         if (dataCacheObj.is_discarded() || !dataCacheObj.is_object()) {
             HILOG_ERROR("GetData failed due to dataCache is discarded");
             return false;
@@ -138,7 +139,7 @@ bool FormCacheMgr::InnerGetImageData(
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const
 {
     HILOG_DEBUG("InnerGetImageData start");
-    nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
+    nlohmann::json imgCacheObj = SafeJsonParse(formCache.imgCache);
     if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
         HILOG_ERROR("imgCacheObj is discarded");
         return false;
@@ -218,7 +219,7 @@ bool FormCacheMgr::AddImgData(
     }
 
     if (HasContent(formCache.imgCache)) {
-        nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
+        nlohmann::json imgCacheObj = SafeJsonParse(formCache.imgCache);
         if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
             HILOG_ERROR("parse data failed");
             return false;
@@ -244,7 +245,7 @@ bool FormCacheMgr::AddCacheData(
     auto newDataStr = formProviderData.GetDataString();
     nlohmann::json newDataObj;
     if (HasContent(newDataStr)) {
-        newDataObj = nlohmann::json::parse(newDataStr, nullptr, false);
+        newDataObj = SafeJsonParse(newDataStr);
         if (newDataObj.is_discarded() || !newDataObj.is_object()) {
             HILOG_ERROR("parse data failed");
             return false;
@@ -264,7 +265,7 @@ bool FormCacheMgr::AddCacheData(
         return true;
     }
 
-    nlohmann::json dataCacheObj = nlohmann::json::parse(formCache.dataCache, nullptr, false);
+    nlohmann::json dataCacheObj = SafeJsonParse(formCache.dataCache);
     if (dataCacheObj.is_discarded() || !dataCacheObj.is_object()) {
         HILOG_ERROR("parse data failed");
         return false;
@@ -355,7 +356,7 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
             isNeedDeleteImgCache = false;
         }
 
-        imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
+        imgCacheObj = SafeJsonParse(formCache.imgCache);
         if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
             HILOG_ERROR("parse data failed");
             isNeedDeleteImgCache = false;

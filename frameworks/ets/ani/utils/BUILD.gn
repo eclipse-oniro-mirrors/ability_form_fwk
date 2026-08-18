@@ -74,6 +74,7 @@ ohos_shared_library("util_ani") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
     "runtime_core:ani",
     "window_manager:libwmutil",
   ]

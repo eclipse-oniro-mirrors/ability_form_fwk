@@ -104,7 +104,8 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
     return g_mockGetFormRecordRet;
 }
 
-void FormDataMgr::GetReCreateFormRecordsByBundleName(const std::string &bundleName, std::set<int64_t> &reCreateForms)
+void FormDataMgr::GetReCreateFormRecordsByBundleName(const std::string &bundleName, std::set<int64_t> &reCreateForms,
+    const int32_t appIndex)
 {
     if (true == g_mockGetReCreateFormRecordsByBundleNameRet) {
         int64_t formId = 1;

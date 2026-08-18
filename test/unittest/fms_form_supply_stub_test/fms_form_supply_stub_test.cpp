@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,6 +69,7 @@ public:
 
     int OnAcquire(const FormProviderInfo &formInfo, const Want &want) override
     {
+        ++onAcquireCallCount_;
         return ERR_OK;
     };
 
@@ -106,6 +107,21 @@ public:
     {
         return ERR_OK;
     }
+
+    bool VerifyCaller(CallerType callerType) override
+    {
+        if (callerType == CallerType::PROVIDER) {
+            return verifyProviderResult_;
+        }
+        if (callerType == CallerType::FRS) {
+            return verifyFrsResult_;
+        }
+        return false;
+    }
+
+    bool verifyProviderResult_ = true;
+    bool verifyFrsResult_ = true;
+    int onAcquireCallCount_ = 0;
 
     bool asObject_ = true;
 };
@@ -319,7 +335,7 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_011, TestSize.Level1)
 
 /**
  * @tc.name: FormSupplyStubTest_012
- * @tc.desc: Verify function HandleOnAcquireStateResult the return value is ERR_APPEXECFWK_PARCEL_ERROR
+ * @tc.desc: Verify HandleOnAcquireStateResult returns ERR_APPEXECFWK_PARCEL_ERROR when parcel is empty
  * @tc.type: FUNC
  */
 HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_012, TestSize.Level1)
@@ -336,7 +352,7 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_012, TestSize.Level1)
 
 /**
  * @tc.name: FormSupplyStubTest_013
- * @tc.desc: Verify function HandleOnAcquireStateResult the return value is ERR_APPEXECFWK_PARCEL_ERROR
+ * @tc.desc: Verify HandleOnAcquireStateResult returns ERR_APPEXECFWK_FORM_INVALID_PARAM when provider is empty
  * @tc.type: FUNC
  */
 HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_013, TestSize.Level1)
@@ -352,7 +368,7 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_013, TestSize.Level1)
     data.WriteString("");
     data.WriteParcelable(&wantArg);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
 }
 
 /**
@@ -371,7 +387,7 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_014, TestSize.Level1)
     Want wantArg = {};
     data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
     data.WriteInt32(1);
-    data.WriteString("");
+    data.WriteString("com.test.provider");
     data.WriteParcelable(&wantArg);
     data.WriteParcelable(&want);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
@@ -1023,44 +1039,6 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_051, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormSupplyStubTest_052
- * @tc.desc: Verify function HandleOnAcquireStateResult the return value is ERR_APPEXECFWK_PARCEL_ERROR
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_052, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_053
- * @tc.desc: Verify function HandleOnAcquireStateResult the return value is ERR_APPEXECFWK_PARCEL_ERROR
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_053, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    Want wantArg = {};
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    data.WriteInt32(1);
-    data.WriteString("");
-    data.WriteParcelable(&wantArg);
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
  * @tc.name: FormSupplyStubTest_054
  * @tc.desc: Verify function HandleOnDeleteFormDone the return value is ERR_APPEXECFWK_PARCEL_ERROR
  * @tc.type: FUNC
@@ -1234,6 +1212,137 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_061, TestSize.Level1)
     data.WriteParcelable(&want);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_062
+ * @tc.desc: Verify OnRemoteRequest with PROVIDER code and VerifyCaller returning true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_062, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    ASSERT_NE(callback, nullptr);
+    callback->verifyProviderResult_ = true;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    Want want = {};
+    FormProviderInfo formInfo;
+    want.SetParam(Constants::PROVIDER_FLAG, ERR_OK);
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    data.WriteParcelable(&want);
+    data.WriteParcelable(&formInfo);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(callback->onAcquireCallCount_, 1);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_063
+ * @tc.desc: Verify OnRemoteRequest with PROVIDER code and VerifyCaller returning false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_063, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    ASSERT_NE(callback, nullptr);
+    callback->verifyProviderResult_ = false;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    Want want = {};
+    FormProviderInfo formInfo;
+    want.SetParam(Constants::PROVIDER_FLAG, ERR_OK);
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    data.WriteParcelable(&want);
+    data.WriteParcelable(&formInfo);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_064
+ * @tc.desc: Verify OnRemoteRequest with FRS code and VerifyCaller returning true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_064, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    ASSERT_NE(callback, nullptr);
+    callback->verifyFrsResult_ = true;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    Want want = {};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    data.WriteInt64(1);
+    data.WriteParcelable(&want);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_065
+ * @tc.desc: Verify OnRemoteRequest with FRS code and VerifyCaller returning false
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_065, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    ASSERT_NE(callback, nullptr);
+    callback->verifyFrsResult_ = false;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    Want want = {};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    data.WriteInt64(1);
+    data.WriteParcelable(&want);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_066
+ * @tc.desc: Verify HandleOnAcquireStateResult rejects FormState below valid range
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_066, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    ASSERT_NE(callback, nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    data.WriteInt32(-2);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_067
+ * @tc.desc: Verify HandleOnAcquireStateResult rejects FormState above valid range
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_067, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    ASSERT_NE(callback, nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    data.WriteInt32(2);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

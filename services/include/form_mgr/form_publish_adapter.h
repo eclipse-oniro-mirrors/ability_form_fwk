@@ -62,9 +62,10 @@ public:
 
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-        const std::vector<FormDataProxy> &formDataProxies = {}, bool needCheckFormPermission = true);
+        const std::vector<FormDataProxy> &formDataProxies = {});
 
-    ErrCode QueryPublishFormToHost(Want &wantToHost);
+    ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId);
 
     ErrCode QueryPublishFormToHost(Want &wantToHost, int32_t userId);
 
@@ -95,13 +96,14 @@ private:
     bool IsErmsSupportPublishForm(const std::string &bundleName, std::vector<Want> wants);
     bool CheckSnapshotWant(const Want &want);
     void IncreaseAddFormRequestTimeOutTask(const int64_t formId);
-    ErrCode RequestPublishFormToHost(Want &want);
-    ErrCode RequestPublishFormToHost(Want &want, int32_t userId);
+    ErrCode RequestPublishFormToHost(Want &want, int32_t userId, bool checkFormCountLimit = false);
     int32_t GetCallerType(const std::string &bundleName);
     bool GetBundleName(std::string &bundleName, bool needCheckFormPermission = true);
     ErrCode ValidatePublishFormParamsForCrossUser(const Want &want, int32_t userId);
     ErrCode ValidateParamsForCrossUser(const Want &want);
     ErrCode ValidateFormInfoMatchForCrossUser(const Want &want, int32_t userId);
+    ErrCode CheckFormCountLimit(const Want &want, int32_t userId);
+    bool ResolveAcquireResult(const int64_t formId, ErrCode &result);
 
     std::unique_ptr<FormSerialQueue> serialQueue_;
     std::map<int64_t, AddFormResultErrorCodes> formIdMap_;

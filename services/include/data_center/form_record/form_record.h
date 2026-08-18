@@ -115,6 +115,7 @@ public:
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
     bool addFormFinish = false;
     bool isNeedUpdateFormOnAddFormFinish = false;
+    int32_t appIndex = Constants::MAIN_APP_INDEX; // App index for clone application, default is main app
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

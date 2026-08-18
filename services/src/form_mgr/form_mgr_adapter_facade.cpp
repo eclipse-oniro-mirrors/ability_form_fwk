@@ -51,11 +51,6 @@ void FormMgrAdapterFacade::Init()
     FormVisibilityAdapter::GetInstance().Init();
 }
 
-ErrCode FormMgrAdapterFacade::QueryPublishFormToHost(Want &want)
-{
-    return FormPublishAdapter::GetInstance().QueryPublishFormToHost(want);
-}
-
 ErrCode FormMgrAdapterFacade::QueryPublishFormToHost(Want &want, int32_t userId)
 {
     return FormPublishAdapter::GetInstance().QueryPublishFormToHost(want, userId);
@@ -73,10 +68,17 @@ ErrCode FormMgrAdapterFacade::RequestPublishFormCrossUser(Want &want, int32_t us
 
 ErrCode FormMgrAdapterFacade::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     return FormPublishAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId,
-        formDataProxies, needCheckFormPermission);
+        formDataProxies);
+}
+
+ErrCode FormMgrAdapterFacade::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+{
+    return FormPublishAdapter::GetInstance().RequestPublishFormWithSnapshot(want, withFormBindingData,
+        formBindingData, formId);
 }
 
 ErrCode FormMgrAdapterFacade::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)

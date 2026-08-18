@@ -31,6 +31,7 @@
 #include "extractor.h"
 #include "dfx_dump_catcher.h"
 #include "nlohmann/json.hpp"
+#include "json_util_form.h"
 #include "resource_manager.h"
 #include "xcollie/watchdog.h"
 
@@ -541,6 +542,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     options.loadAce = true;
     options.isBundle = true;
     options.isUnique = true;
+    options.isFormRender = true;
     options.moduleCheckerDelegate = std::make_shared<FormModuleChecker>();
 
     SetPkgContextInfoMap(formJsInfo, options);
@@ -662,7 +664,7 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 {
     std::map<std::string, std::string> pkgContextInfoJsonStringMap;
     for (auto modulePkgNamePair : formJsInfo.modulePkgNameMap) {
-        nlohmann::json moduleInfos = nlohmann::json::parse(modulePkgNamePair.second, nullptr, false);
+        nlohmann::json moduleInfos = SafeJsonParse(modulePkgNamePair.second);
         if (moduleInfos.is_discarded()) {
             HILOG_ERROR("fail parse modulePkgNamePair");
             continue;
@@ -803,6 +805,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
     applicationInfo->apiCompatibleVersion =
         static_cast<uint32_t>(want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
     applicationInfo->apiTargetVersion = static_cast<int32_t>(want.GetIntParam(Constants::FORM_TARGET_VERSION_KEY, 0));
+    applicationInfo->isSystemApp = want.GetBoolParam(Constants::FORM_IS_SYSTEM_APP_KEY, false);
     context->SetApplicationInfo(applicationInfo);
     HILOG_DEBUG("bundleName is %{public}s, moduleName is %{public}s",
         formJsInfo.bundleName.c_str(), formJsInfo.moduleName.c_str());
