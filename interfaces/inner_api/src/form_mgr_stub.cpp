@@ -775,9 +775,9 @@ int32_t FormMgrStub::HandleLifecycleUpdate(MessageParcel &data, MessageParcel &r
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
@@ -843,9 +843,9 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
@@ -1128,9 +1128,9 @@ int32_t FormMgrStub::HandleDeleteInvalidForms(MessageParcel &data, MessageParcel
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
@@ -1197,9 +1197,9 @@ int32_t FormMgrStub::HandleNotifyFormsVisible(MessageParcel &data, MessageParcel
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isVisible = false;
@@ -1229,9 +1229,9 @@ int32_t FormMgrStub::HandleNotifyFormsPrivacyProtected(MessageParcel &data, Mess
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isProtected = false;
@@ -1267,9 +1267,9 @@ int32_t FormMgrStub::HandleNotifyFormsEnableUpdate(MessageParcel &data, MessageP
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isEnableUpdate = false;
@@ -2013,9 +2013,9 @@ ErrCode FormMgrStub::HandleRegisterFormRouterProxy(MessageParcel &data, MessageP
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
@@ -2039,9 +2039,9 @@ ErrCode FormMgrStub::HandleUnregisterFormRouterProxy(MessageParcel &data, Messag
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     auto result = UnregisterFormRouterProxy(formIds);
@@ -2136,9 +2136,9 @@ int32_t FormMgrStub::HandleSetFormsRecyclable(MessageParcel &data, MessageParcel
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     int32_t result = SetFormsRecyclable(formIds);
@@ -2157,9 +2157,9 @@ int32_t FormMgrStub::HandleRecycleForms(MessageParcel &data, MessageParcel &repl
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
@@ -2183,9 +2183,9 @@ int32_t FormMgrStub::HandleRecoverForms(MessageParcel &data, MessageParcel &repl
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORMS) {
+    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
-            formIds.size(), Constants::MAX_FORMS);
+            formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());

@@ -249,6 +249,7 @@ namespace Constants {
 
     constexpr size_t MAX_LAYOUT = 8;
     constexpr int32_t MAX_FORMS = 512;
+    constexpr int32_t MAX_FORM_IDS_SIZE = 1024;
     constexpr int32_t MAX_RECORD_PER_HOST = 256;
     constexpr int32_t MAX_RECORD_PER_USER = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
