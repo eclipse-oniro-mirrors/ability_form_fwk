@@ -2174,6 +2174,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0089, TestSize.Level1) {
     constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS);
     MessageParcel data;
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteBool(false);
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
@@ -2450,6 +2451,7 @@ HWTEST_F(FormMgrStubTest, HandleGetFormInstanceById_0100, TestSize.Level1) {
 HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfos_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfos_0100 starts";
     MessageParcel data;
+    data.WriteBool(false);
     MessageParcel reply;
     EXPECT_CALL(*mockFormMgrService, GetRunningFormInfos(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetRunningFormInfos(data, reply);

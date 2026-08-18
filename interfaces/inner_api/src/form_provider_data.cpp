@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -217,7 +217,12 @@ void FormProviderData::ParseImagesData()
     }
     for (auto iter = jsonImages.begin(); iter != jsonImages.end(); iter++) {
         if (iter->is_number_integer()) {
-            AddImageData(iter.key(), iter.value());
+            int fdValue = iter.value().get<int>();
+            if (fdValue < 0) {
+                HILOG_ERROR("invalid fd in json image: %{public}d", fdValue);
+                continue;
+            }
+            AddImageData(iter.key(), fdValue);
         } else {
             HILOG_ERROR("fd not integer");
         }
@@ -463,6 +468,10 @@ bool FormProviderData::HandleImageDataStateAdded(Parcel &parcel)
             return false;
         }
         int32_t len = parcel.ReadInt32();
+        if (len <= 0 || len > MAX_IMAGE_BYTE_SIZE) {
+            HILOG_ERROR("invalid image data len: %{public}d", len);
+            return false;
+        }
         std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, len);
         auto picName = Str16ToStr8(parcel.ReadString16());
         imageDataMap_[picName] = imageDataRecord;
@@ -600,7 +609,7 @@ FormProviderData* FormProviderData::Unmarshalling(Parcel &parcel)
 }
 
 /**
- * @brief Clear imageDataMap, rawImageBytesMap_, imageDataState_ and jsonFormProviderData_.
+ * @brief Clear jsonFormProviderData_.
  */
 void FormProviderData::ClearData()
 {
@@ -610,6 +619,10 @@ void FormProviderData::ClearData()
 bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string &picName,
     const std::shared_ptr<char> &data, int32_t size) const
 {
+    if (size <= 0 || size > MAX_IMAGE_BYTE_SIZE) {
+        HILOG_ERROR("invalid image data size: %{public}d", size);
+        return false;
+    }
     FormAshmem formAshmem;
     if (!formAshmem.WriteToAshmem(picName, data.get(), size)) {
         return false;

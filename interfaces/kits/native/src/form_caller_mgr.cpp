@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -148,7 +148,7 @@ void FormCallerMgr::RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteO
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end(); ++iter) {
-        if ((*iter)->IsSameToken(callerToken)) {
+        if (!(*iter)->IsSameToken(callerToken)) {
             continue;
         }
         (*iter)->DeleteForm(formId);
@@ -163,12 +163,12 @@ void FormCallerMgr::RemoveFormProviderCaller(const sptr<IRemoteObject> &callerTo
 {
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
-    for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end();) {
-        if ((*iter)->IsSameToken(callerToken)) {
-            ++iter;
-        } else {
-            iter = formProviderCallers_.erase(iter);
+    for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end(); ++iter) {
+        if (!(*iter)->IsSameToken(callerToken)) {
+            continue;
         }
+        iter = formProviderCallers_.erase(iter);
+        break;
     }
 }
 

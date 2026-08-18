@@ -579,8 +579,16 @@ int32_t FormMgrStub::HandleSetNextRefreshTime(MessageParcel &data, MessageParcel
  */
 int32_t FormMgrStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
-    std::string compId = data.ReadString();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::string compId;
+    if (!data.ReadString(compId)) {
+        HILOG_ERROR("read compId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int32_t result = ReleaseRenderer(formId, compId);
     reply.WriteInt32(result);
     return result;
@@ -962,6 +970,10 @@ int32_t FormMgrStub::HandleDeleteInvalidForms(MessageParcel &data, MessageParcel
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
         HILOG_ERROR("ReadInt64Vector failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.size() > static_cast<size_t>(Constants::MAX_FORM_DATA_SIZE)) {
+        HILOG_ERROR("formIds size exceeds limit: %{public}zu", formIds.size());
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
@@ -1583,7 +1595,11 @@ int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel 
 ErrCode FormMgrStub::HandleGetRunningFormInfos(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    bool isUnusedInclude = data.ReadBool();
+    bool isUnusedInclude = false;
+    if (!data.ReadBool(isUnusedInclude)) {
+        HILOG_ERROR("read bool failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::vector<RunningFormInfo> runningFormInfos;
     ErrCode result = GetRunningFormInfos(isUnusedInclude, runningFormInfos);
     reply.WriteInt32(result);
@@ -1803,7 +1819,11 @@ ErrCode FormMgrStub::HandleRequestPublishProxyForm(MessageParcel &data, MessageP
 }
 bool FormMgrStub::ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies)
 {
-    auto number = data.ReadInt32();
+    int32_t number = 0;
+    if (!data.ReadInt32(number)) {
+        HILOG_ERROR("read proxies number failed");
+        return false;
+    }
     HILOG_DEBUG("proxies number:%{public}d", number);
     if (number < 0 || number > INT16_MAX) {
         HILOG_ERROR("proxies number over limit:%{public}d", number);
@@ -1811,8 +1831,18 @@ bool FormMgrStub::ReadFormDataProxies(MessageParcel &data, std::vector<FormDataP
     }
 
     for (int32_t i = 0; i < number; i++) {
-        std::string key = Str16ToStr8(data.ReadString16());
-        std::string subscribeId = Str16ToStr8(data.ReadString16());
+        std::u16string keyStr;
+        if (!data.ReadString16(keyStr)) {
+            HILOG_ERROR("read key failed");
+            return false;
+        }
+        std::u16string subscribeIdStr;
+        if (!data.ReadString16(subscribeIdStr)) {
+            HILOG_ERROR("read subscribeId failed");
+            return false;
+        }
+        std::string key = Str16ToStr8(keyStr);
+        std::string subscribeId = Str16ToStr8(subscribeIdStr);
         if (key.empty()) {
             continue;
         }
@@ -1990,9 +2020,13 @@ int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
     std::vector<FormLockInfo> formLockInfo;
-    int32_t infoSize = data.ReadInt32();
+    int32_t infoSize = 0;
+    if (!data.ReadInt32(infoSize)) {
+        HILOG_ERROR("read infoSize failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (infoSize > static_cast<int32_t>(MAX_ALLOW_SIZE)) {
-        HILOG_ERROR("The vector/array size exceeds the security limit!");
+        HILOG_ERROR("infoSize exceeds limit: %{public}d", infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

@@ -130,6 +130,11 @@ int FormProviderClient::NotifyFormsDelete(
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
+        if (formIds.size() > static_cast<size_t>(Constants::MAX_FORM_DATA_SIZE)) {
+            HILOG_ERROR("formIds size exceeds limit: %{public}zu", formIds.size());
+            errorCode = ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            break;
+        }
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
             HILOG_ERROR("null Owner");
@@ -196,6 +201,11 @@ int FormProviderClient::EventNotify(
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
+        if (formIds.size() > static_cast<size_t>(Constants::MAX_FORM_DATA_SIZE)) {
+            HILOG_ERROR("formIds size exceeds limit: %{public}zu", formIds.size());
+            errorCode = ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            break;
+        }
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
             HILOG_ERROR("null Owner");

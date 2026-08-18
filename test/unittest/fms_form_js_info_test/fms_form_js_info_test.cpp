@@ -673,7 +673,7 @@ HWTEST_F(FmsFormJsInfoTest, WriteImageData_STATE_ADDED_OverThreshold_001, TestSi
     writeJsInfo.formProviderData.SetImageDataState(FormProviderData::IMAGE_DATA_STATE_ADDED);
     MockGetImageDataMap(true);
     MessageParcel parcel;
-    EXPECT_TRUE(writeJsInfo.WriteImageData(parcel));
+    EXPECT_FALSE(writeJsInfo.WriteImageData(parcel));
     FormJsInfo readJsInfo;
     readJsInfo.ReadImageData(parcel);
     EXPECT_TRUE(readJsInfo.imageDataMap.empty());
