@@ -2878,7 +2878,7 @@ bool FormMgrProxy::IsFormBundleProtected(const std::string &bundleName, int64_t 
         IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return true;
+        return false;
     }
     bool result = false;
     if (!reply.ReadBool(result)) {
@@ -2936,7 +2936,7 @@ bool FormMgrProxy::IsFormBundleExempt(int64_t formId)
         IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return true;
+        return false;
     }
     bool result = false;
     if (!reply.ReadBool(result)) {
