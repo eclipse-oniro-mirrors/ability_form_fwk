@@ -70,6 +70,8 @@ ohos_unittest("FmsParamManagerTest") {
     "${form_fwk_path}/services/common/include",
   ]
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]

@@ -20,8 +20,6 @@ ohos_unittest("FmsProviderConnectionErrorHandlerTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/common/retry_policy/retry_policy.cpp",
-    "${form_fwk_path}/services/src/form_provider/error_handler/provider_connection_error_handler.cpp",
     "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
     "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
     "${form_fwk_path}/test/unittest/fms_provider_connection_error_handler_test/fms_provider_connection_error_handler_test.cpp",
@@ -41,6 +39,8 @@ ohos_unittest("FmsProviderConnectionErrorHandlerTest") {
 
   configs = []
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }

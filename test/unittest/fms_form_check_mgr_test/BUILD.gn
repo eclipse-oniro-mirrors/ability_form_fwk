@@ -66,6 +66,8 @@ ohos_unittest("FmsFormCheckMgrTest") {
 
   configs = []
   cflags = []
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
+
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
@@ -157,6 +159,8 @@ ohos_unittest("FmsFormCheckMgrTest2") {
 
   configs = []
   cflags = []
+
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
