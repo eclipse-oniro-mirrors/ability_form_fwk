@@ -25,6 +25,7 @@
 #include "bundle_info.h"
 #include "configuration.h"
 #include "form_constants.h"
+#include "form_constants_util.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "ipc_skeleton.h"
@@ -1008,6 +1009,11 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
 
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    if (protect) {
+        FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
+    }
+
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, protect:%{public}d", userId, formInfos.size(), protect);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
@@ -1019,8 +1025,8 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         iter->protectForm = protect;
         FormDataMgr::GetInstance().SetFormProtect(iter->formId, protect);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
-        if (protect) {
-            FormCallbackAdapter::GetInstance().CancelOverflow(iter->formId);
+        if (protect && IsLiveFormActive(iter->formId, liveFormStatusMap)) {
+            FormCallbackAdapter::GetInstance().CancelSceneEffects(iter->formId);
         }
         ++iter;
     }
@@ -1028,6 +1034,17 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         FormDataMgr::GetInstance().LockForms(std::move(formInfos), protect);
     }
     return ERR_OK;
+}
+
+bool FormLifecycleAdapter::IsLiveFormActive(const int64_t formId,
+    const std::unordered_map<std::string, std::string> &liveFormStatusMap)
+{
+    auto it = liveFormStatusMap.find(std::to_string(formId));
+    if (it == liveFormStatusMap.end()) {
+        return false;
+    }
+    const char *activeState = FormConstantsUtil::GetLiveFormActiveState(it->second);
+    return activeState != nullptr && std::string(activeState) == "ACTIVE";
 }
 
 // Implementation of RecoverForms

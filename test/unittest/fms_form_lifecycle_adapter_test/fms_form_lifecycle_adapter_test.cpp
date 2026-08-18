@@ -1114,6 +1114,54 @@ HWTEST_F(FmsFormLifecycleAdapterTest, ProtectLockForms_005, TestSize.Level1)
     GTEST_LOG_(INFO) << "ProtectLockForms_005 end";
 }
 
+// ========== IsLiveFormActive Tests ==========
+
+/**
+ * @tc.name: IsLiveFormActive_001
+ * @tc.desc: Verify IsLiveFormActive returns true for active liveform status
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, IsLiveFormActive_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsLiveFormActive_001 start";
+
+    std::unordered_map<std::string, std::string> statusMap;
+    std::string key = std::to_string(TEST_FORM_ID);
+    statusMap[key] = "20";
+    EXPECT_TRUE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+    statusMap[key] = "21";
+    EXPECT_TRUE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+
+    GTEST_LOG_(INFO) << "IsLiveFormActive_001 end";
+}
+
+/**
+ * @tc.name: IsLiveFormActive_002
+ * @tc.desc: Verify IsLiveFormActive returns false for inactive/pause/absent/unknown status
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, IsLiveFormActive_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsLiveFormActive_002 start";
+
+    std::unordered_map<std::string, std::string> statusMap;
+    std::string key = std::to_string(TEST_FORM_ID);
+    statusMap[key] = "00";
+    EXPECT_FALSE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+    statusMap[key] = "01";
+    EXPECT_FALSE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+    statusMap[key] = "10";
+    EXPECT_FALSE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+    statusMap[key] = "11";
+    EXPECT_FALSE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+    statusMap.clear();
+    EXPECT_FALSE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+    statusMap[key] = "unknown";
+    EXPECT_FALSE(FormLifecycleAdapter::GetInstance().IsLiveFormActive(TEST_FORM_ID, statusMap));
+
+    GTEST_LOG_(INFO) << "IsLiveFormActive_002 end";
+}
+
 // ========== SwitchLockForms Additional Branches ==========
 
 /**

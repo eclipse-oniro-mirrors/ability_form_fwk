@@ -149,6 +149,8 @@ private:
     int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const int32_t userId);
     bool IsFormRenderServiceCall(int callingUid);
     ErrCode CheckAddRequestPublishForm(const Want &want, const Want &formProviderWant);
+    bool IsLiveFormActive(const int64_t formId,
+        const std::unordered_map<std::string, std::string> &liveFormStatusMap);
 
 #ifdef THEME_MGR_ENABLE
     int DeleteThemeForm(const int64_t formId);
