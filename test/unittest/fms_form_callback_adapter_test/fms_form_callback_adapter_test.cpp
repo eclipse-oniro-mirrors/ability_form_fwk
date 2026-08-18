@@ -1418,7 +1418,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_009, TestSize.Level1)
 
 /**
  * @tc.name: StartAbilityByFms_010
- * @tc.desc: Verify LIVE_FORM with status not in LIVE_FORM_STATUS_MAP returns LIVE_OP_UNSUPPORTED
+ * @tc.desc: Verify LIVE_FORM with an unsupported status returns LIVE_OP_UNSUPPORTED.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_010, TestSize.Level1)
@@ -1441,7 +1441,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_010, TestSize.Level1)
         .WillRepeatedly(Return(TEST_CALLING_UID));
 
     auto result = FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
-    // Status "99" not in LIVE_FORM_STATUS_MAP -> LIVE_OP_UNSUPPORTED
+    // Status "99" is unsupported and returns LIVE_OP_UNSUPPORTED.
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
 
     // Cleanup

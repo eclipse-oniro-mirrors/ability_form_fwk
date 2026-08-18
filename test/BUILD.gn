@@ -41,6 +41,7 @@ group("unittest") {
     "unittest/fms_form_batch_delete_connection_test:unittest",
     "unittest/fms_form_bms_helper_test:unittest",
     "unittest/fms_form_caller_mgr_test:unittest",
+    "unittest/fms_form_constants_test:unittest",
     "unittest/fms_form_data_mgr_test:unittest",
     "unittest/fms_form_data_proxy_mgr_test:unittest",
     "unittest/fms_form_data_proxy_record_test:unittest",

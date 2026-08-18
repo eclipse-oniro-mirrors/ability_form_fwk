@@ -23,6 +23,7 @@
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
+#include "form_constants_util.h"
 #include "data_center/form_basic_info_mgr.h"
 #include "data_center/form_data_proxy_mgr.h"
 #include "data_center/database/form_db_cache.h"
@@ -2480,12 +2481,12 @@ bool FormDataMgr::GetAbilityFormInfo(const FormRecord &record, const std::vector
 
 bool FormDataMgr::IsSameForm(const FormRecord &record, const AbilityFormInfo &abilityFormInfo)
 {
-    auto dimensionIter = Constants::DIMENSION_MAP.find(static_cast<Constants::Dimension>(record.specification));
-    if (dimensionIter == Constants::DIMENSION_MAP.end()) {
+    const char* dimension =
+        FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(record.specification));
+    if (dimension == nullptr) {
         HILOG_ERROR("invalid specification:%{public}d", record.specification);
         return false;
     }
-    auto dimension = dimensionIter->second;
     auto supportDimensions = abilityFormInfo.supportDimensions;
     if (record.formName == abilityFormInfo.name &&
         std::find(supportDimensions.begin(), supportDimensions.end(), dimension) != supportDimensions.end()) {
@@ -2493,7 +2494,7 @@ bool FormDataMgr::IsSameForm(const FormRecord &record, const AbilityFormInfo &ab
     }
 
     HILOG_ERROR("no same form, formName:%{public}s, dimension:%{public}s, abilityFormName:%{public}s",
-        record.formName.c_str(), dimension.c_str(), abilityFormInfo.name.c_str());
+        record.formName.c_str(), dimension, abilityFormInfo.name.c_str());
 
     return false;
 }

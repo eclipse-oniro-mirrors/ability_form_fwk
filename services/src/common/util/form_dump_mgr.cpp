@@ -22,6 +22,7 @@
 #include "common/util/form_trust_mgr.h"
 #include "data_center/form_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
+#include "form_constants_util.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
 #include "form_refresh/strategy/refresh_control_mgr.h"
 #include "status_mgr_center/form_status.h"
@@ -436,11 +437,13 @@ void FormDumpMgr::AppendLiveFormStatus(const std::string &formId,
     }
  
     std::string status = it->second;
-    auto iter = Constants::LIVE_FORM_STATUS_MAP.find(status);
-    if (iter == Constants::LIVE_FORM_STATUS_MAP.end()) {
+    const char* activeState = FormConstantsUtil::GetLiveFormActiveState(status);
+    if (activeState == nullptr) {
         formInfo += "[ INACTIVE ]\n";
     } else {
-        formInfo += "[ " + iter->second.activeState + " ]\n";
+        formInfo += "[ ";
+        formInfo += activeState;
+        formInfo += " ]\n";
     }
 }
 
