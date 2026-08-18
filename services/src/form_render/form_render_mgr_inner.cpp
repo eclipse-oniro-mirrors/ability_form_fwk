@@ -519,6 +519,7 @@ void FormRenderMgrInner::ExecOnUnlockTask(const sptr<IRemoteObject> &remoteObjec
     {
         std::unique_lock<std::mutex> unlockTaskLock(onUnlockTaskMutex_);
         if (!onUnlockTask_) {
+            HILOG_ERROR("null onUnlockTask_");
             return;
         }
         unlockTask = std::move(onUnlockTask_);
