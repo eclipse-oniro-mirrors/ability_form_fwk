@@ -375,7 +375,7 @@ int FormMgrStub::OnRemoteRequestSixth(uint32_t code, MessageParcel &data, Messag
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL):
             return HandleUnregisterPublishFormCrossBundleControl(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION):
- 	        return HandleGetFormIdsByFormLocation(data, reply);
+            return HandleGetFormIdsByFormLocation(data, reply);
         default:
             return OnRemoteRequestSeventh(code, data, reply, option);
     }
