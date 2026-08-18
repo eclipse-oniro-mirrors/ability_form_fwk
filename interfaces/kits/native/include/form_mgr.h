@@ -1087,6 +1087,10 @@ private:
 
     static std::atomic<int> recoverStatus_;
 
+    // Protects formDeathCallbacks_ from concurrent access:
+    // OnRemoteDied (binder thread) uses shared_lock for read;
+    // Register/UnRegister (app thread) use unique_lock for write.
+    mutable std::shared_mutex formDeathCallbacksMutex_;
     std::vector<std::shared_ptr<FormCallbackInterface>> formDeathCallbacks_;
 };
 }  // namespace AppExecFwk

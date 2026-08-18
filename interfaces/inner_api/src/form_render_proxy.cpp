@@ -316,6 +316,12 @@ int FormRenderProxy::SendTransactCmd(IFormRender::Message code, MessageParcel &d
 template<typename T>
 int32_t FormRenderProxy::WriteParcelableVector(const std::vector<T> &parcelableVector, MessageParcel &reply)
 {
+    static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
+    if (parcelableVector.size() > static_cast<size_t>(MAX_ALLOW_SIZE)) {
+        HILOG_ERROR("parcelableVector size %{public}zu exceeds limit %{public}d",
+            parcelableVector.size(), MAX_ALLOW_SIZE);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (!reply.WriteInt32(parcelableVector.size())) {
         HILOG_ERROR("write ParcelableVector size failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -358,7 +364,12 @@ int32_t FormRenderProxy::RecycleForm(const int64_t &formId, const Want &want)
         return error;
     }
 
-    return reply.ReadInt32();
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &want)

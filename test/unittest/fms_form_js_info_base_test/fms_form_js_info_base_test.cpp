@@ -326,7 +326,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0900, TestSize.Level0)
     }
     Parcel parcel;
     auto result = formJsInfo.WriteImageData(parcel);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_0900 end";
 }
 

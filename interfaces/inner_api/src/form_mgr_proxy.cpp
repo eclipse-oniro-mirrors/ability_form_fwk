@@ -321,7 +321,12 @@ int FormMgrProxy::SetNextRefreshTime(const int64_t formId, const int64_t nextTim
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    return reply.ReadInt32();
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 int FormMgrProxy::ReleaseRenderer(int64_t formId, const std::string &compId)
@@ -388,11 +393,21 @@ ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    ErrCode errCode = reply.ReadInt32();
-    if (errCode == ERR_OK) {
-        formId = reply.ReadInt64();
+    ErrCode errCode = 0;
+    if (!reply.ReadInt32(errCode)) {
+        HILOG_ERROR("read errCode failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    return errCode;
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    int64_t readFormId = 0;
+    if (!reply.ReadInt64(readFormId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    formId = readFormId;
+    return ERR_OK;
 }
 
 ErrCode FormMgrProxy::RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId)
@@ -421,11 +436,21 @@ ErrCode FormMgrProxy::RequestPublishFormCrossUser(Want &want, int32_t userId, in
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    ErrCode errCode = reply.ReadInt32();
-    if (errCode == ERR_OK) {
-        formId = reply.ReadInt64();
+    ErrCode errCode = 0;
+    if (!reply.ReadInt32(errCode)) {
+        HILOG_ERROR("read errCode failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    return errCode;
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    int64_t readFormId = 0;
+    if (!reply.ReadInt64(readFormId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    formId = readFormId;
+    return ERR_OK;
 }
 
 ErrCode FormMgrProxy::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
@@ -1042,9 +1067,12 @@ int FormMgrProxy::GetPublishedFormInfos(IFormMgr::Message code, MessageParcel &d
         return error;
     }
 
-    error = reply.ReadInt32();
-    if (error != ERR_OK) {
-        return error;
+    int32_t replyResult = 0;
+    if (!reply.ReadInt32(replyResult)) {
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (replyResult != ERR_OK) {
+        return replyResult;
     }
 
     return GetParcelableInfos<RunningFormInfo>(reply, formInfos);
@@ -1667,7 +1695,12 @@ bool FormMgrProxy::IsRequestPublishFormSupported()
         return false;
     }
     // retrieve and return result.
-    return reply.ReadBool();
+    bool result = false;
+    if (!reply.ReadBool(result)) {
+        HILOG_ERROR("ReadBool failed");
+        return false;
+    }
+    return result;
 }
 
 int32_t FormMgrProxy::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
@@ -2304,7 +2337,12 @@ ErrCode FormMgrProxy::RegisterFormRouterProxy(const std::vector<int64_t> &formId
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    return reply.ReadInt32();
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 ErrCode FormMgrProxy::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
@@ -3241,7 +3279,12 @@ ErrCode FormMgrProxy::ChangeSceneAnimationState(const int64_t formId, int32_t st
         HILOG_ERROR("SendRequest failed: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    return reply.ReadInt32();
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 ErrCode FormMgrProxy::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
@@ -3344,7 +3387,12 @@ ErrCode FormMgrProxy::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;
     }
-    return reply.ReadInt32();
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 ErrCode FormMgrProxy::UnregisterGetLiveFormStatusProxy()

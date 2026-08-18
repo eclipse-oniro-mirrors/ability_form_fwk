@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,7 @@ struct FormJsInfo : public Parcelable {
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
 
     bool ReadFromParcel(Parcel &parcel);
+    bool ReadFormFields(Parcel &parcel, std::u16string &strValue);
     virtual bool Marshalling(Parcel &parcel) const override;
     static FormJsInfo *Unmarshalling(Parcel &parcel);
     bool WriteFormData(Parcel &parcel) const;
@@ -66,6 +67,8 @@ struct FormJsInfo : public Parcelable {
     bool WriteObjects(Parcel &parcel) const;
     bool WriteImageData(Parcel &parcel) const;
     void ReadImageData(Parcel &parcel);
+    void ReadAddedImages(Parcel &parcel);
+    bool ReadSingleImage(Parcel &parcel);
     bool ConvertRawImageData();
     bool WritePkgNameMap(Parcel &parcel) const;
     void ReadPkgNameMap(Parcel &parcel);

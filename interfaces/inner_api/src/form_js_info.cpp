@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,48 +27,109 @@
 namespace OHOS {
 namespace AppExecFwk {
 constexpr int32_t MAX_FORM_DATA_BUFFER_SIZE = 128 * 1024 * 1024; // 128M
+
+namespace {
+bool ReadStringField(Parcel &parcel, const char *fieldName, std::string &out, std::u16string &tmp)
+{
+    if (!parcel.ReadString16(tmp)) {
+        HILOG_ERROR("read %{public}s failed", fieldName);
+        return false;
+    }
+    out = Str16ToStr8(tmp);
+    return true;
+}
+
+bool ReadInt32Field(Parcel &parcel, const char *fieldName, int32_t &out)
+{
+    if (!parcel.ReadInt32(out)) {
+        HILOG_ERROR("read %{public}s failed", fieldName);
+        return false;
+    }
+    return true;
+}
+
+bool ReadBoolField(Parcel &parcel, const char *fieldName, bool &out)
+{
+    if (!parcel.ReadBool(out)) {
+        HILOG_ERROR("read %{public}s failed", fieldName);
+        return false;
+    }
+    return true;
+}
+
+bool ReadUint32Field(Parcel &parcel, const char *fieldName, uint32_t &out)
+{
+    if (!parcel.ReadUint32(out)) {
+        HILOG_ERROR("read %{public}s failed", fieldName);
+        return false;
+    }
+    return true;
+}
+}
+
 bool FormJsInfo::ReadFromParcel(Parcel &parcel)
 {
-    formId = parcel.ReadInt64();
-    formName = Str16ToStr8(parcel.ReadString16());
-    bundleName = Str16ToStr8(parcel.ReadString16());
-    abilityName = Str16ToStr8(parcel.ReadString16());
-    moduleName = Str16ToStr8(parcel.ReadString16());
-
-    formTempFlag = parcel.ReadBool();
-    jsFormCodePath = Str16ToStr8(parcel.ReadString16());
-    int32_t formDataLength = parcel.ReadInt32();
+    std::u16string strValue;
+    if (!parcel.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return false;
+    }
+    if (!ReadStringField(parcel, "formName", formName, strValue) ||
+        !ReadStringField(parcel, "bundleName", bundleName, strValue) ||
+        !ReadStringField(parcel, "abilityName", abilityName, strValue) ||
+        !ReadStringField(parcel, "moduleName", moduleName, strValue) ||
+        !ReadBoolField(parcel, "formTempFlag", formTempFlag) ||
+        !ReadStringField(parcel, "jsFormCodePath", jsFormCodePath, strValue)) {
+        return false;
+    }
+    int32_t formDataLength = 0;
+    if (!ReadInt32Field(parcel, "formDataLength", formDataLength)) {
+        return false;
+    }
     HILOG_INFO("ReadFromParcel data length is %{public}d , formId:%{public}" PRId64, formDataLength, formId);
     if (formDataLength > BIG_DATA) {
         if (!ReadAshmemFormData(parcel, formDataLength, formData)) {
             return false;
         }
     } else {
-        formData = Str16ToStr8(parcel.ReadString16());
+        if (!ReadStringField(parcel, "formData", formData, strValue)) {
+            return false;
+        }
     }
-
-    formSrc = Str16ToStr8(parcel.ReadString16());
-    formWindow.designWidth = parcel.ReadInt32();
-    formWindow.autoDesignWidth = parcel.ReadBool();
-
-    versionCode = parcel.ReadUint32();
-    versionName = Str16ToStr8(parcel.ReadString16());
-    compatibleVersion = parcel.ReadUint32();
-    int32_t typeData = parcel.ReadInt32();
-    type = static_cast<FormType>(typeData);
-    uiSyntax = static_cast<FormType>(parcel.ReadInt32());
-    isDynamic = parcel.ReadBool();
-    transparencyEnabled = parcel.ReadBool();
-    templateFormImperativeFwk = Str16ToStr8(parcel.ReadString16());
-
+    if (!ReadFormFields(parcel, strValue)) {
+        return false;
+    }
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
     if (bindingData == nullptr) {
         return false;
     }
     formProviderData = *bindingData;
-
     ReadImageData(parcel);
     ReadPkgNameMap(parcel);
+    return true;
+}
+
+bool FormJsInfo::ReadFormFields(Parcel &parcel, std::u16string &strValue)
+{
+    if (!ReadStringField(parcel, "formSrc", formSrc, strValue) ||
+        !ReadInt32Field(parcel, "designWidth", formWindow.designWidth) ||
+        !ReadBoolField(parcel, "autoDesignWidth", formWindow.autoDesignWidth) ||
+        !ReadUint32Field(parcel, "versionCode", versionCode) ||
+        !ReadStringField(parcel, "versionName", versionName, strValue) ||
+        !ReadUint32Field(parcel, "compatibleVersion", compatibleVersion)) {
+        return false;
+    }
+    int32_t typeData = 0;
+    int32_t uiSyntaxData = 0;
+    if (!ReadInt32Field(parcel, "type", typeData) ||
+        !ReadInt32Field(parcel, "uiSyntax", uiSyntaxData) ||
+        !ReadBoolField(parcel, "isDynamic", isDynamic) ||
+        !ReadBoolField(parcel, "transparencyEnabled", transparencyEnabled) ||
+        !ReadStringField(parcel, "templateFormImperativeFwk", templateFormImperativeFwk, strValue)) {
+        return false;
+    }
+    type = static_cast<FormType>(typeData);
+    uiSyntax = static_cast<FormType>(uiSyntaxData);
     return true;
 }
 
@@ -152,7 +213,10 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
 bool FormJsInfo::WriteFormData(Parcel &parcel) const
 {
     int32_t formDataLength = static_cast<int32_t>(formData.length());
-    parcel.WriteInt32(formDataLength);
+    if (!parcel.WriteInt32(formDataLength)) {
+        HILOG_ERROR("WriteInt32 formDataLength failed");
+        return false;
+    }
     if (formDataLength > BIG_DATA) {
         HILOG_INFO("WriteFormData data length is %{public}d", formDataLength);
         return WriteAshmemFormData(parcel, formDataLength, formData.c_str());
@@ -313,10 +377,10 @@ bool FormJsInfo::WriteImageData(Parcel &parcel) const
                 return false;
             }
             if (size > IMAGE_DATA_THRESHOLD) {
-                HILOG_INFO("unexpected image number %{public}zu", size);
-                break;
+                HILOG_ERROR("unexpected image number %{public}zu", size);
+                return false;
             }
-            for (auto entry : sharedImageMap) {
+            for (const auto &entry : sharedImageMap) {
                 if (!parcel.WriteParcelable(entry.second.first)) {
                     return false;
                 }
@@ -342,39 +406,62 @@ bool FormJsInfo::WriteImageData(Parcel &parcel) const
 void FormJsInfo::ReadImageData(Parcel &parcel)
 {
     HILOG_DEBUG("call");
-    auto imageDateState = parcel.ReadInt32();
+    int32_t imageDateState = 0;
+    if (!parcel.ReadInt32(imageDateState)) {
+        HILOG_ERROR("read imageDataState failed");
+        return;
+    }
     HILOG_DEBUG("imageDateState is %{public}d", imageDateState);
     switch (imageDateState) {
-        case FormProviderData::IMAGE_DATA_STATE_ADDED: {
-            auto size = parcel.ReadInt32();
-            HILOG_INFO("image numer is %{public}d", size);
-            if (size > IMAGE_DATA_THRESHOLD) {
-                HILOG_WARN("unexpected image number %{public}d", size);
-                break;
-            }
-            for (auto i = 0; i < size; i++) {
-                sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
-                if (formAshmem == nullptr) {
-                    HILOG_ERROR("null ashmem");
-                    return;
-                }
-                auto picName = Str16ToStr8(parcel.ReadString16());
-                HILOG_INFO("picName:%{public}s", picName.c_str());
-                imageDataMap[picName] = formAshmem;
-            }
+        case FormProviderData::IMAGE_DATA_STATE_ADDED:
+            ReadAddedImages(parcel);
             break;
-        }
         case FormProviderData::IMAGE_DATA_STATE_NO_OPERATION:
             break;
         case FormProviderData::IMAGE_DATA_STATE_REMOVED:
             break;
-        default: {
+        default:
             HILOG_WARN("unexpected imageDateState %{public}d", imageDateState);
             break;
-        }
     }
     HILOG_DEBUG("end");
-    return;
+}
+
+void FormJsInfo::ReadAddedImages(Parcel &parcel)
+{
+    int32_t size = 0;
+    if (!parcel.ReadInt32(size)) {
+        HILOG_ERROR("read image size failed");
+        return;
+    }
+    HILOG_INFO("image number is %{public}d", size);
+    if (size > IMAGE_DATA_THRESHOLD) {
+        HILOG_WARN("unexpected image number %{public}d", size);
+        return;
+    }
+    for (int32_t i = 0; i < size; i++) {
+        if (!ReadSingleImage(parcel)) {
+            return;
+        }
+    }
+}
+
+bool FormJsInfo::ReadSingleImage(Parcel &parcel)
+{
+    sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
+    if (formAshmem == nullptr) {
+        HILOG_ERROR("null ashmem");
+        return false;
+    }
+    std::u16string picNameStr;
+    if (!parcel.ReadString16(picNameStr)) {
+        HILOG_ERROR("read picName failed");
+        return false;
+    }
+    auto picName = Str16ToStr8(picNameStr);
+    HILOG_INFO("picName:%{public}s", picName.c_str());
+    imageDataMap[picName] = formAshmem;
+    return true;
 }
 
 bool FormJsInfo::ConvertRawImageData()
@@ -406,8 +493,14 @@ bool FormJsInfo::WritePkgNameMap(Parcel &parcel) const
         values.emplace_back(pkgNameInfo.second);
     }
 
-    parcel.WriteStringVector(keys);
-    parcel.WriteStringVector(values);
+    if (!parcel.WriteStringVector(keys)) {
+        HILOG_ERROR("WriteStringVector for keys failed");
+        return false;
+    }
+    if (!parcel.WriteStringVector(values)) {
+        HILOG_ERROR("WriteStringVector for values failed");
+        return false;
+    }
     return true;
 }
 
@@ -430,13 +523,8 @@ void FormJsInfo::ReadPkgNameMap(Parcel &parcel)
         HILOG_ERROR("ReadFromParcel failed, invalid size");
         return;
     }
-
-    std::string key;
-    std::string val;
     for (size_t index = 0; index < keySize; index++) {
-        key = keys.at(index);
-        val = values.at(index);
-        modulePkgNameMap.emplace(key, val);
+        modulePkgNameMap.emplace(keys.at(index), values.at(index));
     }
 }
 

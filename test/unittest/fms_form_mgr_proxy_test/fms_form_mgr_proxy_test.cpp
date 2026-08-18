@@ -98,6 +98,17 @@ int SendRequestReplaceFormInfo(uint32_t code, MessageParcel &data, MessageParcel
     return 0;
 }
 
+int SendRequestReplaceWithFormId(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option, int32_t error, int64_t formId)
+{
+    reply.WriteInt32(error);
+    if (error == ERR_OK) {
+        reply.WriteInt64(formId);
+    }
+    return 0;
+}
+
+
 /*
  * @tc.name: AddFormTest_0100
  * @tc.desc: test AddForm function
@@ -1269,13 +1280,13 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishFormTest_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO)
         << "FmsFormMgrProxyTest, RequestPublishFormTest_0200, TestSize.Level1";
-    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _))
-        .WillRepeatedly(DoAll(Invoke(std::bind(SendRequestReplace, _1, _2, _3, _4,
-        ERR_OK, true)), Return(NO_ERROR)));
     Want want;
     bool withFormBindingData = true;
     std::unique_ptr<FormProviderData> formBindingData;
     int64_t formId = 1;
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke(std::bind(SendRequestReplaceWithFormId, _1, _2, _3, _4,
+        ERR_OK, formId)), Return(NO_ERROR)));
     int32_t result = proxy_->RequestPublishForm(want, withFormBindingData, formBindingData, formId);
     EXPECT_EQ(ERR_OK, result);
 }

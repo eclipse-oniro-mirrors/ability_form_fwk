@@ -150,7 +150,7 @@ void FormAbnormalReporter::MarkUpdateRender(int64_t formId)
 
 void FormAbnormalReporter::AddRecord(int64_t formId, int32_t ratio)
 {
-    if (ratio >= THRESHOLD_FOR_NONTRANSPARENCY_RATIO) {
+    if (ratio < 0 || ratio >= THRESHOLD_FOR_NONTRANSPARENCY_RATIO) {
         return;
     }
     HILOG_INFO("formId:%{public}" PRId64 " ratio:%{public}d", formId, ratio);

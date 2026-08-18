@@ -634,8 +634,8 @@ void FormRenderMgrInner::RerenderAllFormsImmediate()
 
 void FormRenderMgrInner::DisconnectAllRenderConnections()
 {
-    HILOG_INFO("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     std::lock_guard<std::mutex> lock(resourceMutex_);
+    HILOG_INFO("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     size_t size = renderFormConnections_.size();
     for (auto iter = renderFormConnections_.begin(); iter != renderFormConnections_.end();) {
         DisconnectRenderService(iter->second, size);
