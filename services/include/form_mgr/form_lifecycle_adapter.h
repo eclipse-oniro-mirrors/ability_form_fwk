@@ -149,6 +149,11 @@ private:
     int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const int32_t userId);
     bool IsFormRenderServiceCall(int callingUid);
     ErrCode CheckAddRequestPublishForm(const Want &want, const Want &formProviderWant);
+    int64_t GetRecycleFormIdIfValid(int64_t formId, FormRecord &record,
+        int32_t &callingUid, bool isCheckCallingUid);
+    ErrCode HandleAddRequestPublishForm(const int64_t formId, const Want &want,
+        const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo,
+        const FormItemInfo &formItemInfo);
 
 #ifdef THEME_MGR_ENABLE
     int DeleteThemeForm(const int64_t formId);
