@@ -23,6 +23,13 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+
+namespace LiveFormState {
+    constexpr const char* INACTIVE = "INACTIVE";
+    constexpr const char* PAUSE = "PAUSE";
+    constexpr const char* ACTIVE = "ACTIVE";
+}
+
 class FormConstantsUtil {
 public:
     static const char* GetDimensionString(Constants::Dimension dimension);

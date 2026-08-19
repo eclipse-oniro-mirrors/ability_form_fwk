@@ -53,6 +53,9 @@
 #include "form_event_report.h"
 #include "form_host/form_host_record.h"
 #include "form_mgr/form_callback_adapter.h"
+#ifdef SUPPORT_POWER
+#include "power_mgr_client.h"
+#endif
 #include "form_mgr/form_common_adapter.h"
 #include "form_mgr/form_data_adapter.h"
 #include "form_mgr/form_publish_adapter.h"
@@ -1011,7 +1014,14 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
 
     std::unordered_map<std::string, std::string> liveFormStatusMap;
     if (protect) {
+#ifdef SUPPORT_POWER
+        if (PowerMgr::PowerMgrClient::GetInstance().GetDeviceMode()
+            != PowerMgr::PowerMode::CUSTOM_POWER_SAVE_MODE) {
+            FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
+        }
+#else
         FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
+#endif
     }
 
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, protect:%{public}d", userId, formInfos.size(), protect);
@@ -1043,8 +1053,8 @@ bool FormLifecycleAdapter::IsLiveFormActive(const int64_t formId,
     if (it == liveFormStatusMap.end()) {
         return false;
     }
-    const char *activeState = FormConstantsUtil::GetLiveFormActiveState(it->second);
-    return activeState != nullptr && std::string(activeState) == "ACTIVE";
+    const char* activeState = FormConstantsUtil::GetLiveFormActiveState(it->second);
+    return activeState != nullptr && strcmp(activeState, LiveFormState::ACTIVE) == 0;
 }
 
 // Implementation of RecoverForms
