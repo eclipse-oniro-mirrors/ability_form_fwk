@@ -721,12 +721,17 @@ ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParc
         HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    Constants::PublishFormResult errorCodeInfo;
     std::string message;
     if (!data.ReadString(message)) {
         HILOG_ERROR("read message failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    if (message.size() > static_cast<size_t>(Constants::MAX_PUBLISH_FORM_MESSAGE_LENGTH)) {
+        HILOG_ERROR("message length %{public}zu exceeds limit %{public}d",
+            message.size(), Constants::MAX_PUBLISH_FORM_MESSAGE_LENGTH);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    Constants::PublishFormResult errorCodeInfo;
     errorCodeInfo.message = message;
     int32_t err = 0;
     if (!data.ReadInt32(err)) {
@@ -734,7 +739,7 @@ ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (err < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
-        err > static_cast<int32_t>(Constants::PublishFormErrorCode::INTERNAL_ERROR)) {
+        err >= static_cast<int32_t>(Constants::PublishFormErrorCode::BUTT)) {
         HILOG_ERROR("invalid PublishFormErrorCode:%{public}d", err);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -775,7 +780,7 @@ int32_t FormMgrStub::HandleLifecycleUpdate(MessageParcel &data, MessageParcel &r
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -843,7 +848,7 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -1128,7 +1133,7 @@ int32_t FormMgrStub::HandleDeleteInvalidForms(MessageParcel &data, MessageParcel
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -1197,7 +1202,7 @@ int32_t FormMgrStub::HandleNotifyFormsVisible(MessageParcel &data, MessageParcel
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -1229,7 +1234,7 @@ int32_t FormMgrStub::HandleNotifyFormsPrivacyProtected(MessageParcel &data, Mess
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -1267,7 +1272,7 @@ int32_t FormMgrStub::HandleNotifyFormsEnableUpdate(MessageParcel &data, MessageP
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -1482,7 +1487,7 @@ int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &repl
     std::vector<FormInfo> infos;
     // call FormMgrService to get formInfos into infos.
     int32_t result = GetFormsInfo(*filter, infos);
-    if (!reply.WriteInt32(result)) {
+    if (!reply.WriteBool(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -1508,7 +1513,10 @@ int32_t FormMgrStub::HandleGetPublishedFormInfoById(MessageParcel &data, Message
     RunningFormInfo info;
     // call FormMgrService to get formInfo.
     int32_t result = GetPublishedFormInfoById(formId, info);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (result == ERR_OK && !reply.WriteParcelable(&info)) {
         HILOG_ERROR("write failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1523,7 +1531,10 @@ int32_t FormMgrStub::HandleGetPublishedFormInfos(MessageParcel &data, MessagePar
     std::vector<RunningFormInfo> infos;
     // call FormMgrService to get formInfos into infos.
     int32_t result = GetPublishedFormInfos(infos);
-    reply.WriteInt32(result);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (result == ERR_OK && !WriteParcelableVector(infos, reply)) {
         HILOG_ERROR("write failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1593,6 +1604,8 @@ int32_t FormMgrStub::HandleAcquireFormData(MessageParcel &data, MessageParcel &r
             HILOG_ERROR("write customizeData failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
+    } else {
+        HILOG_INFO("skip writing customizeData, result:%{public}d", result);
     }
     return result;
 }
@@ -2013,7 +2026,7 @@ ErrCode FormMgrStub::HandleRegisterFormRouterProxy(MessageParcel &data, MessageP
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -2039,7 +2052,7 @@ ErrCode FormMgrStub::HandleUnregisterFormRouterProxy(MessageParcel &data, Messag
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -2150,7 +2163,7 @@ int32_t FormMgrStub::HandleSetFormsRecyclable(MessageParcel &data, MessageParcel
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -2171,7 +2184,7 @@ int32_t FormMgrStub::HandleRecycleForms(MessageParcel &data, MessageParcel &repl
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -2197,7 +2210,7 @@ int32_t FormMgrStub::HandleRecoverForms(MessageParcel &data, MessageParcel &repl
         HILOG_ERROR("read formIds failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (formIds.empty() || formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
+    if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
         HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -2444,9 +2457,9 @@ int32_t FormMgrStub::HandleNotifyFormLocked(MessageParcel &data, MessageParcel &
         HILOG_ERROR("read isLocked failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool result = NotifyFormLocked(formId, isLocked);
-    if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write action failed");
+    int32_t result = NotifyFormLocked(formId, isLocked);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2625,7 +2638,7 @@ ErrCode FormMgrStub::HandleChangeSceneAnimationState(MessageParcel &data, Messag
         HILOG_ERROR("read state failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (state < 0) {
+    if (state < 0 || state > Constants::MAX_SCENE_ANIMATION_STATE) {
         HILOG_ERROR("invalid state %{public}d", state);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }

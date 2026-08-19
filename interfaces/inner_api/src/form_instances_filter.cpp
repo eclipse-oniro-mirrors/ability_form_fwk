@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,21 +27,25 @@ bool FormInstancesFilter::ReadFromParcel(Parcel &parcel)
         return false;
     }
     bundleName = Str16ToStr8(bundleNameStr);
+
     std::u16string formNameStr;
     if (!parcel.ReadString16(formNameStr)) {
         return false;
     }
     formName = Str16ToStr8(formNameStr);
+
     std::u16string moduleNameStr;
     if (!parcel.ReadString16(moduleNameStr)) {
         return false;
     }
     moduleName = Str16ToStr8(moduleNameStr);
+
     std::u16string abilityNameStr;
     if (!parcel.ReadString16(abilityNameStr)) {
         return false;
     }
     abilityName = Str16ToStr8(abilityNameStr);
+
     if (!parcel.ReadBool(isUnusedIncluded)) {
         return false;
     }

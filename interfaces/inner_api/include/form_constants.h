@@ -146,6 +146,8 @@ namespace Constants {
     constexpr const char* FUN_INTERACTION = "1";
     constexpr const char* SCENE_ANIMATION = "2";
     constexpr const char* LIVE_FORM_BOTH = "3";
+    // scene animation state: 0=disable, 1=enable
+    constexpr int32_t MAX_SCENE_ANIMATION_STATE = 1;
 
     // class names
     constexpr const char* FORM_INFO_CLASS_NAME = "@ohos.app.form.formInfo.formInfo.FormInfo";
@@ -254,6 +256,8 @@ namespace Constants {
     constexpr int32_t MAX_RECORD_PER_USER = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
+    // max length for publish form result message
+    constexpr int32_t MAX_PUBLISH_FORM_MESSAGE_LENGTH = 1024;
     constexpr int32_t MAX_FORM_NAME_LENGTH = 128;
     constexpr int32_t MAX_BUNDLE_NAME_LENGTH = 128;
     constexpr int32_t MAX_ABILITY_NAME_LENGTH = 128;
@@ -361,6 +365,7 @@ namespace Constants {
         PARAM_ERROR,
         INTERNAL_ERROR,
         NOT_SUPPORT,
+        BUTT, // boundary for validation
     };
  
     enum FormUpdateReason : int8_t {
