@@ -478,8 +478,8 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         } else {
             auto value = std::get<std::string>(iter.value_);
             nlohmann::json dataObject = SafeJsonParse(value);
-            if (dataObject.is_discarded() || !dataObject.is_object()) {
-                HILOG_ERROR("fail parse data or not object:%{public}s", value.c_str());
+            if (dataObject.is_discarded()) {
+                HILOG_ERROR("fail parse data:%{public}s", value.c_str());
                 continue;
             }
             object[iter.key_] = dataObject;
@@ -520,8 +520,8 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     for (const auto& iter : data) {
         HILOG_DEBUG("iter: %{private}s.", iter.c_str());
         nlohmann::json dataObject = SafeJsonParse(iter);
-        if (dataObject.is_discarded() || !dataObject.is_object()) {
-            HILOG_ERROR("fail parse data or not object:%{public}s", iter.c_str());
+        if (dataObject.is_discarded()) {
+            HILOG_ERROR("fail parse data:%{public}s", iter.c_str());
             continue;
         }
         object.merge_patch(dataObject);
