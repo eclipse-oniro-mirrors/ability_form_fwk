@@ -453,6 +453,26 @@ static void InnerAcquireFormState(napi_env env, AsyncAcquireFormStateCallbackInf
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
+static void AcquireFormStateAsyncComplete(napi_env env, napi_status status, void *data)
+{
+    HILOG_INFO("napi_create_async_work complete");
+    auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo *>(data);
+    if (callbackInfo == nullptr) {
+        HILOG_ERROR("null asyncCallbackInfo");
+        return;
+    }
+    // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
+    napi_async_work asyncWork = callbackInfo->asyncWork;
+    // When the result is not ERR_OK, OnAcquireState will be called here,
+    // else OnAcquireState will be called after the form state is acquired.
+    if (callbackInfo->result != ERR_OK) {
+        FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, callbackInfo->want);
+    }
+    if (asyncWork != nullptr) {
+        napi_delete_async_work(env, asyncWork);
+    }
+}
+
 napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
     AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
 {
@@ -478,24 +498,7 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
             }
             InnerAcquireFormState(env, callbackInfo);
         },
-        [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("napi_create_async_work complete");
-            auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
-            if (callbackInfo == nullptr) {
-                HILOG_ERROR("null asyncCallbackInfo");
-                return;
-            }
-            // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
-            napi_async_work asyncWork = callbackInfo->asyncWork;
-            // When the result is not ERR_OK, OnAcquireState will be called here,
-            // else OnAcquireState will be called after the form state is acquired.
-            if (callbackInfo->result != ERR_OK) {
-                FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, callbackInfo->want);
-            }
-            if (asyncWork != nullptr) {
-                napi_delete_async_work(env, asyncWork);
-            }
-        }, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
+        AcquireFormStateAsyncComplete, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
@@ -805,6 +808,27 @@ napi_value NotifyFormsVisibleCallback(napi_env env, napi_value callbackFunc,
     return NapiGetResult(env, 1);
 }
 
+static void NotifyFormsVisiblePromiseComplete(napi_env env, napi_status status, void *data)
+{
+    HILOG_INFO("promise complete");
+    auto *callbackInfo = static_cast<AsyncNotifyFormsVisibleCallbackInfo *>(data);
+    if (callbackInfo == nullptr) {
+        HILOG_ERROR("null asyncCallbackInfo");
+        return;
+    }
+    napi_value result;
+    InnerCreatePromiseRetMsg(env, callbackInfo->result, &result);
+    if (callbackInfo->result == ERR_OK) {
+        napi_resolve_deferred(callbackInfo->env, callbackInfo->deferred, result);
+    } else {
+        napi_reject_deferred(callbackInfo->env, callbackInfo->deferred, result);
+    }
+    if (callbackInfo->asyncWork) {
+        napi_delete_async_work(env, callbackInfo->asyncWork);
+    }
+    delete callbackInfo;
+}
+
 napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
 {
     HILOG_INFO("NotifyFormsVisiblePromise start");
@@ -826,25 +850,7 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
             }
             InnerNotifyFormsVisible(env, callbackInfo);
         },
-        [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("promise complete");
-            auto *callbackInfo = static_cast<AsyncNotifyFormsVisibleCallbackInfo*>(data);
-            if (callbackInfo == nullptr) {
-                HILOG_ERROR("null asyncCallbackInfo");
-                return;
-            }
-            napi_value result;
-            InnerCreatePromiseRetMsg(env, callbackInfo->result, &result);
-            if (callbackInfo->result == ERR_OK) {
-                napi_resolve_deferred(callbackInfo->env, callbackInfo->deferred, result);
-            } else {
-                napi_reject_deferred(callbackInfo->env, callbackInfo->deferred, result);
-            }
-            if (callbackInfo->asyncWork) {
-                napi_delete_async_work(env, callbackInfo->asyncWork);
-            }
-            delete callbackInfo;
-        }, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
+        NotifyFormsVisiblePromiseComplete, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
