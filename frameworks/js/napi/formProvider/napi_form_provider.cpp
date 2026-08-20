@@ -308,19 +308,16 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
     };
     if (asyncCallbackInfo == nullptr) {
         HILOG_ERROR("asyncCallbackInfo == nullptr");
-        napi_value code = nullptr;
-        napi_create_int32(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &code);
-        napi_reject_deferred(env, deferred, code);
+        napi_value error = nullptr;
+        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
+        napi_reject_deferred(env, deferred, error);
         return promise;
     }
 
     ErrCode errCode = RequestPublishFormParse(env, argv, asyncCallbackInfo);
     if (errCode != ERR_OK) {
-        napi_value result = nullptr;
-        InnerCreatePromiseRetMsg(env, errCode, &result);
-        napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
         delete asyncCallbackInfo;
-        return promise;
+        return RetErrMsg(InitErrMsg(env, errCode, PROMISE_FLG, nullptr));
     }
     
     FormPromiseCreateAsyncWork(env, asyncCallbackInfo);
@@ -330,7 +327,9 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
-        napi_reject_deferred(env, deferred, CreateJsError(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
+        napi_value error = nullptr;
+        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
+        napi_reject_deferred(env, deferred, error);
         delete asyncCallbackInfo;
         return promise;
     }
