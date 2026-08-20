@@ -113,7 +113,7 @@ HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0400, TestSize.Level0)
     FormInstancesFilter formInstanceFilter;
     Parcel parcel;
     auto result = formInstanceFilter.Unmarshalling(parcel);
-    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result, nullptr);
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0400 end";
 }
 
@@ -143,7 +143,7 @@ HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0600, TestSize.Level0)
     FormInstancesFilter formInstanceFilter;
     Parcel parcel;
     auto result = formInstanceFilter.ReadFromParcel(parcel);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0600 end";
 }
 } // namespace AppExecFwk

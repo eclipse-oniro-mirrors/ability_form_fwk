@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,12 +22,26 @@ namespace OHOS {
 namespace AppExecFwk {
 bool FormInstancesFilter::ReadFromParcel(Parcel &parcel)
 {
-    bundleName = Str16ToStr8(parcel.ReadString16());
-    formName = Str16ToStr8(parcel.ReadString16());
-    moduleName = Str16ToStr8(parcel.ReadString16());
-    abilityName = Str16ToStr8(parcel.ReadString16());
-    isUnusedIncluded = parcel.ReadBool();
-
+    std::u16string str;
+    if (!parcel.ReadString16(str)) {
+        return false;
+    }
+    bundleName = Str16ToStr8(str);
+    if (!parcel.ReadString16(str)) {
+        return false;
+    }
+    formName = Str16ToStr8(str);
+    if (!parcel.ReadString16(str)) {
+        return false;
+    }
+    moduleName = Str16ToStr8(str);
+    if (!parcel.ReadString16(str)) {
+        return false;
+    }
+    abilityName = Str16ToStr8(str);
+    if (!parcel.ReadBool(isUnusedIncluded)) {
+        return false;
+    }
     return true;
 }
 

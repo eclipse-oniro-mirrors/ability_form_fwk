@@ -2434,6 +2434,8 @@ HWTEST_F(FormMgrStubTest, HandleGetFormInstanceById_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleGetFormInstanceById_0100 starts";
     MessageParcel data;
     MessageParcel reply;
+    data.WriteInt64(1);
+    data.WriteBool(false);
     EXPECT_CALL(*mockFormMgrService, GetFormInstanceById(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetFormInstanceById(data, reply);
     std::vector<FormInfo> resultInfos;
@@ -2472,6 +2474,8 @@ HWTEST_F(FormMgrStubTest, HandleUpdateFormLocation_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleUpdateFormLocation_0100 starts";
     MessageParcel data;
     MessageParcel reply;
+    data.WriteInt64(1);
+    data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::DESKTOP));
     EXPECT_CALL(*mockFormMgrService, UpdateFormLocation(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(ERR_OK, mockFormMgrService->HandleUpdateFormLocation(data, reply));
     GTEST_LOG_(INFO) << "HandleUpdateFormLocation_0100 ends";
@@ -2532,6 +2536,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0102, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0102 starts";
     MessageParcel data;
     MessageParcel reply;
+    data.WriteInt64(1);
+    data.WriteString("test");
+    data.WriteInt32(static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS));
     EXPECT_CALL(*mockFormMgrService, SetPublishFormResult(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleSetPublishFormResult(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0102 ends";
@@ -2546,6 +2553,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0103, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0103 starts";
     MessageParcel data;
     MessageParcel reply;
+    data.WriteInt64(1);
     EXPECT_CALL(*mockFormMgrService, AcquireAddFormResult(_)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleAcquireAddFormResult(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0103 ends";
@@ -3280,7 +3288,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0133, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0133 ends";
 }
- 
+
 /**
  * @tc.number: FormMgrStubTest_0133
  * @tc.name: Verify OnRemoteRequest and HandleChangeSceneAnimationState
@@ -3675,7 +3683,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_009, TestSize
     EXPECT_THAT(resultFormIds, ContainerEq(formIds));
     GTEST_LOG_(INFO) << "FormMgrStubTest_GetFormIdsByFormLocation_009 ends";
 }
- 
+
 /**
  * @tc.number: FormMgrStubTest_RequestPublishFormCrossUser_001
  * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormCrossUser
@@ -3737,7 +3745,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_RequestPublishFormCrossUser_002, TestS
     EXPECT_EQ(result, errorCode);
     GTEST_LOG_(INFO) << "FormMgrStubTest_RequestPublishFormCrossUser_002 ends";
 }
- 
+
 /**
  * @tc.number: FormMgrStubTest_RequestPublishFormCrossUser_003
  * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormCrossUser
@@ -3990,7 +3998,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_001, TestSize.Level1) {
     MessageParcel reply;
     MessageOption option{MessageOption::TF_SYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    
+
     std::vector<FormRecordFilter> filters;
     FormRecordFilter filter;
     filter.bundleName = "com.test.bundle";
@@ -3998,12 +4006,12 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_001, TestSize.Level1) {
     filter.abilityName = "ability";
     filter.formName = "form";
     filters.push_back(filter);
-    
+
     data.WriteInt32(filters.size());
     for (const auto &f : filters) {
         data.WriteParcelable(&f);
     }
-    
+
     EXPECT_CALL(*mockFormMgrService, DeleteForms(_)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
@@ -4098,17 +4106,17 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_006, TestSize.Level1) {
     EXPECT_TRUE(mockFormMgrService != nullptr);
     MessageParcel data;
     MessageParcel reply;
-    
+
     std::vector<FormRecordFilter> filters;
     FormRecordFilter filter;
     filter.bundleName = "com.test.bundle";
     filters.push_back(filter);
-    
+
     data.WriteInt32(filters.size());
     for (const auto &f : filters) {
         data.WriteParcelable(&f);
     }
-    
+
     EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
         .Times(1)
         .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG));
@@ -4130,7 +4138,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
     EXPECT_TRUE(mockFormMgrService != nullptr);
     MessageParcel data;
     MessageParcel reply;
-    
+
     std::vector<FormRecordFilter> filters;
     for (int i = 0; i < Constants::DELETE_FORMS_FILTER_MAX_NUM; ++i) {
         FormRecordFilter filter;
@@ -4140,12 +4148,12 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
         filter.formName = "form" + std::to_string(i);
         filters.push_back(filter);
     }
-    
+
     data.WriteInt32(filters.size());
     for (const auto &f : filters) {
         data.WriteParcelable(&f);
     }
-    
+
     EXPECT_CALL(*mockFormMgrService, DeleteForms(_)).Times(1).WillOnce(Return(ERR_OK));
     auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
     EXPECT_EQ(errCode, ERR_OK);
@@ -4169,18 +4177,18 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_001, TestS
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
- 
+
     data.WriteInterfaceToken(FormMgrStubCrossBundleTestTarget::GetDescriptor());
     data.WriteInt64(formId);
     data.WriteParcelable(&formBindingData);
- 
+
     auto result = stub->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     EXPECT_EQ(stub->updateFormCrossBundleCount, 1);
     EXPECT_EQ(reply.ReadInt32(), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 ends";
 }
- 
+
 /**
  * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_002
  * @tc.name: Verify OnRemoteRequest for FORM_MGR_UPDATE_FORM_CROSS_BUNDLE with missing FormProviderData.
@@ -4195,10 +4203,10 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_002, TestS
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
- 
+
     data.WriteInterfaceToken(FormMgrStubCrossBundleTestTarget::GetDescriptor());
     data.WriteInt64(formId);
- 
+
     auto result = stub->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     EXPECT_EQ(stub->updateFormCrossBundleCount, 0);

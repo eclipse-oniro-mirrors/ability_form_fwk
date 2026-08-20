@@ -302,24 +302,6 @@ HWTEST_F(FmsFormDataAdapterTest, RequestForm_004, TestSize.Level1)
     GTEST_LOG_(INFO) << "RequestForm_004 end";
 }
 
-// ========== UpdateFormSize(float) Tests ==========
-
-/**
- * @tc.name: UpdateFormSize_Float_001
- * @tc.desc: Verify UpdateFormSize(float) always returns ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormDataAdapterTest, UpdateFormSize_Float_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "UpdateFormSize_Float_001 start";
-
-    auto result = FormDataAdapter::GetInstance().UpdateFormSize(
-        TEST_FORM_ID, 100.0f, 100.0f, 1.0f, 1.0f);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "UpdateFormSize_Float_001 end";
-}
-
 // ========== EnableUpdateForm / DisableUpdateForm Tests ==========
 
 /**
@@ -1482,7 +1464,7 @@ HWTEST_F(FmsFormDataAdapterTest, PostEnterpriseAppInstallFailedRetryTask_003, Te
 }
 
 // ========== UpdateFormSize(int32_t) Additional Tests ==========
- 
+
 /**
  * @tc.name: UpdateFormSize_Int32_001
  * @tc.desc: Verify GetFormInfo failure returns error code
@@ -1491,27 +1473,27 @@ HWTEST_F(FmsFormDataAdapterTest, PostEnterpriseAppInstallFailedRetryTask_003, Te
 HWTEST_F(FmsFormDataAdapterTest, UpdateFormSize_Int32_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "UpdateFormSize_Int32_001 start";
- 
+
     FormRecord record;
     record.formId = TEST_FORM_ID;
- 
+
     Rect newRect;
     newRect.left = 0;
     newRect.top = 0;
     newRect.width = 100;
     newRect.height = 100;
- 
+
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
         .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
 
     auto result = FormDataAdapter::GetInstance().UpdateFormSize(TEST_FORM_ID, TEST_DIMENSION_ID, newRect);
     EXPECT_NE(result, ERR_OK);
- 
+
     GTEST_LOG_(INFO) << "UpdateFormSize_Int32_001 end";
 }
- 
+
 // ========== ReloadForms Additional Tests ==========
- 
+
 /**
  * @tc.name: ReloadForms_003
  * @tc.desc: Verify successful ReloadForms increments reloadNum
@@ -1520,12 +1502,12 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateFormSize_Int32_001, TestSize.Level1)
 HWTEST_F(FmsFormDataAdapterTest, ReloadForms_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "ReloadForms_003 start";
- 
+
     int32_t reloadNum = 0;
     FormRecord record;
     record.formId = TEST_FORM_ID;
     std::vector<FormRecord> refreshForms = {record};
- 
+
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingPid())
         .WillRepeatedly(Return(TEST_CALLING_PID));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
@@ -1534,12 +1516,12 @@ HWTEST_F(FmsFormDataAdapterTest, ReloadForms_003, TestSize.Level1)
     FormDataAdapter::GetInstance().ReloadForms(reloadNum, refreshForms);
     // Note: In actual test, CheckUIAbilityContext fails, so this test may not reach BatchRequestRefresh
     // The test verifies the logic flow when conditions are met
- 
+
     GTEST_LOG_(INFO) << "ReloadForms_003 end";
 }
- 
+
 // ========== AcquireProviderFormInfoByFormRecord Additional Tests ==========
- 
+
 /**
  * @tc.name: AcquireProviderFormInfoByFormRecord_003
  * @tc.desc: Verify GetFormsInfoByRecord failure returns error
@@ -1548,7 +1530,7 @@ HWTEST_F(FmsFormDataAdapterTest, ReloadForms_003, TestSize.Level1)
 HWTEST_F(FmsFormDataAdapterTest, AcquireProviderFormInfoByFormRecord_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AcquireProviderFormInfoByFormRecord_003 start";
- 
+
     FormRecord record;
     record.formId = TEST_FORM_ID;
     record.bundleName = "com.test.bundle";
@@ -1556,21 +1538,21 @@ HWTEST_F(FmsFormDataAdapterTest, AcquireProviderFormInfoByFormRecord_003, TestSi
     record.moduleName = "entry";
     record.formName = "widget";
     WantParams wantParams;
- 
+
     sptr<IBundleMgr> bundleMgr = new MockBundleMgrStub();
     BundleInfo bundleInfo;
     bundleInfo.name = "com.test.bundle";
- 
+
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(bundleMgr));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
- 
+
     auto result = FormDataAdapter::GetInstance().AcquireProviderFormInfoByFormRecord(record, wantParams);
     EXPECT_NE(result, ERR_OK);
- 
+
     GTEST_LOG_(INFO) << "AcquireProviderFormInfoByFormRecord_003 end";
 }
 }  // namespace AppExecFwk
