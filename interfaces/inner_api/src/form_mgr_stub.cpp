@@ -870,8 +870,6 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
         HILOG_ERROR("read formVisibleType failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-
-
     int32_t result = NotifyWhetherVisibleForms(formIds, client, formVisibleType);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
