@@ -41,12 +41,12 @@ struct StatusInfo {
 // '0' means INACTIVE, '1' means PAUSE, and '2' means ACTIVE. The second digit describes launcher support:
 // '0' means unsupported and '1' means supported.
 const std::unordered_map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
-    {"00", {"INACTIVE", false}},
-    {"01", {"INACTIVE", true}},
-    {"10", {"PAUSE", false}},
-    {"11", {"PAUSE", true}},
-    {"20", {"ACTIVE", false}},
-    {"21", {"ACTIVE", true}},
+    {"00", {LiveFormState::INACTIVE, false}},
+    {"01", {LiveFormState::INACTIVE, true}},
+    {"10", {LiveFormState::PAUSE, false}},
+    {"11", {LiveFormState::PAUSE, true}},
+    {"20", {LiveFormState::ACTIVE, false}},
+    {"21", {LiveFormState::ACTIVE, true}},
 };
 }
 

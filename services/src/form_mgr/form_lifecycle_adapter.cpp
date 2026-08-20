@@ -25,6 +25,7 @@
 #include "bundle_info.h"
 #include "configuration.h"
 #include "form_constants.h"
+#include "form_constants_util.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "ipc_skeleton.h"
@@ -52,6 +53,9 @@
 #include "form_event_report.h"
 #include "form_host/form_host_record.h"
 #include "form_mgr/form_callback_adapter.h"
+#ifdef SUPPORT_POWER
+#include "power_mgr_client.h"
+#endif
 #include "form_mgr/form_common_adapter.h"
 #include "form_mgr/form_data_adapter.h"
 #include "form_mgr/form_publish_adapter.h"
@@ -1058,6 +1062,18 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
 
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    if (protect) {
+#ifdef SUPPORT_POWER
+        if (PowerMgr::PowerMgrClient::GetInstance().GetDeviceMode()
+            != PowerMgr::PowerMode::CUSTOM_POWER_SAVE_MODE) {
+            FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
+        }
+#else
+        FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
+#endif
+    }
+
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, protect:%{public}d", userId, formInfos.size(), protect);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
@@ -1069,8 +1085,8 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         iter->protectForm = protect;
         FormDataMgr::GetInstance().SetFormProtect(iter->formId, protect);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
-        if (protect) {
-            FormCallbackAdapter::GetInstance().CancelOverflow(iter->formId);
+        if (protect && IsLiveFormActive(iter->formId, liveFormStatusMap)) {
+            FormCallbackAdapter::GetInstance().CancelSceneEffects(iter->formId);
         }
         ++iter;
     }
@@ -1078,6 +1094,17 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         FormDataMgr::GetInstance().LockForms(std::move(formInfos), protect);
     }
     return ERR_OK;
+}
+
+bool FormLifecycleAdapter::IsLiveFormActive(const int64_t formId,
+    const std::unordered_map<std::string, std::string> &liveFormStatusMap)
+{
+    auto it = liveFormStatusMap.find(std::to_string(formId));
+    if (it == liveFormStatusMap.end()) {
+        return false;
+    }
+    const char* activeState = FormConstantsUtil::GetLiveFormActiveState(it->second);
+    return activeState != nullptr && strcmp(activeState, LiveFormState::ACTIVE) == 0;
 }
 
 // Implementation of RecoverForms
