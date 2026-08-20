@@ -34,8 +34,13 @@ FormEditExtension *FormEditExtension::Create(const std::unique_ptr<Runtime> &run
     switch (runtime->GetLanguage()) {
         case Runtime::Language::JS:
             return JsFormEditExtension::Create(runtime);
-        case Runtime::Language::ETS:
-            return CreateETSFormEditExtension(runtime);
+        case Runtime::Language::ETS: {
+            auto* extension = CreateETSFormEditExtension(runtime);
+            if (extension == nullptr) {
+                return new FormEditExtension();
+            }
+            return extension;
+        }
         default:
             return new FormEditExtension();
     }

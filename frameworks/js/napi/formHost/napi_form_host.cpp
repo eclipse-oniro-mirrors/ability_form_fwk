@@ -78,6 +78,10 @@ static std::string GetStringFromNAPI(napi_env env, napi_value value)
         HILOG_ERROR("%{public}s, can not get string size", __func__);
         return "";
     }
+    if (size >= SIZE_MAX - 1) {
+        HILOG_ERROR("%{public}s, string size too large", __func__);
+        return "";
+    }
     result.reserve(size + 1);
     result.resize(size);
     if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
@@ -250,7 +254,17 @@ public:
         asyncCallbackInfo_ = asyncCallbackInfo;
     }
 
-    virtual ~FormStateCallbackClient() = default;
+    virtual ~FormStateCallbackClient()
+    {
+        if (asyncCallbackInfo_ != nullptr) {
+            if (asyncCallbackInfo_->callback != nullptr) {
+                napi_delete_reference(asyncCallbackInfo_->env, asyncCallbackInfo_->callback);
+                asyncCallbackInfo_->callback = nullptr;
+            }
+            delete asyncCallbackInfo_;
+            asyncCallbackInfo_ = nullptr;
+        }
+    }
 
     void ProcessAcquireState(FormState state) override
     {
@@ -347,6 +361,10 @@ public:
         bool isEqual = false;
         napi_value myCallback = nullptr;
         napi_get_reference_value(env_, callbackRef_, &myCallback);
+        if (myCallback == nullptr) {
+            HILOG_ERROR("myCallback is nullptr");
+            return false;
+        }
         napi_strict_equals(env_, myCallback, callback, &isEqual);
         HILOG_INFO("isStrictEqual:%{public}d", isEqual);
         return isEqual;
@@ -381,8 +399,12 @@ bool AddFormUninstallCallback(napi_env env, napi_value callback)
         }
     }
 
-    napi_ref callbackRef;
-    napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    napi_ref callbackRef = nullptr;
+    napi_status status = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    if (status != napi_ok || callbackRef == nullptr) {
+        HILOG_ERROR("%{public}s, create reference failed", __func__);
+        return false;
+    }
     std::shared_ptr<FormUninstallCallbackClient> callbackClient = std::make_shared<FormUninstallCallbackClient>(env,
         callbackRef);
 
@@ -440,7 +462,11 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, callbackFunc, &valueType));
     NAPI_ASSERT(env, valueType == napi_function, "expected type is function.");
-    napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
+    napi_status refStatus = napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
+    if (refStatus != napi_ok) {
+        HILOG_ERROR("create reference failed");
+        return nullptr;
+    }
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
@@ -715,16 +741,21 @@ static void NotifyFormsVisibleCallbackComplete(napi_env env, napi_status, void *
     if (asyncCallbackInfo) {
         if (asyncCallbackInfo->callback) {
             napi_handle_scope scope = nullptr;
-            napi_open_handle_scope(env, &scope);
-            napi_value callback = nullptr;
-            napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
-            InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
+            napi_status openStatus = napi_open_handle_scope(env, &scope);
+            if (openStatus != napi_ok || scope == nullptr) {
+                HILOG_ERROR("napi_open_handle_scope failed");
+                napi_delete_reference(env, asyncCallbackInfo->callback);
+            } else {
+                napi_value callback = nullptr;
+                napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
+                InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
 
-            napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
-            napi_value callResult = nullptr;
-            napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
-            napi_delete_reference(env, asyncCallbackInfo->callback);
-            napi_close_handle_scope(env, scope);
+                napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+                napi_value callResult = nullptr;
+                napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
+                napi_delete_reference(env, asyncCallbackInfo->callback);
+                napi_close_handle_scope(env, scope);
+            }
         }
         if (asyncCallbackInfo->asyncWork) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -742,7 +773,11 @@ napi_value NotifyFormsVisibleCallback(napi_env env, napi_value callbackFunc,
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, callbackFunc, &valueType));
     NAPI_ASSERT(env, valueType == napi_function, "expected type is function.");
-    napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
+    napi_status refStatus = napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
+    if (refStatus != napi_ok) {
+        HILOG_ERROR("create reference failed");
+        return nullptr;
+    }
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
@@ -816,7 +851,11 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
         if (asyncCallbackInfo->asyncWork) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
-        return nullptr;
+        napi_value result;
+        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &result);
+        napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
+        delete asyncCallbackInfo;
+        return promise;
     }
     return promise;
 }
@@ -897,14 +936,22 @@ static void NotifyFormsEnableUpdateCallbackComplete(napi_env env, napi_status st
     auto *asyncCallbackInfo = static_cast<AsyncNotifyFormsEnableUpdateCallbackInfo*>(data);
     if (asyncCallbackInfo) {
         if (asyncCallbackInfo->callback != nullptr) {
-            napi_value callback;
-            napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
-            InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
+            napi_handle_scope scope = nullptr;
+            napi_status openStatus = napi_open_handle_scope(env, &scope);
+            if (openStatus != napi_ok || scope == nullptr) {
+                HILOG_ERROR("napi_open_handle_scope failed");
+                napi_delete_reference(env, asyncCallbackInfo->callback);
+            } else {
+                napi_value callback;
+                napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
+                InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
 
-            napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
-            napi_value callResult;
-            napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
-            napi_delete_reference(env, asyncCallbackInfo->callback);
+                napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+                napi_value callResult;
+                napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
+                napi_delete_reference(env, asyncCallbackInfo->callback);
+                napi_close_handle_scope(env, scope);
+            }
         }
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -922,7 +969,11 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env, napi_value callbackFunc
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, callbackFunc, &valueType));
     NAPI_ASSERT(env, valueType == napi_function, "expected type is function.");
-    napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
+    napi_status refStatus = napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
+    if (refStatus != napi_ok) {
+        HILOG_ERROR("create reference failed");
+        return nullptr;
+    }
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
@@ -969,6 +1020,10 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
         [](napi_env env, void *data) {
             HILOG_INFO("runnning");
             auto *callbackInfo = static_cast<AsyncNotifyFormsEnableUpdateCallbackInfo*>(data);
+            if (callbackInfo == nullptr) {
+                HILOG_ERROR("null asyncCallbackInfo");
+                return;
+            }
             InnerNotifyFormsEnableUpdate(env, callbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
@@ -990,8 +1045,11 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
+        napi_value result;
+        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &result);
+        napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
         delete asyncCallbackInfo;
-        return nullptr;
+        return promise;
     }
     return promise;
 }
@@ -1608,13 +1666,26 @@ napi_value NapiFormHost::OnEnableFormsUpdate(napi_env env, size_t argc, napi_val
 
 bool NapiFormHost::GetStringsValue(napi_env env, napi_value array, std::vector<std::string> &strList)
 {
+    bool isArray = false;
+    napi_status status = napi_is_array(env, array, &isArray);
+    if (status != napi_ok || !isArray) {
+        HILOG_ERROR("input is not array");
+        return false;
+    }
     uint32_t nativeArrayLen = 0;
-    napi_get_array_length(env, array, &nativeArrayLen);
+    status = napi_get_array_length(env, array, &nativeArrayLen);
+    if (status != napi_ok) {
+        HILOG_ERROR("get array length failed");
+        return false;
+    }
     napi_value element = nullptr;
 
     for (uint32_t i = 0; i < nativeArrayLen; i++) {
         std::string itemStr("");
-        napi_get_element(env, array, i, &element);
+        if (napi_get_element(env, array, i, &element) != napi_ok) {
+            HILOG_ERROR("get element at index %{public}u failed", i);
+            return false;
+        }
         if (!ConvertFromJsValue(env, element, itemStr)) {
             HILOG_ERROR("GetElement from to array [%{public}u] error", i);
             return false;

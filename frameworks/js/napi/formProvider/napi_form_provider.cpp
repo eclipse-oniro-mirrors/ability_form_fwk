@@ -49,6 +49,12 @@ namespace {
 
 napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
 {
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr");
+        napi_value result = nullptr;
+        napi_get_undefined(env, &result);
+        return result;
+    }
     if (napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
         // store return-message to callbackValues[0].
@@ -70,6 +76,10 @@ napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCa
 
 void ExecuteAsyncPromiseWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
 {
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr");
+        return;
+    }
     if (napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         napi_value error;
         InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
@@ -298,13 +308,19 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
     };
     if (asyncCallbackInfo == nullptr) {
         HILOG_ERROR("asyncCallbackInfo == nullptr");
-        return nullptr;
+        napi_value code = nullptr;
+        napi_create_int32(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &code);
+        napi_reject_deferred(env, deferred, code);
+        return promise;
     }
 
     ErrCode errCode = RequestPublishFormParse(env, argv, asyncCallbackInfo);
     if (errCode != ERR_OK) {
+        napi_value result = nullptr;
+        InnerCreatePromiseRetMsg(env, errCode, &result);
+        napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
         delete asyncCallbackInfo;
-        return RetErrMsg(InitErrMsg(env, errCode, PROMISE_FLG, nullptr));
+        return promise;
     }
     
     FormPromiseCreateAsyncWork(env, asyncCallbackInfo);
@@ -314,8 +330,9 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
+        napi_reject_deferred(env, deferred, CreateJsError(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
         delete asyncCallbackInfo;
-        return nullptr;
+        return promise;
     }
     return promise;
 }
@@ -406,7 +423,9 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
     size_t convertArgc = 0;
     FormInfoFilter formInfoFilter;
     napi_valuetype type = napi_undefined;
-    napi_typeof(env, argv[0], &type);
+    if (argc > 0 && argv[0] != nullptr) {
+        napi_typeof(env, argv[0], &type);
+    }
     if (argc > 0 && type != napi_function) {
         if (!ConvertFormInfoFilter(env, argv[0], formInfoFilter)) {
             HILOG_ERROR("%{public}s, convert form info filter failed.", __func__);
@@ -511,9 +530,11 @@ napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* a
         errCode = ERR_APPEXECFWK_FORM_INVALID_PROVIDER_DATA;
     }
     auto formProviderData = std::make_shared<OHOS::AppExecFwk::FormProviderData>();
-    std::string formDataStr = GetStringByProp(env, argv[PARAM1], "data");
-    formProviderData->SetDataString(formDataStr);
-    formProviderData->ParseImagesData();
+    if (errCode == ERR_OK) {
+        std::string formDataStr = GetStringByProp(env, argv[PARAM1], "data");
+        formProviderData->SetDataString(formDataStr);
+        formProviderData->ParseImagesData();
+    }
     NapiAsyncTask::CompleteCallback complete =
         [errCode, formId, data = formProviderData](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
