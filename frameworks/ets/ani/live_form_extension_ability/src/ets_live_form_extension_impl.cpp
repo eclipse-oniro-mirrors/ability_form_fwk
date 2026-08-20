@@ -78,14 +78,6 @@ void EtsLiveFormExtensionImpl::BindContext()
         env->GlobalReference_Delete(contextRef);
         return;
     }
-    status = env->Object_SetFieldByName_Long(
-        etsObj_->aniObj, "nativeEtsLiveFormExtension", reinterpret_cast<ani_long>(this));
-    if (status != ANI_OK) {
-        HILOG_ERROR("Set native extension failed, status: %{public}d", status);
-        env->GlobalReference_Delete(contextRef);
-        return;
-    }
-
     BindMethod(env);
 }
 
@@ -133,8 +125,7 @@ EtsLiveFormExtensionImpl* EtsLiveFormExtensionImpl::GetEtsEtsLiveForm(ani_env *e
     EtsLiveFormExtensionImpl *etsLiveForm = nullptr;
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
-    if ((status = env->Object_GetFieldByName_Long(
-        obj, "nativeEtsLiveFormExtension", &etsContextLong)) != ANI_OK) {
+    if ((status = env->Object_GetFieldByName_Long(obj, "context", &etsContextLong)) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }

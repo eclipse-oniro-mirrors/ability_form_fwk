@@ -32,7 +32,6 @@ export interface LiveFormInfo {
 
 export default class LiveFormExtensionAbility extends UIExtensionAbility {
   public liveFormContext: LiveFormExtensionContext = {};
-  private nativeEtsLiveFormExtension: long = 0;
 
   private native nativeSetWindowBackgroundColor(): void;
   private native nativeSetFontScale(fontScale: double): void;
