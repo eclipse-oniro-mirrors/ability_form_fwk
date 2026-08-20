@@ -571,12 +571,7 @@ ErrCode FormCommonAdapter::RegisterAddObserver(const std::string &bundleName, co
         HILOG_DEBUG("%{public}s add register.", bundleName.c_str());
         remoteObjects.emplace_back(callerToken);
     }
-    sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormCommonAdapter::ClientDeathRecipient();
-    if (deathRecipient == nullptr) {
-        HILOG_ERROR("alloc deathRecipient failed");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    SetDeathRecipient(callerToken, deathRecipient);
+    SetDeathRecipient(callerToken, new (std::nothrow) FormCommonAdapter::ClientDeathRecipient());
     HILOG_DEBUG("RegisterAddObserver success");
     return ERR_OK;
 }
@@ -589,22 +584,20 @@ ErrCode FormCommonAdapter::RegisterRemoveObserver(const std::string &bundleName,
     if (formObserver == formObservers_.end()) {
         HILOG_ERROR("bundleName not exist");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    } else {
+        auto &remoteObjects = formObserver->second;
+        for (auto itr = remoteObjects.begin(); itr != remoteObjects.end();) {
+            if (*itr == callerToken) {
+                remoteObjects.erase(itr);
+                SetDeathRecipient(callerToken, new (std::nothrow) FormCommonAdapter::ClientDeathRecipient());
+                HILOG_DEBUG("RegisterRemoveObserver success");
+                return ERR_OK;
+            }
+            ++itr;
+        }
     }
-    auto &remoteObjects = formObserver->second;
-    auto itr = std::find(remoteObjects.begin(), remoteObjects.end(), callerToken);
-    if (itr == remoteObjects.end()) {
-        HILOG_ERROR("callback not exist");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-    remoteObjects.erase(itr);
-    sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormCommonAdapter::ClientDeathRecipient();
-    if (deathRecipient == nullptr) {
-        HILOG_ERROR("alloc deathRecipient failed");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-    SetDeathRecipient(callerToken, deathRecipient);
-    HILOG_DEBUG("RegisterRemoveObserver success");
-    return ERR_OK;
+    HILOG_ERROR("callback not exist");
+    return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
 }
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormCommonAdapter::GetAppMgr()

@@ -196,10 +196,6 @@ int32_t FormHostStub::HandleOnAcquireDataResponse(MessageParcel &data, MessagePa
     }
 
     auto requestCode = data.ReadInt64();
-    if (requestCode <= 0) {
-        HILOG_ERROR("fail ReadInt64<requestCode>");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
 
     OnAcquireDataResponse(*wantParams, requestCode);
     reply.WriteInt32(ERR_OK);
