@@ -1210,7 +1210,7 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
     }
     if (state < static_cast<int32_t>(AppExecFwk::FormState::UNKNOWN) ||
         state > static_cast<int32_t>(AppExecFwk::FormState::READY)) {
-        HILOG_INFO("Invalid FormState value: %{public}d", state);
+        HILOG_ERROR("Invalid FormState value: %{public}d", state);
         return nullptr;
     }
     ani_enum formState;
