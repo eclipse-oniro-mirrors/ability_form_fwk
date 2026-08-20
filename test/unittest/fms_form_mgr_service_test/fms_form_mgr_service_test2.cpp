@@ -1375,6 +1375,23 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0182, TestSize.Level1)
 }
 
 /**
+ * @tc.number: FormMgrService_ChangeSceneAnimationState_0001
+ * @tc.name: test ChangeSceneAnimationState non-system app.
+ * @tc.desc: Verify that ChangeSceneAnimationState returns permission deny for non-system app.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ChangeSceneAnimationState_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0001 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    int32_t state = 1;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0001 end";
+}
+
+/**
  * @tc.number: FormMgrService_0184
  * @tc.name: test getFormRect function.
  * @tc.desc: Verify that the getFormRect interface is called normally
