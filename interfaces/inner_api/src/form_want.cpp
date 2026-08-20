@@ -44,6 +44,7 @@ const std::unordered_set<std::string> FormWant::FILTER_INTERNAL_PARAMS_ = {
     Constants::PARAM_LAYOUT_WIDTH_KEY,
     Constants::PARAM_LAYOUT_HEIGHT_KEY,
     Constants::PARAM_FORM_VIEW_SCALE,
+    Constants::PARAM_FORM_DISPLAY_ID_KEY,
     Constants::IS_ADD_FORM_BY_HOST,
     Constants::PARAM_DELETE_BACKGROUND_IMAGE,
     Constants::PARAM_FORM_COLOR_MODE_KEY,

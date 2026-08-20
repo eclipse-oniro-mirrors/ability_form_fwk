@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,7 +73,7 @@ namespace {
     int g_registerGetFormRectProxy = OHOS::ERR_OK;
     int g_registerGetLiveFormStatusProxy = OHOS::ERR_OK;
     int g_unregisterGetLiveFormStatusProxy = OHOS::ERR_OK;
-    int g_updateFormSizeFloat = OHOS::ERR_OK;
+
     int g_registerTemplateFormDetailInfoChange = OHOS::ERR_OK;
     int g_unregisterTemplateFormDetailInfoChange = OHOS::ERR_OK;
     int g_updateTemplateFormDetailInfo = OHOS::ERR_OK;
@@ -212,10 +212,6 @@ void MockFormMgrAdapterFacadeUnregisterGetLiveFormStatusProxy(int mockRet)
     g_unregisterGetLiveFormStatusProxy = mockRet;
 }
 
-void MockFormMgrAdapterFacadeUpdateFormSizeFloat(int mockRet)
-{
-    g_updateFormSizeFloat = mockRet;
-}
 
 void MockFormMgrAdapterFacadeRegisterTemplateFormDetailInfoChange(int mockRet)
 {
@@ -569,10 +565,9 @@ ErrCode FormMgrAdapterFacade::UnregisterGetLiveFormStatusProxy()
     return g_unregisterGetLiveFormStatusProxy;
 }
 
-ErrCode FormMgrAdapterFacade::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+void FormMgrAdapterFacade::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
     float formViewScale)
 {
-    return g_updateFormSizeFloat;
 }
 
 ErrCode FormMgrAdapterFacade::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)

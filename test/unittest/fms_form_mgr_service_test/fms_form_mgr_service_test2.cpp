@@ -2208,7 +2208,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UpdateFormSize_0002, TestSize.Le
     float borderWidth = 10.0f;
     float formViewScale = 1.0f;
     MockIsSACall(true);
-    (void)MockFormMgrAdapterFacadeUpdateFormSizeFloat(ERR_OK);
     ErrCode ret = formMgrService.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_UpdateFormSize_0002 end";

@@ -212,9 +212,9 @@ int32_t FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageP
 
 int32_t FormSupplyStub::HandleOnShareAcquire(MessageParcel &data, MessageParcel &reply)
 {
-    auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -261,9 +261,9 @@ int32_t FormSupplyStub::HandleOnAcquireDataResult(MessageParcel &data, MessagePa
 
 int32_t FormSupplyStub::HandleOnRenderTaskDone(MessageParcel &data, MessageParcel &reply)
 {
-    auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -281,9 +281,9 @@ int32_t FormSupplyStub::HandleOnRenderTaskDone(MessageParcel &data, MessageParce
 
 int32_t FormSupplyStub::HandleOnStopRenderingTaskDone(MessageParcel &data, MessageParcel &reply)
 {
-    auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -314,9 +314,9 @@ int32_t FormSupplyStub::HandleOnRenderingBlock(MessageParcel &data, MessageParce
 
 int32_t FormSupplyStub::HandleOnRecycleForm(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -353,9 +353,9 @@ int32_t FormSupplyStub::HandleOnRecoverFormsByConfigUpdate(MessageParcel &data, 
 
 int32_t FormSupplyStub::HandleOnNotifyRefreshForm(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -366,9 +366,9 @@ int32_t FormSupplyStub::HandleOnNotifyRefreshForm(MessageParcel &data, MessagePa
 
 int32_t FormSupplyStub::HandleOnRenderFormDone(MessageParcel &data, MessageParcel &reply)
 {
-    auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -386,9 +386,9 @@ int32_t FormSupplyStub::HandleOnRenderFormDone(MessageParcel &data, MessageParce
 
 int32_t FormSupplyStub::HandleOnRecoverFormDone(MessageParcel &data, MessageParcel &reply)
 {
-    auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -406,9 +406,9 @@ int32_t FormSupplyStub::HandleOnRecoverFormDone(MessageParcel &data, MessageParc
 
 int32_t FormSupplyStub::HandleOnRecycleFormDone(MessageParcel &data, MessageParcel &reply)
 {
-    auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -426,9 +426,9 @@ int32_t FormSupplyStub::HandleOnRecycleFormDone(MessageParcel &data, MessageParc
 
 int32_t FormSupplyStub::HandleOnDeleteFormDone(MessageParcel &data, MessageParcel &reply)
 {
-    auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("ReadInt64<formId> failed");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
