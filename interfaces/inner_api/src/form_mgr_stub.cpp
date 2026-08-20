@@ -2765,32 +2765,6 @@ ErrCode FormMgrStub::HandleUnregisterGetLiveFormStatusProxy(MessageParcel &data,
     return ERR_OK;
 }
 
-ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("Call");
-    int64_t formId = 0;
-    if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    int32_t newDimension = 0;
-    if (!data.ReadInt32(newDimension)) {
-        HILOG_ERROR("read newDimension failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
-    if (newRect == nullptr) {
-        HILOG_ERROR("Read newRect failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    ErrCode result = UpdateFormSize(formId, newDimension, *newRect);
-    if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Write request result failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return ERR_OK;
-}
-
 ErrCode FormMgrStub::HandleIsFormDueControl(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
