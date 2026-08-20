@@ -1732,7 +1732,8 @@ HWTEST_F(FmsFormMgrProxyTest, AcquireFormData_0300, TestSize.Level1)
 HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesByFilter_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstancesByFilter_0100, TestSize.Level1";
-    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(0)));
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Invoke(std::bind(
+        SendRequestReplace, _1, _2, _3, _4, ERR_OK, true)), Return(NO_ERROR)));
     FormInstancesFilter formInstancesFilter;
     std::vector<FormInstance> formInstances;
     int32_t result = proxy_->GetFormInstancesByFilter(formInstancesFilter, formInstances);
@@ -1804,7 +1805,8 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstancesById_0200, TestSize.Level1)
 HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, GetFormInstance_0100, TestSize.Level1";
-    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(0)));
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Invoke(std::bind(
+        SendRequestReplace, _1, _2, _3, _4, ERR_OK, true)), Return(NO_ERROR)));
     std::vector<FormInstance> formInstance;
     MessageParcel data;
     int32_t result =
