@@ -548,15 +548,17 @@ private:
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
         bool isCallbackUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(callback));
         sptr<EtsFormStateObserver> formObserver = EtsFormStateObserver::GetInstance();
+        if (formObserver == nullptr) {
+            HILOG_ERROR("null formObserver");
+            return;
+        }
 
         if (isBundleNameUndefined && isCallbackUndefined) {
-            EtsFormStateObserver::GetInstance()->ClearFormNotifyVisibleCallbackByBundle("",
-                isVisibility, formObserver);
+            formObserver->ClearFormNotifyVisibleCallbackByBundle("", isVisibility, formObserver);
             return;
         }
         if (isBundleNameUndefined && !isCallbackUndefined) {
-            EtsFormStateObserver::GetInstance()->DelFormNotifyVisibleCallbackByBundle("",
-                isVisibility, callback, formObserver);
+            formObserver->DelFormNotifyVisibleCallbackByBundle("", isVisibility, callback, formObserver);
             return;
         }
         if (!isBundleNameUndefined && isCallbackUndefined) {
@@ -566,8 +568,7 @@ private:
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
-            EtsFormStateObserver::GetInstance()->ClearFormNotifyVisibleCallbackByBundle(bundleName,
-                isVisibility, formObserver);
+            formObserver->ClearFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, formObserver);
             return;
         }
         if (!isBundleNameUndefined && !isCallbackUndefined) {
@@ -577,8 +578,7 @@ private:
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
-            EtsFormStateObserver::GetInstance()->DelFormNotifyVisibleCallbackByBundle(bundleName,
-                isVisibility, callback, formObserver);
+            formObserver->DelFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, callback, formObserver);
             return;
         }
     }
