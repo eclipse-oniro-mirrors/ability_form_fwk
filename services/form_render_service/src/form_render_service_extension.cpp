@@ -35,7 +35,7 @@ FormRenderServiceExtension *FormRenderServiceExtension::Create(const std::unique
     return new (std::nothrow) FormRenderServiceExtension(runtime);
 }
 
-FormRenderServiceExtension::FormRenderServiceExtension(const std::unique_ptr<Runtime> &runtime) : runtime_(runtime) {}
+FormRenderServiceExtension::FormRenderServiceExtension(const std::unique_ptr<Runtime> &runtime) {}
 FormRenderServiceExtension::~FormRenderServiceExtension() = default;
 
 void FormRenderServiceExtension::Init(const std::shared_ptr<AbilityLocalRecord> &record,

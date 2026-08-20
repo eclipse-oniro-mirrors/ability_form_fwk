@@ -27,6 +27,8 @@
 #include "napi_form_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 #include "runtime.h"
 
 namespace OHOS {
@@ -547,6 +549,12 @@ napi_value JsFormProvider::OnIsRequestPublishFormSupported(napi_env env, size_t 
         napi_value jsNull = nullptr;
         NAPI_CALL(env, napi_get_null(env, &jsNull));
         return jsNull;
+    }
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    if (!Security::AccessToken::AccessTokenKit::IsSystemAppByFullTokenID(selfToken)) {
+        HILOG_ERROR("The application not system-app,can't use system-api");
+        NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+        return CreateJsUndefined(env);
     }
     struct OnIsRequestPublishFormSupported {
         bool result;

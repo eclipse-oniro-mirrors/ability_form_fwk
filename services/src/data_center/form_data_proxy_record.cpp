@@ -462,7 +462,7 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(
             }
 
             std::string uri = key + "?" + "user=" + userId + "&srcToken=" + token;
-            HILOG_DEBUG("Convert data, uri:%{public}s, subscriberId:%{public}" PRId64, uri.c_str(), subscriberId);
+            HILOG_DEBUG("Convert data, uri:%{private}s, subscriberId:%{public}" PRId64, uri.c_str(), subscriberId);
             uri += "&dstBundleName=" + bundleName_;
             auto it = subscribeId2UrisMap.find(subscriberId);
             if (it == subscribeId2UrisMap.end()) {
@@ -494,10 +494,14 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         if (iter.IsAshmem()) {
             PrepareImageData(iter, object, imageDataMap);
         } else {
-            auto value = std::get<std::string>(iter.value_);
-            nlohmann::json dataObject = SafeJsonParse(value);
+            auto *value = std::get_if<std::string>(&iter.value_);
+            if (value == nullptr) {
+                HILOG_ERROR("invalid value type for key:%{public}s", iter.key_.c_str());
+                continue;
+            }
+            nlohmann::json dataObject = SafeJsonParse(*value);
             if (dataObject.is_discarded()) {
-                HILOG_ERROR("fail parse data:%{public}s", value.c_str());
+                HILOG_ERROR("fail parse data or not object:%{public}s", value->c_str());
                 continue;
             }
             object[iter.key_] = dataObject;
@@ -755,7 +759,12 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(const SubscribeMap &publishSubs
 bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap)
 {
-    auto node = std::get<DataShare::AshmemNode>(data.value_);
+    auto *nodePtr = std::get_if<DataShare::AshmemNode>(&data.value_);
+    if (nodePtr == nullptr) {
+        HILOG_ERROR("value type mismatch, expected AshmemNode");
+        return false;
+    }
+    auto& node = *nodePtr;
     if (node.ashmem == nullptr) {
         HILOG_ERROR("null node.ashmem");
         return false;

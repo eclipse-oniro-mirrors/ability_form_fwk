@@ -571,7 +571,12 @@ ErrCode FormCommonAdapter::RegisterAddObserver(const std::string &bundleName, co
         HILOG_DEBUG("%{public}s add register.", bundleName.c_str());
         remoteObjects.emplace_back(callerToken);
     }
-    SetDeathRecipient(callerToken, new (std::nothrow) FormCommonAdapter::ClientDeathRecipient());
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormCommonAdapter::ClientDeathRecipient();
+    if (deathRecipient == nullptr) {
+        HILOG_ERROR("alloc deathRecipient failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    SetDeathRecipient(callerToken, deathRecipient);
     HILOG_DEBUG("RegisterAddObserver success");
     return ERR_OK;
 }
@@ -589,7 +594,11 @@ ErrCode FormCommonAdapter::RegisterRemoveObserver(const std::string &bundleName,
         for (auto itr = remoteObjects.begin(); itr != remoteObjects.end();) {
             if (*itr == callerToken) {
                 remoteObjects.erase(itr);
-                SetDeathRecipient(callerToken, new (std::nothrow) FormCommonAdapter::ClientDeathRecipient());
+                sptr<IRemoteObject::DeathRecipient> deathRecipient =
+                    new (std::nothrow) FormCommonAdapter::ClientDeathRecipient();
+                if (deathRecipient != nullptr) {
+                    SetDeathRecipient(callerToken, deathRecipient);
+                }
                 HILOG_DEBUG("RegisterRemoveObserver success");
                 return ERR_OK;
             }
@@ -642,12 +651,12 @@ void FormCommonAdapter::CheckUpdateFormRecord(const int64_t formId, const FormIt
     }
 }
 
-ErrCode FormCommonAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+bool FormCommonAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
 {
     HILOG_DEBUG("CheckFormDueControl called");
     if (ParamControl::GetInstance().IsDueDisableCtrlEmpty()) {
-        // due disable ctrl param empty, just return
-        return ERR_OK;
+        // due disable ctrl param empty, not controlled
+        return false;
     }
 
     Want want;
@@ -657,8 +666,8 @@ ErrCode FormCommonAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInf
     BundleInfo bundleInfo;
     std::string packageName;
     if (GetBundleInfo(want, bundleInfo, packageName) != ERR_OK) {
-        HILOG_ERROR("Get bundle info failed");
-        return ERR_OK;
+        HILOG_WARN("Get bundle info failed, skip due control check (fail-open)");
+        return false;
     }
 
     FormRecord formRecord;

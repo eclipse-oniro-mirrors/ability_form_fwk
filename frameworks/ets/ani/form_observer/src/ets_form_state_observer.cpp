@@ -249,6 +249,7 @@ bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
                 HILOG_ERROR("found equal callback");
+                env->GlobalReference_Delete(callbackRef);
                 return false;
             }
         }
@@ -287,6 +288,7 @@ bool EtsFormStateObserver::RegisterFormRemoveCallback(ani_vm* ani_vm,
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
                 HILOG_ERROR("found equal callback");
+                env->GlobalReference_Delete(callbackRef);
                 return false;
             }
         }
@@ -803,8 +805,8 @@ void EtsFormEventCallbackList::PushCallback(ani_object call)
 void EtsFormEventCallbackList::RemoveCallback(ani_object call)
 {
     HILOG_DEBUG("call");
-    if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+    if (env_ == nullptr || call == nullptr) {
+        HILOG_ERROR("null env or callback");
         return;
     }
     auto iter = std::find_if(callbacks_.begin(), callbacks_.end(), [env = env_, callback = call](auto &item) {
@@ -813,10 +815,9 @@ void EtsFormEventCallbackList::RemoveCallback(ani_object call)
         return equal;
     });
     if (iter != callbacks_.end()) {
-        ani_status status = ANI_ERROR;
-        if ((status = env_->GlobalReference_Delete(*iter)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
-            return;
+        ani_status status = env_->GlobalReference_Delete(*iter);
+        if (status != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete failed: %{public}d, force erase", status);
         }
         callbacks_.erase(iter);
     }

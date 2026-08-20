@@ -1584,6 +1584,10 @@ int32_t FormMgrStub::HandleRegisterFormAddObserverByBundle(MessageParcel &data, 
     HILOG_DEBUG("call");
 
     std::string bundleName = data.ReadString();
+    if (bundleName.size() > Constants::MAX_BUNDLE_NAME_LENGTH) {
+        HILOG_ERROR("bundleName too long: %{public}zu", bundleName.size());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
         HILOG_ERROR("get remoteObject failed");
@@ -1599,6 +1603,10 @@ int32_t FormMgrStub::HandleRegisterFormRemoveObserverByBundle(MessageParcel &dat
     HILOG_DEBUG("call");
 
     std::string bundleName = data.ReadString();
+    if (bundleName.size() > Constants::MAX_BUNDLE_NAME_LENGTH) {
+        HILOG_ERROR("bundleName too long: %{public}zu", bundleName.size());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
         HILOG_ERROR("get remoteObject failed");

@@ -41,8 +41,8 @@ FormRenderReport::~FormRenderReport() {}
 void FormRenderReport::RecordFRSStart()
 {
     HILOG_INFO("call");
-    if (isFRSFirstLoaded_.load()) {
-        isFRSFirstLoaded_.store(false);
+    bool expected = true;
+    if (isFRSFirstLoaded_.compare_exchange_strong(expected, false)) {
         RecordFRSStatus(FRS_START);
     }
 }
@@ -50,8 +50,9 @@ void FormRenderReport::RecordFRSStart()
 void FormRenderReport::RecordFRSDead()
 {
     HILOG_INFO("call");
-    if (!isFRSFirstLoaded_.load()) {
-        isFRSFirstLoaded_.store(true);
+    bool expected = false;
+    if (isFRSFirstLoaded_.compare_exchange_strong(expected, true)) {
+        // 仅恢复标志，不重复记录
     }
     RecordFRSStatus(FRS_DEAD);
 }

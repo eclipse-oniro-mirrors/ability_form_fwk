@@ -292,7 +292,11 @@ bool FormUtil::ConvertStringToInt64(std::string_view strInfo, int64_t &int64Valu
                 int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
                 return true;
             }
-            int maxSubValue = ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
+            int maxSubValue = 0;
+            if (!ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1), maxSubValue)) {
+                HILOG_ERROR("ConvertStringToInt failed for maxSubValue");
+                return false;
+            }
             if (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER) {
                 int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
                 return true;
@@ -311,7 +315,11 @@ bool FormUtil::ConvertStringToInt64(std::string_view strInfo, int64_t &int64Valu
             return true;
         }
         if (strLength == INT_64_LENGTH + 1) {
-            int minSubValue = ConvertStringToInt(strInfo.substr(1, 1));
+            int minSubValue = 0;
+            if (!ConvertStringToInt(strInfo.substr(1, 1), minSubValue)) {
+                HILOG_ERROR("ConvertStringToInt failed for minSubValue");
+                return false;
+            }
             if (minSubValue < BASE_NUMBER) {
                 int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
                 return true;
@@ -330,9 +338,19 @@ bool FormUtil::ConvertStringToInt64(std::string_view strInfo, int64_t &int64Valu
     return false;
 }
 
-int FormUtil::ConvertStringToInt(std::string_view strInfo, int radix)
+bool FormUtil::ConvertStringToInt(std::string_view strInfo, int &intValue, int radix)
 {
-    return static_cast<int>(strtol(std::string(strInfo).c_str(), nullptr, radix));
+    if (strInfo.empty()) {
+        return false;
+    }
+    char *endPtr = nullptr;
+    errno = 0;
+    long result = strtol(std::string(strInfo).c_str(), &endPtr, radix);
+    if (errno == ERANGE || endPtr == strInfo.data() || *endPtr != '\0') {
+        return false;
+    }
+    intValue = static_cast<int>(result);
+    return true;
 }
 
 long long FormUtil::ConvertStringToLongLong(std::string_view strInfo, int radix)
@@ -395,7 +413,10 @@ std::vector<int> FormUtil::ParseFormUpdateLevels(const std::string &additionalIn
         if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
             continue;
         }
-        int val = FormUtil::ConvertStringToInt(searchResult[DATA_FIELD].str());
+        int val = 0;
+        if (!FormUtil::ConvertStringToInt(searchResult[DATA_FIELD].str(), val)) {
+            continue;
+        }
         if (val >= Constants::MIN_CONFIG_DURATION && val <= Constants::MAX_CONFIG_DURATION) {
             durationArray.emplace_back(val);
         }

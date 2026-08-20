@@ -100,6 +100,11 @@ static napi_value GetFormIds(napi_env env, napi_value value, ErrCode &errCode, s
 
     uint32_t arrayLength = 0;
     NAPI_CALL(env, napi_get_array_length(env, value, &arrayLength));
+    if (arrayLength > Constants::MAX_FORM_DATA_SIZE) {
+        HILOG_ERROR("arrayLength too large: %{public}u", arrayLength);
+        errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
+        return nullptr;
+    }
 
     for (size_t i = 0; i < arrayLength; i++) {
         napi_value napiFormId;
@@ -453,18 +458,28 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
             InnerAcquireFormState(env, callbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("napi_create_async_work complete");
             auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
             if (callbackInfo == nullptr) {
                 HILOG_ERROR("null asyncCallbackInfo");
                 return;
             }
-            // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
             napi_async_work asyncWork = callbackInfo->asyncWork;
-            // When the result is not ERR_OK, OnAcquireState will be called here,
-            // else OnAcquireState will be called after the form state is acquired.
+            napi_ref callback = callbackInfo->callback;
             if (callbackInfo->result != ERR_OK) {
-                FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, callbackInfo->want);
+                FormHostClient::GetInstance()->RemoveFormState(callbackInfo->want);
+                if (callback != nullptr) {
+                    napi_value jsResult = nullptr;
+                    napi_create_int32(env, static_cast<int32_t>(FormState::UNKNOWN), &jsResult);
+                    napi_value callbackResult = nullptr;
+                    napi_value undefined = nullptr;
+                    napi_get_undefined(env, &undefined);
+                    napi_value callbackFunc = nullptr;
+                    napi_get_reference_value(env, callback, &callbackFunc);
+                    if (callbackFunc != nullptr) {
+                        napi_call_function(env, undefined, callbackFunc, 1, &jsResult, &callbackResult);
+                    }
+                }
+                delete callbackInfo;
             }
             if (asyncWork != nullptr) {
                 napi_delete_async_work(env, asyncWork);

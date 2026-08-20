@@ -64,7 +64,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
     FormRenderReport::GetInstance().RecordFRSStart();
-    connectState_ = ConnectState::CONNECTED;
+    connectState_.store(ConnectState::CONNECTED);
     failedTimes = 0;
     int32_t compileMode = 0;
     FormRecord newRecord;
@@ -96,28 +96,28 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    if (resultCode && connectState_ == ConnectState::CONNECTING) {
+    if (resultCode && connectState_.load() == ConnectState::CONNECTING) {
         HILOG_WARN("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
-            GetFormId(), resultCode, connectState_);
+            GetFormId(), resultCode, connectState_.load());
         FormRenderMgr::GetInstance().RemoveConnection(GetFormId(), formRecord_);
         FormHostTaskMgr::GetInstance().PostConnectFRSFailedTaskToHost(
             GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, FORM_RECONNECT_DELAY_TIME);
     } else {
         HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
-            GetFormId(), resultCode, connectState_);
+            GetFormId(), resultCode, connectState_.load());
     }
-    connectState_ = ConnectState::DISCONNECTED;
+    connectState_.store(ConnectState::DISCONNECTED);
     failedTimes = 0;
 }
 
 void FormRenderConnection::SetStateConnecting()
 {
-    connectState_ = ConnectState::CONNECTING;
+    connectState_.store(ConnectState::CONNECTING);
 }
 
 void FormRenderConnection::SetStateDisconnected()
 {
-    connectState_ = ConnectState::DISCONNECTED;
+    connectState_.store(ConnectState::DISCONNECTED);
 }
 
 void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)

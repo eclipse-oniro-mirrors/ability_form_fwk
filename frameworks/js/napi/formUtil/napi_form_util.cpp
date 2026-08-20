@@ -124,6 +124,10 @@ bool NapiFormUtil::Throw(napi_env env, int32_t errCode, const std::string &errMe
 
 bool NapiFormUtil::ThrowByInternalErrorCode(napi_env env, int32_t internalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
@@ -132,6 +136,10 @@ bool NapiFormUtil::ThrowByInternalErrorCode(napi_env env, int32_t internalErrorC
 
 bool NapiFormUtil::ThrowByExternalErrorCode(napi_env env, int32_t externalErrorCode)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
     return Throw(env, externalErrorCode, externalErrorMessage);
 }

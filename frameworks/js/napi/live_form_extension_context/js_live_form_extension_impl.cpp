@@ -35,7 +35,7 @@ napi_value AttachUIExtensionContext(napi_env env, void *value, void *)
         return nullptr;
     }
 
-    auto ptr = reinterpret_cast<std::weak_ptr<LiveFormExtensionContext> *>(value)->lock();
+    auto ptr = (*reinterpret_cast<std::shared_ptr<LiveFormExtensionContext> *>(value));
     if (ptr == nullptr) {
         HILOG_ERROR("Invalid context");
         return nullptr;
@@ -122,10 +122,10 @@ void JsLiveFormExtensionImpl::BindContext()
     napi_status status = napi_wrap(env, contextObj, workContext,
         [](napi_env, void *data, void *) {
             if (data == nullptr) {
-                HILOG_ERROR("Finalizer for weak_ptr is nullptr");
+                HILOG_ERROR("Finalizer for shared_ptr is nullptr");
                 return;
             }
-            delete static_cast<std::weak_ptr<LiveFormExtensionContext> *>(data);
+            delete static_cast<std::shared_ptr<LiveFormExtensionContext> *>(data);
         }, nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
         HILOG_ERROR("napi_wrap Failed: %{public}d", status);

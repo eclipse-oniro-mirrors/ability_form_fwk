@@ -284,6 +284,10 @@ ani_enum_item CreateSceneAnimationTriggerType(ani_env *env, AppExecFwk::SceneAni
         HILOG_ERROR("env is nullptr.");
         return nullptr;
     }
+    if (static_cast<int32_t>(triggerType) <= 0) {
+        HILOG_ERROR("invalid triggerType value");
+        return nullptr;
+    }
     ani_enum triggerTypeEnum;
     ani_status status = env->FindEnum(TRIGGER_TYPE_CLASS_NAME, &triggerTypeEnum);
     if (status != ANI_OK) {
@@ -577,6 +581,10 @@ bool SetPropertyIntByName(ani_env *env, ani_object object, const char *name, int
 {
     if (env == nullptr) {
         HILOG_ERROR("null env");
+        return false;
+    }
+    if (object == nullptr || name == nullptr) {
+        HILOG_ERROR("null object or name");
         return false;
     }
     ani_status status = ANI_ERROR;
@@ -1364,6 +1372,10 @@ bool IsRefUndefined(ani_env *env, ani_object obj)
 {
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
+        return false;
+    }
+    if (obj == nullptr) {
+        HILOG_ERROR("obj is nullptr");
         return false;
     }
     ani_boolean isUndefined = false;
