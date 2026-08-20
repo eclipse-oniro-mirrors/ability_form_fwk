@@ -168,6 +168,9 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
 
     ani_env* GetAniEnv(ani_vm* ani_vm);
+
+    void ProcessVisibilityNotificationInternal(ani_env *env, const std::string &bundleName,
+        const std::vector<AppExecFwk::FormInstance> &formInstances, bool isVisibility);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

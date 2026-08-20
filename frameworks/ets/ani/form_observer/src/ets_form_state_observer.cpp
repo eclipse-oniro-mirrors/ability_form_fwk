@@ -549,8 +549,6 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
     }
     wptr<EtsFormStateObserver> weakObserver = this;
     handler->PostSyncTask([weakObserver, visibleType, formInstances, bundleName, aniVm = ani_vm_]() {
-        std::string specialFlag = "#";
-        bool isVisibleTypeFlag = false;
         auto sharedThis = weakObserver.promote();
         if (sharedThis == nullptr) {
             HILOG_ERROR("null sharedThis");
@@ -562,59 +560,49 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
             return;
         }
         ani_size nr_refs = REFERENCES_MAX_NUMBER;
-        env->CreateLocalScope(nr_refs);
-        if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
-            isVisibleTypeFlag = true;
-            if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
-                std::string bundleNameNew = std::regex_replace(bundleName,
-                    std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
-                std::shared_ptr<AppExecFwk::ETSNativeReference> callback;
-                {
-                    std::lock_guard<std::mutex> lock(sharedThis->formIsvisibleCallbackMutex_);
-                    auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
-                    if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
-                        callback = visibleCallback->second;
-                    }
-                }
-                if (callback != nullptr) {
-                    ani_ref res = callback->aniRef;
-                    ani_object aniValue = FormAniUtil::CreateFormInstances(env, formInstances);
-                    bool bRet = FormAniUtil::Callback(env, static_cast<ani_object>(res), aniValue,
-                        CLASSNAME_CALLBACK_WRAPPER);
-                    if (!bRet) {
-                        HILOG_ERROR("callback failed");
-                        return;
-                    }
-                }
-            }
-        } else {
-            isVisibleTypeFlag = false;
-            if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
-                std::string bundleNameNew =
-                    std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
-                std::shared_ptr<AppExecFwk::ETSNativeReference> callback;
-                {
-                    std::lock_guard<std::mutex> lock(sharedThis->formIsvisibleCallbackMutex_);
-                    auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
-                    if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
-                        callback = invisibleCallback->second;
-                    }
-                }
-                if (callback != nullptr) {
-                    ani_ref res = callback->aniRef;
-                    ani_object aniValue = FormAniUtil::CreateFormInstances(env, formInstances);
-                    bool bRet = FormAniUtil::Callback(env, static_cast<ani_object>(res), aniValue,
-                        CLASSNAME_CALLBACK_WRAPPER);
-                    if (!bRet) {
-                        HILOG_ERROR("callback failed");
-                        return;
-                    }
-                }
-            }
+        if (env->CreateLocalScope(nr_refs) != ANI_OK) {
+            HILOG_ERROR("CreateLocalScope failed");
+            return;
         }
-        env->DestroyLocalScope();
+        bool isVisibility = visibleType == AppExecFwk::FormVisibilityType::VISIBLE;
+        sharedThis->ProcessVisibilityNotificationInternal(env, bundleName, formInstances, isVisibility);
+        if (env->DestroyLocalScope() != ANI_OK) {
+            HILOG_ERROR("DestroyLocalScope failed");
+        }
     });
     return ERR_OK;
+}
+
+void EtsFormStateObserver::ProcessVisibilityNotificationInternal(ani_env *env, const std::string &bundleName,
+    const std::vector<AppExecFwk::FormInstance> &formInstances, bool isVisibility)
+{
+    const std::string specialFlag = "#" + std::to_string(isVisibility);
+    if (bundleName.find(specialFlag) == std::string::npos) {
+        HILOG_DEBUG("bundleName does not contain %s flag: %s", isVisibility ? "visible" : "invisible",
+            bundleName.c_str());
+        return;
+    }
+    std::string bundleNameNew = std::regex_replace(bundleName, std::regex(specialFlag), "");
+    std::shared_ptr<AppExecFwk::ETSNativeReference> callback;
+    {
+        std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+        auto &callbackMap = isVisibility ? formVisibleCallbackMap_ : formInvisibleCallbackMap_;
+        auto iter = callbackMap.find(bundleNameNew);
+        if (iter != callbackMap.end()) {
+            callback = iter->second;
+        }
+    }
+    if (callback == nullptr) {
+        HILOG_DEBUG("No %s callback registered for bundle: %s", isVisibility ? "visible" : "invisible",
+            bundleNameNew.c_str());
+        return;
+    }
+    ani_object aniValue = FormAniUtil::CreateFormInstances(env, formInstances);
+    bool bRet = FormAniUtil::Callback(env, static_cast<ani_object>(callback->aniRef),
+        aniValue, CLASSNAME_CALLBACK_WRAPPER);
+    if (!bRet) {
+        HILOG_ERROR("%s callback failed", isVisibility ? "visible" : "invisible");
+    }
 }
 
 ErrCode EtsFormStateObserver::OnFormClickEvent(
