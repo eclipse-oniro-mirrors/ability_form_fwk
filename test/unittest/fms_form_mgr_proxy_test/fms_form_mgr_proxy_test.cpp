@@ -66,6 +66,8 @@ int SendRequestReplace(uint32_t code, MessageParcel &data, MessageParcel &reply,
 {
     if (setError) {
         reply.WriteInt32(error);
+        reply.WriteInt32(0);
+        reply.WriteInt32(0);
     }
     return 0;
 }
@@ -2009,7 +2011,8 @@ HWTEST_F(FmsFormMgrProxyTest, RequestPublishProxyForm_0200, TestSize.Level1)
 HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0100, TestSize.Level1";
-    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Invoke(std::bind(
+        SendRequestReplace, _1, _2, _3, _4, ERR_OK, true)), Return(NO_ERROR)));
 
     int32_t result = proxy_->RegisterPublishFormInterceptor(nullptr);
     EXPECT_EQ(result, ERR_OK);
@@ -2042,7 +2045,8 @@ HWTEST_F(FmsFormMgrProxyTest, RegisterPublishFormInterceptor_0200, TestSize.Leve
 HWTEST_F(FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UnregisterPublishFormInterceptor_0100, TestSize.Level1";
-    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Invoke(std::bind(
+        SendRequestReplace, _1, _2, _3, _4, ERR_OK, true)), Return(NO_ERROR)));
 
     int32_t result = proxy_->UnregisterPublishFormInterceptor(nullptr);
     EXPECT_EQ(result, ERR_OK);
@@ -2171,7 +2175,8 @@ HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0100, TestSize.Level1)
 HWTEST_F(FmsFormMgrProxyTest, SetFormsRecyclable_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, SetFormsRecyclable_0200, TestSize.Level1";
-    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Invoke(std::bind(
+        SendRequestReplace, _1, _2, _3, _4, ERR_OK, true)), Return(NO_ERROR)));
 
     std::vector<int64_t> formIds{0};
     int32_t result = proxy_->SetFormsRecyclable(formIds);
