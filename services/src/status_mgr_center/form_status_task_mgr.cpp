@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -227,6 +227,11 @@ int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &w
     std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
     int32_t event =
         want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(FormFsmEvent::RECYCLE_DATA_FAIL));
+    if (event < static_cast<int32_t>(FormFsmEvent::RENDER_FORM) ||
+        event >= static_cast<int32_t>(FormFsmEvent::INVALID_EVENT)) {
+        HILOG_ERROR("invalid form event:%{public}d", event);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
         formId,
         eventId.c_str(),
@@ -252,7 +257,7 @@ int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &w
             remoteFormHost->OnRecycleForm(formId);
             FormStatusTaskMgr::GetInstance().ScheduleRecycleTimeout(formId);
         };
-        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event, reCycleForm);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, static_cast<FormFsmEvent>(event), reCycleForm);
     }
     return ERR_OK;
 }
@@ -285,6 +290,11 @@ int32_t FormStatusTaskMgr::HandleFrsEventReply(const int64_t formId, const Want 
     std::string curTid = FormStatusMgr::GetInstance().GetFormEventId(formId);
     int32_t event =
         want.GetIntParam(Constants::FORM_STATUS_EVENT, static_cast<int32_t>(failEvent));
+    if (event < static_cast<int32_t>(FormFsmEvent::RENDER_FORM) ||
+        event >= static_cast<int32_t>(FormFsmEvent::INVALID_EVENT)) {
+        HILOG_ERROR("invalid form event:%{public}d", event);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
         formId,
         eventId.c_str(),
@@ -296,7 +306,7 @@ int32_t FormStatusTaskMgr::HandleFrsEventReply(const int64_t formId, const Want 
     }
     if (!eventId.empty() && eventId == curTid) {
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
-        FormStatusMgr::GetInstance().PostFormEvent(formId, (FormFsmEvent)event);
+        FormStatusMgr::GetInstance().PostFormEvent(formId, static_cast<FormFsmEvent>(event));
     }
     return ERR_OK;
 }

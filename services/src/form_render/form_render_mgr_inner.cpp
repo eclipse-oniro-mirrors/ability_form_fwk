@@ -634,15 +634,17 @@ void FormRenderMgrInner::RerenderAllFormsImmediate()
 
 void FormRenderMgrInner::DisconnectAllRenderConnections()
 {
-    std::lock_guard<std::mutex> lock(resourceMutex_);
-    HILOG_INFO("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
-    size_t size = renderFormConnections_.size();
-    for (auto iter = renderFormConnections_.begin(); iter != renderFormConnections_.end();) {
-        DisconnectRenderService(iter->second, size);
-        iter = renderFormConnections_.erase(iter);
-        size--;
+    std::unordered_map<int64_t, sptr<FormRenderConnection>> connectionsToDisconnect;
+    {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        std::swap(connectionsToDisconnect, renderFormConnections_);
+        isActiveUser_.store(false);
     }
-    isActiveUser_.store(false);
+    size_t size = connectionsToDisconnect.size();
+    HILOG_INFO("renderFormConnections size: %{public}zu.", size);
+    for (auto &iter : connectionsToDisconnect) {
+        DisconnectRenderService(iter.second, size--);
+    }
 }
 
 void FormRenderMgrInner::DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const
@@ -846,6 +848,10 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
     float formViewScale)
 {
     HILOG_DEBUG("call");
+    if (width <= 0 || height <= 0 || borderWidth <= 0 || formViewScale <= 0) {
+        HILOG_ERROR("invalid surface params");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     RecoverFRSOnFormActivity();
     
     FormRecord formRecord;

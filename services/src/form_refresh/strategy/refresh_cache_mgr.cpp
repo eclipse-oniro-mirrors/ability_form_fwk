@@ -20,6 +20,7 @@
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_record/form_record_report.h"
 #include "fms_log_wrapper.h"
+#include "form_constants_util.h"
 #include "form_refresh/form_refresh_mgr.h"
 
 namespace OHOS {
@@ -94,7 +95,7 @@ void RefreshCacheMgr::AddFlagByInvisible(const int64_t formId, int refreshType)
     HILOG_WARN("add invisible form:%{public}" PRId64", refreshType:%{public}d", formId, refreshType);
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
     FormDataMgr::GetInstance().SetRefreshType(formId, refreshType);
-    if (Constants::CONDITION_REFRESHTYPE_SET.find(refreshType) != Constants::CONDITION_REFRESHTYPE_SET.end()) {
+    if (FormConstantsUtil::IsConditionRefreshType(refreshType)) {
         // The visibility refresh of network refresh is processed in the same way as the timer refresh.
         FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
     }

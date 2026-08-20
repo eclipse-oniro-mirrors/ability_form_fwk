@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_ABILITY_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_ABILITY_CONNECTION_H
 
+#include <atomic>
 #include "app_mgr_interface.h"
 #include "ability_connect_callback_stub.h"
 #include "want.h"
@@ -274,7 +275,7 @@ private:
     std::string moduleName_ = "";
     bool isFreeInstall_ = false;
     int32_t userId_ = 0;
-    int32_t connectId_ = 0;
+    std::atomic<int32_t> connectId_{0};
     int32_t appFormPid_ = -1;
     sptr<IRemoteObject> hostToken_ = nullptr;
     sptr<IRemoteObject> providerToken_ = nullptr;

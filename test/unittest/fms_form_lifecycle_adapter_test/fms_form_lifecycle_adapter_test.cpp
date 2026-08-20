@@ -3681,13 +3681,19 @@ HWTEST_F(FmsFormLifecycleAdapterTest, HandleCastTempForm_003, TestSize.Level1)
 HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeleteThemeForm_001 start";
- 
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    FormRecord record;
+    record.formUserUids.push_back(TEST_CALLING_UID);
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockThemeFormClient::obj, DeleteForms(_))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
- 
+
     auto result = FormLifecycleAdapter::GetInstance().DeleteThemeForm(TEST_FORM_ID);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
- 
+
     GTEST_LOG_(INFO) << "DeleteThemeForm_001 end";
 }
  
@@ -3699,15 +3705,21 @@ HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_001, TestSize.Level1)
 HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeleteThemeForm_002 start";
- 
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    FormRecord record;
+    record.formUserUids.push_back(TEST_CALLING_UID);
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockThemeFormClient::obj, DeleteForms(_))
         .WillOnce(Return(ERR_OK));
     EXPECT_CALL(*MockFormDbCache::obj, DeleteFormInfo(_))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
- 
+
     auto result = FormLifecycleAdapter::GetInstance().DeleteThemeForm(TEST_FORM_ID);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
- 
+
     GTEST_LOG_(INFO) << "DeleteThemeForm_002 end";
 }
  
@@ -3719,15 +3731,21 @@ HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_002, TestSize.Level1)
 HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeleteThemeForm_003 start";
- 
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    FormRecord record;
+    record.formUserUids.push_back(TEST_CALLING_UID);
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockThemeFormClient::obj, DeleteForms(_))
         .WillOnce(Return(ERR_OK));
     EXPECT_CALL(*MockFormDbCache::obj, DeleteFormInfo(_))
         .WillOnce(Return(ERR_OK));
- 
+
     auto result = FormLifecycleAdapter::GetInstance().DeleteThemeForm(TEST_FORM_ID);
     EXPECT_EQ(result, ERR_OK);
- 
+
     GTEST_LOG_(INFO) << "DeleteThemeForm_003 end";
 }
 #endif

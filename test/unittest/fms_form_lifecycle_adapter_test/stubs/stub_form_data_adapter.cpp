@@ -25,10 +25,9 @@ int FormDataAdapter::RequestForm(const int64_t formId,
     return ERR_OK;
 }
 
-ErrCode FormDataAdapter::UpdateFormSize(const int64_t &formId,
+void FormDataAdapter::UpdateFormSize(const int64_t &formId,
     float width, float height, float borderWidth, float formViewScale)
 {
-    return ERR_OK;
 }
 
 ErrCode FormDataAdapter::UpdateFormSize(const int64_t formId,

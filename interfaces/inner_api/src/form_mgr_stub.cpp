@@ -811,11 +811,13 @@ int32_t FormMgrStub::HandleLifecycleUpdate(MessageParcel &data, MessageParcel &r
 int32_t FormMgrStub::HandleRequestForm(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
+
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
         HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
         HILOG_ERROR("get remote object failed");
@@ -863,6 +865,13 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
         HILOG_ERROR("read formVisibleType failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    int32_t formVisibleType = 0;
+    if (!data.ReadInt32(formVisibleType)) {
+        HILOG_ERROR("read formVisibleType failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+
     int32_t result = NotifyWhetherVisibleForms(formIds, client, formVisibleType);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -1565,6 +1574,7 @@ int32_t FormMgrStub::HandleShareForm(MessageParcel &data, MessageParcel &reply)
         HILOG_ERROR("read requestCode failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     auto result = ShareForm(formId, deviceId, callerToken, requestCode);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2241,6 +2251,11 @@ ErrCode FormMgrStub::HandleUpdateFormLocation(MessageParcel &data, MessageParcel
         HILOG_ERROR("read formLocation failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+        formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
+        HILOG_ERROR("formLocation not FormLocation enum, formLocation = %{public}d", formLocation);
+        return ERR_APPEXECFWK_FORM_LOCATION_INVALID;
+    }
     ErrCode result = UpdateFormLocation(formId, formLocation);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
@@ -2377,7 +2392,11 @@ int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
         formLockInfo.push_back(*info);
     }
 
-    int32_t dataValue = data.ReadInt32();
+    int32_t dataValue = 0;
+    if (!data.ReadInt32(dataValue)) {
+        HILOG_ERROR("read dataValue failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     LockChangeType type = ParseLockChangeType(dataValue);
     if (type == LockChangeType::INVALID_PARAMETER) {
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2684,6 +2703,7 @@ ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply
         HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     Rect item;
     ErrCode result = GetFormRect(formId, item);
     if (!reply.WriteInt32(result)) {
@@ -2697,6 +2717,32 @@ ErrCode FormMgrStub::HandleGetFormRect(MessageParcel &data, MessageParcel &reply
         }
     }
     return result;
+}
+
+ErrCode FormMgrStub::HandleNotifyUpdateFormSize(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("Call");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t newDimension = 0;
+    if (!data.ReadInt32(newDimension)) {
+        HILOG_ERROR("read newDimension failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
+    if (newRect == nullptr) {
+        HILOG_ERROR("Read newRect failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = UpdateFormSize(formId, newDimension, *newRect);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("Write request result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
 }
 
 ErrCode FormMgrStub::HandleRegisterGetLiveFormStatusProxy(MessageParcel &data, MessageParcel &reply)
@@ -2869,7 +2915,11 @@ ErrCode FormMgrStub::HandleUpdateTemplateFormDetailInfo(MessageParcel &data, Mes
 {
     HILOG_DEBUG("call");
     std::vector<TemplateFormDetailInfo> templateFormInfo;
-    int32_t size = data.ReadInt32();
+    int32_t size = 0;
+    if (!data.ReadInt32(size)) {
+        HILOG_ERROR("read size failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (size > Constants::TEMPLATE_FORM_MAX_SIZE) {
         HILOG_ERROR("size limit");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2999,7 +3049,11 @@ ErrCode FormMgrStub::HandleUnregisterUpdateFormsConfigCallback(MessageParcel &da
 ErrCode FormMgrStub::HandleUpdateFormsConfig(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    int32_t size = data.ReadInt32();
+    int32_t size = 0;
+    if (!data.ReadInt32(size)) {
+        HILOG_ERROR("read size failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (size <= 0 || size > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
         HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
         if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_COMMON_CODE)) {
@@ -3060,7 +3114,11 @@ ErrCode FormMgrStub::HandleUnregisterDeleteFormsCallback(MessageParcel &data, Me
 ErrCode FormMgrStub::HandleDeleteForms(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
-    int32_t size = data.ReadInt32();
+    int32_t size = 0;
+    if (!data.ReadInt32(size)) {
+        HILOG_ERROR("read size failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (size <= 0 || size > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
         HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::DELETE_FORMS_FILTER_MAX_NUM);
         if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {

@@ -216,11 +216,10 @@ int FormDataAdapter::RequestForm(const int64_t formId,
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_HOST);
 }
 
-int FormDataAdapter::UpdateFormSize(const int64_t &formId,
+void FormDataAdapter::UpdateFormSize(const int64_t &formId,
     float width, float height, float borderWidth, float formViewScale)
 {
     FormRenderMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
-    return ERR_OK;
 }
 
 ErrCode FormDataAdapter::UpdateFormSize(const int64_t formId,
@@ -665,7 +664,8 @@ int32_t FormDataAdapter::OnNotifyRefreshForm(const int64_t &formId)
         }
     }
 
-    if (currentTime - lastTime < jurgeMs && isUpdate) {
+    int64_t diff = currentTime - lastTime;
+    if (diff >= 0 && diff < jurgeMs && isUpdate) {
         FormRecord formInfo;
         if (!FormDataMgr::GetInstance().GetFormRecord(formId, formInfo)) {
             HILOG_ERROR("GetFormRecord error");
@@ -762,7 +762,8 @@ void FormDataAdapter::UpdateReUpdateFormMap(const int64_t formId)
     std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
     auto iter = reUpdateFormMap_.begin();
     while (iter != reUpdateFormMap_.end()) {
-        if (currentTime - iter->second.first > jurgeMs) {
+        int64_t diff = currentTime - iter->second.first;
+        if (diff < 0 || diff > jurgeMs) {
             iter = reUpdateFormMap_.erase(iter);
         } else {
             ++iter;

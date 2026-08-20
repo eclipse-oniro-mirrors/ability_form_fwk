@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -546,7 +546,8 @@ uint32_t FormDbCache::GetMultiAppFormVersionCode(const std::string &bundleName)
         versionCode.empty()) {
         return 0;
     }
-    uint32_t code = static_cast<uint32_t>(FormUtil::ConvertStringToInt(versionCode));
+    int32_t codeInt = FormUtil::ConvertStringToInt(versionCode);
+    uint32_t code = (codeInt >= 0) ? static_cast<uint32_t>(codeInt) : 0;
     multiAppFormVersionCodeMap_.emplace(bundleName, code);
     return code;
 }

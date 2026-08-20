@@ -123,7 +123,7 @@ public:
 
     int RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want);
 
-    ErrCode UpdateFormSize(const int64_t &formId, float width, float height,
+    void UpdateFormSize(const int64_t &formId, float width, float height,
         float borderWidth, float formViewScale);
 
     ErrCode UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect);

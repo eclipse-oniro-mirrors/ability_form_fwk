@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,11 +85,11 @@ ErrCode FormObserverRecord::SetFormRemoveObserver(const std::string bundleName, 
 void FormObserverRecord::onFormAdd(const std::string bundleName, RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("start");
+    std::lock_guard<std::mutex> lock(formAddObserverMutex_);
     if (formAddObservers_.empty()) {
         HILOG_DEBUG("No observer has been added");
         return;
     }
-    std::lock_guard<std::mutex> lock(formAddObserverMutex_);
     auto iter = formAddObservers_.find(bundleName);
     if (iter != formAddObservers_.end()) {
         for (auto callerToken : iter->second) {
@@ -101,12 +101,11 @@ void FormObserverRecord::onFormAdd(const std::string bundleName, RunningFormInfo
 void FormObserverRecord::onFormRemove(const std::string bundleName, const RunningFormInfo runningFormInfo)
 {
     HILOG_DEBUG("start");
+    std::lock_guard<std::mutex> lock(formRemoveObserverMutex_);
     if (formRemoveObservers_.empty()) {
         HILOG_DEBUG("No observer has been added");
         return;
     }
-
-    std::lock_guard<std::mutex> lock(formRemoveObserverMutex_);
     auto iter = formRemoveObservers_.find(bundleName);
     if (iter != formRemoveObservers_.end()) {
         for (auto callerToken : iter->second) {

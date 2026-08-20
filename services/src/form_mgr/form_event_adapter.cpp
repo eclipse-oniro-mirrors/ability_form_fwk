@@ -244,7 +244,7 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     std::string params = want.GetStringParam(Constants::FORM_CALL_EVENT_PARAMS);
     nlohmann::json jsonObject = SafeJsonParse(params, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("fail parse jsonDataString:%{public}s", params.c_str());
+        HILOG_ERROR("fail parse jsonDataString, length:%{public}zu", params.size());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     if (!jsonObject.contains(Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY) ||

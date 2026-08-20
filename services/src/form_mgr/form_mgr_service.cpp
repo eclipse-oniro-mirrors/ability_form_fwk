@@ -1687,6 +1687,7 @@ void FormMgrService::HiDumpHasFormVisible(const std::string &args, std::string &
 {
     if (args.empty()) {
         result = "error:request bundle info like bundleName_userId_instIndex.";
+        return;
     }
     FormMgrAdapterFacade::GetInstance().DumpHasFormVisible(args, result);
 }
@@ -1765,6 +1766,10 @@ ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundle
         HILOG_ERROR("register form add observer permission denied");
         return ret;
     }
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     return FormMgrAdapterFacade::GetInstance().RegisterFormAddObserverByBundle(bundleName, callerToken);
 }
 
@@ -1776,6 +1781,10 @@ ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bun
     if (ret != ERR_OK) {
         HILOG_ERROR("register form remove observer permission denied");
         return ret;
+    }
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return FormMgrAdapterFacade::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, callerToken);
 }
@@ -2050,6 +2059,10 @@ int32_t FormMgrService::EnableForms(const std::string bundleName, const int32_t 
         HILOG_ERROR("disable forms permission denied");
         return ret;
     }
+    if (userId < 0) {
+        HILOG_ERROR("invalid userId");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     return FormMgrAdapterFacade::GetInstance().EnableForms(bundleName, userId, enable);
 }
 
@@ -2163,7 +2176,8 @@ ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float
         HILOG_ERROR("update formSize permission denied");
         return ret;
     }
-    return FormMgrAdapterFacade::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
+    FormMgrAdapterFacade::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
+    return ERR_OK;
 }
 
 ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 #include "js_form_state_observer_interface.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
- 
+
 namespace OHOS {
 namespace AppExecFwk {
 FormObserverTaskMgr::FormObserverTaskMgr() {}
@@ -35,6 +35,10 @@ void FormObserverTaskMgr::PostAddTaskToHost(const std::string bundleName,
     const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("call");
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is null");
+        return;
+    }
 
     auto addFunc = [bundleName, remoteObject, runningFormInfo]() {
         FormObserverTaskMgr::GetInstance().FormAdd(bundleName, remoteObject, runningFormInfo);
@@ -52,6 +56,10 @@ void FormObserverTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
     const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("call");
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is null");
+        return;
+    }
 
     auto removeFunc = [bundleName, remoteObject, runningFormInfo]() {
         FormObserverTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);
@@ -71,12 +79,12 @@ void FormObserverTaskMgr::PostFormClickEventToHost(
     const RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("call");
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is null");
+        return;
+    }
 
     auto task = [bundleName, formEventType, remoteObject, runningFormInfo]() {
-        if (remoteObject == nullptr) {
-            HILOG_ERROR("null remoteObject");
-            return;
-        }
         FormObserverTaskMgr::GetInstance().FormClickEvent(bundleName, formEventType, remoteObject, runningFormInfo);
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);

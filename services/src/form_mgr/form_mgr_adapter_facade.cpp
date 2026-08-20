@@ -197,11 +197,11 @@ int FormMgrAdapterFacade::RequestForm(const int64_t formId,
     return FormDataAdapter::GetInstance().RequestForm(formId, callerToken, want);
 }
 
-ErrCode FormMgrAdapterFacade::UpdateFormSize(const int64_t &formId, float width, float height,
+void FormMgrAdapterFacade::UpdateFormSize(const int64_t &formId, float width, float height,
     float borderWidth, float formViewScale)
 {
     HILOG_INFO("UpdateFormSize called, formId:%{public}" PRId64, formId);
-    return FormDataAdapter::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
+    FormDataAdapter::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
 }
 
 ErrCode FormMgrAdapterFacade::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)

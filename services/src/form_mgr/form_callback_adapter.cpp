@@ -35,6 +35,7 @@
 #include "feature/route_proxy/form_router_proxy_mgr.h"
 #include "form_mgr/form_common_adapter.h"
 #include "form_mgr/form_publish_adapter.h"
+#include "form_constants_util.h"
 #include "form_mgr_errors.h"
 #include "form_event_report.h"
 #include "fms_log_wrapper.h"
@@ -669,8 +670,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
             return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
         }
         std::string status = it->second;
-        auto iter = Constants::LIVE_FORM_STATUS_MAP.find(status);
-        if (iter == Constants::LIVE_FORM_STATUS_MAP.end() || !iter->second.isSupportLauncher) {
+        if (!FormConstantsUtil::IsLiveFormSupportLauncher(status)) {
             HILOG_ERROR("This live form is not support launcher, status:%{public}s", status.c_str());
             return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
         }

@@ -179,6 +179,7 @@
                 "header": {
                   "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include/",
                   "header_files": [
+                    "form_constants_util.h"
                   ]
                 },
                 "name": "//foundation/ability/form_fwk:form_utils"

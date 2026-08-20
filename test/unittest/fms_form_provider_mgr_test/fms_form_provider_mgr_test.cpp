@@ -807,7 +807,7 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_010, TestSize.Level0)
 
 /**
  * @tc.name: RefreshForm_011
- * @tc.desc: Verify RefreshForm when refreshType is in CONDITION_REFRESHTYPE_SET.
+ * @tc.desc: Verify RefreshForm when refreshType uses the conditional refresh path.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormProviderMgrTest, RefreshForm_011, TestSize.Level0)

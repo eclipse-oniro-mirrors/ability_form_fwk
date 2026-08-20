@@ -16,9 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_CONSTANTS_H
 #define OHOS_FORM_FWK_FORM_CONSTANTS_H
 
+#include <cstdint>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -60,6 +59,7 @@ namespace Constants {
     constexpr const char* PARAM_LAYOUT_WIDTH_KEY = "ohos.extra.param.key.layout_width";
     constexpr const char* PARAM_LAYOUT_HEIGHT_KEY = "ohos.extra.param.key.layout_height";
     constexpr const char* PARAM_FORM_VIEW_SCALE = "ohos.extra.param.key.form_view_scale";
+    constexpr const char* PARAM_FORM_DISPLAY_ID_KEY = "ohos.extra.param.key.form_display_id";
     constexpr const char* CONNECT_TO_RENDER = "ohos.connect.to.render";
     constexpr const char* PARAM_JSON_WANT_KEY = "ohos.extra.param.key.json_want";
     constexpr const char* PARAM_LIVE_FORM_ID_KEY = "ohos.extra.param.key.live_form_id";
@@ -314,32 +314,6 @@ namespace Constants {
         CIRCLE
     };
 
-    inline const std::unordered_map<Dimension, std::string> DIMENSION_MAP = {
-        {Dimension::DIMENSION_1_2, "1*2"},
-        {Dimension::DIMENSION_2_2, "2*2"},
-        {Dimension::DIMENSION_2_4, "2*4"},
-        {Dimension::DIMENSION_4_4, "4*4"},
-        {Dimension::DIMENSION_2_1, "2*1"},
-        {Dimension::DIMENSION_1_1, "1*1"},
-        {Dimension::DIMENSION_6_4, "6*4"},
-        {Dimension::DIMENSION_2_3, "2*3"},
-        {Dimension::DIMENSION_3_3, "3*3"}
-    };
-
-    struct StatusInfo {
-        std::string activeState;
-        bool isSupportLauncher;
-    };
-
-    inline const std::unordered_map<std::string, StatusInfo> LIVE_FORM_STATUS_MAP = {
-        {"00", {"INACTIVE", false}},
-        {"01", {"INACTIVE", true}},
-        {"10", {"PAUSE", false}},
-        {"11", {"PAUSE", true}},
-        {"20", {"ACTIVE", false}},
-        {"21", {"ACTIVE", true}},
-    };
-
     enum class RenderingMode : int8_t {
         FULL_COLOR = 0,
         SINGLE_COLOR
@@ -533,9 +507,6 @@ namespace Constants {
 
     constexpr const int32_t DELAY_REFRESH_PER_BATCH = 6;
 
-    inline const std::unordered_set<int32_t> CONDITION_REFRESHTYPE_SET = {
-        REFRESHTYPE_NETWORKCHANGED,
-    };
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

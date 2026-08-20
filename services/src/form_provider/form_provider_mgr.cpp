@@ -22,6 +22,7 @@
 #include "form_provider/connection/form_batch_delete_connection.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
+#include "form_constants_util.h"
 #include "data_center/form_data_mgr.h"
 #include "form_provider/connection/form_delete_connection.h"
 #include "form_mgr_errors.h"
@@ -167,7 +168,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (refreshType == Constants::REFRESHTYPE_VISIABLE) {
         FormDataMgr::GetInstance().GetRefreshType(formId, refreshType);
         HILOG_INFO("refreshType:%{public}d", refreshType);
-        if (Constants::CONDITION_REFRESHTYPE_SET.find(refreshType) != Constants::CONDITION_REFRESHTYPE_SET.end()) {
+        if (FormConstantsUtil::IsConditionRefreshType(refreshType)) {
             isCountTimerRefresh = false;
         }
     }

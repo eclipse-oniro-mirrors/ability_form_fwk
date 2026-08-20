@@ -30,7 +30,6 @@ void MockFormMgrAdapterFacadeRegisterOverflowProxy(int mockRet);
 void MockFormMgrAdapterFacadeRegisterGetFormRectProxy(int mockRet);
 void MockFormMgrAdapterFacadeRegisterGetLiveFormStatusProxy(int mockRet);
 void MockFormMgrAdapterFacadeUnregisterGetLiveFormStatusProxy(int mockRet);
-void MockFormMgrAdapterFacadeUpdateFormSizeFloat(int mockRet);
 void MockFormMgrAdapterFacadeRegisterTemplateFormDetailInfoChange(int mockRet);
 void MockFormMgrAdapterFacadeUnregisterTemplateFormDetailInfoChange(int mockRet);
 void MockFormMgrAdapterFacadeUpdateTemplateFormDetailInfo(int mockRet);

@@ -49,6 +49,7 @@ enum class FormFsmEvent {
     DELETE_FORM_FINISH,
     EXECUTION_TIMEOUT,
     RELOAD_FORM,
+    INVALID_EVENT,
 };
 
 enum class FormFsmProcessType {

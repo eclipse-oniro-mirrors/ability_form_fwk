@@ -131,11 +131,15 @@ void FormAbilityConnection::ProcessFreeInstall(const AppExecFwk::ElementName &el
 void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     HILOG_INFO("element:%{public}s, resultCode:%{public}d", element.GetURI().c_str(), resultCode);
-    if (connectId_ != 0) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
-        connectId_ = 0;
+    int32_t connectId = connectId_.load();
+    if (connectId != 0) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        // CAS: skip clear if SetConnectId has set a new value concurrently
+        if (!connectId_.compare_exchange_strong(connectId, 0)) {
+            HILOG_INFO("connectId_ changed during disconnect, skip clear, current:%{public}d", connectId);
+        }
     } else {
-        HILOG_ERROR("invalid connectId_:%{public}d", connectId_);
+        HILOG_ERROR("invalid connectId_:%{public}d", connectId);
     }
     ReportFormAppUnbindEvent();
     connectState_.store(ConnectState::DISCONNECTED);
@@ -208,7 +212,7 @@ void FormAbilityConnection::SetConnectId(int32_t connectId)
 
 int32_t FormAbilityConnection::GetConnectId() const
 {
-    return connectId_;
+    return connectId_.load();
 }
 
 std::string FormAbilityConnection::GetProviderKey() const
