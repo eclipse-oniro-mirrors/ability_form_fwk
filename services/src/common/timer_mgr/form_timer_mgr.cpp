@@ -146,15 +146,15 @@ bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::v
     }
     bool result = true;
     for (const auto &time : updateAtTimes) {
-            if (time.size() < TIME_MIN_SIZE) {
-                HILOG_ERROR("Insufficient length");
-                return false;
-            }
-            if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR
-                || time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
-                HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
-                return false;
-            }
+        if (time.size() < TIME_MIN_SIZE) {
+            HILOG_ERROR("Insufficient length");
+            return false;
+        }
+        if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR
+            || time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
+            HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
+            return false;
+        }
         FormTimer timerTask(formId, time[0], time[1], userId);
         timerTask.needUpdateAlarm = false;
         result = AddFormTimer(timerTask);

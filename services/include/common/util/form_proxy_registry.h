@@ -57,7 +57,7 @@ public:
      */
     explicit FormProxyRegistry(const std::string &tag);
 
-    ~FormProxyRegistry();
+    ~FormProxyRegistry() { Clear(); }
 
     /**
      * @brief Register a proxy by caller UID.

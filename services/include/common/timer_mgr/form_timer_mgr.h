@@ -16,7 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORM_TIMER_MGR_H
 #define OHOS_FORM_FWK_FORM_TIMER_MGR_H
 
-#include <atomic>
 #include <list>
 #include <map>
 #include <mutex>

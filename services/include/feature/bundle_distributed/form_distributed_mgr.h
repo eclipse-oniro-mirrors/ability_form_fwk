@@ -16,7 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORM_DISTRIBUTED_MGR_H
 #define OHOS_FORM_FWK_FORM_DISTRIBUTED_MGR_H
 
-#include <atomic>
 #include <map>
 #include <shared_mutex>
 #include <singleton.h>

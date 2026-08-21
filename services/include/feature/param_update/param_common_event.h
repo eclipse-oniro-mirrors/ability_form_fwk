@@ -19,7 +19,6 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <singleton.h>
 #include <string>
 

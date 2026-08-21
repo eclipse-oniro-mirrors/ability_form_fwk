@@ -36,18 +36,6 @@ void FormProxyDeathRecipient::OnRemoteDied([[maybe_unused]] const wptr<IRemoteOb
 
 FormProxyRegistry::FormProxyRegistry(const std::string &tag) : tag_(tag) {}
 
-FormProxyRegistry::~FormProxyRegistry()
-{
-    std::unique_lock<std::shared_mutex> lock(mutex_);
-    for (auto &item : deathRecipients_) {
-        if (item.second != nullptr && item.second->GetRefPtr() != nullptr) {
-            item.second->GetRefPtr()->RemoveDeathRecipient(item.second);
-        }
-    }
-    deathRecipients_.clear();
-    proxies_.clear();
-}
-
 ErrCode FormProxyRegistry::Register(int32_t callingUid, const sptr<IRemoteObject> &proxy)
 {
     if (proxy == nullptr) {
