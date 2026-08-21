@@ -2704,8 +2704,7 @@ void FormDataMgr::GetUnusedFormInstancesByFilter(
         instance.formId = dbInfo.formId;
         instance.specification = dbRecord.specification;
         instance.formVisiblity = IsValidVisibilityType(dbRecord.formVisibleNotifyState)
-            ? static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState)
-            : FormVisibilityType::UNKNOWN;
+            ? static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState) : FormVisibilityType::UNKNOWN;
         instance.bundleName = dbRecord.bundleName;
         instance.moduleName = dbRecord.moduleName;
         instance.abilityName = dbRecord.abilityName;
