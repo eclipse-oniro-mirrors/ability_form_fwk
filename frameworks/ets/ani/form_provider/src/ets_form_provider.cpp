@@ -639,7 +639,6 @@ void OpenFormManagerCrossBundle(ani_env *env, ani_object aniWant)
     const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
     const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
     want.SetParam(key, value);
-    HILOG_DEBUG("stsFormProvider OpenFormManagerCrossBundle want:%{public}s", want.ToString().c_str());
 
     auto ret = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
     if (ret != ERR_OK) {
@@ -694,9 +693,14 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
     }
 
     std::string formIdStr = std::to_string(formId);
-    env->String_NewUTF8(formIdStr.c_str(), formIdStr.size(), &formIdAniStr);
+    ani_status status = env->String_NewUTF8(formIdStr.c_str(), formIdStr.size(), &formIdAniStr);
+    if (status != ANI_OK) {
+        HILOG_ERROR("String_NewUTF8 failed, status: %{public}d", status);
+        InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
+        return;
+    }
     HILOG_INFO("End");
-    InvokeAsyncWithBusinessError(env, callback, ret, formIdAniStr); // crash
+    InvokeAsyncWithBusinessError(env, callback, ret, formIdAniStr);
 }
 
 void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
@@ -818,6 +822,11 @@ void ReloadAllForms(ani_env* env, ani_object etsContext, ani_object callback)
     }
 
     ani_object etsReloadNum = CreateInt(env, reloadNum);
+    if (etsReloadNum == nullptr) {
+        HILOG_ERROR("CreateInt failed");
+        InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
+        return;
+    }
     InvokeAsyncWithBusinessError(env, callback, ret, etsReloadNum);
 
     HILOG_DEBUG("End");
@@ -869,17 +878,19 @@ void UnregisterPublishFormCrossBundleControl(ani_env* env, ani_object callback)
     EtsFormProviderProxyMgr::GetInstance()->UnregisterPublishFormCrossBundleControl();
 }
 
-sptr<EtsFormProviderProxyMgr> EtsFormProviderProxyMgr::instance_ = nullptr;
-std::mutex EtsFormProviderProxyMgr::mutex_;
 sptr<EtsFormProviderProxyMgr> EtsFormProviderProxyMgr::GetInstance()
 {
-    if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = new (std::nothrow) EtsFormProviderProxyMgr();
+    static std::once_flag initFlag;
+    static sptr<EtsFormProviderProxyMgr> instance;
+
+    std::call_once(initFlag, []() {
+        instance = sptr<EtsFormProviderProxyMgr>(new (std::nothrow) EtsFormProviderProxyMgr());
+        if (instance == nullptr) {
+            HILOG_ERROR("create EtsFormProviderProxyMgr failed");
         }
-    }
-    return instance_;
+    });
+
+    return instance;
 }
 
 void EtsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(ani_env *env, ani_object callback)
@@ -901,6 +912,11 @@ void EtsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(ani_env *env
     ani_vm *aniVM = nullptr;
     if (env->GetVM(&aniVM) != ANI_OK) {
         HILOG_ERROR("get aniVM failed.");
+        if ((status = env->GlobalReference_Delete(crossBundleControlCallback_)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d.", status);
+            return;
+        }
+        crossBundleControlCallback_ = nullptr;
         return;
     }
     crossBundleControlVm_ = aniVM;
@@ -918,8 +934,7 @@ void EtsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
     ani_status status = ANI_ERROR;
     if (crossBundleControlCallback_ != nullptr) {
         if ((status = env->GlobalReference_Delete(crossBundleControlCallback_)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
-            return;
+            HILOG_ERROR("GlobalReference_Delete failed, force null to prevent double-delete: %{public}d", status);
         }
         crossBundleControlCallback_ = nullptr;
     }

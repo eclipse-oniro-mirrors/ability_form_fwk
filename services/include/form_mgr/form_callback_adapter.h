@@ -126,7 +126,7 @@ public:
 
     sptr<IFormPublishInterceptor> GetFormPublishInterceptor();
 
-    void CancelOverflow(const int64_t formId);
+    void CancelSceneEffects(const int64_t formId);
 
 private:
     void GetMatchedFormIds(const std::vector<FormRecordFilter> &filters, std::vector<std::string> &formIds);

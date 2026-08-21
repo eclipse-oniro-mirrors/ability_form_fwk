@@ -76,6 +76,10 @@ bool FormXMLParser::ParseInternal(xmlNodePtr &node)
 {
     HILOG_DEBUG("ParseInternal start");
     xmlNodePtr curNodePtr = node->xmlChildrenNode;
+    if (curNodePtr == nullptr) {
+        HILOG_ERROR("curNodePtr is null");
+        return false;
+    }
     std::string quantityConfig = "quantityConfig";
     std::string nodeName = reinterpret_cast<const char*>(curNodePtr->name);
     if (nodeName != quantityConfig) {

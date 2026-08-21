@@ -77,6 +77,10 @@ size_t FormEventQueue::GetEventQueueSize()
     return eventQueue_.size();
 }
 
+/**
+ * @note Requires caller to hold FormEventQueue's eventQueueMutex_
+ * The calling context needs to be locked, and locking is not allowed inside the function
+ */
 bool FormEventQueue::ReportQueueOverLimit(const int64_t formId)
 {
     FormRecord formRecord;

@@ -42,6 +42,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int32_t SCENE_ANIMATION_DEACTIVATED = 0;
+}
 
 FormCallbackAdapter::FormCallbackAdapter()
 {
@@ -793,35 +796,34 @@ ErrCode FormCallbackAdapter::GetWantCallbackProxy(int32_t callingUid, sptr<IRemo
     return wantCallbackRegistry_.Get(callingUid, proxy);
 }
 
-void FormCallbackAdapter::CancelOverflow(const int64_t formId)
+void FormCallbackAdapter::CancelSceneEffects(const int64_t formId)
 {
+    // Caller ensures the form is an active live form.
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64, formId);
         return;
     }
-    FormInfo formInfo;
-    ErrCode result = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
-    if (result != ERR_OK) {
-        HILOG_ERROR("Get target form info failed");
-        return;
-    }
-    if (formInfo.sceneAnimationParams.abilityName.empty()) {
-        HILOG_ERROR("SceneAnimationParams abilityName is empty");
-        return;
-    }
     for (int uid : formRecord.formUserUids) {
-        sptr<IRemoteObject> callerToken;
-        if (overflowRegistry_.Get(uid, callerToken) != ERR_OK) {
-            continue;
+        ErrCode overflowRet = ERR_OK;
+        sptr<IRemoteObject> overflowToken;
+        if (overflowRegistry_.Get(uid, overflowToken) == ERR_OK) {
+            sptr<IFormHostDelegate> overflowProxy = iface_cast<IFormHostDelegate>(overflowToken);
+            if (overflowProxy != nullptr) {
+                OverflowInfo overflowInfo;
+                overflowRet = overflowProxy->RequestOverflow(formId, overflowInfo, false);
+            }
         }
-        sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
-        if (proxy == nullptr) {
-            continue;
+        ErrCode sceneRet = ERR_OK;
+        sptr<IRemoteObject> sceneToken;
+        if (sceneAnimationRegistry_.Get(uid, sceneToken) == ERR_OK) {
+            sptr<IFormHostDelegate> sceneProxy = iface_cast<IFormHostDelegate>(sceneToken);
+            if (sceneProxy != nullptr) {
+                sceneRet = sceneProxy->ChangeSceneAnimationState(formId, SCENE_ANIMATION_DEACTIVATED);
+            }
         }
-        OverflowInfo overflowInfo;
-        result = proxy->RequestOverflow(formId, overflowInfo, false);
-        HILOG_INFO("formid:%{public}" PRId64 ",result: %{public}d", formId, result);
+        HILOG_INFO("CancelSceneEffects formId:%{public}" PRId64 ", overflowRet:%{public}d, sceneRet:%{public}d",
+            formId, overflowRet, sceneRet);
     }
 }
 } // namespace AppExecFwk

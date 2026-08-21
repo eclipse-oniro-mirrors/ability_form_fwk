@@ -66,7 +66,11 @@ FormTimerMgr::FormTimerMgr()
 FormTimerMgr::~FormTimerMgr()
 {
     ClearIntervalTimer();
+    ClearUpdateAtTimerResource();
+    ClearDynamicResource();
     ClearLimiterTimerResource();
+    ClearDiskInfoReportTimer();
+    DestroyFormCheckTimer();
 }
 /**
  * @brief Add form timer by timer task.

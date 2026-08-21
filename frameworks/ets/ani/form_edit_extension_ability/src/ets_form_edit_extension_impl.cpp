@@ -62,6 +62,9 @@ void EtsFormEditExtensionImpl::BindContext()
         env->GlobalReference_Delete(contextRef);
         return;
     }
+    shellContextRef_ = std::make_shared<AppExecFwk::ETSNativeReference>();
+    shellContextRef_->aniObj = contextObj;
+    shellContextRef_->aniRef = contextRef;
 
     HILOG_INFO("BindContext end");
 }

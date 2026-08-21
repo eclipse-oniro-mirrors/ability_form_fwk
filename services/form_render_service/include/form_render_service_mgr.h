@@ -18,6 +18,7 @@
 
 #include "form_render_stub.h"
 
+#include <atomic>
 #include <memory>
 #include <singleton.h>
 
@@ -156,8 +157,8 @@ private:
     std::shared_ptr<Common::FormBaseSerialQueue> serialQueue_ = nullptr;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
-    bool isVerified_ = false;
-    bool hasCachedConfig_ = false;
+    std::atomic<bool> isVerified_ = false;
+    std::atomic<bool> hasCachedConfig_ = false;
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> mainHandler_ = nullptr;
     std::function<void()> mainGcCb_ = nullptr;
 };

@@ -71,14 +71,13 @@ void EtsLiveFormExtensionImpl::BindContext()
     ani_ref contextRef = nullptr;
     if (env->GlobalReference_Create(contextObj, &contextRef) != ANI_OK) {
         HILOG_ERROR("GlobalReference_Create contextObj failed");
-        env->GlobalReference_Delete(contextRef);
         return;
     }
     if (env->Object_SetField_Ref(etsObj_->aniObj, contextField, contextRef) != ANI_OK) {
         HILOG_ERROR("Object_SetField_Ref contextObj failed");
+        env->GlobalReference_Delete(contextRef);
         return;
     }
-
     BindMethod(env);
 }
 

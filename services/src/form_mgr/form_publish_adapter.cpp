@@ -313,7 +313,7 @@ void FormPublishAdapter::IncreaseAddFormRequestTimeOutTask(const int64_t formId)
         auto &instance = FormPublishAdapter::GetInstance();
         std::lock_guard<std::mutex> lock(instance.formResultMutex_);
         auto iter = instance.formIdMap_.find(formId);
-        if (iter != instance.formIdMap_.end()) {
+        if (iter != instance.formIdMap_.end() && iter->second == AddFormResultErrorCodes::UNKNOWN) {
             iter->second = AddFormResultErrorCodes::TIMEOUT;
             instance.condition_.notify_all();
         }
@@ -331,8 +331,8 @@ void FormPublishAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, c
         HILOG_ERROR("null serialQueue_");
         return;
     }
-    serialQueue_->CancelDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId));
     std::lock_guard<std::mutex> lock(formResultMutex_);
+    serialQueue_->CancelDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId));
     auto iter = formIdMap_.find(formId);
     if (iter != formIdMap_.end()) {
         const auto state = (result != ERR_OK ? AddFormResultErrorCodes::FAILED : AddFormResultErrorCodes::SUCCESS);
@@ -382,8 +382,8 @@ ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::pair<int64_t, int64_t> eventMsg(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId);
-    serialQueue_->CancelDelayTask(eventMsg);
     std::lock_guard<std::mutex> lock(formResultMutex_);
+    serialQueue_->CancelDelayTask(eventMsg);
     auto iter = formIdMap_.find(formId);
     if (iter != formIdMap_.end()) {
         auto mapIt = PUBLISH_RESULT_MAP.find(static_cast<int8_t>(errorCodeInfo.code));

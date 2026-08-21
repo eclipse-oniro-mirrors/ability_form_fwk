@@ -2288,6 +2288,9 @@ ErrCode FormMgrService::UnregisterChangeSceneAnimationStateProxy()
 ErrCode FormMgrService::ChangeSceneAnimationState(const int64_t formId, int32_t state)
 {
     HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().ChangeSceneAnimationState(formId, callingUid, state);
 }

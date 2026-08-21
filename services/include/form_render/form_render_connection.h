@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_RENDER_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_RENDER_CONNECTION_H
 
+#include <mutex>
 #include <unordered_set>
 
 #include "common/connection/form_ability_connection.h"
@@ -75,7 +76,6 @@ protected:
 private:
     FormRecord formRecord_;
     WantParams wantParams_;
-    ConnectState connectState_ = ConnectState::DISCONNECTED;
     std::mutex formRecordMutex_;
     int32_t failedTimes = 0;
     DISALLOW_COPY_AND_MOVE(FormRenderConnection);

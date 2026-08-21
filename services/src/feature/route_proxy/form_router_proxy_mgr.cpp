@@ -47,6 +47,10 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
     const sptr<IRemoteObject> &callerToken)
 {
 #ifndef WATCH_API_DISABLE
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     for (const auto &formId : formIds) {

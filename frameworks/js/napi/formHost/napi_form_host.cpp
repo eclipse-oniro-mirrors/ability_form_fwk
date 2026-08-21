@@ -104,6 +104,11 @@ static napi_value GetFormIds(napi_env env, napi_value value, ErrCode &errCode, s
 
     uint32_t arrayLength = 0;
     NAPI_CALL(env, napi_get_array_length(env, value, &arrayLength));
+    if (arrayLength > Constants::MAX_FORM_DATA_SIZE) {
+        HILOG_ERROR("arrayLength too large: %{public}u", arrayLength);
+        errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
+        return nullptr;
+    }
 
     for (size_t i = 0; i < arrayLength; i++) {
         napi_value napiFormId;
@@ -453,20 +458,54 @@ static void InnerAcquireFormState(napi_env env, AsyncAcquireFormStateCallbackInf
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
-static void AcquireFormStateAsyncComplete(napi_env env, napi_status status, void *data)
+static void AcquireFormStateExecuteWork(napi_env env, void *data)
 {
-    HILOG_INFO("napi_create_async_work complete");
-    auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo *>(data);
+    HILOG_INFO("napi_create_async_work running");
+    auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
     if (callbackInfo == nullptr) {
         HILOG_ERROR("null asyncCallbackInfo");
         return;
     }
-    // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
+    InnerAcquireFormState(env, callbackInfo);
+}
+
+static void InvokeAcquireFormStateFailureCallback(napi_env env, napi_ref callback)
+{
+    if (callback == nullptr) {
+        return;
+    }
+    napi_value jsResult = nullptr;
+    napi_create_int32(env, static_cast<int32_t>(FormState::UNKNOWN), &jsResult);
+    napi_value callbackFunc = nullptr;
+    napi_get_reference_value(env, callback, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        return;
+    }
+    napi_value undefined = nullptr;
+    napi_get_undefined(env, &undefined);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, undefined, callbackFunc, 1, &jsResult, &callbackResult);
+}
+
+static void AcquireFormStateCallbackComplete(napi_env env, napi_status status, void *data)
+{
+    auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
+    if (callbackInfo == nullptr) {
+        HILOG_ERROR("null asyncCallbackInfo");
+        return;
+    }
     napi_async_work asyncWork = callbackInfo->asyncWork;
-    // When the result is not ERR_OK, OnAcquireState will be called here,
-    // else OnAcquireState will be called after the form state is acquired.
+    napi_ref callback = callbackInfo->callback;
     if (callbackInfo->result != ERR_OK) {
-        FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, callbackInfo->want);
+        FormHostClient::GetInstance()->RemoveFormState(callbackInfo->want);
+        InvokeAcquireFormStateFailureCallback(env, callback);
+        if (callback != nullptr) {
+            napi_status refStatus = napi_delete_reference(env, callback);
+            if (refStatus != napi_ok) {
+                HILOG_ERROR("napi_delete_reference failed: %{public}d", refStatus);
+            }
+        }
+        delete callbackInfo;
     }
     if (asyncWork != nullptr) {
         napi_delete_async_work(env, asyncWork);
@@ -482,23 +521,10 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, callbackFunc, &valueType));
     NAPI_ASSERT(env, valueType == napi_function, "expected type is function.");
-    napi_status refStatus = napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
-    if (refStatus != napi_ok) {
-        HILOG_ERROR("create reference failed");
-        return nullptr;
-    }
-    napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) {
-            HILOG_INFO("napi_create_async_work running");
-            auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
-            if (callbackInfo == nullptr) {
-                HILOG_ERROR("null asyncCallbackInfo");
-                return;
-            }
-            InnerAcquireFormState(env, callbackInfo);
-        },
-        AcquireFormStateAsyncComplete, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
+    napi_create_reference(env, callbackFunc, REF_COUNT, &asyncCallbackInfo->callback);
+    napi_create_async_work(env, nullptr, resourceName,
+        AcquireFormStateExecuteWork, AcquireFormStateCallbackComplete,
+        static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
@@ -526,15 +552,7 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
         env, nullptr, resourceName,
-        [](napi_env env, void *data) {
-            HILOG_INFO("runnning");
-            auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);
-            if (callbackInfo == nullptr) {
-                HILOG_ERROR("null asyncCallbackInfo");
-                return;
-            }
-            InnerAcquireFormState(env, callbackInfo);
-        },
+        AcquireFormStateExecuteWork,
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("complete");
             auto *callbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo*>(data);

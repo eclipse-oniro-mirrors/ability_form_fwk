@@ -474,13 +474,18 @@ void FormRenderServiceMgr::OnConfigurationUpdated(const std::shared_ptr<OHOS::Ap
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     if (!screenOnFlag && !collaborationScreenOnFlag) {
         HILOG_WARN("screen off");
-        hasCachedConfig_ = true;
+        hasCachedConfig_.store(true, std::memory_order_release);
         return;
     }
 #endif
 
     serialQueue_->CancelDelayTask(TASK_ONCONFIGURATIONUPDATED);
-    auto duration = std::chrono::steady_clock::now() - configUpdateTime_;
+    std::chrono::steady_clock::time_point lastUpdateTime;
+    {
+        std::lock_guard<std::mutex> lock(configMutex_);
+        lastUpdateTime = configUpdateTime_;
+    }
+    auto duration = std::chrono::steady_clock::now() - lastUpdateTime;
     if (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() < MIN_DURATION_MS) {
         HILOG_INFO("OnConfigurationUpdated ignored");
         auto configUpdateFunc = []() {
@@ -506,7 +511,6 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
     std::shared_ptr<OHOS::AppExecFwk::Configuration> applyConfig = GetNeedApplyConfig();
     // Update all configuration item caches
     CacheAppliedConfig();
-    configUpdateTime_ = std::chrono::steady_clock::now();
     size_t allFormCount = 0;
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
@@ -518,7 +522,7 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
         }
     }
     HILOG_INFO("OnConfigurationUpdated %{public}zu forms updated.", allFormCount);
-    hasCachedConfig_ = false;
+    hasCachedConfig_.store(false, std::memory_order_release);
     PerformanceEventInfo eventInfo;
     eventInfo.timeStamp = Common::FormTimeUtil::GetNowMillisecond();
     eventInfo.bundleName = Constants::FRS_BUNDLE_NAME;
@@ -559,7 +563,7 @@ bool FormRenderServiceMgr::SetConfiguration(const std::shared_ptr<OHOS::AppExecF
 void FormRenderServiceMgr::RunCachedConfigurationUpdated()
 {
     HILOG_INFO("RunCachedConfigUpdated");
-    if (hasCachedConfig_) {
+    if (hasCachedConfig_.load(std::memory_order_acquire)) {
         SetCriticalTrueOnFormActivity();
         OnConfigurationUpdatedInner();
     }
@@ -910,6 +914,7 @@ void FormRenderServiceMgr::CacheAppliedConfig()
             appliedConfig_->AddItem(item, value);
         }
     }
+    configUpdateTime_ = std::chrono::steady_clock::now();
     HILOG_INFO("already applied config:%{public}s", appliedConfig_->GetName().c_str());
 }
 
