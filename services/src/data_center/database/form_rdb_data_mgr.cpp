@@ -340,7 +340,6 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
     } else {
         ret = absSharedResultSet->GetString(FORM_VALUE_INDEX, value);
     }
-    absSharedResultSet->Close();
 
     if (ret == NativeRdb::E_OK) {
         UpdateReadCount();
@@ -407,7 +406,6 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::strin
             values.emplace(resultKey, resultValue);
         } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
     }
-    absSharedResultSet->Close();
     if (ret == NativeRdb::E_OK) {
         UpdateReadCount();
         return ERR_OK;
@@ -472,7 +470,6 @@ ErrCode FormRdbDataMgr::QueryAllData(const std::string &tableName,
             datas.emplace(resultKey, resultValue);
         } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
     }
-    absSharedResultSet->Close();
 
     if (ret == NativeRdb::E_OK) {
         UpdateReadCount();
@@ -678,7 +675,7 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     int64_t curTime = FormUtil::GetCurrentMillisecond();
-    if ((curTime - lastRdbBuildTime_) <= MIN_FORM_RDB_REBUILD_INTERVAL) {
+    if ((curTime - lastRdbBuildTime_.load()) <= MIN_FORM_RDB_REBUILD_INTERVAL) {
         return ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD;
     }
 
@@ -702,7 +699,7 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         HILOG_ERROR("Reload form rdb failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    lastRdbBuildTime_ = curTime;
+    lastRdbBuildTime_.store(curTime);
 
     if (restoreRet != NativeRdb::E_OK) {
         //fallback restoration if Restore() did not work
@@ -829,7 +826,7 @@ void FormRdbDataMgr::UpdateReadCount()
 void FormRdbDataMgr::UpdateWriteCount(size_t dataSize)
 {
     writeCount_.fetch_add(1, std::memory_order_relaxed);
-    writeSize_.fetch_add(dataSize, std::memory_order_relaxed);
+    writeSize_.fetch_add(static_cast<int64_t>(dataSize), std::memory_order_relaxed);
 }
 
 void FormRdbDataMgr::PrintStatistics()
