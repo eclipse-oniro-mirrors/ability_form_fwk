@@ -65,16 +65,10 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
-        napi_handle_scope scope = nullptr;
-        napi_status openStatus = napi_open_handle_scope(sharedThis->env_, &scope);
-        if (openStatus != napi_ok || scope == nullptr) {
-            HILOG_ERROR("napi_open_handle_scope failed");
-            return;
-        }
+        AbilityRuntime::HandleScope scopeGuard(env);
         napi_value callbackValues = nullptr;
         if (napi_create_object(sharedThis->env_, &callbackValues) != napi_ok || callbackValues == nullptr) {
             HILOG_ERROR("napi_create_object failed");
-            napi_close_handle_scope(sharedThis->env_, scope);
             return;
         }
         ParseRunningFormInfoIntoNapi(sharedThis->env_, runningFormInfo, callbackValues);
@@ -84,7 +78,6 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
-        napi_close_handle_scope(sharedThis->env_, scope);
     });
 }
 
@@ -134,16 +127,11 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
-        napi_handle_scope scope = nullptr;
-        napi_status openStatus = napi_open_handle_scope(sharedThis->env_, &scope);
-        if (openStatus != napi_ok || scope == nullptr) {
-            HILOG_ERROR("napi_open_handle_scope failed");
-            return;
-        }
+        AbilityRuntime::HandleScope scopeGuard(env);
         napi_value callbackValues = nullptr;
         if (napi_create_object(sharedThis->env_, &callbackValues) != napi_ok || callbackValues == nullptr) {
             HILOG_ERROR("napi_create_object failed");
-            napi_close_handle_scope(sharedThis->env_, scope);
+            AbilityRuntime::HandleScope scopeGuard(env);
             return;
         }
         ParseRunningFormInfoIntoNapi(sharedThis->env_, runningFormInfo, callbackValues);
@@ -153,7 +141,7 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
-        napi_close_handle_scope(sharedThis->env_, scope);
+        AbilityRuntime::HandleScope scopeGuard(env);
     });
 }
 
@@ -512,12 +500,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                 HILOG_ERROR("null sharedThis");
                 return;
             }
-            napi_handle_scope scope = nullptr;
-            napi_status openStatus = napi_open_handle_scope(sharedThis->env_, &scope);
-            if (openStatus != napi_ok || scope == nullptr) {
-                HILOG_ERROR("napi_open_handle_scope failed");
-                return;
-            }
+            AbilityRuntime::HandleScope scopeGuard(env);
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
                 isVisibleTypeFlag = true;
                 if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
@@ -543,7 +526,6 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                     }
                 }
             }
-            napi_close_handle_scope(sharedThis->env_, scope);
         });
     }
     return ERR_OK;
@@ -766,16 +748,10 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
         HILOG_ERROR("null env");
         return;
     }
-    napi_handle_scope scope = nullptr;
-    napi_status openStatus = napi_open_handle_scope(env_, &scope);
-    if (openStatus != napi_ok || scope == nullptr) {
-        HILOG_ERROR("napi_open_handle_scope failed");
-        return;
-    }
+    AbilityRuntime::HandleScope scopeGuard(env);
     napi_value formInfo = nullptr;
     if (napi_create_object(env_, &formInfo) != napi_ok || formInfo == nullptr) {
         HILOG_ERROR("napi_create_object failed");
-        napi_close_handle_scope(env_, scope);
         return;
     }
     ParseRunningFormInfoIntoNapi(env_, runningFormInfo, formInfo);
@@ -787,7 +763,6 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
             napi_call_function(env_, nullptr, callbackfun, ARGS_ONE, &formInfo, &callResult);
         }
     }
-    napi_close_handle_scope(env_, scope);
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

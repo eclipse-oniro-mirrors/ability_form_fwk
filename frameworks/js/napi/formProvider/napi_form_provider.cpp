@@ -310,10 +310,7 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
     };
     if (asyncCallbackInfo == nullptr) {
         HILOG_ERROR("asyncCallbackInfo == nullptr");
-        napi_value error = nullptr;
-        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
-        napi_reject_deferred(env, deferred, error);
-        return promise;
+        return nullptr;
     }
 
     ErrCode errCode = RequestPublishFormParse(env, argv, asyncCallbackInfo);
@@ -329,11 +326,7 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
-        napi_value error = nullptr;
-        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
-        napi_reject_deferred(env, deferred, error);
         delete asyncCallbackInfo;
-        return promise;
     }
     return promise;
 }

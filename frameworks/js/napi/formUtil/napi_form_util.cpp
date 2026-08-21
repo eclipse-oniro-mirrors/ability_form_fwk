@@ -115,14 +115,6 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
     { ERR_DISTRIBUTED_SCHEDULE_FAILED, "failed to distributed schedule" },
     { ERR_IN_RECOVERY, "the form is being restored" }
 };
-
-inline void napi_set_named_property(napi_env env, napi_value object, const char *name, napi_value value)
-{
-    napi_status status = napi_set_named_property(env, object, name, value);
-    if (status != napi_ok) {
-        HILOG_ERROR("napi_set_named_property failed, name:%{public}s", name);
-    }
-}
 }
 
 bool NapiFormUtil::Throw(napi_env env, int32_t errCode, const std::string &errMessage)
@@ -658,7 +650,8 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "groupId", CreateJsValue(env, formInfo.groupId));
     napi_set_named_property(env, objContext, "isStandbySupported", CreateJsValue(env, formInfo.standby.isSupported));
     napi_set_named_property(env, objContext, "isStandbyAdapted", CreateJsValue(env, formInfo.standby.isAdapted));
-    napi_set_named_property(env, objContext, "isPrivacySensitive", CreateJsValue(env, formInfo.standby.isPrivacySensitive));
+    napi_set_named_property(env, objContext, "isPrivacySensitive",
+        CreateJsValue(env, formInfo.standby.isPrivacySensitive));
     napi_set_named_property(env, objContext, "isTemplateForm", CreateJsValue(env, formInfo.isTemplateForm));
 
     return objContext;

@@ -278,6 +278,8 @@ public:
             asyncCallbackInfo_ = nullptr;
             delete work;
             work = nullptr;
+        } else {
+            asyncCallbackInfo_ = nullptr;
         }
     }
 
