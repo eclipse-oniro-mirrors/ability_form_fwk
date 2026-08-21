@@ -166,13 +166,6 @@ void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
 
     if (asyncCallbackInfo->callback != nullptr) {
         AbilityRuntime::HandleScope scopeGuard(env);
-        if (scope == nullptr) {
-            delete asyncCallbackInfo;
-            asyncCallbackInfo = nullptr;
-            delete work;
-            work = nullptr;
-            return;
-        }
         napi_value callback;
         napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
         InnerCreateCallbackRetMsg(env, asyncCallbackInfo->result, callbackValues);
