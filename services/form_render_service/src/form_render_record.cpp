@@ -554,6 +554,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     }
     if (!runtime_->Init(options)) {
         HILOG_ERROR("Init runtime Failed");
+        return false;
     }
     hapPath_ = formJsInfo.jsFormCodePath;
     runtime_->SetLocalFontCollectionMaxSize();
@@ -561,6 +562,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
     if (!ret) {
         HILOG_ERROR("InsertHapPath Failed");
+        return false;
     }
 
     std::string target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;

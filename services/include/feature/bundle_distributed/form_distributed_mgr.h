@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_DISTRIBUTED_MGR_H
 #define OHOS_FORM_FWK_FORM_DISTRIBUTED_MGR_H
 
+#include <atomic>
 #include <map>
 #include <shared_mutex>
 #include <singleton.h>
@@ -94,7 +95,7 @@ private:
     void DeleteDataInDb(const std::string &bundleName, int32_t userId);
 
 private:
-    std::atomic<bool> isInitialized_ = false;
+    std::atomic<bool> isInitialized_{false};
     std::unordered_map<std::string, DistributedModule> distributedBundleMap_;
     mutable std::shared_mutex bundleDistributedMapMutex_;
 };

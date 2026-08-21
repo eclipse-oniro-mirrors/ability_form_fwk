@@ -56,7 +56,17 @@ public:
      */
     explicit FormProxyRegistry(const std::string &tag);
 
-    ~FormProxyRegistry() { Clear(); }
+    ~FormProxyRegistry()
+    {
+        std::unique_lock<std::shared_mutex> lock(mutex_);
+        for (auto &item : deathRecipients_) {
+            if (item.second != nullptr && item.second->GetRefPtr() != nullptr) {
+                item.second->GetRefPtr()->RemoveDeathRecipient(item.second);
+            }
+        }
+        deathRecipients_.clear();
+        proxies_.clear();
+    }
 
     /**
      * @brief Register a proxy by caller UID.

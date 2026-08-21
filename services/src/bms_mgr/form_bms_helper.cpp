@@ -278,8 +278,9 @@ int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     auto callingUid = IPCSkeleton::GetCallingUid();
-    if (IN_PROCESS_CALL(iBundleMgr->GetNameForUid(callingUid, callerBundleName)) != ERR_OK) {
-        HILOG_ERROR("fail get form config info");
+    if (IN_PROCESS_CALL(iBundleMgr->GetNameForUid(callingUid, callerBundleName)) != ERR_OK
+        || callerBundleName.empty()) {
+        HILOG_ERROR("fail get bundleName");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     return ERR_OK;

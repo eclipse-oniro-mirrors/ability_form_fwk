@@ -15,6 +15,8 @@
 
 #include "common/util/form_util.h"
 
+#include <cerrno>
+#include <climits>
 #include <set>
 #include <thread>
 #include <chrono>
@@ -364,7 +366,13 @@ bool FormUtil::ConvertStringToInt(std::string_view strInfo, int &intValue, int r
 
 long long FormUtil::ConvertStringToLongLong(std::string_view strInfo, int radix)
 {
-    return static_cast<long long>(strtoll(std::string(strInfo).c_str(), nullptr, radix));
+    errno = 0;
+    long long result = strtoll(std::string(strInfo).c_str(), nullptr, radix);
+    if (errno == ERANGE) {
+        HILOG_ERROR("ConvertStringToLongLong overflow");
+        return 0;
+    }
+    return result;
 }
 
 bool FormUtil::IsActiveUser(const int32_t userId)
@@ -388,7 +396,11 @@ int32_t FormUtil::GetCallerUserId(const int callingUid)
 {
     // get caller userId
     int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
-    (void)DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->GetOsAccountLocalIdFromUid(callingUid, userId);
+    auto errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()
+        ->GetOsAccountLocalIdFromUid(callingUid, userId);
+    if (errCode != ERR_OK) {
+        HILOG_WARN("GetOsAccountLocalIdFromUid failed, use fallback userId");
+    }
     return userId;
 }
 

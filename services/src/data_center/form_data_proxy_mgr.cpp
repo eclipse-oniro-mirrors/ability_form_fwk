@@ -100,6 +100,18 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 void FormDataProxyMgr::UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("update subscribe form data. formId:%{public}" PRId64, formId);
+    std::string callerBundleName;
+    if (FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName) != ERR_OK
+        || callerBundleName.empty()) {
+        HILOG_ERROR("get caller bundleName failed");
+        return;
+    }
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)
+        || callerBundleName != formRecord.bundleName) {
+        HILOG_ERROR("caller is not the provider");
+        return;
+    }
     std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
     if (recordPtr != nullptr) {
         recordPtr->UpdateSubscribeFormData(formDataProxies);

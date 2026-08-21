@@ -99,16 +99,13 @@ bool FormRouterProxyMgr::HasRouterProxy(int64_t formId)
 void FormRouterProxyMgr::OnFormRouterEvent(int64_t formId, const Want &want)
 {
     HILOG_DEBUG("call");
-    if (!HasRouterProxy(formId)) {
+    std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
+    auto it = formRouterProxyMap_.find(formId);
+    if (it == formRouterProxyMap_.end() || it->second == nullptr) {
         HILOG_WARN("This form no formRouterProxy has been register");
         return;
     }
-    std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
-    auto routerProxy = formRouterProxyMap_[formId];
-    if (routerProxy == nullptr) {
-        return;
-    }
-    PostRouterProxyToHost(formId, routerProxy, want);
+    PostRouterProxyToHost(formId, it->second, want);
 }
 
 void FormRouterProxyMgr::CleanResource(const wptr<IRemoteObject> &remote)

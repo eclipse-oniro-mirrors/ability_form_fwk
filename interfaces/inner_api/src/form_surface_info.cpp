@@ -26,6 +26,10 @@ bool FormSurfaceInfo::ReadFromParcel(Parcel &parcel)
     height = parcel.ReadFloat();
     borderWidth = parcel.ReadFloat();
     formViewScale = parcel.ReadFloat();
+    if (width <= 0 || height <= 0 || formViewScale <= 0) {
+        HILOG_ERROR("invalid surface params");
+        return false;
+    }
     return true;
 }
 

@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_TIMER_MGR_H
 #define OHOS_FORM_FWK_FORM_TIMER_MGR_H
 
+#include <atomic>
 #include <list>
 #include <map>
 #include <mutex>
@@ -397,7 +398,6 @@ private:
     void ClearDiskInfoReportTimer();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
-    bool IsDynamicTimerExpired(int64_t formId);
     bool UpdateAtTimerAlarmDetail(FormTimer &timerTask);
 
     mutable std::mutex intervalMutex_;
@@ -415,8 +415,8 @@ private:
     uint64_t updateAtTimerId_ = 0L;
     uint64_t dynamicAlarmTimerId_ = 0L;
     std::atomic<uint64_t> limiterTimerId_ = 0L;
-    uint64_t limiterTimerReportId_ = 0L;
-    uint64_t reportDiskUseTimerId_ = 0L;
+    std::atomic<uint64_t> limiterTimerReportId_ = 0L;
+    std::atomic<uint64_t> reportDiskUseTimerId_ = 0L;
     mutable std::mutex formCheckTimerMutex_;
     uint64_t formCheckTimerId_ = 0L;
 
@@ -427,7 +427,7 @@ private:
     std::shared_ptr<WantAgent> currentLimiterWantAgent_ = nullptr;
 
     int64_t dynamicWakeUpTime_ = INT64_MAX;
-    long atTimerWakeUpTime_ = LONG_MAX;
+    std::atomic<int64_t> atTimerWakeUpTime_ = INT64_MAX;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

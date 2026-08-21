@@ -87,12 +87,12 @@ void ParamCommonEvent::SubscriberEvent()
 void ParamCommonEvent::UnSubscriberEvent()
 {
     HILOG_INFO("call");
-    eventHandles_.clear();
-    handleEventFunc_.clear();
     if (subscriber_) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_);
         subscriber_ = nullptr;
     }
+    eventHandles_.clear();
+    handleEventFunc_.clear();
     HILOG_INFO("UnSubscriberEvent end.");
 }
 

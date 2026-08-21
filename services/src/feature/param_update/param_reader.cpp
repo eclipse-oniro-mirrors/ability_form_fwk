@@ -66,7 +66,12 @@ std::string ParamReader::GetPathVersion(const std::string &path)
     }
     std::string line;
     std::getline(file, line);
-    std::string versionStr = StringUtils::split(line, '=')[1];
+    auto tokens = StringUtils::split(line, '=');
+    if (tokens.size() < 2) {
+        HILOG_ERROR("invalid version file line format");
+        return Constants::FMC_DEFAULT_VERSION;
+    }
+    std::string versionStr = tokens[1];
     StringUtils::trim(versionStr);
     file.close();
     return versionStr;
@@ -146,7 +151,12 @@ std::string ParamReader::GetManifestSha256Digest()
     std::string line;
     std::getline(file, line);
     file.close();
-    sha256Digest = StringUtils::split(line, ':')[1];
+    auto tokens = StringUtils::split(line, ':');
+    if (tokens.size() < 2) {
+        HILOG_ERROR("invalid cert.sf line format");
+        return sha256Digest;
+    }
+    sha256Digest = tokens[1];
     StringUtils::trim(sha256Digest);
     return sha256Digest;
 }
@@ -165,7 +175,12 @@ std::string ParamReader::GetSha256Digest(const std::string &fileName)
         std::string nextline;
         if (line.find(FILE_SHA_KEY + fileName) != std::string::npos) {
             std::getline(file, nextline);
-            sha256Digest = StringUtils::split(nextline, ':')[1];
+            auto tokens = StringUtils::split(nextline, ':');
+            if (tokens.size() < 2) {
+                HILOG_ERROR("invalid manifest line format");
+                continue;
+            }
+            sha256Digest = tokens[1];
             StringUtils::trim(sha256Digest);
             break;
         }
