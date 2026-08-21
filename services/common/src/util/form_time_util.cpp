@@ -37,7 +37,7 @@ int64_t FormTimeUtil::GetBootTimeMs()
         auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
         return std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
     }
-    if (tv.tv_sec > INT64_MAX / NANO_PER_SECOND) {
+    if (tv.tv_sec >= INT64_MAX / NANO_PER_SECOND) {
         HILOG_WARN("tv_sec too large, would overflow, use std::chrono::steady_clock");
         auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
         return std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
