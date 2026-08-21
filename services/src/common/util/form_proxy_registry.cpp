@@ -36,6 +36,18 @@ void FormProxyDeathRecipient::OnRemoteDied([[maybe_unused]] const wptr<IRemoteOb
 
 FormProxyRegistry::FormProxyRegistry(const std::string &tag) : tag_(tag) {}
 
+FormProxyRegistry::~FormProxyRegistry()
+{
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    for (auto &item : deathRecipients_) {
+        if (item.second != nullptr && item.second->GetRefPtr() != nullptr) {
+            item.second->GetRefPtr()->RemoveDeathRecipient(item.second);
+        }
+    }
+    deathRecipients_.clear();
+    proxies_.clear();
+}
+
 ErrCode FormProxyRegistry::Register(int32_t callingUid, const sptr<IRemoteObject> &proxy)
 {
     if (proxy == nullptr) {
@@ -146,11 +158,16 @@ size_t FormProxyRegistry::Size() const
 
 bool FormProxyRegistry::AddDeathRecipient(int32_t uid, const sptr<IRemoteObject> &proxy)
 {
-    auto callback = [this](int32_t diedUid) {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        deathRecipients_.erase(diedUid);
-        proxies_.erase(diedUid);
-        HILOG_INFO("%{public}s: auto cleaned died proxy for uid=%{public}d", tag_.c_str(), diedUid);
+    std::weak_ptr<FormProxyRegistry> weakSelf = weak_from_this();
+    auto callback = [weakSelf = std::move(weakSelf)](int32_t diedUid) {
+        auto self = weakSelf.lock();
+        if (!self) {
+            return;
+        }
+        std::unique_lock<std::shared_mutex> lock(self->mutex_);
+        self->deathRecipients_.erase(diedUid);
+        self->proxies_.erase(diedUid);
+        HILOG_INFO("%{public}s: auto cleaned died proxy for uid=%{public}d", self->tag_.c_str(), diedUid);
     };
 
     auto recipient = sptr<FormProxyDeathRecipient>::MakeSptr(uid, std::move(callback));

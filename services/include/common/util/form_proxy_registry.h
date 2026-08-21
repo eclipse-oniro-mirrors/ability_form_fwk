@@ -16,8 +16,10 @@
 #ifndef OHOS_FORM_FWK_FORM_PROXY_REGISTRY_H
 #define OHOS_FORM_FWK_FORM_PROXY_REGISTRY_H
 
+#include <memory>
 #include <shared_mutex>
 #include <string>
+#include <unordered_map>
 
 #include "form_mgr_errors.h"
 #include "iremote_object.h"
@@ -48,7 +50,7 @@ private:
  * duplicated code across multiple callback registration interfaces.
  * Uses std::shared_mutex for read-write lock optimization.
  */
-class FormProxyRegistry {
+class FormProxyRegistry : public std::enable_shared_from_this<FormProxyRegistry> {
 public:
     /**
      * @brief Constructor.
@@ -56,17 +58,7 @@ public:
      */
     explicit FormProxyRegistry(const std::string &tag);
 
-    ~FormProxyRegistry()
-    {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        for (auto &item : deathRecipients_) {
-            if (item.second != nullptr && item.second->GetRefPtr() != nullptr) {
-                item.second->GetRefPtr()->RemoveDeathRecipient(item.second);
-            }
-        }
-        deathRecipients_.clear();
-        proxies_.clear();
-    }
+    ~FormProxyRegistry();
 
     /**
      * @brief Register a proxy by caller UID.
