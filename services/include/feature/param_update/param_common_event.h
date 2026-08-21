@@ -19,6 +19,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <singleton.h>
 #include <string>
 
@@ -58,6 +59,7 @@ private:
     std::map<std::string, EventHandle> eventHandles_;
     std::map<std::string, HandleEventFunc> handleEventFunc_;
     std::shared_ptr<ParamCommonEventSubscriber> subscriber_ = nullptr;
+    std::mutex eventMutex_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

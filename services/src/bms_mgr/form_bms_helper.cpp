@@ -364,19 +364,6 @@ bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::str
     return false;
 }
 
-bool FormBmsHelper::GetCompatibleVersion(const std::string& bundleName, int32_t userId, int32_t& compatibleVersion)
-{
-    HILOG_DEBUG("call");
-    BundleInfo bundleInfo;
-    if (!GetBundleInfoDefault(bundleName, userId, bundleInfo)) {
-        HILOG_ERROR("Get bundle info failed");
-        return false;
-    }
-
-    compatibleVersion = static_cast<int32_t>(bundleInfo.compatibleVersion);
-    return true;
-}
-
 ErrCode FormBmsHelper::GetProxyDataInfos(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<ProxyData> &proxyData)
 {

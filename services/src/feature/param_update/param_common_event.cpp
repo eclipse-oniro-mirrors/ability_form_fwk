@@ -91,6 +91,7 @@ void ParamCommonEvent::UnSubscriberEvent()
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_);
         subscriber_ = nullptr;
     }
+    std::lock_guard<std::mutex> lock(eventMutex_);
     eventHandles_.clear();
     handleEventFunc_.clear();
     HILOG_INFO("UnSubscriberEvent end.");
@@ -99,12 +100,17 @@ void ParamCommonEvent::UnSubscriberEvent()
 void ParamCommonEvent::OnReceiveEvent(const AAFwk::Want &want)
 {
     std::string action = want.GetAction();
-    auto it = eventHandles_.find(action);
-    if (it == eventHandles_.end()) {
-        HILOG_WARN("Ignore event: %{public}s", action.c_str());
-        return;
+    EventHandle handle;
+    {
+        std::lock_guard<std::mutex> lock(eventMutex_);
+        auto it = eventHandles_.find(action);
+        if (it == eventHandles_.end()) {
+            HILOG_WARN("Ignore event: %{public}s", action.c_str());
+            return;
+        }
+        handle = it->second;
     }
-    it->second(want);
+    handle(want);
 }
 
 
