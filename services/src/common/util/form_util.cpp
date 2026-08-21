@@ -370,7 +370,6 @@ long long FormUtil::ConvertStringToLongLong(std::string_view strInfo, int radix)
     long long result = strtoll(std::string(strInfo).c_str(), nullptr, radix);
     if (errno == ERANGE) {
         HILOG_ERROR("ConvertStringToLongLong overflow");
-        return 0;
     }
     return result;
 }

@@ -18,6 +18,7 @@
 
 #include "form_render_stub.h"
 
+#include <atomic>
 #include <memory>
 #include <singleton.h>
 

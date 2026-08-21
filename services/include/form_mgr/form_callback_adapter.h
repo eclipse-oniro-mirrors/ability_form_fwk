@@ -148,9 +148,12 @@ private:
     std::shared_ptr<FormProxyRegistry> sceneAnimationRegistry_ = std::make_shared<FormProxyRegistry>("SceneAnimation");
     std::shared_ptr<FormProxyRegistry> formRectRegistry_ = std::make_shared<FormProxyRegistry>("FormRect");
     std::shared_ptr<FormProxyRegistry> liveFormStatusRegistry_ = std::make_shared<FormProxyRegistry>("LiveFormStatus");
-    std::shared_ptr<FormProxyRegistry> crossBundleControlRegistry_ = std::make_shared<FormProxyRegistry>("CrossBundleControl");
-    std::shared_ptr<FormProxyRegistry> templateFormDetailInfoRegistry_ = std::make_shared<FormProxyRegistry>("TemplateFormDetailInfo");
-    std::shared_ptr<FormProxyRegistry> updateFormsConfigRegistry_ = std::make_shared<FormProxyRegistry>("UpdateFormsConfig");
+    std::shared_ptr<FormProxyRegistry> crossBundleControlRegistry_ =
+        std::make_shared<FormProxyRegistry>("CrossBundleControl");
+    std::shared_ptr<FormProxyRegistry> templateFormDetailInfoRegistry_ =
+        std::make_shared<FormProxyRegistry>("TemplateFormDetailInfo");
+    std::shared_ptr<FormProxyRegistry> updateFormsConfigRegistry_ =
+        std::make_shared<FormProxyRegistry>("UpdateFormsConfig");
     std::shared_ptr<FormProxyRegistry> deleteFormsRegistry_ = std::make_shared<FormProxyRegistry>("DeleteForms");
     std::shared_ptr<FormProxyRegistry> wantCallbackRegistry_ = std::make_shared<FormProxyRegistry>("WantCallback");
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
