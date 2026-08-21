@@ -146,9 +146,8 @@ size_t FormProxyRegistry::Size() const
 
 bool FormProxyRegistry::AddDeathRecipient(int32_t uid, const sptr<IRemoteObject> &proxy)
 {
-    std::weak_ptr<FormProxyRegistry> weakSelf = weak_from_this();
-    auto callback = [weakSelf = std::move(weakSelf)](int32_t diedUid) {
-        auto self = weakSelf.lock();
+    auto callback = [weak = weak_from_this()](int32_t diedUid) {
+        auto self = weak.lock();
         if (!self) {
             return;
         }

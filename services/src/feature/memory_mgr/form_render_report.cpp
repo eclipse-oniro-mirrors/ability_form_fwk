@@ -100,7 +100,7 @@ void FormRenderReport::ReportFRSStatus()
 
 int32_t FormRenderReport::GetAllFormsCount()
 {
-    int32_t tempFormsCount;
+    int32_t tempFormsCount = 0;
     FormDataMgr::GetInstance().GetTempFormsCount(tempFormsCount);
     int32_t castFormsCount = 0;
     FormDataMgr::GetInstance().GetCastFormsCount(castFormsCount);
