@@ -551,25 +551,33 @@ napi_value JsFormProvider::OnIsRequestPublishFormSupported(napi_env env, size_t 
         return jsNull;
     }
     auto selfToken = IPCSkeleton::GetSelfTokenID();
-    if (!Security::AccessToken::AccessTokenKit::IsSystemAppByFullTokenID(selfToken)) {
+    bool isNotSystemApp = !Security::AccessToken::AccessTokenKit::IsSystemAppByFullTokenID(selfToken);
+    if (isNotSystemApp) {
         HILOG_ERROR("The application not system-app,can't use system-api");
-        NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
-        return CreateJsUndefined(env);
     }
     struct OnIsRequestPublishFormSupported {
         bool result;
+        bool isNotSystemApp;
     };
-    std::shared_ptr<OnIsRequestPublishFormSupported> onIsRequestPublishFormSupported =
-        std::make_shared<OnIsRequestPublishFormSupported>();
-    auto execute = [data = onIsRequestPublishFormSupported] () {
+    auto callbackInfo = std::make_shared<OnIsRequestPublishFormSupported>();
+    callbackInfo->isNotSystemApp = isNotSystemApp;
+    auto execute = [data = callbackInfo]() {
         if (data == nullptr) {
             HILOG_ERROR("onIsRequestPublishFormSupported is nullptr.");
             return;
         }
+        if (data->isNotSystemApp) {
+            data->result = false;
+            return;
+        }
         data->result = FormMgr::GetInstance().IsRequestPublishFormSupported();
     };
-    NapiAsyncTask::CompleteCallback complete = [data = onIsRequestPublishFormSupported](
+    NapiAsyncTask::CompleteCallback complete = [data = callbackInfo](
             napi_env env, NapiAsyncTask &task, int32_t status) {
+        if (data->isNotSystemApp) {
+            task.Reject(env, CreateJsError(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP));
+            return;
+        }
         auto retMsg = QueryRetMsg(ERR_OK);
         task.ResolveWithCustomize(env, CreateJsError(env, ERR_OK, retMsg),
             CreateJsValue(env, data->result));

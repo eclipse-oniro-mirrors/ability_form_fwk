@@ -277,25 +277,74 @@ bool FormUtil::VerifyPermissionByBundleName(int32_t userId, const std::string &b
 
 bool FormUtil::ConvertStringToInt64(std::string_view strInfo, int64_t &int64Value)
 {
-    if (strInfo.empty()) {
-        int64Value = 0;
+    size_t strLength = strInfo.size();
+    if (strLength == ZERO_VALUE) {
+        int64Value = ZERO_VALUE;
         return true;
     }
-    std::string str(strInfo);
-    static const std::regex pattern("^0|-?[1-9][0-9]{0,18}$");
+    std::regex pattern("^0|-?[1-9][0-9]{0,18}$");
+    std::string strInfoStd(strInfo);
     std::smatch match;
-    if (!regex_match(str, match, pattern)) {
+    if (!regex_match(strInfoStd, match, pattern)) {
         HILOG_DEBUG("regex_match failed");
         return false;
     }
-    errno = 0;
-    char *end = nullptr;
-    long long val = strtoll(str.c_str(), &end, 10);
-    if (errno == ERANGE || end == str.c_str() || *end != '\0' || val < INT64_MIN || val > INT64_MAX) {
+    if (strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1) != "-") {
+        return CheckPositiveInt64Overflow(strInfo, int64Value);
+    }
+    return CheckNegativeInt64Overflow(strInfo, int64Value);
+}
+
+bool FormUtil::CheckPositiveInt64Overflow(std::string_view strInfo, int64_t &int64Value)
+{
+    size_t strLength = strInfo.size();
+    if (strLength < INT_64_LENGTH) {
+        int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
+        return true;
+    }
+    int maxSubValue = 0;
+    if (!ConvertStringToInt(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1), maxSubValue)) {
         return false;
     }
-    int64Value = static_cast<int64_t>(val);
-    return true;
+    if (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER) {
+        int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
+        return true;
+    }
+    // INT64_MAX remove the first number
+    int64_t subValue = static_cast<int64_t>(ConvertStringToLongLong(strInfo.substr(ZERO_VALUE + 1,
+        INT_64_LENGTH - 1)));
+    if (strLength == INT_64_LENGTH && subValue <= (INT64_MAX - HEAD_BIT_NUM)) {
+        int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
+        return true;
+    }
+    return false;
+}
+
+bool FormUtil::CheckNegativeInt64Overflow(std::string_view strInfo, int64_t &int64Value)
+{
+    size_t strLength = strInfo.size();
+    if (strLength < INT_64_LENGTH + 1) {
+        int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
+        return true;
+    }
+    if (strLength == INT_64_LENGTH + 1) {
+        int minSubValue = 0;
+        if (!ConvertStringToInt(strInfo.substr(1, 1), minSubValue)) {
+            return false;
+        }
+        if (minSubValue < BASE_NUMBER) {
+            int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
+            return true;
+        }
+        // INT64_MIN remove the first number
+        int64_t subValue = static_cast<int64_t>(ConvertStringToLongLong(strInfo.substr(ZERO_VALUE + 2,
+            INT_64_LENGTH - 1)));
+        if (subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
+            int64Value = ConvertStringToLongLong(strInfo);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool FormUtil::ConvertStringToInt(std::string_view strInfo, int &intValue, int radix)

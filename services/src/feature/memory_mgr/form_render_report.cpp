@@ -51,9 +51,7 @@ void FormRenderReport::RecordFRSDead()
 {
     HILOG_INFO("call");
     bool expected = false;
-    if (isFRSFirstLoaded_.compare_exchange_strong(expected, true)) {
-        // 仅恢复标志，不重复记录
-    }
+    isFRSFirstLoaded_.compare_exchange_strong(expected, true);
     RecordFRSStatus(FRS_DEAD);
 }
 

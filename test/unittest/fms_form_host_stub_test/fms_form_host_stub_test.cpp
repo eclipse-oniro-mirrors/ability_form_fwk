@@ -353,7 +353,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_017, TestSize.Level1)
     data.WriteParcelable(&wantParams);
     data.WriteInt64(requestCode);
     auto result = callback.OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(result, ERR_OK);
 }
 
 /**

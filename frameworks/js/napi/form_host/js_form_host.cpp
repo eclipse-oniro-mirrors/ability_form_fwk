@@ -2781,7 +2781,10 @@ FormRouterProxyCallbackClient::FormRouterProxyCallbackClient(napi_env env, napi_
 FormRouterProxyCallbackClient::~FormRouterProxyCallbackClient()
 {
     if (env_ != nullptr && callbackRef_ != nullptr) {
-        napi_delete_reference(env_, callbackRef_);
+        napi_status status = napi_delete_reference(env_, callbackRef_);
+        if (status != napi_ok) {
+            HILOG_ERROR("napi_delete_reference failed: %{public}d", status);
+        }
     }
 }
 

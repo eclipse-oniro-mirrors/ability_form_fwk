@@ -182,9 +182,15 @@ int FormDebugAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::str
     int32_t userId = DEFAULT_USER_ID;
     int32_t instIndex = 0;
     if (size > USER_ID_INDEX) {
-        FormUtil::ConvertStringToInt(bundleInfoList[USER_ID_INDEX], userId);
+        if (!FormUtil::ConvertStringToInt(bundleInfoList[USER_ID_INDEX], userId)) {
+            HILOG_ERROR("convert userId failed");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
         if (size > INSTANCE_SEQ_INDEX) {
-            FormUtil::ConvertStringToInt(bundleInfoList[INSTANCE_SEQ_INDEX], instIndex);
+            if (!FormUtil::ConvertStringToInt(bundleInfoList[INSTANCE_SEQ_INDEX], instIndex)) {
+                HILOG_ERROR("convert instIndex failed");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
         }
     }
     HILOG_INFO("resolve bundleInfo, bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d",

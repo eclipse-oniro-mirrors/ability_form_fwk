@@ -461,16 +461,17 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(
                     "formId:%{public}" PRId64, subscribe.c_str(), formId_);
             }
 
-            std::string uri = key + "?" + "user=" + userId + "&srcToken=" + token;
-            HILOG_DEBUG("Convert data, uri:%{private}s, subscriberId:%{public}" PRId64, uri.c_str(), subscriberId);
-            uri += "&dstBundleName=" + bundleName_;
+            std::string resourceKey = key + "?" + "user=" + userId + "&srcToken=" + token;
+            HILOG_DEBUG("Convert data, resourceKey:%{public}s, subscriberId:%{public}" PRId64,
+                resourceKey.c_str(), subscriberId);
+            resourceKey += "&dstBundleName=" + bundleName_;
             auto it = subscribeId2UrisMap.find(subscriberId);
             if (it == subscribeId2UrisMap.end()) {
                 std::vector<std::string> uris;
-                uris.push_back(uri);
+                uris.push_back(resourceKey);
                 subscribeId2UrisMap.emplace(subscriberId, uris);
             } else {
-                it->second.push_back(uri);
+                it->second.push_back(resourceKey);
             }
         }
     }

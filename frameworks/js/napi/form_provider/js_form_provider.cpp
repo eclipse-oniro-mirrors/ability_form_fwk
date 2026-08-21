@@ -386,7 +386,6 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
     const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
     const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
     want.SetParam(key, value);
-    HILOG_DEBUG("JsFormProvider OnOpenFormManager want:%{private}s", want.ToString().c_str());
 
 #ifdef NO_RUNTIME_EMULATOR
     time_t beginTime = time(nullptr);
@@ -442,7 +441,6 @@ napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t arg
     const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
     const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
     want.SetParam(key, value);
-    HILOG_DEBUG("JsFormProvider OnOpenFormManagerCrossBundle want:%{private}s", want.ToString().c_str());
 
 #ifdef NO_RUNTIME_EMULATOR
     time_t beginTime = time(nullptr);

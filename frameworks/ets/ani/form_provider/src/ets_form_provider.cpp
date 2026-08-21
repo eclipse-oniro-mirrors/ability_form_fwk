@@ -639,7 +639,6 @@ void OpenFormManagerCrossBundle(ani_env *env, ani_object aniWant)
     const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
     const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
     want.SetParam(key, value);
-    HILOG_DEBUG("stsFormProvider OpenFormManagerCrossBundle want:%{private}s", want.ToString().c_str());
 
     auto ret = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
     if (ret != ERR_OK) {

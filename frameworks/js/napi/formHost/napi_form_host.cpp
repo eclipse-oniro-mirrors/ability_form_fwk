@@ -478,7 +478,10 @@ static void AcquireFormStateCallbackComplete(napi_env env, napi_status status, v
         FormHostClient::GetInstance()->RemoveFormState(callbackInfo->want);
         InvokeAcquireFormStateFailureCallback(env, callback);
         if (callback != nullptr) {
-            napi_delete_reference(env, callback);
+            napi_status refStatus = napi_delete_reference(env, callback);
+            if (refStatus != napi_ok) {
+                HILOG_ERROR("napi_delete_reference failed: %{public}d", refStatus);
+            }
         }
         delete callbackInfo;
     }
