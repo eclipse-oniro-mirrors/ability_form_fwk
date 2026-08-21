@@ -35,6 +35,7 @@ constexpr const char *CERT_SF_FILE = "CERT.SF";
 constexpr const char *MANIFEST_MF_FILE = "MANIFEST.MF";
 constexpr const char *FILE_SHA_KEY = "Name: ";
 constexpr const char *PUBKEY_PATH = "/system/etc/update/hwkey_param_upgrade_v1.pem";
+constexpr size_t MIN_SPLIT_PAIR_SIZE = 2;
 }
 
 ParamReader::ParamReader()
@@ -67,7 +68,7 @@ std::string ParamReader::GetPathVersion(const std::string &path)
     std::string line;
     std::getline(file, line);
     auto splitResult = StringUtils::split(line, '=');
-    if (splitResult.size() < 2) {
+    if (splitResult.size() < MIN_SPLIT_PAIR_SIZE) {
         HILOG_ERROR("invalid version file line format");
         return Constants::FMC_DEFAULT_VERSION;
     }
@@ -152,7 +153,7 @@ std::string ParamReader::GetManifestSha256Digest()
     std::getline(file, line);
     file.close();
     auto splitResult = StringUtils::split(line, ':');
-    if (splitResult.size() < 2) {
+    if (splitResult.size() < MIN_SPLIT_PAIR_SIZE) {
         HILOG_ERROR("invalid cert.sf line format");
         return sha256Digest;
     }
@@ -176,7 +177,7 @@ std::string ParamReader::GetSha256Digest(const std::string &fileName)
         if (line.find(FILE_SHA_KEY + fileName) != std::string::npos) {
             std::getline(file, nextline);
             auto splitResult = StringUtils::split(nextline, ':');
-            if (splitResult.size() < 2) {
+            if (splitResult.size() < MIN_SPLIT_PAIR_SIZE) {
                 HILOG_ERROR("invalid manifest line format");
                 continue;
             }
