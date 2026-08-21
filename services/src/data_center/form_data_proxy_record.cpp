@@ -112,11 +112,11 @@ void FormDataProxyRecord::GetSubscribeFormDataProxies(const FormDataProxy formDa
 {
     std::string userId = std::to_string(FormUtil::GetCallerUserId(uid_));
     std::string token = std::to_string(tokenId_);
-    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token +
+    std::string subscribeKey = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token +
         "&dstBundleName=" + bundleName_;
-    HILOG_INFO("get sub data, uri:%{public}s, formId_:%{public}" PRId64, uri.c_str(), formId_);
+    HILOG_INFO("get sub data, subscribeKey:%{public}s, formId_:%{public}" PRId64, subscribeKey.c_str(), formId_);
     std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
-    auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
+    auto rdbSubscribeResult = rdbSubscribeResultMap_.find(subscribeKey);
     if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
         int64_t subscriberId = formId_;
         if (!FormUtil::ConvertStringToInt64(formDataProxy.subscribeId, subscriberId)) {
@@ -507,7 +507,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
     }
     std::string formDataStr = object.empty() ? "" : object.dump();
     HILOG_INFO("formId:%{public}" PRId64 " update published data. formDataStr[len:%{public}zu], "
-        "formDataKeysStr:%{public}s, imageDataMap size:%{public}zu", formId_, formDataStr.length(),
+        "formDataKeysStr:%{private}s, imageDataMap size:%{public}zu", formId_, formDataStr.length(),
         formDataKeysStr.c_str(), imageDataMap.size());
 
     FormProviderData formProviderData;
@@ -784,8 +784,7 @@ bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &d
 
 void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record, bool isRdbType)
 {
-    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
-    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> lock(isRdbType ? rdbSubscribeResultMapMutex_ : publishSubscribeResultMapMutex_);
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     auto mapIter = resultMap->find(record.uri);
@@ -800,8 +799,7 @@ void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record,
 
 void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string &uri, int64_t subscribeId, bool isRdbType)
 {
-    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
-    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> lock(isRdbType ? rdbSubscribeResultMapMutex_ : publishSubscribeResultMapMutex_);
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     auto mapIter = resultMap->find(uri);
@@ -820,8 +818,7 @@ void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string &uri, in
 void FormDataProxyRecord::PrintSubscribeState(const std::string &uri, int64_t subscribeId, bool isRdbType)
 {
     std::string type = isRdbType ? "rdb" : "published";
-    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
-    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> lock(isRdbType ? rdbSubscribeResultMapMutex_ : publishSubscribeResultMapMutex_);
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     bool alreadySubscribed = true;
@@ -914,8 +911,7 @@ void FormDataProxyRecord::RetryFailurePublishedSubscribes(SubscribeResultRecord 
 
 void FormDataProxyRecord::GetFormSubscribeKeys(std::vector<std::string> &subscribedKeys, bool isRdbType)
 {
-    std::lock_guard<std::mutex> rdbLock(rdbSubscribeResultMapMutex_);
-    std::lock_guard<std::mutex> publishLock(publishSubscribeResultMapMutex_);
+    std::lock_guard<std::mutex> lock(isRdbType ? rdbSubscribeResultMapMutex_ : publishSubscribeResultMapMutex_);
     auto resultMap = isRdbType ? rdbSubscribeResultMap_ : publishSubscribeResultMap_;
     for (auto &result : resultMap) {
         for (auto &records : result.second) {

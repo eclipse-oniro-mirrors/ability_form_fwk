@@ -302,6 +302,7 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
         outFormInfos = inFormInfos;
         return;
     }
+    // compatibility: if db already holds more used forms than the limit, outFormInfos may exceed FORM_INFO_MAX_NUM
     int32_t addFormNum = 0;
     unsigned int formNum = formDBNames.size();
     if (formDBNames.size() < Constants::FORM_INFO_MAX_NUM) {

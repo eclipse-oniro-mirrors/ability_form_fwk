@@ -198,7 +198,7 @@ private:
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
     std::shared_mutex rdbStoreMutex_;
     std::shared_mutex formRdbTableCfgMapMutex_;
-    int64_t lastRdbBuildTime_ = 0;
+    std::atomic<int64_t> lastRdbBuildTime_ = 0;
     std::atomic<int64_t> readCount_ = 0;
     std::atomic<int64_t> writeCount_ = 0;
     std::atomic<int64_t> writeSize_ = 0;

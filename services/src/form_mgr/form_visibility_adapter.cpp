@@ -72,6 +72,12 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    if (formVisibleType < static_cast<int32_t>(FormVisibilityType::UNKNOWN) ||
+        formVisibleType > static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
+        HILOG_ERROR("invalid formVisibleType:%{public}d", formVisibleType);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
     int64_t matchedFormId = 0;
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);

@@ -348,8 +348,8 @@ ani_array CreateTriggerTypesAniArray(ani_env *env,
 
 void SetFormInfoArrayProperties(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+    if (env == nullptr || formInfoAni == nullptr) {
+        HILOG_ERROR("invalid param");
         return;
     }
     // Set array properties
@@ -375,8 +375,8 @@ void SetFormInfoArrayProperties(ani_env *env, ani_object formInfoAni, const AppE
 void SetFormInfoFunInteractionParams(ani_env *env, ani_object formInfoAni,
     const AppExecFwk::FormFunInteractionParams &funInteractionParams)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+    if (env == nullptr || formInfoAni == nullptr) {
+        HILOG_ERROR("invalid param");
         return;
     }
     ani_object funInteractionParamsAni = FormAniUtil::CreateAniObject(env, ETS_FUNINTERACTIONPARAMS_NAME);
@@ -395,8 +395,8 @@ void SetFormInfoFunInteractionParams(ani_env *env, ani_object formInfoAni,
 void SetFormInfoSceneAnimationParams(ani_env *env, ani_object formInfoAni,
     const AppExecFwk::FormSceneAnimationParams &formSceneAnimationParams)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+    if (env == nullptr || formInfoAni == nullptr) {
+        HILOG_ERROR("invalid param");
         return;
     }
     ani_object sceneAnimationParamsAni = FormAniUtil::CreateAniObject(env, ETS_SCENEANIMATIONPARAMS_NAME);
@@ -1538,8 +1538,8 @@ void PrepareExceptionAndThrow(ani_env *env, int32_t internalErrorCode)
 
 void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+    if (env == nullptr || formInfoAni == nullptr) {
+        HILOG_ERROR("invalid param");
         return;
     }
     // Set nullable boolean properties
@@ -1623,8 +1623,8 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
 
 void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::RunningFormInfo &formInfo)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+    if (env == nullptr || formInfoAni == nullptr) {
+        HILOG_ERROR("invalid param");
         return;
     }
     // Set basic integer properties
