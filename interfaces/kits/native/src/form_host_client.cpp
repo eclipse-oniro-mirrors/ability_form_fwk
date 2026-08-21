@@ -316,6 +316,10 @@ bool FormHostClient::AddAcqiureFormDataCallback(const std::shared_ptr<FormDataCa
 void FormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (requestCode <= 0) {
+        HILOG_ERROR("invalid requestCode:%{public}" PRId64, requestCode);
+        return;
+    }
     std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
     auto iter = acquireDataCallbackMap_.find(requestCode);
     if (iter == acquireDataCallbackMap_.end()) {
@@ -334,6 +338,10 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("result:%{public}d", result);
+    if (requestCode <= 0) {
+        HILOG_ERROR("invalid requestCode:%{public}" PRId64, requestCode);
+        return;
+    }
     std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
     auto iter = shareFormCallbackMap_.find(requestCode);
     if (iter == shareFormCallbackMap_.end()) {

@@ -104,7 +104,7 @@ bool FormDistributedMgr::Init()
 
     LoadDataFromDb();
 
-    isInitialized_ = true;
+    isInitialized_.store(true, std::memory_order_release);
     HILOG_INFO("initialized");
     return true;
 }
@@ -134,7 +134,7 @@ void FormDistributedMgr::SetBundleDistributedStatus(
         return;
     }
 
-    if (!isInitialized_ && !Init()) {
+    if (!isInitialized_.load(std::memory_order_acquire) && !Init()) {
         HILOG_ERROR("Form bundle distributed mgr not init");
         return;
     }
@@ -156,7 +156,7 @@ void FormDistributedMgr::SetBundleDistributedStatus(
 bool FormDistributedMgr::IsBundleDistributedInit()
 {
     std::unique_lock<std::shared_mutex> lock(bundleDistributedMapMutex_);
-    if (!isInitialized_ && !Init()) {
+    if (!isInitialized_.load(std::memory_order_acquire) && !Init()) {
         HILOG_ERROR("Form bundle distributed mgr not init");
         return false;
     }

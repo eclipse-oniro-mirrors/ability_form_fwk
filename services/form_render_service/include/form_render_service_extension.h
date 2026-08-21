@@ -136,7 +136,6 @@ public:
 private:
     void GetSrcPath(std::string &srcPath);
 
-    const std::unique_ptr<Runtime> &runtime_;
     std::weak_ptr<AppExecFwk::OHOSApplication> application_;
 };
 }  // namespace AbilityRuntime

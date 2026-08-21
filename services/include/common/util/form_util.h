@@ -126,7 +126,7 @@ public:
      */
     static bool ConvertStringToInt64(std::string_view strInfo, int64_t &int64Value);
 
-    static int ConvertStringToInt(std::string_view strInfo, int radix = BASE_REQUEST_CODE_NUM);
+    static bool ConvertStringToInt(std::string_view strInfo, int &intValue, int radix = BASE_REQUEST_CODE_NUM);
 
     static long long ConvertStringToLongLong(std::string_view strInfo, int radix = BASE_REQUEST_CODE_NUM);
 
@@ -155,6 +155,10 @@ public:
      * @return Returns true if the caller bundle name matches FRS_BUNDLE_NAME; returns false otherwise.
      */
     static bool CheckIsFRSCall();
+
+private:
+    static bool CheckPositiveInt64Overflow(std::string_view strInfo, int64_t &int64Value);
+    static bool CheckNegativeInt64Overflow(std::string_view strInfo, int64_t &int64Value);
 };
 
 } // namespace AppExecFwk

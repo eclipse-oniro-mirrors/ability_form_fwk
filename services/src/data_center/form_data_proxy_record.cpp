@@ -461,16 +461,17 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(
                     "formId:%{public}" PRId64, subscribe.c_str(), formId_);
             }
 
-            std::string uri = key + "?" + "user=" + userId + "&srcToken=" + token;
-            HILOG_DEBUG("Convert data, uri:%{public}s, subscriberId:%{public}" PRId64, uri.c_str(), subscriberId);
-            uri += "&dstBundleName=" + bundleName_;
+            std::string resourceKey = key + "?" + "user=" + userId + "&srcToken=" + token;
+            HILOG_DEBUG("Convert data, resourceKey:%{public}s, subscriberId:%{public}" PRId64,
+                resourceKey.c_str(), subscriberId);
+            resourceKey += "&dstBundleName=" + bundleName_;
             auto it = subscribeId2UrisMap.find(subscriberId);
             if (it == subscribeId2UrisMap.end()) {
                 std::vector<std::string> uris;
-                uris.push_back(uri);
+                uris.push_back(resourceKey);
                 subscribeId2UrisMap.emplace(subscriberId, uris);
             } else {
-                it->second.push_back(uri);
+                it->second.push_back(resourceKey);
             }
         }
     }
@@ -481,30 +482,41 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(
     }
 }
 
+void FormDataProxyRecord::CollectPublishedData(const std::vector<DataShare::PublishedDataItem> &data,
+    nlohmann::json &object, std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap,
+    std::string &formDataKeysStr)
+{
+    for (const auto &item : data) {
+        if (item.key_.empty()) {
+            HILOG_ERROR("empty key");
+            continue;
+        }
+        if (item.IsAshmem()) {
+            PrepareImageData(item, object, imageDataMap);
+            continue;
+        }
+        auto *value = std::get_if<std::string>(&item.value_);
+        if (value == nullptr) {
+            HILOG_ERROR("invalid value type for key:%{public}s", item.key_.c_str());
+            continue;
+        }
+        nlohmann::json dataObject = SafeJsonParse(*value);
+        if (dataObject.is_discarded() || !dataObject.is_object()) {
+            HILOG_ERROR("fail parse data or not object:%{public}s", value->c_str());
+            continue;
+        }
+        object[item.key_] = dataObject;
+        std::string newKeyStr = formDataKeysStr.empty() ? item.key_ : (", " + item.key_);
+        formDataKeysStr += newKeyStr;
+    }
+}
+
 void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::PublishedDataItem> &data)
 {
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     nlohmann::json object;
     std::string formDataKeysStr = "";
-    for (const auto& iter : data) {
-        if (iter.key_.empty()) {
-            HILOG_ERROR("empty key");
-            continue;
-        }
-        if (iter.IsAshmem()) {
-            PrepareImageData(iter, object, imageDataMap);
-        } else {
-            auto value = std::get<std::string>(iter.value_);
-            nlohmann::json dataObject = SafeJsonParse(value);
-            if (dataObject.is_discarded()) {
-                HILOG_ERROR("fail parse data:%{public}s", value.c_str());
-                continue;
-            }
-            object[iter.key_] = dataObject;
-            std::string newKeyStr = formDataKeysStr.empty() ? iter.key_ : (", " + iter.key_);
-            formDataKeysStr += newKeyStr;
-        }
-    }
+    CollectPublishedData(data, object, imageDataMap, formDataKeysStr);
     std::string formDataStr = object.empty() ? "" : object.dump();
     HILOG_INFO("formId:%{public}" PRId64 " update published data. formDataStr[len:%{public}zu], "
         "formDataKeysStr:%{public}s, imageDataMap size:%{public}zu", formId_, formDataStr.length(),
@@ -755,7 +767,12 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(const SubscribeMap &publishSubs
 bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap)
 {
-    auto node = std::get<DataShare::AshmemNode>(data.value_);
+    auto *nodePtr = std::get_if<DataShare::AshmemNode>(&data.value_);
+    if (nodePtr == nullptr) {
+        HILOG_ERROR("value type mismatch, expected AshmemNode");
+        return false;
+    }
+    auto& node = *nodePtr;
     if (node.ashmem == nullptr) {
         HILOG_ERROR("null node.ashmem");
         return false;

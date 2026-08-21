@@ -151,6 +151,8 @@ public:
     ErrCode ClearFormClickCallback(const std::string &type, const std::string &bundleName, const napi_value &callback);
 
 private:
+    bool DelCallbackFromMap(std::map<std::string, std::shared_ptr<NativeReference>> &callbackMap,
+        const std::string &bundleName, napi_value jsObserverObject);
     static std::mutex mutex_;
     static sptr<JsFormStateObserver> instance_;
     mutable std::mutex addFormCallbackMutex_;

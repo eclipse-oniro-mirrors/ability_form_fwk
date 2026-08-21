@@ -76,6 +76,8 @@ private:
     void ConvertSubscribeMapToRequests(const SubscribeMap &subscribeMap,
         std::vector<FormDataProxyRequest> &formDataProxyRequests);
     void UpdatePublishedDataForm(const std::vector<DataShare::PublishedDataItem> &data);
+    void CollectPublishedData(const std::vector<DataShare::PublishedDataItem> &data, nlohmann::json &object,
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap, std::string &formDataKeysStr);
     void UpdateRdbDataForm(const std::vector<std::string> &data);
     ErrCode SubscribeRdbFormData(const SubscribeMap &rdbSubscribeMap);
     ErrCode SubscribePublishFormData(const SubscribeMap &publishSubscribeMap);

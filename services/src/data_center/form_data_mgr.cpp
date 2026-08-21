@@ -1918,8 +1918,12 @@ void FormDataMgr::ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemI
             HILOG_ERROR("invalid config");
             continue;
         }
-        int hour = FormUtil::ConvertStringToInt(temp[0]);
-        int min = FormUtil::ConvertStringToInt(temp[1]);
+        int hour = 0;
+        int min = 0;
+        if (!FormUtil::ConvertStringToInt(temp[0], hour) || !FormUtil::ConvertStringToInt(temp[1], min)) {
+            HILOG_ERROR("invalid time format");
+            continue;
+        }
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME ||
             min > Constants::MAX_MINUTE) {
             HILOG_ERROR("invalid time, hour:%{public}d, min:%{public}d", hour, min);
@@ -1955,10 +1959,12 @@ void FormDataMgr::ParseAtTimerConfig(FormRecord &record, const FormItemInfo &inf
         HILOG_ERROR("invalid config");
         return;
     }
-    int hour = -1;
-    int min = -1;
-    hour = FormUtil::ConvertStringToInt(temp[0]);
-    min = FormUtil::ConvertStringToInt(temp[1]);
+    int hour = 0;
+    int min = 0;
+    if (!FormUtil::ConvertStringToInt(temp[0], hour) || !FormUtil::ConvertStringToInt(temp[1], min)) {
+        HILOG_ERROR("invalid time format");
+        return;
+    }
     if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME ||
         min > Constants::MAX_MINUTE) {
         HILOG_ERROR("invalid time");
@@ -2626,6 +2632,7 @@ int32_t FormDataMgr::GetTempFormsCount(int32_t &formCount)
 
 int32_t FormDataMgr::GetCastFormsCount(int32_t &formCount)
 {
+    formCount = 0;
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (const auto &recordPair : formRecords_) {
         FormRecord record = recordPair.second;

@@ -639,7 +639,6 @@ void OpenFormManagerCrossBundle(ani_env *env, ani_object aniWant)
     const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
     const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
     want.SetParam(key, value);
-    HILOG_DEBUG("stsFormProvider OpenFormManagerCrossBundle want:%{public}s", want.ToString().c_str());
 
     auto ret = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
     if (ret != ERR_OK) {
@@ -935,8 +934,7 @@ void EtsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
     ani_status status = ANI_ERROR;
     if (crossBundleControlCallback_ != nullptr) {
         if ((status = env->GlobalReference_Delete(crossBundleControlCallback_)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
-            return;
+            HILOG_ERROR("GlobalReference_Delete failed, force null to prevent double-delete: %{public}d", status);
         }
         crossBundleControlCallback_ = nullptr;
     }

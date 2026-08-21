@@ -192,7 +192,11 @@ bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
 {
     HILOG_DEBUG("start");
     napi_ref callbackRef = nullptr;
-    napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    if (refStatus != napi_ok || callbackRef == nullptr) {
+        HILOG_ERROR("create reference failed");
+        return false;
+    }
     std::shared_ptr<FormAddCallbackClient> callbackClient = std::make_shared<FormAddCallbackClient>(env,
         callbackRef);
 
@@ -208,6 +212,7 @@ bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
                 HILOG_ERROR("found equal callback");
+                napi_delete_reference(env, callbackRef);
                 return false;
             }
         }
@@ -363,7 +368,11 @@ int JsFormStateObserver::RegisterFormInstanceCallback(napi_env env, napi_value j
             HILOG_ERROR("bundleName is already in the map,bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        napi_create_reference(env, jsObserverObject, 1, &ref);
+        napi_status refStatus = napi_create_reference(env, jsObserverObject, 1, &ref);
+        if (refStatus != napi_ok || ref == nullptr) {
+            HILOG_ERROR("napi_create_reference failed");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formVisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(reinterpret_cast<NativeReference *>(ref)));
     } else {
@@ -372,7 +381,11 @@ int JsFormStateObserver::RegisterFormInstanceCallback(napi_env env, napi_value j
             HILOG_ERROR("bundleName is already in the map,bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        napi_create_reference(env, jsObserverObject, 1, &ref);
+        napi_status refStatus = napi_create_reference(env, jsObserverObject, 1, &ref);
+        if (refStatus != napi_ok || ref == nullptr) {
+            HILOG_ERROR("napi_create_reference failed");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formInvisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(reinterpret_cast<NativeReference *>(ref)));
     }
@@ -412,51 +425,38 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
     }
 }
 
+bool JsFormStateObserver::DelCallbackFromMap(
+    std::map<std::string, std::shared_ptr<NativeReference>> &callbackMap,
+    const std::string &bundleName, napi_value jsObserverObject)
+{
+    auto callbackIter = callbackMap.find(bundleName);
+    if (callbackIter == callbackMap.end() || callbackIter->second == nullptr) {
+        HILOG_ERROR("callback not found or null");
+        return false;
+    }
+    napi_value value = callbackIter->second->GetNapiValue();
+    bool isEqual = false;
+    napi_strict_equals(env_, value, jsObserverObject, &isEqual);
+    if (!isEqual) {
+        HILOG_ERROR("no matching callback has been register");
+        return false;
+    }
+    callbackMap.erase(callbackIter);
+    return true;
+}
+
 ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
     bool isVisibility, napi_value jsObserverObject, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    std::string specialFlag = "#";
-    if (isVisibility) {
-        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
-        if (visibleCallback != formVisibleCallbackMap_.end()) {
-            napi_value value = visibleCallback->second->GetNapiValue();
-            bool isEqual = false;
-            napi_strict_equals(env_, value, jsObserverObject, &isEqual);
-            if (isEqual) {
-                AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
-                    bundleName + specialFlag + std::to_string(isVisibility), formObserver);
-                formVisibleCallbackMap_.erase(visibleCallback);
-                return ERR_OK;
-            } else {
-                HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
-                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-            }
-        } else {
-            HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
-            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-        }
-    } else {
-        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-        if (invisibleCallback != formInvisibleCallbackMap_.end()) {
-            napi_value value = invisibleCallback->second->GetNapiValue();
-            bool isEqual = false;
-            napi_strict_equals(env_, value, jsObserverObject, &isEqual);
-            if (isEqual) {
-                AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
-                    bundleName + specialFlag + std::to_string(isVisibility), formObserver);
-                formInvisibleCallbackMap_.erase(invisibleCallback);
-                return ERR_OK;
-            } else {
-                HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
-                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-            }
-        } else {
-            HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
-            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-        }
+    auto &callbackMap = isVisibility ? formVisibleCallbackMap_ : formInvisibleCallbackMap_;
+    if (!DelCallbackFromMap(callbackMap, bundleName, jsObserverObject)) {
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
+        bundleName + "#" + std::to_string(isVisibility), formObserver);
+    return ERR_OK;
 }
 
 std::shared_ptr<AppExecFwk::EventHandler> JsFormStateObserver::GetMainEventRunner()
@@ -664,6 +664,9 @@ ErrCode JsFormStateObserver::ClearFormClickCallback(
 
 FormEventCallbackList::~FormEventCallbackList()
 {
+    if (env_ == nullptr) {
+        return;
+    }
     for (auto &iter : callbacks_) {
         napi_delete_reference(env_, iter);
     }

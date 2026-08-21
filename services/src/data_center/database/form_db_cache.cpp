@@ -546,7 +546,10 @@ uint32_t FormDbCache::GetMultiAppFormVersionCode(const std::string &bundleName)
         versionCode.empty()) {
         return 0;
     }
-    int32_t codeInt = FormUtil::ConvertStringToInt(versionCode);
+    int codeInt = 0;
+    if (!FormUtil::ConvertStringToInt(versionCode, codeInt)) {
+        return 0;
+    }
     uint32_t code = (codeInt >= 0) ? static_cast<uint32_t>(codeInt) : 0;
     multiAppFormVersionCodeMap_.emplace(bundleName, code);
     return code;
