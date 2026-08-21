@@ -511,10 +511,6 @@ void FormRenderServiceMgr::OnConfigurationUpdatedInner()
     std::shared_ptr<OHOS::AppExecFwk::Configuration> applyConfig = GetNeedApplyConfig();
     // Update all configuration item caches
     CacheAppliedConfig();
-    {
-        std::lock_guard<std::mutex> lock(configMutex_);
-        configUpdateTime_ = std::chrono::steady_clock::now();
-    }
     size_t allFormCount = 0;
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
