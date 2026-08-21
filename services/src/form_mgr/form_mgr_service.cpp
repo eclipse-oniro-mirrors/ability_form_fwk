@@ -854,6 +854,8 @@ void FormMgrService::OnStop()
 
     state_ = ServiceRunningState::STATE_NOT_START;
 
+    DelayedSingleton<FormShareMgr>::GetInstance()->UnregisterObserver();
+
     if (serialQueue_) {
         serialQueue_.reset();
     }
