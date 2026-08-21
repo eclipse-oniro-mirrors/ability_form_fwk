@@ -515,11 +515,17 @@ void FormRenderMgrInner::CleanFormHost(const sptr<IRemoteObject> &host)
 
 void FormRenderMgrInner::ExecOnUnlockTask(const sptr<IRemoteObject> &remoteObject)
 {
-    std::unique_lock<std::mutex> unlockTaskLock(onUnlockTaskMutex_);
-    if (onUnlockTask_) {
-        onUnlockTask_(remoteObject);
+    std::function<void(const sptr<IRemoteObject> &remoteObject)> unlockTask;
+    {
+        std::unique_lock<std::mutex> unlockTaskLock(onUnlockTaskMutex_);
+        if (!onUnlockTask_) {
+            HILOG_ERROR("null onUnlockTask_");
+            return;
+        }
+        unlockTask = std::move(onUnlockTask_);
         onUnlockTask_ = nullptr;
     }
+    unlockTask(remoteObject);
 }
 
 void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject)
