@@ -720,9 +720,13 @@ bool JsFormProvider::ConvertFromDataProxies(napi_env env, napi_value value,
 bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
     AppExecFwk::FormDataProxy &formDataProxy)
 {
+    if (value == nullptr) {
+        HILOG_WARN("null jsValue,not object");
+        return false;
+    }
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, value, &valueType);
-    if (value == nullptr || valueType != napi_object) {
+    if (valueType != napi_object) {
         HILOG_WARN("null jsValue,not object");
         return false;
     }
@@ -878,7 +882,7 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("convert formId failed, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("convert formId failed, formId:%{private}" PRId64 ".", formId);
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -892,15 +896,15 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
                 return;
             }
-            bool ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, false);
-            if (!ret) {
+            ErrCode ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, false);
+            if (ret != ERR_OK) {
                 HILOG_INFO("complete ret false");
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }
             HILOG_INFO("complete ret true");
             napi_value jsValue = nullptr;
-            napi_get_boolean(env, ret, &jsValue);
+            napi_get_boolean(env, true, &jsValue);
             task.ResolveWithNoError(env, jsValue);
         };
     napi_value result = nullptr;
@@ -972,9 +976,9 @@ napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc,
         return CreateJsUndefined(env);
     }
 
-    int64_t formId;
+    int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("Convert formId failed, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("Convert formId failed, formId:%{private}" PRId64 ".", formId);
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -1051,7 +1055,7 @@ bool JsFormProvider::ConvertFormOverflowInfo(
         return false;
     }
     overflowInfo->area = area;
-    HILOG_INFO("ConvertFormOverflowInfo rect: %{public}f, %{public}f, %{public}f, %{public}f",
+    HILOG_INFO("ConvertFormOverflowInfo rect: %{private}f, %{private}f, %{private}f, %{private}f",
         area.left, area.top, area.width, area.height);
     return true;
 }
@@ -1338,7 +1342,12 @@ napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env,
     }
     napi_value callback = argv[PARAM0];
     napi_ref callbackRef = nullptr;
-    napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    if (refStatus != napi_ok || callbackRef == nullptr) {
+        HILOG_ERROR("create reference failed");
+        NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+        return CreateJsUndefined(env);
+    }
 
     ErrCode result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
         JsFormProviderProxyMgr::GetInstance());

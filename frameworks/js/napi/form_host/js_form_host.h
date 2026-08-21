@@ -99,16 +99,16 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
     DISALLOW_COPY_AND_MOVE(JsFormRouterProxyMgr);
     napi_ref overflowRegisterCallback_ = nullptr;
-    napi_env overflowEnv_;
+    napi_env overflowEnv_ = nullptr;
     napi_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
-    napi_env changeSceneAnimationStateEnv_;
+    napi_env changeSceneAnimationStateEnv_ = nullptr;
     ErrCode RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow = true);
     void CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo, napi_value* result);
     void RequestOverflowInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
     void ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     napi_ref getFormRectCallbackRef_ = nullptr;
-    napi_env getFormRectEnv_;
+    napi_env getFormRectEnv_ = nullptr;
     ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect);
     void GetFormRectInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     void CallPromise(napi_value funcResult, std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam);
@@ -116,13 +116,13 @@ private:
     static bool ConvertFunctionResult(napi_env env, napi_value funcResult, AppExecFwk::Rect &rect);
 
     napi_ref getLiveFormStatusCallbackRef_ = nullptr;
-    napi_env getLiveFormStatusEnv_;
+    napi_env getLiveFormStatusEnv_ = nullptr;
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
 
     napi_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
-    napi_env templateFormDetailInfoChangeEnv_;
+    napi_env templateFormDetailInfoChangeEnv_ = nullptr;
     ErrCode TemplateFormDetailInfoChange(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
     bool TemplateFormDetailInfoChangeInner(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
     void GetTemplateFormInfoArray(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,

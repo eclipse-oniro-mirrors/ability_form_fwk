@@ -810,7 +810,7 @@ private:
 
         Want want;
         AAFwk::WantParams wantParams;
-        if (UnwrapWantParams(env, argv[PARAM1], wantParams)) {
+        if (argc == ARGS_TWO && UnwrapWantParams(env, argv[PARAM1], wantParams)) {
             want.SetParams(wantParams);
         }
         convertArgc++;
@@ -2949,6 +2949,11 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
 {
     HILOG_INFO("call");
     napi_handle_scope scope = nullptr;
+    if (overflowEnv_ == nullptr) {
+        HILOG_ERROR("null env");
+        dataParam->result = false;
+        return;
+    }
     napi_open_handle_scope(overflowEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
@@ -2970,6 +2975,12 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     {
         std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
         napi_get_reference_value(overflowEnv_, overflowRegisterCallback_, &myCallback);
+    }
+    if (myCallback == nullptr) {
+        HILOG_ERROR("null myCallback");
+        dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
+        return;
     }
 
     napi_valuetype valueType;
@@ -3413,6 +3424,10 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
         dataParam->condition.notify_all();
     };
 
+    if (getLiveFormStatusEnv_ == nullptr) {
+        HILOG_ERROR("null env");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     napi_send_event(getLiveFormStatusEnv_, task, napi_eprio_immediate);
     std::unique_lock<std::mutex> lock(dataParam->mutex);
     dataParam->condition.wait_for(
@@ -3431,6 +3446,10 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
     }
     dataParam->result = false;
     napi_handle_scope scope = nullptr;
+    if (getLiveFormStatusEnv_ == nullptr) {
+        HILOG_ERROR("null env");
+        return;
+    }
     napi_open_handle_scope(getLiveFormStatusEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
@@ -3606,6 +3625,10 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
     }
 
     napi_handle_scope scope = nullptr;
+    if (templateFormDetailInfoChangeEnv_ == nullptr) {
+        HILOG_ERROR("null env");
+        return false;
+    }
     napi_open_handle_scope(templateFormDetailInfoChangeEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
@@ -3790,6 +3813,10 @@ bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
 
     std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
     napi_handle_scope scope = nullptr;
+    if (updateFormsConfigEnv_ == nullptr) {
+        HILOG_ERROR("null env");
+        return false;
+    }
     napi_open_handle_scope(updateFormsConfigEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
@@ -3914,6 +3941,10 @@ bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::strin
 
     napi_handle_scope scope = nullptr;
     std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
+    if (deleteFormsCallbackEnv_ == nullptr) {
+        HILOG_ERROR("null env");
+        return false;
+    }
     napi_open_handle_scope(deleteFormsCallbackEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
@@ -4000,6 +4031,10 @@ bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::F
 {
     HILOG_INFO("call, formCount:%{public}zu", formInfos.size());
     napi_handle_scope scope = nullptr;
+    if (formWantCallbackEnv_ == nullptr) {
+        HILOG_ERROR("null env");
+        return false;
+    }
     napi_open_handle_scope(formWantCallbackEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
