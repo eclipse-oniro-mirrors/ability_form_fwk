@@ -155,6 +155,7 @@ void FormDistributedMgr::SetBundleDistributedStatus(
 
 bool FormDistributedMgr::IsBundleDistributedInit()
 {
+    std::unique_lock<std::shared_mutex> lock(bundleDistributedMapMutex_);
     if (!isInitialized_.load(std::memory_order_acquire) && !Init()) {
         HILOG_ERROR("Form bundle distributed mgr not init");
         return false;
@@ -195,7 +196,6 @@ std::string FormDistributedMgr::GetUiModuleName(const std::string &bundleName, i
 
 void FormDistributedMgr::LoadDataFromDb()
 {
-    std::unique_lock<std::shared_mutex> lock(bundleDistributedMapMutex_);
     NativeRdb::AbsRdbPredicates absRdbPredicates(DISTRIBUTED_FORM_BUNDLE_TABLE);
     auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
     if (absSharedResultSet == nullptr) {
