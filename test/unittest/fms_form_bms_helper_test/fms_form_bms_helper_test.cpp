@@ -210,13 +210,13 @@ public:
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_001 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_001 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_001 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_001 end";
 }
 
 /**
@@ -226,7 +226,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_001, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_002 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_002 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -235,7 +235,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_002, TestSize.Level1)
     const std::string moduleName = "";
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_002 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_002 end";
 }
 
 /**
@@ -245,7 +245,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_002, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_003 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_003 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -254,7 +254,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_003, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_003 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_003 end";
 }
 
 /**
@@ -264,7 +264,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_003, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_004 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_004 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -273,7 +273,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_004, TestSize.Level1)
     const std::string moduleName = "";
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_004 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_004 end";
 }
 
 /**
@@ -283,7 +283,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_004, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_005 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_005 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "bb";
     const std::string moduleName = "aa";
@@ -294,7 +294,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_005, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(formBmsHelper.GetBundleMgr(), nullptr);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_005 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_005 end";
 }
 
 /**
@@ -304,7 +304,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_005, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_006 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_006 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -315,7 +315,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_006, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_006 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_006 end";
 }
 
 /**
@@ -325,7 +325,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_006, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_007, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_007 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_007 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -334,7 +334,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_007, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_007 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_007 end";
 }
 
 /**
@@ -344,7 +344,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_007, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_008 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_008 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -353,7 +353,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_008, TestSize.Level1)
     const std::string moduleName = "";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_008 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_008 end";
 }
 
 /**
@@ -363,7 +363,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_008, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_009, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_009 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_009 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -372,7 +372,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_009, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_009 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_009 end";
 }
 
 /**
@@ -382,7 +382,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_009, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_010, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_010 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_010 start";
     FormBmsHelper formBmsHelper;
     std::string bundleName = "aa";
     constexpr int32_t userId = 1;
@@ -393,7 +393,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_010, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_010 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_010 end";
 }
 
 /**
@@ -403,7 +403,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_010, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_011, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_011 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_011 start";
     FormBmsHelper formBmsHelper;
 
     std::string action = "";
@@ -416,7 +416,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_011, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_011 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_011 end";
 }
 
 /**
@@ -426,7 +426,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_011, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_012, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_012 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_012 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -436,7 +436,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_012, TestSize.Level1)
     AbilityInfo abilityInfo;
     ExtensionAbilityInfo extensionAbilityInfo;
     EXPECT_FALSE(formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_012 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_012 end";
 }
 
 /**
@@ -446,7 +446,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_012, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_013, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_013 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_013 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     constexpr int32_t userId = 1;
@@ -457,7 +457,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_013, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_013 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_013 end";
 }
 
 /**
@@ -467,7 +467,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_013, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_014, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_014 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_014 start";
     FormBmsHelper formBmsHelper;
     std::string callerBundleName = "";
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
@@ -476,7 +476,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_014, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_014 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_014 end";
 }
 
 /**
@@ -486,7 +486,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_014, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_015, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_015 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_015 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     constexpr int32_t userId = 1;
@@ -496,7 +496,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_015, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetUidByBundleName(bundleName, userId), 0);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_015 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_015 end";
 }
 
 /**
@@ -506,7 +506,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_015, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_016, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_016 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_016 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -516,7 +516,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_016, TestSize.Level1)
     constexpr int32_t userId = 1;
     BundlePackInfo bundlePackInfo;
     EXPECT_TRUE(formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_016 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_016 end";
 }
 
 /**
@@ -526,7 +526,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_016, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_017, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_017 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_017 start";
     FormBmsHelper formBmsHelper;
 
     const sptr<IRemoteObject> impl;
@@ -537,7 +537,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_017, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_017 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_017 end";
 }
 
 /**
@@ -547,7 +547,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_017, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_018, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_018 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_018 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -555,7 +555,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_018, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     std::string callerBundleName = "";
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_018 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_018 end";
 }
 
 /**
@@ -619,13 +619,13 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_021, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_022, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_022 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_022 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(nullptr, formBmsHelper.GetBundleInstaller());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_022 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_022 end";
 }
 
 /**
@@ -635,7 +635,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_022, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_023, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_023 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_023 start";
     FormBmsHelper formBmsHelper;
 
     Want want;
@@ -662,7 +662,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_023, TestSize.Level1)
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
 
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_023 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_023 end";
 }
 
 /**
@@ -672,7 +672,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_023, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_024, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_024 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_024 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     constexpr int32_t userId = 1;
@@ -684,7 +684,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_024, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetBundleInfoWithPermission(bundleName, userId, bundleInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_024 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_024 end";
 }
 
 /**
@@ -694,7 +694,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_024, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_025, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_025 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_025 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -707,7 +707,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_025, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_025 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_025 end";
 }
 
 /**
@@ -717,7 +717,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_025, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_026, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_026 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_026 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -727,7 +727,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_026, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_026 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_026 end";
 }
 
 /**
@@ -737,7 +737,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_026, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_027, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_027 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_027 start";
     FormBmsHelper formBmsHelper;
 
     const sptr<IRemoteObject> impl;
@@ -747,7 +747,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_027, TestSize.Level1)
 
     MockRegisterBundleEventCallback(true);
     EXPECT_EQ(formBmsHelper.RegisterBundleEventCallback(), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_027 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_027 end";
 }
 
 /**
@@ -757,7 +757,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_027, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_028, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_028 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_028 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -766,7 +766,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_028, TestSize.Level1)
 
     MockUnregisterBundleEventCallback(true);
     EXPECT_EQ(formBmsHelper.UnregisterBundleEventCallback(), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_028 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_028 end";
 }
 
 /**
@@ -776,13 +776,13 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_028, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0001 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0001 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0001 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0001 end";
 }
 
 /**
@@ -792,7 +792,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0001, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0002 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0002 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -801,7 +801,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0002, TestSize.Level1)
     const std::string moduleName = "";
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0002 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0002 end";
 }
 
 /**
@@ -811,7 +811,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0002, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0003 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0003 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -820,7 +820,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0003, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0003 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0003 end";
 }
 
 /**
@@ -830,7 +830,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0003, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0004 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0004 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -839,7 +839,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0004, TestSize.Level1)
     const std::string moduleName = "";
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0004 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0004 end";
 }
 
 /**
@@ -849,7 +849,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0004, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0005 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0005 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "bb";
     const std::string moduleName = "aa";
@@ -860,7 +860,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0005, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
     EXPECT_NE(formBmsHelper.GetBundleMgr(), nullptr);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0005 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0005 end";
 }
 
 /**
@@ -870,7 +870,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0005, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0006 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0006 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -881,7 +881,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0006, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0006 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0006 end";
 }
 
 /**
@@ -891,7 +891,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0006, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0007, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0007 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0007 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -900,7 +900,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0007, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0007 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0007 end";
 }
 
 /**
@@ -910,7 +910,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0007, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0008 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0008 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -919,7 +919,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0008, TestSize.Level1)
     const std::string moduleName = "";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0008 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0008 end";
 }
 
 /**
@@ -929,7 +929,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0008, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0009, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0009 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0009 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -938,7 +938,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0009, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0009 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0009 end";
 }
 
 /**
@@ -948,7 +948,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0009, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0010, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0010 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0010 start";
     FormBmsHelper formBmsHelper;
     std::string bundleName = "aa";
     constexpr int32_t userId = 1;
@@ -959,7 +959,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0010, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0010 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0010 end";
 }
 
 /**
@@ -969,7 +969,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0010, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0011, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0011 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0011 start";
     FormBmsHelper formBmsHelper;
     
     std::string action = "";
@@ -982,7 +982,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0011, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0011 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0011 end";
 }
 
 /**
@@ -992,7 +992,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0011, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0012, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0012 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0012 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1002,7 +1002,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0012, TestSize.Level1)
     AbilityInfo abilityInfo;
     ExtensionAbilityInfo extensionAbilityInfo;
     EXPECT_FALSE(formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0012 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0012 end";
 }
 
 /**
@@ -1012,7 +1012,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0012, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0013, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0013 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0013 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     constexpr int32_t userId = 1;
@@ -1023,7 +1023,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0013, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0013 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0013 end";
 }
 
 /**
@@ -1033,7 +1033,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0013, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0014, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0014 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0014 start";
     FormBmsHelper formBmsHelper;
     std::string callerBundleName = "";
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
@@ -1042,7 +1042,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0014, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0014 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0014 end";
 }
 
 /**
@@ -1052,7 +1052,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0014, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0015, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0015 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0015 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     constexpr int32_t userId = 1;
@@ -1062,7 +1062,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0015, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetUidByBundleName(bundleName, userId), 0);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0015 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0015 end";
 }
 
 /**
@@ -1072,7 +1072,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0015, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0016, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0016 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0016 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1082,7 +1082,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0016, TestSize.Level1)
     constexpr int32_t userId = 1;
     BundlePackInfo bundlePackInfo;
     EXPECT_TRUE(formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0016 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0016 end";
 }
 
 /**
@@ -1092,7 +1092,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0016, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0017, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0017 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0017 start";
     FormBmsHelper formBmsHelper;
 
     const sptr<IRemoteObject> impl;
@@ -1103,7 +1103,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0017, TestSize.Level1)
     const std::string moduleName = "aa";
     formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0017 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0017 end";
 }
 
 /**
@@ -1113,7 +1113,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0017, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0018, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0018 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0018 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1121,7 +1121,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0018, TestSize.Level1)
     formBmsHelper.SetBundleManager(bundleManager);
     std::string callerBundleName = "";
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0018 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0018 end";
 }
 
 /**
@@ -1185,13 +1185,13 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0021, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0022, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0022 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0022 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(nullptr, formBmsHelper.GetBundleInstaller());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0022 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0022 end";
 }
 
 /**
@@ -1201,7 +1201,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0022, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0023 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0023 start";
     FormBmsHelper formBmsHelper;
     
     Want want;
@@ -1229,7 +1229,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
     abilityInfo.name = "MainAbility";
     abilityInfo.bundleName = "com.ohos.launcher";
 
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0023 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0023 end";
 }
 
 /**
@@ -1239,7 +1239,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0023, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0024, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0024 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0024 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     constexpr int32_t userId = 1;
@@ -1251,7 +1251,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0024, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetBundleInfoWithPermission(bundleName, userId, bundleInfo));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0024 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0024 end";
 }
 
 /**
@@ -1261,7 +1261,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0024, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0025, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0025 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0025 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -1274,7 +1274,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0025, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_FALSE(formBmsHelper.GetCompileMode(bundleName, moduleName, userId, compileMode));
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0025 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0025 end";
 }
 
 /**
@@ -1284,7 +1284,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0025, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0026, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0026 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0026 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -1294,7 +1294,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0026, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0026 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0026 end";
 }
 
 /**
@@ -1304,7 +1304,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0026, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0027, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0027 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0027 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -1314,7 +1314,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0027, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0027 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0027 end";
 }
 
 /**
@@ -1324,13 +1324,13 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0027, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0028, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0028 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0028 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_0028 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_0028 end";
 }
 
 /**
@@ -1340,7 +1340,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_0028, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_20027, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20027 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_20027 start";
     FormBmsHelper formBmsHelper;
     const std::string bundleName = "";
     const std::string moduleName = "";
@@ -1350,7 +1350,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_20027, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetProxyDataInfos(bundleName, moduleName, userId, proxyData), ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20027 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_20027 end";
 }
 
 /**
@@ -1360,13 +1360,13 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_20027, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_20028, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20028 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_20028 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_NE(nullptr, formBmsHelper.GetBundleMgr());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_20028 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_20028 end";
 }
 
 /**
@@ -1376,14 +1376,14 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_20028, TestSize.Level1)
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_001 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_001 start";
     FormBmsHelper formBmsHelper;
     formBmsHelper.SetBundleManager(nullptr);
     int32_t appIndex = 1;
     EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex),
         ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
     EXPECT_EQ(appIndex, 0);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_001 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_001 end";
 }
 
 /**
@@ -1393,7 +1393,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_001, Te
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_002 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_002 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1403,7 +1403,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_002, Te
     int32_t appIndex = 1;
     EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex),
         ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_002 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_002 end";
 }
 
 /**
@@ -1413,7 +1413,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_002, Te
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_003 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_003 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1423,7 +1423,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_003, Te
     int32_t appIndex = 1;
     EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex),
         ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_003 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_003 end";
 }
 
 /**
@@ -1433,7 +1433,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_003, Te
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_004 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_004 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1447,7 +1447,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_004, Te
     int32_t appIndex = -1;
     EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex), ERR_OK);
     EXPECT_EQ(appIndex, 0);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_004 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_004 end";
 }
 
 /**
@@ -1457,7 +1457,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_004, Te
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_005 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_005 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1469,7 +1469,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_005, Te
     int32_t appIndex = -1;
     EXPECT_EQ(formBmsHelper.GetEnabledCloneIndex(1, "com.test", appIndex), ERR_OK);
     EXPECT_EQ(appIndex, 2);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetEnabledCloneIndex_005 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetEnabledCloneIndex_005 end";
 }
 
 /**
@@ -1479,7 +1479,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetEnabledCloneIndex_005, Te
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1489,7 +1489,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppInd
     int32_t appIndex = 0;
     EXPECT_EQ(formBmsHelper.GetCallerBundleNameAndAppIndex(callerBundleName, appIndex),
         ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_001 end";
 }
 
 /**
@@ -1499,7 +1499,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppInd
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
@@ -1511,7 +1511,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppInd
     EXPECT_EQ(formBmsHelper.GetCallerBundleNameAndAppIndex(callerBundleName, appIndex), ERR_OK);
     EXPECT_EQ(appIndex, 1);
     EXPECT_FALSE(callerBundleName.empty());
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetCallerBundleNameAndAppIndex_002 end";
 }
 
 /**
@@ -1521,11 +1521,11 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetCallerBundleNameAndAppInd
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetUidByBundleName_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_001 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetUidByBundleName_001 start";
     FormBmsHelper formBmsHelper;
     formBmsHelper.SetBundleManager(nullptr);
     EXPECT_EQ(formBmsHelper.GetUidByBundleName("com.test", 1, 1), -1);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_001 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetUidByBundleName_001 end";
 }
 
 /**
@@ -1535,14 +1535,14 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetUidByBundleName_001, Test
  */
 HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetUidByBundleName_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_002 start";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetUidByBundleName_002 start";
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     bundleManager->uidByBundleClone_ = 600;
     formBmsHelper.SetBundleManager(bundleManager);
     EXPECT_EQ(formBmsHelper.GetUidByBundleName("com.test", 1, 1), 600);
-    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_GetUidByBundleName_002 end";
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetUidByBundleName_002 end";
 }
 } // namespace AppExecFwk
 } // namespace OHOS
