@@ -138,7 +138,7 @@ bool FormRemoveCallbackClient::IsStrictEqual(napi_value callback)
 {
     bool isEqual = false;
     napi_value myCallback = nullptr;
-    api_status status = napi_get_reference_value(env_, callbackRef_, &myCallback);
+    napi_status status = napi_get_reference_value(env_, callbackRef_, &myCallback);
     if (status != napi_ok || myCallback == nullptr) {
         HILOG_ERROR("get reference value failed");
         return false;
