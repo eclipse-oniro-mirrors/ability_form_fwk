@@ -48,6 +48,7 @@ FormAddCallbackClient::~FormAddCallbackClient()
 {
     if (env_ != nullptr && callbackRef_ != nullptr) {
         napi_delete_reference(env_, callbackRef_);
+        callbackRef_ = nullptr;
     }
 }
 
