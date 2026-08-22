@@ -91,11 +91,13 @@ napi_value JsLiveFormExtensionContext::CreateJsLiveFormExtensionContext(
     }
 
     napi_value objValue = CreateJsExtensionContext(env, context, abilityInfo);
-    std::unique_ptr<JsLiveFormExtensionContext> jsContext = std::make_unique<JsLiveFormExtensionContext>(context);
-    napi_status status = napi_wrap(env, objValue, jsContext.release(), Finalizer, nullptr, nullptr);
+    auto jsContext = std::make_unique<JsLiveFormExtensionContext>(context);
+    napi_status status = napi_wrap(env, objValue, jsContext.get(), Finalizer, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR("Failed to do napi wrap");
+        return nullptr;
     }
+    (void)jsContext.release();
 
     const char *moduleName = "JsLiveFormExtensionContext";
     BindNativeFunction(env, objValue, "setWindowBackgroundColor", moduleName, SetWindowBackgroundColor);
@@ -186,7 +188,7 @@ napi_value JsLiveFormExtensionContext::OnSetUIExtCustomDensity(napi_env env, Nap
     }
 
     double layoutScale = 1.0;
-    if (!OHOS::AppExecFwk::UnwrapDoubleFromJS2(env, info.argv[0], layoutScale)) {
+    if (!OHOS::AppExecFwk::UnwrapDoubleFromJS2(env, info.argv[0], layoutScale) || std::isnan(layoutScale)) {
         HILOG_ERROR("failed to get layoutScale");
         ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
             FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
@@ -451,10 +453,10 @@ bool JsLiveFormExtensionContext::CheckConnectionParam(napi_env env, napi_value v
     }
     connection->SetJsConnectionObject(value);
     UIExtensionConnectionKey key;
-    key.id = g_serialNumber;
     key.want = want;
-    connection->SetConnectionId(key.id);
     std::lock_guard<std::mutex> lock(g_connectsMutex_);
+    key.id = g_serialNumber;
+    connection->SetConnectionId(key.id);
     g_connects.emplace(key, connection);
     if (g_serialNumber < INT32_MAX) {
         g_serialNumber++;
