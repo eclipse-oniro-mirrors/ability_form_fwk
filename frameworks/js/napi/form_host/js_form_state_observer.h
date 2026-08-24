@@ -154,6 +154,7 @@ private:
     bool DelCallbackFromMap(std::map<std::string, std::shared_ptr<NativeReference>> &callbackMap,
         const std::string &bundleName, napi_value jsObserverObject);
     static std::mutex mutex_;
+    static std::once_flag onceFlag_;
     static sptr<JsFormStateObserver> instance_;
     mutable std::mutex addFormCallbackMutex_;
     mutable std::mutex removeFormCallbackMutex_;

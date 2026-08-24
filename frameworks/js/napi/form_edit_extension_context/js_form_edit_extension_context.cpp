@@ -100,7 +100,11 @@ napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallb
     }
 
     AAFwk::Want want;
-    OHOS::AppExecFwk::UnwrapWant(env, info.argv[0], want);
+    if (!AppExecFwk::UnwrapWant(env, info.argv[INDEX_ZERO], want)) {
+        TAG_LOGE(AAFwkTag::UI_EXT, "Parse param want failed");
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARSE_WANT_FAILED);
+        return CreateJsUndefined(env);
+    }
     NapiAsyncTask::CompleteCallback complete = [weak = context_, want](napi_env env, NapiAsyncTask &task,
                                                                       int32_t status) {
         TAG_LOGD(AAFwkTag::UI_EXT, "OnStartSecondPage begin");
