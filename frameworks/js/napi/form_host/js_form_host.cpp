@@ -2989,21 +2989,27 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
         return;
     }
 
+    InvokeOverflowCallback(overflowEnv_, myCallback, requestObj, dataParam, scope);
+}
+
+void JsFormRouterProxyMgr::InvokeOverflowCallback(napi_env env, napi_value callback, napi_value requestObj,
+    std::shared_ptr<LiveFormInterfaceParam> dataParam, napi_handle_scope scope)
+{
     napi_value args[] = { requestObj };
-    napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, nullptr);
+    napi_status status = napi_call_function(env, nullptr, callback, 1, args, nullptr);
     if (status == napi_ok) {
         HILOG_INFO("RequestOverflowInner success");
         dataParam->result = true;
-        napi_close_handle_scope(overflowEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return;
     }
     HILOG_INFO("RequestOverflowInner fail");
     dataParam->result = false;
     dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (status == napi_pending_exception) {
-        dataParam->errCode = NapiFormUtil::CatchErrorCode(overflowEnv_);
+        dataParam->errCode = NapiFormUtil::CatchErrorCode(env);
     }
-    napi_close_handle_scope(overflowEnv_, scope);
+    napi_close_handle_scope(env, scope);
 }
 
 napi_value JsFormRouterProxyMgr::CreateRequestOverflowObj(napi_env env,
