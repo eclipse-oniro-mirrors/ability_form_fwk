@@ -84,7 +84,8 @@
               "image_framework",
               "bounds_checking_function",
               "node",
-              "libuv"
+              "libuv",
+              "dsoftbus"
           ],
           "third_party": [
               "json"
