@@ -327,6 +327,7 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
         delete asyncCallbackInfo;
+        return nullptr;
     }
     return promise;
 }
