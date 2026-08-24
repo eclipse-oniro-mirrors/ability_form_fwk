@@ -2042,6 +2042,7 @@ int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result != ERR_OK) {
+        HILOG_ERROR("read reply result failed");
         return result;
     }
     if (!reply.ReadInt32(formCount)) {
@@ -2145,6 +2146,7 @@ int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCo
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result != ERR_OK) {
+        HILOG_ERROR("read reply result failed");
         return result;
     }
     if (!reply.ReadInt32(formCount)) {
