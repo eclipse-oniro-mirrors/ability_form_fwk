@@ -2980,7 +2980,7 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
         return;
     }
 
-    napi_valuetype valueType;
+    napi_valuetype valueType = napi_undefined;
     napi_typeof(overflowEnv_, myCallback, &valueType);
 
     if (valueType != napi_function) {
