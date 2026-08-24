@@ -146,11 +146,15 @@ size_t FormProxyRegistry::Size() const
 
 bool FormProxyRegistry::AddDeathRecipient(int32_t uid, const sptr<IRemoteObject> &proxy)
 {
-    auto callback = [this](int32_t diedUid) {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        deathRecipients_.erase(diedUid);
-        proxies_.erase(diedUid);
-        HILOG_INFO("%{public}s: auto cleaned died proxy for uid=%{public}d", tag_.c_str(), diedUid);
+    auto callback = [weak = weak_from_this()](int32_t diedUid) {
+        auto self = weak.lock();
+        if (!self) {
+            return;
+        }
+        std::unique_lock<std::shared_mutex> lock(self->mutex_);
+        self->deathRecipients_.erase(diedUid);
+        self->proxies_.erase(diedUid);
+        HILOG_INFO("%{public}s: auto cleaned died proxy for uid=%{public}d", self->tag_.c_str(), diedUid);
     };
 
     auto recipient = sptr<FormProxyDeathRecipient>::MakeSptr(uid, std::move(callback));

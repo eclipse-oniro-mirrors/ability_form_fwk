@@ -1337,10 +1337,10 @@ private:
     std::vector<int64_t> tempForms_;
     std::map<std::string, FormHostRecord> formStateRecord_;
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formAddObservers_;
-    std::map<int32_t, FormHostRecord> formAcquireDataRecord_;
+    std::unordered_map<int64_t, FormHostRecord> formAcquireDataRecord_;
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
-    int64_t udidHash_ = 0;
+    std::atomic<int64_t> udidHash_ = 0;
     std::vector<sptr<IRemoteObject>> formObservers_;
     std::map<std::string, int32_t> formConfigMap_;
     std::unordered_map<std::string, int> formCloudUpdateDurationMap_;

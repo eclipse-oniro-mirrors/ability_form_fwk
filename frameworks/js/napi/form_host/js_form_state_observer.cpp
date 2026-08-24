@@ -65,7 +65,7 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
-        AbilityRuntime::HandleScope scopeGuard(env);
+        AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
         napi_value callbackValues = nullptr;
         if (napi_create_object(sharedThis->env_, &callbackValues) != napi_ok || callbackValues == nullptr) {
             HILOG_ERROR("napi_create_object failed");
@@ -127,11 +127,10 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
-        AbilityRuntime::HandleScope scopeGuard(env);
+        AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
         napi_value callbackValues = nullptr;
         if (napi_create_object(sharedThis->env_, &callbackValues) != napi_ok || callbackValues == nullptr) {
             HILOG_ERROR("napi_create_object failed");
-            AbilityRuntime::HandleScope scopeGuard(env);
             return;
         }
         ParseRunningFormInfoIntoNapi(sharedThis->env_, runningFormInfo, callbackValues);
@@ -141,7 +140,6 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
-        AbilityRuntime::HandleScope scopeGuard(env);
     });
 }
 
@@ -500,7 +498,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                 HILOG_ERROR("null sharedThis");
                 return;
             }
-            AbilityRuntime::HandleScope scopeGuard(env);
+            AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
                 isVisibleTypeFlag = true;
                 if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
@@ -748,7 +746,7 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
         HILOG_ERROR("null env");
         return;
     }
-    AbilityRuntime::HandleScope scopeGuard(env);
+    AbilityRuntime::HandleScope scopeGuard(env_);
     napi_value formInfo = nullptr;
     if (napi_create_object(env_, &formInfo) != napi_ok || formInfo == nullptr) {
         HILOG_ERROR("napi_create_object failed");

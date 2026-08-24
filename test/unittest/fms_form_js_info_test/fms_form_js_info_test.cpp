@@ -671,7 +671,13 @@ HWTEST_F(FmsFormJsInfoTest, WriteImageData_STATE_ADDED_OverThreshold_001, TestSi
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin WriteImageData_STATE_ADDED_OverThreshold_001";
     FormJsInfo writeJsInfo;
     writeJsInfo.formProviderData.SetImageDataState(FormProviderData::IMAGE_DATA_STATE_ADDED);
-    MockGetImageDataMap(true);
+    sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    int32_t a = 1;
+    for (int32_t i = 0; i < FormJsInfo::IMAGE_DATA_THRESHOLD + 1; i++) {
+        imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
+    }
+    writeJsInfo.formProviderData.SetImageDataMap(imageDataMap);
     MessageParcel parcel;
     EXPECT_FALSE(writeJsInfo.WriteImageData(parcel));
     FormJsInfo readJsInfo;
