@@ -2952,21 +2952,18 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     if (overflowEnv_ == nullptr) {
         HILOG_ERROR("null env");
         dataParam->result = false;
-        dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
         return;
     }
     napi_open_handle_scope(overflowEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
         dataParam->result = false;
-        dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
         return;
     }
     napi_value requestObj = CreateRequestOverflowObj(overflowEnv_, dataParam);
     if (requestObj == nullptr) {
         HILOG_ERROR("null requestObj");
         dataParam->result = false;
-        dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
         napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
@@ -2979,19 +2976,19 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     if (myCallback == nullptr) {
         HILOG_ERROR("null myCallback");
         dataParam->result = false;
-        dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
         napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
 
     napi_valuetype valueType;
     napi_typeof(overflowEnv_, myCallback, &valueType);
+
     if (valueType != napi_function) {
         dataParam->result = false;
-        dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
         napi_close_handle_scope(overflowEnv_, scope);
         return;
     }
+
     InvokeOverflowCallback(overflowEnv_, myCallback, requestObj, dataParam, scope);
 }
 
