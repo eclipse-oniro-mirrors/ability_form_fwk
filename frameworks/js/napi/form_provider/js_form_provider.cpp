@@ -1055,7 +1055,7 @@ bool JsFormProvider::ConvertFormOverflowInfo(
         return false;
     }
     overflowInfo->area = area;
-    HILOG_INFO("ConvertFormOverflowInfo rect: %{private}f, %{private}f, %{private}f, %{private}f",
+    HILOG_INFO("ConvertFormOverflowInfo rect: %{public}f, %{public}f, %{public}f, %{public}f",
         area.left, area.top, area.width, area.height);
     return true;
 }
