@@ -2971,11 +2971,22 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     napi_value myCallback = nullptr;
     {
         std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
-        if (!GetValidCallback(overflowEnv_, overflowRegisterCallback_, myCallback)) {
-            dataParam->result = false;
-            napi_close_handle_scope(overflowEnv_, scope);
-            return;
-        }
+        napi_get_reference_value(overflowEnv_, overflowRegisterCallback_, &myCallback);
+    }
+    if (myCallback == nullptr) {
+        HILOG_ERROR("null myCallback");
+        dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
+        return;
+    }
+
+    napi_valuetype valueType;
+    napi_typeof(overflowEnv_, myCallback, &valueType);
+
+    if (valueType != napi_function) {
+        dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
+        return;
     }
 
     napi_value args[] = { requestObj };
