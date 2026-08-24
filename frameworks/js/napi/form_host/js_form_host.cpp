@@ -2959,17 +2959,7 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
         HILOG_ERROR("null scope");
         return;
     }
-    napi_value requestObj;
-    napi_create_object(overflowEnv_, &requestObj);
-
-    napi_value formIdValue;
-    napi_create_string_utf8(overflowEnv_, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
-    napi_set_named_property(overflowEnv_, requestObj, "formId", formIdValue);
-    napi_set_named_property(overflowEnv_, requestObj, "isOverflow", CreateJsValue(overflowEnv_, dataParam->isOverflow));
-
-    napi_value overflowInfoValue;
-    CreateFormOverflowInfo(overflowEnv_, dataParam->overflowInfo, &overflowInfoValue);
-    napi_set_named_property(overflowEnv_, requestObj, "overflowInfo", overflowInfoValue);
+    napi_value requestObj = CreateRequestOverflowObj(overflowEnv_, dataParam);
 
     napi_value myCallback = nullptr;
     {
@@ -3007,6 +2997,23 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
         dataParam->errCode = NapiFormUtil::CatchErrorCode(overflowEnv_);
     }
     napi_close_handle_scope(overflowEnv_, scope);
+}
+
+napi_value JsFormRouterProxyMgr::CreateRequestOverflowObj(napi_env env,
+    std::shared_ptr<LiveFormInterfaceParam> dataParam)
+{
+    napi_value requestObj;
+    napi_create_object(env, &requestObj);
+
+    napi_value formIdValue;
+    napi_create_string_utf8(env, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
+    napi_set_named_property(env, requestObj, "formId", formIdValue);
+    napi_set_named_property(env, requestObj, "isOverflow", CreateJsValue(env, dataParam->isOverflow));
+
+    napi_value overflowInfoValue;
+    CreateFormOverflowInfo(env, dataParam->overflowInfo, &overflowInfoValue);
+    napi_set_named_property(env, requestObj, "overflowInfo", overflowInfoValue);
+    return requestObj;
 }
 
 void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo,

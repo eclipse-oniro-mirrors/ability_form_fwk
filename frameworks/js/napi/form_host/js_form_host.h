@@ -105,6 +105,7 @@ private:
     ErrCode RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow = true);
     void CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo, napi_value* result);
     void RequestOverflowInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
+    napi_value CreateRequestOverflowObj(napi_env env, std::shared_ptr<LiveFormInterfaceParam> dataParam);
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
     void ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     napi_ref getFormRectCallbackRef_ = nullptr;
