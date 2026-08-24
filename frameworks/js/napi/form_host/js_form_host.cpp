@@ -2957,9 +2957,16 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     napi_open_handle_scope(overflowEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
+        dataParam->result = false;
         return;
     }
     napi_value requestObj = CreateRequestOverflowObj(overflowEnv_, dataParam);
+    if (requestObj == nullptr) {
+        HILOG_ERROR("null requestObj");
+        dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
+        return;
+    }
 
     napi_value myCallback = nullptr;
     {
@@ -3002,8 +3009,12 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
 napi_value JsFormRouterProxyMgr::CreateRequestOverflowObj(napi_env env,
     std::shared_ptr<LiveFormInterfaceParam> dataParam)
 {
-    napi_value requestObj;
-    napi_create_object(env, &requestObj);
+    napi_value requestObj = nullptr;
+    napi_status status = napi_create_object(env, &requestObj);
+    if (status != napi_ok || requestObj == nullptr) {
+        HILOG_ERROR("napi_create_object failed, status: %{public}d", static_cast<int>(status));
+        return nullptr;
+    }
 
     napi_value formIdValue;
     napi_create_string_utf8(env, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
