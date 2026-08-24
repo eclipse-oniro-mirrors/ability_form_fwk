@@ -7964,3 +7964,68 @@ HWTEST_F(FmsFormDataMgrTest, FormRecord_HostWant_GetWant_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRecord_HostWant_GetWant_001 end";
 }
 
+/**
+ * @tc.name: FmsFormDataMgrTest_IsRecordMatchFilter_001
+ * @tc.desc: Test IsRecordMatchFilter returns false when moduleName mismatches.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsRecordMatchFilter_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsRecordMatchFilter_001 start";
+    FormInstancesFilter filter;
+    filter.moduleName = "moduleA";
+    FormRecord record;
+    record.moduleName = "moduleB";
+    EXPECT_FALSE(formDataMgr_.IsRecordMatchFilter(filter, record, 0));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsRecordMatchFilter_001 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_IsRecordMatchFilter_002
+ * @tc.desc: Test IsRecordMatchFilter returns false when appIndex mismatches.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsRecordMatchFilter_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsRecordMatchFilter_002 start";
+    FormInstancesFilter filter;
+    FormRecord record;
+    EXPECT_FALSE(formDataMgr_.IsRecordMatchFilter(filter, record, 1));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsRecordMatchFilter_002 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_IsRecordMatchFilter_003
+ * @tc.desc: Test IsRecordMatchFilter returns true when all fields match.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsRecordMatchFilter_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsRecordMatchFilter_003 start";
+    FormInstancesFilter filter;
+    FormRecord record;
+    EXPECT_TRUE(formDataMgr_.IsRecordMatchFilter(filter, record, 0));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsRecordMatchFilter_003 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001
+ * @tc.desc: Test BuildFormInstanceByFromRecord fills instance fields from record.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001 start";
+    FormRecord record;
+    record.formId = 123;
+    record.bundleName = FORM_HOST_BUNDLE_NAME;
+    record.appIndex = 1;
+    FormHostRecord hostRecord;
+    hostRecord.AddForm(record.formId);
+    FormInstance instance;
+    formDataMgr_.BuildFormInstanceByFromRecord(record, hostRecord, instance);
+    EXPECT_EQ(instance.formId, 123);
+    EXPECT_EQ(instance.bundleName, FORM_HOST_BUNDLE_NAME);
+    EXPECT_EQ(instance.appIndex, 1);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001 end";
+}

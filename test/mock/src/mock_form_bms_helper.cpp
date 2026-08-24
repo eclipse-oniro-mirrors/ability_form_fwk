@@ -90,5 +90,14 @@ ErrCode FormBmsHelper::GetEnabledCloneIndex(int32_t userId, const std::string &b
     }
     return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
 }
+
+int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, int32_t userId, int32_t appIndex)
+{
+    GTEST_LOG_(INFO) << "GetUidByBundleName called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetUidByBundleName(bundleName, userId, appIndex);
+    }
+    return static_cast<int32_t>(INVALID_UID);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
