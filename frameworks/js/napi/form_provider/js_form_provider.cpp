@@ -882,7 +882,7 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("convert formId failed, formId:%{private}" PRId64 ".", formId);
+        HILOG_ERROR("convert formId failed, formId:%{public}" PRId64 ".", formId);
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -978,7 +978,7 @@ napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc,
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("Convert formId failed, formId:%{private}" PRId64 ".", formId);
+        HILOG_ERROR("Convert formId failed, formId:%{public}" PRId64 ".", formId);
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
