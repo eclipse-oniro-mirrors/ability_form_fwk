@@ -227,17 +227,7 @@ public:
         asyncCallbackInfo_ = asyncCallbackInfo;
     }
 
-    virtual ~FormStateCallbackClient()
-    {
-        if (asyncCallbackInfo_ != nullptr) {
-            if (asyncCallbackInfo_->callback != nullptr) {
-                napi_delete_reference(asyncCallbackInfo_->env, asyncCallbackInfo_->callback);
-                asyncCallbackInfo_->callback = nullptr;
-            }
-            delete asyncCallbackInfo_;
-            asyncCallbackInfo_ = nullptr;
-        }
-    }
+    virtual ~FormStateCallbackClient() = default;
 
     void ProcessAcquireState(FormState state) override
     {
@@ -249,13 +239,25 @@ public:
         uv_loop_s *loop = nullptr;
         napi_get_uv_event_loop(asyncCallbackInfo_->env, &loop);
         if (loop == nullptr) {
-            HILOG_ERROR("%{public}s, loop == nullptr.", __func__);
+            HILOG_ERROR("loop == nullptr.");
+            if (asyncCallbackInfo_->callback != nullptr) {
+                napi_delete_reference(asyncCallbackInfo_->env, asyncCallbackInfo_->callback);
+                asyncCallbackInfo_->callback = nullptr;
+            }
+            delete asyncCallbackInfo_;
+            asyncCallbackInfo_ = nullptr;
             return;
         }
 
         auto *work = new (std::nothrow) uv_work_t;
         if (work == nullptr) {
-            HILOG_ERROR("%{public}s, work == nullptr.", __func__);
+            HILOG_ERROR("work == nullptr.");
+            if (asyncCallbackInfo_->callback != nullptr) {
+                napi_delete_reference(asyncCallbackInfo_->env, asyncCallbackInfo_->callback);
+                asyncCallbackInfo_->callback = nullptr;
+            }
+            delete asyncCallbackInfo_;
+            asyncCallbackInfo_ = nullptr;
             return;
         }
         work->data = asyncCallbackInfo_;
