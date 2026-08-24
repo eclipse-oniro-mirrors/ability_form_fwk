@@ -43,6 +43,10 @@ void FormObserverRecord::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
 ErrCode FormObserverRecord::SetFormAddObserver(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("start");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("null callerToken");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     std::lock_guard<std::mutex> lock(formAddObserverMutex_);
     auto iter = formAddObservers_.find(bundleName);
     if (iter == formAddObservers_.end()) {
@@ -64,6 +68,10 @@ ErrCode FormObserverRecord::SetFormAddObserver(const std::string bundleName, con
 ErrCode FormObserverRecord::SetFormRemoveObserver(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("start");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("null callerToken");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     std::lock_guard<std::mutex> lock(formRemoveObserverMutex_);
     auto iter = formRemoveObservers_.find(bundleName);
     if (iter == formRemoveObservers_.end()) {

@@ -120,6 +120,7 @@ public:
     int32_t SetRenderGroupParams(const int64_t formId, const Want &want);
 
 private:
+    // Acquires renderRecordMutex_ internally. Caller must NOT hold it.
     void SetCriticalFalseOnAllFormInvisible();
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);
@@ -132,6 +133,7 @@ private:
     int32_t RecoverFormByUid(
         const FormJsInfo &formJsInfo, const Want &want, const std::string &uid, const std::string &statusData);
     int32_t RecycleFormByUid(const std::string &uid, std::string &statusData, const int64_t formId);
+    // Acquires renderRecordMutex_ internally. Caller must NOT hold it.
     int32_t DeleteRenderRecordByUid(const std::string &uid, const std::shared_ptr<FormRenderRecord> &search);
     std::shared_ptr<OHOS::AppExecFwk::Configuration> GetNeedApplyConfig();
     void CacheAppliedConfig();

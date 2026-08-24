@@ -150,6 +150,11 @@ bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::v
             HILOG_ERROR("Insufficient length");
             return false;
         }
+        if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR
+            || time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
+            HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
+            return false;
+        }
         FormTimer timerTask(formId, time[0], time[1], userId);
         timerTask.needUpdateAlarm = false;
         result = AddFormTimer(timerTask);
@@ -648,7 +653,7 @@ bool FormTimerMgr::HandleSystemTimeChanged()
             return true;
         }
     }
-    atTimerWakeUpTime_ = LONG_MAX;
+    atTimerWakeUpTime_.store(INT64_MAX);
     UpdateAtTimerAlarm();
     HILOG_INFO("end");
     return true;
@@ -1120,6 +1125,10 @@ void FormTimerMgr::ClearLimiterTimerResource()
 
 bool FormTimerMgr::CreateLimiterTimer()
 {
+    std::lock_guard<std::mutex> lock(currentLimiterWantAgentMutex_);
+    if (limiterTimerId_.load() != 0L) {
+        return true;
+    }
     auto timerOption = std::make_shared<FormTimerOption>();
     timerOption->SetType(timerOption->TIMER_TYPE_EXACT);
     timerOption->SetRepeat(false);
@@ -1130,12 +1139,14 @@ bool FormTimerMgr::CreateLimiterTimer()
         return false;
     }
     timerOption->SetWantAgent(wantAgent);
-    if (limiterTimerId_.load() == 0L) {
-        limiterTimerId_.store(MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption));
-        HILOG_INFO("new timerId:%{public}" PRId64 ".", limiterTimerId_.load());
-        std::lock_guard<std::mutex> lock(currentLimiterWantAgentMutex_);
-        currentLimiterWantAgent_ = wantAgent;
+    uint64_t timerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+    if (timerId == 0L) {
+        HILOG_ERROR("create limiter timer failed");
+        return false;
     }
+    limiterTimerId_.store(timerId);
+    HILOG_INFO("new timerId:%{public}" PRId64 ".", timerId);
+    currentLimiterWantAgent_ = wantAgent;
     return true;
 }
 
@@ -1387,7 +1398,7 @@ void FormTimerMgr::DestroyFormCheckTimer()
 void FormTimerMgr::FormPeriodReport()
 {
     HILOG_INFO("init base Refresh count task");
-    if (limiterTimerReportId_ != 0L) {
+    if (limiterTimerReportId_.load() != 0L) {
         return;
     }
     auto timerOption = std::make_shared<FormTimerOption>();
@@ -1403,12 +1414,12 @@ void FormTimerMgr::FormPeriodReport()
         FormAbnormalReporter::GetInstance().ReportAbnormalForms();
     };
     timerOption->SetCallbackInfo(timeCallback);
-    limiterTimerReportId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+    limiterTimerReportId_.store(MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption));
     int64_t timeInSec = Common::FormTimeUtil::GetBootTimeMs();
     HILOG_INFO("TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64 ".",
-        limiterTimerReportId_, timeInSec, interval);
+        limiterTimerReportId_.load(), timeInSec, interval);
     int64_t startTime = timeInSec + interval;
-    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerReportId_,
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerReportId_.load(),
         static_cast<uint64_t>(startTime));
     if (!bRet) {
         HILOG_ERROR("init limiterTimerReport task error");
@@ -1420,7 +1431,7 @@ void FormTimerMgr::FormPeriodReport()
 void FormTimerMgr::StartDiskUseInfoReportTimer()
 {
     HILOG_INFO("start disk use report Timer");
-    if (reportDiskUseTimerId_ != 0L) {
+    if (reportDiskUseTimerId_.load() != 0L) {
         return;
     }
     auto timerOption = std::make_shared<FormTimerOption>();
@@ -1432,16 +1443,16 @@ void FormTimerMgr::StartDiskUseInfoReportTimer()
     timerOption->SetInterval(interval);
     auto timeCallback = []() { FormEventReport::SendDiskUseEvent(); };
     timerOption->SetCallbackInfo(timeCallback);
-    reportDiskUseTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
-    if (reportDiskUseTimerId_ <= 0) {
-        HILOG_ERROR("invalid reportDiskUseTimerId_:%{public}" PRId64 ".", reportDiskUseTimerId_);
+    reportDiskUseTimerId_.store(MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption));
+    if (reportDiskUseTimerId_.load() <= 0) {
+        HILOG_ERROR("invalid reportDiskUseTimerId_:%{public}" PRId64 ".", reportDiskUseTimerId_.load());
         return;
     }
     int64_t timeInSec = Common::FormTimeUtil::GetBootTimeMs();
     HILOG_INFO("TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64 ".",
-        reportDiskUseTimerId_, timeInSec, interval);
+        reportDiskUseTimerId_.load(), timeInSec, interval);
     int64_t startTime = timeInSec + interval;
-    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(reportDiskUseTimerId_,
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(reportDiskUseTimerId_.load(),
         static_cast<uint64_t>(startTime));
     if (!bRet) {
         HILOG_ERROR("start disk use report Timer error");
@@ -1475,10 +1486,10 @@ void FormTimerMgr::InnerClearIntervalTimer()
 void FormTimerMgr::InnerClearIntervalReportTimer()
 {
     HILOG_INFO("start");
-    if (limiterTimerReportId_ != 0L) {
+    if (limiterTimerReportId_.load() != 0L) {
         HILOG_INFO("Destroy interval Report Timerr");
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerReportId_);
-        limiterTimerReportId_ = 0L;
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerReportId_.load());
+        limiterTimerReportId_.store(0L);
     }
     HILOG_INFO("end");
 }
@@ -1486,10 +1497,10 @@ void FormTimerMgr::InnerClearIntervalReportTimer()
 void FormTimerMgr::ClearDiskInfoReportTimer()
 {
     HILOG_INFO("start");
-    if (reportDiskUseTimerId_ != 0L) {
+    if (reportDiskUseTimerId_.load() != 0L) {
         HILOG_INFO("Destroy interval Report Timerr");
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(reportDiskUseTimerId_);
-        reportDiskUseTimerId_ = 0L;
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(reportDiskUseTimerId_.load());
+        reportDiskUseTimerId_.store(0L);
     }
     HILOG_INFO("end");
 }
@@ -1556,8 +1567,8 @@ void FormTimerMgr::Init()
     updateAtTimerId_ = 0L;
     dynamicAlarmTimerId_ = 0L;
     limiterTimerId_.store(0L);
-    limiterTimerReportId_ = 0L;
-    reportDiskUseTimerId_ = 0L;
+    limiterTimerReportId_.store(0L);
+    reportDiskUseTimerId_.store(0L);
     formCheckTimerId_ = 0L;
     FormPeriodReport();
     CreateLimiterTimer();
@@ -1636,29 +1647,6 @@ bool FormTimerMgr::IsActiveUser(int32_t userId)
     return false;
 }
 
-bool FormTimerMgr::IsDynamicTimerExpired(int64_t formId)
-{
-    std::lock_guard<std::mutex> lock(dynamicMutex_);
-    auto itItem = std::find_if(dynamicRefreshTasks_.begin(), dynamicRefreshTasks_.end(),
-        [formId](const auto &it) { return it.formId == formId; });
-    if (itItem == dynamicRefreshTasks_.end()) {
-        HILOG_WARN("can't find dynamic refresh task, just restore. formId:%{public}" PRId64, formId);
-        return true;
-    }
-
-    auto timeInSec = Common::FormTimeUtil::GetBootTimeMs();
-    if (itItem->settedTime > timeInSec) {
-        HILOG_INFO("dynamic refresh task wait trigger. formId:%{public}" PRId64, formId);
-        return false;
-    }
-
-    HILOG_WARN("dynamic refresh timed out without triggering. formId:%{public}" PRId64, formId);
-    dynamicRefreshTasks_.erase(itItem);
-    dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
-    UpdateDynamicAlarm();
-    return true;
-}
-
 bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
 {
     struct tm tmAtTime = {0};
@@ -1685,7 +1673,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
             std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
             ClearUpdateAtTimerResource();
         }
-        atTimerWakeUpTime_ = LONG_MAX;
+        atTimerWakeUpTime_.store(INT64_MAX);
         HILOG_INFO("no update at task in system now");
         return true;
     }
@@ -1710,7 +1698,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
     HILOG_INFO("timeInSec:%{public}" PRId64 ".", timeInSec);
     int64_t nextTime = timeInSec + (selectTime - currentTime);
     HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
-    if (nextTime == atTimerWakeUpTime_) {
+    if (nextTime == atTimerWakeUpTime_.load()) {
         HILOG_WARN("end, wakeUpTime not change, no need update alarm");
         return true;
     }
@@ -1731,7 +1719,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
     }
     timerOption->SetWantAgent(wantAgent);
 
-    atTimerWakeUpTime_ = nextTime;
+    atTimerWakeUpTime_.store(nextTime);
     {
         std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
         if (currentUpdateAtWantAgent_ != nullptr) {

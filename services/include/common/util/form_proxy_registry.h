@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_PROXY_REGISTRY_H
 #define OHOS_FORM_FWK_FORM_PROXY_REGISTRY_H
 
+#include <memory>
 #include <shared_mutex>
 #include <string>
 
@@ -48,7 +49,7 @@ private:
  * duplicated code across multiple callback registration interfaces.
  * Uses std::shared_mutex for read-write lock optimization.
  */
-class FormProxyRegistry {
+class FormProxyRegistry : public std::enable_shared_from_this<FormProxyRegistry> {
 public:
     /**
      * @brief Constructor.
