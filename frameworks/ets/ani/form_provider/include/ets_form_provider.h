@@ -40,11 +40,9 @@ public:
 
     void UnregisterPublishFormCrossBundleControl();
 private:
-    static std::mutex mutex_;
-    static sptr<EtsFormProviderProxyMgr> instance_;
     ani_ref crossBundleControlCallback_ = nullptr;
     ani_vm* crossBundleControlVm_;
-    
+
     ani_env* GetCrossBundleControlEnv();
     mutable std::mutex crossBundleControlMutex_;
     ErrCode PublishFormCrossBundleControl(const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen);

@@ -642,12 +642,12 @@ void FormCommonAdapter::CheckUpdateFormRecord(const int64_t formId, const FormIt
     }
 }
 
-ErrCode FormCommonAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
+bool FormCommonAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
 {
     HILOG_DEBUG("CheckFormDueControl called");
     if (ParamControl::GetInstance().IsDueDisableCtrlEmpty()) {
-        // due disable ctrl param empty, just return
-        return ERR_OK;
+        // due disable ctrl param empty, not controlled
+        return false;
     }
 
     Want want;
@@ -657,8 +657,8 @@ ErrCode FormCommonAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInf
     BundleInfo bundleInfo;
     std::string packageName;
     if (GetBundleInfo(want, bundleInfo, packageName) != ERR_OK) {
-        HILOG_ERROR("Get bundle info failed");
-        return ERR_OK;
+        HILOG_WARN("Get bundle info failed, skip due control check (fail-open)");
+        return false;
     }
 
     FormRecord formRecord;

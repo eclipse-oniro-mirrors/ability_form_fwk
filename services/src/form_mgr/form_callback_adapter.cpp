@@ -42,6 +42,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int32_t SCENE_ANIMATION_DEACTIVATED = 0;
+}
 
 FormCallbackAdapter::FormCallbackAdapter()
 {
@@ -198,14 +201,14 @@ ErrCode FormCallbackAdapter::RegisterOverflowProxy(const sptr<IRemoteObject> &ca
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return overflowRegistry_.Register(callingUid, callerToken);
+    return overflowRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterOverflowProxy()
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return overflowRegistry_.Unregister(callingUid);
+    return overflowRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::RequestOverflow(const int64_t formId, const int32_t callingUid,
@@ -225,7 +228,7 @@ ErrCode FormCallbackAdapter::RequestOverflow(const int64_t formId, const int32_t
     ErrCode result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     for (int uid : formRecord.formUserUids) {
         sptr<IRemoteObject> callerToken;
-        if (overflowRegistry_.Get(uid, callerToken) != ERR_OK) {
+        if (overflowRegistry_->Get(uid, callerToken) != ERR_OK) {
             continue;
         }
         sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
@@ -243,14 +246,14 @@ ErrCode FormCallbackAdapter::RegisterChangeSceneAnimationStateProxy(
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return sceneAnimationRegistry_.Register(callingUid, callerToken);
+    return sceneAnimationRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterChangeSceneAnimationStateProxy()
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return sceneAnimationRegistry_.Unregister(callingUid);
+    return sceneAnimationRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::ChangeSceneAnimationState(const int64_t formId,
@@ -270,7 +273,7 @@ ErrCode FormCallbackAdapter::ChangeSceneAnimationState(const int64_t formId,
     ErrCode result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     for (int uid : formRecord.formUserUids) {
         sptr<IRemoteObject> callerToken;
-        if (sceneAnimationRegistry_.Get(uid, callerToken) != ERR_OK) {
+        if (sceneAnimationRegistry_->Get(uid, callerToken) != ERR_OK) {
             continue;
         }
         sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
@@ -290,14 +293,14 @@ ErrCode FormCallbackAdapter::RegisterGetFormRectProxy(const sptr<IRemoteObject> 
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return formRectRegistry_.Register(callingUid, callerToken);
+    return formRectRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterGetFormRectProxy()
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return formRectRegistry_.Unregister(callingUid);
+    return formRectRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::GetFormRect(const int64_t formId,
@@ -317,7 +320,7 @@ ErrCode FormCallbackAdapter::GetFormRect(const int64_t formId,
     ErrCode result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     for (int uid : formRecord.formUserUids) {
         sptr<IRemoteObject> callerToken;
-        if (formRectRegistry_.Get(uid, callerToken) != ERR_OK) {
+        if (formRectRegistry_->Get(uid, callerToken) != ERR_OK) {
             continue;
         }
         sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
@@ -337,14 +340,14 @@ ErrCode FormCallbackAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteOb
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return liveFormStatusRegistry_.Register(callingUid, callerToken);
+    return liveFormStatusRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterGetLiveFormStatusProxy()
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return liveFormStatusRegistry_.Unregister(callingUid);
+    return liveFormStatusRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::GetLiveFormStatus(
@@ -352,7 +355,7 @@ ErrCode FormCallbackAdapter::GetLiveFormStatus(
 {
     HILOG_INFO("call");
     std::vector<sptr<IRemoteObject>> callerTokens;
-    ErrCode ret = liveFormStatusRegistry_.GetAll(callerTokens);
+    ErrCode ret = liveFormStatusRegistry_->GetAll(callerTokens);
     if (ret != ERR_OK) {
         return ret;
     }
@@ -378,14 +381,14 @@ ErrCode FormCallbackAdapter::RegisterPublishFormCrossBundleControl(
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return crossBundleControlRegistry_.Register(callingUid, callerToken);
+    return crossBundleControlRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterPublishFormCrossBundleControl()
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return crossBundleControlRegistry_.Unregister(callingUid);
+    return crossBundleControlRegistry_->Unregister(callingUid);
 }
 
 bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo)
@@ -395,7 +398,7 @@ bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBu
         bundleInfo.targetTemplateFormDetailId.c_str());
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     std::vector<sptr<IRemoteObject>> callerTokens;
-    ErrCode ret = crossBundleControlRegistry_.GetByUserId(userId, callerTokens);
+    ErrCode ret = crossBundleControlRegistry_->GetByUserId(userId, callerTokens);
     if (ret != ERR_OK) {
         return false;
     }
@@ -422,14 +425,14 @@ ErrCode FormCallbackAdapter::RegisterTemplateFormDetailInfoChange(
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return templateFormDetailInfoRegistry_.Register(callingUid, callerToken);
+    return templateFormDetailInfoRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterTemplateFormDetailInfoChange()
 {
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return templateFormDetailInfoRegistry_.Unregister(callingUid);
+    return templateFormDetailInfoRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
@@ -438,7 +441,7 @@ ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
     HILOG_DEBUG("call");
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     std::vector<sptr<IRemoteObject>> callerTokens;
-    ErrCode ret = templateFormDetailInfoRegistry_.GetByUserId(userId, callerTokens);
+    ErrCode ret = templateFormDetailInfoRegistry_->GetByUserId(userId, callerTokens);
     if (ret != ERR_OK) {
         return ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION;
     }
@@ -463,7 +466,7 @@ ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemot
 {
     HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    ErrCode result = updateFormsConfigRegistry_.Register(callingUid, callerToken);
+    ErrCode result = updateFormsConfigRegistry_->Register(callingUid, callerToken);
     if (result == ERR_OK) {
         NotifyCachedFormConfigs(callerToken);
     }
@@ -474,7 +477,7 @@ ErrCode FormCallbackAdapter::UnregisterUpdateFormsConfigCallback()
 {
     HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return updateFormsConfigRegistry_.Unregister(callingUid);
+    return updateFormsConfigRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
@@ -485,7 +488,7 @@ ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfi
         formCustomConfigCache_ = configs;
     }
     FormInfoMgr::GetInstance().UpdateFormShowConfigs(configs);
-    return NotifyAllHosts(updateFormsConfigRegistry_, "UpdateFormsConfig",
+    return NotifyAllHosts(*updateFormsConfigRegistry_, "UpdateFormsConfig",
         [&configs](const sptr<IFormHostDelegate> &proxy) {
             return proxy->UpdateFormsConfigCallback(configs);
         });
@@ -495,14 +498,14 @@ ErrCode FormCallbackAdapter::RegisterDeleteFormsCallback(const sptr<IRemoteObjec
 {
     HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return deleteFormsRegistry_.Register(callingUid, callerToken);
+    return deleteFormsRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterDeleteFormsCallback()
 {
     HILOG_DEBUG("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    return deleteFormsRegistry_.Unregister(callingUid);
+    return deleteFormsRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::DeleteForms(const std::vector<FormRecordFilter> &filters)
@@ -514,7 +517,7 @@ ErrCode FormCallbackAdapter::DeleteForms(const std::vector<FormRecordFilter> &fi
         HILOG_INFO("no forms matched");
         return ERR_OK;
     }
-    return NotifyAllHosts(deleteFormsRegistry_, "DeleteForms",
+    return NotifyAllHosts(*deleteFormsRegistry_, "DeleteForms",
         [&matchedFormIds](const sptr<IFormHostDelegate> &proxy) {
             return proxy->DeleteFormsCallback(matchedFormIds);
         });
@@ -780,48 +783,47 @@ void FormCallbackAdapter::NotifyCachedFormConfigs(const sptr<IRemoteObject> &cal
 
 ErrCode FormCallbackAdapter::RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken)
 {
-    return wantCallbackRegistry_.Register(callingUid, callerToken);
+    return wantCallbackRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterFormWantCallback(int32_t callingUid)
 {
-    return wantCallbackRegistry_.Unregister(callingUid);
+    return wantCallbackRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::GetWantCallbackProxy(int32_t callingUid, sptr<IRemoteObject> &proxy)
 {
-    return wantCallbackRegistry_.Get(callingUid, proxy);
+    return wantCallbackRegistry_->Get(callingUid, proxy);
 }
 
-void FormCallbackAdapter::CancelOverflow(const int64_t formId)
+void FormCallbackAdapter::CancelSceneEffects(const int64_t formId)
 {
+    // Caller ensures the form is an active live form.
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64, formId);
         return;
     }
-    FormInfo formInfo;
-    ErrCode result = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
-    if (result != ERR_OK) {
-        HILOG_ERROR("Get target form info failed");
-        return;
-    }
-    if (formInfo.sceneAnimationParams.abilityName.empty()) {
-        HILOG_ERROR("SceneAnimationParams abilityName is empty");
-        return;
-    }
     for (int uid : formRecord.formUserUids) {
-        sptr<IRemoteObject> callerToken;
-        if (overflowRegistry_.Get(uid, callerToken) != ERR_OK) {
-            continue;
+        ErrCode overflowRet = ERR_OK;
+        sptr<IRemoteObject> overflowToken;
+        if (overflowRegistry_->Get(uid, overflowToken) == ERR_OK) {
+            sptr<IFormHostDelegate> overflowProxy = iface_cast<IFormHostDelegate>(overflowToken);
+            if (overflowProxy != nullptr) {
+                OverflowInfo overflowInfo;
+                overflowRet = overflowProxy->RequestOverflow(formId, overflowInfo, false);
+            }
         }
-        sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
-        if (proxy == nullptr) {
-            continue;
+        ErrCode sceneRet = ERR_OK;
+        sptr<IRemoteObject> sceneToken;
+        if (sceneAnimationRegistry_->Get(uid, sceneToken) == ERR_OK) {
+            sptr<IFormHostDelegate> sceneProxy = iface_cast<IFormHostDelegate>(sceneToken);
+            if (sceneProxy != nullptr) {
+                sceneRet = sceneProxy->ChangeSceneAnimationState(formId, SCENE_ANIMATION_DEACTIVATED);
+            }
         }
-        OverflowInfo overflowInfo;
-        result = proxy->RequestOverflow(formId, overflowInfo, false);
-        HILOG_INFO("formid:%{public}" PRId64 ",result: %{public}d", formId, result);
+        HILOG_INFO("CancelSceneEffects formId:%{public}" PRId64 ", overflowRet:%{public}d, sceneRet:%{public}d",
+            formId, overflowRet, sceneRet);
     }
 }
 } // namespace AppExecFwk

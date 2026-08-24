@@ -64,6 +64,10 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
     }
 
     for (const auto &item: value) {
+        if (item.first.size() <= strlen(FORM_INFO_PREFIX)) {
+            HILOG_ERROR("invalid key: %{public}s", item.first.c_str());
+            continue;
+        }
         formInfoStorages.emplace_back(item.first.substr(strlen(FORM_INFO_PREFIX)), item.second);
     }
 

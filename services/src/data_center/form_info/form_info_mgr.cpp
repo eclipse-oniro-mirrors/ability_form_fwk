@@ -597,8 +597,10 @@ void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bu
 {
     std::string versionCode;
     FormInfoRdbStorageMgr::GetInstance().GetFormVersionCode(versionCode);
-    bool isNeedUpdateAll = versionCode.empty() ||
-        Constants::FORM_VERSION_CODE != FormUtil::ConvertStringToInt(versionCode);
+    int oldVersionCode = 0;
+    bool convertOk = FormUtil::ConvertStringToInt(versionCode, oldVersionCode);
+    bool isNeedUpdateAll = versionCode.empty() || !convertOk ||
+        Constants::FORM_VERSION_CODE != oldVersionCode;
     HILOG_INFO("bundle number:%{public}zu, old versionCode:%{public}s, new versionCode:%{public}d",
         bundleVersionMap.size(), versionCode.c_str(), Constants::FORM_VERSION_CODE);
     std::vector<std::string> needUpdateBundleNames;

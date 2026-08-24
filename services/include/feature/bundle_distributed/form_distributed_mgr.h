@@ -94,7 +94,7 @@ private:
     void DeleteDataInDb(const std::string &bundleName, int32_t userId);
 
 private:
-    bool isInitialized_ = false;
+    std::atomic<bool> isInitialized_{false};
     std::unordered_map<std::string, DistributedModule> distributedBundleMap_;
     mutable std::shared_mutex bundleDistributedMapMutex_;
 };

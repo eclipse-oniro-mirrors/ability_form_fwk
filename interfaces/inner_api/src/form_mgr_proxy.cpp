@@ -3505,7 +3505,10 @@ ErrCode FormMgrProxy::ReloadForms(int32_t &reloadNum, const std::string &moduleN
         HILOG_ERROR("SendRequest failed: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    reloadNum = reply.ReadInt32();
+    if (!reply.ReadInt32(reloadNum)) {
+        HILOG_ERROR("read reloadNum failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return reply.ReadInt32();
 }
 
@@ -3524,7 +3527,10 @@ ErrCode FormMgrProxy::ReloadAllForms(int32_t &reloadNum)
         HILOG_ERROR("SendRequest failed: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    reloadNum = reply.ReadInt32();
+    if (!reply.ReadInt32(reloadNum)) {
+        HILOG_ERROR("read reloadNum failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return reply.ReadInt32();
 }
 

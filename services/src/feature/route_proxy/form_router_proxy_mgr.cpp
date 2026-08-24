@@ -47,6 +47,10 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
     const sptr<IRemoteObject> &callerToken)
 {
 #ifndef WATCH_API_DISABLE
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     for (const auto &formId : formIds) {
@@ -95,16 +99,13 @@ bool FormRouterProxyMgr::HasRouterProxy(int64_t formId)
 void FormRouterProxyMgr::OnFormRouterEvent(int64_t formId, const Want &want)
 {
     HILOG_DEBUG("call");
-    if (!HasRouterProxy(formId)) {
+    std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
+    auto it = formRouterProxyMap_.find(formId);
+    if (it == formRouterProxyMap_.end() || it->second == nullptr) {
         HILOG_WARN("This form no formRouterProxy has been register");
         return;
     }
-    std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
-    auto routerProxy = formRouterProxyMap_[formId];
-    if (routerProxy == nullptr) {
-        return;
-    }
-    PostRouterProxyToHost(formId, routerProxy, want);
+    PostRouterProxyToHost(formId, it->second, want);
 }
 
 void FormRouterProxyMgr::CleanResource(const wptr<IRemoteObject> &remote)

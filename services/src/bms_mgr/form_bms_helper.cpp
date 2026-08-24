@@ -279,7 +279,7 @@ int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
     }
     auto callingUid = IPCSkeleton::GetCallingUid();
     if (IN_PROCESS_CALL(iBundleMgr->GetNameForUid(callingUid, callerBundleName)) != ERR_OK) {
-        HILOG_ERROR("fail get form config info");
+        HILOG_ERROR("fail get bundleName");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     return ERR_OK;
@@ -361,19 +361,6 @@ bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::str
 
     HILOG_ERROR("Get compile mode failed");
     return false;
-}
-
-bool FormBmsHelper::GetCompatibleVersion(const std::string& bundleName, int32_t userId, int32_t& compatibleVersion)
-{
-    HILOG_DEBUG("call");
-    BundleInfo bundleInfo;
-    if (!GetBundleInfoDefault(bundleName, userId, bundleInfo)) {
-        HILOG_ERROR("Get bundle info failed");
-        return false;
-    }
-
-    compatibleVersion = static_cast<int32_t>(bundleInfo.compatibleVersion);
-    return true;
 }
 
 ErrCode FormBmsHelper::GetProxyDataInfos(const std::string &bundleName, const std::string &moduleName,

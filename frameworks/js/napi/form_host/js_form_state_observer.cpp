@@ -35,6 +35,7 @@ namespace {
 
 sptr<JsFormStateObserver> JsFormStateObserver::instance_ = nullptr;
 std::mutex JsFormStateObserver::mutex_;
+std::once_flag JsFormStateObserver::onceFlag_;
 
 FormAddCallbackClient::FormAddCallbackClient(napi_env env, napi_ref callbackRef)
 {
@@ -45,8 +46,9 @@ FormAddCallbackClient::FormAddCallbackClient(napi_env env, napi_ref callbackRef)
 
 FormAddCallbackClient::~FormAddCallbackClient()
 {
-    if (callbackRef_ != nullptr) {
+    if (env_ != nullptr && callbackRef_ != nullptr) {
         napi_delete_reference(env_, callbackRef_);
+        callbackRef_ = nullptr;
     }
 }
 
@@ -63,14 +65,12 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
-        napi_handle_scope scope = nullptr;
-        napi_open_handle_scope(sharedThis->env_, &scope);
-        if (scope == nullptr) {
-            HILOG_ERROR("null scope");
+        AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
+        napi_value callbackValues = nullptr;
+        if (napi_create_object(sharedThis->env_, &callbackValues) != napi_ok || callbackValues == nullptr) {
+            HILOG_ERROR("napi_create_object failed");
             return;
         }
-        napi_value callbackValues = nullptr;
-        napi_create_object(sharedThis->env_, &callbackValues);
         ParseRunningFormInfoIntoNapi(sharedThis->env_, runningFormInfo, callbackValues);
         napi_value callResult;
         napi_value myCallback = nullptr;
@@ -78,7 +78,6 @@ void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
-        napi_close_handle_scope(sharedThis->env_, scope);
     });
 }
 
@@ -101,8 +100,9 @@ FormRemoveCallbackClient::FormRemoveCallbackClient(napi_env env, napi_ref callba
 
 FormRemoveCallbackClient::~FormRemoveCallbackClient()
 {
-    if (callbackRef_ != nullptr) {
+    if (env_ != nullptr && callbackRef_ != nullptr) {
         napi_delete_reference(env_, callbackRef_);
+        callbackRef_ = nullptr;
     }
 }
 
@@ -119,14 +119,12 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
-        napi_handle_scope scope = nullptr;
-        napi_open_handle_scope(sharedThis->env_, &scope);
-        if (scope == nullptr) {
-            HILOG_ERROR("null scope");
+        AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
+        napi_value callbackValues = nullptr;
+        if (napi_create_object(sharedThis->env_, &callbackValues) != napi_ok || callbackValues == nullptr) {
+            HILOG_ERROR("napi_create_object failed");
             return;
         }
-        napi_value callbackValues = nullptr;
-        napi_create_object(sharedThis->env_, &callbackValues);
         ParseRunningFormInfoIntoNapi(sharedThis->env_, runningFormInfo, callbackValues);
         napi_value callResult;
         napi_value myCallback = nullptr;
@@ -134,7 +132,6 @@ void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
         if (myCallback != nullptr) {
             napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
         }
-        napi_close_handle_scope(sharedThis->env_, scope);
     });
 }
 
@@ -142,23 +139,28 @@ bool FormRemoveCallbackClient::IsStrictEqual(napi_value callback)
 {
     bool isEqual = false;
     napi_value myCallback = nullptr;
-    napi_get_reference_value(env_, callbackRef_, &myCallback);
-    napi_strict_equals(env_, myCallback, callback, &isEqual);
+    napi_status status = napi_get_reference_value(env_, callbackRef_, &myCallback);
+    if (status != napi_ok || myCallback == nullptr) {
+        HILOG_ERROR("get reference value failed");
+        return false;
+    }
+    status = napi_strict_equals(env_, myCallback, callback, &isEqual);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_strict_equals failed");
+        return false;
+    }
     HILOG_INFO("isStrictEqual:%{public}d", isEqual);
     return isEqual;
 }
 
 sptr<JsFormStateObserver> JsFormStateObserver::GetInstance()
 {
-    if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
+    std::call_once(onceFlag_, []() {
+        instance_ = new (std::nothrow) JsFormStateObserver();
         if (instance_ == nullptr) {
-            instance_ = new (std::nothrow) JsFormStateObserver();
-            if (instance_ == nullptr) {
-                HILOG_ERROR("create JsFormStateObserver failed");
-            }
+            HILOG_ERROR("create JsFormStateObserver failed");
         }
-    }
+    });
     return instance_;
 }
 
@@ -192,7 +194,11 @@ bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
 {
     HILOG_DEBUG("start");
     napi_ref callbackRef = nullptr;
-    napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    if (refStatus != napi_ok || callbackRef == nullptr) {
+        HILOG_ERROR("create reference failed");
+        return false;
+    }
     std::shared_ptr<FormAddCallbackClient> callbackClient = std::make_shared<FormAddCallbackClient>(env,
         callbackRef);
 
@@ -208,6 +214,7 @@ bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
                 HILOG_ERROR("found equal callback");
+                napi_delete_reference(env, callbackRef);
                 return false;
             }
         }
@@ -221,7 +228,11 @@ bool JsFormStateObserver::RegisterFormRemoveCallback(const napi_env env,
 {
     HILOG_DEBUG("start");
     napi_ref callbackRef = nullptr;
-    napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    napi_status status = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    if (status != napi_ok || callbackRef == nullptr) {
+        HILOG_ERROR("create reference failed");
+        return false;
+    }
     std::shared_ptr<FormRemoveCallbackClient> callbackClient =
         std::make_shared<FormRemoveCallbackClient>(env, callbackRef);
 
@@ -363,7 +374,11 @@ int JsFormStateObserver::RegisterFormInstanceCallback(napi_env env, napi_value j
             HILOG_ERROR("bundleName is already in the map,bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        napi_create_reference(env, jsObserverObject, 1, &ref);
+        napi_status refStatus = napi_create_reference(env, jsObserverObject, 1, &ref);
+        if (refStatus != napi_ok || ref == nullptr) {
+            HILOG_ERROR("napi_create_reference failed");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formVisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(reinterpret_cast<NativeReference *>(ref)));
     } else {
@@ -372,7 +387,11 @@ int JsFormStateObserver::RegisterFormInstanceCallback(napi_env env, napi_value j
             HILOG_ERROR("bundleName is already in the map,bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        napi_create_reference(env, jsObserverObject, 1, &ref);
+        napi_status refStatus = napi_create_reference(env, jsObserverObject, 1, &ref);
+        if (refStatus != napi_ok || ref == nullptr) {
+            HILOG_ERROR("napi_create_reference failed");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formInvisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(reinterpret_cast<NativeReference *>(ref)));
     }
@@ -412,51 +431,38 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
     }
 }
 
+bool JsFormStateObserver::DelCallbackFromMap(
+    std::map<std::string, std::shared_ptr<NativeReference>> &callbackMap,
+    const std::string &bundleName, napi_value jsObserverObject)
+{
+    auto callbackIter = callbackMap.find(bundleName);
+    if (callbackIter == callbackMap.end() || callbackIter->second == nullptr) {
+        HILOG_ERROR("callback not found or null");
+        return false;
+    }
+    napi_value value = callbackIter->second->GetNapiValue();
+    bool isEqual = false;
+    napi_strict_equals(env_, value, jsObserverObject, &isEqual);
+    if (!isEqual) {
+        HILOG_ERROR("no matching callback has been register");
+        return false;
+    }
+    callbackMap.erase(callbackIter);
+    return true;
+}
+
 ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
     bool isVisibility, napi_value jsObserverObject, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    std::string specialFlag = "#";
-    if (isVisibility) {
-        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
-        if (visibleCallback != formVisibleCallbackMap_.end()) {
-            napi_value value = visibleCallback->second->GetNapiValue();
-            bool isEqual = false;
-            napi_strict_equals(env_, value, jsObserverObject, &isEqual);
-            if (isEqual) {
-                AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
-                    bundleName + specialFlag + std::to_string(isVisibility), formObserver);
-                formVisibleCallbackMap_.erase(visibleCallback);
-                return ERR_OK;
-            } else {
-                HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
-                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-            }
-        } else {
-            HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
-            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-        }
-    } else {
-        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-        if (invisibleCallback != formInvisibleCallbackMap_.end()) {
-            napi_value value = invisibleCallback->second->GetNapiValue();
-            bool isEqual = false;
-            napi_strict_equals(env_, value, jsObserverObject, &isEqual);
-            if (isEqual) {
-                AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
-                    bundleName + specialFlag + std::to_string(isVisibility), formObserver);
-                formInvisibleCallbackMap_.erase(invisibleCallback);
-                return ERR_OK;
-            } else {
-                HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
-                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-            }
-        } else {
-            HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
-            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-        }
+    auto &callbackMap = isVisibility ? formVisibleCallbackMap_ : formInvisibleCallbackMap_;
+    if (!DelCallbackFromMap(callbackMap, bundleName, jsObserverObject)) {
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
+        bundleName + "#" + std::to_string(isVisibility), formObserver);
+    return ERR_OK;
 }
 
 std::shared_ptr<AppExecFwk::EventHandler> JsFormStateObserver::GetMainEventRunner()
@@ -484,12 +490,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                 HILOG_ERROR("null sharedThis");
                 return;
             }
-            napi_handle_scope scope = nullptr;
-            napi_open_handle_scope(sharedThis->env_, &scope);
-            if (scope == nullptr) {
-                HILOG_ERROR("null scope");
-                return;
-            }
+            AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
                 isVisibleTypeFlag = true;
                 if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
@@ -515,7 +516,6 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                     }
                 }
             }
-            napi_close_handle_scope(sharedThis->env_, scope);
         });
     }
     return ERR_OK;
@@ -664,6 +664,9 @@ ErrCode JsFormStateObserver::ClearFormClickCallback(
 
 FormEventCallbackList::~FormEventCallbackList()
 {
+    if (env_ == nullptr) {
+        return;
+    }
     for (auto &iter : callbacks_) {
         napi_delete_reference(env_, iter);
     }
@@ -697,9 +700,11 @@ void FormEventCallbackList::PushCallback(napi_value call)
     }
     if (!ContainEqualCallback(call)) {
         napi_ref callbackRef = nullptr;
-        napi_create_reference(env_, call, REF_COUNT, &callbackRef);
-        if (callbackRef != nullptr) {
+        napi_status status = napi_create_reference(env_, call, REF_COUNT, &callbackRef);
+        if (status == napi_ok && callbackRef != nullptr) {
             callbacks_.emplace_back(callbackRef);
+        } else {
+            HILOG_ERROR("create reference failed");
         }
     }
 }
@@ -733,14 +738,12 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
         HILOG_ERROR("null env");
         return;
     }
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    if (scope == nullptr) {
-        HILOG_ERROR("null scope");
+    AbilityRuntime::HandleScope scopeGuard(env_);
+    napi_value formInfo = nullptr;
+    if (napi_create_object(env_, &formInfo) != napi_ok || formInfo == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
         return;
     }
-    napi_value formInfo = nullptr;
-    napi_create_object(env_, &formInfo);
     ParseRunningFormInfoIntoNapi(env_, runningFormInfo, formInfo);
     napi_value callResult;
     napi_value callbackfun = nullptr;
@@ -750,7 +753,6 @@ void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &r
             napi_call_function(env_, nullptr, callbackfun, ARGS_ONE, &formInfo, &callResult);
         }
     }
-    napi_close_handle_scope(env_, scope);
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

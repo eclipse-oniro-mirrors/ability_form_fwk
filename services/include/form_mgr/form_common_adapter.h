@@ -228,9 +228,9 @@ public:
      * @brief Check form due control
      * @param formMajorInfo Form major info
      * @param isDisablePolicy Is disable policy
-     * @return Returns ERR_OK if no control, ERR_APPEXECFWK_FORM_DUE_REMOVE if due control
+     * @return Returns true if due control (should be blocked), false if not controlled
      */
-    ErrCode CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
+    bool CheckFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy);
 
     /**
      * @brief Handle form add observer

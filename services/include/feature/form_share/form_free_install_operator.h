@@ -36,6 +36,7 @@ public:
     int32_t StartFreeInstall(const std::string &bundleName, const std::string &moduleName,
         const std::string &abilityName, const int32_t userId);
     void OnInstallFinished(int32_t resultCode, const int32_t userId);
+    const std::string& GetFormShareInfoKey() const { return formShareInfoKey_; }
 
 private:
     std::string formShareInfoKey_;

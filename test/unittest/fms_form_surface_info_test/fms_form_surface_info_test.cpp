@@ -64,6 +64,10 @@ HWTEST_F(FmsFormSurfaceInfoTest, FmsFormSurfaceInfoTest_0100, TestSize.Level0)
 
     FormSurfaceInfo formSurfaceInfo;
     Parcel parcel;
+    parcel.WriteFloat(1.0f);
+    parcel.WriteFloat(1.0f);
+    parcel.WriteFloat(0.0f);
+    parcel.WriteFloat(1.0f);
     auto result = formSurfaceInfo.ReadFromParcel(parcel);
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FmsFormSurfaceInfoTest_0100 end";
@@ -95,6 +99,10 @@ HWTEST_F(FmsFormSurfaceInfoTest, FmsFormSurfaceInfoTest_0300, TestSize.Level0)
 
     FormSurfaceInfo formSurfaceInfo;
     Parcel parcel;
+    parcel.WriteFloat(1.0f);
+    parcel.WriteFloat(1.0f);
+    parcel.WriteFloat(0.0f);
+    parcel.WriteFloat(1.0f);
     auto result = formSurfaceInfo.Unmarshalling(parcel);
     EXPECT_NE(result, nullptr);
     GTEST_LOG_(INFO) << "FmsFormSurfaceInfoTest_0300 end";

@@ -29,6 +29,7 @@
 #include "in_process_call_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "string_wrapper.h"
+#include "remote_object_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -49,9 +50,6 @@ FormShareMgr::FormShareMgr()
 FormShareMgr::~FormShareMgr()
 {
     HILOG_DEBUG("FormShareMgr is destroyed");
-    if (eventHandler_ != nullptr) {
-        eventHandler_->UnregisterEventTimeoutObserver(shared_from_this());
-    }
 };
 
 int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
@@ -212,11 +210,22 @@ int32_t FormShareMgr::CheckFormPackage(const FormShareInfo &info, const std::str
 
 bool FormShareMgr::CheckFormShareInfo(const FormShareInfo &info)
 {
-    return !(info.bundleName.empty() ||
-            info.moduleName.empty() ||
-            info.abilityName.empty() ||
-            info.formName.empty() ||
-            info.deviceId.empty());
+    if (info.bundleName.empty() || info.moduleName.empty() ||
+        info.abilityName.empty() || info.formName.empty() || info.deviceId.empty()) {
+        return false;
+    }
+    if (info.providerShareData.Size() > FORM_SHARE_INFO_MAX_SIZE) {
+        HILOG_ERROR("providerShareData too many keys: %{public}d", info.providerShareData.Size());
+        return false;
+    }
+    const auto &params = info.providerShareData.GetParams();
+    for (const auto &item : params) {
+        if (AAFwk::IRemoteObjectWrap::Query(item.second.GetRefPtr()) != nullptr) {
+            HILOG_ERROR("providerShareData contains IRemoteObject, key: %{public}s", item.first.c_str());
+            return false;
+        }
+    }
+    return true;
 }
 
 std::string FormShareMgr::MakeFormShareInfoKey(const FormShareInfo &info)
@@ -400,8 +409,21 @@ void FormShareMgr::HandleFormShareInfoTimeout(int64_t eventId)
 void FormShareMgr::HandleFreeInstallTimeout(int64_t eventId)
 {
     HILOG_DEBUG("eventId:%{public}" PRId64 "", eventId);
-    std::unique_lock<std::shared_mutex> guard(freeInstallMapMutex_);
-    freeInstallOperatorMap_.erase(eventId);
+    std::string formShareInfoKey;
+    {
+        std::unique_lock<std::shared_mutex> guard(freeInstallMapMutex_);
+        auto it = freeInstallOperatorMap_.find(eventId);
+        if (it != freeInstallOperatorMap_.end()) {
+            formShareInfoKey = it->second->GetFormShareInfoKey();
+            freeInstallOperatorMap_.erase(eventId);
+        }
+        if (serialQueue_ != nullptr) {
+            serialQueue_->CancelDelayTask(std::make_pair(MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG, eventId));
+        }
+    }
+    if (!formShareInfoKey.empty()) {
+        RemoveFormShareInfo(formShareInfoKey);
+    }
 }
 
 void FormShareMgr::AddProviderData(const Want &want, WantParams &wantParams)

@@ -161,8 +161,16 @@ int FormHostStub::HandleOnAcquireState(MessageParcel &data, MessageParcel &reply
 
 int32_t FormHostStub::HandleOnShareFormResponse(MessageParcel &data, MessageParcel &reply)
 {
-    auto requestCode = data.ReadInt64();
-    auto result = data.ReadInt32();
+    int64_t requestCode = 0;
+    if (!data.ReadInt64(requestCode)) {
+        HILOG_ERROR("read requestCode failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = 0;
+    if (!data.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
 
     OnShareFormResponse(requestCode, result);
     reply.WriteInt32(ERR_OK);
@@ -188,10 +196,6 @@ int32_t FormHostStub::HandleOnAcquireDataResponse(MessageParcel &data, MessagePa
     }
 
     auto requestCode = data.ReadInt64();
-    if (requestCode <= 0) {
-        HILOG_ERROR("fail ReadInt64<requestCode>");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
 
     OnAcquireDataResponse(*wantParams, requestCode);
     reply.WriteInt32(ERR_OK);

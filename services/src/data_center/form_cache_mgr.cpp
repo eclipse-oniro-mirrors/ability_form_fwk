@@ -15,6 +15,7 @@
 
 #include "data_center/form_cache_mgr.h"
 
+#include <regex>
 #include <sstream>
 
 #include "fms_log_wrapper.h"
@@ -49,7 +50,14 @@ constexpr const char *IMAGE_SIZE = "IMAGE_SIZE";
 constexpr int32_t IMAGE_SIZE_INDEX = 2;
 
 constexpr int32_t INVALID_INDEX = -1;
+constexpr int32_t MAX_IMAGE_DATA_SIZE = 50 * 1024 * 1024; // 50MB, consistent with MAX_IMAGE_BYTE_SIZE
 constexpr const char *IS_DIRTY_DATA_CLEANED = "isDirtyDataCleaned";
+
+inline bool IsDigitsOnly(const std::string &str)
+{
+    static const std::regex pattern("^[0-9]+$");
+    return !str.empty() && std::regex_match(str, pattern);
+}
 
 inline bool HasContent(const std::string &str)
 {
@@ -146,10 +154,13 @@ bool FormCacheMgr::InnerGetImageData(
     }
 
     for (auto && [key, value] : imgCacheObj.items()) {
-        int64_t rowId;
+        int64_t rowId = INVALID_INDEX;
         std::stringstream ss;
         ss << value.dump();
-        ss >> rowId;
+        if (!(ss >> rowId) || rowId == INVALID_INDEX) {
+            HILOG_ERROR("invalid rowId from imgCache for key:%{public}s", key.c_str());
+            continue;
+        }
         std::vector<uint8_t> blob;
         int32_t size = 0;
         if (!GetImgCacheFromDb(rowId, blob, size)) {
@@ -310,6 +321,10 @@ bool FormCacheMgr::GetImageDataFromAshmem(
     const std::string& picName, const sptr<Ashmem> &ashmem, int32_t len, std::vector<uint8_t> &value)
 {
     HILOG_DEBUG("GetImageDataFromAshmem start picName:%{public}s", picName.c_str());
+    if (len <= 0 || len > MAX_IMAGE_DATA_SIZE) {
+        HILOG_ERROR("invalid len:%{public}d, picName:%{public}s", len, picName.c_str());
+        return false;
+    }
     if (ashmem == nullptr) {
         HILOG_ERROR("null ashmem when picName:%{public}s", picName.c_str());
         return false;
@@ -421,7 +436,7 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
         HILOG_DEBUG("GetString imgCache failed, ret:%{public}d", ret);
     }
 
-    int32_t cacheState;
+    int32_t cacheState = static_cast<int32_t>(CacheState::DEFAULT);
     ret = absSharedResultSet->GetInt(CACHE_STATE_INDEX, cacheState);
     if (ret != NativeRdb::E_OK) {
         HILOG_DEBUG("GetInt cacheState failed, ret:%{public}d", ret);
@@ -522,6 +537,11 @@ bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
     std::stringstream sql;
     sql << "DELETE FROM " << IMG_CACHE_TABLE << " WHERE " << IMAGE_ID << " IN (";
     for (auto iter = rowIds.begin(); iter != rowIds.end(); ++iter) {
+        // RowIds are spliced into SQL directly, allow digits only to block SQL injection
+        if (!IsDigitsOnly(*iter)) {
+            HILOG_ERROR("invalid rowId:%{public}s", iter->c_str());
+            return false;
+        }
         sql << "\'" << *iter << "\',";
     }
     sql.seekp(-1, std::ios::end);

@@ -82,6 +82,12 @@ static void OnMemoryWatermarkChange(const char *key, const char *value, [[maybe_
     }
 }
 
+inline bool IsValidVisibilityType(int32_t value)
+{
+    return value >= static_cast<int32_t>(FormVisibilityType::UNKNOWN) &&
+        value <= static_cast<int32_t>(FormVisibilityType::INVISIBLE);
+}
+
 static void ReportDistributedFormEvent(const FormEventName &eventName, const FormRecord &formRecord)
 {
     if (!formRecord.isDistributedForm) {
@@ -841,7 +847,11 @@ void FormDataMgr::ResetDataProxyUpdate(const int64_t formId)
 ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
     const int64_t &formId, int32_t userId) const
 {
-    HILOG_DEBUG("get form record by bundleName & formId");
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    HILOG_DEBUG("get form record by bundleName:%{public}s & formId:%{public}" PRId64, bundleName.c_str(), formId);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
         if (bundleName == itFormRecord->second.bundleName && formId == itFormRecord->second.formId &&
@@ -1211,7 +1221,7 @@ int64_t FormDataMgr::PaddingUdidHash(const int64_t formId)
     // Compatible with int form id.
     uint64_t unsignedFormId = static_cast<uint64_t>(formId);
     if ((unsignedFormId & 0xffffffff00000000L) == 0) {
-        uint64_t unsignedUdidHash = static_cast<uint64_t>(udidHash_);
+        uint64_t unsignedUdidHash = static_cast<uint64_t>(udidHash_.load());
         uint64_t unsignedUdidHashFormId = unsignedUdidHash | unsignedFormId;
         int64_t udidHashFormId = static_cast<int64_t>(unsignedUdidHashFormId);
         return udidHashFormId;
@@ -1230,7 +1240,7 @@ int64_t FormDataMgr::GenerateFormId()
         HILOG_ERROR("generateFormId no invalid udidHash_");
         return -1;
     }
-    return FormUtil::GenerateFormId(udidHash_);
+    return FormUtil::GenerateFormId(udidHash_.load());
 }
 /**
  * @brief Generate udid.
@@ -1238,16 +1248,17 @@ int64_t FormDataMgr::GenerateFormId()
  */
 bool FormDataMgr::GenerateUdidHash()
 {
-    if (udidHash_ != Constants::INVALID_UDID_HASH) {
+    if (udidHash_.load() != Constants::INVALID_UDID_HASH) {
         return true;
     }
 
-    bool genUdid = FormUtil::GenerateUdidHash(udidHash_);
+    int64_t localUdidHash = Constants::INVALID_UDID_HASH;
+    bool genUdid = FormUtil::GenerateUdidHash(localUdidHash);
     if (!genUdid) {
         HILOG_ERROR("fail generate udid");
         return false;
     }
-
+    udidHash_.store(localUdidHash);
     return true;
 }
 /**
@@ -1256,7 +1267,7 @@ bool FormDataMgr::GenerateUdidHash()
  */
 int64_t FormDataMgr::GetUdidHash() const
 {
-    return udidHash_;
+    return udidHash_.load();
 }
 /**
  * @brief Set udid.
@@ -1264,7 +1275,7 @@ int64_t FormDataMgr::GetUdidHash() const
  */
 void FormDataMgr::SetUdidHash(const int64_t udidHash)
 {
-    udidHash_ = udidHash;
+    udidHash_.store(udidHash);
 }
 
 /**
@@ -1918,8 +1929,12 @@ void FormDataMgr::ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemI
             HILOG_ERROR("invalid config");
             continue;
         }
-        int hour = FormUtil::ConvertStringToInt(temp[0]);
-        int min = FormUtil::ConvertStringToInt(temp[1]);
+        int hour = 0;
+        int min = 0;
+        if (!FormUtil::ConvertStringToInt(temp[0], hour) || !FormUtil::ConvertStringToInt(temp[1], min)) {
+            HILOG_ERROR("invalid time format");
+            continue;
+        }
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME ||
             min > Constants::MAX_MINUTE) {
             HILOG_ERROR("invalid time, hour:%{public}d, min:%{public}d", hour, min);
@@ -1955,10 +1970,12 @@ void FormDataMgr::ParseAtTimerConfig(FormRecord &record, const FormItemInfo &inf
         HILOG_ERROR("invalid config");
         return;
     }
-    int hour = -1;
-    int min = -1;
-    hour = FormUtil::ConvertStringToInt(temp[0]);
-    min = FormUtil::ConvertStringToInt(temp[1]);
+    int hour = 0;
+    int min = 0;
+    if (!FormUtil::ConvertStringToInt(temp[0], hour) || !FormUtil::ConvertStringToInt(temp[1], min)) {
+        HILOG_ERROR("invalid time format");
+        return;
+    }
     if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME ||
         min > Constants::MAX_MINUTE) {
         HILOG_ERROR("invalid time");
@@ -2288,7 +2305,10 @@ void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormId
 void FormDataMgr::StopRenderingForm(int64_t formId)
 {
     FormRecord formrecord;
-    GetFormRecord(formId, formrecord);
+    if (!GetFormRecord(formId, formrecord)) {
+        HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+        return;
+    }
     FormRenderMgr::GetInstance().StopRenderingForm(formId, formrecord);
 }
 
@@ -2547,7 +2567,9 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.abilityName = formRecord.abilityName;
     runningFormInfo.description = formRecord.description;
     runningFormInfo.formLocation = formRecord.formLocation;
-    runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
+    runningFormInfo.formVisiblity = IsValidVisibilityType(formRecord.formVisibleNotifyState)
+        ? static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState)
+        : FormVisibilityType::UNKNOWN;
     runningFormInfo.lowMemoryRecycleStatus = formRecord.lowMemoryRecycleStatus;
     runningFormInfo.formBundleType = formRecord.formBundleType;
     runningFormInfo.userId = formRecord.userId;
@@ -2626,13 +2648,16 @@ int32_t FormDataMgr::GetTempFormsCount(int32_t &formCount)
 
 int32_t FormDataMgr::GetCastFormsCount(int32_t &formCount)
 {
+    formCount = 0;
     std::lock_guard<std::mutex> lock(formRecordMutex_);
+    int32_t castCount = 0;
     for (const auto &recordPair : formRecords_) {
         FormRecord record = recordPair.second;
         if (!record.formTempFlag) {
-            formCount++;
+            castCount++;
         }
     }
+    formCount = castCount;
     HILOG_DEBUG("current exist %{public}d cast forms in system", formCount);
     return ERR_OK;
 }
@@ -2685,7 +2710,8 @@ void FormDataMgr::GetUnusedFormInstancesByFilter(
         FormInstance instance;
         instance.formId = dbInfo.formId;
         instance.specification = dbRecord.specification;
-        instance.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
+        instance.formVisiblity = IsValidVisibilityType(dbRecord.formVisibleNotifyState)
+            ? static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState) : FormVisibilityType::UNKNOWN;
         instance.bundleName = dbRecord.bundleName;
         instance.moduleName = dbRecord.moduleName;
         instance.abilityName = dbRecord.abilityName;
@@ -2719,19 +2745,28 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
     int32_t appIndex = Constants::MAIN_APP_INDEX;
     FormBmsHelper::GetInstance().GetEnabledCloneIndex(userId, formInstancesFilter.bundleName, appIndex);
 
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    for (const auto &pair : formRecords_) {
-        if (formInstancesFilter.bundleName != pair.second.bundleName) {
-            continue;
+    // Phase 1: collect matching FormRecords under formRecordMutex_
+    std::vector<FormRecord> matchedRecords;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        for (const auto &pair : formRecords_) {
+            if (formInstancesFilter.bundleName != pair.second.bundleName) {
+                continue;
+            }
+            if (!IsRecordMatchFilter(formInstancesFilter, pair.second, appIndex)) {
+                continue;
+            }
+            matchedRecords.emplace_back(pair.second);
         }
-        if (!IsRecordMatchFilter(formInstancesFilter, pair.second, appIndex)) {
-            continue;
-        }
+    }
+
+    // Phase 2: query host records without holding formRecordMutex_
+    for (const auto &formRecord : matchedRecords) {
         std::vector<FormHostRecord> formHostRecords;
-        GetFormHostRecord(pair.second.formId, formHostRecords);
+        GetFormHostRecord(formRecord.formId, formHostRecords);
         FormInstance instance;
         for (const auto &formHostRecord : formHostRecords) {
-            BuildFormInstanceByFromRecord(pair.second, formHostRecord, instance);
+            BuildFormInstanceByFromRecord(formRecord, formHostRecord, instance);
             formInstances.emplace_back(instance);
         }
     }
@@ -2765,7 +2800,9 @@ void FormDataMgr::BuildFormInstanceByFromRecord(const FormRecord &record,
     instance.formHostName = hostRecord.GetHostBundleName();
     instance.formId = record.formId;
     instance.specification = record.specification;
-    instance.formVisiblity = static_cast<FormVisibilityType>(record.formVisibleNotifyState);
+    instance.formVisiblity = IsValidVisibilityType(record.formVisibleNotifyState)
+        ? static_cast<FormVisibilityType>(record.formVisibleNotifyState)
+        : FormVisibilityType::UNKNOWN;
     instance.bundleName = record.bundleName;
     instance.moduleName = record.moduleName;
     instance.abilityName = record.abilityName;
@@ -2794,7 +2831,9 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
         formInstance.formId = formRecord.formId;
         formInstance.specification = formRecord.specification;
-        formInstance.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
+        formInstance.formVisiblity = IsValidVisibilityType(formRecord.formVisibleNotifyState)
+            ? static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState)
+            : FormVisibilityType::UNKNOWN;
         formInstance.bundleName = formRecord.bundleName;
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
@@ -2828,7 +2867,9 @@ ErrCode FormDataMgr::GetUnusedFormInstanceById(const int64_t formId, FormInstanc
     }
     formInstance.formId = formId;
     formInstance.specification = dbRecord.specification;
-    formInstance.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
+    formInstance.formVisiblity = IsValidVisibilityType(dbRecord.formVisibleNotifyState)
+        ? static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState)
+        : FormVisibilityType::UNKNOWN;
     formInstance.bundleName = dbRecord.bundleName;
     formInstance.moduleName = dbRecord.moduleName;
     formInstance.abilityName = dbRecord.abilityName;
@@ -2858,7 +2899,9 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
         formInstance.formId = formRecord.formId;
         formInstance.specification = formRecord.specification;
-        formInstance.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
+        formInstance.formVisiblity = IsValidVisibilityType(formRecord.formVisibleNotifyState)
+            ? static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState)
+            : FormVisibilityType::UNKNOWN;
         formInstance.bundleName = formRecord.bundleName;
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
@@ -3487,6 +3530,7 @@ bool FormDataMgr::IsExpectRecycled(int64_t formId)
 void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempForms)
 {
     bool hadNetCondition = false;
+    std::vector<std::pair<int64_t, FormRecord>> deletedRecords;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         std::map<int64_t, FormRecord>::iterator itFormRecord;
@@ -3500,12 +3544,16 @@ void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempFo
                 }
                 itFormRecord = formRecords_.erase(itFormRecord);
                 FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
-                FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
-                FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
+                deletedRecords.emplace_back(formId, formRecord);
             } else {
                 itFormRecord++;
             }
         }
+    }
+    // Notify providers outside the lock to avoid blocking other threads during IPC
+    for (const auto &pair : deletedRecords) {
+        FormProviderMgr::GetInstance().NotifyProviderFormDelete(pair.first, pair.second);
+        FormDataProxyMgr::GetInstance().UnsubscribeFormData(pair.first);
     }
     if (hadNetCondition && !HasNetworkConditionForm()) {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();

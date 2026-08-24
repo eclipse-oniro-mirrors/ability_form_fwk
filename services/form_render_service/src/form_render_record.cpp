@@ -1093,9 +1093,7 @@ void FormRenderRecord::UpdateFormRequestReleaseState(
         return;
     }
 
-    for (auto& formRequest : iter->second) {
-        formRequest.second.hasRelease = hasRelease;
-    }
+    innerIter->second.hasRelease = hasRelease;
 }
 
 void FormRenderRecord::ReleaseRenderer(

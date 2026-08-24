@@ -41,8 +41,8 @@ FormRenderReport::~FormRenderReport() {}
 void FormRenderReport::RecordFRSStart()
 {
     HILOG_INFO("call");
-    if (isFRSFirstLoaded_.load()) {
-        isFRSFirstLoaded_.store(false);
+    bool expected = true;
+    if (isFRSFirstLoaded_.compare_exchange_strong(expected, false)) {
         RecordFRSStatus(FRS_START);
     }
 }
@@ -50,9 +50,8 @@ void FormRenderReport::RecordFRSStart()
 void FormRenderReport::RecordFRSDead()
 {
     HILOG_INFO("call");
-    if (!isFRSFirstLoaded_.load()) {
-        isFRSFirstLoaded_.store(true);
-    }
+    bool expected = false;
+    isFRSFirstLoaded_.compare_exchange_strong(expected, true);
     RecordFRSStatus(FRS_DEAD);
 }
 
@@ -101,9 +100,9 @@ void FormRenderReport::ReportFRSStatus()
 
 int32_t FormRenderReport::GetAllFormsCount()
 {
-    int32_t tempFormsCount;
+    int32_t tempFormsCount = 0;
     FormDataMgr::GetInstance().GetTempFormsCount(tempFormsCount);
-    int32_t castFormsCount;
+    int32_t castFormsCount = 0;
     FormDataMgr::GetInstance().GetCastFormsCount(castFormsCount);
     return tempFormsCount + castFormsCount;
 }

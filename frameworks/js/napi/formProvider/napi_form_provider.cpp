@@ -27,6 +27,8 @@
 #include "napi_form_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 #include "runtime.h"
 
 namespace OHOS {
@@ -49,6 +51,12 @@ namespace {
 
 napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
 {
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr");
+        napi_value result = nullptr;
+        napi_get_undefined(env, &result);
+        return result;
+    }
     if (napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
         // store return-message to callbackValues[0].
@@ -70,6 +78,10 @@ napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCa
 
 void ExecuteAsyncPromiseWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
 {
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr");
+        return;
+    }
     if (napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         napi_value error;
         InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
@@ -406,7 +418,9 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
     size_t convertArgc = 0;
     FormInfoFilter formInfoFilter;
     napi_valuetype type = napi_undefined;
-    napi_typeof(env, argv[0], &type);
+    if (argc > 0 && argv[0] != nullptr) {
+        napi_typeof(env, argv[0], &type);
+    }
     if (argc > 0 && type != napi_function) {
         if (!ConvertFormInfoFilter(env, argv[0], formInfoFilter)) {
             HILOG_ERROR("%{public}s, convert form info filter failed.", __func__);
@@ -511,9 +525,11 @@ napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* a
         errCode = ERR_APPEXECFWK_FORM_INVALID_PROVIDER_DATA;
     }
     auto formProviderData = std::make_shared<OHOS::AppExecFwk::FormProviderData>();
-    std::string formDataStr = GetStringByProp(env, argv[PARAM1], "data");
-    formProviderData->SetDataString(formDataStr);
-    formProviderData->ParseImagesData();
+    if (errCode == ERR_OK) {
+        std::string formDataStr = GetStringByProp(env, argv[PARAM1], "data");
+        formProviderData->SetDataString(formDataStr);
+        formProviderData->ParseImagesData();
+    }
     NapiAsyncTask::CompleteCallback complete =
         [errCode, formId, data = formProviderData](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
@@ -548,20 +564,34 @@ napi_value JsFormProvider::OnIsRequestPublishFormSupported(napi_env env, size_t 
         NAPI_CALL(env, napi_get_null(env, &jsNull));
         return jsNull;
     }
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    bool isNotSystemApp = !Security::AccessToken::AccessTokenKit::IsSystemAppByFullTokenID(selfToken);
+    if (isNotSystemApp) {
+        HILOG_ERROR("The application not system-app,can't use system-api");
+    }
     struct OnIsRequestPublishFormSupported {
         bool result;
+        bool isNotSystemApp;
     };
-    std::shared_ptr<OnIsRequestPublishFormSupported> onIsRequestPublishFormSupported =
-        std::make_shared<OnIsRequestPublishFormSupported>();
-    auto execute = [data = onIsRequestPublishFormSupported] () {
+    auto callbackInfo = std::make_shared<OnIsRequestPublishFormSupported>();
+    callbackInfo->isNotSystemApp = isNotSystemApp;
+    auto execute = [data = callbackInfo]() {
         if (data == nullptr) {
             HILOG_ERROR("onIsRequestPublishFormSupported is nullptr.");
             return;
         }
+        if (data->isNotSystemApp) {
+            data->result = false;
+            return;
+        }
         data->result = FormMgr::GetInstance().IsRequestPublishFormSupported();
     };
-    NapiAsyncTask::CompleteCallback complete = [data = onIsRequestPublishFormSupported](
+    NapiAsyncTask::CompleteCallback complete = [data = callbackInfo](
             napi_env env, NapiAsyncTask &task, int32_t status) {
+        if (data->isNotSystemApp) {
+            task.Reject(env, CreateJsError(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP));
+            return;
+        }
         auto retMsg = QueryRetMsg(ERR_OK);
         task.ResolveWithCustomize(env, CreateJsError(env, ERR_OK, retMsg),
             CreateJsValue(env, data->result));
