@@ -845,7 +845,7 @@ private:
 
         Want want;
         AAFwk::WantParams wantParams;
-        if (UnwrapWantParams(env, argv[PARAM1], wantParams)) {
+        if (argc == ARGS_TWO && UnwrapWantParams(env, argv[PARAM1], wantParams)) {
             want.SetParams(wantParams);
         }
         convertArgc++;
@@ -3015,24 +3015,27 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
     napi_open_handle_scope(overflowEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
+        dataParam->result = false;
         return;
     }
-    napi_value requestObj;
-    napi_create_object(overflowEnv_, &requestObj);
-
-    napi_value formIdValue;
-    napi_create_string_utf8(overflowEnv_, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
-    napi_set_named_property(overflowEnv_, requestObj, "formId", formIdValue);
-    napi_set_named_property(overflowEnv_, requestObj, "isOverflow", CreateJsValue(overflowEnv_, dataParam->isOverflow));
-
-    napi_value overflowInfoValue;
-    CreateFormOverflowInfo(overflowEnv_, dataParam->overflowInfo, &overflowInfoValue);
-    napi_set_named_property(overflowEnv_, requestObj, "overflowInfo", overflowInfoValue);
+    napi_value requestObj = CreateRequestOverflowObj(overflowEnv_, dataParam);
+    if (requestObj == nullptr) {
+        HILOG_ERROR("null requestObj");
+        dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
+        return;
+    }
 
     napi_value myCallback = nullptr;
     {
         std::lock_guard<std::mutex> lock(registerOverflowProxyMutex_);
         napi_get_reference_value(overflowEnv_, overflowRegisterCallback_, &myCallback);
+    }
+    if (myCallback == nullptr) {
+        HILOG_ERROR("null myCallback");
+        dataParam->result = false;
+        napi_close_handle_scope(overflowEnv_, scope);
+        return;
     }
 
     napi_valuetype valueType = napi_undefined;
@@ -3042,21 +3045,48 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
         return;
     }
 
+    InvokeOverflowCallback(overflowEnv_, myCallback, requestObj, dataParam, scope);
+}
+
+void JsFormRouterProxyMgr::InvokeOverflowCallback(napi_env env, napi_value callback, napi_value requestObj,
+    std::shared_ptr<LiveFormInterfaceParam> dataParam, napi_handle_scope scope)
+{
     napi_value args[] = { requestObj };
-    napi_status status = napi_call_function(overflowEnv_, nullptr, myCallback, 1, args, nullptr);
+    napi_status status = napi_call_function(env, nullptr, callback, 1, args, nullptr);
     if (status == napi_ok) {
         HILOG_INFO("RequestOverflowInner success");
         dataParam->result = true;
-        napi_close_handle_scope(overflowEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return;
     }
     HILOG_INFO("RequestOverflowInner fail");
     dataParam->result = false;
     dataParam->errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (status == napi_pending_exception) {
-        dataParam->errCode = NapiFormUtil::CatchErrorCode(overflowEnv_);
+        dataParam->errCode = NapiFormUtil::CatchErrorCode(env);
     }
-    napi_close_handle_scope(overflowEnv_, scope);
+    napi_close_handle_scope(env, scope);
+}
+
+napi_value JsFormRouterProxyMgr::CreateRequestOverflowObj(napi_env env,
+    std::shared_ptr<LiveFormInterfaceParam> dataParam)
+{
+    napi_value requestObj = nullptr;
+    napi_status status = napi_create_object(env, &requestObj);
+    if (status != napi_ok || requestObj == nullptr) {
+        HILOG_ERROR("napi_create_object failed, status: %{public}d", static_cast<int>(status));
+        return nullptr;
+    }
+
+    napi_value formIdValue;
+    napi_create_string_utf8(env, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
+    napi_set_named_property(env, requestObj, "formId", formIdValue);
+    napi_set_named_property(env, requestObj, "isOverflow", CreateJsValue(env, dataParam->isOverflow));
+
+    napi_value overflowInfoValue;
+    CreateFormOverflowInfo(env, dataParam->overflowInfo, &overflowInfoValue);
+    napi_set_named_property(env, requestObj, "overflowInfo", overflowInfoValue);
+    return requestObj;
 }
 
 void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo,
