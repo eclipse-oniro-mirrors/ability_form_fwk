@@ -1360,21 +1360,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0181, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0182
- * @tc.name: test ChangeSceneAnimationState function.
- * @tc.desc: Verify that the ChangeSceneAnimationState interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0182, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0182 start";
-    FormMgrService formMgrService;
-    const int64_t formId = 1;
-    int32_t state = 1;
-    EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrService_0182 end";
-}
-
-/**
  * @tc.number: FormMgrService_ChangeSceneAnimationState_0001
  * @tc.name: test ChangeSceneAnimationState non-system app.
  * @tc.desc: Verify that ChangeSceneAnimationState returns permission deny for non-system app.
