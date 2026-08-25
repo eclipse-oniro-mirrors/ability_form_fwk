@@ -106,6 +106,7 @@ private:
     void CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo, napi_value* result);
     void RequestOverflowInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     napi_value CreateRequestOverflowObj(napi_env env, std::shared_ptr<LiveFormInterfaceParam> dataParam);
+    // Takes ownership of scope; closes it on all paths.
     void InvokeOverflowCallback(napi_env env, napi_value callback, napi_value requestObj,
         std::shared_ptr<LiveFormInterfaceParam> dataParam, napi_handle_scope scope);
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
