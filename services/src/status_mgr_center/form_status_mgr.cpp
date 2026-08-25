@@ -193,7 +193,10 @@ void FormStatusMgr::AddTaskToQueuePush(const int64_t formId, const FormFsmEvent 
 {
     std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
     FormEventTaskInfo taskInfo{formId, event, func};
-    formEventQueue->PushFormEvent(taskInfo);
+    if (!formEventQueue->PushFormEvent(taskInfo)) {
+        HILOG_ERROR("PushFormEvent failed, formId:%{public}" PRId64, formId);
+        return;
+    }
 
     if (event == FormFsmEvent::RECYCLE_DATA || event == FormFsmEvent::RECYCLE_FORM) {
         FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, true);

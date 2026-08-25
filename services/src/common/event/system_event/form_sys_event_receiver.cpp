@@ -191,7 +191,9 @@ void FormSysEventReceiver::InitFormInfosAndRegister()
     HILOG_INFO("schedule init form infos and register bundle event callback");
     // ReloadFormInfos is time-consuming, elevate task priority
     FormMgrQueue::GetInstance().ScheduleTask(TASK_DELAY_TIME, []() {
-        FormBmsHelper::GetInstance().RegisterBundleEventCallback();
+        if (FormBmsHelper::GetInstance().RegisterBundleEventCallback() != ERR_OK) {
+            HILOG_ERROR("RegisterBundleEventCallback failed");
+        }
         std::vector<int32_t> activeUsers;
         FormUtil::GetActiveUsers(activeUsers);
         if (activeUsers.empty()) {

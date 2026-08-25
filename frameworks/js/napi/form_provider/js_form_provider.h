@@ -141,7 +141,7 @@ class JsFormProviderProxyMgr : public AppExecFwk::FormProviderDelegateStub {
 public:
     JsFormProviderProxyMgr() = default;
 
-    virtual ~JsFormProviderProxyMgr() = default;
+    virtual ~JsFormProviderProxyMgr();
 
     static sptr<JsFormProviderProxyMgr> GetInstance();
 

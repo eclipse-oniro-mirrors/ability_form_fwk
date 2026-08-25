@@ -854,6 +854,8 @@ void FormMgrService::OnStop()
 
     state_ = ServiceRunningState::STATE_NOT_START;
 
+    DelayedSingleton<FormShareMgr>::GetInstance()->UnregisterObserver();
+
     if (serialQueue_) {
         serialQueue_.reset();
     }
@@ -1981,6 +1983,11 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
     if (ret != ERR_OK) {
         HILOG_ERROR("update formLocation form infos permission denied");
         return ret;
+    }
+    if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+        formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
+        HILOG_ERROR("invalid formLocation:%{public}d", formLocation);
+        return ERR_APPEXECFWK_FORM_LOCATION_INVALID;
     }
     bool isRequestPublishFormWithSnapshot =
         requestPublishFormWithSnapshotSet_.find(formId) != requestPublishFormWithSnapshotSet_.end();

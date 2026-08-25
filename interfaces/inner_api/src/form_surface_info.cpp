@@ -14,6 +14,7 @@
  */
 
 #include "form_surface_info.h"
+
 #include "fms_log_wrapper.h"
 #include "message_parcel.h"
 #include "string_ex.h"
@@ -22,10 +23,15 @@ namespace OHOS {
 namespace AppExecFwk {
 bool FormSurfaceInfo::ReadFromParcel(Parcel &parcel)
 {
-    width = parcel.ReadFloat();
-    height = parcel.ReadFloat();
-    borderWidth = parcel.ReadFloat();
-    formViewScale = parcel.ReadFloat();
+    if (!parcel.ReadFloat(width) || !parcel.ReadFloat(height) ||
+        !parcel.ReadFloat(borderWidth) || !parcel.ReadFloat(formViewScale)) {
+        HILOG_ERROR("ReadFloat failed");
+        return false;
+    }
+    if (width <= 0 || height <= 0 || borderWidth < 0 || formViewScale <= 0) {
+        HILOG_ERROR("invalid surface params");
+        return false;
+    }
     return true;
 }
 
@@ -61,4 +67,3 @@ FormSurfaceInfo* FormSurfaceInfo::Unmarshalling(Parcel &parcel)
 }
 } // namespace AppExecFwk
 } // namespace OHOS
- 

@@ -50,9 +50,6 @@ FormShareMgr::FormShareMgr()
 FormShareMgr::~FormShareMgr()
 {
     HILOG_DEBUG("FormShareMgr is destroyed");
-    if (eventHandler_ != nullptr) {
-        eventHandler_->UnregisterEventTimeoutObserver(shared_from_this());
-    }
 };
 
 int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,

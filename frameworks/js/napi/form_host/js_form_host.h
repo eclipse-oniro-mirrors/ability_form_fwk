@@ -123,6 +123,8 @@ private:
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
+    void InsertMapEntry(napi_env env, napi_value obj, napi_value propNames, uint32_t index,
+        std::unordered_map<std::string, std::string> &uMap);
 
     napi_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
     napi_env templateFormDetailInfoChangeEnv_ = nullptr;

@@ -49,6 +49,14 @@ public:
         eventHandler_->RegisterEventTimeoutObserver(shared_from_this());
     }
 
+    void UnregisterObserver()
+    {
+        if (eventHandler_ != nullptr) {
+            eventHandler_->UnregisterEventTimeoutObserver(shared_from_this());
+            eventHandler_ = nullptr;
+        }
+    }
+
     void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
     {
         if (serialQueue == nullptr) {

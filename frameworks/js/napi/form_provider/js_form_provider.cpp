@@ -725,6 +725,10 @@ bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
         return false;
     }
     napi_valuetype valueType = napi_undefined;
+    if (value == nullptr) {
+        HILOG_WARN("null jsValue,not object");
+        return false;
+    }
     napi_typeof(env, value, &valueType);
     if (valueType != napi_object) {
         HILOG_WARN("null jsValue,not object");
@@ -978,7 +982,7 @@ napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc,
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("Convert formId failed, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("Convert formId failed.");
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -1102,7 +1106,10 @@ napi_value CreateFormRect(napi_env env, const AppExecFwk::Rect &rect)
     HILOG_DEBUG("call");
 
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
 
     napi_set_named_property(env, objContext, "left", CreateJsValue(env, rect.left));
     napi_set_named_property(env, objContext, "top", CreateJsValue(env, rect.top));
@@ -1345,16 +1352,14 @@ napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env,
     napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
     if (refStatus != napi_ok || callbackRef == nullptr) {
         HILOG_ERROR("create reference failed");
-        NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+        NapiFormUtil::ThrowByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE);
         return CreateJsUndefined(env);
     }
 
     ErrCode result = FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
         JsFormProviderProxyMgr::GetInstance());
     if (result != ERR_OK) {
-        if (callbackRef != nullptr) {
-            napi_delete_reference(env, callbackRef);
-        }
+        napi_delete_reference(env, callbackRef);
         if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
             result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
         }
@@ -1393,6 +1398,17 @@ napi_value JsFormProvider::OnUnregisterPublishFormCrossBundleControl(napi_env en
 
 sptr<JsFormProviderProxyMgr> JsFormProviderProxyMgr::instance_ = nullptr;
 std::mutex JsFormProviderProxyMgr::mutex_;
+
+JsFormProviderProxyMgr::~JsFormProviderProxyMgr()
+{
+    std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
+    if (crossBundleControlCallback_ != nullptr && crossBundleControlEnv_ != nullptr) {
+        napi_delete_reference(crossBundleControlEnv_, crossBundleControlCallback_);
+        crossBundleControlCallback_ = nullptr;
+    }
+    crossBundleControlEnv_ = nullptr;
+}
+
 sptr<JsFormProviderProxyMgr> JsFormProviderProxyMgr::GetInstance()
 {
     if (instance_ == nullptr) {
@@ -1427,6 +1443,9 @@ bool JsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(napi_env env,
     napi_typeof(env, callback, &valueType);
     if (valueType != napi_function) {
         HILOG_ERROR("callback is not a function");
+        napi_delete_reference(env, crossBundleControlCallback_);
+        crossBundleControlCallback_ = nullptr;
+        crossBundleControlEnv_ = nullptr;
         return false;
     }
     return true;
@@ -1465,6 +1484,11 @@ void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
     std::shared_ptr<PublishFormCrossBundleControlParam> dataParam)
 {
     HILOG_INFO("call");
+    if (crossBundleControlEnv_ == nullptr || crossBundleControlCallback_ == nullptr) {
+        HILOG_ERROR("crossBundle control not registered.");
+        dataParam->isCanOpen = false;
+        return;
+    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(crossBundleControlEnv_, &scope);
     if (scope == nullptr) {

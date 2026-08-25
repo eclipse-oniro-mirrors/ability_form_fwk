@@ -16,6 +16,9 @@
 #include "napi_form_util.h"
 
 #include <cinttypes>
+#include <cerrno>
+#include <climits>
+#include <cmath>
 #include <regex>
 #include <uv.h>
 #include <vector>
@@ -117,7 +120,15 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
 
 bool NapiFormUtil::Throw(napi_env env, int32_t errCode, const std::string &errMessage)
 {
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return false;
+    }
     napi_value error = CreateJsError(env, errCode, errMessage);
+    if (error == nullptr) {
+        HILOG_ERROR("CreateJsError failed");
+        return false;
+    }
     napi_throw(env, error);
     return true;
 }
@@ -316,17 +327,20 @@ void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[
 {
     HILOG_DEBUG("code:%{public}d", code);
     napi_value error = nullptr;
-    napi_create_object(env, &error);
+    if (napi_create_object(env, &error) != napi_ok || error == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        napi_get_undefined(env, &result[0]);
+        napi_get_undefined(env, &result[1]);
+        return;
+    }
 
     auto retCode = QueryRetCode(code);
     auto retMsg = QueryRetMsg(retCode);
 
-    // create error code
     napi_value errCode = nullptr;
     napi_create_int32(env, retCode, &errCode);
     napi_set_named_property(env, error, "code", errCode);
 
-    // create error message
     napi_value errMsg = nullptr;
     napi_create_string_utf8(env, retMsg.c_str(), NAPI_AUTO_LENGTH, &errMsg);
     napi_set_named_property(env, error, "message", errMsg);
@@ -353,17 +367,19 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
         return;
     }
     napi_value errInfo = nullptr;
-    napi_create_object(env, &errInfo);
+    if (napi_create_object(env, &errInfo) != napi_ok || errInfo == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        napi_get_undefined(env, result);
+        return;
+    }
 
     auto retCode = QueryRetCode(code);
     auto retMsg = QueryRetMsg(retCode);
 
-    // create error code
     napi_value errCode = nullptr;
     napi_create_int32(env, retCode, &errCode);
     napi_set_named_property(env, errInfo, "code", errCode);
 
-    // create error message
     napi_value errMsg = nullptr;
     napi_create_string_utf8(env, retMsg.c_str(), NAPI_AUTO_LENGTH, &errMsg);
     napi_set_named_property(env, errInfo, "message", errMsg);
@@ -507,7 +523,10 @@ AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, na
 
 void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFormInfo, napi_value &result)
 {
-    napi_create_object(env, &result);
+    if (napi_create_object(env, &result) != napi_ok || result == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return;
+    }
 
     napi_set_named_property(env, result, "formId", CreateJsValue(env, std::to_string(runningFormInfo.formId)));
     napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
@@ -516,7 +535,6 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
         static_cast<int32_t>(runningFormInfo.formVisiblity)));
     napi_set_named_property(env, result, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
     napi_set_named_property(env, result, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
-    napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
     napi_set_named_property(env, result, "formName", CreateJsValue(env, runningFormInfo.formName));
     napi_set_named_property(env, result, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, result, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
@@ -536,10 +554,23 @@ inline FormType GetFormType(const FormInfo &formInfo)
 napi_value CreateFormInfos(napi_env env, const std::vector<FormInfo> &formInfos)
 {
     napi_value arrayValue = nullptr;
-    napi_create_array_with_length(env, formInfos.size(), &arrayValue);
+    napi_status status = napi_create_array_with_length(env, formInfos.size(), &arrayValue);
+    if (status != napi_ok || arrayValue == nullptr) {
+        HILOG_ERROR("napi_create_array_with_length failed");
+        return nullptr;
+    }
     uint32_t index = 0;
     for (const auto &formInfo : formInfos) {
-        napi_set_element(env, arrayValue, index++, CreateFormInfo(env, formInfo));
+        napi_value element = CreateFormInfo(env, formInfo);
+        if (element == nullptr) {
+            HILOG_ERROR("CreateFormInfo returned nullptr");
+            napi_get_undefined(env, &element);
+        }
+        status = napi_set_element(env, arrayValue, index, element);
+        if (status != napi_ok) {
+            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+        }
+        index++;
     }
     return arrayValue;
 }
@@ -549,7 +580,10 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     HILOG_DEBUG("call");
 
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
 
     napi_set_named_property(env, objContext, "bundleName", CreateJsValue(env, formInfo.bundleName));
     napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, formInfo.moduleName));
@@ -570,28 +604,33 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "scheduledUpdateTime", CreateJsValue(env, formInfo.scheduledUpdateTime));
     napi_set_named_property(env, objContext, "defaultDimension", CreateJsValue(env, formInfo.defaultDimension));
     napi_set_named_property(env, objContext, "relatedBundleName", CreateJsValue(env, formInfo.relatedBundleName));
-    napi_set_named_property(env, objContext, "supportDimensions", CreateNativeArray(env, formInfo.supportDimensions));
-    napi_set_named_property(env, objContext, "customizeData", CreateFormCustomizeDatas(env, formInfo.customizeDatas));
+    napi_set_named_property(env, objContext, "supportDimensions",
+        GetValidArray(env, CreateNativeArray(env, formInfo.supportDimensions), "supportDimensions"));
+    napi_set_named_property(env, objContext, "customizeData",
+        GetValidArray(env, CreateFormCustomizeDatas(env, formInfo.customizeDatas), "customizeData"));
     napi_set_named_property(env, objContext, "isDynamic", CreateJsValue(env, formInfo.isDynamic));
     napi_set_named_property(env, objContext, "transparencyEnabled", CreateJsValue(env, formInfo.transparencyEnabled));
     napi_set_named_property(env, objContext, "isFontScaleFollowSystem",
         CreateJsValue(env, formInfo.fontScaleFollowSystem));
-    napi_set_named_property(env, objContext, "supportedShapes", CreateNativeArray(env, formInfo.supportShapes));
-    napi_set_named_property(env, objContext, "previewImages", CreateNativeArray(env, formInfo.formPreviewImages));
+    napi_set_named_property(env, objContext, "supportedShapes",
+        GetValidArray(env, CreateNativeArray(env, formInfo.supportShapes), "supportedShapes"));
+    napi_set_named_property(env, objContext, "previewImages",
+        GetValidArray(env, CreateNativeArray(env, formInfo.formPreviewImages), "previewImages"));
     napi_set_named_property(env, objContext, "renderingMode", CreateJsValue(env, formInfo.renderingMode));
     napi_set_named_property(env, objContext, "enableBlurBackground", CreateJsValue(env, formInfo.enableBlurBackground));
     napi_set_named_property(env, objContext, "funInteractionParams",
-        CreateFunInteractionParamsDatas(env, formInfo.funInteractionParams));
+        GetValidArray(env, CreateFunInteractionParamsDatas(env, formInfo.funInteractionParams),
+        "funInteractionParams"));
     napi_set_named_property(env, objContext, "sceneAnimationParams",
-        CreateSceneAnimationParamsDatas(env, formInfo.sceneAnimationParams));
+        GetValidArray(env, CreateSceneAnimationParamsDatas(env, formInfo.sceneAnimationParams),
+        "sceneAnimationParams"));
     napi_set_named_property(env, objContext, "resizable", CreateJsValue(env, formInfo.resizable));
     napi_set_named_property(env, objContext, "groupId", CreateJsValue(env, formInfo.groupId));
     napi_set_named_property(env, objContext, "isStandbySupported", CreateJsValue(env, formInfo.standby.isSupported));
     napi_set_named_property(env, objContext, "isStandbyAdapted", CreateJsValue(env, formInfo.standby.isAdapted));
-    napi_set_named_property(
-        env, objContext, "isPrivacySensitive", CreateJsValue(env, formInfo.standby.isPrivacySensitive));
-    napi_set_named_property(
-        env, objContext, "isTemplateForm", CreateJsValue(env, formInfo.isTemplateForm));
+    napi_set_named_property(env, objContext, "isPrivacySensitive",
+        CreateJsValue(env, formInfo.standby.isPrivacySensitive));
+    napi_set_named_property(env, objContext, "isTemplateForm", CreateJsValue(env, formInfo.isTemplateForm));
 
     return objContext;
 }
@@ -599,10 +638,23 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
 napi_value CreateRunningFormInfos(napi_env env, const std::vector<RunningFormInfo> &runningFormInfos)
 {
     napi_value arrayValue = nullptr;
-    napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
+    napi_status status = napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
+    if (status != napi_ok || arrayValue == nullptr) {
+        HILOG_ERROR("napi_create_array_with_length failed");
+        return nullptr;
+    }
     uint32_t index = 0;
     for (const auto &runningFormInfo : runningFormInfos) {
-        napi_set_element(env, arrayValue, index++, CreateRunningFormInfo(env, runningFormInfo));
+        napi_value element = CreateRunningFormInfo(env, runningFormInfo);
+        if (element == nullptr) {
+            HILOG_ERROR("CreateRunningFormInfo returned nullptr");
+            napi_get_undefined(env, &element);
+        }
+        status = napi_set_element(env, arrayValue, index, element);
+        if (status != napi_ok) {
+            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+        }
+        index++;
     }
     return arrayValue;
 }
@@ -612,7 +664,10 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     HILOG_DEBUG("call");
 
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
 
     std::string formStr = std::to_string(runningFormInfo.formId);
     napi_set_named_property(env, objContext, "formId", CreateJsValue(env, formStr));
@@ -634,21 +689,37 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
 napi_value CreateNewRunningFormInfos(napi_env env, const std::vector<RunningFormInfo> &runningFormInfos)
 {
     napi_value arrayValue = nullptr;
-    napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
+    napi_status status = napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
+    if (status != napi_ok || arrayValue == nullptr) {
+        HILOG_ERROR("napi_create_array_with_length failed");
+        return nullptr;
+    }
     uint32_t index = 0;
     for (const auto &runningFormInfo : runningFormInfos) {
-        napi_set_element(env, arrayValue, index++, CreateNewRunningFormInfo(env, runningFormInfo));
+        napi_value element = CreateNewRunningFormInfo(env, runningFormInfo);
+        if (element == nullptr) {
+            HILOG_ERROR("CreateNewRunningFormInfo returned nullptr");
+            napi_get_undefined(env, &element);
+        }
+        status = napi_set_element(env, arrayValue, index, element);
+        if (status != napi_ok) {
+            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+        }
+        index++;
     }
     return arrayValue;
 }
- 
+
 napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("call");
- 
+
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
- 
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
+
     std::string formStr = std::to_string(runningFormInfo.formId);
     napi_set_named_property(env, objContext, "formId", CreateJsValue(env, formStr));
     napi_set_named_property(env, objContext, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
@@ -658,14 +729,17 @@ napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &running
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
         static_cast<int32_t>(runningFormInfo.formLocation)));
- 
+
     return objContext;
 }
 
 napi_value CreateFormCustomizeDatas(napi_env env, const std::vector<FormCustomizeData> &customizeDatas)
 {
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
 
     for (const auto& data : customizeDatas) {
         napi_set_named_property(env, objContext, data.name.c_str(), CreateJsValue(env, data.value));
@@ -677,7 +751,10 @@ napi_value CreateFormCustomizeDatas(napi_env env, const std::vector<FormCustomiz
 napi_value CreateFunInteractionParamsDatas(napi_env env, const FormFunInteractionParams &funInteractionParamsDatas)
 {
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, funInteractionParamsDatas.abilityName));
     napi_set_named_property(env, objContext, "targetBundleName",
         CreateJsValue(env, funInteractionParamsDatas.targetBundleName));
@@ -691,7 +768,10 @@ napi_value CreateFunInteractionParamsDatas(napi_env env, const FormFunInteractio
 napi_value CreateSceneAnimationParamsDatas(napi_env env, const FormSceneAnimationParams &sceneAnimationParamsDatas)
 {
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, sceneAnimationParamsDatas.abilityName));
     napi_set_named_property(env, objContext, "disabledDesktopBehaviors",
         CreateJsValue(env, sceneAnimationParamsDatas.disabledDesktopBehaviors));
@@ -786,10 +866,23 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
 napi_value CreateFormInstances(napi_env env, const std::vector<FormInstance> &formInstances)
 {
     napi_value arrayValue = nullptr;
-    napi_create_array_with_length(env, formInstances.size(), &arrayValue);
+    napi_status status = napi_create_array_with_length(env, formInstances.size(), &arrayValue);
+    if (status != napi_ok || arrayValue == nullptr) {
+        HILOG_ERROR("napi_create_array_with_length failed");
+        return nullptr;
+    }
     uint32_t index = 0;
     for (const auto &formInstance : formInstances) {
-        napi_set_element(env, arrayValue, index++, CreateFormInstance(env, formInstance));
+        napi_value element = CreateFormInstance(env, formInstance);
+        if (element == nullptr) {
+            HILOG_ERROR("CreateFormInstance returned nullptr");
+            napi_get_undefined(env, &element);
+        }
+        status = napi_set_element(env, arrayValue, index, element);
+        if (status != napi_ok) {
+            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+        }
+        index++;
     }
     return arrayValue;
 }
@@ -799,7 +892,10 @@ napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
     HILOG_DEBUG("call");
 
     napi_value objContext = nullptr;
-    napi_create_object(env, &objContext);
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
 
     std::string formStr = std::to_string(formInstance.formId);
     napi_set_named_property(env, objContext, "formId", CreateJsValue(env, formStr));
@@ -844,7 +940,17 @@ bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoF
 
 int NapiFormUtil::ConvertStringToInt(const std::string &strInfo, int radix)
 {
-    return static_cast<int>(strtol(strInfo.c_str(), nullptr, radix));
+    if (strInfo.empty()) {
+        return 0;
+    }
+    char *endPtr = nullptr;
+    errno = 0;
+    long result = strtol(strInfo.c_str(), &endPtr, radix);
+    if (endPtr == strInfo.c_str() || *endPtr != '\0' || errno == ERANGE) {
+        HILOG_ERROR("strtol conversion failed");
+        return 0;
+    }
+    return static_cast<int>(result);
 }
 
 long long NapiFormUtil::ConvertStringToLongLong(const std::string &strInfo, int radix)
@@ -896,32 +1002,56 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
     if (!GetPropertyValueByPropertyName(env, value, "height", rectHeight)) {
         return false;
     }
+    if (!std::isfinite(rectLeft) || !std::isfinite(rectTop) ||
+        !std::isfinite(rectWidth) || !std::isfinite(rectHeight) ||
+        rectWidth < 0 || rectHeight < 0) {
+        HILOG_ERROR("invalid rect values: left=%{public}f, top=%{public}f, width=%{public}f, height=%{public}f",
+            rectLeft, rectTop, rectWidth, rectHeight);
+        return false;
+    }
     rect.left = rectLeft;
     rect.top = rectTop;
     rect.width = rectWidth;
     rect.height = rectHeight;
+
     return true;
 }
-
 int NapiFormUtil::CatchErrorCode(napi_env env)
 {
     napi_value errResult;
     if (napi_get_and_clear_last_exception(env, &errResult) == napi_ok) {
-        napi_value errCode;
+        napi_value errCode = nullptr;
         napi_status status = napi_get_named_property(env, errResult, "code", &errCode);
-        if (status != napi_ok) {
+        if (status != napi_ok || errCode == nullptr) {
             HILOG_ERROR("CatchErrorCode, get property value fail, propertyName:code");
-            return false;
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
         napi_valuetype errCodeType;
-        napi_typeof(env, errCode, &errCodeType);
+        if (napi_typeof(env, errCode, &errCodeType) != napi_ok) {
+            HILOG_ERROR("CatchErrorCode, typeof failed");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
         if (errCodeType == napi_number) {
-            int32_t errCodeInt;
-            napi_get_value_int32(env, errCode, &errCodeInt);
-            return errCodeInt;
+            int32_t errCodeInt = 0;
+            if (napi_get_value_int32(env, errCode, &errCodeInt) == napi_ok) {
+                return errCodeInt;
+            }
         }
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
+napi_value GetValidArray(napi_env env, napi_value value, const char *name)
+{
+    if (value != nullptr) {
+        return value;
+    }
+    HILOG_ERROR("CreateNativeArray failed for %{public}s", name);
+    napi_value emptyArray = nullptr;
+    if (napi_create_array(env, &emptyArray) != napi_ok || emptyArray == nullptr) {
+        HILOG_ERROR("napi_create_array failed");
+    }
+    return emptyArray;
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

@@ -122,9 +122,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     // Cover InnerClearIntervalReportTimer (private method, not in original fuzzer)
     formTimerMgr.InnerClearIntervalReportTimer();
 
-    // Cover IsDynamicTimerExpired (private method, not in original fuzzer)
-    formTimerMgr.IsDynamicTimerExpired(formId);
-
     // Cover UpdateAtTimerAlarmDetail (private method, not in original fuzzer)
     formTimerMgr.UpdateAtTimerAlarmDetail(task);
 
