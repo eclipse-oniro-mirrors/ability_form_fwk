@@ -18,6 +18,7 @@
 #include <cinttypes>
 #include <cerrno>
 #include <climits>
+#include <cmath>
 #include <regex>
 #include <uv.h>
 #include <vector>
@@ -1001,13 +1002,20 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
     if (!GetPropertyValueByPropertyName(env, value, "height", rectHeight)) {
         return false;
     }
+    if (!std::isfinite(rectLeft) || !std::isfinite(rectTop) ||
+        !std::isfinite(rectWidth) || !std::isfinite(rectHeight) ||
+        rectWidth < 0 || rectHeight < 0) {
+        HILOG_ERROR("invalid rect values: left=%{public}f, top=%{public}f, width=%{public}f, height=%{public}f",
+            rectLeft, rectTop, rectWidth, rectHeight);
+        return false;
+    }
     rect.left = rectLeft;
     rect.top = rectTop;
     rect.width = rectWidth;
     rect.height = rectHeight;
+
     return true;
 }
-
 int NapiFormUtil::CatchErrorCode(napi_env env)
 {
     napi_value errResult;

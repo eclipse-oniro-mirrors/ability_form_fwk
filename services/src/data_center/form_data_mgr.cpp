@@ -849,7 +849,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
 {
     if (formId <= 0) {
         HILOG_ERROR("invalid formId:%{public}" PRId64, formId);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     HILOG_DEBUG("get form record by bundleName:%{public}s & formId:%{public}" PRId64, bundleName.c_str(), formId);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
