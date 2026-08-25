@@ -3528,7 +3528,7 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
     };
 
     if (getLiveFormStatusEnv_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("null getLiveFormStatusEnv_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     napi_send_event(getLiveFormStatusEnv_, task, napi_eprio_immediate);
@@ -3550,7 +3550,7 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
     dataParam->result = false;
     napi_handle_scope scope = nullptr;
     if (getLiveFormStatusEnv_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("null getLiveFormStatusEnv_");
         return;
     }
     napi_open_handle_scope(getLiveFormStatusEnv_, &scope);
@@ -3752,7 +3752,7 @@ bool JsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
 
     napi_handle_scope scope = nullptr;
     if (templateFormDetailInfoChangeEnv_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("null templateFormDetailInfoChangeEnv_");
         return false;
     }
     napi_open_handle_scope(templateFormDetailInfoChangeEnv_, &scope);
@@ -4071,8 +4071,8 @@ bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::strin
 
     napi_handle_scope scope = nullptr;
     std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
-    if (deleteFormsCallbackEnv_ == nullptr) {
-        HILOG_ERROR("null env");
+    if (deleteFormsCallbackEnv_ == nullptr || deleteFormsCallbackRef_ == nullptr) {
+        HILOG_WARN("deleteForms callback or env is null");
         return false;
     }
     napi_open_handle_scope(deleteFormsCallbackEnv_, &scope);
@@ -4161,7 +4161,7 @@ bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::F
     HILOG_INFO("call, formCount:%{public}zu", formInfos.size());
     napi_handle_scope scope = nullptr;
     if (formWantCallbackEnv_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("null formWantCallbackEnv_");
         return false;
     }
     napi_open_handle_scope(formWantCallbackEnv_, &scope);
