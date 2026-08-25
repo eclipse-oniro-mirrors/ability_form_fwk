@@ -720,10 +720,6 @@ bool JsFormProvider::ConvertFromDataProxies(napi_env env, napi_value value,
 bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
     AppExecFwk::FormDataProxy &formDataProxy)
 {
-    if (value == nullptr) {
-        HILOG_WARN("null jsValue,not object");
-        return false;
-    }
     napi_valuetype valueType = napi_undefined;
     if (value == nullptr) {
         HILOG_WARN("null jsValue,not object");
