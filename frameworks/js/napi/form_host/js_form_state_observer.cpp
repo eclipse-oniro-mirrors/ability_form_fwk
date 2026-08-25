@@ -85,8 +85,16 @@ bool FormAddCallbackClient::IsStrictEqual(napi_value callback)
 {
     bool isEqual = false;
     napi_value myCallback = nullptr;
-    napi_get_reference_value(env_, callbackRef_, &myCallback);
-    napi_strict_equals(env_, myCallback, callback, &isEqual);
+    napi_status status = napi_get_reference_value(env_, callbackRef_, &myCallback);
+    if (status != napi_ok || myCallback == nullptr) {
+        HILOG_ERROR("get reference value failed");
+        return false;
+    }
+    status = napi_strict_equals(env_, myCallback, callback, &isEqual);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_strict_equals failed");
+        return false;
+    }
     HILOG_INFO("isStrictEqual:%{public}d", isEqual);
     return isEqual;
 }
