@@ -3012,11 +3012,6 @@ void JsFormRouterProxyMgr::RequestOverflowInner(std::shared_ptr<LiveFormInterfac
         return;
     }
     napi_handle_scope scope = nullptr;
-    if (overflowEnv_ == nullptr) {
-        HILOG_ERROR("null env");
-        dataParam->result = false;
-        return;
-    }
     napi_open_handle_scope(overflowEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
@@ -3953,10 +3948,6 @@ bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
         return false;
     }
     napi_handle_scope scope = nullptr;
-    if (updateFormsConfigEnv_ == nullptr) {
-        HILOG_ERROR("null env");
-        return false;
-    }
     napi_open_handle_scope(updateFormsConfigEnv_, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
