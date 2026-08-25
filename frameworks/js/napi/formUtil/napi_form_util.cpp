@@ -615,7 +615,6 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
         GetValidArray(env, CreateNativeArray(env, formInfo.supportShapes), "supportedShapes"));
     napi_set_named_property(env, objContext, "previewImages",
         GetValidArray(env, CreateNativeArray(env, formInfo.formPreviewImages), "previewImages"));
-    napi_set_named_property(env, objContext, "previewImages", previewImages);
     napi_set_named_property(env, objContext, "renderingMode", CreateJsValue(env, formInfo.renderingMode));
     napi_set_named_property(env, objContext, "enableBlurBackground", CreateJsValue(env, formInfo.enableBlurBackground));
     napi_set_named_property(env, objContext, "funInteractionParams",
