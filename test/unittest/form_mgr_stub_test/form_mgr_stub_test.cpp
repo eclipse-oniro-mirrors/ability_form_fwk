@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2196,6 +2196,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0090, TestSize.Level1) {
     const std::string bundleName = "ABC";
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteString(bundleName);
+    data.WriteBool(false);
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
@@ -2420,6 +2421,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0100, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(0);
+    data.WriteBool(false);
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0100 ends";
@@ -2433,6 +2435,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0100, TestSize.Level1) {
 HWTEST_F(FormMgrStubTest, HandleGetFormInstanceById_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleGetFormInstanceById_0100 starts";
     MessageParcel data;
+    data.WriteInt64(0);
+    data.WriteBool(false);
     MessageParcel reply;
     data.WriteInt64(1);
     data.WriteBool(false);
@@ -2489,6 +2493,8 @@ HWTEST_F(FormMgrStubTest, HandleUpdateFormLocation_0100, TestSize.Level1) {
 HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfosByBundleName_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfosByBundleName_0100 starts";
     MessageParcel data;
+    data.WriteString("bundleName");
+    data.WriteBool(false);
     MessageParcel reply;
     EXPECT_CALL(*mockFormMgrService, GetRunningFormInfosByBundleName(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetRunningFormInfosByBundleName(data, reply);
@@ -2535,6 +2541,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0101, TestSize.Level1) {
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0102, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0102 starts";
     MessageParcel data;
+    data.WriteInt64(0);
+    data.WriteString("testMessage");
+    data.WriteInt32(0);
     MessageParcel reply;
     data.WriteInt64(1);
     data.WriteString("test");
@@ -2552,6 +2561,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0102, TestSize.Level1) {
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0103, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0103 starts";
     MessageParcel data;
+    data.WriteInt64(0);
     MessageParcel reply;
     data.WriteInt64(1);
     EXPECT_CALL(*mockFormMgrService, AcquireAddFormResult(_)).Times(1).WillOnce(Return(ERR_OK));
