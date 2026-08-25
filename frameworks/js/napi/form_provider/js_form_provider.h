@@ -141,7 +141,7 @@ class JsFormProviderProxyMgr : public AppExecFwk::FormProviderDelegateStub {
 public:
     JsFormProviderProxyMgr() = default;
 
-    virtual ~JsFormProviderProxyMgr() = default;
+    virtual ~JsFormProviderProxyMgr();
 
     static sptr<JsFormProviderProxyMgr> GetInstance();
 
@@ -155,7 +155,7 @@ private:
 
     DISALLOW_COPY_AND_MOVE(JsFormProviderProxyMgr);
     napi_ref crossBundleControlCallback_ = nullptr;
-    napi_env crossBundleControlEnv_;
+    napi_env crossBundleControlEnv_ = nullptr;
     mutable std::mutex crossBundleControlMutex_;
     ErrCode PublishFormCrossBundleControl(const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen);
     void PublishFormCrossBundleControlInner(std::shared_ptr<PublishFormCrossBundleControlParam> dataParam);

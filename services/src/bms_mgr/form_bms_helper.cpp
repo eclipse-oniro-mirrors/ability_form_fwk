@@ -239,10 +239,11 @@ bool FormBmsHelper::GetBundleInfoByFlags(const std::string& bundleName, int32_t 
         HILOG_ERROR("null iBundleMgr");
         return false;
     }
-    int32_t v9Flag = flags |
-        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_DISABLE) |
-        static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
-    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetBundleInfoV9(bundleName, v9Flag, bundleInfo, userId));
+    uint32_t v9Flag = static_cast<uint32_t>(flags) |
+        static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_DISABLE) |
+        static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_EXCLUDE_EXT);
+    ErrCode ret = IN_PROCESS_CALL(iBundleMgr->GetBundleInfoV9(
+        bundleName, static_cast<int32_t>(v9Flag), bundleInfo, userId));
     return ret == ERR_OK;
 }
 
