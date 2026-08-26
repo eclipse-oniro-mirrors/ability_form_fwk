@@ -407,6 +407,14 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleDeleteForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE):
             return HandleUpdateFormCrossBundle(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_HOST_SERVICE):
+            return HandleRegisterFormHostService(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_HOST_SERVICE):
+            return HandleUnregisterFormHostService(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES):
+            return HandleGetAvailableFormHostServices(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE):
+            return HandleRequestPublishFormCrossDevice(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
