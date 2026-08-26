@@ -26,6 +26,7 @@
 #include <singleton.h>
 
 #include "app_mgr_interface.h"
+#include "form_adapter_constants.h"
 #include "form_constants.h"
 #include "form_info.h"
 #include "form_provider_data.h"
@@ -81,6 +82,9 @@ public:
 
     ErrCode RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId);
 
+    ErrCode RequestPublishFormCrossDevice(Want &want, int32_t userId, int64_t &formId,
+        std::unique_ptr<FormProviderData> &formProviderData);
+
     bool IsActionAllowToPublish(const std::string &action);
 
     // Functions moved from FormLifecycleAdapter
@@ -95,8 +99,10 @@ private:
     bool CheckIsSystemAppByBundleName(const int32_t &userId, const std::string &bundleName);
     bool IsErmsSupportPublishForm(const std::string &bundleName, std::vector<Want> wants);
     bool CheckSnapshotWant(const Want &want);
-    void IncreaseAddFormRequestTimeOutTask(const int64_t formId);
-    ErrCode RequestPublishFormToHost(Want &want, int32_t userId, bool checkFormCountLimit = false);
+    void IncreaseAddFormRequestTimeOutTask(const int64_t formId,
+        int timeoutMs = FormAdapterConstants::ADD_FORM_TIMEOUT_MS);
+    ErrCode RequestPublishFormToHost(Want &want, int32_t userId, bool checkFormCountLimit = false,
+        int timeoutMs = FormAdapterConstants::ADD_FORM_TIMEOUT_MS);
     int32_t GetCallerType(const std::string &bundleName);
     bool GetBundleName(std::string &bundleName, bool needCheckFormPermission = true);
     ErrCode ValidatePublishFormParamsForCrossUser(const Want &want, int32_t userId);
@@ -104,6 +110,7 @@ private:
     ErrCode ValidateFormInfoMatchForCrossUser(const Want &want, int32_t userId);
     ErrCode CheckFormCountLimit(const Want &want, int32_t userId);
     bool ResolveAcquireResult(const int64_t formId, ErrCode &result);
+    ErrCode CheckPublishFormCrossDevice(Want &want, int32_t userId);
 
     std::unique_ptr<FormSerialQueue> serialQueue_;
     std::map<int64_t, AddFormResultErrorCodes> formIdMap_;
