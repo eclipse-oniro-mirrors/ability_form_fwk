@@ -46,12 +46,7 @@ FormMgrAdapterFacade::~FormMgrAdapterFacade()
 void FormMgrAdapterFacade::Init()
 {
     HILOG_INFO("Init called");
-    // Note: Individual adapters handle their own initialization internally.
-    // This method is provided for API compatibility with FormMgrAdapter.
-
-    // Clean up invalid form cache (only executes once)
     FormDataAdapter::GetInstance().DeleteInvalidFormCacheIfNeed();
-    // Load visibleNotifyDelayTime
     FormVisibilityAdapter::GetInstance().Init();
 }
 
