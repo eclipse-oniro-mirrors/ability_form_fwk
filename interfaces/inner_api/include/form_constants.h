@@ -339,6 +339,7 @@ namespace Constants {
         PARAM_ERROR,
         INTERNAL_ERROR,
         NOT_SUPPORT,
+        HOST_FORM_LIMIT,
         BUTT, // boundary for validation
     };
  
