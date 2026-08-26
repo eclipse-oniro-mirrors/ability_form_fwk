@@ -26,6 +26,10 @@
 #include "form_mgr/form_publish_adapter.h"
 #include "form_mgr/form_visibility_adapter.h"
 #include "fms_log_wrapper.h"
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+#include "feature/service_discovery/form_service_discovery.h"
+#include "feature/service_gateway/form_publish_router.h"
+#endif
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -683,6 +687,65 @@ ErrCode FormMgrAdapterFacade::UnregisterDeleteFormsCallback()
 ErrCode FormMgrAdapterFacade::DeleteForms(const std::vector<FormRecordFilter> &filters)
 {
     return FormCallbackAdapter::GetInstance().DeleteForms(filters);
+}
+
+ErrCode FormMgrAdapterFacade::RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId)
+{
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormServiceDiscovery::GetInstance().Register(serviceInfo, serviceId);
+#else
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterFormHostService(int64_t serviceId)
+{
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormServiceDiscovery::GetInstance().Unregister(serviceId);
+#else
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
+}
+
+ErrCode FormMgrAdapterFacade::GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services)
+{
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormServiceDiscovery::GetInstance().GetAvailableFormHostServices(services);
+#else
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
+}
+
+ErrCode FormMgrAdapterFacade::DumpFormService(std::string &result)
+{
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    FormServiceDiscovery::GetInstance().Dump(result);
+#endif
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapterFacade::RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+    const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback)
+{
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormPublishRouter::GetInstance().RequestPublish(request, callerToken, callback);
+#else
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
+}
+
+ErrCode FormMgrAdapterFacade::DumpCrossDevice(std::string &result)
+{
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    FormPublishRouter::GetInstance().Dump(result);
+#endif
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapterFacade::HandleCrossDevicePublish(Want &want, int32_t userId, int64_t &formId,
+    std::unique_ptr<FormProviderData> &formProviderData)
+{
+    return FormPublishAdapter::GetInstance().RequestPublishFormCrossDevice(want, userId, formId, formProviderData);
 }
 
 ErrCode FormMgrAdapterFacade::StartAbilityByFms(const Want &want)
