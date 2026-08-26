@@ -19,6 +19,7 @@
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
+#include "peer_form_service_info.h"
 #include "running_form_info.h"
 #include "string_ex.h"
 
@@ -3932,5 +3933,133 @@ ErrCode FormMgrProxy::DeleteForms(const std::vector<FormRecordFilter> &filters)
     }
     return reply.ReadInt32();
 }
+
+ErrCode FormMgrProxy::RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&serviceInfo)) {
+        HILOG_ERROR("write serviceInfo failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_HOST_SERVICE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    ErrCode result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result == ERR_OK) {
+        if (!reply.ReadInt64(serviceId)) {
+            HILOG_ERROR("read serviceId failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+ErrCode FormMgrProxy::UnregisterFormHostService(int64_t serviceId)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(serviceId)) {
+        HILOG_ERROR("write serviceId failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_HOST_SERVICE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t readResult = 0;
+    if (!reply.ReadInt32(readResult)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return readResult;
+}
+
+ErrCode FormMgrProxy::GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    ErrCode result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result != ERR_OK) {
+        HILOG_ERROR("GetAvailableFormHostServices failed, errCode: %{public}d.", result);
+        return result;
+    }
+    return GetParcelableInfos<PeerFormHostServiceInfo>(reply, services);
+}
+
+ErrCode FormMgrProxy::RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+    const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback)
+{
+    HILOG_DEBUG("call");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&request)) {
+        HILOG_ERROR("write request failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callback)) {
+        HILOG_ERROR("write callback failed.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    ErrCode error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("send request failed, errCode: %{public}d.", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t readResult = 0;
+    if (!reply.ReadInt32(readResult)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return readResult;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
