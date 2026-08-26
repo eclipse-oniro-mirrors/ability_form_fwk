@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -840,26 +840,29 @@ bool GetStringPropFromNapi(napi_env env, napi_value args, const char *name, std:
 
 std::string GetStringFromNapi(napi_env env, napi_value value)
 {
-    std::string result;
-    size_t size = 0;
-
-    if (napi_get_value_string_utf8(env, value, nullptr, 0, &size) != napi_ok) {
+    size_t need = 0;
+    if (napi_get_value_string_utf8(env, value, nullptr, 0, &need) != napi_ok) {
         HILOG_ERROR("can't get stringSize");
         return "";
     }
-    if (size == 0) {
+    if (need == 0) {
         HILOG_WARN("args size is zero");
         return "";
     }
-    if (size >= SIZE_MAX - 1) {
+    if (need >= SIZE_MAX - 1) {
         HILOG_ERROR("string size too large");
         return "";
     }
-    result.resize(size + 1);
-    if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
+
+    std::string result;
+    result.resize(need + 1);
+    size_t written = 0;
+    if (napi_get_value_string_utf8(env, value, result.data(), (need + 1), &written) != napi_ok) {
         HILOG_ERROR("can't get string value");
         return "";
     }
+
+    result.resize(written);
     return result;
 }
 
@@ -909,6 +912,127 @@ napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, formInstance.formUsageState));
     napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, formInstance.description));
     return objContext;
+}
+
+
+// Service discovery
+napi_value CreatePeerFormHostServiceInfos(napi_env env,
+    const std::vector<AppExecFwk::PeerFormHostServiceInfo> &services)
+{
+    napi_value arrayValue = nullptr;
+    napi_status status = napi_create_array_with_length(env, services.size(), &arrayValue);
+    if (status != napi_ok || arrayValue == nullptr) {
+        HILOG_ERROR("failed to create array");
+        return nullptr;
+    }
+    uint32_t index = 0;
+    for (const auto &service : services) {
+        napi_value element = CreatePeerFormHostServiceInfo(env, service);
+        if (element == nullptr) {
+            HILOG_ERROR("failed to create PeerFormHostServiceInfo at index %{public}u", index);
+            index++;
+            continue;
+        }
+        status = napi_set_element(env, arrayValue, index, element);
+        if (status != napi_ok) {
+            HILOG_ERROR("failed to set array element at index %{public}u", index);
+            return nullptr;
+        }
+        index++;
+    }
+    return arrayValue;
+}
+
+napi_value CreatePeerFormHostServiceInfo(napi_env env, const AppExecFwk::PeerFormHostServiceInfo &service)
+{
+    HILOG_DEBUG("call");
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
+    napi_set_named_property(env, objContext, "serviceName", CreateJsValue(env, service.serviceName));
+    napi_set_named_property(env, objContext, "serviceDisplayName", CreateJsValue(env, service.serviceDisplayName));
+    napi_set_named_property(env, objContext, "displayId", CreateJsValue(env, service.displayId));
+    napi_set_named_property(env, objContext, "customData", CreateJsValue(env, service.customData));
+    napi_set_named_property(env, objContext, "deviceId", CreateJsValue(env, service.deviceId));
+    napi_set_named_property(env, objContext, "networkId", CreateJsValue(env, service.networkId));
+    napi_set_named_property(env, objContext, "serviceId", CreateJsValue(env, service.serviceId));
+    return objContext;
+}
+
+static bool GetOptionalString(napi_env env, napi_value obj, const char *key, std::string &out)
+{
+    bool has = false;
+    napi_has_named_property(env, obj, key, &has);
+    if (!has) {
+        return true;
+    }
+    napi_value prop = nullptr;
+    napi_get_named_property(env, obj, key, &prop);
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, prop, &type);
+    if (type != napi_string) {
+        return true;
+    }
+    out = GetStringFromNapi(env, prop);
+    return true;
+}
+
+bool ParsePeerFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::PeerFormHostServiceInfo &service)
+{
+    HILOG_DEBUG("call");
+    napi_valuetype valueType = napi_undefined;
+    NAPI_CALL_BASE(env, napi_typeof(env, value, &valueType), false);
+    if (valueType != napi_object) {
+        HILOG_ERROR("PeerFormHostServiceInfo not object type");
+        return false;
+    }
+    // serviceName is required
+    napi_value prop = nullptr;
+    napi_get_named_property(env, value, "serviceName", &prop);
+    napi_typeof(env, prop, &valueType);
+    if (valueType != napi_string) {
+        HILOG_ERROR("serviceName missing or not string");
+        return false;
+    }
+    service.serviceName = GetStringFromNapi(env, prop);
+    if (service.serviceName.empty()) {
+        HILOG_ERROR("empty serviceName");
+        return false;
+    }
+    GetOptionalString(env, value, "serviceDisplayName", service.serviceDisplayName);
+    GetOptionalString(env, value, "displayId", service.displayId);
+    GetOptionalString(env, value, "customData", service.customData);
+    GetOptionalString(env, value, "deviceId", service.deviceId);
+    GetOptionalString(env, value, "networkId", service.networkId);
+    GetOptionalString(env, value, "serviceId", service.serviceId);
+    return true;
+}
+
+bool ParseFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::FormHostServiceInfo &service)
+{
+    HILOG_DEBUG("call");
+    napi_valuetype valueType = napi_undefined;
+    NAPI_CALL_BASE(env, napi_typeof(env, value, &valueType), false);
+    if (valueType != napi_object) {
+        HILOG_ERROR("FormHostServiceInfo not object type");
+        return false;
+    }
+    // serviceName is required
+    napi_value prop = nullptr;
+    napi_get_named_property(env, value, "serviceName", &prop);
+    napi_typeof(env, prop, &valueType);
+    if (valueType != napi_string) {
+        HILOG_ERROR("serviceName missing or not string");
+        return false;
+    }
+    service.serviceName = GetStringFromNapi(env, prop);
+    if (service.serviceName.empty()) {
+        HILOG_ERROR("empty serviceName");
+        return false;
+    }
+    GetOptionalString(env, value, "serviceDisplayName", service.serviceDisplayName);
+    GetOptionalString(env, value, "displayId", service.displayId);
+    GetOptionalString(env, value, "customData", service.customData);
+    return true;
 }
 
 bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoFilter &formInfoFilter)
