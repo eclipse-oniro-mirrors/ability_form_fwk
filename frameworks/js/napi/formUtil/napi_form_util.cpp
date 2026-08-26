@@ -255,7 +255,7 @@ napi_value NapiGetResult(napi_env env, int iResult)
 /**
  * @brief Convert string to int64_t
  *
- * @param[in] strInfo The string information
+ * @param[in] strInfo The string information, allowed to be empty, if it is empty, `int64Value` returns 0
  * @param[out] int64Value Convert string to int64_t
  *
  * @return Return the convert result
