@@ -914,7 +914,6 @@ napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
     return objContext;
 }
 
-
 // Service discovery
 napi_value CreatePeerFormHostServiceInfos(napi_env env,
     const std::vector<AppExecFwk::PeerFormHostServiceInfo> &services)
