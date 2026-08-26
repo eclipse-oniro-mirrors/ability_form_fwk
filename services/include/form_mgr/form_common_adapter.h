@@ -53,7 +53,8 @@ enum class AddFormResultErrorCodes : int8_t {
     FAILED,
     TIMEOUT,
     NO_SPACE,
-    NOT_SUPPORT
+    NOT_SUPPORT,
+    HOST_FORM_LIMIT
 };
 
 /**
