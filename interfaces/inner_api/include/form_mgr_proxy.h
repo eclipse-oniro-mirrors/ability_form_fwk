@@ -22,6 +22,7 @@
 #include "form_state_info.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
+#include "peer_form_service_info.h"
 #include "running_form_info.h"
 #include "template_form_detail_info.h"
 #include "iremote_proxy.h"
@@ -954,6 +955,38 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters) override;
+
+    /**
+     * @brief Register local form host service info to FMS for cross-device discovery.
+     * @param serviceInfo The form host service info including serviceName, displayId, customData, etc.
+     * @param serviceId Return the allocated service ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId) override;
+
+    /**
+     * @brief Unregister local form host service from FMS.
+     * @param serviceId The service ID returned by RegisterFormHostService.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormHostService(int64_t serviceId) override;
+
+    /**
+     * @brief Get available peer form host services discovered via DM.
+     * @param services Return the list of peer form host service info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services) override;
+
+    /**
+     * @brief Request to publish a form to a cross-device target.
+     * @param request The cross-device publish request containing peerNetworkId, peerServiceId, want, etc.
+     * @param callerToken Caller ability token.
+     * @param callback The callback for receiving publish result asynchronously.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+        const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback) override;
 
 private:
     template<typename T>
