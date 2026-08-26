@@ -2887,5 +2887,64 @@ ErrCode FormMgr::UnregisterFormWantCallback()
     }
     return remoteProxy_->UnregisterFormWantCallback();
 }
+
+ErrCode FormMgr::RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect failed, errCode %{public}d", errCode);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RegisterFormHostService(serviceInfo, serviceId);
+}
+
+ErrCode FormMgr::UnregisterFormHostService(int64_t serviceId)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UnregisterFormHostService(serviceId);
+}
+
+ErrCode FormMgr::GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->GetAvailableFormHostServices(services);
+}
+
+ErrCode FormMgr::RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+    const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback)
+{
+    HILOG_DEBUG("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RequestPublishFormCrossDevice(request, callerToken, callback);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
