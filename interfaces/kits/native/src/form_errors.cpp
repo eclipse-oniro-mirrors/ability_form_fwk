@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -316,6 +316,69 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     },
     {
         ERR_APPEXECFWK_FORM_PUBLISH_NOT_SUPPORT, { ERR_FORM_EXTERNAL_PUBLISH_NOT_SUPPORT, "" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM,
+        {
+            ERR_FORM_EXTERNAL_PERMISSION_DENIED,
+            "check permission denied, need to request ohos.permission.AGENT_REQUIRE_FORM."
+        }
+    },
+    {
+        ERR_APPEXECFWK_FORM_PUBLISH_HOST_FORM_LIMIT, { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "" }
+    },
+    // distributed service discovery
+    {
+        ERR_APPEXECFWK_FORM_SERVICE_DM_UNAVAILABLE,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_SERVICE_PUBLISH_FAILED,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_SERVICE_NOT_EXIST,
+        { ERR_FORM_EXTERNAL_SERVICE_NOT_SELF,
+            "Unregistered form service that do not belong to oneself is not supported." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_SERVICE_NOT_SELF,
+        { ERR_FORM_EXTERNAL_SERVICE_NOT_SELF,
+            "Unregistered form service that do not belong to oneself is not supported." }
+    },
+    // cross-device transport
+    {
+        ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "" }
+    },
+    {
+        ERR_APPEXECFWK_FORM_CD_BIND_TIMEOUT,
+        { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT, "Cross-device connection timed out." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_CD_CODEC_FAILED,
+        { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "Cross-device data codec failed." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_CD_INVALID_PARAM,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Invalid cross-device parameter." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_CD_PEER_SERVICE_UNAVAILABLE,
+        { ERR_FORM_EXTERNAL_CD_PEER_SERVICE_UNAVAILABLE, "Remote form service is unavailable." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_CD_PEER_APP_NOT_INSTALLED,
+        { ERR_FORM_EXTERNAL_CD_PEER_APP_NOT_INSTALLED,
+            "The peer form application is not installed or the version is too old." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_CD_REQUEST_TIMEOUT,
+        { ERR_FORM_EXTERNAL_CD_PEER_SERVICE_UNAVAILABLE, "Remote form service is unavailable." }
+    },
+    {
+        ERR_APPEXECFWK_FORM_CD_INVALID_MSG_TYPE,
+        { ERR_FORM_EXTERNAL_CD_PEER_SERVICE_UNAVAILABLE, "Remote form service is unavailable." }
     }
 };
 
@@ -352,6 +415,11 @@ static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG =
     { ERR_FORM_EXTERNAL_FORM_LOCATION_INVALID,        "The location of the widget is invalid." },
     { ERR_FORM_EXTERNAL_PUBLISH_NO_SPACE,             "There is no space to publish form." },
     { ERR_FORM_EXTERNAL_PUBLISH_NOT_SUPPORT,          "This form does not support publishing." },
+    { ERR_FORM_EXTERNAL_SERVICE_NOT_SELF,
+        "Unregistered form service that do not belong to oneself is not supported." },
+    { ERR_FORM_EXTERNAL_CD_PEER_SERVICE_UNAVAILABLE,  "Remote form service is unavailable." },
+    { ERR_FORM_EXTERNAL_CD_PEER_APP_NOT_INSTALLED,
+        "The peer form application is not installed or the version is too old." },
 };
 }
 
