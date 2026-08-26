@@ -1070,6 +1070,7 @@ private:
         KEY_DUMP_VISIBLE,
         KEY_DUMP_RUNNING,
         KEY_DUMP_BLOCKED_APPS,
+        KEY_DUMP_CROSS_DEVICE,
     };
     /**
      * @brief initialization of form manager service.
@@ -1094,6 +1095,7 @@ private:
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
     bool PublishFormCrossBundleControl(const Want &want);
