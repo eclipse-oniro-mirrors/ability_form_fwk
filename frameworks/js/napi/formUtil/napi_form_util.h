@@ -159,6 +159,7 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect);
 napi_value CreateNewRunningFormInfos(napi_env env,
     const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
 napi_value CreateNewRunningFormInfo(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo);
+napi_value GetValidArray(napi_env env, napi_value value, const char *name);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */

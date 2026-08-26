@@ -98,6 +98,10 @@ ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
     const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
 {
     HILOG_DEBUG("connect service ability with userId");
+    if (connect == nullptr) {
+        HILOG_ERROR("connect is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     sptr<AAFwk::IAbilityManager> abilityManagerService = GetAbilityManager();
     if (abilityManagerService == nullptr) {
         HILOG_ERROR("ability service not connect");

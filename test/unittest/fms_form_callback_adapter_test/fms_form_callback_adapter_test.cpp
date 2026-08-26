@@ -429,7 +429,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterOverflowProxy_001, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().overflowRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().overflowRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterOverflowProxy_001 end";
 }
@@ -590,7 +590,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterChangeSceneAnimationStateProxy_001,
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().sceneAnimationRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().sceneAnimationRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterChangeSceneAnimationStateProxy_001 end";
 }
@@ -702,7 +702,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterGetFormRectProxy_001, TestSize.Leve
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().formRectRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().formRectRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterGetFormRectProxy_001 end";
 }
@@ -808,7 +808,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterGetLiveFormStatusProxy_001, TestSiz
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterGetLiveFormStatusProxy_001 end";
 }
@@ -856,7 +856,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_001, TestSize.Level1)
     std::unordered_map<std::string, std::string> liveFormStatusMap;
 
     // Clear registry to ensure no proxies
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     auto result = FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
@@ -888,7 +888,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterPublishFormCrossBundleControl_001, 
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().crossBundleControlRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().crossBundleControlRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterPublishFormCrossBundleControl_001 end";
 }
@@ -941,7 +941,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, PublishFormCrossBundleControl_001, TestSize
         .WillOnce(Return(TEST_CALLING_UID));
 
     // Clear registry to ensure no proxies
-    FormCallbackAdapter::GetInstance().crossBundleControlRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().crossBundleControlRegistry_->Clear();
 
     auto result = FormCallbackAdapter::GetInstance().PublishFormCrossBundleControl(bundleInfo);
     EXPECT_FALSE(result);
@@ -973,7 +973,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterTemplateFormDetailInfoChange_001, T
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterTemplateFormDetailInfoChange_001 end";
 }
@@ -1024,7 +1024,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_001, TestSize.
         .WillOnce(Return(TEST_CALLING_UID));
 
     // Clear registry to ensure no proxies
-    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_->Clear();
 
     auto result = FormCallbackAdapter::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
     EXPECT_EQ(result, ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION);
@@ -1209,7 +1209,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "StartAbilityByFms_002 start";
 
     // Clear registry so GetLiveFormStatus returns error
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     Want want;
     want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
@@ -1395,7 +1395,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_009, TestSize.Level1)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
     mockDelegate->liveFormStatusData_ = {{"form_999", "10"}};
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     Want want;
@@ -1411,7 +1411,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_009, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "StartAbilityByFms_009 end";
 }
@@ -1429,7 +1429,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_010, TestSize.Level1)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
     mockDelegate->liveFormStatusData_ = {{"form_888", "99"}};
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     Want want;
@@ -1445,7 +1445,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_010, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "StartAbilityByFms_010 end";
 }
@@ -1463,7 +1463,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_011, TestSize.Level1)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
     mockDelegate->liveFormStatusData_ = {{"form_777", "21"}};
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     Want want;
@@ -1487,7 +1487,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_011, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "StartAbilityByFms_011 end";
 }
@@ -1638,7 +1638,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_005, TestSize.Level1)
     FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::SCENE_ANIMATION;
 
     // Clear overflow registry so no proxy found
-    FormCallbackAdapter::GetInstance().overflowRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().overflowRegistry_->Clear();
 
     auto result = FormCallbackAdapter::GetInstance().RequestOverflow(
         TEST_FORM_ID, callingUid, overflowInfo, isOverflow);
@@ -1695,7 +1695,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_006, TestSize.Level1)
     // Register mock delegate in overflow registry
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->requestOverflowResult_ = ERR_OK;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().overflowRegistry_.Register(callingUid,
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().overflowRegistry_->Register(callingUid,
         sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     auto result = FormCallbackAdapter::GetInstance().RequestOverflow(
@@ -1703,7 +1703,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_006, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().overflowRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().overflowRegistry_->Clear();
     FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
 
     GTEST_LOG_(INFO) << "RequestOverflow_006 end";
@@ -1786,7 +1786,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_004, TestSize.Lev
     // Register mock delegate in scene animation registry
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->changeSceneResult_ = ERR_OK;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().sceneAnimationRegistry_.Register(callingUid,
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().sceneAnimationRegistry_->Register(callingUid,
         sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     auto result = FormCallbackAdapter::GetInstance().ChangeSceneAnimationState(
@@ -1794,7 +1794,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_004, TestSize.Lev
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().sceneAnimationRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().sceneAnimationRegistry_->Clear();
     FormCustConfigMgr::GetInstance().liveFormSupportType = Constants::LIVE_FORM_NONE;
 
     GTEST_LOG_(INFO) << "ChangeSceneAnimationState_004 end";
@@ -1852,7 +1852,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetFormRect_004, TestSize.Level1)
         .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
 
     // Clear registry so no proxy found
-    FormCallbackAdapter::GetInstance().formRectRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().formRectRegistry_->Clear();
 
     auto result = FormCallbackAdapter::GetInstance().GetFormRect(TEST_FORM_ID, callingUid, rect);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
@@ -1885,14 +1885,14 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetFormRect_005, TestSize.Level1)
     // Register mock delegate in form rect registry
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getFormRectResult_ = ERR_OK;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().formRectRegistry_.Register(callingUid,
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().formRectRegistry_->Register(callingUid,
         sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     auto result = FormCallbackAdapter::GetInstance().GetFormRect(TEST_FORM_ID, callingUid, rect);
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().formRectRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().formRectRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "GetFormRect_005 end";
 }
@@ -1912,7 +1912,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_003, TestSize.Level1)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
     mockDelegate->liveFormStatusData_ = {{"form_123", "21"}};
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     std::unordered_map<std::string, std::string> liveFormStatusMap;
@@ -1922,7 +1922,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_003, TestSize.Level1)
     EXPECT_EQ(liveFormStatusMap["form_123"], "21");
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "GetLiveFormStatus_003 end";
 }
@@ -1939,7 +1939,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_004, TestSize.Level1)
     // Register a mock delegate that returns error
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     std::unordered_map<std::string, std::string> liveFormStatusMap;
@@ -1948,7 +1948,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_004, TestSize.Level1)
     EXPECT_TRUE(liveFormStatusMap.empty());
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "GetLiveFormStatus_004 end";
 }
@@ -2124,7 +2124,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterFormWantCallback_001, TestSize.Leve
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterFormWantCallback_001 end";
 }
@@ -2148,11 +2148,11 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterFormWantCallback_002, TestSize.Leve
 
     // Verify proxy is stored
     sptr<IRemoteObject> storedProxy;
-    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Get(TEST_CALLING_UID, storedProxy), ERR_OK);
     EXPECT_EQ(storedProxy, callerToken);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterFormWantCallback_002 end";
 }
@@ -2186,11 +2186,11 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterFormWantCallback_003, TestSize.Leve
 
     // Verify proxy is updated
     sptr<IRemoteObject> storedProxy;
-    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Get(TEST_CALLING_UID, storedProxy), ERR_OK);
     EXPECT_EQ(storedProxy, callerToken2);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterFormWantCallback_003 end";
 }
@@ -2207,7 +2207,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UnregisterFormWantCallback_001, TestSize.Le
     GTEST_LOG_(INFO) << "UnregisterFormWantCallback_001 start";
 
     // Clear registry to ensure no prior registration
-    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Clear();
 
     auto result = FormCallbackAdapter::GetInstance().UnregisterFormWantCallback(TEST_CALLING_UID);
     EXPECT_EQ(result, ERR_OK);
@@ -2239,7 +2239,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UnregisterFormWantCallback_002, TestSize.Le
 
     // Verify proxy is removed
     sptr<IRemoteObject> storedProxy;
-    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Get(TEST_CALLING_UID, storedProxy),
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Get(TEST_CALLING_UID, storedProxy),
         ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
 
     GTEST_LOG_(INFO) << "UnregisterFormWantCallback_002 end";
@@ -2257,7 +2257,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetWantCallbackProxy_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GetWantCallbackProxy_001 start";
 
     // Clear registry to ensure no prior registration
-    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Clear();
 
     sptr<IRemoteObject> proxy;
     auto result = FormCallbackAdapter::GetInstance().GetWantCallbackProxy(TEST_CALLING_UID, proxy);
@@ -2292,7 +2292,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetWantCallbackProxy_002, TestSize.Level1)
     EXPECT_EQ(proxy, callerToken);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "GetWantCallbackProxy_002 end";
 }
@@ -2351,7 +2351,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetWantCallbackProxy_004, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().wantCallbackRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().wantCallbackRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "GetWantCallbackProxy_004 end";
 }
@@ -2445,7 +2445,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_002, TestSize.
     // Register mock delegate in template form detail info registry
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->templateFormResult_ = ERR_OK;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
@@ -2456,7 +2456,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_002, TestSize.
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_002 end";
 }
@@ -2473,7 +2473,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_003, TestSize.
     // Register mock delegate that returns error
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->templateFormResult_ = ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
@@ -2484,7 +2484,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateTemplateFormDetailInfo_003, TestSize.
     EXPECT_EQ(result, ERR_APPEXECFWK_TEMPLATE_UNSUPPORTED_OPERATION);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().templateFormDetailInfoRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "UpdateTemplateFormDetailInfo_003 end";
 }
@@ -2508,7 +2508,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterDeleteFormsCallback_001, TestSize.L
 
     // Verify proxy is stored
     sptr<IRemoteObject> storedProxy;
-    EXPECT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_->Get(TEST_CALLING_UID, storedProxy), ERR_OK);
     EXPECT_EQ(storedProxy, callerToken);
 
     GTEST_LOG_(INFO) << "RegisterDeleteFormsCallback_001 end";
@@ -2538,7 +2538,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UnregisterDeleteFormsCallback_001, TestSize
 
     // Verify proxy is removed
     sptr<IRemoteObject> storedProxy;
-    EXPECT_NE(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Get(TEST_CALLING_UID, storedProxy), ERR_OK);
+    EXPECT_NE(FormCallbackAdapter::GetInstance().deleteFormsRegistry_->Get(TEST_CALLING_UID, storedProxy), ERR_OK);
 
     GTEST_LOG_(INFO) << "UnregisterDeleteFormsCallback_001 end";
 }
@@ -2608,7 +2608,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, DeleteForms_003, TestSize.Level1)
     // Setup mock delegate
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->deleteFormsResult_ = ERR_OK;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().deleteFormsRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     std::vector<FormRecordFilter> filters;
@@ -2663,12 +2663,12 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterUpdateFormsConfigCallback_001, Test
 
     // Verify proxy is stored
     sptr<IRemoteObject> storedProxy;
-    EXPECT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Get(
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Get(
         TEST_CALLING_UID, storedProxy), ERR_OK);
     EXPECT_EQ(storedProxy, callerToken);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "RegisterUpdateFormsConfigCallback_001 end";
 }
@@ -2704,7 +2704,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, RegisterUpdateFormsConfigCallback_002, Test
     ASSERT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Clear();
     {
         std::lock_guard<std::mutex> lock(FormCallbackAdapter::GetInstance().formCustomConfigCacheMutex_);
         FormCallbackAdapter::GetInstance().formCustomConfigCache_.clear();
@@ -2739,7 +2739,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UnregisterUpdateFormsConfigCallback_001, Te
 
     // Verify proxy is removed
     sptr<IRemoteObject> storedProxy;
-    EXPECT_NE(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Get(
+    EXPECT_NE(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Get(
         TEST_CALLING_UID, storedProxy), ERR_OK);
 
     GTEST_LOG_(INFO) << "UnregisterUpdateFormsConfigCallback_001 end";
@@ -2754,7 +2754,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UnregisterUpdateFormsConfigCallback_002, Te
 {
     GTEST_LOG_(INFO) << "UnregisterUpdateFormsConfigCallback_002 start";
 
-    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Clear();
 
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
@@ -2775,7 +2775,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "UpdateFormsConfig_001 start";
 
-    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Clear();
 
     std::vector<FormCustomConfig> configs;
     FormCustomConfig config;
@@ -2802,7 +2802,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_002, TestSize.Level1)
 
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->updateFormsConfigResult_ = ERR_OK;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     std::vector<FormCustomConfig> configs;
@@ -2819,7 +2819,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_002, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "UpdateFormsConfig_002 end";
 }
@@ -2835,7 +2835,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_003, TestSize.Level1)
 
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->updateFormsConfigResult_ = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
-    ASSERT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Register(
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
     std::vector<FormCustomConfig> configs;
@@ -2852,7 +2852,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_003, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
 
     // Cleanup
-    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_.Clear();
+    FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "UpdateFormsConfig_003 end";
 }

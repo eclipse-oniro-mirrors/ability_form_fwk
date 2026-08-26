@@ -1360,21 +1360,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0181, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0182
- * @tc.name: test ChangeSceneAnimationState function.
- * @tc.desc: Verify that the ChangeSceneAnimationState interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0182, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0182 start";
-    FormMgrService formMgrService;
-    const int64_t formId = 1;
-    int32_t state = 1;
-    EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrService_0182 end";
-}
-
-/**
  * @tc.number: FormMgrService_ChangeSceneAnimationState_0001
  * @tc.name: test ChangeSceneAnimationState non-system app.
  * @tc.desc: Verify that ChangeSceneAnimationState returns permission deny for non-system app.
@@ -1388,7 +1373,26 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ChangeSceneAnimationState_0001, 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
     GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_ChangeSceneAnimationState_0002
+ * @tc.name: test ChangeSceneAnimationState system app success.
+ * @tc.desc: Verify that ChangeSceneAnimationState returns success when caller is system app.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ChangeSceneAnimationState_0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0002 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    int32_t state = 1;
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0002 end";
 }
 
 /**
@@ -1470,8 +1474,11 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_SendNonTransparencyRatio_0001, T
     EXPECT_EQ(ret, ERR_OK);
 
     MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
     ret = formMgrService.SendNonTransparencyRatio(formId, ratio);
     EXPECT_NE(ret, ERR_OK);
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
     GTEST_LOG_(INFO) << "FormMgrService_SendNonTransparencyRatio_0001 end";
 }
 

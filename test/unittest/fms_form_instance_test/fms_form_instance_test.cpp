@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -109,11 +109,21 @@ HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0300, TestSize.Level0)
 HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0400, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0400 start";
-
     FormInstancesFilter formInstanceFilter;
     Parcel parcel;
+    parcel.WriteString16(Str8ToStr16("bundleName"));
+    parcel.WriteString16(Str8ToStr16("formName"));
+    parcel.WriteString16(Str8ToStr16("moduleName"));
+    parcel.WriteString16(Str8ToStr16("abilityName"));
+    parcel.WriteBool(false);
     auto result = formInstanceFilter.Unmarshalling(parcel);
-    EXPECT_EQ(result, nullptr);
+    ASSERT_NE(result, nullptr);
+    EXPECT_EQ(result->bundleName, "bundleName");
+    EXPECT_EQ(result->formName, "formName");
+    EXPECT_EQ(result->moduleName, "moduleName");
+    EXPECT_EQ(result->abilityName, "abilityName");
+    EXPECT_FALSE(result->isUnusedIncluded);
+    delete result;
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0400 end";
 }
 
@@ -142,8 +152,18 @@ HWTEST_F(FmsFormInstanceTest, FmsFormInstanceTest_0600, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0600 start";
     FormInstancesFilter formInstanceFilter;
     Parcel parcel;
+    parcel.WriteString16(Str8ToStr16("bundleName"));
+    parcel.WriteString16(Str8ToStr16("formName"));
+    parcel.WriteString16(Str8ToStr16("moduleName"));
+    parcel.WriteString16(Str8ToStr16("abilityName"));
+    parcel.WriteBool(false);
     auto result = formInstanceFilter.ReadFromParcel(parcel);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(formInstanceFilter.bundleName, "bundleName");
+    EXPECT_EQ(formInstanceFilter.formName, "formName");
+    EXPECT_EQ(formInstanceFilter.moduleName, "moduleName");
+    EXPECT_EQ(formInstanceFilter.abilityName, "abilityName");
+    EXPECT_FALSE(formInstanceFilter.isUnusedIncluded);
     GTEST_LOG_(INFO) << "FmsFormInstanceTest_0600 end";
 }
 } // namespace AppExecFwk

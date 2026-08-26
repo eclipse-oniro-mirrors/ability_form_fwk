@@ -246,7 +246,11 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
         return;
     }
     FormRecord formRecord;
-    FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("get formRecord failed, formId:%{public}" PRId64, formId);
+        RemoveConnection(connectId);
+        return;
+    }
     FormJsInfo formJsInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
     int error = formProviderProxy->AcquireProviderFormInfo(formJsInfo, want, FormSupplyCallback::GetInstance());

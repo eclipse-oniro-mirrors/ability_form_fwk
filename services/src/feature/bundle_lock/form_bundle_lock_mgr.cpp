@@ -65,7 +65,9 @@ bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, const int32_
 
     if (formId != 0) {
         bool lockStatus = false;
-        FormDataMgr::GetInstance().GetFormLock(formId, lockStatus);
+        if (FormDataMgr::GetInstance().GetFormLock(formId, lockStatus) != ERR_OK) {
+            HILOG_ERROR("GetFormLock failed, use default lock status");
+        }
         return lockStatus;
     }
 
