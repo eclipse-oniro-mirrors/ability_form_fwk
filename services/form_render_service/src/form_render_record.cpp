@@ -151,6 +151,23 @@ FormRenderRecord::FormRenderRecord(
 FormRenderRecord::~FormRenderRecord()
 {
     RemoveWatchDogThreadMonitor();
+    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
+    if (eventHandler == nullptr) {
+        HILOG_WARN("null eventHandler");
+        return;
+    }
+ 
+    // Some resources need to be deleted in a JS thread
+    auto syncTask = [weak = weak_from_this()]() {
+        auto renderRecord = weak.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("null renderRecord");
+            return;
+        }
+        renderRecord->HandleDestroyInJsThread();
+        // Release need rectification
+    };
+    eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
     Release();
 }
 
@@ -1165,8 +1182,6 @@ void FormRenderRecord::Release()
             HILOG_ERROR("null renderRecord");
             return;
         }
-        // Some resources need to be deleted in a JS thread
-        renderRecord->HandleDestroyInJsThread();
         renderRecord->HandleReleaseInJsThread();
     };
     eventHandler->PostSyncTask(syncTask, "HandleReleaseInJsThread");
