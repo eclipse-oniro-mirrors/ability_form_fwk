@@ -102,7 +102,6 @@ static bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExec
     return true;
 }
 
-
 static bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId)
 {
     std::string strFormId;
