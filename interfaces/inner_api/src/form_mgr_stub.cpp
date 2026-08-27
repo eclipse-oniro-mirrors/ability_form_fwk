@@ -19,6 +19,7 @@
 #include "fms_log_wrapper.h"
 #include "form_info.h"
 #include "form_mgr_errors.h"
+#include "peer_form_service_info.h"
 #include "running_form_info.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -406,6 +407,14 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleDeleteForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE):
             return HandleUpdateFormCrossBundle(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_HOST_SERVICE):
+            return HandleRegisterFormHostService(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_HOST_SERVICE):
+            return HandleUnregisterFormHostService(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES):
+            return HandleGetAvailableFormHostServices(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE):
+            return HandleRequestPublishFormCrossDevice(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -3123,5 +3132,92 @@ ErrCode FormMgrStub::HandleDeleteForms(MessageParcel &data, MessageParcel &reply
     }
     return ERR_OK;
 }
+
+ErrCode FormMgrStub::HandleRegisterFormHostService(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::unique_ptr<FormHostServiceInfo> service(data.ReadParcelable<FormHostServiceInfo>());
+    if (service == nullptr) {
+        HILOG_ERROR("read FormHostServiceInfo failed");
+        if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
+    int64_t serviceId = -1;
+    ErrCode result = RegisterFormHostService(*service, serviceId);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result == ERR_OK && !reply.WriteInt64(serviceId)) {
+        HILOG_ERROR("write serviceId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterFormHostService(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int64_t serviceId = 0;
+    if (!data.ReadInt64(serviceId)) {
+        HILOG_ERROR("read serviceId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = UnregisterFormHostService(serviceId);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleGetAvailableFormHostServices(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::vector<PeerFormHostServiceInfo> services;
+    ErrCode result = GetAvailableFormHostServices(services);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(services, reply)) {
+            HILOG_ERROR("write services failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRequestPublishFormCrossDevice(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::unique_ptr<FormCrossDeviceRequest> request(data.ReadParcelable<FormCrossDeviceRequest>());
+    if (request == nullptr) {
+        HILOG_ERROR("read FormCrossDeviceRequest failed");
+        if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    sptr<IRemoteObject> callback = data.ReadRemoteObject();
+    if (callerToken == nullptr || callback == nullptr) {
+        HILOG_ERROR("ReadRemoteObject failed");
+        if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_OK;
+    }
+    ErrCode result = RequestPublishFormCrossDevice(*request, callerToken, callback);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

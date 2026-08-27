@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -154,7 +154,8 @@ export default namespace formInfo {
     NO_SPACE = 1,
     PARAM_ERROR = 2,
     INTERNAL_ERROR = 3,
-    NOT_SUPPORT = 4
+    NOT_SUPPORT = 4,
+    HOST_FORM_LIMIT = 5
   }
 
   export interface FormProviderFilter {
@@ -407,6 +408,48 @@ export default namespace formInfo {
     relatedBundleName: string;
     isShowInFormCenter: boolean;
     isRepeatAdditionSupported: boolean;
+  }
+
+  export interface FormHostServiceInfo {
+    serviceName: string;
+    serviceDisplayName: string;
+    displayId: string;
+    customData?: Record<string, string>;
+  }
+
+  class FormHostServiceInfoInner implements FormHostServiceInfo {
+    serviceName: string = '';
+    serviceDisplayName: string = '';
+    displayId: string = '';
+    customData?: Record<string, string> = {};
+  }
+
+  export interface PeerFormHostServiceInfo {
+    serviceName: string;
+    serviceDisplayName: string;
+    displayId: string;
+    customData?: Record<string, string>;
+    deviceId: string;
+    networkId: string;
+    serviceId: string;
+  }
+
+  class PeerFormHostServiceInfoInner implements PeerFormHostServiceInfo {
+    serviceName: string = '';
+    serviceDisplayName: string = '';
+    displayId: string = '';
+    customData?: Record<string, string> = {};
+    deviceId: string = '';
+    networkId: string = '';
+    serviceId: string = '';
+  }
+
+  export interface PublishFormCrossDeviceResult {
+    formId: string;
+  }
+
+  class PublishFormCrossDeviceResultInner implements PublishFormCrossDeviceResult {
+    formId: string = '';
   }
 
   type UpdateFormsConfigCallback = (configInfo: Array<FormCustomConfig>) => void;

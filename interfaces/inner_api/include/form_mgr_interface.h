@@ -34,6 +34,9 @@
 #include "template_form_detail_info.h"
 #include "form_custom_config.h"
 #include "form_record_filter.h"
+#include "form_service_info.h"
+#include "peer_form_service_info.h"
+#include "form_cross_device_request.h"
 
 #include "want.h"
 
@@ -1170,6 +1173,50 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Register local form host service info to FMS for cross-device discovery.
+     * @param serviceInfo The form host service info including serviceName, displayId, customData, etc.
+     * @param serviceId Return the allocated service ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Unregister local form host service from FMS.
+     * @param serviceId The service ID returned by RegisterFormHostService.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterFormHostService(int64_t serviceId)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Get available peer form host services discovered via DM.
+     * @param services Return the list of peer form host service info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Request to publish a form to a cross-device target.
+     * @param request The cross-device publish request containing peerNetworkId, peerServiceId, want, etc.
+     * @param callerToken Caller ability token.
+     * @param callback The callback for receiving publish result asynchronously.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+        const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1300,6 +1347,10 @@ public:
         FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK,
         FORM_MGR_DELETE_FORMS,
         FORM_MGR_UPDATE_FORM_CROSS_BUNDLE,
+        FORM_MGR_REGISTER_FORM_HOST_SERVICE,
+        FORM_MGR_UNREGISTER_FORM_HOST_SERVICE,
+        FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES,
+        FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE,
     };
 };
 }  // namespace AppExecFwk

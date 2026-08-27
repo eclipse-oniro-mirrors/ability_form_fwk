@@ -23,6 +23,7 @@
 #include "form_instances_filter.h"
 #include "iremote_object.h"
 #include "iremote_stub.h"
+#include "peer_form_service_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -986,6 +987,38 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleDeleteForms(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle register form host service.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterFormHostService(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister form host service.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterFormHostService(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle get available form host services.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleGetAvailableFormHostServices(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle request publish form cross device.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRequestPublishFormCrossDevice(MessageParcel &data, MessageParcel &reply);
 
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);

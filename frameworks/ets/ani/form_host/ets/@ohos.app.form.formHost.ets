@@ -77,6 +77,10 @@ export default namespace formHost {
   native function notifyInvisibleFormsInner(formIds: Array<string>, callback: AsyncCallbackWrapper<void>): void;
   native function notifyFormsPrivacyProtectedInner(formIds: Array<string>, isProtected: boolean, callback: AsyncCallbackWrapper<void>): void;
   native function setFormUpdateInner(formIds: Array<string>, isEnable: boolean, callback: AsyncCallbackWrapper<void>): void;
+  native function registerFormHostServiceInner(service: formInfo.FormHostServiceInfo,
+    callback: AsyncCallbackWrapper<string>): void;
+  native function unregisterFormHostServiceInner(registryId: string,
+    callback: AsyncCallbackWrapper<void>): void;
   native function updateFormLocation(formId: string, location: formInfo.FormLocation): void;
   native function updateFormLockedStateInner(formId: string, isLocked: boolean, callback: AsyncCallbackWrapper<void>): void;
   native function setFormsRecyclableInner(formIds: Array<string>, callback: AsyncCallbackWrapper<void>): void;
@@ -613,6 +617,46 @@ export default namespace formHost {
       });
       taskpool.execute((): void => {
         notifyFormsPrivacyProtectedInner(formIds, isProtected, callbackWrap);
+      });
+    });
+  }
+
+  export function registerFormHostService(service: formInfo.FormHostServiceInfo): Promise<string> {
+    return new Promise<string>((resolve: (data: string) => void,
+      reject: (err: BusinessError) => void): void => {
+      if (service === undefined || service === null) {
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
+      }
+      let call = new AsyncCallbackWrapper<string>(
+        (err: BusinessError | null, data: string | undefined) => {
+          if (err == null || err.code == ERR_OK) {
+            resolve(data as string);
+          } else {
+            reject(err);
+          }
+        });
+      taskpool.execute((): void => {
+        registerFormHostServiceInner(service, call);
+      });
+    });
+  }
+
+  export function unregisterFormHostService(registryId: string): Promise<void> {
+    return new Promise<void>((resolve, reject): void => {
+      if (registryId === "") {
+        reject(new BusinessError(INVALID_PARAM_ERROR_CODE, new Error(INVALID_PARAM_MESSAGE_ETS)));
+        return;
+      }
+      let call = new AsyncCallbackWrapper<void>((err) => {
+        if (err == null || err.code == ERR_OK) {
+          resolve(undefined);
+        } else {
+          reject(err);
+        }
+      });
+      taskpool.execute((): void => {
+        unregisterFormHostServiceInner(registryId, call);
       });
     });
   }

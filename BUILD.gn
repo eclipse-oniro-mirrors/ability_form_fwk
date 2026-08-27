@@ -307,6 +307,22 @@ ohos_static_library("libfms_internal_static") {
     "services/src/status_mgr_center/form_status_task_mgr.cpp",
   ]
 
+  defines = []
+  if (softbus_enable && device_manager_enable) {
+    sources += [
+      "services/src/feature/service_discovery/form_service_discovery.cpp",
+      "services/src/feature/service_discovery/form_service_proxy.cpp",
+ 
+      "services/src/feature/service_gateway/form_connection_pool.cpp",
+      "services/src/feature/service_gateway/form_publish_router.cpp",
+ 
+      "services/src/feature/cross_device_publish/form_cross_device_codec.cpp",
+      "services/src/feature/cross_device_publish/dm_service_adapter.cpp",
+      "services/src/feature/cross_device_publish/form_softbus_session_registry.cpp",
+    ]
+    defines += [ "DISTRIBUTED_FORM_SUPPORTED" ]
+  }
+
   configs = [
     ":fms_idl_config",
     ":formmgr_config",
@@ -393,9 +409,8 @@ ohos_static_library("libfms_internal_static") {
     cflags_cc += [ "-DTHEME_MGR_ENABLE" ]
   }
 
-  defines = []
   if (form_runtime_power) {
-    defines = [ "SUPPORT_POWER" ]
+    defines += [ "SUPPORT_POWER" ]
     external_deps += [ "power_manager:powermgr_client" ]
   }
 
@@ -406,6 +421,13 @@ ohos_static_library("libfms_internal_static") {
 
   if (form_fwk_watch_api_disable) {
     defines += [ "WATCH_API_DISABLE" ]
+  }
+
+  if (softbus_enable && device_manager_enable) {
+    external_deps += [
+      "device_manager:devicemanagersdk",
+      "dsoftbus:softbus_client",
+    ]
   }
 
   if (res_schedule_service && !form_fwk_watch_api_disable) {
@@ -478,6 +500,7 @@ ohos_shared_library("fmskit_native") {
     ":fms_idl_config",
   ]
   public_configs = [ ":fmskit_public_config" ]
+
   sources = [
     "interfaces/inner_api/src/form_event_hiappevent.cpp",
     "interfaces/kits/native/src/form_caller_mgr.cpp",
@@ -518,6 +541,7 @@ ohos_shared_library("fmskit_native") {
     ":form_utils",
   ]
 
+  defines = []
   external_deps = [
     "ability_base:configuration",
     "ability_base:want",
@@ -540,7 +564,6 @@ ohos_shared_library("fmskit_native") {
   innerapi_tags = [ "platformsdk" ]
   part_name = "form_fwk"
 
-  defines = []
   if (form_fwk_watch_api_disable) {
     defines += [ "WATCH_API_DISABLE" ]
   }
@@ -701,6 +724,11 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/template_form_detail_info.cpp",
     "interfaces/inner_api/src/form_custom_config.cpp",
     "interfaces/inner_api/src/form_record_filter.cpp",
+    "interfaces/inner_api/src/form_service_info.cpp",
+    "interfaces/inner_api/src/peer_form_service_info.cpp",
+    "interfaces/inner_api/src/form_cross_device_request.cpp",
+    "interfaces/inner_api/src/form_cross_device_publish_callback_proxy.cpp",
+    "interfaces/inner_api/src/form_cross_device_publish_callback_stub.cpp",
   ]
 
   configs = [ ":formmgr_log_config" ]

@@ -32,6 +32,9 @@
 #include "running_form_info.h"
 #include "template_form_detail_info.h"
 #include "iremote_object.h"
+#include "form_service_info.h"
+#include "peer_form_service_info.h"
+#include "form_cross_device_request.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -976,6 +979,38 @@ public:
     ErrCode UnregisterFormWantCallback() override;
 
     /**
+     * @brief Register local form host service info to FMS for cross-device discovery.
+     * @param serviceInfo The form host service info including serviceName, displayId, customData, etc.
+     * @param serviceId Return the allocated service ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId) override;
+
+    /**
+     * @brief Unregister local form host service from FMS.
+     * @param serviceId The service ID returned by RegisterFormHostService.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormHostService(int64_t serviceId) override;
+
+    /**
+     * @brief Get available peer form host services discovered via DM.
+     * @param services Return the list of peer form host service info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services) override;
+
+    /**
+     * @brief Request to publish a form to a cross-device target.
+     * @param request The cross-device publish request containing peerNetworkId, peerServiceId, want, etc.
+     * @param callerToken Caller ability token.
+     * @param callback The callback for receiving publish result asynchronously.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+        const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback) override;
+
+    /**
      * @brief Register update form config callback.
      * @param callerToken The caller token.
      * @return Returns ERR_OK on success, others on failure.
@@ -1035,6 +1070,7 @@ private:
         KEY_DUMP_VISIBLE,
         KEY_DUMP_RUNNING,
         KEY_DUMP_BLOCKED_APPS,
+        KEY_DUMP_CROSS_DEVICE,
     };
     /**
      * @brief initialization of form manager service.
@@ -1059,6 +1095,7 @@ private:
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
     bool PublishFormCrossBundleControl(const Want &want);
