@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// 
+
 #ifndef OHOS_FORM_FWK_FMS_LOG_WRAPPER_H
 #define OHOS_FORM_FWK_FMS_LOG_WRAPPER_H
 
