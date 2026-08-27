@@ -209,6 +209,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002
     FormDataMgr::GetInstance().AllotFormRecord(itemInfo, 0, 0);
 
     FormRecord record;
+    record.formId = formId;
     record.formProviderInfo.SetFormData(FormProviderData("{\"key\":\"value\"}"));
     record.isUpdateDuringDisableForm = true;
     record.enableForm = false;
