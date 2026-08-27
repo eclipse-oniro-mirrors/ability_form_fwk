@@ -144,7 +144,8 @@ public:
                 napi_close_handle_scope(env_, scope);
             }
             selfRef_ = nullptr; // release self-reference after Promise settled
-        }, "JsFormCrossDevicePublishCallback::OnResult");
+            },
+            "JsFormCrossDevicePublishCallback::OnResult");
     }
 
 private:

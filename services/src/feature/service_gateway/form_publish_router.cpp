@@ -135,26 +135,34 @@ void FormPublishRouter::RegisterPublishResponseHandler(uint32_t seqId,
     connectionPool_->RegisterResponseHandler(seqId, peerNetworkId,
         [this, cb](FormCdMsgType msgType, uint32_t seqId, const std::string &payload) {
             CancelPendingTimer(seqId);
-            if (msgType == FormCdMsgType::RESPONSE_PUBLISH) {
-                PublishFormCrossDeviceResult res;
-                if (!FormCrossDeviceCodec::DecodeResult(payload, res)) {
-                    HILOG_ERROR("DecodeResult failed for RESPONSE_PUBLISH seq=%{public}u", seqId);
-                    res = PublishFormCrossDeviceResult{ ERR_APPEXECFWK_FORM_CD_CODEC_FAILED, FORM_CD_INVALID_FORM_ID };
-                }
-                HILOG_INFO("RESPONSE_PUBLISH received: seq=%{public}u formId=%{public}" PRId64,
-                    seqId, res.formId);
-                cb->OnResult(res);
-            } else if (msgType == FormCdMsgType::ERROR) {
-                HILOG_WARN("ERROR response received for seq=%{public}u", seqId);
-                cb->OnResult(PublishFormCrossDeviceResult{
-                    ERR_APPEXECFWK_FORM_CD_PEER_APP_NOT_INSTALLED, FORM_CD_INVALID_FORM_ID });
-            } else {
-                HILOG_ERROR("unexpected msgType=%{public}u for REQUEST_PUBLISH seq=%{public}u",
-                    static_cast<uint32_t>(msgType), seqId);
-                cb->OnResult(PublishFormCrossDeviceResult{
-                    ERR_APPEXECFWK_FORM_CD_INVALID_MSG_TYPE, FORM_CD_INVALID_FORM_ID });
-            }
+            HandlePublishResponse(msgType, seqId, payload, cb);
         });
+}
+
+void FormPublishRouter::HandlePublishResponse(FormCdMsgType msgType, uint32_t seqId,
+    const std::string &payload, const sptr<IFormCrossDevicePublishCallback> &cb)
+{
+    if (msgType == FormCdMsgType::RESPONSE_PUBLISH) {
+        PublishFormCrossDeviceResult res;
+        if (!FormCrossDeviceCodec::DecodeResult(payload, res)) {
+            HILOG_ERROR("DecodeResult failed for RESPONSE_PUBLISH seq=%{public}u", seqId);
+            res = PublishFormCrossDeviceResult{ ERR_APPEXECFWK_FORM_CD_CODEC_FAILED, FORM_CD_INVALID_FORM_ID };
+        }
+        HILOG_INFO("RESPONSE_PUBLISH received: seq=%{public}u formId=%{public}" PRId64,
+            seqId, res.formId);
+        cb->OnResult(res);
+        return;
+    }
+    if (msgType == FormCdMsgType::ERROR) {
+        HILOG_WARN("ERROR response received for seq=%{public}u", seqId);
+        cb->OnResult(PublishFormCrossDeviceResult{
+            ERR_APPEXECFWK_FORM_CD_PEER_APP_NOT_INSTALLED, FORM_CD_INVALID_FORM_ID });
+        return;
+    }
+    HILOG_ERROR("unexpected msgType=%{public}u for REQUEST_PUBLISH seq=%{public}u",
+        static_cast<uint32_t>(msgType), seqId);
+    cb->OnResult(PublishFormCrossDeviceResult{
+        ERR_APPEXECFWK_FORM_CD_INVALID_MSG_TYPE, FORM_CD_INVALID_FORM_ID });
 }
 
 ErrCode FormPublishRouter::SendPublishFrame(const FormCrossDeviceRequest &request, uint32_t seqId)

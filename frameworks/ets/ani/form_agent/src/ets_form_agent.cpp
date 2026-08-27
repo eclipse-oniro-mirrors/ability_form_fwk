@@ -201,7 +201,8 @@ public:
             }
             env->DestroyLocalScope();
             selfRef_ = nullptr; // release self-reference after callback invoked
-        }, "JsFormCrossDevicePublishCallback::OnResult");
+            },
+            "JsFormCrossDevicePublishCallback::OnResult");
     }
 
 private:
@@ -240,6 +241,18 @@ ani_object CreatePeerFormHostServiceInfoObj(ani_env *env, const AppExecFwk::Peer
     return obj;
 }
 
+void FillFormHostServicesArray(ani_env *env, ani_array arrayObj,
+    const std::vector<AppExecFwk::PeerFormHostServiceInfo> &services)
+{
+    for (size_t i = 0; i < services.size(); ++i) {
+        ani_object item = CreatePeerFormHostServiceInfoObj(env, services[i]);
+        if (item == nullptr) {
+            continue;
+        }
+        env->Array_Set(arrayObj, i, static_cast<ani_ref>(item));
+    }
+}
+
 void GetAvailableFormHostServices(ani_env *env, ani_object asyncCallback)
 {
     HILOG_INFO("call");
@@ -249,20 +262,15 @@ void GetAvailableFormHostServices(ani_env *env, ani_object asyncCallback)
     }
     std::vector<AppExecFwk::PeerFormHostServiceInfo> services;
     auto retCode = FormMgr::GetInstance().GetAvailableFormHostServices(services);
-    if (retCode == ERR_OK) {
-        ani_object arrayObj = FormAniUtil::GetAniArray(env, services.size());
-        if (arrayObj != nullptr) {
-            for (size_t i = 0; i < services.size(); ++i) {
-                ani_object item = CreatePeerFormHostServiceInfoObj(env, services[i]);
-                if (item != nullptr) {
-                    env->Array_Set(static_cast<ani_array>(arrayObj), i, static_cast<ani_ref>(item));
-                }
-            }
-        }
-        FormAniUtil::InvokeAsyncWithBusinessError(env, asyncCallback, ERR_OK, arrayObj);
-    } else {
+    if (retCode != ERR_OK) {
         FormAniUtil::InvokeAsyncWithBusinessError(env, asyncCallback, retCode, nullptr);
+        return;
     }
+    ani_object arrayObj = FormAniUtil::GetAniArray(env, services.size());
+    if (arrayObj != nullptr) {
+        FillFormHostServicesArray(env, static_cast<ani_array>(arrayObj), services);
+    }
+    FormAniUtil::InvokeAsyncWithBusinessError(env, asyncCallback, ERR_OK, arrayObj);
 }
 
 bool ParsePeerFormHostServiceInfoObj(ani_env *env, ani_object serviceObj, AppExecFwk::PeerFormHostServiceInfo &service)

@@ -72,6 +72,8 @@ private:
     ErrCode EnsurePeerConnection(const std::string &peerNetworkId, int64_t peerServiceId);
     void RegisterPublishResponseHandler(uint32_t seqId, const std::string &peerNetworkId,
         const sptr<IFormCrossDevicePublishCallback> &cb);
+    void HandlePublishResponse(FormCdMsgType msgType, uint32_t seqId,
+        const std::string &payload, const sptr<IFormCrossDevicePublishCallback> &cb);
     ErrCode SendPublishFrame(const FormCrossDeviceRequest &request, uint32_t seqId);
     void StartPublishTimer(uint32_t seqId, const sptr<IFormCrossDevicePublishCallback> &cb);
 
