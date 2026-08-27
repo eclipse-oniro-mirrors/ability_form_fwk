@@ -1108,7 +1108,7 @@ HWTEST_F(FmsFormDataAdapterTest, DelayRefreshFormsOnAppUpgrade_002, TestSize.Lev
 
 /**
  * @tc.name: IsDeleteCacheInUpgradeScene_001
- * @tc.desc: Verify IsDeleteCacheInUpgradeScene with isDataProxy form returns false
+ * @tc.desc: Verify system app with isDataProxy returns false
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormDataAdapterTest, IsDeleteCacheInUpgradeScene_001, TestSize.Level1)
@@ -1117,6 +1117,7 @@ HWTEST_F(FmsFormDataAdapterTest, IsDeleteCacheInUpgradeScene_001, TestSize.Level
 
     FormRecord record;
     record.isDataProxy = true;
+    record.isSystemApp = true;
     record.bundleName = "com.test.bundle";
     record.moduleName = "entry";
     record.formName = "widget";
@@ -1130,7 +1131,7 @@ HWTEST_F(FmsFormDataAdapterTest, IsDeleteCacheInUpgradeScene_001, TestSize.Level
 
 /**
  * @tc.name: IsDeleteCacheInUpgradeScene_002
- * @tc.desc: Verify IsDeleteCacheInUpgradeScene with non-system non-dataProxy form returns true
+ * @tc.desc: Verify non-system non-dataProxy form returns true
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormDataAdapterTest, IsDeleteCacheInUpgradeScene_002, TestSize.Level1)
@@ -1145,11 +1146,33 @@ HWTEST_F(FmsFormDataAdapterTest, IsDeleteCacheInUpgradeScene_002, TestSize.Level
     record.formName = "widget";
     record.userId = TEST_USER_ID;
 
-    // GetFormsInfoByRecord returns error by default, so falls to error branch returning true
     auto result = FormDataAdapter::GetInstance().IsDeleteCacheInUpgradeScene(record);
     EXPECT_TRUE(result);
 
     GTEST_LOG_(INFO) << "IsDeleteCacheInUpgradeScene_002 end";
+}
+
+/**
+ * @tc.name: IsDeleteCacheInUpgradeScene_003
+ * @tc.desc: Verify system non-dataProxy app with GetFormsInfoByRecord error returns true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, IsDeleteCacheInUpgradeScene_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsDeleteCacheInUpgradeScene_003 start";
+
+    FormRecord record;
+    record.isDataProxy = false;
+    record.isSystemApp = true;
+    record.bundleName = "com.test.bundle";
+    record.moduleName = "entry";
+    record.formName = "widget";
+    record.userId = TEST_USER_ID;
+
+    auto result = FormDataAdapter::GetInstance().IsDeleteCacheInUpgradeScene(record);
+    EXPECT_TRUE(result);
+
+    GTEST_LOG_(INFO) << "IsDeleteCacheInUpgradeScene_003 end";
 }
 
 // ========== OnNotifyRefreshForm Additional Tests ==========

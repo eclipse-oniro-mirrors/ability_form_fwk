@@ -212,6 +212,7 @@ void FormRenderTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, 
         (void)FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData);
         FormJsInfo formInfo;
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formInfo);
+        formInfo.formProviderData.ClearData(); // JSON already in formData, avoid duplicate in IPC
         formJsInfos.emplace_back(formInfo);
     }
 
