@@ -1169,6 +1169,8 @@ HWTEST_F(FmsFormDataAdapterTest, IsDeleteCacheInUpgradeScene_003, TestSize.Level
     record.formName = "widget";
     record.userId = TEST_USER_ID;
 
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
     auto result = FormDataAdapter::GetInstance().IsDeleteCacheInUpgradeScene(record);
     EXPECT_TRUE(result);
 

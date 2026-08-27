@@ -211,6 +211,7 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002
     FormRecord record;
     record.formProviderInfo.SetFormData(FormProviderData("{\"key\":\"value\"}"));
     record.isUpdateDuringDisableForm = true;
+    record.enableForm = false;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
 
     std::vector<FormRecord> formRecords;
