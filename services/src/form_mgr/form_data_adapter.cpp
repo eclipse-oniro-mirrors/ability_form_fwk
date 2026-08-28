@@ -631,6 +631,9 @@ bool FormDataAdapter::CheckUIAbilityContext(const pid_t pid)
 
 bool FormDataAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record)
 {
+    if (!record.isSystemApp) {
+        return true;
+    }
     if (record.isDataProxy) {
         return false;
     }
@@ -640,10 +643,7 @@ bool FormDataAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record)
         HILOG_ERROR("get formInfo failed");
         return true;
     }
-    if (record.isSystemApp && !FormInfoMgr::GetInstance().IsDeleteCacheInUpgradeScene(formInfo)) {
-        return false;
-    }
-    return true;
+    return FormInfoMgr::GetInstance().IsDeleteCacheInUpgradeScene(formInfo);
 }
 
 int32_t FormDataAdapter::OnNotifyRefreshForm(const int64_t &formId)

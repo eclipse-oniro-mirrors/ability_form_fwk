@@ -87,6 +87,10 @@ void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterato
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(record->formId, false);
         FormProviderData data = record->formProviderInfo.GetFormData();
         RefreshExecMgr::UpdateByProviderData(record->formId, data, true);
+        // Consume cached formProviderInfo.
+        FormDataMgr::GetInstance().UpdateFormRecord(record->formId, [](FormRecord &formRecord) {
+            formRecord.formProviderInfo = FormProviderInfo();
+        });
     }
 }
 

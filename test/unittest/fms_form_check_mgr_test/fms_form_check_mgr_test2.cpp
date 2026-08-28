@@ -172,4 +172,34 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshCacheMgr_005, TestSize
     RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(FORM_ID_ONE, 1);
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_RefreshCacheMgr_005 end";
 }
+
+/**
+ * @tc.name: FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001
+ * @tc.desc: Verify ConsumeHealthyControlFlag clears formProviderInfo after consuming.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001 start";
+    constexpr int64_t formId = 3;
+    FormItemInfo itemInfo;
+    itemInfo.SetFormId(formId);
+    FormDataMgr::GetInstance().AllotFormRecord(itemInfo, 0, 0);
+
+    FormRecord record;
+    record.formId = formId;
+    record.formProviderInfo.SetFormData(FormProviderData("{\"key\":\"value\"}"));
+    record.isUpdateDuringDisableForm = true;
+    record.enableForm = false;
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+
+    std::vector<FormRecord> formRecords;
+    formRecords.push_back(record);
+    auto iter = formRecords.begin();
+    RefreshCacheMgr::GetInstance().ConsumeHealthyControlFlag(iter, 0);
+
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    EXPECT_TRUE(record.formProviderInfo.GetFormData().GetDataString().empty());
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001 end";
+}
 }
