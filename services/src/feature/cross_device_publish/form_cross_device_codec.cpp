@@ -149,7 +149,6 @@ void FormCrossDeviceCodec::Feed(int32_t fd, const void *data, uint32_t len, cons
         auto msgType = static_cast<FormCdMsgType>(hdr[5]);
         uint32_t seqId = ReadBe32U(hdr + 8);
         uint32_t payloadLen = ReadBe32U(hdr + 12);
-
         if (magic != FORM_CD_MAGIC || version != FORM_CD_PROTO_VERSION ||
             payloadLen > FORM_CD_MAX_PAYLOAD) {
             HILOG_ERROR("dirty frame, magic=0x%{public}x ver=%{public}d payloadLen=%{public}u, drop fd=%{public}d",
