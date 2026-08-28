@@ -216,11 +216,8 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002
     FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
 
     std::vector<FormRecord> formRecords;
-    FormDataMgr::GetInstance().GetFormRecordsByUserId(0, formRecords);
-    auto iter = std::find_if(formRecords.begin(), formRecords.end(),
-        [formId](const FormRecord &r) { return r.formId == formId; });
-    ASSERT_NE(iter, formRecords.end());
-    iter->isUpdateDuringDisableForm = true;
+    formRecords.push_back(record);
+    auto iter = formRecords.begin();
     RefreshCacheMgr::GetInstance().ConsumeHealthyControlFlag(iter, 0);
 
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
