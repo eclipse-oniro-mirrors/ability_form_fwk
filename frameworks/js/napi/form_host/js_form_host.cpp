@@ -26,6 +26,7 @@
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_histogram_utils.h"
+#include "form_service_info.h"
 #include "ipc_skeleton.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
@@ -384,6 +385,16 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnDeleteInvalidForms);
     }
 
+    static napi_value RegisterFormHostService(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRegisterFormHostService);
+    }
+
+    static napi_value UnregisterFormHostService(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterFormHostService);
+    }
+
     static napi_value AcquireFormState(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnAcquireFormState);
@@ -649,7 +660,7 @@ private:
             return false;
         }
         if (formErrorCode < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
-                formErrorCode > static_cast<int32_t>(Constants::PublishFormErrorCode::NOT_SUPPORT)) {
+                formErrorCode > static_cast<int32_t>(Constants::PublishFormErrorCode::HOST_FORM_LIMIT)) {
             HILOG_ERROR("PublishFormResult is convert fail");
             return false;
         }
@@ -732,6 +743,80 @@ private:
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnDeleteForm",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
+    }
+
+    napi_value OnRegisterFormHostService(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_INFO("call");
+        if (argc < ARGS_ONE || argc > ARGS_TWO) {
+            HILOG_ERROR("OnRegisterFormHostService invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
+            return CreateJsUndefined(env);
+        }
+        FormHostServiceInfo service;
+        if (!ParseFormHostServiceInfo(env, argv[PARAM0], service)) {
+            HILOG_ERROR("OnRegisterFormHostService parse service failed");
+            NapiFormUtil::ThrowParamTypeError(env, "service", "FormHostServiceInfo");
+            return CreateJsUndefined(env);
+        }
+        auto registryId = std::make_shared<int64_t>();
+        auto retCode = std::make_shared<int32_t>();
+        NapiAsyncTask::ExecuteCallback execute = [service, registryId, retCode]() {
+            *retCode = FormMgr::GetInstance().RegisterFormHostService(service, *registryId);
+        };
+        NapiAsyncTask::CompleteCallback complete = [registryId, retCode](napi_env env,
+            NapiAsyncTask &task, int32_t status) {
+            if (*retCode == ERR_OK) {
+                task.ResolveWithNoError(env, CreateJsValue(env, std::to_string(*registryId)));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *retCode));
+            }
+        };
+        napi_value lastParam = (argc == ARGS_ONE) ? nullptr : argv[ARGS_ONE];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnRegisterFormHostService",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
+    }
+
+    napi_value OnUnregisterFormHostService(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_INFO("call");
+        if (argc < ARGS_ONE || argc > ARGS_TWO) {
+            HILOG_ERROR("OnUnregisterFormHostService invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
+            return CreateJsUndefined(env);
+        }
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, argv[PARAM0], &valueType);
+        if (valueType != napi_string) {
+            HILOG_ERROR("OnUnregisterFormHostService registryId is not string");
+            NapiFormUtil::ThrowParamTypeError(env, "registryId", "string");
+            return CreateJsUndefined(env);
+        }
+        int64_t registryId = -1;
+        if (!ConvertStringToInt64(GetStringFromNapi(env, argv[PARAM0]), registryId)) {
+            HILOG_ERROR("OnUnregisterFormHostService registryId is not a numeric string");
+            NapiFormUtil::ThrowParamError(env, "registryId must be a numeric string");
+            return CreateJsUndefined(env);
+        }
+        auto retCode = std::make_shared<int32_t>();
+        NapiAsyncTask::ExecuteCallback execute = [registryId, retCode]() {
+            *retCode = FormMgr::GetInstance().UnregisterFormHostService(registryId);
+        };
+        NapiAsyncTask::CompleteCallback complete = [retCode](napi_env env,
+            NapiAsyncTask &task, int32_t status) {
+            if (*retCode == ERR_OK) {
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *retCode));
+            }
+        };
+        napi_value lastParam = (argc == ARGS_ONE) ? nullptr : argv[ARGS_ONE];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnUnregisterFormHostService",
             env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }
@@ -2841,6 +2926,8 @@ const std::pair<const char *, napi_callback> JS_FORM_HOST_BINDINGS[] = {
     { "getFormIdsByFormLocation", JsFormHost::GetFormIdsByFormLocation },
     { "onGetWantParamsCallback", JsFormHost::RegisterGetWantParamsCallback },
     { "offGetWantParamsCallback", JsFormHost::UnregisterGetWantParamsCallback },
+    { "registerFormHostService", JsFormHost::RegisterFormHostService },
+    { "unregisterFormHostService", JsFormHost::UnregisterFormHostService },
 };
 }
 

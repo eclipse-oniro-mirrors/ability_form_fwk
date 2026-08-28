@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include "ability.h"
 #include "form_provider_data.h"
 #include "form_provider_info.h"
+#include "form_service_info.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
@@ -26,6 +27,8 @@
 #include "nlohmann/json.hpp"
 #include "want.h"
 #include <vector>
+#include "event_handler.h"
+#include "form_cross_device_publish_callback_stub.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -49,11 +52,15 @@ public:
     static void Finalizer(napi_env env, void* data, void* hint);
     static napi_value RequestPublishForm(napi_env env, napi_callback_info info);
     static napi_value UpdateFormCrossBundle(napi_env env, napi_callback_info info);
+    static napi_value GetAvailableFormHostServices(napi_env env, napi_callback_info info);
+    static napi_value RequestPublishFormCrossDevice(napi_env env, napi_callback_info info);
 private:
     napi_value OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv);
     napi_value OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value* argv);
     bool ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, napi_value* argv,
         std::shared_ptr<UpdateFormCrossBundleCallbackInfo> &callbackInfo, napi_value &lastParam);
+    napi_value OnGetAvailableFormHostServices(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnRequestPublishFormCrossDevice(napi_env env, size_t argc, napi_value* argv);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

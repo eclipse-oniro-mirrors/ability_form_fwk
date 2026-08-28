@@ -124,7 +124,8 @@ const std::string FORM_DUMP_HELP = "options list:\n"
     "  -n  <bundle-name>                    query form info by a bundle name\n"
     "  -i  <form-id>                        query form info by a form ID\n"
     "  -r  --running                        query running form info\n"
-    "  -a  --apps-blocked                   query blocked app name list\n";
+    "  -a  --apps-blocked                   query blocked app name list\n"
+    "  -c  --cross-device                   query cross-device publish router state\n";
 
 const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
     {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
@@ -143,6 +144,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"--running", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
     {"-a", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
     {"--apps-blocked", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
+    {"-c", FormMgrService::DumpKey::KEY_DUMP_CROSS_DEVICE},
+    {"--cross-device", FormMgrService::DumpKey::KEY_DUMP_CROSS_DEVICE},
 };
 
 FormMgrService::FormMgrService()
@@ -1527,6 +1530,13 @@ void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &
             return HiDumpFormRunningFormInfos(value, result);
         case DumpKey::KEY_DUMP_BLOCKED_APPS:
             return HiDumpFormBlockedApps(value, result);
+        case DumpKey::KEY_DUMP_CROSS_DEVICE:
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+            return HiDumpCrossDevice(value, result);
+#else
+            result = "DISTRIBUTED_FORM_SUPPORTED not enabled";
+            return;
+#endif
         default:
             result = "error: unknow function.";
             return;
@@ -1700,6 +1710,15 @@ void FormMgrService::HiDumpFormBlockedApps([[maybe_unused]] const std::string &a
         return;
     }
     FormTrustMgr::GetInstance().GetUntrustAppNameList(result);
+}
+
+void FormMgrService::HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result)
+{
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    FormMgrAdapterFacade::GetInstance().DumpCrossDevice(result);
+#else
+    result = "DISTRIBUTED_FORM_SUPPORTED not enabled";
+#endif
 }
 
 void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string &result)
@@ -2647,6 +2666,79 @@ std::string FormMgrService::GetOnKvDataServiceAddTime() const
 {
     std::lock_guard<std::mutex> lock(onKvDataServiceAddTimeMutex_);
     return onKvDataServiceAddTime_;
+}
+
+ErrCode FormMgrService::RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormMgrAdapterFacade::GetInstance().RegisterFormHostService(serviceInfo, serviceId);
+#else
+    HILOG_WARN("cross-device not supported on this build");
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
+}
+
+ErrCode FormMgrService::UnregisterFormHostService(int64_t serviceId)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormMgrAdapterFacade::GetInstance().UnregisterFormHostService(serviceId);
+#else
+    HILOG_WARN("cross-device not supported on this build");
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
+}
+
+ErrCode FormMgrService::GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM;
+    }
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormMgrAdapterFacade::GetInstance().GetAvailableFormHostServices(services);
+#else
+    HILOG_WARN("cross-device not supported on this build");
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
+}
+
+ErrCode FormMgrService::RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+    const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM;
+    }
+    if (callerToken == nullptr || callback == nullptr) {
+        HILOG_ERROR("callerToken or callback null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    return FormMgrAdapterFacade::GetInstance().RequestPublishFormCrossDevice(request, callerToken, callback);
+#else
+    HILOG_WARN("cross-device not supported on this build");
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+#endif
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

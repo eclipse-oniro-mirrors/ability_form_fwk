@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,9 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "runtime.h"
+#include "form_cross_device_request.h"
+#include "form_cross_device_publish_callback_stub.h"
+#include "peer_form_service_info.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -37,8 +40,13 @@ using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 namespace {
+constexpr size_t ARGS_SIZE_ZERO = 0;
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
+constexpr size_t ARGS_SIZE_THREE = 3;
+constexpr int32_t PARAM_INDEX_ZERO = 0;
+constexpr int32_t PARAM_INDEX_ONE = 1;
+constexpr int32_t PARAM_INDEX_TWO = 2;
 constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 const std::string IS_FORM_AGENT = "isFormAgent";
 
@@ -85,6 +93,68 @@ bool UnwrapFormBindingData(napi_env env, napi_value value, std::string &out)
 }
 }
 
+napi_value CreateCrossDeviceResultJsObject(napi_env env, const PublishFormCrossDeviceResult &result)
+{
+    napi_value obj = nullptr;
+    napi_create_object(env, &obj);
+    napi_set_named_property(env, obj, "formId", CreateJsValue(env, std::to_string(result.formId)));
+    return obj;
+}
+
+// IPC callback stub: FMS pushes OnResult, PostTask dispatches to main thread for Promise resolve/reject.
+// Holds a self-reference (selfRef_) to prevent premature destruction when the caller's sptr goes out
+// of scope before the async IPC callback arrives. Released after OnResult completes on the main thread.
+class JsFormCrossDevicePublishCallback : public FormCrossDevicePublishCallbackStub {
+public:
+    JsFormCrossDevicePublishCallback(napi_env env, napi_deferred deferred) : env_(env), deferred_(deferred) {}
+    ~JsFormCrossDevicePublishCallback() override = default;
+
+    void HoldSelfRef(const sptr<IRemoteObject> &ref)
+    {
+        selfRef_ = ref;
+    }
+
+    void ReleaseSelfRef()
+    {
+        selfRef_ = nullptr;
+    }
+
+    void OnResult(const PublishFormCrossDeviceResult &result) override
+    {
+        bool expected = false;
+        if (!done_.compare_exchange_strong(expected, true)) {
+            return; // prevent duplicate callback
+        }
+        auto resultPtr = std::make_shared<PublishFormCrossDeviceResult>(result);
+        auto mainHandler = std::make_shared<EventHandler>(EventRunner::GetMainEventRunner());
+        mainHandler->PostTask([this, resultPtr, mainHandler]() {
+            if (env_ == nullptr) {
+                selfRef_ = nullptr;
+                return;
+            }
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(env_, &scope);
+            if (resultPtr->errCode == ERR_OK) {
+                napi_resolve_deferred(env_, deferred_, CreateCrossDeviceResultJsObject(env_, *resultPtr));
+            } else {
+                napi_reject_deferred(env_, deferred_,
+                    NapiFormUtil::CreateErrorByInternalErrorCode(env_, resultPtr->errCode));
+            }
+            if (scope != nullptr) {
+                napi_close_handle_scope(env_, scope);
+            }
+            selfRef_ = nullptr; // release self-reference after Promise settled
+            },
+            "JsFormCrossDevicePublishCallback::OnResult");
+    }
+
+private:
+    napi_env env_ = nullptr;
+    napi_deferred deferred_ = nullptr;
+    std::atomic<bool> done_{false};
+    sptr<IRemoteObject> selfRef_;
+};
+
 void JsFormAgent::Finalizer(napi_env env, void *data, void *hint)
 {
     HILOG_INFO("call");
@@ -116,7 +186,7 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
         return CreateJsUndefined(env);
     }
 
-    if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], asyncCallbackInfo->want)) {
+    if (!AppExecFwk::UnwrapWant(env, argv[PARAM_INDEX_ZERO], asyncCallbackInfo->want)) {
         HILOG_ERROR("fail convert want");
         NapiFormUtil::ThrowParamError(env, "Failed to convert want.");
         return CreateJsUndefined(env);
@@ -153,11 +223,99 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
     return result;
 }
 
+napi_value JsFormAgent::GetAvailableFormHostServices(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnGetAvailableFormHostServices);
+}
+
+napi_value JsFormAgent::RequestPublishFormCrossDevice(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnRequestPublishFormCrossDevice);
+}
+
+napi_value JsFormAgent::OnGetAvailableFormHostServices(napi_env env, size_t argc, napi_value *argv)
+{
+    HILOG_INFO("call");
+    if (argc > ARGS_SIZE_ZERO) {
+        HILOG_ERROR("invalid argc %{public}zu", argc);
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0");
+        return CreateJsUndefined(env);
+    }
+    auto services = std::make_shared<std::vector<PeerFormHostServiceInfo>>();
+    auto retCode = std::make_shared<int32_t>();
+    NapiAsyncTask::ExecuteCallback execute = [services, retCode]() {
+        *retCode = FormMgr::GetInstance().GetAvailableFormHostServices(*services);
+    };
+    NapiAsyncTask::CompleteCallback complete = [services, retCode](napi_env env, NapiAsyncTask &task, int32_t status) {
+        if (*retCode == ERR_OK) {
+            task.ResolveWithNoError(env, CreatePeerFormHostServiceInfos(env, *services));
+        } else {
+            task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *retCode));
+        }
+    };
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnGetAvailableFormHostServices",
+        env, CreateAsyncTaskWithLastParam(env, nullptr, std::move(execute), std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormAgent::OnRequestPublishFormCrossDevice(napi_env env, size_t argc, napi_value *argv)
+{
+    HILOG_INFO("call");
+    if (argc < ARGS_SIZE_TWO) {
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
+        return CreateJsUndefined(env);
+    }
+    AppExecFwk::PeerFormHostServiceInfo peerServiceInfo;
+    if (!ParsePeerFormHostServiceInfo(env, argv[PARAM_INDEX_ZERO], peerServiceInfo)) {
+        NapiFormUtil::ThrowParamTypeError(env, "peerServiceInfo", "PeerFormHostServiceInfo");
+        return CreateJsUndefined(env);
+    }
+    Want want;
+    if (!AppExecFwk::UnwrapWant(env, argv[PARAM_INDEX_ONE], want)) {
+        NapiFormUtil::ThrowParamTypeError(env, "want", "Want");
+        return CreateJsUndefined(env);
+    }
+    std::string formProviderDataStr;
+    if (argc >= ARGS_SIZE_THREE) {
+        if (!UnwrapFormBindingData(env, argv[PARAM_INDEX_TWO], formProviderDataStr)) {
+            NapiFormUtil::ThrowParamTypeError(env, "formBindingData", "FormBindingData");
+            return CreateJsUndefined(env);
+        }
+    }
+    FormCrossDeviceRequest req;
+    req.peerNetworkId = peerServiceInfo.networkId;
+    if (!ConvertStringToInt64(peerServiceInfo.serviceId, req.peerServiceId)) {
+        NapiFormUtil::ThrowParamTypeError(env, "peerServiceId", "number");
+        return CreateJsUndefined(env);
+    }
+    req.want = want;
+    req.formProviderData = formProviderDataStr;
+
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    napi_create_promise(env, &deferred, &promise);
+    sptr<JsFormCrossDevicePublishCallback> cb = new (std::nothrow) JsFormCrossDevicePublishCallback(env, deferred);
+    if (cb == nullptr) {
+        napi_reject_deferred(env, deferred,
+            NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
+        return promise;
+    }
+    cb->HoldSelfRef(cb);
+    sptr<IRemoteObject> callerToken = IPCSkeleton::GetContextObject();
+    ErrCode ret = FormMgr::GetInstance().RequestPublishFormCrossDevice(req, callerToken, cb);
+    if (ret != ERR_OK) {
+        napi_reject_deferred(env, deferred, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+        cb->ReleaseSelfRef();
+    }
+    return promise;
+}
+
 napi_value JsFormAgent::UpdateFormCrossBundle(napi_env env, napi_callback_info info)
 {
     GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnUpdateFormCrossBundle);
 }
- 
+
 bool JsFormAgent::ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, napi_value *argv,
     std::shared_ptr<UpdateFormCrossBundleCallbackInfo> &callbackInfo, napi_value &lastParam)
 {
@@ -166,20 +324,20 @@ bool JsFormAgent::ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, na
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
         return false;
     }
- 
+
     std::string formIdStr;
     if (!ConvertFromJsValue(env, argv[0], formIdStr) || formIdStr.empty()) {
         HILOG_ERROR("formId is invalid");
         NapiFormUtil::ThrowParamError(env, "formId is invalid");
         return false;
     }
- 
+
     std::string formDataStr;
     if (!UnwrapFormBindingData(env, argv[1], formDataStr)) {
         NapiFormUtil::ThrowParamError(env, "formBindingData is invalid");
         return false;
     }
- 
+
     callbackInfo = std::make_shared<UpdateFormCrossBundleCallbackInfo>();
     if (!ConvertStringToInt64(formIdStr, callbackInfo->formId)) {
         HILOG_ERROR("formId ConvertStringToInt64 failed");
@@ -187,28 +345,28 @@ bool JsFormAgent::ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, na
         return false;
     }
     callbackInfo->formBindingData = std::make_shared<OHOS::AppExecFwk::FormProviderData>(formDataStr);
- 
+
     lastParam = (argc <= ARGS_SIZE_TWO) ? nullptr : argv[ARGS_SIZE_TWO];
     return true;
 }
- 
+
 napi_value JsFormAgent::OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value *argv)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Agent.updateFormCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
- 
+
     std::shared_ptr<UpdateFormCrossBundleCallbackInfo> asyncCallbackInfo;
     napi_value lastParam = nullptr;
     if (!ParseUpdateFormCrossBundleParams(env, argc, argv, asyncCallbackInfo, lastParam)) {
         return CreateJsUndefined(env);
     }
- 
+
     auto apiResult = std::make_shared<int32_t>();
     NapiAsyncTask::ExecuteCallback execute = [asyncCallbackInfo, ret = apiResult]() {
         *ret = FormMgr::GetInstance().UpdateFormCrossBundle(
             asyncCallbackInfo->formId, *asyncCallbackInfo->formBindingData);
     };
- 
+
     NapiAsyncTask::CompleteCallback complete =
         [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t /*status*/) {
         napi_handle_scope scope = nullptr;
@@ -224,7 +382,7 @@ napi_value JsFormAgent::OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_
         }
         napi_close_handle_scope(env, scope);
     };
- 
+
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnUpdateFormCrossBundle",
         env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));

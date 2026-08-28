@@ -45,6 +45,9 @@
 #include "form_mgr/form_publish_adapter.h"
 #include "form_mgr/form_query_adapter.h"
 #include <singleton.h>
+#include "form_cross_device_request.h"
+#include "form_service_info.h"
+#include "peer_form_service_info.h"
 
 #include "form_mgr/form_visibility_adapter.h"
 
@@ -346,6 +349,22 @@ public:
     ErrCode UnregisterDeleteFormsCallback();
 
     ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters);
+
+    ErrCode RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId);
+
+    ErrCode UnregisterFormHostService(int64_t serviceId);
+
+    ErrCode GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services);
+
+    ErrCode DumpFormService(std::string &result);
+
+    ErrCode RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+        const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback);
+
+    ErrCode DumpCrossDevice(std::string &result);
+
+    ErrCode HandleCrossDevicePublish(Want &want, int32_t userId, int64_t &formId,
+        std::unique_ptr<FormProviderData> &formProviderData);
 
     ErrCode RegisterFormWantCallback(int32_t callingUid, const sptr<IRemoteObject> &callerToken);
 

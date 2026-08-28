@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,8 @@
 #include "form_info_filter.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
+#include "form_service_info.h"
+#include "peer_form_service_info.h"
 #include "js_runtime_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
@@ -150,6 +152,13 @@ bool ParseParam(napi_env env, napi_value args, AppExecFwk::FormInstancesFilter &
 std::string GetStringFromNapi(napi_env env, napi_value value);
 napi_value CreateFormInstances(napi_env env, const std::vector<AppExecFwk::FormInstance> &formInstances);
 napi_value CreateFormInstance(napi_env env, const AppExecFwk::FormInstance &formInstance);
+
+// Service discovery
+napi_value CreatePeerFormHostServiceInfos(napi_env env,
+    const std::vector<AppExecFwk::PeerFormHostServiceInfo> &services);
+napi_value CreatePeerFormHostServiceInfo(napi_env env, const AppExecFwk::PeerFormHostServiceInfo &service);
+bool ParsePeerFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::PeerFormHostServiceInfo &service);
+bool ParseFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::FormHostServiceInfo &service);
 bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoFilter &formInfoFilter);
 napi_value CreateFunInteractionParamsDatas(napi_env env,
     const OHOS::AppExecFwk::FormFunInteractionParams &funInteractionParamsDatas);

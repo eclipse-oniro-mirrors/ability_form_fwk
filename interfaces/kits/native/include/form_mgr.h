@@ -30,6 +30,7 @@
 #include "form_instances_filter.h"
 #include "form_js_info.h"
 #include "form_mgr_interface.h"
+#include "peer_form_service_info.h"
 #include "form_provider_data.h"
 #include "form_provider_data_proxy.h"
 #include "form_state_info.h"
@@ -298,6 +299,38 @@ public:
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
     ErrCode AcquireAddFormResult(const int64_t formId);
+
+    /**
+     * @brief Register a form host service for cross-device publishing.
+     * @param serviceInfo The form host service info to register.
+     * @param serviceId Return the allocated service ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId);
+
+    /**
+     * @brief Unregister a form host service.
+     * @param serviceId The service ID to unregister.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormHostService(int64_t serviceId);
+
+    /**
+     * @brief Get available form host services discovered on peer devices.
+     * @param services Return the peer form host service info list.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services);
+
+    /**
+     * @brief Request to publish a form to a peer device.
+     * @param request The cross-device publish request containing target device and form info.
+     * @param callerToken Caller ability token.
+     * @param callback The callback to receive the publish result asynchronously.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
+        const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback);
 
     /**
      * @brief Lifecycle Update.
