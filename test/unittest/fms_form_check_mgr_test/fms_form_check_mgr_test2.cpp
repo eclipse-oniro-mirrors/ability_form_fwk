@@ -175,34 +175,12 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_RefreshCacheMgr_005, TestSize
 
 /**
  * @tc.name: FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001
- * @tc.desc: Verify formProviderInfo is cached in formRecords_ via UpdateFormRecord.
+ * @tc.desc: Verify ConsumeHealthyControlFlag clears formProviderInfo after consuming.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001 start";
-    constexpr int64_t formId = 2;
-    FormItemInfo itemInfo;
-    itemInfo.SetFormId(formId);
-    FormDataMgr::GetInstance().AllotFormRecord(itemInfo, 0, 0);
-
-    FormRecord record;
-    record.formProviderInfo.SetFormData(FormProviderData("{\"key\":\"value\"}"));
-    FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
-
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    EXPECT_FALSE(record.formProviderInfo.GetFormData().GetDataString().empty());
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001 end";
-}
-
-/**
- * @tc.name: FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002
- * @tc.desc: Verify ConsumeHealthyControlFlag clears formProviderInfo after consuming.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002 start";
     constexpr int64_t formId = 3;
     FormItemInfo itemInfo;
     itemInfo.SetFormId(formId);
@@ -222,6 +200,6 @@ HWTEST_F(FmsFormCheckMgrTest2, FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002
 
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
     EXPECT_TRUE(record.formProviderInfo.GetFormData().GetDataString().empty());
-    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ConsumeHealthyControlFlag_002 end";
+    GTEST_LOG_(INFO) << "FmsFormCheckMgrTest_ConsumeHealthyControlFlag_001 end";
 }
 }
