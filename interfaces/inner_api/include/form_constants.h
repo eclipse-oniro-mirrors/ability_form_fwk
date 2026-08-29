@@ -254,6 +254,7 @@ namespace Constants {
     constexpr int32_t MAX_FORM_IDS_SIZE = 1024;
     constexpr int32_t MAX_RECORD_PER_HOST = 256;
     constexpr int32_t MAX_RECORD_PER_USER = 256;
+    constexpr int32_t MAX_RECORD_PER_APP = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
     // max length for publish form result message

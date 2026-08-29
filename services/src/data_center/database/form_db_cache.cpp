@@ -524,6 +524,30 @@ int32_t FormDbCache::GetFormCountsByHostBundleName(const std::string &hostBundle
 }
 
 /**
+ * @brief Get form counts from DbCache by calling user id.
+ * @param currentAccountId current account ID.
+ * @param callingUid calling user ID.
+ * @return Returns form counts.
+ */
+int FormDbCache::GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid)
+{
+    int callingUidFormCounts = 0;
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (const auto& record : formDBInfos_) {
+        if (record.providerUserId != currentAccountId) {
+            continue;
+        }
+        for (const auto &userUid : record.formUserUids) {
+            if (userUid != callingUid) {
+                continue;
+            }
+            callingUidFormCounts++;
+        }
+    }
+    return callingUidFormCounts;
+}
+
+/**
  * @brief Get all form data size from DbCache.
  * @return Returns form data size.
  */
