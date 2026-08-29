@@ -3302,7 +3302,7 @@ std::vector<ani_native_function> GetBindMethods()
             reinterpret_cast<void *>(GetFormIdsByFormLocation)},
         ani_native_function {
             "registerFormHostServiceInner",
-            "C{@ohos.app.form.formInfo.formInfo.FormHostServiceInfoInner}"
+            "C{@ohos.app.form.formInfo.formInfo.FormHostServiceInfo}"
             "C{@ohos.app.form.formHost.AsyncCallbackWrapper}:",
             reinterpret_cast<void *>(RegisterFormHostServiceInner)},
         ani_native_function {
