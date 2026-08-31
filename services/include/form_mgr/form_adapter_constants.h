@@ -44,6 +44,7 @@ namespace FormAdapterConstants {
     constexpr const char *FORM_CLICK_ROUTER = "router";
     constexpr const char *FORM_CLICK_MESSAGE = "message";
     constexpr const char *FORM_CLICK_CALL = "call";
+    constexpr const char *FORM_CLICK_INSIGHT_INTENT = "insightIntent";
 
     // Ecological rule manager
     constexpr const char *FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE =

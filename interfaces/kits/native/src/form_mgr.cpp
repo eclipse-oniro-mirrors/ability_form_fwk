@@ -619,6 +619,29 @@ int FormMgr::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObj
 }
 
 /**
+ * @brief Process js insight intent event, launch the target ability by insight intent.
+ * @param formId Indicates the unique id of form.
+ * @param want the want which carries the insight intent execute param.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgr::InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("errCode:%{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->InsightIntentEvent(formId, want, callerToken);
+}
+
+/**
  * @brief Process Background event.
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.

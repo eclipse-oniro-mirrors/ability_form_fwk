@@ -142,6 +142,18 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode StartAbilityByCallerToken(const Want &want, const sptr<IRemoteObject> &callerToken);
+    /**
+     * @brief ExecuteIntentWithSpecalTokenId, execute insight intent with ability manager service.
+     * @param key The key of the intent executing client, formId for the form scenario.
+     * @param insightIntentHostClient The host client carrying host context for the
+     *        execute-done callback.
+     * @param param The insight intent execute param.
+     * @param wantParams The want params carrying intentName and intentParams.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ExecuteIntentWithSpecalTokenId(uint64_t key,
+        const sptr<InsightIntentHostClient> &insightIntentHostClient,
+        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams);
 private:
     /**
      * @brief acquire a form ability manager, if it not existed,

@@ -20,7 +20,10 @@
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "hitrace_meter.h"
-#include "in_process_call_wrapper.h"
+#include "insight_intent/insight_intent_execute_param.h"
+// InsightIntentHostClient is being developed in the ability_runtime repo
+// (insight intent module); header path follows insight_intent_execute_param.h.
+#include "insight_intent/insight_intent_host_client.h"
 #include "running_form_info.h"
 #include "start_options.h"
 
@@ -32,7 +35,6 @@
 
 #include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
-#include "common/util/form_util.h"
 #include "data_center/form_data_mgr.h"
 #include "feature/route_proxy/form_router_proxy_mgr.h"
 #include "form_constants.h"
@@ -271,6 +273,71 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
         return result;
     }
     NotifyFormClickEvent(formId, FORM_CLICK_CALL, FormCommonAdapter::GetInstance().GetCallingUserId());
+    return ERR_OK;
+}
+
+int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    const int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormRecord record;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    // Parse the execute param from want (keys stuffed by ace_engine, see
+    // INSIGHT_INTENT_EXECUTE_PARAM_* in insight_intent_execute_param.h).
+    InsightIntentExecuteParam executeParam;
+    if (!InsightIntentExecuteParam::GenerateFromWant(want, executeParam)) {
+        HILOG_ERROR("GenerateFromWant failed, formId:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    // Host want carries no element; AMS CheckAndUpdateParam requires
+    // bundleName/moduleName/insightIntentName non-empty, fill provider info from form record.
+    executeParam.bundleName_ = record.bundleName;
+    executeParam.moduleName_ = record.moduleName;
+    if (executeParam.abilityName_.empty()) {
+        executeParam.abilityName_ = record.abilityName;
+    }
+
+    // specifyTokenId is no longer carried by the new AMS interface; AMS checks
+    // permissions internally, so the provider ApplicationInfo lookup is dropped.
+
+    // Host client carries the host context for the execute-done callback, the
+    // same way the router event connects AMS through the caller token. The
+    // class is under development in ability_runtime; align the construction
+    // once it lands.
+    sptr<InsightIntentHostClient> insightIntentHostClient = new (std::nothrow) InsightIntentHostClient();
+    if (insightIntentHostClient == nullptr) {
+        HILOG_ERROR("null insightIntentHostClient");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    // wantParams keeps the arkts-side structure: intentName + intentParams
+    // (appBundleName, entryKey, ...), exactly what ace_engine stuffed into want.
+    auto executeParams = want.GetParams();
+    if (executeParams == nullptr) {
+        HILOG_ERROR("want params is null, formId:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    // key = matchedFormId: intent executing client handle, same as native ExecuteIntent.
+    const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecalTokenId(
+        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, *executeParams);
+    if (result != ERR_OK) {
+        HILOG_ERROR("fail ExecuteIntentWithSpecalTokenId, result:%{public}d", result);
+        return result;
+    }
+
+    NotifyFormClickEvent(formId, FORM_CLICK_INSIGHT_INTENT, FormCommonAdapter::GetInstance().GetCallingUserId());
     return ERR_OK;
 }
 

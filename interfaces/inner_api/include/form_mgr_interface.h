@@ -279,6 +279,15 @@ public:
     virtual int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
+     * @brief Process js insight intent event, launch the target ability by insight intent.
+     * @param formId Indicates the unique id of form.
+     * @param want the want which carries the insight intent execute param.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    virtual int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.
@@ -1351,6 +1360,7 @@ public:
         FORM_MGR_UNREGISTER_FORM_HOST_SERVICE,
         FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES,
         FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE,
+        FORM_MGR_INSIGHT_INTENT_EVENT,
     };
 };
 }  // namespace AppExecFwk

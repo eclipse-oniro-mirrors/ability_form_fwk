@@ -21,6 +21,7 @@
 #include <iremote_proxy.h>
 
 #include "ability_manager_interface.h"
+#include "insight_intent/insight_intent_host_client.h"
 #include "mock_form_provider_client.h"
 #include "semaphore_ex.h"
 
@@ -319,6 +320,13 @@ public:
 
     int32_t ExecuteIntent(uint64_t key,  const sptr<IRemoteObject> &callerToken,
         const InsightIntentExecuteParam &param)
+    {
+        return 0;
+    }
+
+    int32_t ExecuteIntentWithSpecalTokenId(uint64_t key,
+        const sptr<InsightIntentHostClient> &insightIntentHostClient,
+        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
     {
         return 0;
     }
@@ -817,6 +825,13 @@ public:
 
     int32_t ExecuteIntent(uint64_t key,  const sptr<IRemoteObject> &callerToken,
         const InsightIntentExecuteParam &param)
+    {
+        return 0;
+    }
+
+    int32_t ExecuteIntentWithSpecalTokenId(uint64_t key,
+        const sptr<InsightIntentHostClient> &insightIntentHostClient,
+        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
     {
         return 0;
     }

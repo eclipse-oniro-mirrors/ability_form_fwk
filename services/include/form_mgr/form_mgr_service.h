@@ -282,6 +282,15 @@ public:
     int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
+     * @brief Process js insight intent event, launch the target ability by insight intent.
+     * @param formId Indicates the unique id of form.
+     * @param want the want which carries the insight intent execute param.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
+
+    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.

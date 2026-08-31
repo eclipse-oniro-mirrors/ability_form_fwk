@@ -959,6 +959,45 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want, const sptr<IRemo
     return result;
 }
 
+/**
+ * @brief Process js insight intent event, launch the target ability by insight intent.
+ * @param formId Indicates the unique id of form.
+ * @param want the want which carries the insight intent execute param.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgrProxy::InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interfaceToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_INSIGHT_INTENT_EVENT,
+        data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 template<typename T>
 int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
