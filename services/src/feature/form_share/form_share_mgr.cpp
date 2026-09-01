@@ -414,7 +414,9 @@ void FormShareMgr::HandleFreeInstallTimeout(int64_t eventId)
         std::unique_lock<std::shared_mutex> guard(freeInstallMapMutex_);
         auto it = freeInstallOperatorMap_.find(eventId);
         if (it != freeInstallOperatorMap_.end()) {
-            formShareInfoKey = it->second->GetFormShareInfoKey();
+            if (it->second) {
+                formShareInfoKey = it->second->GetFormShareInfoKey();
+            }
             freeInstallOperatorMap_.erase(eventId);
         }
         if (serialQueue_ != nullptr) {
