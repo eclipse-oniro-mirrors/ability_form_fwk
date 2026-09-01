@@ -21,8 +21,6 @@
 #include "bundle_mgr_interface.h"
 #include "hitrace_meter.h"
 #include "insight_intent/insight_intent_execute_param.h"
-// InsightIntentHostClient is being developed in the ability_runtime repo
-// (insight intent module); header path follows insight_intent_execute_param.h.
 #include "insight_intent/insight_intent_host_client.h"
 #include "running_form_info.h"
 #include "start_options.h"
@@ -292,8 +290,6 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    // Parse the execute param from want (keys stuffed by ace_engine, see
-    // INSIGHT_INTENT_EXECUTE_PARAM_* in insight_intent_execute_param.h).
     InsightIntentExecuteParam executeParam;
     if (!InsightIntentExecuteParam::GenerateFromWant(want, executeParam)) {
         HILOG_ERROR("GenerateFromWant failed, formId:%{public}" PRId64 "", formId);
@@ -308,21 +304,12 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         executeParam.abilityName_ = record.abilityName;
     }
 
-    // specifyTokenId is no longer carried by the new AMS interface; AMS checks
-    // permissions internally, so the provider ApplicationInfo lookup is dropped.
-
-    // Host client carries the host context for the execute-done callback, the
-    // same way the router event connects AMS through the caller token. The
-    // class is under development in ability_runtime; align the construction
-    // once it lands.
     sptr<InsightIntentHostClient> insightIntentHostClient = new (std::nothrow) InsightIntentHostClient();
     if (insightIntentHostClient == nullptr) {
         HILOG_ERROR("null insightIntentHostClient");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    // wantParams keeps the arkts-side structure: intentName + intentParams
-    // (appBundleName, entryKey, ...), exactly what ace_engine stuffed into want.
     auto executeParams = want.GetParams();
     if (executeParams == nullptr) {
         HILOG_ERROR("want params is null, formId:%{public}" PRId64 "", formId);
