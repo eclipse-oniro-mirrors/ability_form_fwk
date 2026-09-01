@@ -4549,3 +4549,84 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateFormSizeOfGroups_005, 
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateFormSizeOfGroups_005 end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_HandleOnUnlock_001
+ * @tc.desc: Verify HandleOnUnlock re-notifies recorded visible state after unlock.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleOnUnlock_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_001 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 101;
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->RecordFormVisibility(formId, true);
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
+
+    EXPECT_EQ(ERR_OK, formRenderRecordPtr_->HandleOnUnlock());
+    // Recorded visibility should not be changed by re-notify.
+    EXPECT_TRUE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->RecordFormVisibility(formId, false);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_001 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_HandleOnUnlock_002
+ * @tc.desc: Verify HandleOnUnlock re-notifies recorded invisible state after unlock.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleOnUnlock_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_002 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 102;
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->RecordFormVisibility(formId, false);
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
+
+    EXPECT_EQ(ERR_OK, formRenderRecordPtr_->HandleOnUnlock());
+    EXPECT_FALSE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_002 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_HandleOnUnlock_003
+ * @tc.desc: Verify HandleOnUnlock with no recorded visibility, defaults to invisible.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleOnUnlock_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_003 start";
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+
+    int64_t formId = 103;
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->RecordFormVisibility(formId, false);
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
+
+    // No visibility recorded before unlock, IsFormVisible returns false by default.
+    EXPECT_EQ(ERR_OK, formRenderRecordPtr_->HandleOnUnlock());
+    EXPECT_FALSE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_003 end";
+}
