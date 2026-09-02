@@ -21,12 +21,37 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include <thread>
 
+#include "rdb_helper.h"
+
 #define private public
 #define protected public
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 #include "form_refresh/strategy/refresh_config.h"
 #undef private
 #undef protected
+
+// Interpose RdbHelper::GetRdbStore so no real rdb store is opened. Opening the
+// store spawns an async backup thread that outlives the fuzz process and races
+// with rdb's static SqlLog teardown at exit (heap-use-after-free).
+namespace OHOS {
+namespace NativeRdb {
+std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
+    const RdbStoreConfig &config, int version, RdbOpenCallback &openCallback, int &errCode)
+{
+    errCode = E_ERROR;
+    return nullptr;
+}
+} // namespace NativeRdb
+} // namespace OHOS
+
+// The fuzz target links the real form service stack, whose FormDataMgr registers a
+// memory-watermark parameter watcher. Its IPC-thread callback can submit ffrt tasks
+// after the global scheduler is torn down at process exit (heap-use-after-free). The
+// watcher path is not reachable from fuzz input, so stub the registration as no-op.
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 

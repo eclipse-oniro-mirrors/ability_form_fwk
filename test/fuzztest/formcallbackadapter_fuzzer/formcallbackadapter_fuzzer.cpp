@@ -36,6 +36,15 @@
 #include "template_form_detail_info.h"
 #include "want.h"
 
+// The fuzz target links the real form service stack, whose FormDataMgr registers a
+// memory-watermark parameter watcher. Its IPC-thread callback can submit ffrt tasks
+// after the global scheduler is torn down at process exit (heap-use-after-free). The
+// watcher path is not reachable from fuzz input, so stub the registration as no-op.
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
+
 using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
 

@@ -43,6 +43,13 @@ ohos_fuzztest("formrefreshFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
+  # Keep RefreshControlMgr layout in sync with libfms_internal_static (built
+  # with RES_SCHEDULE_ENABLE), otherwise the atomic<bool> member at offset 8
+  # overflows the smaller allocation made by this TU's GetInstance.
+  defines = [
+    "RES_SCHEDULE_ENABLE",
+  ]
+
   sources = [
     "${form_fwk_path}/services/common/src/util/form_status_print.cpp",
     "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",

@@ -31,6 +31,15 @@
 #undef protected
 #include "securec.h"
 
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose dispatch hits pure-virtual stubs while
+// ffrt's static CPUWorkerGroup is torn down at exit (__cxa_pure_virtual abort).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
