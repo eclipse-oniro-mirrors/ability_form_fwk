@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,30 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "rdb_helper.h"
+
+// Interpose RdbHelper::GetRdbStore so no real rdb store is opened. Opening the
+// store spawns async rdb threads that outlive the fuzz process and race with
+// rdb's static SqlLog teardown at exit (heap-use-after-free).
+namespace OHOS {
+namespace NativeRdb {
+std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
+    const RdbStoreConfig &config, int version, RdbOpenCallback &openCallback, int &errCode)
+{
+    errCode = E_ERROR;
+    return nullptr;
+}
+} // namespace NativeRdb
+} // namespace OHOS
+
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
 
 using namespace OHOS::AppExecFwk;
 

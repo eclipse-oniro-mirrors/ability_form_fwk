@@ -61,6 +61,9 @@ ohos_fuzztest("FormDistributedMgrFuzzTest") {
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",
+    # Keep rdb headers available for the RdbHelper::GetRdbStore interposition in
+    # the fuzzer source (see formdistributedmgr_fuzzer.cpp).
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -69,6 +69,9 @@ ohos_fuzztest("FormCommonAdapterFuzzTest") {
     "hicollie:libhicollie",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    # Keep rdb headers available for the RdbHelper::GetRdbStore interposition in
+    # the fuzzer source (see formcommonadapter_fuzzer.cpp).
+    "relational_store:native_rdb",
     "libxml2:libxml2",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

@@ -20,12 +20,28 @@
 #include <chrono>
 #include <thread>
 
+#include "rdb_helper.h"
+
 #define private public
 #define protected public
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #undef private
 #undef protected
 #include "securec.h"
+
+// Interpose RdbHelper::GetRdbStore so no real rdb store is opened. Opening the
+// store spawns async rdb threads that outlive the fuzz process and race with
+// rdb's static SqlLog teardown at exit (heap-use-after-free).
+namespace OHOS {
+namespace NativeRdb {
+std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
+    const RdbStoreConfig &config, int version, RdbOpenCallback &openCallback, int &errCode)
+{
+    errCode = E_ERROR;
+    return nullptr;
+}
+} // namespace NativeRdb
+} // namespace OHOS
 
 using namespace OHOS::AppExecFwk;
 

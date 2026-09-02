@@ -28,6 +28,14 @@
 #undef private
 #undef protected
 
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(...)
+{
+    return 0;
+}
+
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
