@@ -151,10 +151,9 @@ FormRenderRecord::FormRenderRecord(
 FormRenderRecord::~FormRenderRecord()
 {
     RemoveWatchDogThreadMonitor();
-    Release();
     /*
-    The destructor here needs to clean up `formRequests_`, but this should not be performed within
-    `HandleDestroyInJsThread` to avoid a scenario where `formRequests_` cannot be found in `ReAddIfHapPathChanged`
+    `weak_from_this` cannot be used within the destructor; `Release()` must be called explicitly beforehand to
+    ensure `formRendererGroupMap_` is cleaned up on the UI thread, leaving only the cleanup of `formRequests_` here
     */
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     formRequests_.clear();
