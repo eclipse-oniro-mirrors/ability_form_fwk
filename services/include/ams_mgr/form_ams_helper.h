@@ -23,6 +23,8 @@
 #include "common/event/form_event_handler.h"
 #include "common/util/form_serial_queue.h"
 #include "iconfiguration_observer.h"
+#include "insight_intent/insight_intent_execute_param.h"
+#include "insight_intent/insight_intent_host_client.h"
 #include "start_options.h"
 #include "uri.h"
 
@@ -152,7 +154,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ExecuteIntentWithSpecalTokenId(uint64_t key,
-        const sptr<InsightIntentHostClient> &insightIntentHostClient,
+        const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
         const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams);
 private:
     /**

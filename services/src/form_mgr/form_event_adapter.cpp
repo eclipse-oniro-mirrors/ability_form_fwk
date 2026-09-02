@@ -304,21 +304,16 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         executeParam.abilityName_ = record.abilityName;
     }
 
-    sptr<InsightIntentHostClient> insightIntentHostClient = new (std::nothrow) InsightIntentHostClient();
+    sptr<AbilityRuntime::InsightIntentHostClient> insightIntentHostClient =
+        new (std::nothrow) AbilityRuntime::InsightIntentHostClient();
     if (insightIntentHostClient == nullptr) {
         HILOG_ERROR("null insightIntentHostClient");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    auto executeParams = want.GetParams();
-    if (executeParams == nullptr) {
-        HILOG_ERROR("want params is null, formId:%{public}" PRId64 "", formId);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
     // key = matchedFormId: intent executing client handle, same as native ExecuteIntent.
     const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecalTokenId(
-        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, *executeParams);
+        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams());
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecalTokenId, result:%{public}d", result);
         return result;

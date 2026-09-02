@@ -325,7 +325,7 @@ public:
     }
 
     int32_t ExecuteIntentWithSpecalTokenId(uint64_t key,
-        const sptr<InsightIntentHostClient> &insightIntentHostClient,
+        const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
         const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
     {
         return 0;
@@ -830,7 +830,7 @@ public:
     }
 
     int32_t ExecuteIntentWithSpecalTokenId(uint64_t key,
-        const sptr<InsightIntentHostClient> &insightIntentHostClient,
+        const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
         const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
     {
         return 0;

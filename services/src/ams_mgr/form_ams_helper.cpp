@@ -343,7 +343,7 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::ExecuteIntentWithSpecalTokenId(uint64_t key,
-    const sptr<InsightIntentHostClient> &insightIntentHostClient,
+    const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
     const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
 {
     HILOG_DEBUG("call");
