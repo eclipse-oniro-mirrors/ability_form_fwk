@@ -46,9 +46,12 @@ public:
  */
 HWTEST_F(FormPublishInterceptorProxyTest, FormPublishInterceptorProxyTest_0001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormPublishInterceptorProxyTest_0001 starts";
-    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
-        .WillOnce(Return(ERR_OK));
     Want want = {};
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(DoAll(Invoke([](uint32_t, MessageParcel &, MessageParcel &reply, MessageOption &) {
+            reply.WriteInt32(ERR_OK);
+            return ERR_OK;
+        })));
     int result = formRenderProxy_->ProcessPublishForm(want);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormPublishInterceptorProxyTest_0001 test ends";

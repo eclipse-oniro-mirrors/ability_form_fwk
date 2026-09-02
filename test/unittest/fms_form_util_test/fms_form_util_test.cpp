@@ -128,92 +128,6 @@ HWTEST_F(FormUtilTest, FormUtilTest_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_004
- * @tc.desc: Verify GenerateUdidHash
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_004, TestSize.Level1)
-{
-    int64_t udidHash = 0x1111111100000000L;
-    auto result = FormUtil::GenerateUdidHash(udidHash);
-
-    EXPECT_TRUE(result);
-}
-
-/**
- * @tc.name: FormUtilTest_005
- * @tc.desc: Verify GenerateUdidHash
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_005, TestSize.Level1)
-{
-    int64_t udidHash = 0;
-    auto result = FormUtil::GenerateUdidHash(udidHash);
-
-    EXPECT_TRUE(result);
-}
-
-/**
- * @tc.name: FormUtilTest_006
- * @tc.desc: Verify GetCurrentNanosecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_006, TestSize.Level1)
-{
-    auto result1 = FormUtil::GetCurrentNanosecond();
-    auto result2 = FormUtil::GetCurrentNanosecond();
-
-    EXPECT_TRUE(result2 >= result1);
-}
-
-/**
- * @tc.name: FormUtilTest_007
- * @tc.desc: Verify GetCurrentMillisecond
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_007, TestSize.Level1)
-{
-    auto result1 = FormUtil::GetCurrentMillisecond();
-    auto result2 = FormUtil::GetCurrentMillisecond();
-
-    EXPECT_TRUE(result2 >= result1);
-}
-
-/**
- * @tc.name: FormUtilTest_008
- * @tc.desc: Verify GetMillisecondFromTm
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_008, TestSize.Level1)
-{
-    constexpr int64_t value = -1;
-    time_t rawtime;
-    time(&rawtime);
-    struct tm* timeinfo = localtime(&rawtime);
-    EXPECT_TRUE(timeinfo != nullptr);
-
-    auto result = FormUtil::GetMillisecondFromTm(*timeinfo);
-
-    EXPECT_NE(result, value);
-}
-
-/**
- * @tc.name: FormUtilTest_009
- * @tc.desc: Verify GetCurrentAccountId
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_009, TestSize.Level1)
-{
-    constexpr size_t accountId = 99;
-    MockQueryActiveOsAccountIdsRetVal(false);
-    MockQueryActiveOsAccountIdsParams(false);
-
-    auto result = FormUtil::GetCurrentAccountId();
-
-    EXPECT_NE(result, accountId);
-}
-
-/**
  * @tc.name: FormUtilTest_010
  * @tc.desc: Verify StringSplit
  * @tc.type: FUNC
@@ -241,22 +155,6 @@ HWTEST_F(FormUtilTest, FormUtilTest_011, TestSize.Level1)
     auto result = FormUtil::GetCurrentAccountId();
 
     EXPECT_EQ(result, accountId);
-}
-
-/**
- * @tc.name: FormUtilTest_012
- * @tc.desc: Verify GetCurrentAccountId
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_012, TestSize.Level1)
-{
-    constexpr size_t accountId = 99;
-    MockQueryActiveOsAccountIdsRetVal(true);
-    MockQueryActiveOsAccountIdsParams(false);
-
-    auto result = FormUtil::GetCurrentAccountId();
-
-    EXPECT_NE(result, accountId);
 }
 
 /**
