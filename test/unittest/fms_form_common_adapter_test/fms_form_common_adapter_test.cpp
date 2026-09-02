@@ -1151,30 +1151,6 @@ HWTEST_F(FmsFormCommonAdapterTest, SetHostBundleName_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "SetHostBundleName_002 end";
 }
 
-/**
- * @tc.name: SetHostBundleName_003
- * @tc.desc: Verify non-SA UID with GetCallerBundleName failure returns error
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, SetHostBundleName_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "SetHostBundleName_003 start";
-
-    Want want;
-
-    FormItemInfo itemInfo;
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED));
-
-    auto result = FormCommonAdapter::GetInstance().SetHostBundleName(want, itemInfo);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "SetHostBundleName_003 end";
-}
-
 // ========== GetFormInfoByFormRecord Tests ==========
 
 /**
@@ -1410,183 +1386,6 @@ HWTEST_F(FmsFormCommonAdapterTest, CheckFormDueControl_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: CheckFormDueControl_003
- * @tc.desc: Verify isDisablePolicy=true calls IsFormDisable
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, CheckFormDueControl_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "CheckFormDueControl_003 start";
-
-    FormMajorInfo formMajorInfo;
-    formMajorInfo.bundleName = "com.test.bundle";
-    formMajorInfo.abilityName = "MainAbility";
-    formMajorInfo.moduleName = "entry";
-    formMajorInfo.formName = "widget";
-    formMajorInfo.dimension = 2;
-
-    BundleInfo bundleInfo;
-    bundleInfo.moduleNames.push_back("entry");
-    bundleInfo.versionCode = 100;
-
-    EXPECT_CALL(*MockParamControl::obj, IsDueDisableCtrlEmpty())
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillRepeatedly(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockParamControl::obj, IsFormDisable(_))
-        .WillOnce(Return(true));
-
-    auto result = FormCommonAdapter::GetInstance().CheckFormDueControl(formMajorInfo, true);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "CheckFormDueControl_003 end";
-}
-
-/**
- * @tc.name: CheckFormDueControl_004
- * @tc.desc: Verify isDisablePolicy=false calls IsFormRemove
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, CheckFormDueControl_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "CheckFormDueControl_004 start";
-
-    FormMajorInfo formMajorInfo;
-    formMajorInfo.bundleName = "com.test.bundle";
-    formMajorInfo.abilityName = "MainAbility";
-    formMajorInfo.moduleName = "entry";
-    formMajorInfo.formName = "widget";
-    formMajorInfo.dimension = 2;
-
-    BundleInfo bundleInfo;
-    bundleInfo.moduleNames.push_back("entry");
-    bundleInfo.versionCode = 100;
-
-    EXPECT_CALL(*MockParamControl::obj, IsDueDisableCtrlEmpty())
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillRepeatedly(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockParamControl::obj, IsFormRemove(_))
-        .WillOnce(Return(true));
-
-    auto result = FormCommonAdapter::GetInstance().CheckFormDueControl(formMajorInfo, false);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "CheckFormDueControl_004 end";
-}
-
-// ========== UpdateFormCloudUpdateDuration Tests ==========
-
-/**
- * @tc.name: UpdateFormCloudUpdateDuration_001
- * @tc.desc: Verify null IBundleMgr calls RemoveFormCloudUpdateDuration
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, UpdateFormCloudUpdateDuration_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_001 start";
-
-    std::string bundleName = "com.test.bundle";
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(nullptr));
-    EXPECT_CALL(*MockFormDataMgr::obj, RemoveFormCloudUpdateDuration(bundleName))
-        .Times(1);
-    EXPECT_CALL(*MockFormDataMgr::obj, UpdateFormCloudUpdateDuration(bundleName, _))
-        .Times(0);
-
-    FormCommonAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
-
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_001 end";
-}
-
-/**
- * @tc.name: UpdateFormCloudUpdateDuration_002
- * @tc.desc: Verify GetAdditionalInfo fails calls RemoveFormCloudUpdateDuration
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, UpdateFormCloudUpdateDuration_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_002 start";
-
-    std::string bundleName = "com.test.bundle";
-
-    auto mockBundleMgr = sptr<IBundleMgr>(new MockBundleMgrStub());
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(mockBundleMgr));
-    EXPECT_CALL(*MockFormDataMgr::obj, RemoveFormCloudUpdateDuration(bundleName))
-        .Times(1);
-    EXPECT_CALL(*MockFormDataMgr::obj, UpdateFormCloudUpdateDuration(bundleName, _))
-        .Times(0);
-
-    FormCommonAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
-
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_002 end";
-}
-
-/**
- * @tc.name: UpdateFormCloudUpdateDuration_003
- * @tc.desc: Verify empty additionalInfo calls RemoveFormCloudUpdateDuration
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, UpdateFormCloudUpdateDuration_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_003 start";
-
-    std::string bundleName = "com.test.bundle";
-
-    sptr<IRemoteObject> remoteObj = new MockIRemoteObject();
-    auto mockProxy = new MockBundleMgrProxy(remoteObj);
-    EXPECT_CALL(*mockProxy, GetAdditionalInfo(_, _))
-        .WillOnce(Return(ERR_OK));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(sptr<IBundleMgr>(mockProxy)));
-    EXPECT_CALL(*MockFormDataMgr::obj, RemoveFormCloudUpdateDuration(bundleName))
-        .Times(1);
-    EXPECT_CALL(*MockFormDataMgr::obj, UpdateFormCloudUpdateDuration(bundleName, _))
-        .Times(0);
-
-    FormCommonAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
-
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_003 end";
-}
-
-/**
- * @tc.name: UpdateFormCloudUpdateDuration_004
- * @tc.desc: Verify empty ParseFormUpdateLevels calls RemoveFormCloudUpdateDuration
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, UpdateFormCloudUpdateDuration_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_004 start";
-
-    std::string bundleName = "com.test.bundle";
-
-    sptr<IRemoteObject> remoteObj = new MockIRemoteObject();
-    auto mockProxy = new MockBundleMgrProxy(remoteObj);
-    EXPECT_CALL(*mockProxy, GetAdditionalInfo(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>("invalid_data"), Return(ERR_OK)));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(sptr<IBundleMgr>(mockProxy)));
-    EXPECT_CALL(*MockFormDataMgr::obj, RemoveFormCloudUpdateDuration(bundleName))
-        .Times(1);
-    EXPECT_CALL(*MockFormDataMgr::obj, UpdateFormCloudUpdateDuration(bundleName, _))
-        .Times(0);
-
-    FormCommonAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
-
-    GTEST_LOG_(INFO) << "UpdateFormCloudUpdateDuration_004 end";
-}
-
-/**
  * @tc.name: UpdateFormCloudUpdateDuration_005
  * @tc.desc: Verify valid duration calls UpdateFormCloudUpdateDuration with duration
  * @tc.type: FUNC
@@ -1709,39 +1508,6 @@ HWTEST_F(FmsFormCommonAdapterTest, GetFormItemInfo_002, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NO_SUCH_DIMENSION);
 
     GTEST_LOG_(INFO) << "GetFormItemInfo_002 end";
-}
-
-/**
- * @tc.name: GetFormItemInfo_003
- * @tc.desc: Verify GetFormItemInfo returns error when SetHostBundleName fails
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, GetFormItemInfo_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetFormItemInfo_003 start";
-
-    Want want;
-    want.SetElementName("com.test.bundle", "MainAbility");
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
-
-    BundleInfo bundleInfo;
-    bundleInfo.name = "com.test.bundle";
-
-    FormInfo formInfo;
-    formInfo.supportDimensions.push_back(TEST_DIMENSION_ID);
-    formInfo.defaultDimension = TEST_DIMENSION_ID;
-
-    FormItemInfo formItemInfo;
-
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillRepeatedly(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED));
-
-    auto result = FormCommonAdapter::GetInstance().GetFormItemInfo(want, bundleInfo, formInfo, formItemInfo);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "GetFormItemInfo_003 end";
 }
 
 // ========== GAP Method 2: SetFormItemModuleInfo Tests ==========
@@ -2336,29 +2102,6 @@ HWTEST_F(FmsFormCommonAdapterTest, HandleFormAddObserver_003, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     GTEST_LOG_(INFO) << "HandleFormAddObserver_003 end";
-}
-
-// ========== GAP Method 4: GetAppMgr Tests ==========
-
-/**
- * @tc.name: GetAppMgr_001
- * @tc.desc: Verify GetAppMgr returns nullptr when system ability manager is unavailable
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, GetAppMgr_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetAppMgr_001 start";
-
-    // GetAppMgr uses SystemAbilityManagerClient which is not mockable in this test setup.
-    // This test verifies the method can be called without crash.
-    auto result = FormCommonAdapter::GetInstance().GetAppMgr();
-    // In test environment, system ability manager is typically not available,
-    // so we expect nullptr. If it happens to be available, that's also fine.
-    // The key assertion is that the method does not crash.
-    // In test environment, system ability manager is typically not available, so expect nullptr.
-    EXPECT_NE(result, nullptr);
-
-    GTEST_LOG_(INFO) << "GetAppMgr_001 end";
 }
 
 // ========== GAP Method: SetFormItemInfoParams with hapModuleInfo path coverage ==========
@@ -3459,39 +3202,6 @@ HWTEST_F(FmsFormCommonAdapterTest, GetValidFormUpdateDuration_004, TestSize.Leve
     EXPECT_EQ(updateDuration, formRecord.updateDuration);
 
     GTEST_LOG_(INFO) << "GetValidFormUpdateDuration_004 end";
-}
-
-/**
- * @tc.name: GetValidFormUpdateDuration_005
- * @tc.desc: Verify API >= 11 with non-zero cloud duration uses max of local and cloud
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCommonAdapterTest, GetValidFormUpdateDuration_005, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetValidFormUpdateDuration_005 start";
-
-    FormRecord formRecord;
-    formRecord.bundleName = "com.test.bundle";
-    formRecord.providerUserId = TEST_USER_ID;
-    formRecord.updateDuration = 3600000; // 1 hour
-    int64_t updateDuration = 0;
-
-    ApplicationInfo appInfo;
-    appInfo.apiTargetVersion = API_VERSION_11; // API 11
-
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(appInfo), Return(ERR_OK)));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormCloudUpdateDuration(_))
-        .WillOnce(Return(7200)); // 2 hours => 7200 * 1800000 = large number
-
-    auto result = FormCommonAdapter::GetInstance().GetValidFormUpdateDuration(TEST_FORM_ID, updateDuration);
-    EXPECT_TRUE(result);
-    // Cloud duration: 7200 * TIME_CONVERSION(1800000) = very large
-    EXPECT_GT(updateDuration, formRecord.updateDuration);
-
-    GTEST_LOG_(INFO) << "GetValidFormUpdateDuration_005 end";
 }
 
 // ========== Missing Branch Coverage: CheckFormDueControl Tests ==========

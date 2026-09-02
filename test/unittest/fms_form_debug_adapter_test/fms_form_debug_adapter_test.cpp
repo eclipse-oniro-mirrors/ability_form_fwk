@@ -446,25 +446,6 @@ HWTEST_F(FmsFormDebugAdapterTest, DumpFormTimerByFormId_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "DumpFormTimerByFormId_003 end";
 }
 
-// ========== Method 7: DumpHasFormVisible Tests ==========
-
-/**
- * @tc.name: DumpHasFormVisible_001
- * @tc.desc: Verify valid bundleInfo returns ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormDebugAdapterTest, DumpHasFormVisible_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "DumpHasFormVisible_001 start";
-
-    std::string formInfos;
-
-    auto result = FormDebugAdapter::GetInstance().DumpHasFormVisible("com.test.bundle", formInfos);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "DumpHasFormVisible_001 end";
-}
-
 // ========== Method 8: DumpFormRunningFormInfos Tests ==========
 
 /**

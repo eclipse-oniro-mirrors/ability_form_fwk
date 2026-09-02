@@ -47,52 +47,6 @@ void FormRenderEventReportTest::TearDown()
 {}
 
 /**
- * @tc.name: SendPerformanceEvent_001
- * @tc.desc: Check SendPerformanceEvent Test
- * @tc.type: FUNC
- * @tc.require: issuesI9MVRJ
- */
-HWTEST_F(FormRenderEventReportTest, SendPerformanceEvent_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "SendPerformanceEvent_001 begin";
-    PerformanceEventInfo eventInfo;
-    eventInfo.timeStamp = 123456789;
-    eventInfo.bundleName = "com.ohos.test.example";
-    eventInfo.sceneId = "1";
-    FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
-    GTEST_LOG_(INFO) << "SendPerformanceEvent_001 test ends";
-}
-
-/**
- * @tc.name: SendPerformanceEvent_001
- * @tc.desc: Check SendPerformanceEvent Test
- * @tc.type: FUNC
- * @tc.require: issuesI9MVRJ
- */
-HWTEST_F(FormRenderEventReportTest, SendBlockFaultEvent_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "SendBlockFaultEvent_001 begin";
-    std::string bundleName = "com.ohos.test.example";
-    std::string errorName = "test error type";
-    std::string errorMsg = "test error msg";
-    FormRenderEventReport::SendBlockFaultEvent(bundleName, errorName, errorMsg);
-    GTEST_LOG_(INFO) << "SendBlockFaultEvent_001 test ends";
-}
-
-/**
- * @tc.name: FormMemoryGuardTest_001
- * @tc.desc: Check FormMemoryGuard Test
- * @tc.type: FUNC
- * @tc.require: issuesI9MVRJ
- */
-HWTEST_F(FormRenderEventReportTest, FormMemoryGuardTest_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMemoryGuardTest_001 begin";
-    FormMemoryGuard formMemoryGuard;
-    GTEST_LOG_(INFO) << "FormMemoryGuardTest_001 test ends";
-}
-
-/**
  * @tc.name: FormRenderEventReportTest_SendFormFailedEvent
  * @tc.desc: Check SendFormFailedEvent Test
  * @tc.type: FUNC

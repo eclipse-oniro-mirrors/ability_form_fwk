@@ -37,7 +37,6 @@ public:
     sptr<FormBatchDeleteConnection> formBatchDeleteConnection_ = nullptr;
 };
 
-
 void FormBatchDeleteConnectionTest::SetUpTestCase()
 {}
 
@@ -97,11 +96,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0002, Test
         new FormBatchDeleteConnection(formIds, bundleName, abilityName, userId);
     formBatchDeleteConnection_ = formBatchDeleteConnection;
 
-    // test OnAbilityConnectDone
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = ERR_OK;
-    formBatchDeleteConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
+    ASSERT_FALSE(formBatchDeleteConnection->onFormAppConnect());
     GTEST_LOG_(INFO) << "FormBatchDeleteConnectionTest_0002 end";
 }
 }

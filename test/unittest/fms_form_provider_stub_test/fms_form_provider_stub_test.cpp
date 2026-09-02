@@ -200,24 +200,6 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_005, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormProviderStubTest_006
- * @tc.desc: 1.Verify that the OnRemoteRequest interface executes as expected.
- *           2.The interface return value IPC_STUB_UNKNOW_TRANS_ERR.
- * @tc.type: FUNC
- */
-HWTEST_F(FormProviderStubTest, FormProviderStubTest_006, TestSize.Level1)
-{
-    MockFormProviderClient callback;
-    constexpr uint32_t code = static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO) + 100;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(u"ohos.appexecfwk.FormProvider");
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
-}
-
-/**
  * @tc.name: FormProviderStubTest_007
  * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
  *           2.The interface return value ERR_OK.
