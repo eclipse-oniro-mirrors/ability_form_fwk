@@ -1464,6 +1464,8 @@ int32_t FormRenderRecord::HandleOnUnlock()
     for (const auto& iter : formRendererGroupMap_) {
         if (iter.second) {
             iter.second->OnUnlock();
+            // Re-notify recorded visibility: preload-stage visibility was not applied (page not loaded).
+            iter.second->SetVisibleChange(IsFormVisible(iter.first));
         }
     }
     return ERR_OK;
