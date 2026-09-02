@@ -64,6 +64,14 @@ public:
     int32_t GetFormCountsByHostBundleName(const std::string &hostBundleName);
 
     /**
+     * @brief Get form counts from DbCache by calling user id.
+     * @param currentAccountId current account ID.
+     * @param callingUid calling user ID.
+     * @return Returns form counts.
+     */
+    int GetFormCountsByCallingUid(const int32_t currentAccountId, const int callingUid);
+
+    /**
      * @brief Get all form data in DbCache and DB by bundleName.
      * @param bundleName BundleName.
      * @param userId user ID.

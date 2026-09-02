@@ -556,9 +556,8 @@ int FormDataMgr::CheckEnoughFormForUser(const int32_t currentUserId, const bool 
     HILOG_DEBUG("current user:%{public}d has form count:%{public}d", currentUserId, formCountsCurUser);
 
     if (!isCastTempForm && formCountsCurUser >= maxRecordPerUser) {
-        HILOG_WARN("exceeds max form number %{public}d per user %{public}d", maxRecordPerUser, currentUserId);
+        HILOG_ERROR("The maximum number of form in per user is %{public}d", maxRecordPerUser);
         PrintFormsExceedsInfo();
-        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_USER;
     }
 
     return ERR_OK;
@@ -596,12 +595,28 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     int32_t formCountsCurHost = FormDbCache::GetInstance().GetFormCountsByHostBundleName(hostBundleName);
     HILOG_DEBUG("already use %{public}d forms by host:%{public}s", formCountsCurHost, hostBundleName.c_str());
     if (formCountsCurHost >= maxRecordPerHost) {
-        HILOG_WARN("exceeds max form number %{public}d per app %{public}s", maxRecordPerHost, hostBundleName.c_str());
+        HILOG_ERROR("The maximum number of form in per host is %{public}d", maxRecordPerHost);
         PrintFormsExceedsInfo();
+    }
+
+    CheckEnoughFormForUser(currentUserId, isCastTempForm);
+
+    int32_t maxRecordPerApp = Constants::MAX_RECORD_PER_APP;
+    GetConfigParamFormMap(Constants::HOST_MAX_FORM_SIZE, maxRecordPerApp);
+    maxRecordPerApp = ((maxRecordPerApp > Constants::MAX_RECORD_PER_APP) || (maxRecordPerApp < 0)) ?
+        Constants::MAX_RECORD_PER_APP : maxRecordPerApp;
+    HILOG_DEBUG("maxRecordPerApp:%{public}d", maxRecordPerApp);
+    if (maxRecordPerApp == 0) {
+        HILOG_ERROR("The maximum number of normal cards in pre host is 0");
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
+    }
+    int callingUidFormCounts = FormDbCache::GetInstance().GetFormCountsByCallingUid(currentUserId, callingUid);
+    if (callingUidFormCounts >= maxRecordPerApp) {
+        HILOG_WARN("already use %{public}d forms by userId==currentAccountId", maxRecordPerApp);
         return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
-    return CheckEnoughFormForUser(currentUserId, isCastTempForm);
+    return ERR_OK;
 }
 
 /**
