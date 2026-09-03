@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -435,22 +435,22 @@ static void AcquireFormStateExecuteWork(napi_env env, void *data)
     InnerAcquireFormState(env, callbackInfo);
 }
 
-static void InvokeAcquireFormStateFailureCallback(napi_env env, napi_ref callback)
+static void InvokeAcquireFormStateFailureCallback(napi_env env, napi_ref callback, int32_t result)
 {
     if (callback == nullptr) {
         return;
     }
-    napi_value jsResult = nullptr;
-    napi_create_int32(env, static_cast<int32_t>(FormState::UNKNOWN), &jsResult);
     napi_value callbackFunc = nullptr;
     napi_get_reference_value(env, callback, &callbackFunc);
     if (callbackFunc == nullptr) {
         return;
     }
+    napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
+    InnerCreateCallbackRetMsg(env, result, callbackValues);
     napi_value undefined = nullptr;
     napi_get_undefined(env, &undefined);
     napi_value callbackResult = nullptr;
-    napi_call_function(env, undefined, callbackFunc, 1, &jsResult, &callbackResult);
+    napi_call_function(env, undefined, callbackFunc, ARGS_SIZE_TWO, callbackValues, &callbackResult);
 }
 
 static void AcquireFormStateCallbackComplete(napi_env env, napi_status status, void *data)
@@ -464,7 +464,7 @@ static void AcquireFormStateCallbackComplete(napi_env env, napi_status status, v
     napi_ref callback = callbackInfo->callback;
     if (callbackInfo->result != ERR_OK) {
         FormHostClient::GetInstance()->RemoveFormState(callbackInfo->want);
-        InvokeAcquireFormStateFailureCallback(env, callback);
+        InvokeAcquireFormStateFailureCallback(env, callback, callbackInfo->result);
         if (callback != nullptr) {
             napi_status refStatus = napi_delete_reference(env, callback);
             if (refStatus != napi_ok) {
