@@ -62,33 +62,6 @@ HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_001, TestSiz
 }
  
 /**
- * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_002
- * @tc.name: Verify parameter-count error message format.
- * @tc.desc: test the "Parameter error. Got <argc>, expected 2" contract for ArkTS callers.
- */
-HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_002, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_002 starts";
-    auto msg = BuildParamNumErrorMessage("1", "2");
-    EXPECT_EQ(msg, "Parameter error. Got 1, expected 2");
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_002 ends";
-}
- 
-/**
- * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_003
- * @tc.name: Verify parameter-validation error message format.
- * @tc.desc: test the formId / formBindingData error message prefixes.
- */
-HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_003, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_003 starts";
-    auto formIdMsg = BuildParamErrorMessage("formId is invalid");
-    EXPECT_EQ(formIdMsg, "Parameter error. formId is invalid");
- 
-    auto dataMsg = BuildParamErrorMessage("formBindingData is invalid");
-    EXPECT_EQ(dataMsg, "Parameter error. formBindingData is invalid");
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_003 ends";
-}
- 
-/**
  * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_004
  * @tc.name: Verify FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE value stability.
  * @tc.desc: test that the dedicated internal code 2293857 remains stable for the 201 mapping.

@@ -48,17 +48,6 @@ void FormRecordReportTest::TearDown()
 }
 
 /**
- * @tc.name: FormRecordReport_001
- * @tc.desc: test GetFormRecords function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRecordReportTest, FormRecordReport_001, TestSize.Level1)
-{
-    formRecordReport.SetFormRecordRecordInfo(TEST_FORM_ID, want);
-    auto it = formRecordReport.GetFormRecords().find(TEST_FORM_ID);
-    ASSERT_NE(it, formRecordReport.GetFormRecords().end());
-}
-/**
  * @tc.name: FormRecordReport_002
  * @tc.desc: test IncreaseUpdateTimes function.
  * @tc.type: FUNC

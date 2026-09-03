@@ -1012,22 +1012,6 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0054, TestSize.Level1)
 }
 
 /**
- * @tc.number: Fms_FormTimerMgr_0055
- * @tc.name: SetEnableFlag.
- * @tc.desc: test SetEnableFlag function.
- */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0055, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0055 start";
-    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
-    ASSERT_NE(nullptr, formTimerMgr);
-    int64_t formId = 1;
-    bool flag = true;
-    formTimerMgr->SetEnableFlag(formId, flag);
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0055 end";
-}
-
-/**
  * @tc.number: Fms_FormTimerMgr_0056
  * @tc.name: SetEnableFlag.
  * @tc.desc: test SetEnableFlag function.

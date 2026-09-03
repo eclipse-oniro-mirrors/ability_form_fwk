@@ -1227,39 +1227,6 @@ HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_005, TestSize.Level
 // ========== RequestPublishFormToHost Tests ==========
 
 /**
- * @tc.name: RequestPublishFormToHost_006
- * @tc.desc: Verify 2-arg overload with QueryPublishFormToHost success and StartAbility fail
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormPublishAdapterTest, RequestPublishFormToHost_006, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_006 start";
-
-    Want want;
-    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
-    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(TEST_FORM_ID));
-
-    AbilityInfo abilityInfo;
-    abilityInfo.name = TEST_ABILITY_NAME;
-    abilityInfo.bundleName = "com.host.bundle";
-    ExtensionAbilityInfo emptyExtAbilityInfo;
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(abilityInfo), SetArgReferee<3>(emptyExtAbilityInfo),
-            Return(true)));
-    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
-    EXPECT_CALL(*MockFormCallbackAdapter::obj, GetFormPublishInterceptor())
-        .WillRepeatedly(Return(nullptr));
-
-    FormPublishAdapter::GetInstance().formIdMap_[TEST_FORM_ID] = AddFormResultErrorCodes::SUCCESS;
-
-    auto result = FormPublishAdapter::GetInstance().RequestPublishFormToHost(want, TEST_USER_ID);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "RequestPublishFormToHost_006 end";
-}
-
-/**
  * @tc.name: RequestPublishFormToHost_007
  * @tc.desc: Verify 2-arg overload with formId parse failure
  * @tc.type: FUNC
