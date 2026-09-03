@@ -21,7 +21,7 @@
 #include <iremote_proxy.h>
 
 #include "ability_manager_interface.h"
-#include "insight_intent/insight_intent_host_client.h"
+#include "insight_intent_host_client.h"
 #include "mock_form_provider_client.h"
 #include "semaphore_ex.h"
 

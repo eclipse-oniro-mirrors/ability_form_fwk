@@ -21,7 +21,7 @@
 #include "bundle_mgr_interface.h"
 #include "hitrace_meter.h"
 #include "insight_intent/insight_intent_execute_param.h"
-#include "insight_intent/insight_intent_host_client.h"
+#include "insight_intent_host_client.h"
 #include "running_form_info.h"
 #include "start_options.h"
 

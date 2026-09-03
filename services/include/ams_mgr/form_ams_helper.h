@@ -24,7 +24,7 @@
 #include "common/util/form_serial_queue.h"
 #include "iconfiguration_observer.h"
 #include "insight_intent/insight_intent_execute_param.h"
-#include "insight_intent/insight_intent_host_client.h"
+#include "insight_intent_host_client.h"
 #include "start_options.h"
 #include "uri.h"
 
