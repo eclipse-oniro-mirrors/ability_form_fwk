@@ -34,20 +34,6 @@ public:
     void TearDown() {}
 };
  
-// Mirror of NapiFormUtil::ThrowParamNumError's message builder. Keep in sync
-// with frameworks/js/napi/formUtil/napi_form_util.cpp:158-162.
-std::string BuildParamNumErrorMessage(const std::string &gotNum, const std::string &expectedNum)
-{
-    return "Parameter error. Got " + gotNum + ", expected " + expectedNum;
-}
- 
-// Mirror of NapiFormUtil::ThrowParamError's message builder. Keep in sync with
-// frameworks/js/napi/formUtil/napi_form_util.cpp:164-168.
-std::string BuildParamErrorMessage(const std::string &extraMessage)
-{
-    return "Parameter error. " + extraMessage;
-}
- 
 /**
  * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_001
  * @tc.name: Verify UpdateFormCrossBundleCallbackInfo sentinel defaults.

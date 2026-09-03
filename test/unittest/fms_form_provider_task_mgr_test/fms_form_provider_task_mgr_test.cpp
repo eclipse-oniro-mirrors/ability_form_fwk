@@ -16,9 +16,9 @@
 #include <gtest/gtest.h>
 
 using namespace testing::ext;
-using namespace OHOS;
-using namespace OHOS::AppExecFwk;
 
+namespace OHOS {
+namespace AppExecFwk {
 namespace {
 class FormProviderTaskMgrTest : public testing::Test {
 public:
@@ -39,4 +39,6 @@ void FormProviderTaskMgrTest::SetUp()
 
 void FormProviderTaskMgrTest::TearDown()
 {}
-}
+}  // namespace
+}  // namespace AppExecFwk
+}  // namespace OHOS
