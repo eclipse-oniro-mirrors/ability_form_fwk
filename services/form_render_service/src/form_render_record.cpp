@@ -151,24 +151,12 @@ FormRenderRecord::FormRenderRecord(
 FormRenderRecord::~FormRenderRecord()
 {
     RemoveWatchDogThreadMonitor();
-    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
-    if (eventHandler == nullptr) {
-        HILOG_WARN("null eventHandler");
-        return;
-    }
- 
-    // Some resources need to be deleted in a JS thread
-    auto syncTask = [weak = weak_from_this()]() {
-        auto renderRecord = weak.lock();
-        if (renderRecord == nullptr) {
-            HILOG_ERROR("null renderRecord");
-            return;
-        }
-        renderRecord->HandleDestroyInJsThread();
-        // Release need rectification
-    };
-    eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
-    Release();
+    /*
+    `weak_from_this` cannot be used within the destructor; `Release()` must be called explicitly beforehand to
+    ensure `formRendererGroupMap_` is cleaned up on the UI thread, leaving only the cleanup of `formRequests_` here
+    */
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    formRequests_.clear();
 }
 
 bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
@@ -1182,6 +1170,7 @@ void FormRenderRecord::Release()
             HILOG_ERROR("null renderRecord");
             return;
         }
+        renderRecord->HandleDestroyInJsThread();
         renderRecord->HandleReleaseInJsThread();
     };
     eventHandler->PostSyncTask(syncTask, "HandleReleaseInJsThread");
@@ -1310,10 +1299,6 @@ void FormRenderRecord::HandleDestroyInJsThread()
 {
     HILOG_INFO("FormRenderService is exiting, destroy some resources in js thread");
     MarkThreadAlive();
-    {
-        std::lock_guard<std::mutex> lock(formRequestsMutex_);
-        formRequests_.clear();
-    }
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     formRendererGroupMap_.clear();
 }

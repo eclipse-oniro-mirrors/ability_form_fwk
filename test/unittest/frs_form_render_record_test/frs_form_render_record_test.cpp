@@ -1657,7 +1657,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_083, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_083 start";
 
     ASSERT_NE(formRenderRecordPtr_, nullptr);
-    EXPECT_EQ(formRenderRecordPtr_->FormCount(), 0);
+    EXPECT_EQ(formRenderRecordPtr_->FormCount(), 1);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_083 end";
 }
 
