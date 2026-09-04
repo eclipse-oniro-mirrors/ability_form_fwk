@@ -30,21 +30,9 @@ ohos_unittest("FmsFormEventReportTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [
-    "${form_fwk_path}:libfms_internal_static",
-    "${form_fwk_path}:form_manager",
-    "${form_fwk_path}:form_render_info",
-    "${form_fwk_path}:form_utils",
-    "${form_fwk_path}:form_common_info",
-  ]
+  deps = []
 
   external_deps = [
-    "ability_base:want",
-    "ability_runtime:ability_connect_callback_stub",
-    "c_utils:utils",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "ipc:ipc_core",
     "googletest:gmock_main",
   ]
 }

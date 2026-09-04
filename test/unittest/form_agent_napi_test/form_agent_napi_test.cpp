@@ -34,20 +34,6 @@ public:
     void TearDown() {}
 };
  
-// Mirror of NapiFormUtil::ThrowParamNumError's message builder. Keep in sync
-// with frameworks/js/napi/formUtil/napi_form_util.cpp:158-162.
-std::string BuildParamNumErrorMessage(const std::string &gotNum, const std::string &expectedNum)
-{
-    return "Parameter error. Got " + gotNum + ", expected " + expectedNum;
-}
- 
-// Mirror of NapiFormUtil::ThrowParamError's message builder. Keep in sync with
-// frameworks/js/napi/formUtil/napi_form_util.cpp:164-168.
-std::string BuildParamErrorMessage(const std::string &extraMessage)
-{
-    return "Parameter error. " + extraMessage;
-}
- 
 /**
  * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_001
  * @tc.name: Verify UpdateFormCrossBundleCallbackInfo sentinel defaults.
@@ -59,33 +45,6 @@ HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_001, TestSiz
     EXPECT_EQ(info.formId, -1);
     EXPECT_EQ(info.formBindingData, nullptr);
     GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_001 ends";
-}
- 
-/**
- * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_002
- * @tc.name: Verify parameter-count error message format.
- * @tc.desc: test the "Parameter error. Got <argc>, expected 2" contract for ArkTS callers.
- */
-HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_002, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_002 starts";
-    auto msg = BuildParamNumErrorMessage("1", "2");
-    EXPECT_EQ(msg, "Parameter error. Got 1, expected 2");
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_002 ends";
-}
- 
-/**
- * @tc.number: FormAgentNapiTest_UpdateFormCrossBundle_003
- * @tc.name: Verify parameter-validation error message format.
- * @tc.desc: test the formId / formBindingData error message prefixes.
- */
-HWTEST_F(FormAgentNapiTest, FormAgentNapiTest_UpdateFormCrossBundle_003, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_003 starts";
-    auto formIdMsg = BuildParamErrorMessage("formId is invalid");
-    EXPECT_EQ(formIdMsg, "Parameter error. formId is invalid");
- 
-    auto dataMsg = BuildParamErrorMessage("formBindingData is invalid");
-    EXPECT_EQ(dataMsg, "Parameter error. formBindingData is invalid");
-    GTEST_LOG_(INFO) << "FormAgentNapiTest_UpdateFormCrossBundle_003 ends";
 }
  
 /**

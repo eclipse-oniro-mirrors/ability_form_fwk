@@ -27,7 +27,6 @@ ohos_unittest("FmsFormCallerMgrTest") {
   configs = [ ":form_mgr_test_config" ]
 
   sources = [
-    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "form_caller_mgr_test.cpp",
   ]
 
