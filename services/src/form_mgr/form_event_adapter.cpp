@@ -312,10 +312,10 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     }
 
     // key = matchedFormId: intent executing client handle, same as native ExecuteIntent.
-    const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecalTokenId(
+    const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
         static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams());
     if (result != ERR_OK) {
-        HILOG_ERROR("fail ExecuteIntentWithSpecalTokenId, result:%{public}d", result);
+        HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;
     }
 

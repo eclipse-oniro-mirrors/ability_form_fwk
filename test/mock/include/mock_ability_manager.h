@@ -324,9 +324,10 @@ public:
         return 0;
     }
 
-    int32_t ExecuteIntentWithSpecalTokenId(uint64_t key,
-        const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
-        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
+    int32_t ExecuteIntentWithSpecifyTokenId(uint64_t key,
+        const sptr<IRemoteObject> &hostClient,
+        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
+        uint32_t specifyTokenId = 0)
     {
         return 0;
     }
@@ -829,9 +830,10 @@ public:
         return 0;
     }
 
-    int32_t ExecuteIntentWithSpecalTokenId(uint64_t key,
-        const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
-        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
+    int32_t ExecuteIntentWithSpecifyTokenId(uint64_t key,
+        const sptr<IRemoteObject> &hostClient,
+        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
+        uint32_t specifyTokenId = 0)
     {
         return 0;
     }

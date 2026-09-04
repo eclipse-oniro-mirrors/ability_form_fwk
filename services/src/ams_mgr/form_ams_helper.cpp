@@ -334,7 +334,7 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
 }
 
 /**
- * @brief ExecuteIntentWithSpecalTokenId, execute insight intent with ability manager service.
+ * @brief ExecuteIntentWithSpecifyTokenId, execute insight intent with ability manager service.
  * @param key The key of the intent executing client, formId for the form scenario.
  * @param insightIntentHostClient The host client carrying host context for the
  *        execute-done callback.
@@ -342,7 +342,7 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
  * @param wantParams The want params carrying intentName and intentParams.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormAmsHelper::ExecuteIntentWithSpecalTokenId(uint64_t key,
+ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
     const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
     const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
 {
@@ -352,7 +352,7 @@ ErrCode FormAmsHelper::ExecuteIntentWithSpecalTokenId(uint64_t key,
         HILOG_ERROR("null ams");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecalTokenId(key, insightIntentHostClient, param, wantParams));
+    return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecifyTokenId(key, insightIntentHostClient, param, wantParams));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
