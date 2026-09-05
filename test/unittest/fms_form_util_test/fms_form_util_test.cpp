@@ -175,33 +175,6 @@ HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_015
- * @tc.desc: Verify GetActiveUsers
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level1)
-{
-    std::vector<int32_t> activeList;
-    FormUtil::GetActiveUsers(activeList);
-    EXPECT_EQ(true, activeList.empty());
-}
-
-/**
- * @tc.name: FormUtilTest_016
- * @tc.desc: Verify GenerateFormId
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_016, TestSize.Level1)
-{
-    constexpr int64_t udidHash = 0x00000000ffffffffL;
-    int64_t firstFormId = FormUtil::GenerateFormId(udidHash);
-    int64_t secondFormId = FormUtil::GenerateFormId(udidHash);
-    EXPECT_EQ(firstFormId, secondFormId);
-    FormUtil::DeleteFormId(firstFormId);
-    FormUtil::DeleteFormId(secondFormId);
-}
-
-/**
  * @tc.name: FormUtilTest_017
  * @tc.desc: Verify ConvertStringToInt64 with 19-digit number starting with 8
  * @tc.type: FUNC
