@@ -19,15 +19,7 @@ module_output_path = "form_fwk/form_fwk/form_mgr_service"
 ohos_unittest("FmsFormObserverTaskMgrTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
-    "${form_fwk_path}/services/common/src/queue/form_base_serial_queue.cpp",
-    "${form_fwk_path}/services/common/src/queue/form_singleton_queue_base.cpp",
-  ]
-  sources += [
-    "fms_form_observer_task_mgr_test.cpp",
-    "${form_fwk_path}/services/src/form_observer/form_observer_task_mgr.cpp",
-  ]
+  sources = [ "fms_form_observer_task_mgr_test.cpp" ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",

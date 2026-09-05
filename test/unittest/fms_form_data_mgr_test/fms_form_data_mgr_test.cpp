@@ -6743,7 +6743,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_001, TestSiz
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_001 end";
 }
-}
 
 /**
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_002
@@ -7619,3 +7618,4 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_BuildFormInstanceByFromRecord_00
     EXPECT_EQ(instance.appIndex, 1);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001 end";
 }
+}  // namespace
