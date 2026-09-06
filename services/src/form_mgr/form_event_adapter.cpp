@@ -17,6 +17,7 @@
 
 #include <algorithm>
 
+#include "accesstoken_kit.h"
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "hitrace_meter.h"
@@ -24,6 +25,7 @@
 #include "insight_intent_host_client.h"
 #include "running_form_info.h"
 #include "start_options.h"
+#include "tokenid_kit.h"
 
 #include "nlohmann/json.hpp"
 
@@ -51,6 +53,31 @@ using namespace FormAdapterConstants;
 namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
+
+// 系统签名应用：非预置、但以系统证书签名（profile 中 app-feature 为 hos_system_app）。
+// 其 AccessToken 系统应用标志位与预置系统应用一致，可通过 fullTokenId 查询，与是否预装无关。
+bool IsSystemSignedProvider(const std::string &bundleName, const int32_t providerUserId)
+{
+    if (bundleName.empty()) {
+        return false;
+    }
+    const auto tokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(providerUserId, bundleName, 0);
+    if (tokenId == 0) {
+        HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
+            providerUserId, bundleName.c_str());
+        return false;
+    }
+    Security::AccessToken::HapTokenInfo hapInfo;
+    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo)
+        != Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
+        HILOG_ERROR("GetHapTokenInfo failed, bundleName:%{public}s", bundleName.c_str());
+        return false;
+    }
+    // tokenAttr 为 fullTokenId 的高 32 位，拼接后查询系统应用标志位。
+    constexpr int32_t TOKEN_ID_BIT_SIZE = 32;
+    const auto fullTokenId = (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ID_BIT_SIZE) + tokenId;
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
+}
 } // namespace
 
 FormEventAdapter::FormEventAdapter()
@@ -288,6 +315,14 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    // insightIntent 仅开放给系统应用的卡片提供方：预置系统应用走 FormRecord 标志，
+    // 非预置的系统签名应用走 AccessToken 标志位。
+    if (!record.isSystemApp && !IsSystemSignedProvider(record.bundleName, record.providerUserId)) {
+        HILOG_ERROR("insightIntent rejected, provider is not system app or system signed app, "
+            "bundleName:%{public}s", record.bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
     InsightIntentExecuteParam executeParam;
