@@ -325,6 +325,14 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
+    // 同 RouterEvent：取提供方 accessTokenId，作为 ams 侧权限校验的指定身份。
+    ApplicationInfo appInfo;
+    const int32_t callerUserId = FormCommonAdapter::GetInstance().GetCallingUserId();
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, callerUserId, appInfo) != ERR_OK) {
+        HILOG_ERROR("Get app info failed, bundleName:%{public}s", record.bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
     InsightIntentExecuteParam executeParam;
     if (!InsightIntentExecuteParam::GenerateFromWant(want, executeParam)) {
         HILOG_ERROR("GenerateFromWant failed, formId:%{public}" PRId64 "", formId);
@@ -347,8 +355,11 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     }
 
     // key = matchedFormId: intent executing client handle, same as native ExecuteIntent.
+    // 同 router 链路（StartAbilityOnlyUIAbility）：specifyTokenId 传提供方 accessTokenId，
+    // callerToken 为宿主 token。
     const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
-        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams());
+        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
+        appInfo.accessTokenId, callerToken);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;

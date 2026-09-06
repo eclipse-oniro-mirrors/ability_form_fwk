@@ -340,11 +340,14 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
  *        execute-done callback.
  * @param param The insight intent execute param.
  * @param wantParams The want params carrying intentName and intentParams.
+ * @param specifyTokenId The token id used by ams permission checking, 0 means not specified.
+ * @param callerToken The caller ability token of the form host, same as router.
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
     const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
-    const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams)
+    const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
+    uint32_t specifyTokenId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
@@ -352,7 +355,8 @@ ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
         HILOG_ERROR("null ams");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecifyTokenId(key, insightIntentHostClient, param, wantParams));
+    return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecifyTokenId(key, insightIntentHostClient,
+        param, wantParams, specifyTokenId, callerToken));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
