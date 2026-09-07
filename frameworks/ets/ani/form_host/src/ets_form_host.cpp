@@ -1889,6 +1889,14 @@ void DeleteInvalidForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
         return;
     }
 
+    ani_size arrayLength = 0;
+    if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK ||
+        arrayLength > FormAniUtil::MAX_FORM_ID_LIST_SIZE) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+
     std::vector<int64_t> formIds;
     if (!FormAniUtil::ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
@@ -2383,6 +2391,18 @@ void NotifyVisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
         return;
     }
 
+    ani_size arrayLength = 0;
+    if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+    if (arrayLength > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
+        return;
+    }
+
     std::vector<int64_t> formIds;
     if (!FormAniUtil::ConvertStringArrayToInt64Vector(env, arrayObj, formIds)) {
         HILOG_ERROR("ConvertStringArrayToInt64Vector failed");
@@ -2413,6 +2433,18 @@ void NotifyInvisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, an
     if (IsRefUndefined(env, arrayObj)) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+
+    ani_size arrayLength = 0;
+    if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+        return;
+    }
+    if (arrayLength > Constants::MAX_VISIBLE_NOTIFY_LIST) {
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
         return;
     }
 

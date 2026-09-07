@@ -1673,6 +1673,12 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
         return false;
     }
 
+    if (arrayLength > MAX_FORM_ID_LIST_SIZE) {
+        HILOG_ERROR("formIds count exceeds the limit");
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        return false;
+    }
+
     for (size_t i = 0; i < static_cast<size_t>(arrayLength); i++) {
         ani_ref stringEntryRef;
         status = env->Object_CallMethodByName_Ref(arrayObj, ANI_GETTER_MARKER, "i:Y",

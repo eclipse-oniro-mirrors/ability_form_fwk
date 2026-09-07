@@ -24,6 +24,7 @@
 #include "ani.h"
 #include "ani_common_want.h"
 #include "form_errors.h"
+#include "form_constants.h"
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_instance.h"
@@ -91,6 +92,8 @@ bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t>
 // Parsing Functions
 // ============================================================================
 
+// Cover all normal and temporary forms on the device, including a complete valid-ID list.
+constexpr ani_size MAX_FORM_ID_LIST_SIZE = AppExecFwk::Constants::MAX_FORMS + AppExecFwk::Constants::MAX_TEMP_FORMS;
 bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, std::vector<int64_t> &int64Vector);
 void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &formDataProxies,
     ani_ref proxiesArrayRef);

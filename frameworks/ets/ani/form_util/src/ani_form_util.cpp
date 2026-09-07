@@ -21,6 +21,9 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
+// Bound both iteration work and native string storage for callback records.
+constexpr size_t MAX_RECORD_ENTRIES = 1024;
+constexpr ani_size MAX_RECORD_STRING_BYTES = 4096;
 constexpr const char *DELEGATOR_RECORD_KEY = "keys";
 constexpr const char *DELEGATOR_RECORD_NEXT = "next";
 constexpr const char *DELEGATOR_RECORD_DONE = "done";
@@ -45,24 +48,32 @@ bool GetPropertyDoubleByName(ani_env *env, ani_object object, const char *name, 
     return true;
 }
 
-void SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
+bool SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
     std::unordered_map<std::string, std::string> &uMap)
 {
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
-        return;
+        return false;
+    }
+    ani_size keySize = 0;
+    ani_size valueSize = 0;
+    if (env->String_GetUTF8Size(aniKey, &keySize) != ANI_OK || keySize > MAX_RECORD_STRING_BYTES ||
+        env->String_GetUTF8Size(aniValue, &valueSize) != ANI_OK || valueSize > MAX_RECORD_STRING_BYTES) {
+        HILOG_ERROR("Invalid record string or string exceeds the limit");
+        return false;
     }
     std::string mapKey = "";
     if (!FormAniUtil::GetStdString(env, aniKey, mapKey)) {
         HILOG_ERROR("GetStdString failed");
-        return;
+        return false;
     }
     std::string mapValue = "";
     if (!FormAniUtil::GetStdString(env, aniValue, mapValue)) {
         HILOG_ERROR("GetStdString failed");
-        return;
+        return false;
     }
     uMap.emplace(mapKey, mapValue);
+    return true;
 }
 
 bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, ani_ref &aniKey, ani_ref &aniValue)
@@ -150,6 +161,7 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
     }
     ani_ref next = nullptr;
     ani_boolean done = false;
+    size_t entryCount = 0;
     while (ANI_OK == env->Object_CallMethodByName_Ref(
         static_cast<ani_object>(iter), DELEGATOR_RECORD_NEXT, nullptr, &next)) {
         status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), DELEGATOR_RECORD_DONE, &done);
@@ -161,13 +173,20 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
             HILOG_DEBUG("[forEachMapEntry] done break");
             return true;
         }
+        if (entryCount >= MAX_RECORD_ENTRIES) {
+            HILOG_ERROR("Record entry count exceeds the limit");
+            return false;
+        }
+        ++entryCount;
         ani_ref aniKey = nullptr;
         ani_ref aniValue = nullptr;
         if (!ParseRecordStringInner(env, next, aniMockList, aniKey, aniValue)) {
             HILOG_ERROR("ParseRecordStringInner failed");
             return false;
         }
-        SetRecordStringToMap(env, static_cast<ani_string>(aniKey), static_cast<ani_string>(aniValue), mockList);
+        if (!SetRecordStringToMap(env, static_cast<ani_string>(aniKey), static_cast<ani_string>(aniValue), mockList)) {
+            return false;
+        }
     }
     return true;
 }

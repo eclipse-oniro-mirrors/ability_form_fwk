@@ -416,6 +416,11 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
     }
     std::string specialFlag = "#";
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    const auto &callbackMap = isVisibility ? formVisibleCallbackMap_ : formInvisibleCallbackMap_;
+    if (callbackMap.size() >= KEY_LIMIT && callbackMap.find(bundleName) == callbackMap.end()) {
+        HILOG_ERROR("the number of the bundleName exceeds the limit");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     ani_ref ref = nullptr;
     auto etsReference = std::make_shared<AppExecFwk::ETSNativeReference>();
     if (isVisibility) {
