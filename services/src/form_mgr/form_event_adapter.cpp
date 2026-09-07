@@ -78,28 +78,6 @@ bool IsSystemSignedProvider(const std::string &bundleName, const int32_t provide
     const auto fullTokenId = (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ID_BIT_SIZE) + tokenId;
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
 }
-
-// 意图执行目标是提供方模块的入口 UIAbility（module.json5 的 mainElement，如 EntryAbility），
-// 而非提供卡片的 FormExtensionAbility（record.abilityName）。AMS 侧 GenerateWant 以该
-// abilityName 设置 element，并与装饰器/配置条目声明的 abilityName 严格比对，若回填
-// FormExtensionAbility 名会导致 "ability name mismatch" 且拉起目标错误。
-std::string GetProviderMainElement(const FormRecord &record, const int32_t userId)
-{
-    BundleInfo bundleInfo;
-    const int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE);
-    if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(record.bundleName, flags, userId, bundleInfo)) {
-        HILOG_ERROR("GetBundleInfoByFlags failed, bundleName:%{public}s", record.bundleName.c_str());
-        return "";
-    }
-    for (const auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
-        if (hapModuleInfo.name == record.moduleName) {
-            return hapModuleInfo.mainElementName;
-        }
-    }
-    HILOG_ERROR("module not found, bundleName:%{public}s, moduleName:%{public}s",
-        record.bundleName.c_str(), record.moduleName.c_str());
-    return "";
-}
 } // namespace
 
 FormEventAdapter::FormEventAdapter()
@@ -366,14 +344,7 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     executeParam.bundleName_ = record.bundleName;
     executeParam.moduleName_ = record.moduleName;
     if (executeParam.abilityName_.empty()) {
-        // 卡片侧不传 abilityName；回填提供方模块 mainElement（入口 UIAbility）。
-        // record.abilityName 为 FormExtensionAbility 名，不能作为意图执行目标。
-        executeParam.abilityName_ = GetProviderMainElement(record, callerUserId);
-        if (executeParam.abilityName_.empty()) {
-            HILOG_ERROR("empty mainElement, bundleName:%{public}s, moduleName:%{public}s",
-                record.bundleName.c_str(), record.moduleName.c_str());
-            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-        }
+        executeParam.abilityName_ = record.abilityName;
     }
 
     sptr<AbilityRuntime::InsightIntentHostClient> insightIntentHostClient =
@@ -388,7 +359,7 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     // callerToken 为宿主 token。
     const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
         static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
-        appInfo.accessTokenId, callerToken);
+        static_cast<uint64_t>(appInfo.accessTokenId), callerToken);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;

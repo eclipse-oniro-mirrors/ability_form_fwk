@@ -340,14 +340,14 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
  *        execute-done callback.
  * @param param The insight intent execute param.
  * @param wantParams The want params carrying intentName and intentParams.
- * @param specifyTokenId The token id used by ams permission checking, 0 means not specified.
- * @param callerToken The caller ability token of the form host, same as router.
+ * @param specifyTokenId The specified token id for permission checking.
+ * @param callerToken The caller ability token.
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
     const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
     const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-    uint32_t specifyTokenId, const sptr<IRemoteObject> &callerToken)
+    uint64_t specifyTokenId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
