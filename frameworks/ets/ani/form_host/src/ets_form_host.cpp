@@ -323,15 +323,22 @@ public:
             HILOG_ERROR("get aniVM failed");
             return;
         }
-        if (!EtsFormRouterProxyMgr::GetInstance()->RegisterDeleteFormsCallbackListener(aniVM, callback)) {
+        // GetInstance() may return nullptr only on the first call
+        // once created, later calls are guaranteed non-null
+        auto proxy = EtsFormRouterProxyMgr::GetInstance();
+        if (proxy == nullptr) {
+            HILOG_ERROR("EtsFormRouterProxyMgr is nullptr");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            return;
+        }
+        if (!proxy->RegisterDeleteFormsCallbackListener(aniVM, callback)) {
             HILOG_ERROR("RegisterDeleteFormsCallbackListener failed");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
             return;
         }
-        ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterDeleteFormsCallback(
-            EtsFormRouterProxyMgr::GetInstance());
+        ErrCode result = AppExecFwk::FormMgr::GetInstance().RegisterDeleteFormsCallback(proxy);
         if (result != ERR_OK) {
-            EtsFormRouterProxyMgr::GetInstance()->UnregisterDeleteFormsCallbackListener();
+            proxy->UnregisterDeleteFormsCallbackListener();
             if (result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
                 result == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
                 EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
