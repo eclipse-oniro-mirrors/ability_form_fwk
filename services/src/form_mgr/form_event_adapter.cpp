@@ -56,27 +56,34 @@ constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.
 
 // 系统签名应用：非预置、但以系统证书签名（profile 中 app-feature 为 hos_system_app）。
 // 其 AccessToken 系统应用标志位与预置系统应用一致，可通过 fullTokenId 查询，与是否预装无关。
-bool IsSystemSignedProvider(const std::string &bundleName, const int32_t providerUserId)
+
+// 拼接提供方 fullTokenId（高 32 位 tokenAttr + 低 32 位 hapTokenId），查询失败返回 0。
+uint64_t GetProviderFullTokenId(const std::string &bundleName, const int32_t userId)
 {
     if (bundleName.empty()) {
-        return false;
+        return 0;
     }
-    const auto tokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(providerUserId, bundleName, 0);
+    const auto tokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
     if (tokenId == 0) {
         HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
-            providerUserId, bundleName.c_str());
-        return false;
+            userId, bundleName.c_str());
+        return 0;
     }
     Security::AccessToken::HapTokenInfo hapInfo;
     if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo)
         != Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
         HILOG_ERROR("GetHapTokenInfo failed, bundleName:%{public}s", bundleName.c_str());
-        return false;
+        return 0;
     }
-    // tokenAttr 为 fullTokenId 的高 32 位，拼接后查询系统应用标志位。
     constexpr int32_t TOKEN_ID_BIT_SIZE = 32;
-    const auto fullTokenId = (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ID_BIT_SIZE) + tokenId;
-    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
+    return (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ID_BIT_SIZE) + tokenId;
+}
+
+bool IsSystemSignedProvider(const std::string &bundleName, const int32_t providerUserId)
+{
+    // tokenAttr 为 fullTokenId 的高 32 位，拼接后查询系统应用标志位。
+    const uint64_t fullTokenId = GetProviderFullTokenId(bundleName, providerUserId);
+    return fullTokenId != 0 && Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
 }
 
 // 意图执行目标是提供方模块的入口 UIAbility（module.json5 的 mainElement，如 EntryAbility），
@@ -347,12 +354,14 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
-    // 同 RouterEvent：取提供方 accessTokenId，作为 ams 侧权限校验的指定身份。
-    ApplicationInfo appInfo;
+    // specifyTokenId 需传提供方 fullTokenId（高 32 位 tokenAttr + 低 32 位 hapTokenId）：
+    // AMS 侧 JudgeCallerIsAllowedToUseSystemAPIByTokenId 以完整 64 位判定系统应用身份，
+    // 32 位 accessTokenId 零扩展后高 32 位为 0，会被判非系统应用（ERR_NOT_SYSTEM_APP）。
     const int32_t callerUserId = FormCommonAdapter::GetInstance().GetCallingUserId();
-    if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, callerUserId, appInfo) != ERR_OK) {
-        HILOG_ERROR("Get app info failed, bundleName:%{public}s", record.bundleName.c_str());
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    const uint64_t providerFullTokenId = GetProviderFullTokenId(record.bundleName, record.providerUserId);
+    if (providerFullTokenId == 0) {
+        HILOG_ERROR("get provider fullTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
     InsightIntentExecuteParam executeParam;
@@ -384,11 +393,14 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     }
 
     // key = matchedFormId: intent executing client handle, same as native ExecuteIntent.
-    // 同 router 链路（StartAbilityOnlyUIAbility）：specifyTokenId 传提供方 accessTokenId，
-    // callerToken 为宿主 token。
+    // specifyTokenId 传提供方 fullTokenId：AMS 侧以完整 64 位判定系统应用身份，
+    // 权限校验取其低 32 位（hapTokenId），callerToken 为宿主 token。
+    // formId 透传 matchedFormId（规范化完整卡片 id）：AMS 侧据此向最终 Want 注入
+    // 卡片标识参数（ohos.extra.param.key.form_identity / formID），供返回动画锚定
+    // 到卡片，与 router 链路（RouterEvent 注入的参数集）对齐。
     const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
         static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
-        static_cast<uint64_t>(appInfo.accessTokenId), callerToken);
+        providerFullTokenId, callerToken, matchedFormId);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;

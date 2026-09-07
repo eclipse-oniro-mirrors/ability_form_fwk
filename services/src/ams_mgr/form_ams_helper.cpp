@@ -342,12 +342,13 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
  * @param wantParams The want params carrying intentName and intentParams.
  * @param specifyTokenId The specified token id for permission checking.
  * @param callerToken The caller ability token.
+ * @param formId The matched form id of the clicked card, non-positive means no form source.
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
     const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
     const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-    uint64_t specifyTokenId, const sptr<IRemoteObject> &callerToken)
+    uint64_t specifyTokenId, const sptr<IRemoteObject> &callerToken, int64_t formId)
 {
     HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
@@ -356,7 +357,7 @@ ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecifyTokenId(key, insightIntentHostClient,
-        param, wantParams, specifyTokenId, callerToken));
+        param, wantParams, specifyTokenId, callerToken, formId));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

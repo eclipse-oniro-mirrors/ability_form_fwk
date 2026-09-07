@@ -153,12 +153,16 @@ public:
      * @param wantParams The want params carrying intentName and intentParams.
      * @param specifyTokenId The specified token id for permission checking.
      * @param callerToken The caller ability token.
+     * @param formId The matched form id of the clicked card, non-positive means no form source.
+     *        AMS fills it into the executing want as the card identity params
+     *        (ohos.extra.param.key.form_identity / formID) so that the back transition
+     *        animation can anchor to the card, same as the router event link.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ExecuteIntentWithSpecifyTokenId(uint64_t key,
         const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
         const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-        uint64_t specifyTokenId, const sptr<IRemoteObject> &callerToken);
+        uint64_t specifyTokenId, const sptr<IRemoteObject> &callerToken, int64_t formId);
 private:
     /**
      * @brief acquire a form ability manager, if it not existed,
