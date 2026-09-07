@@ -107,6 +107,43 @@ std::string GetProviderMainElement(const FormRecord &record, const int32_t userI
         record.bundleName.c_str(), record.moduleName.c_str());
     return "";
 }
+
+// 从宿主 want 提取意图执行参数并回填提供方信息，返回 ERR_OK 或对应错误码。
+int PrepareInsightIntentParam(Want &want, const FormRecord &record, const int32_t callerUserId,
+    InsightIntentExecuteParam &executeParam)
+{
+    if (!InsightIntentExecuteParam::GenerateFromWant(want, executeParam)) {
+        HILOG_ERROR("GenerateFromWant failed");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    // Host want carries no element; AMS CheckAndUpdateParam requires
+    // bundleName/moduleName/insightIntentName non-empty, fill provider info from form record.
+    executeParam.bundleName_ = record.bundleName;
+    executeParam.moduleName_ = record.moduleName;
+    if (executeParam.abilityName_.empty()) {
+        // 卡片侧不传 abilityName；回填提供方模块 mainElement（入口 UIAbility）。
+        // record.abilityName 为 FormExtensionAbility 名，不能作为意图执行目标。
+        executeParam.abilityName_ = GetProviderMainElement(record, callerUserId);
+        if (executeParam.abilityName_.empty()) {
+            HILOG_ERROR("empty mainElement, bundleName:%{public}s, moduleName:%{public}s",
+                record.bundleName.c_str(), record.moduleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+    }
+    return ERR_OK;
+}
+
+// 卡片标识参数以系统保留键塞入 want，同 RouterEvent（int/string 分支防 JS 精度溢出）。
+void SetFormIdentityParams(Want &want, const int64_t formId)
+{
+    if (formId < MAX_NUMBER_OF_JS) {
+        want.SetParam(Constants::PARAM_FORM_ID, formId);
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
+    } else {
+        want.SetParam(Constants::PARAM_FORM_ID, std::to_string(formId));
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formId));
+    }
+}
 } // namespace
 
 FormEventAdapter::FormEventAdapter()
@@ -338,80 +375,44 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("invalid formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-
     const int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord record;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-
-    // insightIntent 仅开放给系统应用的卡片提供方：预置系统应用走 FormRecord 标志，
-    // 非预置的系统签名应用走 AccessToken 标志位。
+    // insightIntent 仅开放给系统应用的卡片提供方（预置 FormRecord 标志 / 系统签名 AccessToken 标志）。
     if (!record.isSystemApp && !IsSystemSignedProvider(record.bundleName, record.providerUserId)) {
         HILOG_ERROR("insightIntent rejected, provider is not system app or system signed app, "
             "bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-
-    // specifyTokenId 需传提供方 fullTokenId（高 32 位 tokenAttr + 低 32 位 hapTokenId）：
-    // AMS 侧 JudgeCallerIsAllowedToUseSystemAPIByTokenId 以完整 64 位判定系统应用身份，
-    // 32 位 accessTokenId 零扩展后高 32 位为 0，会被判非系统应用（ERR_NOT_SYSTEM_APP）。
     const int32_t callerUserId = FormCommonAdapter::GetInstance().GetCallingUserId();
     const uint64_t providerFullTokenId = GetProviderFullTokenId(record.bundleName, record.providerUserId);
     if (providerFullTokenId == 0) {
         HILOG_ERROR("get provider fullTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
-
     InsightIntentExecuteParam executeParam;
-    if (!InsightIntentExecuteParam::GenerateFromWant(want, executeParam)) {
-        HILOG_ERROR("GenerateFromWant failed, formId:%{public}" PRId64 "", formId);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    int32_t result = PrepareInsightIntentParam(want, record, callerUserId, executeParam);
+    if (result != ERR_OK) {
+        return result;
     }
-
-    // Host want carries no element; AMS CheckAndUpdateParam requires
-    // bundleName/moduleName/insightIntentName non-empty, fill provider info from form record.
-    executeParam.bundleName_ = record.bundleName;
-    executeParam.moduleName_ = record.moduleName;
-    if (executeParam.abilityName_.empty()) {
-        // 卡片侧不传 abilityName；回填提供方模块 mainElement（入口 UIAbility）。
-        // record.abilityName 为 FormExtensionAbility 名，不能作为意图执行目标。
-        executeParam.abilityName_ = GetProviderMainElement(record, callerUserId);
-        if (executeParam.abilityName_.empty()) {
-            HILOG_ERROR("empty mainElement, bundleName:%{public}s, moduleName:%{public}s",
-                record.bundleName.c_str(), record.moduleName.c_str());
-            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-        }
-    }
-
     sptr<AbilityRuntime::InsightIntentHostClient> insightIntentHostClient =
         new (std::nothrow) AbilityRuntime::InsightIntentHostClient();
     if (insightIntentHostClient == nullptr) {
         HILOG_ERROR("null insightIntentHostClient");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-
-    // key = matchedFormId: intent executing client handle, same as native ExecuteIntent.
-    // specifyTokenId 传提供方 fullTokenId：AMS 侧以完整 64 位判定系统应用身份，
-    // 权限校验取其低 32 位（hapTokenId），callerToken 为宿主 token。
-    // formId 同 router 链路（RouterEvent）：以系统保留键塞入 wantParams 随调用传入 ams，
-    // 供 ams 侧/目标 UIAbility 识别触发卡片（返回动画锚定到卡片）。
-    if (matchedFormId < MAX_NUMBER_OF_JS) {
-        want.SetParam(Constants::PARAM_FORM_ID, matchedFormId);
-        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, matchedFormId);
-    } else {
-        want.SetParam(Constants::PARAM_FORM_ID, std::to_string(matchedFormId));
-        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(matchedFormId));
-    }
-    const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
+    // key = matchedFormId（意图执行回调句柄）；formId 以系统保留键塞入 wantParams（同 router）。
+    SetFormIdentityParams(want, matchedFormId);
+    result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
         static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
         providerFullTokenId, callerToken);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;
     }
-
     NotifyFormClickEvent(formId, FORM_CLICK_INSIGHT_INTENT, FormCommonAdapter::GetInstance().GetCallingUserId());
     return ERR_OK;
 }
