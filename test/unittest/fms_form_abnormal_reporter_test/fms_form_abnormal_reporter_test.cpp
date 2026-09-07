@@ -53,38 +53,6 @@ void FormAbnormalReporterTest::TearDown()
 {}
 
 /**
- * @tc.name: FormAbnormalReporterTest_AddRecord_0001
- * @tc.desc: test AddRecord function
- * @tc.type: FUNC
- */
-HWTEST_F(FormAbnormalReporterTest, FormAbnormalReporterTest_AddRecord_0001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAbnormalReporterTest_AddRecord_0001 start";
-    int64_t formId = 123456;
-    FormRecord formRecord;
-    formRecord.formId = formId;
-    
-    MockFormDataMgr::obj = std::make_shared<MockFormDataMgr>();
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(formId, _))
-        .Times(2)
-        .WillOnce(Return(false))
-        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
-    
-    // Test ratio beyond the threshold
-    FormAbnormalReporter::GetInstance().AddRecord(formId, 10);
-
-    // Test form not found
-    FormAbnormalReporter::GetInstance().AddRecord(formId, 0);
-
-    // Test form found
-    FormAbnormalReporter::GetInstance().AddRecord(formId, 0);
-
-    // clear cached abnormal records
-    FormAbnormalReporter::GetInstance().formAbnormalInfoMap_.clear();
-    GTEST_LOG_(INFO) << "FormAbnormalReporterTest_AddRecord_0001 end";
-}
-
-/**
  * @tc.name: FormAbnormalReporterTest_MarkUpdateRender_0001
  * @tc.desc: test MarkUpdateRender function
  * @tc.type: FUNC

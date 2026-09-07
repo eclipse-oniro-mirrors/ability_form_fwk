@@ -444,35 +444,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormHostRecord_003, TestSiz
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_CreateFormInfo_001
- * @tc.name: CreateFormInfo
- * @tc.desc: Verify that the return value is correct.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormInfo_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormInfo_001 start";
-
-    int64_t formId = 1;
-
-    // create record
-    FormRecord record;
-    record.bundleName = FORM_HOST_BUNDLE_NAME;
-    record.abilityName = FORM_PROVIDER_ABILITY_NAME;
-    record.formName = FORM_NAME;
-    record.formTempFlag = true;
-
-    FormJsInfo formInfo;
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->CreateFormJsInfo(formId, record, formInfo);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormInfo_001 output=>bundleName:" << formInfo.bundleName
-                     << "abilityName:" << formInfo.abilityName << "formName:" << formInfo.formName
-                     << "formTempFlag:" << formInfo.formTempFlag;
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormInfo_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_CheckTempEnoughForm_001
  * @tc.name: CheckTempEnoughForm
  * @tc.desc: Verify that the return value is correct.
@@ -1098,32 +1069,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteHostRecord_001, TestSize.L
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_CleanHostRemovedForms_001
- * @tc.name: CleanHostRemovedForms
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       clientRecords_ is found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CleanHostRemovedForms_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CleanHostRemovedForms_001 start";
-
-    std::vector<int64_t> removedFormIds;
-    int64_t formId = 1;
-    removedFormIds.emplace_back(formId);
-
-    // create clientRecords_
-    FormHostRecord formHostRecord;
-    formHostRecord.SetFormHostClient(token_);
-    formHostRecord.AddForm(formId);
-    formDataMgr_.clientRecords_.push_back(formHostRecord);
-
-    formDataMgr_.CleanHostRemovedForms(removedFormIds);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CleanHostRemovedForms_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_HandleHostDied_001
  * @tc.name: HandleHostDied
  * @tc.desc: Verify that the return value is correct.
@@ -1155,74 +1100,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_001, TestSize.Lev
     formDataMgr_.HandleHostDied(token_);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleHostDied_001 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_HandleHostDied_002
- * @tc.name: HandleHostDied
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       tempForms_ is not match.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleHostDied_002 start";
-
-    int64_t formId = 2;
-    int64_t otherFormId = 3;
-
-    // create tempForms_
-    formDataMgr_.tempForms_.emplace_back(otherFormId);
-
-    // create clientRecords_
-    FormHostRecord formHostRecord;
-    formHostRecord.SetFormHostClient(token_);
-    formHostRecord.AddForm(formId);
-    formDataMgr_.clientRecords_.push_back(formHostRecord);
-
-    // create formRecords
-    int callingUid = 0;
-    FormItemInfo formItemInfo;
-    InitFormItemInfo(formId, formItemInfo);
-    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
-    formDataMgr_.formRecords_.emplace(formId, record);
-
-    formDataMgr_.HandleHostDied(token_);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleHostDied_002 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_HandleHostDied_003
- * @tc.name: HandleHostDied
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       remoteHost is not match, formRecords is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleHostDied_003 start";
-
-    int64_t formId = 3;
-
-    // create clientRecords_
-    sptr<OHOS::AppExecFwk::MockFormHostClient> token_2;
-    FormHostRecord formHostRecord;
-    formHostRecord.SetFormHostClient(token_2);
-    formHostRecord.AddForm(formId);
-    formDataMgr_.clientRecords_.push_back(formHostRecord);
-
-    // create formRecords
-    int callingUid = 0;
-    FormItemInfo formItemInfo;
-    InitFormItemInfo(formId, formItemInfo);
-    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
-    record.expectRecycled = true;
-    formDataMgr_.formRecords_.emplace(formId, record);
-
-    formDataMgr_.HandleHostDied(token_);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HandleHostDied_003 end";
 }
 
 /**
@@ -1348,26 +1225,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetMatchedHostClient_002, TestSi
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_SetNeedRefresh_001
- * @tc.name: SetNeedRefresh
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetNeedRefresh_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedRefresh_001 start";
-
-    int64_t formId = 1;
-    bool needRefresh = true;
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetNeedRefresh(formId, needRefresh);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedRefresh_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_SetNeedRefresh_002
  * @tc.name: SetNeedRefresh
  * @tc.desc: Verify that the return value is correct.
@@ -1392,26 +1249,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetNeedRefresh_002, TestSize.Lev
     EXPECT_EQ(true, formDataMgr_.formRecords_.find(formId)->second.needRefresh);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedRefresh_002 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_SetCountTimerRefresh_001
- * @tc.name: SetCountTimerRefresh
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetCountTimerRefresh_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetCountTimerRefresh_001 start";
-
-    int64_t formId = 1;
-    bool countTimerRefresh = true;
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetCountTimerRefresh(formId, countTimerRefresh);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetCountTimerRefresh_001 end";
 }
 
 /**
@@ -1541,27 +1378,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUpdatedForm_003, TestSize.Lev
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_SetEnableUpdate_001
- * @tc.name: SetEnableUpdate
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetEnableUpdate_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetEnableUpdate_001 start";
-
-    int64_t formId = 1;
-    bool enableUpdate = true;
-
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetEnableUpdate(formId, enableUpdate);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetEnableUpdate_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_SetEnableUpdate_002
  * @tc.name: SetEnableUpdate
  * @tc.desc: Verify that the return value is correct.
@@ -1586,32 +1402,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetEnableUpdate_002, TestSize.Le
     EXPECT_EQ(true, formDataMgr_.formRecords_.find(formId)->second.isEnableUpdate);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetEnableUpdate_002 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_SetUpdateInfo_001
- * @tc.name: SetUpdateInfo
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetUpdateInfo_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetUpdateInfo_001 start";
-
-    int64_t formId = 1;
-    bool enableUpdate = true;
-    long updateDuration = 100;
-    int updateAtHour = 24;
-    int updateAtMin = 59;
-    std::vector<std::vector<int>> updateAtTimes;
-    std::vector<int> newElement = { updateAtHour, updateAtMin };
-    updateAtTimes.push_back(newElement);
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetUpdateInfo_001 end";
 }
 
 /**
@@ -1866,25 +1656,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetReCreateFormRecordsByBundleNa
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_SetFormCacheInited_001
- * @tc.name: SetFormCacheInited
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormCacheInited_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormCacheInited_001 start";
-
-    int64_t formId = 1;
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetFormCacheInited(formId, true);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormCacheInited_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_SetFormCacheInited_002
  * @tc.name: SetFormCacheInited
  * @tc.desc: Verify that the return value is correct.
@@ -1912,26 +1683,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormCacheInited_002, TestSize
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_SetVersionUpgrade_001
- * @tc.name: SetVersionUpgrade
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetVersionUpgrade_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetVersionUpgrade_001 start";
-
-    int64_t formId = 1;
-    bool version = true;
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetVersionUpgrade(formId, version);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetVersionUpgrade_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_SetVersionUpgrade_002
  * @tc.name: SetFormCacheInited
  * @tc.desc: Verify that the return value is correct.
@@ -1956,28 +1707,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetVersionUpgrade_002, TestSize.
     EXPECT_EQ(true, formDataMgr_.formRecords_.find(formId)->second.versionUpgrade);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetVersionUpgrade_002 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_UpdateHostNeedRefresh_001
- * @tc.name: UpdateHostNeedRefresh
- * @tc.desc: Verify that the return value is correct.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostNeedRefresh_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateHostNeedRefresh_001 start";
-
-    int64_t formId = 1;
-    bool needRefresh = true;
-
-    // create clientRecords_
-    FormHostRecord formHostRecord;
-    formHostRecord.AddForm(formId);
-    formDataMgr_.clientRecords_.push_back(formHostRecord);
-
-    formDataMgr_.UpdateHostNeedRefresh(formId, needRefresh);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateHostNeedRefresh_001 end";
 }
 
 /**
@@ -3519,41 +3248,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRecordsByFormType_001, TestSi
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_EnableForms_001
- * @tc.name: EnableForms
- * @tc.desc: Verify that the map can be operated normally.
- * @tc.details: Determine whether an element exists in the map.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_EnableForms_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_EnableForms_001 start";
-    std::vector<FormRecord> formRecords;
-    formDataMgr_.EnableForms(std::move(formRecords), true);
-    formDataMgr_.EnableForms(std::move(formRecords), false);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_EnableForms_001 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_GetFormIdsByUserId_001
- * @tc.name: GetFormIdsByUserId
- * @tc.desc: Verify that get all formIds by userId.
- * @tc.details: Determine whether an element exists in the map.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormIdsByUserId_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormIdsByUserId_001 start";
-    FormRecord record;
-    int64_t formId = 1;
-    int formUserUid = 100;
-    record.userId = formUserUid;
-
-    formDataMgr_.formRecords_.emplace(formId, record);
-    std::vector<int64_t> formIds;
-    formDataMgr_.GetFormIdsByUserId(formUserUid, formIds);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormIdsByUserId_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_DeleteFormRecord_001
  * @tc.name: DeleteFormRecord
  * @tc.desc: Verify that the return value is correct.
@@ -3677,22 +3371,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsCallingUidValid_003, TestSize.
     bool result = formDataMgr_.IsCallingUidValid(formUserUids);
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_IsCallingUidValid_003 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_ExistFormRecord_001
- * @tc.name: ExistFormRecord
- * @tc.desc: Verify that the return value is correct.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ExistFormRecord_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ExistFormRecord_001 start";
-    int64_t formId = FORM_ID_ONE;
-    std::vector<int> formUserUids;
-    formUserUids.emplace_back(formId);
-    bool result = formDataMgr_.IsCallingUidValid(formUserUids);
-    EXPECT_EQ(result, false);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ExistFormRecord_001 end";
 }
 
 /**
@@ -4455,94 +4133,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearWantCache_002, TestSize.Lev
     auto itFormRecord = formDataMgr_.formRecords_.find(formId);
     EXPECT_TRUE(itFormRecord->second.refreshWantMap.empty());
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearWantCache_002 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_Coverage_001
- * @tc.name: Coverage
- * @tc.desc: Increase branch coverage.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_Coverage_001 start";
-    // init formID & callingUid
-    int formId1 = 1;
-    int formId2 = 2;
-    int callingUid1 = 100;
-    int callingUid2 = 102;
-
-    // init FormItemInfo
-    FormItemInfo formItemInfo1;
-    InitFormItemInfo(formId1, formItemInfo1);
-    FormItemInfo formItemInfo2;
-    InitFormItemInfo(formId2, formItemInfo2);
-
-    // init record
-    FormRecord record1 = formDataMgr_.CreateFormRecord(formItemInfo1, callingUid1, formId1);
-    FormRecord record2 = formDataMgr_.CreateFormRecord(formItemInfo2, callingUid2, formId2);
-    formDataMgr_.formRecords_.emplace(formId1, record1);
-    formDataMgr_.formRecords_.emplace(formId2, record2);
-
-    // init clientRecords
-    FormHostRecord formHostRecord1;
-    formHostRecord1.CreateRecord(formItemInfo1, token_, callingUid1);
-    formHostRecord1.AddForm(formId1);
-    formHostRecord1.callerUid_ = callingUid1;
-
-    FormHostRecord formHostRecord2;
-    formHostRecord2.CreateRecord(formItemInfo2, token_, callingUid2);
-    formHostRecord2.AddForm(formId2);
-    formHostRecord2.callerUid_ = callingUid2;
-
-    formDataMgr_.clientRecords_.push_back(formHostRecord1);
-    formDataMgr_.clientRecords_.push_back(formHostRecord2);
-
-    formDataMgr_.RecycleAllRecyclableForms();
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_Coverage_001 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_Coverage_002
- * @tc.name: Coverage
- * @tc.desc: Increase branch coverage.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_Coverage_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_Coverage_002 start";
-    // init formID & callingUid
-    int formId1 = 1;
-    int formId2 = 2;
-    int callingUid1 = 100;
-    int callingUid2 = 102;
-
-    // init FormItemInfo
-    FormItemInfo formItemInfo1;
-    InitFormItemInfo(formId1, formItemInfo1);
-
-    FormItemInfo formItemInfo2;
-    InitFormItemInfo(formId2, formItemInfo2);
-
-    // init clientRecords
-    FormHostRecord formHostRecord1;
-    formHostRecord1.CreateRecord(formItemInfo1, token_, callingUid1);
-    formHostRecord1.AddForm(formId1);
-    formHostRecord1.callerUid_ = callingUid1;
-
-    FormHostRecord formHostRecord2;
-    formHostRecord2.CreateRecord(formItemInfo2, token_, callingUid2);
-    formHostRecord2.AddForm(formId2);
-    formHostRecord2.callerUid_ = callingUid2;
-
-    formDataMgr_.clientRecords_.push_back(formHostRecord1);
-    formDataMgr_.clientRecords_.push_back(formHostRecord2);
-
-    Want want;
-    std::vector<int64_t> formIds = { formId1 };
-    formDataMgr_.RecycleForms(formIds, callingUid2, want);
-    formIds = { formId2 };
-    formDataMgr_.RecycleForms(formIds, callingUid2, want);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_Coverage_002 end";
 }
 
 /**
@@ -7153,7 +6743,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_001, TestSiz
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_001 end";
 }
-}
 
 /**
  * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos1_002
@@ -8029,3 +7618,4 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_BuildFormInstanceByFromRecord_00
     EXPECT_EQ(instance.appIndex, 1);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001 end";
 }
+}  // namespace

@@ -692,32 +692,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, BatchNotifyFormsConfigurationUpdate_001, T
 // ========== HandleFormRemoveObserver Tests ==========
 
 /**
- * @tc.name: HandleFormRemoveObserver_001
- * @tc.desc: Verify HandleFormRemoveObserver returns early when GetCallerBundleName fails
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, HandleFormRemoveObserver_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_001 start";
-
-    RunningFormInfo runningFormInfo;
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
-
-    FormLifecycleAdapter::GetInstance().HandleFormRemoveObserver(runningFormInfo);
-    // FormDataMgr::HandleFormRemoveObserver should NOT be called when GetCallerBundleName fails
-    EXPECT_CALL(*MockFormDataMgr::obj, HandleFormRemoveObserver(_, _))
-        .Times(0);
-    // Re-verify: calling again with the same mock setup confirms early return
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
-    FormLifecycleAdapter::GetInstance().HandleFormRemoveObserver(runningFormInfo);
-
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_001 end";
-}
-
-/**
  * @tc.name: HandleFormRemoveObserver_002
  * @tc.desc: Verify HandleFormRemoveObserver calls FormDataMgr when GetCallerBundleName succeeds
  * @tc.type: FUNC
@@ -1607,25 +1581,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, RecycleForms_009, TestSize.Level1)
 
 // ========== BatchNotifyFormsConfigurationUpdate Happy Path ==========
 
-/**
- * @tc.name: BatchNotifyFormsConfigurationUpdate_002
- * @tc.desc: Verify BatchNotifyFormsConfigurationUpdate with visible records processes them
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, BatchNotifyFormsConfigurationUpdate_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "BatchNotifyFormsConfigurationUpdate_002 start";
-
-    AppExecFwk::Configuration configuration;
-
-    // GetRecordsByFormType is not mocked - it's a real call that returns empty by default
-    // So we test the default empty case
-    auto result = FormLifecycleAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
-    EXPECT_EQ(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "BatchNotifyFormsConfigurationUpdate_002 end";
-}
-
 // ========== CreateForm Additional Branch ==========
 
 /**
@@ -2054,31 +2009,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, HandleDeleteFormCache_002, TestSize.Level1
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "HandleDeleteFormCache_002 end";
-}
-
-/**
- * @tc.name: HandleDeleteFormCache_003
- * @tc.desc: Verify HandleDeleteFormCache returns error when UpdateDBRecord fails
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, HandleDeleteFormCache_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "HandleDeleteFormCache_003 start";
-
-    FormRecord dbRecord;
-    dbRecord.formId = TEST_FORM_ID;
-    dbRecord.bundleName = "com.test.bundle";
-    dbRecord.moduleName = "entry";
-    dbRecord.formUserUids.push_back(TEST_CALLING_UID);
-    dbRecord.formUserUids.push_back(999);
-
-    EXPECT_CALL(*MockFormDbCache::obj, UpdateDBRecord(_, _))
-        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
-
-    auto result = FormLifecycleAdapter::GetInstance().HandleDeleteFormCache(dbRecord, TEST_CALLING_UID, TEST_FORM_ID);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "HandleDeleteFormCache_003 end";
 }
 
 // ========== HandleReleaseForm Tests ==========

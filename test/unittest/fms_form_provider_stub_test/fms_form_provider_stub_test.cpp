@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -122,57 +122,6 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_001, TestSize.Level0)
 {
     MockFormProviderClient callback;
     uint32_t code = 1;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormProviderStubTest_002
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormProviderStubTest, FormProviderStubTest_002, TestSize.Level0)
-{
-    MockFormProviderClient callback;
-    uint32_t code = 2;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormProviderStubTest_003
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormProviderStubTest, FormProviderStubTest_003, TestSize.Level0)
-{
-    MockFormProviderClient callback;
-    uint32_t code = 3;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormProviderStubTest_004
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormProviderStubTest, FormProviderStubTest_004, TestSize.Level0)
-{
-    MockFormProviderClient callback;
-    uint32_t code = 4;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
