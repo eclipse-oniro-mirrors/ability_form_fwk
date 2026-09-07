@@ -395,12 +395,18 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     // key = matchedFormId: intent executing client handle, same as native ExecuteIntent.
     // specifyTokenId 传提供方 fullTokenId：AMS 侧以完整 64 位判定系统应用身份，
     // 权限校验取其低 32 位（hapTokenId），callerToken 为宿主 token。
-    // formId 透传 matchedFormId（规范化完整卡片 id）：AMS 侧据此向最终 Want 注入
-    // 卡片标识参数（ohos.extra.param.key.form_identity / formID），供返回动画锚定
-    // 到卡片，与 router 链路（RouterEvent 注入的参数集）对齐。
+    // formId 同 router 链路（RouterEvent）：以系统保留键塞入 wantParams 随调用传入 ams，
+    // 供 ams 侧/目标 UIAbility 识别触发卡片（返回动画锚定到卡片）。
+    if (matchedFormId < MAX_NUMBER_OF_JS) {
+        want.SetParam(Constants::PARAM_FORM_ID, matchedFormId);
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, matchedFormId);
+    } else {
+        want.SetParam(Constants::PARAM_FORM_ID, std::to_string(matchedFormId));
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(matchedFormId));
+    }
     const int32_t result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
         static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
-        providerFullTokenId, callerToken, matchedFormId);
+        providerFullTokenId, callerToken);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;

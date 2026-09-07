@@ -327,8 +327,7 @@ public:
     int32_t ExecuteIntentWithSpecifyTokenId(uint64_t key,
         const sptr<IRemoteObject> &hostClient,
         const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-        uint64_t specifyTokenId = 0, const sptr<IRemoteObject> &callerToken = nullptr,
-        int64_t formId = 0)
+        uint64_t specifyTokenId = 0, const sptr<IRemoteObject> &callerToken = nullptr)
     {
         return 0;
     }
@@ -834,8 +833,7 @@ public:
     int32_t ExecuteIntentWithSpecifyTokenId(uint64_t key,
         const sptr<IRemoteObject> &hostClient,
         const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-        uint64_t specifyTokenId = 0, const sptr<IRemoteObject> &callerToken = nullptr,
-        int64_t formId = 0)
+        uint64_t specifyTokenId = 0, const sptr<IRemoteObject> &callerToken = nullptr)
     {
         return 0;
     }
