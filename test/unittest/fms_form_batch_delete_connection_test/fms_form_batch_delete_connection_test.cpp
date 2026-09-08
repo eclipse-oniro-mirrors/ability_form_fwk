@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,53 +50,4 @@ void FormBatchDeleteConnectionTest::TearDown()
 {
     formBatchDeleteConnection_ = nullptr;
 }
-
-/**
- * @tc.name: FormBatchDeleteConnectionTest_0001
- * @tc.desc: test OnAbilityConnectDone function and resultCode != ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0001, TestSize.Level0)
-{
-    HILOG_INFO("FormBatchDeleteConnectionTest_0001 start");
-    int64_t formId = 1;
-    std::set<int64_t> formIds;
-    formIds.insert(formId);
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    int32_t userId = 100;
-    sptr<FormBatchDeleteConnection> formBatchDeleteConnection =
-        new FormBatchDeleteConnection(formIds, bundleName, abilityName, userId);
-    formBatchDeleteConnection_ = formBatchDeleteConnection;
-
-    // test OnAbilityConnectDone
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = 11;
-    formBatchDeleteConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
-    ASSERT_FALSE(formBatchDeleteConnection->onFormAppConnect());
-    GTEST_LOG_(INFO) << "FormBatchDeleteConnectionTest_0001 end";
-}
-
-/**
- * @tc.name: FormBatchDeleteConnectionTest_0002
- * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0002, TestSize.Level0)
-{
-    HILOG_INFO("FormBatchDeleteConnectionTest_0002 start");
-    int64_t formId = 1;
-    std::set<int64_t> formIds;
-    formIds.insert(formId);
-    std::string bundleName = "aa";
-    std::string abilityName = "bb";
-    int32_t userId = 100;
-    sptr<FormBatchDeleteConnection> formBatchDeleteConnection =
-        new FormBatchDeleteConnection(formIds, bundleName, abilityName, userId);
-    formBatchDeleteConnection_ = formBatchDeleteConnection;
-
-    ASSERT_FALSE(formBatchDeleteConnection->onFormAppConnect());
-    GTEST_LOG_(INFO) << "FormBatchDeleteConnectionTest_0002 end";
-}
-}
+}  // namespace

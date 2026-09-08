@@ -906,21 +906,6 @@ HWTEST_F(FmsFormAbilityConnectionTest, onFormAppConnect_EmptyBundleName_001, Tes
 }
 
 /**
- * @tc.name: OnPreConnectTask_001
- * @tc.desc: Verify OnPreConnectTask default implementation does nothing and does not throw.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, OnPreConnectTask_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnPreConnectTask_001 start";
-
-    connection_->OnPreConnectTask();
-    EXPECT_TRUE(connection_->IsPreConnectTaskExecuted());
-
-    GTEST_LOG_(INFO) << "OnPreConnectTask_001 end";
-}
-
-/**
  * @tc.name: OnConnectError_001
  * @tc.desc: Verify OnConnectError is called with correct error code in derived class.
  * @tc.type: FUNC

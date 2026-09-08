@@ -178,20 +178,28 @@ void ParamControl::ParseJsonToObj(const nlohmann::json &jsonObject)
 {
     if (jsonObject.contains(DUE_PARAM_UPDATE_CTRL) && !jsonObject.at(DUE_PARAM_UPDATE_CTRL).is_null() &&
         jsonObject.at(DUE_PARAM_UPDATE_CTRL).is_array()) {
-        auto formUpdateCtrls = jsonObject.at(DUE_PARAM_UPDATE_CTRL).get<std::vector<ParamCtrl>>();
-        for (auto &item : formUpdateCtrls) {
-            if (IsParamValid(item, false)) {
-                nextUpdateDurationCtrl_.push_back(item);
+        for (const auto &item : jsonObject.at(DUE_PARAM_UPDATE_CTRL)) {
+            if (!item.is_object()) {
+                HILOG_ERROR("updateCtrls item not object");
+                continue;
+            }
+            ParamCtrl paramCtrl = item.get<ParamCtrl>();
+            if (IsParamValid(paramCtrl, false)) {
+                nextUpdateDurationCtrl_.push_back(paramCtrl);
             }
         }
     }
 
     if (jsonObject.contains(DUE_PARAM_DISABLE_CTRL) && !jsonObject.at(DUE_PARAM_DISABLE_CTRL).is_null() &&
         jsonObject.at(DUE_PARAM_DISABLE_CTRL).is_array()) {
-        auto formDisableCtrls = jsonObject.at(DUE_PARAM_DISABLE_CTRL).get<std::vector<ParamCtrl>>();
-        for (auto &item : formDisableCtrls) {
-            if (IsParamValid(item, true)) {
-                nextDisableCtrl_.push_back(item);
+        for (const auto &item : jsonObject.at(DUE_PARAM_DISABLE_CTRL)) {
+            if (!item.is_object()) {
+                HILOG_ERROR("disableCtrls item not object");
+                continue;
+            }
+            ParamCtrl paramCtrl = item.get<ParamCtrl>();
+            if (IsParamValid(paramCtrl, true)) {
+                nextDisableCtrl_.push_back(paramCtrl);
             }
         }
     }
@@ -412,6 +420,10 @@ bool ParamControl::ShouldProcessForm(const FormRecord &formRecord, const ParamCt
 
 void from_json(const nlohmann::json &jsonObject, ParamCtrl &paramCtrl)
 {
+    if (!jsonObject.is_object()) {
+        HILOG_ERROR("paramCtrl jsonObject not object");
+        return;
+    }
     paramCtrl.bundleName = jsonObject.value(DUE_PARAM_BUNDLENAME, "");
     paramCtrl.moduleName = jsonObject.value(DUE_PARAM_MODULENAME, "");
     paramCtrl.abilityName = jsonObject.value(DUE_PARAM_ABILITYNAME, "");

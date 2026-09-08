@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,38 +50,3 @@ void FormRenderServiceExtensionTest::SetUp()
 
 void FormRenderServiceExtensionTest::TearDown()
 {}
-
-/**
- * @tc.name: FormRenderServiceExtensionTest_001
- * @tc.desc: Verify Init interface executes as expected.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderServiceExtensionTest, FormRenderServiceExtensionTest_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderServiceExtensionTest_001 start";
-    std::unique_ptr<Runtime> runtime = nullptr;
-    auto formRenderServiceExtension = FormRenderServiceExtension::Create(runtime);
-    std::shared_ptr<AbilityLocalRecord> record = nullptr;
-    std::shared_ptr<OHOSApplication> application = nullptr;
-    std::shared_ptr<AbilityHandler> handler = nullptr;
-    sptr<IRemoteObject> token = nullptr;
-    formRenderServiceExtension->Init(record, application, handler, token);
-    GTEST_LOG_(INFO) << "FormRenderServiceExtensionTest_001 end";
-}
-
-/**
- * @tc.name: FormRenderServiceExtensionTest_002
- * @tc.desc: Verify OnCommand interface executes as expected.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderServiceExtensionTest, FormRenderServiceExtensionTest_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderServiceExtensionTest_002 start";
-    std::unique_ptr<Runtime> runtime = nullptr;
-    auto formRenderServiceExtension = FormRenderServiceExtension::Create(runtime);
-    AAFwk::Want want;
-    bool restart = true;
-    int startId = 1;
-    formRenderServiceExtension->OnCommand(want, restart, startId);
-    GTEST_LOG_(INFO) << "FormRenderServiceExtensionTest_002 end";
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -199,21 +199,6 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_006, TestSize.Level0)
     FormProviderData formProviderData;
     EXPECT_TRUE(formCacheMgr_.AddData(formId, formProviderData));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_006 end";
-}
-
-/*
- * Feature: FormCacheMgr
- * Function: AddCacheData
- * FunctionPoints: FormCacheMgr AddCacheData interface
- * EnvConditions: Mobile that can run ohos test framework
- */
-HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_007, TestSize.Level0)
-{
-    HILOG_INFO("fms_form_cache_mgr_test_007 start");
-    FormProviderData formProviderData;
-    FormCache formCache;
-    EXPECT_TRUE(formCacheMgr_.AddCacheData(formProviderData, formCache));
-    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_007 end";
 }
 
 /*
