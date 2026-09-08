@@ -569,6 +569,12 @@ public:
                                      const sptr<IRemoteObject> &callerToken, int callingUid);
 
     /**
+     * @brief Remove the acquire data host record on connection failure.
+     * @param requestCode The request code of this acquire form.
+     */
+    void RemoveFormAcquireDataRecord(int64_t requestCode);
+
+    /**
      * @brief Create form state host record.
      * @param provider The provider of the form state
      * @param info The form item info.
