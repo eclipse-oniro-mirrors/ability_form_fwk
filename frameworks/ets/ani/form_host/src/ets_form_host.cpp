@@ -2747,14 +2747,17 @@ public:
 
     bool IsStrictEqual(ani_object callback)
     {
-        ani_boolean equals = true;
+        ani_boolean equals = false;
         ani_env *env = GetEnvFromVm(m_vm);
         if (env == nullptr) {
             HILOG_ERROR("Env is null");
-            return equals;
+            return false;
         }
 
-        env->Reference_StrictEquals(callback, m_callback, &equals);
+        if (env->Reference_StrictEquals(callback, m_callback, &equals) != ANI_OK) {
+            HILOG_ERROR("Reference_StrictEquals failed");
+            return false;
+        }
         return equals;
     }
 
