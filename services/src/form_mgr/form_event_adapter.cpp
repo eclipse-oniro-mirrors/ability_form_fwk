@@ -116,12 +116,16 @@ int PrepareInsightIntentParam(Want &want, const FormRecord &record, const int32_
         HILOG_ERROR("GenerateFromWant failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    // Host want carries no element; AMS CheckAndUpdateParam requires
-    // bundleName/moduleName/insightIntentName non-empty, fill provider info from form record.
-    executeParam.bundleName_ = record.bundleName;
-    executeParam.moduleName_ = record.moduleName;
+    // 宿主 want 可携带 postCardAction 透传的目标三元组：已传入字段保持用户值，
+    // 仅缺失时按 FormRecord 回填提供方信息（AMS 侧要求三项最终非空）。
+    if (executeParam.bundleName_.empty()) {
+        executeParam.bundleName_ = record.bundleName;
+    }
+    if (executeParam.moduleName_.empty()) {
+        executeParam.moduleName_ = record.moduleName;
+    }
     if (executeParam.abilityName_.empty()) {
-        // 卡片侧不传 abilityName；回填提供方模块 mainElement（入口 UIAbility）。
+        // 用户未传 abilityName 时回填提供方模块 mainElement（入口 UIAbility）。
         // record.abilityName 为 FormExtensionAbility 名，不能作为意图执行目标。
         executeParam.abilityName_ = GetProviderMainElement(record, callerUserId);
         if (executeParam.abilityName_.empty()) {
