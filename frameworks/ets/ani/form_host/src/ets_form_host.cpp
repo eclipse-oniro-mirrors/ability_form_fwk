@@ -927,6 +927,7 @@ ErrCode EtsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string,
         EtsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
     };
     mainHandler->PostSyncTask(executeFunc, "EtsFormRouterProxyMgr::GetLiveFormStatus");
+
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;

@@ -3659,6 +3659,7 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
         JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::GetLiveFormStatus");
+
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
