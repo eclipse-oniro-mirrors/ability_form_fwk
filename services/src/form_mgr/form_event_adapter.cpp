@@ -25,7 +25,6 @@
 #include "insight_intent_host_client.h"
 #include "running_form_info.h"
 #include "start_options.h"
-#include "tokenid_kit.h"
 
 #include "nlohmann/json.hpp"
 
@@ -54,9 +53,6 @@ namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 
-// 系统签名应用：非预置、但以系统证书签名（profile 中 app-feature 为 hos_system_app）。
-// 其 AccessToken 系统应用标志位与预置系统应用一致，可通过 fullTokenId 查询，与是否预装无关。
-
 // 拼接提供方 fullTokenId（高 32 位 tokenAttr + 低 32 位 hapTokenId），查询失败返回 0。
 uint64_t GetProviderFullTokenId(const std::string &bundleName, const int32_t userId)
 {
@@ -77,13 +73,6 @@ uint64_t GetProviderFullTokenId(const std::string &bundleName, const int32_t use
     }
     constexpr int32_t TOKEN_ID_BIT_SIZE = 32;
     return (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ID_BIT_SIZE) + tokenId;
-}
-
-bool IsSystemSignedProvider(const std::string &bundleName, const int32_t providerUserId)
-{
-    // tokenAttr 为 fullTokenId 的高 32 位，拼接后查询系统应用标志位。
-    const uint64_t fullTokenId = GetProviderFullTokenId(bundleName, providerUserId);
-    return fullTokenId != 0 && Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
 }
 
 // 意图执行目标是提供方模块的入口 UIAbility（module.json5 的 mainElement，如 EntryAbility），
@@ -385,9 +374,9 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    // insightIntent 仅开放给系统应用的卡片提供方（预置 FormRecord 标志 / 系统签名 AccessToken 标志）。
-    if (!record.isSystemApp && !IsSystemSignedProvider(record.bundleName, record.providerUserId)) {
-        HILOG_ERROR("insightIntent rejected, provider is not system app or system signed app, "
+    // insightIntent 仅开放给预置系统应用的卡片提供方，不放行系统签名应用。
+    if (!record.isSystemApp) {
+        HILOG_ERROR("insightIntent rejected, provider is not system app, "
             "bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
