@@ -1550,15 +1550,17 @@ void AcquireFormState([[maybe_unused]] ani_env *env, ani_object wantObject, ani_
     bool result = UnwrapWant(env, wantObject, want);
     if (!result) {
         HILOG_ERROR("Fail want parse");
+        env->GlobalReference_Delete(acquireFormStateCallback);
         InvokeAsyncWithBusinessError(env, aniCallback, static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM),
             nullptr);
         return;
     }
 
-    ani_vm *vm;
+    ani_vm *vm = nullptr;
     auto stat = env->GetVM(&vm);
     if (stat != ANI_OK || vm == nullptr) {
         HILOG_ERROR("Cannot get vm");
+        env->GlobalReference_Delete(acquireFormStateCallback);
         InvokeAsyncWithBusinessError(env, aniCallback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
@@ -1580,6 +1582,7 @@ void AcquireFormState([[maybe_unused]] ani_env *env, ani_object wantObject, ani_
             bool result = InnerAcquireFormState(env, acquireFormStateCallback, state, want);
             if (!result) {
                 HILOG_ERROR("Cannot call callback");
+                env->GlobalReference_Delete(acquireFormStateCallback);
                 PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
                 return;
             }
@@ -1599,6 +1602,7 @@ void AcquireFormState([[maybe_unused]] ani_env *env, ani_object wantObject, ani_
     if (resultFromFormMgr != ERR_OK) {
         HILOG_ERROR("Cannot get state info from system");
         FormHostClient::GetInstance()->RemoveFormState(want);
+        env->GlobalReference_Delete(acquireFormStateCallback);
         InvokeAsyncWithBusinessError(env, aniCallback, static_cast<int32_t>(resultFromFormMgr), nullptr);
         return;
     }
@@ -2742,7 +2746,7 @@ public:
             HILOG_ERROR("Env is null");
             return;
         }
-        env->Reference_Delete(m_callback);
+        env->GlobalReference_Delete(m_callback);
     }
 
     bool IsStrictEqual(ani_object callback)
@@ -2842,9 +2846,10 @@ void AddFormUninstallCallback(ani_env *env, ani_object callback)
         return;
     }
 
-    ani_vm *vm;
+    ani_vm *vm = nullptr;
     auto getVmStatus = env->GetVM(&vm);
-    if (getVmStatus != ANI_OK) {
+    if (getVmStatus != ANI_OK || vm == nullptr) {
+        env->GlobalReference_Delete(uninstallCallback);
         HILOG_ERROR("Failed to get VM: %{public}d", getVmStatus);
         PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
         return;
