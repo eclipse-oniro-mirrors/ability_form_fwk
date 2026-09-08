@@ -490,7 +490,7 @@ void FormStatusTaskMgr::RenderForm(
         RemoveConnection(connectId);
         HILOG_ERROR("get formRenderProxy failed");
         return;
-    }
+}
 
     FormJsInfo formJsInfo;
     CreateRenderFormJsInfo(formRecord, want, formJsInfo);
@@ -498,6 +498,8 @@ void FormStatusTaskMgr::RenderForm(
     Want newWant(want);
     std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formRecord.formId);
     newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
+
+    newWant.SetParam(Constants::FORM_IS_VISIBLE, FormDataMgr::GetInstance().GetFormVisible(formRecord.formId));
 
     int32_t error = remoteFormRender->RenderForm(formJsInfo, newWant, FormSupplyCallback::GetInstance());
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId, HiSysEventPointType::TYPE_DAILY_REFRESH);
