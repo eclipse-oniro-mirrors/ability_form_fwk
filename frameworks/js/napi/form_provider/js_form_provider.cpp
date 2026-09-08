@@ -1406,6 +1406,13 @@ napi_value JsFormProvider::OnUnregisterPublishFormCrossBundleControl(napi_env en
     return CreateJsValue(env, result);
 }
 
+<<<<<<< HEAD
+=======
+sptr<JsFormProviderProxyMgr> JsFormProviderProxyMgr::instance_ = nullptr;
+std::once_flag JsFormProviderProxyMgr::onceFlag_;
+std::mutex JsFormProviderProxyMgr::mutex_;
+
+>>>>>>> 4576fc10c (修复form_fwk稳定性问题：json解析类型校验防崩溃、napi返回值检查及引用生命周期管理、单例call_once初始化、FormAmsHelper锁粒度修正、GetUnusedFormInfos按userId过滤)
 JsFormProviderProxyMgr::~JsFormProviderProxyMgr()
 {
     std::lock_guard<std::mutex> lock(crossBundleControlMutex_);

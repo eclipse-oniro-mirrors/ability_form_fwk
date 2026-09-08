@@ -1317,7 +1317,7 @@ private:
     void GetUnusedFormInstancesByFilter(
         const FormInstancesFilter &formInstancesFilter, int32_t appIndex, std::vector<FormInstance> &formInstances);
     ErrCode GetUnusedFormInstanceById(const int64_t formId, FormInstance &formInstance);
-    void GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
+    void GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos, int32_t userId);
     void GetUnusedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos);
     void DeleteRecordTempForms(const std::vector<int64_t> &recordTempForms);
     /**

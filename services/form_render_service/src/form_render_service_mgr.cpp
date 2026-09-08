@@ -848,6 +848,11 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
             HILOG_ERROR("fail.");
             return RENDER_FORM_FAILED;
         }
+        // Identity check: ensure the map entry still points to the same record (TOCTOU guard)
+        if (iterator->second.get() != search.get()) {
+            HILOG_WARN("render record replaced for uid:%{public}s, skip erase", uid.c_str());
+            return ERR_OK;
+        }
         search->Release();
         renderRecordMap_.erase(iterator);
         HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());

@@ -719,6 +719,11 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
     }
+    ret = FormMgrAdapterFacade::GetInstance().MessageEvent(formId, want, callerToken);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("MessageEvent failed, formId:%{public}" PRId64 ", ret:%{public}d", formId, ret);
+        return ret;
+    }
     FormEventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
@@ -730,7 +735,7 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
     }
     FormReport::GetInstance().SetDurationStartTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormEventReport::SendFormEvent(FormEventName::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
-    return FormMgrAdapterFacade::GetInstance().MessageEvent(formId, want, callerToken);
+    return ret;
 }
 
 /**
@@ -1459,8 +1464,7 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
 
 void FormMgrService::InitFormShareMgrSerialQueue()
 {
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(serialQueue_);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler_);
+    DelayedSingleton<FormShareMgr>::GetInstance()->Initialize(handler_, serialQueue_);
 }
 
 int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
@@ -2076,14 +2080,13 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     FormEventReport::SendRequestPublicFormEvent(bundleName, formName,
         RequestFormType::REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
     auto ret = FormMgrAdapterFacade::GetInstance().RequestPublishFormWithSnapshot(want, withFormBindingData,
         formBindingData, formId);
     if (ret == ERR_OK) {
         std::lock_guard<std::mutex> lock(snapshotSetMutex_);
         requestPublishFormWithSnapshotSet_.insert(formId);
-        auto taskId = std::make_pair((int64_t)TaskType::UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
-            static_cast<int64_t>(callingUid));
+        auto taskId = std::make_pair(static_cast<int64_t>(
+            TaskType::UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT), formId);
         FormMgrQueue::GetInstance().ScheduleDelayTask(
             taskId, IS_FORM_REQUEST_PUBLISH_FORM_TASK_DELAY_TIME,
             [weakThis = weak_from_this(), taskId, formId]() {

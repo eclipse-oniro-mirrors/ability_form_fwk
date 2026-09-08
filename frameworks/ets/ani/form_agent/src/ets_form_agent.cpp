@@ -57,36 +57,90 @@ void RequestPublishForm(ani_env *env, ani_object aniWant, ani_object callback)
         HILOG_ERROR("env is nullptr");
         return;
     }
-    auto asyncCallbackInfo = std::make_shared<RequestPublishFormCallbackInfo>();
-    if (!AppExecFwk::UnwrapWant(env, aniWant, asyncCallbackInfo->want)) {
+
+    // Capture VM + global ref BEFORE doing anything that may block so the host ArkTS
+    // callback can be invoked safely on the UI thread afterwards. The callback is an
+    // ArkTS closure bound to the main VM; VM ops must not happen on the taskpool worker
+    // thread (CLAUDE.md S5).
+    ani_vm *vm = nullptr;
+    if (env->GetVM(&vm) != ANI_OK || vm == nullptr) {
+        HILOG_ERROR("GetVM failed");
+        return;
+    }
+    ani_ref callbackRef = nullptr;
+    if (env->GlobalReference_Create(callback, &callbackRef) != ANI_OK) {
+        HILOG_ERROR("GlobalReference_Create failed");
+        return;
+    }
+
+    // UnwrapWant reads the ANI aniWant object; the resulting Want is a value copy that
+    // is safe to use on the worker thread for the following IPC.
+    AAFwk::Want want;
+    if (!AppExecFwk::UnwrapWant(env, aniWant, want)) {
         HILOG_ERROR("fail convert want");
-        EtsFormErrorUtil::ThrowParamError(env, "Failed to convert want.");
+        auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(
+            AppExecFwk::EventRunner::GetMainEventRunner());
+        mainHandler->PostTask([vm, callbackRef, mainHandler]() {
+            ani_env *uiEnv = FormAniUtil::GetEnvFromVm(vm);
+            if (uiEnv == nullptr || callbackRef == nullptr) {
+                HILOG_ERROR("get ui env failed or callback ref is null");
+                return;
+            }
+            ani_size nr = REFERENCES_MAX_NUMBER;
+            uiEnv->CreateLocalScope(nr);
+            EtsFormErrorUtil::ThrowParamError(uiEnv, "Failed to convert want.");
+            FormAniUtil::AsyncCallback(uiEnv, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
+                static_cast<ani_object>(callbackRef),
+                EtsFormErrorUtil::CreateErrorByInternalErrorCode(
+                    uiEnv, ERR_APPEXECFWK_FORM_INVALID_PARAM),
+                nullptr);
+            uiEnv->GlobalReference_Delete(callbackRef);
+            uiEnv->DestroyLocalScope();
+        }, "RequestPublishForm::ParamErrorCallback");
         return;
     }
-    asyncCallbackInfo->want.SetParam(IS_FORM_AGENT, true);
+    want.SetParam(IS_FORM_AGENT, true);
+
+    // Worker thread: blocking IPC only, then capture POD results.
     int64_t formId = -1;
-    ErrCode ret = FormMgr::GetInstance().RequestPublishForm(
-        asyncCallbackInfo->want, false, asyncCallbackInfo->formProviderData,
-        formId, asyncCallbackInfo->formDataProxies);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("fail RequestPublishForm startAbility");
-        FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
-            callback, EtsFormErrorUtil::CreateErrorByInternalErrorCode(env, ret),
-            nullptr);
-        return;
-    }
-    ret = FormMgr::GetInstance().AcquireAddFormResult(formId);
-    if (ret == ERR_OK) {
-        HILOG_INFO("Sucess");
-        ani_string aniStrformId = FormAniUtil::GetAniString(env, std::to_string(formId));
-        FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
-            EtsFormErrorUtil::CreateError(env, ret), reinterpret_cast<ani_object>(aniStrformId));
-    } else {
-        HILOG_ERROR("fail");
-        FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
-            EtsFormErrorUtil::CreateErrorByInternalErrorCode(env, ret), nullptr);
-    }
-    return;
+    std::unique_ptr<AppExecFwk::FormProviderData> formProviderData;
+    std::vector<AppExecFwk::FormDataProxy> formDataProxies;
+    ErrCode ipcRet = FormMgr::GetInstance().RequestPublishForm(
+        want, false, formProviderData, formId, formDataProxies);
+    ErrCode acqRet = (ipcRet == ERR_OK)
+        ? FormMgr::GetInstance().AcquireAddFormResult(formId)
+        : ipcRet;
+
+    // Post VM-facing callback work to the main event runner so all ANI ops happen on
+    // the UI thread (matching JsFormCrossDevicePublishCallback::OnResult pattern).
+    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(
+        AppExecFwk::EventRunner::GetMainEventRunner());
+    mainHandler->PostTask(
+        [vm, callbackRef, acqRet, formId, mainHandler]() {
+            ani_env *uiEnv = FormAniUtil::GetEnvFromVm(vm);
+            if (uiEnv == nullptr || callbackRef == nullptr) {
+                HILOG_ERROR("get ui env failed or callback ref is null");
+                return;
+            }
+            ani_size nr = REFERENCES_MAX_NUMBER;
+            uiEnv->CreateLocalScope(nr);
+            if (acqRet == ERR_OK) {
+                ani_string s = FormAniUtil::GetAniString(uiEnv, std::to_string(formId));
+                FormAniUtil::AsyncCallback(uiEnv, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
+                    static_cast<ani_object>(callbackRef),
+                    EtsFormErrorUtil::CreateError(uiEnv, acqRet),
+                    reinterpret_cast<ani_object>(s));
+            } else {
+                HILOG_ERROR("fail acqRet:%{public}d", acqRet);
+                FormAniUtil::AsyncCallback(uiEnv, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
+                    static_cast<ani_object>(callbackRef),
+                    EtsFormErrorUtil::CreateErrorByInternalErrorCode(uiEnv, acqRet),
+                    nullptr);
+            }
+            uiEnv->GlobalReference_Delete(callbackRef);
+            uiEnv->DestroyLocalScope();
+        },
+        "RequestPublishForm::MainCallback");
 }
 
 void CheckWantParam(ani_env *env, ani_object aniWant, ani_object callback)

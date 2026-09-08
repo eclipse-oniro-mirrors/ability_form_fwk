@@ -1297,20 +1297,17 @@ private:
         }
         convertArgc++;
 
+        auto refGuard = CreateCallbackRefGuard(env, argv[PARAM1]);
+        if (refGuard == nullptr) {
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            return CreateJsUndefined(env);
+        }
+
         auto apiResult = std::make_shared<int32_t>();
-        JsFormRouterProxyMgr::GetInstance()->AddFormRouterProxyCallback(env, argv[PARAM1], formIds);
         auto execute = [formIds, ret = apiResult]() {
             *ret = FormMgr::GetInstance().RegisterFormRouterProxy(formIds, JsFormRouterProxyMgr::GetInstance());
         };
-
-        NapiAsyncTask::CompleteCallback complete =
-            [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
-                if (*ret == ERR_OK) {
-                    task.ResolveWithNoError(env, CreateJsUndefined(env));
-                } else {
-                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
-                }
-            };
+        auto complete = CreateSetRouterProxyCompleteCallback(apiResult, refGuard, formIds);
 
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
@@ -1320,6 +1317,36 @@ private:
 #else
         return nullptr;
 #endif
+    }
+
+    static std::shared_ptr<napi_ref> CreateCallbackRefGuard(napi_env env, napi_value callback)
+    {
+        napi_ref callbackRef = nullptr;
+        if (napi_create_reference(env, callback, REF_COUNT, &callbackRef) != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create callback reference failed");
+            return nullptr;
+        }
+        return std::shared_ptr<napi_ref>(new napi_ref(callbackRef),
+            [env](napi_ref* p) { if (p && *p) { napi_delete_reference(env, *p); } delete p; });
+    }
+
+    NapiAsyncTask::CompleteCallback CreateSetRouterProxyCompleteCallback(std::shared_ptr<int32_t> ret,
+        std::shared_ptr<napi_ref> refGuard, std::vector<int64_t> formIds)
+    {
+        return [ret, refGuard, formIdsCopy = std::move(formIds)](napi_env env, NapiAsyncTask &task,
+            int32_t status) {
+            if (*ret == ERR_OK) {
+                napi_value callback = nullptr;
+                if (napi_get_reference_value(env, *refGuard, &callback) != napi_ok || callback == nullptr) {
+                    HILOG_ERROR("napi_get_reference_value failed");
+                } else {
+                    JsFormRouterProxyMgr::GetInstance()->AddFormRouterProxyCallback(env, callback, formIdsCopy);
+                }
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+            }
+        };
     }
 
     napi_value OnClearRouterProxy(napi_env env, size_t argc, napi_value* argv)
@@ -2870,14 +2897,32 @@ private:
             }
  
             napi_value arrayValue = nullptr;
-            napi_create_array_with_length(env, (*formIds).size(), &arrayValue);
+            if (napi_create_array_with_length(env, formIds->size(), &arrayValue) != napi_ok ||
+                arrayValue == nullptr) {
+                HILOG_ERROR("napi_create_array_with_length failed, size=%{public}zu", formIds->size());
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
+                return;
+            }
+
             uint32_t index = 0;
             for (const auto &formId : *formIds) {
-                napi_value formIdStr;
-                napi_create_string_utf8(env, formId.c_str(), NAPI_AUTO_LENGTH, &formIdStr);
-                napi_set_element(env, arrayValue, index++, formIdStr);
+                napi_value formIdStr = nullptr;
+                if (napi_create_string_utf8(env, formId.c_str(), NAPI_AUTO_LENGTH, &formIdStr) != napi_ok ||
+                    formIdStr == nullptr) {
+                    HILOG_ERROR("napi_create_string_utf8 failed for formId");
+                    task.Reject(env,
+                        NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
+                    return;
+                }
+                if (napi_set_element(env, arrayValue, index, formIdStr) != napi_ok) {
+                    HILOG_ERROR("napi_set_element failed at index=%{public}u", index);
+                    task.Reject(env,
+                        NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
+                    return;
+                }
+                ++index;
             }
- 
+
             task.ResolveWithNoError(env, arrayValue);
         };
     }
@@ -3201,41 +3246,56 @@ napi_value JsFormRouterProxyMgr::CreateRequestOverflowObj(napi_env env,
         return nullptr;
     }
 
-    napi_value formIdValue;
-    napi_create_string_utf8(env, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue);
+    napi_value formIdValue = nullptr;
+    if (napi_create_string_utf8(env, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &formIdValue) != napi_ok ||
+        formIdValue == nullptr) {
+        HILOG_ERROR("create formId string failed");
+        return nullptr;
+    }
     napi_set_named_property(env, requestObj, "formId", formIdValue);
     napi_set_named_property(env, requestObj, "isOverflow", CreateJsValue(env, dataParam->isOverflow));
 
-    napi_value overflowInfoValue;
+    napi_value overflowInfoValue = nullptr;
     CreateFormOverflowInfo(env, dataParam->overflowInfo, &overflowInfoValue);
+    if (overflowInfoValue == nullptr) {
+        HILOG_ERROR("CreateFormOverflowInfo failed");
+        return nullptr;
+    }
     napi_set_named_property(env, requestObj, "overflowInfo", overflowInfoValue);
     return requestObj;
 }
 
+// caller RequestOverflowInner already opens an outer scope that covers this function.
 void JsFormRouterProxyMgr::CreateFormOverflowInfo(napi_env env, AppExecFwk::OverflowInfo &overflowInfo,
     napi_value* result)
 {
     HILOG_INFO("CreateFormOverflowInfo call");
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        HILOG_ERROR("null scope");
+    if (result == nullptr) {
+        HILOG_ERROR("null result");
         return;
     }
     napi_value area = nullptr;
-    napi_create_object(env, &area);
+    if (napi_create_object(env, &area) != napi_ok || area == nullptr) {
+        HILOG_ERROR("create area object failed");
+        return;
+    }
     napi_set_named_property(env, area, "left", CreateJsValue(env, overflowInfo.area.left));
     napi_set_named_property(env, area, "top", CreateJsValue(env, overflowInfo.area.top));
     napi_set_named_property(env, area, "width", CreateJsValue(env, overflowInfo.area.width));
     napi_set_named_property(env, area, "height", CreateJsValue(env, overflowInfo.area.height));
 
     napi_value duration = nullptr;
-    napi_create_int32(env, overflowInfo.duration, &duration);
-    napi_create_object(env, result);
+    if (napi_create_int32(env, overflowInfo.duration, &duration) != napi_ok || duration == nullptr) {
+        HILOG_ERROR("create duration failed");
+        return;
+    }
+    if (napi_create_object(env, result) != napi_ok || *result == nullptr) {
+        HILOG_ERROR("create result object failed");
+        return;
+    }
     napi_set_named_property(env, *result, "area", area);
     napi_set_named_property(env, *result, "duration", duration);
     napi_set_named_property(env, *result, "useDefaultAnimation", CreateJsValue(env, overflowInfo.useDefaultAnimation));
-    napi_close_handle_scope(env, scope);
 }
 
 bool JsFormRouterProxyMgr::RegisterChangeSceneAnimationStateListener(napi_env env, napi_ref callbackRef)
@@ -4188,45 +4248,76 @@ ErrCode JsFormRouterProxyMgr::DeleteFormsCallback(const std::vector<std::string>
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::string> &formIds)
+namespace {
+void CloseScopeAndUnref(napi_env env, napi_handle_scope scope, napi_ref ref)
 {
-    HILOG_DEBUG("call, formIds size: %{public}zu", formIds.size());
+    if (scope != nullptr && napi_close_handle_scope(env, scope) != napi_ok) {
+        HILOG_ERROR("napi_close_handle_scope failed");
+    }
+    uint32_t refCount = 0;
+    if (napi_reference_unref(env, ref, &refCount) != napi_ok) {
+        HILOG_ERROR("napi_reference_unref failed");
+    }
+}
+}
 
-    napi_handle_scope scope = nullptr;
+bool JsFormRouterProxyMgr::AcquireDeleteFormsCallback(napi_env &env, napi_ref &ref)
+{
     std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
     if (deleteFormsCallbackEnv_ == nullptr || deleteFormsCallbackRef_ == nullptr) {
         HILOG_WARN("deleteForms callback or env is null");
         return false;
     }
-    napi_open_handle_scope(deleteFormsCallbackEnv_, &scope);
+    env = deleteFormsCallbackEnv_;
+    ref = deleteFormsCallbackRef_;
+    uint32_t refCount = 0;
+    if (napi_reference_ref(env, ref, &refCount) != napi_ok) {
+        HILOG_ERROR("napi_reference_ref failed");
+        return false;
+    }
+    return true;
+}
+
+bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::string> &formIds)
+{
+    HILOG_DEBUG("call, formIds size: %{public}zu", formIds.size());
+    napi_env env = nullptr;
+    napi_ref ref = nullptr;
+    if (!AcquireDeleteFormsCallback(env, ref)) {
+        return false;
+    }
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
+        CloseScopeAndUnref(env, scope, ref);
         return false;
     }
 
     napi_value callback = nullptr;
-    if (!GetValidCallback(deleteFormsCallbackEnv_, deleteFormsCallbackRef_, callback)) {
-        napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
+    if (!GetValidCallback(env, ref, callback)) {
+        CloseScopeAndUnref(env, scope, ref);
         return false;
     }
 
     napi_value formIdArray = nullptr;
     if (!CreateStringArray(formIds, formIdArray)) {
-        napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
+        CloseScopeAndUnref(env, scope, ref);
         return false;
     }
 
     napi_value undefined = nullptr;
-    napi_get_undefined(deleteFormsCallbackEnv_, &undefined);
-    napi_status status = napi_call_function(
-        deleteFormsCallbackEnv_, undefined, callback, ARGS_ONE, &formIdArray, nullptr);
+    napi_get_undefined(env, &undefined);
+    napi_status status = napi_call_function(env, undefined, callback, ARGS_ONE, &formIdArray, nullptr);
+    {
+        std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
+        CloseScopeAndUnref(env, scope, ref);
+    }
     if (status != napi_ok) {
         HILOG_ERROR("napi_call_function failed, status: %{public}d", static_cast<int>(status));
-        napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
         return false;
     }
-
-    napi_close_handle_scope(deleteFormsCallbackEnv_, scope);
     return true;
 }
 

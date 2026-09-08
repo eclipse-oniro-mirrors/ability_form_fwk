@@ -66,6 +66,20 @@ public:
         serialQueue_ = serialQueue;
     }
 
+    void Initialize(const std::shared_ptr<FormEventHandler> &handler,
+                    const std::shared_ptr<FormSerialQueue> &serialQueue)
+    {
+        std::call_once(initOnce_, [this, handler, serialQueue]() {
+            if (handler == nullptr || serialQueue == nullptr) {
+                HILOG_ERROR("FormShareMgr::Initialize null handler or serialQueue, skip");
+                return;
+            }
+            serialQueue_ = serialQueue;
+            eventHandler_ = handler;
+            eventHandler_->RegisterEventTimeoutObserver(shared_from_this());
+        });
+    }
+
     /**
      * @brief Share form by formID and deviceID.
      * @param formId Indicates the unique id of form.
@@ -159,6 +173,7 @@ private:
     void OnEventTimeoutResponse(int64_t msg, int64_t eventId) override;
 private:
     DECLARE_DELAYED_SINGLETON(FormShareMgr);
+    std::once_flag initOnce_;
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
     std::unique_ptr<FormDistributedClient> formDmsClient_ = nullptr;
     std::once_flag formDmsClientInitFlag_;

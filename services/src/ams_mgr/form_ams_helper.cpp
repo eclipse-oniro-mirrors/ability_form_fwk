@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,26 +45,25 @@ FormAmsHelper::~FormAmsHelper()
 sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
 {
     HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(abilityManagerMutex_);
+    if (abilityManager_ != nullptr) {
+        return abilityManager_;
+    }
+    sptr<ISystemAbilityManager> systemManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemManager == nullptr) {
+        HILOG_ERROR("fail get system ability manager");
+        return nullptr;
+    }
+    auto remoteObject = systemManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("fail get ability manager service");
+        return nullptr;
+    }
+    abilityManager_ = iface_cast<AAFwk::IAbilityManager>(remoteObject);
     if (abilityManager_ == nullptr) {
-        std::lock_guard<std::mutex> lock(abilityManagerMutex_);
-        if (abilityManager_ == nullptr) {
-            sptr<ISystemAbilityManager> systemManager =
-                SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-            if (systemManager == nullptr) {
-                HILOG_ERROR("fail get system ability manager");
-                return nullptr;
-            }
-            auto remoteObject = systemManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
-            if (remoteObject == nullptr) {
-                HILOG_ERROR("fail get ability manager service");
-                return nullptr;
-            }
-            abilityManager_ = iface_cast<AAFwk::IAbilityManager>(remoteObject);
-            if (abilityManager_ == nullptr) {
-                HILOG_ERROR("fail iface_cast ability manager service");
-                return nullptr;
-            }
-        }
+        HILOG_ERROR("fail iface_cast ability manager service");
+        return nullptr;
     }
     return abilityManager_;
 }
@@ -163,6 +162,7 @@ ErrCode FormAmsHelper::StopExtensionAbility(const Want &want)
  */
 void FormAmsHelper::SetAbilityManager(const sptr<AAFwk::IAbilityManager> &abilityManager)
 {
+    std::lock_guard<std::mutex> lock(abilityManagerMutex_);
     abilityManager_ = abilityManager;
 }
 

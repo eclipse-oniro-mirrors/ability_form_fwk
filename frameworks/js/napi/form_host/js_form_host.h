@@ -143,6 +143,7 @@ private:
     napi_env deleteFormsCallbackEnv_ = nullptr;
     ErrCode DeleteFormsCallback(const std::vector<std::string> &formIds);
     bool DeleteFormsCallbackInner(const std::vector<std::string> &formIds);
+    bool AcquireDeleteFormsCallback(napi_env &env, napi_ref &ref);
     bool CreateStringArray(const std::vector<std::string> &strings, napi_value &array);
     static bool GetValidCallback(napi_env env, napi_ref callbackRef, napi_value &callback);
 
