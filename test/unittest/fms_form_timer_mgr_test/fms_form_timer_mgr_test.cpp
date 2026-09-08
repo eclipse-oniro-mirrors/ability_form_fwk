@@ -817,8 +817,8 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0043, TestSize.Level1)
 
 /**
  * @tc.number: Fms_FormTimerMgr_0044
- * @tc.name: UpdateAtTimerValue.
- * @tc.desc: test UpdateAtTimerValue function.
+ * @tc.name: AtTimerToIntervalTimer.
+ * @tc.desc: test AtTimerToIntervalTimer function.
  */
 HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0044, TestSize.Level1)
 {
@@ -826,9 +826,8 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0044, TestSize.Level1)
     FormTimerMgr formTimerMgr;
     int64_t formId = 1;
     FormTimerCfg timerCfg;
-    timerCfg.updateAtHour = Constants::MIN_TIME + 1;
-    timerCfg.updateAtMin = Constants::MIN_TIME + 1;
-    EXPECT_EQ(false, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    timerCfg.updateDuration = 2 * Constants::MIN_PERIOD;
+    EXPECT_EQ(false, formTimerMgr.AtTimerToIntervalTimer(formId, timerCfg));
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0044 end";
 }
 
