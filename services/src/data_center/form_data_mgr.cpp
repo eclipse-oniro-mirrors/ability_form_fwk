@@ -325,6 +325,11 @@ bool FormDataMgr::CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteO
     }
 
     record = FormHostRecord::CreateRecord(info, callerToken, callingUid);
+    if (record.GetDeathRecipient() == nullptr) {
+        // Allocation failed; a record without death recipient can never be cleaned on host died.
+        HILOG_ERROR("create death recipient failed");
+        return false;
+    }
     return true;
 }
 
@@ -1089,10 +1094,10 @@ bool FormDataMgr::RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &cal
 void FormDataMgr::CleanHostRemovedForms(const std::vector<int64_t> &removedFormIds)
 {
     HILOG_INFO("delete form host record by formId list");
-    std::vector<int64_t> matchedIds;
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     std::vector<FormHostRecord>::iterator itHostRecord;
     for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        std::vector<int64_t> matchedIds;
         for (const int64_t &formId : removedFormIds) {
             if (itHostRecord->Contains(formId)) {
                 matchedIds.emplace_back(formId);

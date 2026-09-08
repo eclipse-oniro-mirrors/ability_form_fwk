@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,6 +51,7 @@ constexpr int32_t IMAGE_SIZE_INDEX = 2;
 
 constexpr int32_t INVALID_INDEX = -1;
 constexpr int32_t MAX_IMAGE_DATA_SIZE = 50 * 1024 * 1024; // 50MB, consistent with MAX_IMAGE_BYTE_SIZE
+constexpr size_t MAX_CACHE_DATA_SIZE = 32 * 1024 * 1024; // 32MB, consistent with MAX_BUFFER_SIZE
 constexpr const char *IS_DIRTY_DATA_CLEANED = "isDirtyDataCleaned";
 
 inline bool IsDigitsOnly(const std::string &str)
@@ -273,6 +274,10 @@ bool FormCacheMgr::AddCacheData(
     if (!HasContent(formCache.dataCache)) {
         // No dataCache in db
         formCache.dataCache = newDataObj.dump();
+        if (formCache.dataCache.size() > MAX_CACHE_DATA_SIZE) {
+            HILOG_ERROR("dataCache too large:%{public}zu", formCache.dataCache.size());
+            return false;
+        }
         return true;
     }
 
@@ -287,6 +292,10 @@ bool FormCacheMgr::AddCacheData(
         dataCacheObj[key] = value;
     }
     formCache.dataCache = dataCacheObj.dump();
+    if (formCache.dataCache.size() > MAX_CACHE_DATA_SIZE) {
+        HILOG_ERROR("merged dataCache too large:%{public}zu", formCache.dataCache.size());
+        return false;
+    }
     return true;
 }
 

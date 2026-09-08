@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -284,7 +284,8 @@ bool FormTimerMgr::UpdateTimerValue(int64_t formId, const FormTimerCfg &timerCfg
         }
     }
 
-    if (changedItem.refreshTask.formId == 0) {
+    // Default-constructed FormTimer has formId -1; non-positive means no matching task was found.
+    if (changedItem.refreshTask.formId <= 0) {
         HILOG_ERROR("the updateAtTimer not exist");
         return false;
     }
@@ -328,6 +329,17 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
         || timerCfg.updateAtMin < Constants::MIN_TIME || timerCfg.updateAtMin > Constants::MAX_MINUTE) {
         HILOG_ERROR("invalid time");
         return false;
+    }
+    for (const auto &time : timerCfg.updateAtTimes) {
+        if (time.size() < TIME_MIN_SIZE) {
+            HILOG_ERROR("Insufficient length");
+            return false;
+        }
+        if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR
+            || time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
+            HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
+            return false;
+        }
     }
     UpdateAtItem changedItem;
 
@@ -426,7 +438,8 @@ bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &ti
         return false;
     }
 
-    if (targetItem.refreshTask.formId == 0) {
+    // Default-constructed FormTimer has formId -1; non-positive means no matching task was found.
+    if (targetItem.refreshTask.formId <= 0) {
         HILOG_ERROR("the updateAtTimer not exist");
         return false;
     }
@@ -875,7 +888,8 @@ bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicIte
 void FormTimerMgr::SetTimeSpeed(int32_t timeSpeed)
 {
     HILOG_INFO("set time speed to:%{public}d", timeSpeed);
-    timeSpeed_ = timeSpeed;
+    // Enforce documented range; zero or negative speed would cause divide-by-zero in timer calc.
+    timeSpeed_ = std::clamp(timeSpeed, Constants::MIN_TIME_SPEED, Constants::MAX_TIME_SPEED);
     HandleResetLimiter();
     ClearIntervalTimer();
     FormPeriodReport();
@@ -1616,8 +1630,10 @@ void FormTimerMgr::TimerReceiver::OnReceiveEvent(const EventFwk::CommonEventData
         } else if (type == Constants::TYPE_DYNAMIC_UPDATE) {
             int updateTimeLeft = want.GetIntParam(Constants::KEY_WAKEUP_TIME_LEFT, -1);
             int updateTimeRight = want.GetIntParam(Constants::KEY_WAKEUP_TIME_RIGHT, -1);
-            int64_t updateTime = static_cast<int64_t>(((static_cast<uint64_t>(updateTimeLeft) <<
-                SHIFT_BIT_LENGTH) | static_cast<uint64_t>(updateTimeRight)));
+            // Reassemble by bit pattern: uint32_t casts avoid sign extension of negative halves.
+            uint64_t wakeUpTimeLeft = static_cast<uint32_t>(updateTimeLeft);
+            uint64_t wakeUpTimeRight = static_cast<uint32_t>(updateTimeRight);
+            int64_t updateTime = static_cast<int64_t>((wakeUpTimeLeft << SHIFT_BIT_LENGTH) | wakeUpTimeRight);
             if (updateTime <= 0) {
                 HILOG_ERROR("invalid updateTime:%{public}" PRId64 "", updateTime);
                 return;
