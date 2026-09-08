@@ -854,7 +854,7 @@ ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, f
     float formViewScale)
 {
     HILOG_DEBUG("call");
-    if (width <= 0 || height <= 0 || borderWidth <= 0 || formViewScale <= 0) {
+    if (width <= 0 || height <= 0 || borderWidth < 0 || formViewScale <= 0) {
         HILOG_ERROR("invalid surface params");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
