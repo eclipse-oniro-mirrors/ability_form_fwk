@@ -87,7 +87,6 @@ constexpr const char *FORM_HOST_OVERFLOWINFO_DURATION = "duration";
 constexpr const char *FORM_HOST_OVERFLOWINFO_USEDEFAULTANIMATION = "useDefaultAnimation";
 constexpr const char *FORM_HOST_UPDATEFORMSIZE =
     "C{std.core.String}C{@ohos.app.form.formInfo.formInfo.FormDimension}C{@ohos.app.form.formInfo.formInfo.Rect}:";
-constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
 constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
 
 void CallBackReturn(const Rect &item, LiveFormInterfaceParam* liveFormInterfaceParam, bool ret)
@@ -918,19 +917,16 @@ ErrCode EtsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string,
 {
     HILOG_INFO("GetLiveFormStatus Call");
     std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
-    auto task = [dataParam] () {
-        EtsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
-        HILOG_INFO("getLiveFormStatus start notify.");
-        std::unique_lock<std::mutex> lock(dataParam->mutex);
-        dataParam->isReady = true;
-        dataParam->condition.notify_all();
-    };
-    if (AniTask::AniSendEvent(task) != ANI_OK) {
-        HILOG_ERROR("Failed to aniSendEvent");
+    auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
+    if (runner == nullptr) {
+        HILOG_ERROR("GetMainEventRunner returned nullptr");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    std::unique_lock<std::mutex> lock(dataParam->mutex);
-    dataParam->condition.wait_for(
-        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
+    std::shared_ptr<AppExecFwk::EventHandler> mainHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    std::function<void()> executeFunc = [dataParam]() {
+        EtsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
+    };
+    mainHandler->PostSyncTask(executeFunc, "EtsFormRouterProxyMgr::GetLiveFormStatus");
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
